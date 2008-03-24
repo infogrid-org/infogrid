@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This file is part of InfoGrid(tm). You may not use this file except in
+    compliance with the InfoGrid license. The InfoGrid license and important
+    disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+    have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+    or you do not consent to all aspects of the license and the disclaimers,
+    no license is granted; do not use this file.
+ 
+    For more information about InfoGrid go to http://infogrid.org/
+
+    Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+    All rights reserved.
+-->
+
+<!DOCTYPE model PUBLIC '-//InfoGrid.org//InfoGrid Model//EN' 'http://infogrid.org/dtds/model.dtd'>
+<model>
+    <subjectarea ID="org.infogrid.model.Probe">
+        <name>org.infogrid.model.Probe</name>
+        <username>Probe Subject Area</username>
+        <userdescription>Captures the information necessary for the management of Probes.</userdescription>
+
+        <entitytype ID="org.infogrid.model.Probe#ProbeUpdateSpecification">
+            <name>ProbeUpdateSpecification</name>
+            <username>A Probe's update specification</username>
+            <userdescription>A Home Object of a Probe is blessed with a subtype of this ProbeUpdateSpecification.
+              It expresses meta-data such as when the Probe was last run, when it should be run next etc.
+              Subtypes may implement different algorithms to determine the respective data.</userdescription>
+            <isabstract/>
+            <declaresMethod>
+    /**
+     * A successful run was just performed, but the data source did not change and no update was necessary.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     */
+    public abstract void performedSuccessfulRunNoChange(
+            long consumedTime )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException;
+            </declaresMethod>
+            <declaresMethod>
+    /**
+     * A successful run was just performed, the data source did change, and this is how long the run took.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     */
+    public abstract void performedSuccessfulRunWithChange(
+            long consumedTime )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException;
+            </declaresMethod>
+            <declaresMethod>
+    /**
+     * An attempt to run the Probe was unsuccessful, and no new data could be obtained because a problem occurred.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     * @param problem the Throwable that was thrown by the Probe, indicating the problem
+     */
+    public abstract void performedUnsuccessfulRun(
+            long      consumedTime,
+            Throwable problem )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException;
+            </declaresMethod>
+
+            <propertytype ID="org.infogrid.model.Probe#ProbeUpdateSpecification/NextProbeRun">
+                <name>NextProbeRun</name>
+                <username>Time of next Probe run</username>
+                <userdescription>The time at which to run this Probe next. If this is not given, this indicates
+                  &quot;never&quot;. If this is in the past, it means &quot;as soon as possible&quot;. This value
+                  is given in Java's System.currentTimeMillis() format.</userdescription>
+                <datatype>
+                    <IntegerDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.model.Probe#ProbeUpdateSpecification/LastProbeRun">
+                <name>LastProbeRun</name>
+                <username>Time the Probe was run last</username>
+                <userdescription>The time that the last Probe run was attempted (successful or unsuccessful).
+                  If this is not given, it means that the Probe was never run. This value
+                  is given in Java's System.currentTimeMillis() format.</userdescription>
+                <datatype>
+                    <IntegerDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.model.Probe#ProbeUpdateSpecification/ProbeRunCounter">
+                <name>ProbeRunCounter</name>
+                <username>Probe-run counter</username>
+                <userdescription>This value is incremented every time the Probe is run.</userdescription>
+                <datatype>
+                    <IntegerDataType/>
+                </datatype>
+                <defaultvalue>0</defaultvalue>
+            </propertytype>
+        </entitytype>
+
+        <entitytype ID="org.infogrid.model.Probe#OneTimeOnlyProbeUpdateSpecification">
+            <name>OneTimeOnlyProbeUpdateSpecification</name>
+            <username>A Probe's update specification that updates once only</username>
+            <supertype>org.infogrid.model.Probe#ProbeUpdateSpecification</supertype>
+
+            <implementsMethod><![CDATA[
+    /**
+     * A successful run was just performed, but the data source did not change and no update was necessary.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     */
+    public void performedSuccessfulRunNoChange(
+            long consumedTime )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException
+    {
+        long counter = ((IntegerValue) the_Delegate.getPropertyValue( PROBERUNCOUNTER )).value();
+        the_Delegate.setPropertyValue( PROBERUNCOUNTER, IntegerValue.create( ++counter ));
+
+        the_Delegate.setPropertyValue( NEXTPROBERUN, null ); // never again
+
+        if( log.isDebugEnabled() ) {
+            log.debug( this + "performedSuccessfulRunNoChange() changing ProbeRunCounter to " + counter + " )" );
+        }
+    }
+         ]]></implementsMethod>
+            <implementsMethod><![CDATA[
+    /**
+     * A successful run was just performed, the data source did change, and this is how long the run took.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     */
+    public void performedSuccessfulRunWithChange(
+            long consumedTime )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException
+    {
+        long counter = ((IntegerValue) the_Delegate.getPropertyValue( PROBERUNCOUNTER )).value();
+        the_Delegate.setPropertyValue( PROBERUNCOUNTER, IntegerValue.create( ++counter ));
+
+        the_Delegate.setPropertyValue( NEXTPROBERUN, null ); // never again
+
+        if( log.isDebugEnabled() ) {
+            log.debug( this + "performedSuccessfulRunWithChange( changing ProbeRunCounter to " + counter + " )" );
+        }
+     }
+         ]]></implementsMethod>
+            <implementsMethod><![CDATA[
+    /**
+     * An attempt to run the Probe was unsuccessful,  and no new data could be obtained because a problem occurred.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     * @param problem the Throwable that was thrown by the Probe, indicating the problem
+     */
+    public void performedUnsuccessfulRun(
+            long      consumedTime,
+            Throwable problem )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException
+    {
+        long counter = ((IntegerValue) the_Delegate.getPropertyValue( PROBERUNCOUNTER )).value();
+        the_Delegate.setPropertyValue( PROBERUNCOUNTER, IntegerValue.create( ++counter ));
+
+        the_Delegate.setPropertyValue( NEXTPROBERUN, null ); // never again
+
+        if( log.isDebugEnabled() ) {
+            log.debug( this + "performedUnsuccessfulRun( changing ProbeRunCounter to " + counter + " )" );
+        }
+    }
+         ]]></implementsMethod>
+        </entitytype>
+
+        <entitytype ID="org.infogrid.model.Probe#PeriodicProbeUpdateSpecification">
+            <name>PeriodicProbeUpdateSpecification</name>
+            <username>A Probe's update specification that updates periodically</username>
+            <supertype>org.infogrid.model.Probe#ProbeUpdateSpecification</supertype>
+
+            <implementsMethod><![CDATA[
+    /**
+     * A successful run was just performed, but the data source did not change and no update was necessary.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     */
+    public void performedSuccessfulRunNoChange(
+            long consumedTime )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException
+    {
+        long counter = ((IntegerValue) the_Delegate.getPropertyValue( PROBERUNCOUNTER )).value();
+        the_Delegate.setPropertyValue( PROBERUNCOUNTER, IntegerValue.create( ++counter ));
+        
+        long theDelay = ((IntegerValue) the_Delegate.getPropertyValue( DELAY )).value();
+        the_Delegate.setPropertyValue( NEXTPROBERUN, IntegerValue.create( System.currentTimeMillis() + theDelay ));
+
+        if( log.isDebugEnabled() ) {
+            log.debug( this + "performedSuccessfulRunNoChange( changing ProbeRunCounter to " + counter + " )" );
+        }
+    }
+         ]]></implementsMethod>
+            <implementsMethod><![CDATA[
+    /**
+     * A successful run was just performed, the data source did change, and this is how long the run took.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     */
+    public void performedSuccessfulRunWithChange(
+            long consumedTime )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException
+    {
+        long counter = ((IntegerValue) the_Delegate.getPropertyValue( PROBERUNCOUNTER )).value();
+        the_Delegate.setPropertyValue( PROBERUNCOUNTER, IntegerValue.create( ++counter ));
+        
+        long theDelay = ((IntegerValue) the_Delegate.getPropertyValue( DELAY )).value();
+        the_Delegate.setPropertyValue( NEXTPROBERUN, IntegerValue.create( System.currentTimeMillis() + theDelay ));
+
+        if( log.isDebugEnabled() ) {
+            log.debug( this + "performedSuccessfulRunWithChange( changing ProbeRunCounter to " + counter + " )" );
+        }
+    }
+         ]]></implementsMethod>
+            <implementsMethod><![CDATA[
+    /**
+     * An attempt to run the Probe was unsuccessful,  and no new data could be obtained because a problem occurred.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     * @param problem the Throwable that was thrown by the Probe, indicating the problem
+     */
+    public void performedUnsuccessfulRun(
+            long      consumedTime,
+            Throwable problem )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException
+    {
+        long counter = ((IntegerValue) the_Delegate.getPropertyValue( PROBERUNCOUNTER )).value();
+        the_Delegate.setPropertyValue( PROBERUNCOUNTER, IntegerValue.create( ++counter ));
+        
+        long theDelay = ((IntegerValue) the_Delegate.getPropertyValue( DELAY )).value();
+        the_Delegate.setPropertyValue( NEXTPROBERUN, IntegerValue.create( System.currentTimeMillis() + theDelay ));
+
+        if( log.isDebugEnabled() ) {
+            log.debug( this + "performedUnsuccessfulRun( changing ProbeRunCounter to " + counter + " )" );
+        }
+    }
+         ]]></implementsMethod>
+
+            <propertytype ID="org.infogrid.model.Probe#PeriodicProbeUpdateSpecification/Delay">
+                <name>Delay</name>
+                <username>Delay between Probe runs</username>
+                <userdescription>Delay between the end of a Probe run and the start of the next Probe run.</userdescription>
+                <datatype>
+                    <IntegerDataType/>
+                </datatype>
+                <defaultvalue>86400000</defaultvalue><!-- 1 day -->
+            </propertytype>
+        </entitytype>
+
+        <entitytype ID="org.infogrid.model.Probe#AdaptivePeriodicProbeUpdateSpecification">
+            <name>AdaptivePeriodicProbeUpdateSpecification</name>
+            <username>A Probe's update specification that updates periodically with an adaptive period</username>
+            <supertype>org.infogrid.model.Probe#ProbeUpdateSpecification</supertype>
+
+            <implementsMethod><![CDATA[
+    /**
+     * A successful run was just performed, but the data source did not change and no update was necessary.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     */
+    public void performedSuccessfulRunNoChange(
+            long consumedTime )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException
+    {
+        long counter = ((IntegerValue) the_Delegate.getPropertyValue( PROBERUNCOUNTER )).value();
+        the_Delegate.setPropertyValue( PROBERUNCOUNTER, IntegerValue.create( ++counter ));
+        
+        double theAdaptiveFactor = ((FloatValue)   the_Delegate.getPropertyValue( ADAPTIVEFACTOR )).value();
+        long   theCurrentDelay   = ((IntegerValue) the_Delegate.getPropertyValue( CURRENTDELAY )).value();
+
+        long newDelay = (long) ( theCurrentDelay * theAdaptiveFactor );
+
+        IntegerValue maxDelay = (IntegerValue) the_Delegate.getPropertyValue( MAXDELAY );
+        if( maxDelay != null ) {
+            newDelay = Math.min( newDelay, maxDelay.value() );
+        }
+        
+        the_Delegate.setPropertyValue( CURRENTDELAY, IntegerValue.create( newDelay ));
+        the_Delegate.setPropertyValue( NEXTPROBERUN, IntegerValue.create( System.currentTimeMillis() + newDelay ));
+
+        if( log.isDebugEnabled() ) {
+            log.debug( this + "performedSuccessfulRunNoChange( changing ProbeRunCounter to " + counter + " )" );
+        }
+    }
+         ]]></implementsMethod>
+            <implementsMethod><![CDATA[
+    /**
+     * A successful run was just performed, the data source did change, and this is how long the run took.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     */
+    public void performedSuccessfulRunWithChange(
+            long consumedTime )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException
+    {
+        long counter = ((IntegerValue) the_Delegate.getPropertyValue( PROBERUNCOUNTER )).value();
+        the_Delegate.setPropertyValue( PROBERUNCOUNTER, IntegerValue.create( ++counter ));
+        
+        PropertyValue theFallbackDelay = the_Delegate.getPropertyValue( FALLBACKDELAY );
+        the_Delegate.setPropertyValue( CURRENTDELAY, theFallbackDelay );
+        the_Delegate.setPropertyValue( NEXTPROBERUN, IntegerValue.create( System.currentTimeMillis() + ((IntegerValue)theFallbackDelay).value() ));
+
+        if( log.isDebugEnabled() ) {
+            log.debug( this + "performedSuccessfulRunWithChange( changing ProbeRunCounter to " + counter + " )" );
+        }
+    }
+         ]]></implementsMethod>
+            <implementsMethod><![CDATA[
+    /**
+     * An attempt to run the Probe was unsuccessful,  and no new data could be obtained because a problem occurred.
+     *
+     * @param consumedTime the time in milliseconds that the update took
+     * @param problem the Throwable that was thrown by the Probe, indicating the problem
+     */
+    public void performedUnsuccessfulRun(
+            long      consumedTime,
+            Throwable problem )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.meshbase.transaction.TransactionException
+    {
+        performedSuccessfulRunWithChange( consumedTime ); // simpler
+    }
+         ]]></implementsMethod>
+
+            <propertytype ID="org.infogrid.model.Probe#PeriodicProbeUpdateSpecification/CurrentDelay">
+                <name>CurrentDelay</name>
+                <username>Current delay between Probe runs</username>
+                <userdescription>The current delay between the end of a Probe run and the start of the next Probe run.
+            FIXME: this should use TimePeriodValue not IntegerValue.</userdescription>
+                <datatype>
+                    <IntegerDataType/>
+                </datatype>
+                <defaultvalue>3600000</defaultvalue><!-- one hour -->
+            </propertytype>
+
+            <propertytype ID="org.infogrid.model.Probe#PeriodicProbeUpdateSpecification/MaxDelay">
+                <name>MaxDelay</name>
+                <username>Maximum delay between Probe runs</username>
+                <userdescription>The maximum delay between the end of a Probe run and the start of the next Probe run.
+            FIXME: this should use TimePeriodValue not IntegerValue.</userdescription>
+                <datatype>
+                    <IntegerDataType/>
+                </datatype>
+                <isoptional/>
+                <defaultvalue>604800000</defaultvalue><!-- one week -->
+            </propertytype>
+
+            <propertytype ID="org.infogrid.model.Probe#PeriodicProbeUpdateSpecification/FallbackDelay">
+                <name>FallbackDelay</name>
+                <username>Fallback delay between Probe runs</username>
+                <userdescription>The fallback delay between the end of a Probe run and the start of the next Probe run.
+                  CurrentDelay is re-initialized to this value when a Probe run was unsuccessful, or data changed.
+             FIXME: this should use TimePeriodValue not IntegerValue.</userdescription>
+                <datatype>
+                    <IntegerDataType/>
+                </datatype>
+                <defaultvalue>600000</defaultvalue><!-- 10 minutes -->
+            </propertytype>
+
+            <propertytype ID="org.infogrid.model.Probe#PeriodicProbeUpdateSpecification/AdaptiveFactor">
+                <name>AdaptiveFactor</name>
+                <username>Adaptive Factor</username>
+                <userdescription>The factor by which the delay increases for each Probe run that was successful and did not
+                  produce changed data.</userdescription>
+                <datatype>
+                    <FloatDataType/>
+                </datatype>
+                <defaultvalue>1.1</defaultvalue>
+            </propertytype>
+        </entitytype>
+    </subjectarea>
+</model>
