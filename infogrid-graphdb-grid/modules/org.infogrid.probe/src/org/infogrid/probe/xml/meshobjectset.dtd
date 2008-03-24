@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : meshobjectset.dtd
+    Created on : February 11, 2007, 7:54 PM
+    Author     : jernst
+    Description:
+        Purpose of the document follows.
+
+    TODO define vocabulary identification data
+    PUBLIC ID  : -//vendor//vocabulary//EN
+    SYSTEM ID  : http://server/path/meshobjectset.dtd
+-->
+
+
+<!ELEMENT MeshObjectSet ( MeshObject* )>
+
+<!ELEMENT MeshObject ( ID MeshType* Property* Relationship* )>
+
+<!ELEMENT MeshType ( CDATA ) >
+
+<!ELEMENT BlobValue ( CDATA ) >
+
+<!ELEMENT Property ( BlobValue
+                     BooleanValue
+                     ColorValue
+                     EnumeratedValue
+                     ExtentValue
+                     IntegerValue
+                     FloatValue
+                     MultiplicityValue
+                     PointValue
+                     StringValue
+                     TimePeriodValue
+                     TimeStampValue
+                     null )>
+
+<!ELEMENT Relationship ( RoleType* ) >
+
+<!ELEMENT RoleType EMPTY>
+
+<!ELEMENT BooleanValue ( "TRUE | "FALSE ) >
+
+<!-- no ATTLIST for MeshObjectSet -->
+
+<!ATTLIST MeshObject timeCreated CDATA #REQUIRED
+                     timeUpdated CDATA #IMPLIED
+                     timeRead    CDATA #IMPLIED>
+
+<!ATTLIST BlobValue mime CDATA #IMPLIED
+                    url  CDATA #IMPLIED>
+
+<!ATTLIST ExtentValue width CDATA #REQUIRED
+                      height CDATA #REQUIRED>
+
+<!ATTLIST MultiplicityValue min CDATA #REQUIRED
+                            max CDATA #REQUIRED>
+
+<!ATTLIST PointValue x CDATA #REQUIRED
+                     y CDATA #REQUIRED>
+
+<!ATTLIST TimePeriodValue year CDATA #REQUIRED
+                          month CDATA #REQUIRED
+                          day CDATA #REQUIRED
+                          hour CDATA #REQUIRED
+                          minute CDATA #REQUIRED
+                          second CDATA #REQUIRED>
+
+<!ATTLIST TimeStampValue year CDATA #REQUIRED
+                          month CDATA #REQUIRED
+                          day CDATA #REQUIRED
+                          hour CDATA #REQUIRED
+                          minute CDATA #REQUIRED
+                          second CDATA #REQUIRED>
+                          
+<!-- no ATTLIST for MeshType -->  
