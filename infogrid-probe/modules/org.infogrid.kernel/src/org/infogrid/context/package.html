@@ -1,0 +1,35 @@
+<html>
+ <head>
+  <title>The org.infogrid.context package</title>
+ </head>
+ <body>
+  <p>Implements a light-weight mechanism for objects to find
+     basic application services.</p>
+  <p>Many application objects (but not MeshObjects) in InfoGrid implement the
+     {@link org.infogrid.context.ObjectInContext ObjectInContext} interface.
+     An <code>ObjectInContext</code> runs
+     in a <code>Context</code>, which collects a number of environment objects
+     which the <code>ObjectInContext</code> is likely going to need. In this respect,
+     it is not all that different from what traditional programming does with
+     environment variables. However, one can only have one set of environment
+     variables per application, but there can be an arbitrary number of
+     <code>Context</code>s per application, each of which may contain a different
+     set of application services.</p>
+  <p>A class implementing <code>ObjectInContext</code> is instantiated with a
+     {@link org.infogrid.context.Context Context}, which does not change
+     during the lifetime of the
+     <code>ObjectInContext</code>. The objects in the <code>Context</code> may
+     change, but not the <code>Context</code> itself.</p>
+  <p>A <code>Context</code> collects any number of objects, which generally are
+     being found through lookups based on their class or interface.</p>
+  <p>Contexts can be hierarchical, and we use this extensively. If a (child)
+     context does not have a requested object locally, it delegates the query
+     to its (parent) context.</p>
+  <p>Through configuration of which objects are added to which contexts, one can
+     easily configure large-scale changes to major InfoGrid subsystems with minimum
+     effort. Also, objects can gracefully offer only part of their functionality if
+     certain objects are not present in the environment.</p>
+  <p>The <code>SimpleContext</code> class provides a simple implementation
+     of the <code>Context</code> interface that is sufficient for most uses.</p>
+ </body>
+</html>

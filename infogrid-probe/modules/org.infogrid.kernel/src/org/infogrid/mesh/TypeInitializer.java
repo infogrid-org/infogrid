@@ -1,0 +1,89 @@
+//
+// This file is part of InfoGrid(tm). You may not use this file except in
+// compliance with the InfoGrid license. The InfoGrid license and important
+// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+// or you do not consent to all aspects of the license and the disclaimers,
+// no license is granted; do not use this file.
+// 
+// For more information about InfoGrid go to http://infogrid.org/
+//
+// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// All rights reserved.
+//
+
+package org.infogrid.mesh;
+
+import org.infogrid.model.primitives.EntityType;
+import org.infogrid.model.primitives.PropertyType;
+import org.infogrid.model.primitives.PropertyValue;
+
+import org.infogrid.meshbase.transaction.TransactionException;
+
+import java.lang.reflect.Method;
+
+/**
+ * Subclassable helper class to initialize a MeshObject when it is blessed with
+ * a new type.
+ */
+public class TypeInitializer
+{
+    /**
+     * Constructor.
+     *
+     * @param obj the MeshObject 
+     * @param type the type with which the MeshObject is being newly blessed.
+     */
+    protected TypeInitializer(
+            AbstractMeshObject obj,
+            EntityType         type )
+    {
+        theMeshObject = obj;
+        theType       = type;
+    }
+
+    /**
+     * Perform the initialization.
+     */
+    public void initialize(
+            long timeUpdated )
+    {
+        try {
+            Class  implClass = theMeshObject.getMeshBase().getMeshBaseLifecycleManager().getImplementationClass( theType );
+            Method initializer = implClass.getDeclaredMethod( "initializeDefaultValues", TypeInitializer.class, Long.TYPE );
+            initializer.invoke( null, this, timeUpdated );
+
+        } catch( Exception ex ) {
+            AbstractMeshObject.log.error( ex );
+        }
+    }
+    
+    /**
+     * Callback from the generated code. Subclasses may override this.
+     *
+     * @param propertyTypes the PropertyTypes of the MeshObject to change
+     * @param propertyValues the PropertyValues to set them to
+     * @param timeUpdate the time to use as update time
+     */
+    public void setPropertyValues(
+            PropertyType  [] propertyTypes,
+            PropertyValue [] propertyValues,
+            long             timeUpdated )
+        throws
+            NotPermittedException,
+            TransactionException
+    {
+        AbstractMeshObject realMeshObject = (AbstractMeshObject) theMeshObject;
+        realMeshObject.internalSetPropertyValues( propertyTypes, propertyValues, timeUpdated, false );
+    }
+
+    /**
+     * The MeshObject to be initialized.
+     */
+    protected AbstractMeshObject theMeshObject;
+
+    /**
+     * The type with which the MeshObject is to be initialized.
+     */
+    protected EntityType theType;
+}

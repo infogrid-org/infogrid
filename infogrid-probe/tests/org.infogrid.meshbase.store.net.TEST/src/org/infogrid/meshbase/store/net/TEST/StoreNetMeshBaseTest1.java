@@ -1,0 +1,319 @@
+//
+// This file is part of InfoGrid(tm). You may not use this file except in
+// compliance with the InfoGrid license. The InfoGrid license and important
+// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+// or you do not consent to all aspects of the license and the disclaimers,
+// no license is granted; do not use this file.
+// 
+// For more information about InfoGrid go to http://infogrid.org/
+//
+// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// All rights reserved.
+//
+
+package org.infogrid.meshbase.store.net.TEST;
+
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.meshbase.MeshBaseLifecycleManager;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.ProxyManager;
+import org.infogrid.meshbase.store.net.NetStoreMeshBase;
+import org.infogrid.meshbase.transaction.Transaction;
+import org.infogrid.model.Test.TestSubjectArea;
+import org.infogrid.model.primitives.StringValue;
+import org.infogrid.store.IterableStore;
+import org.infogrid.store.Store;
+import org.infogrid.store.StoreListener;
+import org.infogrid.store.StoreValue;
+import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.store.prefixing.PrefixingStore;
+import org.infogrid.util.logging.Log;
+
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+
+/**
+ * Makes sure we do the right number of writes and reads.
+ */
+public class StoreNetMeshBaseTest1
+        extends
+            AbstractStoreNetMeshBaseTest
+{
+    /**
+     * Run the test.
+     *
+     * @throws Exception thrown if an Exception occurred during the test
+     */
+    public void run()
+        throws
+            Exception
+    {
+        //
+
+        Store         meshObjectStore = PrefixingStore.create(         "mesh", theSqlStore );
+        IterableStore proxyStore      = IterablePrefixingStore.create( "proxy", theSqlStore );
+        
+        MyListener listener = new MyListener();
+        theSqlStore.addStoreListener( listener );
+
+        //
+
+        log.info( "Creating MeshBase" );
+
+        super.startClock();
+        long t1 = System.currentTimeMillis();
+
+        ProxyManager proxyManager = null;
+        
+        NetStoreMeshBase mb = NetStoreMeshBase.create(
+                theNetworkIdentifier,
+                theModelBase,
+                null,
+                meshObjectStore,
+                proxyStore,
+                null,
+                rootContext );
+
+        MeshBaseLifecycleManager life = mb.getMeshBaseLifecycleManager();
+
+        checkEquals( listener.thePuts.size(),    1, "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(), 0, "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),    2, "Wrong number of gets" ); // twice for a non-existing home object
+        checkEquals( listener.theDeletes.size(), 0, "Wrong number of deletes" );
+        listener.reset();
+
+        //
+
+        log.info( "Creating MeshObjects" );
+        
+        Transaction tx = mb.createTransactionNow();
+
+        MeshObject []           mesh  = new MeshObject[ theTestSize ];
+        MeshObjectIdentifier [] names = new MeshObjectIdentifier[ theTestSize ];
+        
+        int updateCount = 0;
+        for( int i=0 ; i<mesh.length ; ++i ) {
+            mesh[i] = life.createMeshObject();
+            
+            names[i] = mesh[i].getIdentifier();
+            
+            if( i % 3 == 1 ) {
+                mesh[i].bless( TestSubjectArea.AA );
+                ++updateCount;
+            } else if( i % 3 == 2 ) {
+                mesh[i].bless( TestSubjectArea.AA );
+                mesh[i].setPropertyValue( TestSubjectArea.A_X, StringValue.create( "Testing ... " + i ));
+                ++updateCount;
+            }
+        }
+
+        tx.commitTransaction();
+
+        checkEquals( listener.thePuts.size(),    theTestSize, "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(), updateCount, "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),    theTestSize, "Wrong number of gets" );
+        checkEquals( listener.theDeletes.size(), 0,           "Wrong number of deletes" );
+        listener.reset();
+
+        //
+        
+        log.info( "Clearing cache, and loading MeshObjects again" );
+        
+        mesh = new MeshObject[ names.length ]; // forget old references
+        mb.clearMemoryCache();
+
+        for( int i=0 ; i<names.length ; ++i ) {
+            mesh[i] = mb.findMeshObjectByIdentifier( names[i] );
+            
+            checkObject( mesh[i], "Could not retrieve MeshObject with Identifier " + names[i] );
+        }
+
+        checkEquals( listener.thePuts.size(),    0,            "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(), 0,            "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),    names.length, "Wrong number of gets" );
+        checkEquals( listener.theDeletes.size(), 0,            "Wrong number of deletes" );
+        listener.reset();
+    }
+
+    /**
+     * Main program.
+     *
+     * @param args command-line arguments
+     */
+    public static void main(
+            String [] args )
+    {
+        StoreNetMeshBaseTest1 test = null;
+        try {
+            if( args.length < 1 ) {
+                System.err.println( "Synopsis: <test size>" );
+                System.err.println( "aborting ..." );
+                System.exit( 1 );
+            }
+
+            test = new StoreNetMeshBaseTest1( args );
+            test.run();
+
+        } catch( Throwable ex ) {
+            log.error( ex );
+            System.exit(1);
+        }
+        if( test != null ) {
+            test.cleanup();
+        }
+        if( errorCount == 0 ) {
+            log.info( "PASS" );
+        } else {
+            log.info( "FAIL (" + errorCount + " errors)" );
+        }
+        System.exit( errorCount );
+    }
+
+    /**
+      * Constructor.
+      *
+      * @param args command-line arguments
+      */
+    public StoreNetMeshBaseTest1(
+            String [] args )
+        throws
+            Exception
+    {
+        super( StoreNetMeshBaseTest1.class );
+
+        theTestSize = Integer.parseInt( args[0] );
+
+        log.info( "Deleting old database and creating new database" );
+        
+        theSqlStore.deleteStore();
+        theSqlStore.initialize();        
+    }
+
+    /**
+     * The number of MeshObjects to create for the test.
+     */
+    protected int theTestSize;
+
+    // Our Logger
+    private static Log log = Log.getLogInstance( StoreNetMeshBaseTest1.class );
+    
+    /**
+     * The NetMeshBaseIdentifier for the NetMeshBase.
+     */
+    protected static NetMeshBaseIdentifier theNetworkIdentifier;
+    static {
+        NetMeshBaseIdentifier id;
+        try {
+            id = NetMeshBaseIdentifier.createUnresolvable( "someprotocol://i.am.here" );
+
+        } catch( URISyntaxException ex ) {
+            log.error( ex );
+            id = null;
+        }
+        
+        theNetworkIdentifier = id;
+    }
+
+    /**
+     * Test listener.
+     */
+    static class MyListener
+            implements
+                StoreListener
+    {
+        /**
+         * A put operation was performed. This indicates either a
+         * <code>Store.put</code> or a <code>Store.putOrUpdate</code> operation
+         * in which an actual <code>put</code> was performed.
+         *
+         * @param store the Store that emitted this event
+         * @param key the key with which the data element was stored
+         * @param value the StoreValue that was put
+         */
+        public void putPerformed(
+                Store      store,
+                String     key,
+                StoreValue value )
+        {
+            thePuts.add( key );
+        }
+
+        /**
+         * An update operation was performed. This indicates either a
+         * <code>Store.update</code> or a <code>Store.putOrUpdate</code> operation
+         * in which an actual <code>update</code> was performed.
+         *
+         * @param store the Store that emitted this event
+         * @param key the key with which the data element was stored
+         * @param value the StoreValue that was updated
+         */
+        public void updatePerformed(
+                Store      store,
+                String     key,
+                StoreValue value )
+        {
+            theUpdates.add( key );
+        }
+
+        /**
+         * A get operation was performed.
+         *
+         * @param store the Store that emitted this event
+         * @param key the key with which the data element was stored
+         * @param value the StoreValue that was obtained
+         */
+        public void getPerformed(
+                Store      store,
+                String     key,
+                StoreValue value )
+        {            
+            theGets.add( key );
+        }                
+
+        /**
+         * A delete operation was performed.
+         *
+         * @param store the Store that emitted this event
+         * @param key the key with which the data element was stored
+         */
+        public void deletePerformed(
+                Store  store,
+                String key )
+        {
+            theDeletes.add( key );
+        }
+
+        /**
+         * A delete-all operation was performed.
+         *
+         * @param store the Store that emitted this event
+         * @param prefix if given, indicates the prefix of all keys that were deleted. If null, indicates &quot;all&quot;.
+         */
+        public void deleteAllPerformed(
+                Store  store,
+                String prefix )
+        {
+            theAllDeletes.add( prefix );
+        }
+
+        /**
+         * Reset the listener.
+         */
+        public void reset()
+        {
+            thePuts.clear();
+            theUpdates.clear();
+            theGets.clear();
+            theDeletes.clear();
+            theAllDeletes.clear();
+        }
+
+        protected ArrayList<String> thePuts         = new ArrayList<String>();
+        protected ArrayList<String> theUpdates      = new ArrayList<String>();
+        protected ArrayList<String> theGets         = new ArrayList<String>();
+        protected ArrayList<String> theDeletes      = new ArrayList<String>();
+        protected ArrayList<String> theAllDeletes = new ArrayList<String>();
+    }
+}
