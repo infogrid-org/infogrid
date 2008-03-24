@@ -1,0 +1,232 @@
+//
+// This file is part of InfoGrid(tm). You may not use this file except in
+// compliance with the InfoGrid license. The InfoGrid license and important
+// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+// or you do not consent to all aspects of the license and the disclaimers,
+// no license is granted; do not use this file.
+// 
+// For more information about InfoGrid go to http://infogrid.org/
+//
+// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// All rights reserved.
+//
+
+package org.infogrid.codegen;
+
+import org.infogrid.codegen.impl.ImplementationGenerator;
+import org.infogrid.codegen.intfc.InterfaceGenerator;
+import org.infogrid.codegen.modelloader.ModelLoaderGenerator;
+
+import org.infogrid.model.primitives.SubjectArea;
+
+import org.infogrid.module.ModelModule;
+import org.infogrid.module.Module;
+import org.infogrid.module.ModuleActivationException;
+import org.infogrid.module.ModuleActivator;
+import org.infogrid.module.ModuleAdvertisement;
+import org.infogrid.module.ModuleRegistry;
+import org.infogrid.module.ModuleRequirement;
+
+import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.logging.Log;
+import org.infogrid.util.logging.log4j.Log4jLog;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+
+/**
+ * The InfoGrid code generator.
+ */
+public class CodeGenerator
+{
+    private static final Log log = Log.getLogInstance( CodeGenerator.class );
+
+    /**
+     * Main program for the code generator.
+     *
+     * @param args command-line arguments
+     * @throws Exception things may go wrong, and there is no error handling on the top
+     */
+    public static void main(
+            String [] args )
+        throws
+            Exception
+    {
+        ArrayList<String> subjectAreas = new ArrayList<String>();
+        File              outputDir    = null;
+        boolean           isOutput     = false;
+
+        for( int i=0 ; i<args.length ; ++i ) {
+            if( "-o".equals( args[i] )) {
+                isOutput = true;
+            } else if( isOutput ) {
+                if( outputDir != null ) {
+                    usageAndQuit();
+                } else {
+                    outputDir = new File( args[i] );
+                    if( !outputDir.exists() || !outputDir.canRead() ) {
+                        outputDir.mkdirs();
+                    }
+                    if( !outputDir.exists() || !outputDir.canRead() ) {
+                        usageAndQuit();
+                    }
+                }
+            } else {
+                subjectAreas.add( args[i] );
+            }
+        }
+        if( outputDir == null ) {
+            usageAndQuit();
+        }
+
+        String nameOfLog4jConfigFile = "org/infogrid/codegen/Log.properties";
+        try {
+            Properties logProperties = new Properties();
+            logProperties.load( new BufferedInputStream(
+                    CodeGenerator.class.getClassLoader().getResourceAsStream( nameOfLog4jConfigFile )));
+
+            Log4jLog.configure( logProperties );
+            // which logger is being used is defined in the module dependency declaration through parameters
+
+        } catch( Exception ex ) {
+            System.err.println( "Unexpected Exception attempting to load " + nameOfLog4jConfigFile );
+            ex.printStackTrace( System.err );
+        }
+
+        ResourceHelper.initializeLogging();
+
+        
+        final String intfcName = "org.infogrid.modelbase.ModelBase";
+        ModuleAdvertisement [] advs = theModuleRegistry.findAdvertisementsForInterface( intfcName, 1 );
+        if( advs == null || advs.length == 0 ) {
+            log.error( "Cannot find a Module that supports interface " + intfcName );
+            System.exit( 0 );
+        }
+        Module modelBaseModule = theModuleRegistry.resolve( advs[0], true );
+
+        Object base = modelBaseModule.activateRecursively();
+
+        CodeGenerator generator         = new CodeGenerator( outputDir );
+        List<File>    moduleDirectories = theModuleRegistry.getSoftwareInstallation().getInstallModuleDirectories();
+
+        Iterator<String> iter = subjectAreas.iterator();
+        while( iter.hasNext() ) {
+            String saName    = iter.next();
+            String saVersion = "1_0";
+
+            ModuleRequirement      saRequirement = ModuleRequirement.create1( saName, saVersion );
+            ModuleAdvertisement [] saCandidates  = theModuleRegistry.determineResolutionCandidates( saRequirement );
+
+            if( saCandidates == null || saCandidates.length == 0 ) {
+                Iterator<ModuleAdvertisement> iter2 = theModuleRegistry.advertisementIterator();
+                StringBuffer buf = new StringBuffer();
+                buf.append( "ModuleRegistry contains:\n" );
+                while( iter2.hasNext() ) {
+                    ModuleAdvertisement current = iter2.next();
+                    buf.append( "    Name: '" ).append( current.getModuleName() ).append( "', version: '" ).append( current.getModuleVersion() ) .append( "'\n" );
+                }
+                throw new ModuleActivationException(
+                        null,
+                        "Cannot find ModuleAdvertisement for subject area " + saName + " in version " + saVersion + ", " + buf.toString() );
+            }
+            if( saCandidates.length > 1 ) {
+                log.warn( "Resolution of subject area " + saName + " in version " + saVersion + " not unique, has " + saCandidates.length + " solutions" );
+            }
+
+            ModelModule saModule = (ModelModule) theModuleRegistry.resolve( saCandidates[0], true );
+
+            ModuleActivator activator = new CodeGeneratorModelModuleActivator(
+                    saModule,
+                    saName,
+                    saVersion,
+                    moduleDirectories );
+
+            SubjectArea [] sas = (SubjectArea []) saModule.activateRecursively( activator );
+
+            if( sas == null || sas.length == 0 ) {
+                log.error( "Could not obtain SubjectArea '" + saName + "', version '" + saVersion + "'" );
+                System.exit( 0 );
+            }
+            generator.generateForAll( sas );
+        }
+    }
+
+    /**
+     * The Module Framework's BootLoader activates this Module by calling this method.
+     *
+     * @param dependentModules the Modules that this Module depends on, if any
+     * @param dependentContextObjects the context objects of the Modules that this Module depends on, if any, in same sequence as dependentModules
+     * @param thisModule reference to the Module that is currently being initialized and to which we belong
+     * @return a context object that is Module-specific, or null if none
+     * @throws Exception may an Exception indicating that the Module could not be activated
+     */
+    public static Object activate(
+            Module [] dependentModules,
+            Object [] dependentContextObjects,
+            Module    thisModule )
+        throws
+            Exception
+    {
+        theModuleRegistry = thisModule.getModuleRegistry();
+        
+        return null;
+    }
+
+    /**
+     * Print usage information and quit.
+     */
+    private static void usageAndQuit()
+    {
+        System.err.println( "Usage:" );
+        System.err.println( "    java " + CodeGenerator.class.getName() + " <subjectArea> ... -o <outputDir>" );
+        System.exit( 0 );
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param outputDir the output directory
+     */
+    public CodeGenerator(
+            File outputDir )
+    {
+        theOutputDirectory = outputDir;
+    }
+    
+    /**
+     * Generate the code for one SubjectArea.
+     *
+     * @param sas the SubjectArea
+     * @throws IOException thrown if an I/O error occurred
+     */
+    public void generateForAll(
+            SubjectArea [] sas )
+        throws
+            IOException
+    {
+        InterfaceGenerator theInterfaceGenerator = new InterfaceGenerator( theOutputDirectory );
+        theInterfaceGenerator.generateForAll( sas );
+
+        ImplementationGenerator theImplementationGenerator = new ImplementationGenerator( theOutputDirectory );
+        theImplementationGenerator.generateForAll( sas );
+
+        ModelLoaderGenerator theLoaderGenerator = new ModelLoaderGenerator( theOutputDirectory );
+        theLoaderGenerator.generateForAll( sas );
+    }
+
+    /**
+     * The ModuleRegistry.
+     */
+    protected static ModuleRegistry theModuleRegistry;
+    
+    /**
+     * The output directory for generated artifacts.
+     */
+    protected File theOutputDirectory;
+}

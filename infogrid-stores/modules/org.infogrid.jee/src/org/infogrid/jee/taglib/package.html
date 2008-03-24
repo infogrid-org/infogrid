@@ -1,0 +1,46 @@
+<html>
+ <head>
+  <title>org.infogrid.jee.taglib</title>
+ </head>
+ <body>
+  <p>Tag libraries and utility classes for custom JSP tags that are InfoGrid-aware. Sub-packages
+     contain specific tag libraries.</p>
+  <p>The following tag libraries are available:</p>
+  <dl>
+   <dt>{@link org.infogrid.jee.taglib.candy}</dt>
+   <dd>Eye candy, such as tabs with rounded corners.</dd>
+   <dt>{@link org.infogrid.jee.taglib.logic}</dt>
+   <dd>Tags evaluating logic conditions, such as conditionals based on <code>PropertyValues</code></dd>
+   <dt>{@link org.infogrid.jee.taglib.mesh}</dt>
+   <dd>Tags that render <code>MeshObjects</code> and their characteristics in a variety of ways, such
+           as showing the time the <code>MeshObject</code> was last updated, or the set of roles in which it currently
+       participates.</dd>
+   <dt>{@link org.infogrid.jee.taglib.mesh.set}</dt>
+   <dd>Tags that render <code>MeshObjectSets</code> (i.e. sets of MeshObjects)</dd>
+  </dl>
+  <p>All InfoGrid tag libraries following these conventions for the attributes on the tag in the HTML:</p>
+  <table class="infogrid-border">
+   <thead>
+    <tr>
+     <td>Attribute name</td>
+     <td>Meaning</td>
+    </tr>
+   </thead>
+   <tbody>
+    <tr>
+     <td><i>xxx</i><code>Name</code></td>
+     <td>Name of a Bean in the page (or other) context, where <i>xxx</i> indicates the semantics of the Bean.</td>
+    </tr>
+    <tr>
+     <td><code>name</code></td>
+     <td>Name of a Bean that is the primary subject of the tag.</td>
+    </tr>
+    <tr>
+     <td><i>xxx</i><code>LoopVar</code></td>
+     <td>Name of the Bean created as the loop variable in a tag that may iterate over its body, where <i>xxx</i>
+         indicates the semantics of the Bean.</td>
+    </tr>
+   </tbody>
+  </table>
+ </body>
+</html>
