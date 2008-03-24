@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This file is part of InfoGrid(tm). You may not use this file except in
+    compliance with the InfoGrid license. The InfoGrid license and important
+    disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+    have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+    or you do not consent to all aspects of the license and the disclaimers,
+    no license is granted; do not use this file.
+ 
+    For more information about InfoGrid go to http://infogrid.org/
+
+    Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+    All rights reserved.
+-->
+
+<!DOCTYPE model PUBLIC '-//InfoGrid.org//InfoGrid Model//EN' 'http://infogrid.org/dtds/model.dtd'>
+<model>
+    <subjectarea ID="org.infogrid.model.Test">
+        <name>org.infogrid.model.Test</name>
+        <username>Test Subject Area</username>
+        <userdescription>The Test Subject Area is only used to test InfoGrid code.</userdescription>
+
+        <entitytype ID="org.infogrid.model.Test#A">
+            <name>A</name>
+            <username>The A EntityType</username>
+            <userdescription>This EntityType is a test EntityType.</userdescription>
+            <isabstract/>
+            <maybeusedasforwardreference/>
+
+            <propertytype ID="org.infogrid.model.Test#A/X">
+                <name>X</name>
+                <username>The X PropertyType of the A EntityType</username>
+                <userdescription>A property.</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.model.Test#A/XX">
+                <name>XX</name>
+                <username>The XX PropertyType of the A EntityType</username>
+                <userdescription>A property.</userdescription>
+                <datatype>
+                    <BlobDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+        </entitytype>
+
+        <entitytype ID="org.infogrid.model.Test#AA">
+            <name>AA</name>
+            <username>The AA EntityType</username>
+            <userdescription>This EntityType is a test EntityType.</userdescription>
+            <supertype>org.infogrid.model.Test#A</supertype>
+            <propertytype ID="org.infogrid.model.Test#AA/Y">
+                <name>Y</name>
+                <username>The Y PropertyType of the A EntityType</username>
+                <userdescription>A property.</userdescription>
+                <datatype>
+                    <FloatDataType/>
+                </datatype>
+                <isoptional/>
+                <defaultvalue>12.34</defaultvalue>
+            </propertytype>
+        </entitytype>
+        
+        <entitytype ID="org.infogrid.model.Test#B">
+            <name>B</name>
+            <username>The B EntityType</username>
+            <userdescription>This EntityType is a test EntityType.</userdescription>
+            
+            <propertytype ID="org.infogrid.model.Test#B/Z">
+                <name>Z</name>
+                <username>The Z PropertyType of the B EntityType</username>
+                <userdescription>A property.</userdescription>
+                <datatype>
+                    <EnumeratedDataType>
+                        <enum>
+                            <name>Value1</name>
+                            <username>First value of Z</username>
+                        </enum>
+                        <enum>
+                            <name>Value2</name>
+                            <username>Second value of Z</username>
+                        </enum>
+                        <enum>
+                            <name>Value3</name>
+                            <username>Third value of Z</username>
+                        </enum>
+                    </EnumeratedDataType>
+                </datatype>
+                <defaultvalue>Value2</defaultvalue>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.model.Test#A/U">
+                <name>U</name>
+                <username>The U PropertyType of the B EntityType</username>
+                <userdescription>A property.</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+        </entitytype>
+
+        <entitytype ID="org.infogrid.model.Test#C">
+            <name>C</name>
+        </entitytype>
+        <entitytype ID="org.infogrid.model.Test#D">
+            <name>D</name>
+            <supertype>org.infogrid.model.Test#C</supertype>
+        </entitytype>
+        
+        <entitytype ID="org.infogrid.model.Test#PropertyTest">
+            <name>PropertyTest</name>
+            <userdescription>Holds properties of all InfoGrid PropertyTypes.</userdescription>
+            
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataBlobDataType">
+                <name>WhataBlobDataType</name>
+                <datatype>
+                    <BlobDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataBooleanDataType">
+                <name>WhataBooleanDataType</name>
+                <datatype>
+                    <BooleanDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataColorDataType">
+                <name>WhataColorDataType</name>
+                <datatype>
+                    <ColorDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataEnumeratedDataType">
+                <name>WhataEnumeratedDataType</name>
+                <datatype>
+                    <EnumeratedDataType>
+                        <enum>
+                            <name>Value1</name>
+                            <username>First value of Z</username>
+                        </enum>
+                        <enum>
+                            <name>Value2</name>
+                            <username>Second value of Z</username>
+                        </enum>
+                        <enum>
+                            <name>Value3</name>
+                            <username>Third value of Z</username>
+                        </enum>                        
+                    </EnumeratedDataType>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataExtentDataType">
+                <name>WhataExtentDataType</name>
+                <datatype>
+                    <ExtentDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataFloatDataType">
+                <name>WhataFloatDataType</name>
+                <datatype>
+                    <FloatDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataIntegerDataType">
+                <name>WhataIntegerDataType</name>
+                <datatype>
+                    <IntegerDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataMultiplicityDataType">
+                <name>WhataMultiplicityDataType</name>
+                <datatype>
+                    <MultiplicityDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataPointDataType">
+                <name>WhataPointDataType</name>
+                <datatype>
+                    <PointDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataStringDataType">
+                <name>WhataStringDataType</name>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataTimePeriodDataType">
+                <name>WhataTimePeriodDataType</name>
+                <datatype>
+                    <TimePeriodDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+            <propertytype ID="org.infogrid.model.Test#PropertyTest/WhataTimeStampDataType">
+                <name>WhataTimeStampDataType</name>
+                <datatype>
+                    <TimeStampDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
+        </entitytype>
+
+        <relationshiptype ID="org.infogrid.model.Test#R">
+            <name>R</name>
+            <username>The R RelationshipType</username>
+            <userdescription>This RelationshipType is a test RelationshipType.</userdescription>
+            <src>
+              <e>org.infogrid.model.Test#A</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.model.Test#B</e>
+              <MultiplicityValue>0:1</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.model.Test#RR">
+            <name>RR</name>
+            <username>The RR RelationshipType</username>
+            <userdescription>This RelationshipType is a test RelationshipType.</userdescription>
+            
+            <src>
+              <e>org.infogrid.model.Test#AA</e>
+              <refines>org.infogrid.model.Test#R-S</refines>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.model.Test#B</e>
+              <refines>org.infogrid.model.Test#R-D</refines>
+              <MultiplicityValue>0:1</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.model.Test#S">
+            <name>S</name>
+            <username>The S RelationshipType</username>
+            <userdescription>This RelationshipType is a test RelationshipType.</userdescription>
+            <src>
+              <e>org.infogrid.model.Test#A</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.model.Test#B</e>
+              <MultiplicityValue>0:1</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.model.Test#AR1A">
+            <name>AR1A</name>
+            <username>The AR1A RelationshipType</username>
+            <userdescription>This RelationshipType is a test RelationshipType.</userdescription>
+            <src>
+              <e>org.infogrid.model.Test#A</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.model.Test#A</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.model.Test#AR2A">
+            <name>AR2A</name>
+            <username>The AR2A RelationshipType</username>
+            <userdescription>This RelationshipType is a test RelationshipType.</userdescription>
+            <src>
+              <e>org.infogrid.model.Test#A</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.model.Test#A</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.model.Test#ARAny">
+            <name>ARAny</name>
+            <username>The ARAny RelationshipType</username>
+            <userdescription>This RelationshipType is a test RelationshipType.</userdescription>
+            <src>
+              <e>org.infogrid.model.Test#A</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+    </subjectarea>
+</model>

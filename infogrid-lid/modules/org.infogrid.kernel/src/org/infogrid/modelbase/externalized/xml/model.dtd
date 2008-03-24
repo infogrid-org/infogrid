@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+//
+// THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL NETMESH INC. BE LIABLE FOR ANY DIRECT,
+// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+// OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// The use of this software is governed by a license agreement that
+// is contained in the package that you downloaded.
+//
+// $Date$
+// -->
+
+<!-- DTD for the InfoGrid Model XML format -->
+
+<!ELEMENT model       ( subjectarea+ )>
+<!ELEMENT subjectarea ( name, username*, userdescription*, version?, dependson?, codegen?, ( entitytype | relationshiptype)+ )>
+<!ELEMENT dependson   ( ( modulerequirement | subjectareareference )+ )>
+<!ELEMENT subjectareareference       ( name, minversion? )>
+<!ELEMENT modulerequirement          ( name, minversion? )>
+<!ELEMENT entitytype                 ( name, username*, userdescription*, icon?, supertype+, overridecode?, isabstract?, issignificant?, forwardreference?, codegen?, ( propertytype | projectedpropertytype | propertytypegroup )* )>
+<!ELEMENT relationshiptype           ( name, username*, userdescription*, (( src, dest ) | srcdest ), isabstract?, codegen?, propertytype* )>
+<!ELEMENT propertytype               ( name, username*, userdescription*, tooverride*, datatype, defaultvalue?, isoptional?, isreadonly?, codegen?, sequencenumber? )>
+<!ELEMENT projectedpropertytype      ( name, username*, userdescription*, tooverride*, datatype, defaultvalue?, isoptional?, isreadonly?, inputpropertyspecification*, projectioncode?, codegen?, sequencenumber? )>
+<!ELEMENT propertytypegroup          ( name, username*, userdescription*, propertytypegroupmember+, sequencenumber? )>
+<!ELEMENT propertytypegroupmember    EMPTY>
+<!ELEMENT inputpropertyspecification ( traversalspecification?, propertytypereference* )>
+<!ELEMENT traversalspecification     ( sequentialtraversalspecification | selectivetraversalspecification | roletypereference )>
+<!ELEMENT sequentialtraversalspecification ( traversalspecification+ )>
+<!ELEMENT selectivetraversalspecification  ( traversalspecification, meshobjectselector )>
+<!ELEMENT meshobjectselector         ( bytypemeshobjectselector )>
+<!ELEMENT bytypemeshobjectselector   EMPTY>
+<!ELEMENT propertytypereference      EMPTY>
+<!ELEMENT roletypereference          EMPTY>
+
+<!ELEMENT name             (#PCDATA)>
+<!ELEMENT minversion       (#PCDATA)>
+<!ELEMENT version          (#PCDATA)>
+<!ELEMENT username         (#PCDATA)>
+<!ELEMENT userdescription  (#PCDATA)>
+<!ELEMENT supertype        (#PCDATA)>
+<!ELEMENT overridecode     (#PCDATA)>
+<!ELEMENT projectioncode   (#PCDATA)>
+<!ELEMENT isabstract       EMPTY>
+<!ELEMENT isoptional       EMPTY>
+<!ELEMENT isreadonly       EMPTY>
+<!ELEMENT issignificant    EMPTY>
+<!ELEMENT forwardreference EMPTY>
+<!ELEMENT codegen          EMPTY>
+<!ELEMENT datatype         ( BlobDataType | BooleanDataType | ColorDataType | EnumeratedDataType | ExtentDataType | FloatDataType | IntegerDataType | MultiplicityDataType | PointDataType | StringDataType | TimePeriodDataType | TimeStampDataType )>
+<!ELEMENT defaultvalue     (#PCDATA)>
+<!ELEMENT src              ( username*, e, refines+, MultiplicityValue, constraint+ )>
+<!ELEMENT dest             ( username*, e, refines+, MultiplicityValue, constraint+ )>
+<!ELEMENT srcdest          ( username*, e, refines*, top?, MultiplicityValue, constraint+ )>
+<!ELEMENT e                (#PCDATA)>
+<!ELEMENT refines          (#PCDATA)>
+<!ELEMENT top              (#PCDATA)>
+<!ELEMENT constraint       (#PCDATA)>
+<!ELEMENT tooverride       (#PCDATA)>
+<!ELEMENT sequencenumber   (#PCDATA)>
+<!ELEMENT icon             EMPTY>
+
+<!ELEMENT BlobDataType         EMPTY>
+<!ELEMENT BooleanDataType      EMPTY>
+<!ELEMENT ColorDataType        EMPTY>
+<!ELEMENT EnumeratedDataType   ( enum+ )>
+<!ELEMENT ExtentDataType       EMPTY>
+<!ELEMENT FloatDataType        EMPTY>
+<!ELEMENT IntegerDataType      EMPTY>
+<!ELEMENT MultiplicityDataType EMPTY>
+<!ELEMENT PointDataType        EMPTY>
+<!ELEMENT StringDataType       EMPTY>
+<!ELEMENT TimePeriodDataType   EMPTY>
+<!ELEMENT TimeStampDataType    EMPTY>
+
+<!ELEMENT MultiplicityValue (#PCDATA)>
+
+<!ELEMENT enum ( name, username*, userdescription* )>
+
+<!ATTLIST subjectarea
+    ID ID #IMPLIED
+>
+<!ATTLIST entitytype
+    ID ID #IMPLIED
+>
+<!ATTLIST securityentitytype
+    ID ID #IMPLIED
+>
+<!ATTLIST relationshiptype
+    ID ID #IMPLIED
+>
+<!ATTLIST propertytype
+    ID ID #IMPLIED
+>
+<!ATTLIST projectedpropertytype
+    ID ID #IMPLIED
+>
+<!ATTLIST propertytypegroup
+    ID ID #IMPLIED
+>
+<!ATTLIST propertytypegroupmember
+    ID ID #IMPLIED
+>
+<!ATTLIST supertype
+    root         CDATA #IMPLIED
+>
+<!ATTLIST username
+    locale       CDATA #IMPLIED
+>
+<!ATTLIST userdescription
+    locale       CDATA #IMPLIED
+>
+<!ATTLIST icon
+    path         CDATA #IMPLIED
+>
+<!ATTLIST defaultvalue
+    code         CDATA #IMPLIED
+>
+<!ATTLIST codegen
+    interface      CDATA #IMPLIED
+    implementation CDATA #IMPLIED
+>
+
+<!ATTLIST bytypemeshobjectselector
+    ID             ID    #IMPLIED
+    subtypeallowed CDATA #IMPLIED
+>
+<!ATTLIST propertytypereference
+    ID             ID    #IMPLIED
+>
+<!ATTLIST roletypereference
+    ID             ID    #IMPLIED
+>
+
+<!ATTLIST BlobDataType
+    default CDATA #IMPLIED
+>
+<!ATTLIST FloatDataType
+    default CDATA #IMPLIED
+>
+<!ATTLIST IntegerDataType
+    default CDATA #IMPLIED
+>
