@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This file is part of InfoGrid(tm). You may not use this file except in
+    compliance with the InfoGrid license. The InfoGrid license and important
+    disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+    have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+    or you do not consent to all aspects of the license and the disclaimers,
+    no license is granted; do not use this file.
+ 
+    For more information about InfoGrid go to http://infogrid.org/
+
+    Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+    All rights reserved.
+-->
+
+<!DOCTYPE model PUBLIC '-//InfoGrid.org//InfoGrid Model//EN' 'http://infogrid.org/dtds/model.dtd'>
+<model>
+    <subjectarea ID="org.infogrid.lid.yadis">
+        <name>org.infogrid.lid.yadis</name>
+        <username>Yadis Subject Area</username>
+        <userdescription>This Subject Area covers the concepts defined by the Yadis protocol.</userdescription>
+
+        <entitytype ID="org.infogrid.lid.yadis#Site">
+            <name>Site</name>
+            <username>Site</username>
+            <userdescription>Essentially a URI.</userdescription>
+<!--
+            <propertytype ID="org.infogrid.lid.yadis#Site/URI">
+                <name>URI</name>
+                <username>URI</username>
+                <userdescription>The URI of this site.</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+-->
+        </entitytype>
+
+        <entitytype ID="org.infogrid.lid.yadis#Service">
+            <name>Service</name>
+            <username>Yadis Service</username>
+            <userdescription>This represents a Yadis Service. The concept of a ServiceType is
+              expressed by subclasses of this EntityType.</userdescription>
+            
+            <propertytype ID="org.infogrid.lid.yadis#Service/Priority">
+                <name>Priority</name>
+                <username>Priority</username>
+                <userdescription>Priority of this Service.</userdescription>
+                <datatype>
+                    <IntegerDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+        </entitytype>
+        
+        <relationshiptype ID="org.infogrid.lid.yadis#Site_MakesUseOf_Service">
+            <name>Site_MakesUseOf_Service</name>
+            <username>makes use of</username>
+            <userdescription>This relates a MeshObject to the Yadis Services that it makes use of.</userdescription>
+            <src>
+              <e>org.infogrid.lid.yadis#Site</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.lid.yadis#Service</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.lid.yadis#Service_IsProvidedAtEndpoint_Site">
+            <name>Service_IsProvidedAtEndpoint_Site</name>
+            <username>Is provided at</username>
+            <userdescription>Expresses at which endpoints a Service is available.</userdescription>
+            <src>
+              <e>org.infogrid.lid.yadis#Service</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.lid.yadis#Site</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+        
+        <relationshiptype ID="org.infogrid.lid.yadis#Site_Offers_Service">
+            <name>Site_Offers_Service</name>
+            <username>offers</username>
+            <userdescription>Expresses which Services a Site offers. This is distinct from Service_IsProvidedAt_Site.</userdescription>
+            <src>
+              <e>org.infogrid.lid.yadis#Site</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.lid.yadis#Service</e>
+              <MultiplicityValue>0:1</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+        
+    </subjectarea>
+</model>
