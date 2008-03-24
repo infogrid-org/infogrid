@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This file is part of InfoGrid(tm). You may not use this file except in
+    compliance with the InfoGrid license. The InfoGrid license and important
+    disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+    have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+    or you do not consent to all aspects of the license and the disclaimers,
+    no license is granted; do not use this file.
+ 
+    For more information about InfoGrid go to http://infogrid.org/
+
+    Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+    All rights reserved.
+-->
+
+<!DOCTYPE model PUBLIC '-//InfoGrid.org//InfoGrid Model//EN' 'http://infogrid.org/dtds/model.dtd'>
+<model>
+    <subjectarea ID="org.infogrid.lid.openid">
+        <name>org.infogrid.lid.openid</name>
+        <username>OpenID Subject Area</username>
+        <userdescription>The concepts defined by OpenID.</userdescription>
+
+        <dependson>
+            <subjectareareference>
+                <name>org.infogrid.lid.yadis</name>
+            </subjectareareference>
+            <subjectareareference>
+                <name>org.infogrid.lid</name>
+            </subjectareareference>
+        </dependson>
+
+        <entitytype ID="http://openid.net/signon/">
+            <name>AuthenticationService</name>
+            <username>OpenID Authentication Service</username>
+            <userdescription>This represents an OpenID Authentication Service in any version.</userdescription>
+            <supertype>org.infogrid.lid#WebAuthenticationService</supertype>
+            <isabstract/>
+            
+            <propertytype ID="org.infogrid.lid.openid#AuthenticationService/Delegate">
+                <name>Delegate</name>
+                <username>Delegate</username>
+                <userdescription>The delegate identifier.</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+        </entitytype>        
+
+        <entitytype ID="org.infogrid.lid.openid#Authentication1Service">
+            <name>Authentication1Service</name>
+            <username>OpenID Authentication Service (version 1)</username>
+            <userdescription>This represents an OpenID Authentication Service (version 1)</userdescription>
+            <supertype>http://openid.net/signon/</supertype>
+            <implementsMethod><![CDATA[
+    public String determineRedirectUrl(
+            MeshObject                   principal,
+            String                       here,
+            String                       trustRoot,
+            org.infogrid.context.Context context )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.util.FactoryException
+    {
+        org.infogrid.mesh.set.MeshObjectSet endpoints = traverse(
+                org.infogrid.lid.yadis.YadisSubjectArea.SERVICE_ISPROVIDEDATENDPOINT_SITE.getSource() );
+        if( endpoints.isEmpty() ) {
+            throw new IllegalArgumentException( "no Endpoint found" );
+        }
+        // FIXME, should use more complex selection algorithm
+        MeshObject selectedEndpoint = endpoints.getMeshObjects()[0];
+        String     endpointUrl      = selectedEndpoint.getIdentifier().toExternalForm();
+        String     theDelegate      = getDelegate() != null ? getDelegate().value() : null;
+        String     theUrl           = principal.getIdentifier().toExternalForm();
+
+        if( trustRoot == null ) {
+            trustRoot = here;
+        }
+
+        StringBuffer ret = new StringBuffer();
+        ret.append( org.infogrid.util.http.HTTP.appendArgumentToUrl( endpointUrl, "openid.mode=checkid_setup" ));
+        if( theDelegate != null ) {
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theDelegate ));
+        } else {
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theUrl ));
+        }
+
+        // add a nonce to the return-to URL
+        String nonce = org.infogrid.lid.LidNonceGenerator.generateNewNonce();
+            
+        here = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-nonce=" + org.infogrid.util.http.HTTP.encodeUrl( nonce ));
+
+        ret.append( "&openid.return_to="  ).append( org.infogrid.util.http.HTTP.encodeUrl( here ));
+        ret.append( "&openid.trust_root=" ).append( org.infogrid.util.http.HTTP.encodeUrl( trustRoot ));
+
+        org.infogrid.lid.openid.RelyingPartySideAssociationManager assocMgr
+                = (org.infogrid.lid.openid.RelyingPartySideAssociationManager) context.findContextObject(
+                        org.infogrid.lid.openid.RelyingPartySideAssociationManager.class );
+        org.infogrid.lid.openid.RelyingPartySideAssociation association = assocMgr.obtainFor( endpointUrl );
+                // may throw exception
+
+        if( association != null ) {
+            ret.append( "&openid.assoc_handle=" ).append( org.infogrid.util.http.HTTP.encodeUrl( association.getAssociationHandle() ));
+        }
+        return ret.toString();
+    }        
+          ]]></implementsMethod>
+        </entitytype>        
+
+        <entitytype ID="http://openid.net/signon/1.0">
+            <name>Authentication1_0Service</name>
+            <username>OpenID Authentication Service (version 1.0)</username>
+            <userdescription>This represents an OpenID Authentication Service (version 1.0)</userdescription>
+            <supertype>http://openid.net/signon/</supertype>
+            <implementsMethod><![CDATA[
+    public String determineRedirectUrl(
+            MeshObject                   principal,
+            String                       here,
+            String                       trustRoot,
+            org.infogrid.context.Context context )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.util.FactoryException
+    {
+        org.infogrid.mesh.set.MeshObjectSet endpoints = traverse(
+                org.infogrid.lid.yadis.YadisSubjectArea.SERVICE_ISPROVIDEDATENDPOINT_SITE.getSource() );
+        if( endpoints.isEmpty() ) {
+            throw new IllegalArgumentException( "no Endpoint found" );
+        }
+        // FIXME, should use more complex selection algorithm
+        MeshObject selectedEndpoint = endpoints.getMeshObjects()[0];
+        String     endpointUrl      = selectedEndpoint.getIdentifier().toExternalForm();
+        String     theDelegate      = getDelegate() != null ? getDelegate().value() : null;
+        String     theUrl           = principal.getIdentifier().toExternalForm();
+
+        if( trustRoot == null ) {
+            trustRoot = here;
+        }
+
+        StringBuffer ret = new StringBuffer();
+        ret.append( org.infogrid.util.http.HTTP.appendArgumentToUrl( endpointUrl, "openid.mode=checkid_setup" ));
+        if( theDelegate != null ) {
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theDelegate ));
+        } else {
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theUrl ));
+        }
+
+        // add a nonce to the return-to URL
+        String nonce = org.infogrid.lid.LidNonceGenerator.generateNewNonce();
+            
+        here = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-nonce=" + org.infogrid.util.http.HTTP.encodeUrl( nonce ));
+
+        ret.append( "&openid.return_to="  ).append( org.infogrid.util.http.HTTP.encodeUrl( here ));
+        ret.append( "&openid.trust_root=" ).append( org.infogrid.util.http.HTTP.encodeUrl( trustRoot ));
+
+        org.infogrid.lid.openid.RelyingPartySideAssociationManager assocMgr
+                = (org.infogrid.lid.openid.RelyingPartySideAssociationManager) context.findContextObject(
+                        org.infogrid.lid.openid.RelyingPartySideAssociationManager.class );
+        org.infogrid.lid.openid.RelyingPartySideAssociation association = assocMgr.obtainFor( endpointUrl );
+                // may throw exception
+
+        if( association != null ) {
+            ret.append( "&openid.assoc_handle=" ).append( org.infogrid.util.http.HTTP.encodeUrl( association.getAssociationHandle() ));
+        }
+        return ret.toString();
+    }        
+          ]]></implementsMethod>
+        </entitytype>
+
+        <entitytype ID="http://openid.net/signon/1.1">
+            <name>Authentication1_1Service</name>
+            <username>OpenID Authentication Service (version 1.1)</username>
+            <userdescription>This represents an OpenID Authentication Service (version 1.1)</userdescription>
+            <supertype>http://openid.net/signon/</supertype>
+            <implementsMethod><![CDATA[
+    public String determineRedirectUrl(
+            MeshObject                   principal,
+            String                       here,
+            String                       trustRoot,
+            org.infogrid.context.Context context )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.util.FactoryException
+    {
+        org.infogrid.mesh.set.MeshObjectSet endpoints = traverse(
+                org.infogrid.lid.yadis.YadisSubjectArea.SERVICE_ISPROVIDEDATENDPOINT_SITE.getSource() );
+        if( endpoints.isEmpty() ) {
+            throw new IllegalArgumentException( "no Endpoint found" );
+        }
+        // FIXME, should use more complex selection algorithm
+        MeshObject selectedEndpoint = endpoints.getMeshObjects()[0];
+        String     endpointUrl      = selectedEndpoint.getIdentifier().toExternalForm();
+        String     theDelegate      = getDelegate() != null ? getDelegate().value() : null;
+        String     theUrl           = principal.getIdentifier().toExternalForm();
+
+        if( trustRoot == null ) {
+            trustRoot = here;
+        }
+
+        StringBuffer ret = new StringBuffer();
+        ret.append( org.infogrid.util.http.HTTP.appendArgumentToUrl( endpointUrl, "openid.mode=checkid_setup" ));
+        if( theDelegate != null ) {
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theDelegate ));
+        } else {
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theUrl ));
+        }
+
+        // add a nonce to the return-to URL
+        String nonce = org.infogrid.lid.LidNonceGenerator.generateNewNonce();
+            
+        here = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-nonce=" + org.infogrid.util.http.HTTP.encodeUrl( nonce ));
+
+        ret.append( "&openid.return_to="  ).append( org.infogrid.util.http.HTTP.encodeUrl( here ));
+        ret.append( "&openid.trust_root=" ).append( org.infogrid.util.http.HTTP.encodeUrl( trustRoot ));
+
+        org.infogrid.lid.openid.RelyingPartySideAssociationManager assocMgr
+                = (org.infogrid.lid.openid.RelyingPartySideAssociationManager) context.findContextObject(
+                        org.infogrid.lid.openid.RelyingPartySideAssociationManager.class );
+        org.infogrid.lid.openid.RelyingPartySideAssociation association = assocMgr.obtainFor( endpointUrl );
+                // may throw exception
+
+        if( association != null ) {
+            ret.append( "&openid.assoc_handle=" ).append( org.infogrid.util.http.HTTP.encodeUrl( association.getAssociationHandle() ));
+        }
+        return ret.toString();
+    }        
+          ]]></implementsMethod>
+        </entitytype>
+
+        <entitytype ID="http://openid.net/signon/2.0">
+            <name>Authentication2Service</name>
+            <username>OpenID Authentication Service (version 2)</username>
+            <userdescription>This represents an OpenID Authentication Service (version 2)</userdescription>
+            <supertype>http://openid.net/signon/</supertype>
+            <implementsMethod><![CDATA[
+    public String determineRedirectUrl(
+            MeshObject                   principal,
+            String                       here,
+            String                       trustRoot,
+            org.infogrid.context.Context context )
+        throws
+            org.infogrid.mesh.NotPermittedException,
+            org.infogrid.util.FactoryException
+    {
+        throw new UnsupportedOperationException();
+    }
+          ]]></implementsMethod>
+        </entitytype>
+
+        
+        <entitytype ID="http://specs.openid.net/auth/return_to">
+            <name>RelyingPartyService</name>
+            <username>OpenID Relying Party Service</username>
+            <userdescription>This service is provided by OpenID RelyingParties in any version.</userdescription>
+            <supertype>org.infogrid.lid#RelyingPartyService</supertype>
+        </entitytype>
+        
+        <entitytype ID="http://specs.openid.net/auth/1.0/return_to">
+            <name>RelyingParty1Service</name>
+            <username>OpenID Relying Party Service (version 1)</username>
+            <userdescription>This service is provided by OpenID RelyingParties (version 1)</userdescription>
+            <supertype>http://specs.openid.net/auth/return_to</supertype>
+        </entitytype>
+
+        <entitytype ID="http://specs.openid.net/auth/1.1/return_to">
+            <name>RelyingParty1_1Service</name>
+            <username>OpenID Relying Party Service (version 1.1)</username>
+            <userdescription>This service is provided by OpenID RelyingParties (version 1.1)</userdescription>
+            <supertype>http://specs.openid.net/auth/return_to</supertype>
+        </entitytype>
+
+        <entitytype ID="http://specs.openid.net/auth/2.0/return_to">
+            <name>RelyingParty2Service</name>
+            <username>OpenID Relying Party Service (version 2)</username>
+            <userdescription>This service is provided by OpenID RelyingParties (version 2)</userdescription>
+            <supertype>http://specs.openid.net/auth/return_to</supertype>
+        </entitytype>
+    </subjectarea>
+</model>

@@ -1,0 +1,417 @@
+//
+// This file is part of InfoGrid(tm). You may not use this file except in
+// compliance with the InfoGrid license. The InfoGrid license and important
+// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+// or you do not consent to all aspects of the license and the disclaimers,
+// no license is granted; do not use this file.
+// 
+// For more information about InfoGrid go to http://infogrid.org/
+//
+// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// All rights reserved.
+//
+
+package org.infogrid.store.sql.TEST;
+
+import org.infogrid.store.Store;
+import org.infogrid.store.StoreKeyDoesNotExistException;
+import org.infogrid.store.StoreListener;
+import org.infogrid.store.StoreValue;
+import org.infogrid.store.sql.SqlStoreIOException;
+import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.StreamUtils;
+import org.infogrid.util.logging.Log;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+/**
+ * Tests the basic SqlStore functions.
+ */
+public class SqlStoreTest1
+        extends
+            AbstractSqlStoreTest
+{
+    /**
+     * Run the test.
+     *
+     * @throws Exception thrown if an Exception occurred during the test
+     */
+    public void run()
+        throws
+            Exception
+    {
+        //
+        
+        log.info( "Deleting old database and creating new database" );
+        
+        try {
+            theSqlStore.deleteStore();
+        } catch( SqlStoreIOException ex ) {
+            // ignore this one
+        }
+        theSqlStore.initialize();
+        
+        MyListener listener = new MyListener();
+        theTestStore.addStoreListener( listener );
+
+        //
+        
+        log.info( "Inserting data and checking it's there" );
+
+        for( int i=0 ; i<firstSet.length ; ++i ) {
+            TestData current = firstSet[i];
+            theTestStore.put(
+                    current.theKey,
+                    current.theEncodingId,
+                    current.theTimeCreated,
+                    current.theTimeUpdated,
+                    current.theTimeRead,
+                    current.theTimeExpires,
+                    current.theData );
+        }
+
+        checkEquals( listener.thePuts.size(),    firstSet.length, "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(), 0,               "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),    0,               "Wrong number of gets" );
+        checkEquals( listener.theDeletes.size(), 0,               "Wrong number of deletes" );
+        listener.reset();
+
+        for( int i=0 ; i<firstSet.length ; ++i ) {
+            TestData   current = firstSet[i];
+            StoreValue value   = theTestStore.get( current.theKey );
+
+            checkEquals(          current.theEncodingId,      value.getEncodingId(),      "not the same encodingId" );
+            checkEquals(          current.theTimeCreated,     value.getTimeCreated(),     "not the same timeCreated" );
+            checkEquals(          current.theTimeUpdated,     value.getTimeUpdated(),     "not the same timeUpdated" );
+            checkEquals(          current.theTimeRead,        value.getTimeRead(),        "not the same timeRead" );
+            checkEquals(          current.theTimeExpires,     value.getTimeExpires()    , "not the same timeExpires" );
+            checkEqualByteArrays( current.theData,            value.getData(),            "not the same content" );
+        }
+
+        checkEquals( listener.thePuts.size(),    0,               "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(), 0,               "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),    firstSet.length, "Wrong number of gets" );
+        checkEquals( listener.theDeletes.size(), 0,               "Wrong number of deletes" );
+        listener.reset();
+
+        //
+        
+        log.info( "Iterating over what's in the Store" );
+        
+        int count = 0;
+        for( StoreValue current : theTestStore ) {
+            log.debug( "Found " + count + ": " + current.getKey() );
+            ++count;
+            TestData found = null;
+            for( TestData data : firstSet ) {
+                if( data.theKey.equals( current.getKey() )) {
+                    found = data;
+                    break;
+                }
+            }
+            if( found == null ) {
+                reportError( "Could not find record with key " + current.getKey() );
+            }
+        }
+        checkEquals( count, firstSet.length, "wrong length of set" );
+
+        //
+        
+        log.info( "Updating data and checking it's there" );
+
+        for( int i=0 ; i<secondSet.length ; ++i ) {
+            TestData current = secondSet[i];
+            theTestStore.update(
+                    current.theKey,
+                    current.theEncodingId,
+                    current.theTimeCreated,
+                    current.theTimeUpdated,
+                    current.theTimeRead,
+                    current.theTimeExpires,
+                    current.theData );
+        }
+
+        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(), secondSet.length, "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),    0,                "Wrong number of gets" );
+        checkEquals( listener.theDeletes.size(), 0,                "Wrong number of deletes" );
+        listener.reset();
+
+        for( int i=0 ; i<secondSet.length ; ++i ) {
+            TestData   current = secondSet[i];
+            StoreValue value   = theTestStore.get( current.theKey );
+
+            checkEquals(          current.theEncodingId,      value.getEncodingId(),      "not the same encodingId" );
+            checkEquals(          current.theTimeCreated,     value.getTimeCreated(),     "not the same timeCreated" );
+            checkEquals(          current.theTimeUpdated,     value.getTimeUpdated(),     "not the same timeUpdated" );
+            checkEquals(          current.theTimeRead,        value.getTimeRead(),        "not the same timeRead" );
+            checkEquals(          current.theTimeExpires,     value.getTimeExpires(),     "not the same timeAAutoDeletes" );
+            checkEqualByteArrays( current.theData,            value.getData(),            "not the same content" );
+        }
+
+        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(), 0,                "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),    secondSet.length, "Wrong number of gets" );
+        checkEquals( listener.theDeletes.size(), 0,                "Wrong number of deletes" );
+        listener.reset();
+
+        //
+        
+        log.info( "Deleting some data and checking it's gone" );
+
+        for( int i=0 ; i<thirdSet.length ; ++i ) {
+            TestData current = thirdSet[i];
+            theTestStore.delete( current.theKey );
+        }
+
+        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(), 0,                "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),    0,                "Wrong number of gets" );
+        checkEquals( listener.theDeletes.size(), thirdSet.length,  "Wrong number of deletes" );
+        listener.reset();
+
+        for( int i=0 ; i<thirdSet.length ; ++i ) {
+            TestData current = thirdSet[i];
+            try {
+                theTestStore.get( current.theKey );
+                
+                reportError( "delete was unsuccessful for " + current );
+
+            } catch( StoreKeyDoesNotExistException ex ) {
+                // noop
+            }
+        }
+        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(), 0,                "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),    thirdSet.length,  "Wrong number of gets" );
+        checkEquals( listener.theDeletes.size(), 0,                "Wrong number of deletes" );
+        listener.reset();
+    }
+
+    /**
+     * Main program.
+     *
+     * @param args command-line arguments
+     */
+    public static void main(
+            String [] args )
+    {
+        SqlStoreTest1 test = null;
+        try {
+            if( args.length < 0 ) { // well, not quite possible but to stay with the general outline
+                System.err.println( "Synopsis: <no arguments>" );
+                System.err.println( "aborting ..." );
+                System.exit( 1 );
+            }
+
+            test = new SqlStoreTest1( args );
+            test.run();
+
+        } catch( Throwable ex ) {
+            log.error( ex );
+            System.exit(1);
+        }
+        if( test != null ) {
+            test.cleanup();
+        }
+        if( errorCount == 0 ) {
+            log.info( "PASS" );
+        } else {
+            log.info( "FAIL (" + errorCount + " errors)" );
+        }
+        System.exit( errorCount );
+    }
+
+    /**
+      * Constructor.
+      *
+      * @param args command-line arguments
+      */
+    public SqlStoreTest1(
+            String [] args )
+        throws
+            Exception
+    {
+        super( SqlStoreTest1.class );
+        
+        theTestStore = theSqlStore;
+    }
+
+    /**
+      * Constructor for subclasses.
+      *
+      * @param c test class
+      */
+    protected SqlStoreTest1(
+            Class c )
+        throws
+            Exception
+    {
+        super( c );
+    }
+
+    // Our Logger
+    private static Log log = Log.getLogInstance( SqlStoreTest1.class);
+    
+    /**
+     * Test data.
+     */
+    protected static final long now = System.currentTimeMillis();
+    protected static final byte [] testImage;
+    static {
+        byte [] data = new byte[0];
+        try {
+            data = StreamUtils.slurp( SqlStoreTest1.class.getResourceAsStream( "TestImage.jpg" ));
+        } catch( IOException ex ) {
+            log.error( ex );
+        }
+        testImage = data;
+    }
+    protected static final TestData[] one = new TestData[] {
+        new TestData( "abc",       "enc1",           12345L, 67890L, 10111213L,     -1L, "some data".getBytes() ),
+        new TestData( "def",       "other encoding",    11L,    22L,       33L,     12L, "some longer data, but not very long".getBytes() ),
+        new TestData( "testImage", "third encoding",      1,      2,         3, 123456L, testImage )
+    };
+    protected static final TestData[] two = new TestData[] {
+        new TestData( "abc", "testing", 5555L, 666L, 1111L,  -1L, "some changed data".getBytes() ),
+    };
+    protected static final TestData[] three = new TestData[] {
+        new TestData( "ghi", "Shakespeare's collected cucumbers", now,    now+1,  now+10000L, 99999L, "Some <b>HTML</b> data".getBytes() )
+    };
+    protected static final TestData[] firstSet  = ArrayHelper.append( one, three, TestData.class );
+    protected static final TestData[] secondSet = two;
+    protected static final TestData[] thirdSet  = three;
+
+    protected static class TestData
+    {
+        public TestData(
+                String  key,
+                String  encodingId,
+                long    timeCreated,
+                long    timeUpdated,
+                long    timeRead,
+                long    timeExpires,
+                byte [] data )
+        {
+            theKey          = key;
+            theEncodingId   = encodingId;
+            theTimeCreated  = timeCreated;
+            theTimeUpdated  = timeUpdated;
+            theTimeRead     = timeRead;
+            theTimeExpires  = timeExpires;
+            theData         = data;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "TestData with key '" + theKey + "'";
+        }
+
+        String  theKey;
+        String  theEncodingId;
+        long    theTimeCreated;
+        long    theTimeUpdated;
+        long    theTimeRead;
+        long    theTimeExpires;
+        byte [] theData;
+    }
+    
+    /**
+     * Test listener.
+     */
+    static class MyListener
+            implements
+                StoreListener
+    {
+        /**
+         * A put operation was performed. This indicates either a
+         * <code>Store.put</code> or a <code>Store.putOrUpdate</code> operation
+         * in which an actual <code>put</code> was performed.
+         *
+         * @param store the Store that emitted this event
+         * @param key the key with which the data element was stored
+         */
+        public void putPerformed(
+                Store      store,
+                String     key,
+                StoreValue value )
+        {
+            thePuts.add( key );
+        }
+
+        /**
+         * An update operation was performed. This indicates either a
+         * <code>Store.update</code> or a <code>Store.putOrUpdate</code> operation
+         * in which an actual <code>update</code> was performed.
+         *
+         * @param store the Store that emitted this event
+         * @param key the key with which the data element was stored
+         */
+        public void updatePerformed(
+                Store      store,
+                String     key,
+                StoreValue value )
+        {
+            theUpdates.add( key );
+        }
+
+        /**
+         * A get operation was performed.
+         *
+         * @param store the Store that emitted this event
+         * @param key the key with which the data element was stored
+         */
+        public void getPerformed(
+                Store      store,
+                String     key,
+                StoreValue value )
+        {
+            theGets.add( key );
+        }
+
+        /**
+         * A delete operation was performed.
+         *
+         * @param store the Store that emitted this event
+         * @param key the key with which the data element was stored
+         */
+        public void deletePerformed(
+                Store  store,
+                String key )
+        {
+            theDeletes.add( key );
+        }
+
+        /**
+         * A delete-all operation was performed.
+         *
+         * @param store the Store that emitted this event
+         * @param prefix if given, indicates the prefix of all keys that were deleted. If null, indicates &quot;all&quot;.
+         */
+        public void deleteAllPerformed(
+                Store  store,
+                String prefix )
+        {
+            // no op
+        }
+        
+        /**
+         * Reset the listener.
+         */
+        public void reset()
+        {
+            thePuts.clear();
+            theUpdates.clear();
+            theGets.clear();
+            theDeletes.clear();
+        }
+
+        protected ArrayList<String> thePuts    = new ArrayList<String>();
+        protected ArrayList<String> theUpdates = new ArrayList<String>();
+        protected ArrayList<String> theGets    = new ArrayList<String>();
+        protected ArrayList<String> theDeletes = new ArrayList<String>();
+    }
+}
