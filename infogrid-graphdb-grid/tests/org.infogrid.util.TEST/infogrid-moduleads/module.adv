@@ -17,7 +17,7 @@
  <name>org.infogrid.util.TEST</name>
  <runclass>org.infogrid.util.TEST.AllTests</runclass>
  <provides>
-  <jar>org.infogrid.util.test.jar</jar>
+  <jar>org.infogrid.util.TEST.jar</jar>
  </provides>
  <dependencies>
   <requires name="org.infogrid.testharness"/>
