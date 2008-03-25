@@ -21,7 +21,7 @@ $Date$
 
 <project name="infogrid-ant-library" default="none">
 
-  <property location="../../../../../svn.infogrid.org/infogrid/trunk/" name="infogrid.org" />
+  <property location="../.." name="infogrid.org" />
 
   <property name="infogrid.org.apps"    value="${infogrid.org}/apps"/>
   <property name="infogrid.org.modules" value="${infogrid.org}/modules"/>
