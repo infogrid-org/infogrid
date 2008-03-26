@@ -15,6 +15,7 @@
 package org.infogrid.viewlet;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.model.traversal.TraversalSpecification;
 import org.infogrid.util.StringHelper;
 
 import java.util.Map;
@@ -38,6 +39,7 @@ public class MeshObjectsToView
                 subject,
                 null,
                 null,
+                null,
                 null );
     }
 
@@ -56,6 +58,7 @@ public class MeshObjectsToView
                 subject,
                 null,
                 viewletTypeName,
+                null,
                 null );
     }
 
@@ -67,19 +70,22 @@ public class MeshObjectsToView
      * @param subjectParameters the parameters for the Viewlet
      * @param viewletTypeName the type of Viewlet to use
      * @param viewletParameters the Viewlet parameters (eg size, zoom, ...) to use
+     * @param traversalSpecification the TraversalSpecification to apply when viewing the subject
      * @return the created MeshObjectsToView
      */
     public static MeshObjectsToView create(
-            MeshObject         subject,
-            Map<String,Object> subjectParameters,
-            String             viewletTypeName,
-            Map<String,Object> viewletParameters )
+            MeshObject             subject,
+            Map<String,Object>     subjectParameters,
+            String                 viewletTypeName,
+            Map<String,Object>     viewletParameters,
+            TraversalSpecification traversalSpecification )
     {
         return new MeshObjectsToView(
                 subject,
                 subjectParameters,
                 viewletTypeName,
-                viewletParameters );
+                viewletParameters,
+                traversalSpecification );
     }
 
     /**
@@ -89,17 +95,20 @@ public class MeshObjectsToView
      * @param subjectParameters the parameters for the Viewlet
      * @param viewletTypeName the type of Viewlet to use
      * @param viewletParameters the Viewlet parameters (eg size, zoom, ...) to use
+     * @param traversalSpecification the TraversalSpecification to apply when viewing the subject
      */
     protected MeshObjectsToView(
-            MeshObject         subject,
-            Map<String,Object> subjectParameters,
-            String             viewletTypeName,
-            Map<String,Object> viewletParameters )
+            MeshObject             subject,
+            Map<String,Object>     subjectParameters,
+            String                 viewletTypeName,
+            Map<String,Object>     viewletParameters,
+            TraversalSpecification traversalSpecification )
     {
-        theSubject           = subject;
-        theSubjectParameters = subjectParameters;
-        theViewletTypeName   = viewletTypeName;
-        theViewletParameters = viewletParameters;
+        theSubject                = subject;
+        theSubjectParameters      = subjectParameters;
+        theViewletTypeName        = viewletTypeName;
+        theViewletParameters      = viewletParameters;
+        theTraversalSpecification = traversalSpecification;
     }
 
     /**
@@ -143,6 +152,16 @@ public class MeshObjectsToView
     }
 
     /**
+     * Obtain the TraversalSpecification that the Viewlet is supposed to use.
+     * 
+     * @eturn the TraversalSpecification that the Viewlet is supposed to use
+     */
+    public TraversalSpecification getTraversalSpecification()
+    {
+        return theTraversalSpecification;
+    }
+
+    /**
      * For debugging.
      *
      * @return debugging string
@@ -156,13 +175,15 @@ public class MeshObjectsToView
                     "subject",
                     "subjectPars",
                     "viewletTypeName",
-                    "viewletPars"
+                    "viewletPars",
+                    "traversalSpecification"
                 },
                 new Object[] {
                     theSubject,
                     theSubjectParameters,
                     theViewletTypeName,
-                    theViewletParameters
+                    theViewletParameters,
+                    theTraversalSpecification
         });
     }
 
@@ -185,4 +206,9 @@ public class MeshObjectsToView
      * The parameters that we would like the Viewlet to use when viewing the selected objects.
      */
     protected Map<String,Object> theViewletParameters;
+    
+    /**
+     * The TraversalSpecification from the subject, if any.
+     */
+    protected TraversalSpecification theTraversalSpecification;
 }

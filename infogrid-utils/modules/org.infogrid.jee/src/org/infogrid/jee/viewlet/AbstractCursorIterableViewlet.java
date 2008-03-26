@@ -15,7 +15,7 @@
 package org.infogrid.jee.viewlet;
 
 import org.infogrid.context.Context;
-
+import org.infogrid.mesh.MeshObject;
 import org.infogrid.util.CursorIterator;
 
 /**
@@ -42,5 +42,8 @@ public abstract class AbstractCursorIterableViewlet<T>
      *
      * @return the CursorIterator.
      */
-    public abstract CursorIterator<T> getCursorIterator();
+    public CursorIterator<MeshObject> getCursorIterator()
+    {
+        return getObjects().iterator();
+    }
 }

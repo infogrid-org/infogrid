@@ -90,7 +90,7 @@ public class BulkLoaderViewlet
         
         String bulkXml = theSaneRequest.getPostArgument( "bulkXml" );
 
-        MeshBase    base = theSubject.getMeshBase();
+        MeshBase    base = getSubject().getMeshBase();
         Transaction tx   = null;
         try {
             tx = base.createTransactionAsapIfNeeded();

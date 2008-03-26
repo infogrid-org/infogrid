@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import org.infogrid.model.traversal.TraversalSpecification;
 
 /**
  * <p>Main JeeViewlet dispatcher to determine the REST subject, the best JeeViewlet, and
@@ -142,14 +143,21 @@ public class ViewletDispatcherServlet
 
             try {
                 // Look for the lid-format string
-                String lidFormat        = realRequest.getParameter( "lid-format" );
+                String lidFormat        = realRequest.getParameter( LID_FORMAT_PARAMETER_NAME );
                 String viewletClassName = null;
 
                 if( lidFormat != null && lidFormat.startsWith( VIEWLET_PREFIX )) {
                     viewletClassName = lidFormat.substring( VIEWLET_PREFIX.length() );
                 }
 
-                toView = MeshObjectsToView.create( subject, viewletClassName );
+                // Look for the lid-xpath string
+                String                 lidXpath  = realRequest.getParameter( LID_XPATH_PARAMETER_NAME );
+                TraversalSpecification traversal = null;
+                if( lidXpath != null && lidXpath.length() > 0 ) {
+                    traversal = app.getTraversalDictionary().translate( subject, lidXpath );
+                }
+                
+                toView = MeshObjectsToView.create( subject, null, viewletClassName, null, traversal );
 
                 viewlet = (JeeViewlet) app.getViewletFactory().obtainFor( toView, c );
 
@@ -227,11 +235,21 @@ public class ViewletDispatcherServlet
                 context );
         return ret;
     }
+    
+    /**
+     * Name of the LID format parameter.
+     */
+    public static final String LID_FORMAT_PARAMETER_NAME = "lid-format";
 
     /**
      * The prefix in the lid-format string that indicates the name of a viewlet.
      */
     public static final String VIEWLET_PREFIX = "viewlet:";
+    
+    /**
+     * Name of the LID Xpath parameter.
+     */
+    public static final String LID_XPATH_PARAMETER_NAME = "lid-xpath";
 
     /**
      * Our ResourceHelper.

@@ -197,6 +197,24 @@ public class SelectiveTraversalSpecification
     }
 
     /**
+     * Hash code.
+     * 
+     * @return hash code
+     */
+    @Override
+    public int hashCode()
+    {
+        int ret = theQualified.hashCode();
+        if( theStartSelector != null ) {
+            ret ^= theStartSelector.hashCode();
+        }
+        if( theEndSelector != null ) {
+            ret ^= theEndSelector.hashCode();
+        }
+        return ret;
+    }
+
+    /**
      * Determine whether a given event, with a source of from where we traverse the
      * TraversalSpecification, may affect the result of the traversal.
      *
