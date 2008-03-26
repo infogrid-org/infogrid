@@ -102,11 +102,13 @@ public abstract class InfoGridWebApp
      * @param applicationContext the main application Context
      */
     protected InfoGridWebApp(
+            MeshBase                                mainMeshBase,
             NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer,
             ViewletFactory                          viewletFactory,
             TraversalDictionary                     traversalDictionary,
             Context                                 applicationContext )
-    {
+    {        
+        theMainMeshBase        = mainMeshBase;
         theMeshBaseNameServer  = meshBaseNameServer;
         theViewletFactory      = viewletFactory;
         theTraversalDictionary = traversalDictionary;
@@ -551,6 +553,17 @@ public abstract class InfoGridWebApp
         throws
             URISyntaxException;
 
+
+    /**
+     * Obtain the default MeshBase.
+     * 
+     * @return the default MeshBase
+     */
+    public MeshBase getDefaultMeshBase()
+    {
+        return theMainMeshBase;
+    }
+
     /**
      * The NameServer that knows the Meshbase(s) in this application.
      */
@@ -590,7 +603,12 @@ public abstract class InfoGridWebApp
      * The TraversalDictionary for this application, if one was given.
      */
     protected TraversalDictionary theTraversalDictionary;
-    
+        
+    /**
+     * The main MeshBase.
+     */
+    protected MeshBase theMainMeshBase;
+
     /**
      * Simple, bootstrap ViewletFactory.
      */

@@ -18,10 +18,7 @@ import org.infogrid.jee.viewlet.AbstractCursorIterableViewlet;
 
 import org.infogrid.context.Context;
 
-import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.Proxy;
-
-import org.infogrid.util.CursorIterator;
 
 /**
  * A Viewlet that shows a NetMeshBase's Proxies.
@@ -51,17 +48,5 @@ public class ProxiesViewlet
             Context c )
     {
         super( c );
-    }
-
-    /**
-     * Obtain the MeshObjectSet to display
-     *
-     * @return the MeshObjectSet
-     */
-    public CursorIterator<Proxy> getCursorIterator()
-    {
-        NetMeshBase meshBase = (NetMeshBase) getSubject().getMeshBase();
-
-        return meshBase.proxies();
     }
 }

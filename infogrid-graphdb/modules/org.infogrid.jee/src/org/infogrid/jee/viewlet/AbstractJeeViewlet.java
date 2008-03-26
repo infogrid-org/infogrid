@@ -14,19 +14,21 @@
 
 package org.infogrid.jee.viewlet;
 
-import org.infogrid.context.Context;
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.viewlet.CannotViewException;
-import org.infogrid.viewlet.DefaultViewedMeshObjects;
-import org.infogrid.viewlet.MeshObjectsToView;
-import org.infogrid.viewlet.ViewedMeshObjects;
-
-import org.infogrid.util.http.HTTP;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.infogrid.context.Context;
+import org.infogrid.jee.app.InfoGridWebApp;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.set.MeshObjectSet;
+import org.infogrid.model.traversal.TraversalDictionary;
+import org.infogrid.model.traversal.TraversalSpecification;
+import org.infogrid.util.http.HTTP;
+import org.infogrid.viewlet.CannotViewException;
+import org.infogrid.viewlet.DefaultViewedMeshObjects;
+import org.infogrid.viewlet.MeshObjectsToView;
+import org.infogrid.viewlet.ViewedMeshObjects;
 
 /**
  * Factors out commonly used functionality for Viewlets.
@@ -67,8 +69,6 @@ public abstract class AbstractJeeViewlet
         throws
             CannotViewException
     {
-        theSubject = toView.getSubject();
-        
         theViewedMeshObjects.updateFrom( toView );
     }
     
@@ -93,7 +93,17 @@ public abstract class AbstractJeeViewlet
      */
     public MeshObject getSubject()
     {
-        return theSubject;
+        return theViewedMeshObjects.getSubject();
+    }
+
+    /**
+     * Obtain the Objects.
+     * 
+     * @return the set of Objects, which may be empty
+     */
+    public MeshObjectSet getObjects()
+    {
+        return theViewedMeshObjects.getObjects();
     }
 
     /**
@@ -188,6 +198,22 @@ public abstract class AbstractJeeViewlet
     }
 
     /**
+     * Obtain the Xpath element.
+     *
+     * @return the Xpath element
+     */
+    public String getLidXpath()
+    {
+        MeshObject             subject   = theViewedMeshObjects.getSubject();
+        TraversalSpecification traversal = theViewedMeshObjects.getTraversalSpecification();
+        InfoGridWebApp         app       = InfoGridWebApp.getSingleton();
+        TraversalDictionary    dict      = app.getTraversalDictionary();
+
+        String ret = dict.translate( subject, traversal );
+        return ret;
+    }
+    
+    /**
      * Obtain the URL to which forms should be HTTP post'd. This
      * can be overridden by subclasses.
      *
@@ -214,33 +240,6 @@ public abstract class AbstractJeeViewlet
     }
 
     /**
-     * <p>Check that the named value is one of the valid values,
-     * and it not, set it to the default. The default is the first value in the
-     * array of allowedValues.</p>
-     *
-     * <p>This depends on a good implementation of equals().</p>
-     *
-     * @param candidateValue the candidate value
-     * @param allowedValues the set of allowed values
-     * @return the approved value
-     */    
-    protected static <T> T correct(
-            T    candidateValue,
-            T [] allowedValues )
-    {
-        for( T current : allowedValues ) {
-            if( candidateValue == null ) {
-                if( current == null ) {
-                    return current; // fine
-                }
-            } else if( candidateValue.equals( current )) {
-                return current; // fine
-            }
-        }
-        return allowedValues[0];
-    }
-    
-    /**
      * This method converts a Class (subclass of this one) into the default request URL
      * for the RequestDispatcher.
      * 
@@ -263,11 +262,6 @@ public abstract class AbstractJeeViewlet
     protected DefaultViewedMeshObjects theViewedMeshObjects = new DefaultViewedMeshObjects( this );
 
     /**
-     * The REST-ful subject.
-     */
-    protected MeshObject theSubject;
-
-    /**
      * The application context
      */
     protected Context theContext;
@@ -275,5 +269,5 @@ public abstract class AbstractJeeViewlet
     /**
      * The request currently being processed.
      */
-    protected HttpServletRequest  theCurrentRequest;
+    protected HttpServletRequest theCurrentRequest;
 }
