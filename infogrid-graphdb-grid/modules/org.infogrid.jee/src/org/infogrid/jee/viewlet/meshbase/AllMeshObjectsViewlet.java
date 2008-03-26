@@ -55,9 +55,10 @@ public class AllMeshObjectsViewlet
      *
      * @return the MeshObjectSet
      */
+    @Override
     public CursorIterator<MeshObject> getCursorIterator()
     {
-        IterableMeshBase meshBase = (IterableMeshBase) theSubject.getMeshBase(); // derive from the subject, so we can do any MeshBase
+        IterableMeshBase meshBase = (IterableMeshBase) getSubject().getMeshBase(); // derive from the subject, so we can do any MeshBase
         
         return meshBase.iterator();
     }

@@ -12,5 +12,8 @@ ant -f apps/org.infogrid.meshworld/build.xml dist || exit 1;
 echo '**** Now building NetMeshWorld ****'
 ant -f apps/org.infogrid.meshworld.net/build.xml dist || exit 1;
 
+echo '*** Now building other modules not referenced so far ***'
+ant -f modules/org.infogrid.lid.openid.store/build.xml jar || exit 1;
+
 echo '**** Now running ALLTESTS ****'
 ant -f tests/org.infogrid.ALLTESTS/build.xml run || exit 1;

@@ -185,7 +185,7 @@ public class NetMeshWorldApp
 
         NameServer<NetMeshBaseIdentifier,NetMeshBase> ns = meshBase.getLocalNameServer();
         
-        NetMeshWorldApp ret = new NetMeshWorldApp( ns, rootContext );
+        NetMeshWorldApp ret = new NetMeshWorldApp( meshBase, ns, rootContext );
         return ret;
     }
 
@@ -197,10 +197,11 @@ public class NetMeshWorldApp
      */
     @SuppressWarnings(value={"unchecked"})
     protected NetMeshWorldApp(
+            NetMeshBase                                   mainMeshBase,
             NameServer<NetMeshBaseIdentifier,NetMeshBase> meshBaseNameServer,
             SimpleContext                                 applicationContext )
     {
-        super( (NameServer) meshBaseNameServer, new NetMeshWorldViewletFactory(), null, applicationContext );
+        super( mainMeshBase, (NameServer) meshBaseNameServer, new NetMeshWorldViewletFactory(), null, applicationContext );
     }
 
     /**
@@ -217,5 +218,16 @@ public class NetMeshWorldApp
     {
         NetMeshBaseIdentifier ret = NetMeshBaseIdentifier.create( stringForm );
         return ret;
+    }
+
+    /**
+     * Obtain the default MeshBase.
+     * 
+     * @return the default MeshBase
+     */
+    @Override
+    public IterableLocalNetStoreMeshBase getDefaultMeshBase()
+    {
+        return (IterableLocalNetStoreMeshBase) super.getDefaultMeshBase();
     }
 }
