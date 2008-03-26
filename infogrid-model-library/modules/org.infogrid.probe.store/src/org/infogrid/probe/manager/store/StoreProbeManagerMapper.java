@@ -31,7 +31,6 @@ import org.infogrid.store.StoreValueDecodingException;
 import org.infogrid.store.StoreValueEncodingException;
 
 import org.infogrid.util.FactoryException;
-import org.infogrid.util.logging.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -45,8 +44,6 @@ public class StoreProbeManagerMapper
         implements
             StoreEntryMapper<NetMeshBaseIdentifier,ShadowMeshBase>
 {
-    private static final Log log = Log.getLogInstance( StoreProbeManagerMapper.class ); // our own, private logger
-
     /**
      * Constructor.
      */

@@ -85,7 +85,7 @@ public class DefaultNetRestfulRequest
             String proxyIdentifierString;
             String meshObjectIdentifierString;
             
-            String fallBackMeshBaseIdentifierString = theSaneRequest.getRootUri() + theContextPath + "/"; // does not have a slash at the end
+            // String fallBackMeshBaseIdentifierString = theSaneRequest.getRootUri() + theContextPath + "/"; // context does not have a slash at the end
 
             Matcher m = theUrlPattern.matcher( trailer );
             if( m.matches() ) {
@@ -98,17 +98,23 @@ public class DefaultNetRestfulRequest
                 proxyIdentifierString      = null;
                 meshObjectIdentifierString = trailer;
             }
-            if( meshBaseIdentifierString == null ) {
-                meshBaseIdentifierString = fallBackMeshBaseIdentifierString;
-            }
+            // if( meshBaseIdentifierString == null ) {
+            //     meshBaseIdentifierString = fallBackMeshBaseIdentifierString;
+            // }
             if( meshObjectIdentifierString == null ) {
                 meshObjectIdentifierString = "";
             }
-            theRequestedMeshBaseIdentifier = NetMeshBaseIdentifier.create( meshBaseIdentifierString );
             
-            NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = InfoGridWebApp.getSingleton().getMeshBaseNameServer();
+            MeshBase mb;
+            if( meshBaseIdentifierString == null ) {
+                mb = InfoGridWebApp.getSingleton().getDefaultMeshBase();
+            } else {
+                theRequestedMeshBaseIdentifier = NetMeshBaseIdentifier.create( meshBaseIdentifierString );
             
-            MeshBase mb = meshBaseNameServer.get( theRequestedMeshBaseIdentifier );
+                NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = InfoGridWebApp.getSingleton().getMeshBaseNameServer();
+            
+                mb = meshBaseNameServer.get( theRequestedMeshBaseIdentifier );
+            }
 //            if( mb == null && !fallBackMeshBaseIdentifierString.equals( meshBaseIdentifierString )) {
 //                log.warn( "Could not find requested MeshBase: " + theRequestedMeshBaseIdentifier );
 //
@@ -117,9 +123,9 @@ public class DefaultNetRestfulRequest
 //                mb = meshBaseNameServer.get( fallBackMeshBaseIdentifier );
 //            }
 
-            if( mb == null ) {
-                throw new IllegalStateException( "Illegal configuration: cannot find default MeshBase at " + fallBackMeshBaseIdentifierString );
-            }
+            //if( mb == null ) {
+            //    throw new IllegalStateException( "Illegal configuration: cannot find default MeshBase at " + fallBackMeshBaseIdentifierString );
+            //}
             
             if( proxyIdentifierString != null ) {
                 theRequestedProxyIdentifier = NetMeshBaseIdentifier.create( proxyIdentifierString );
