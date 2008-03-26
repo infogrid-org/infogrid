@@ -149,6 +149,21 @@ public class AlternativeCompoundTraversalSpecification
     }
 
     /**
+     * Hash code.
+     * 
+     * @return hash code
+     */
+    @Override
+    public int hashCode()
+    {
+        int ret = 0;
+        for( TraversalSpecification current : theAlternatives ) {
+            ret ^= current.hashCode();
+        }
+        return ret;
+    }
+
+    /**
      * Determine whether a given event, with a source of from where we traverse the
      * TraversalSpecification, may affect the result of the traversal.
      *

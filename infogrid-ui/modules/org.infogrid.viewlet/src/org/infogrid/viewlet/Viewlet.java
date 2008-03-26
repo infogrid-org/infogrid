@@ -16,6 +16,7 @@ package org.infogrid.viewlet;
 
 import org.infogrid.context.ObjectInContext;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.set.MeshObjectSet;
 
 /**
  * <p>A software component of an InfoGrid application's user interface.
@@ -68,6 +69,14 @@ public interface Viewlet
      * @return the subject
      */
     public MeshObject getSubject();
+
+    /**
+     * Obtain the Objects, i.e. the MeshObjects reached by traversing from the
+     * Subject via the TraversalSpecification.
+     * 
+     * @return the Objects
+     */
+    public MeshObjectSet getObjects();
 
     /**
       * Obtain the MeshObjects that this Viewlet is currently viewing, plus
