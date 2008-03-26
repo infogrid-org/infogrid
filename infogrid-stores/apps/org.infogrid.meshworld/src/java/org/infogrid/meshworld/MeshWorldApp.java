@@ -159,7 +159,7 @@ public class MeshWorldApp
         // Name Server
         MNameServer<MeshBaseIdentifier,MeshBase> nameServer = MNameServer.create();
         nameServer.put( mbId, meshBase );
-        MeshWorldApp ret = new MeshWorldApp( nameServer, rootContext );
+        MeshWorldApp ret = new MeshWorldApp( meshBase, nameServer, rootContext );
         return ret;
     }
 
@@ -170,10 +170,11 @@ public class MeshWorldApp
      * @param applicationContext the main application Context
      */
     protected MeshWorldApp(
+            IterableStoreMeshBase                   mainMeshBase,
             NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer,
             SimpleContext                           applicationContext )
     {
-        super( meshBaseNameServer, new MeshWorldViewletFactory(), null, applicationContext );
+        super( mainMeshBase, meshBaseNameServer, new MeshWorldViewletFactory(), null, applicationContext );
     }
 
     /**

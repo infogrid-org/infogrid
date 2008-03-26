@@ -14,10 +14,11 @@
 
 package org.infogrid.viewlet;
 
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.util.StringHelper;
-
 import java.util.Map;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.set.MeshObjectSet;
+import org.infogrid.model.traversal.TraversalSpecification;
+import org.infogrid.util.StringHelper;
 
 /**
  * This is the default implementation of ViewedMeshObjects. This is useful for
@@ -46,13 +47,15 @@ public class DefaultViewedMeshObjects
      * @param viewletParameters the parameters of the Viewlet, if any
      */
     public void update(
-            MeshObject         subject,
-            Map<String,Object> subjectParameters,
-            Map<String,Object> viewletParameters )
+            MeshObject             subject,
+            Map<String,Object>     subjectParameters,
+            Map<String,Object>     viewletParameters,
+            TraversalSpecification traversal )
     {
-        theSubject           = subject;
-        theSubjectParameters = subjectParameters;
-        theViewletParameters = viewletParameters;
+        theSubject                = subject;
+        theSubjectParameters      = subjectParameters;
+        theViewletParameters      = viewletParameters;
+        theTraversalSpecification = traversal;
     }
 
     /**
@@ -65,7 +68,8 @@ public class DefaultViewedMeshObjects
     {
         update( newObjectsToView.getSubject(),
                 newObjectsToView.getSubjectParameters(),
-                newObjectsToView.getViewletParameters() );
+                newObjectsToView.getViewletParameters(),
+                newObjectsToView.getTraversalSpecification() );
     }
 
     /**
@@ -110,6 +114,34 @@ public class DefaultViewedMeshObjects
     }
 
     /**
+     * Obtain the TraversalSpecification that the Viewlet currently uses.
+     * 
+     * @eturn the TraversalSpecification that the Viewlet currently uses
+     */
+    public TraversalSpecification getTraversalSpecification()
+    {
+        return theTraversalSpecification;
+    }
+
+    /**
+     * Obtain the Objects, i.e. the MeshObjects reached by traversing from the
+     * Subject via the TraversalSpecification.
+     * 
+     * @return the Objects
+     */
+    public MeshObjectSet getObjects()
+    {
+        if( theObjects == null ) {
+            if( theTraversalSpecification != null ) {
+                theObjects = theSubject.traverse( theTraversalSpecification );
+            } else {
+                theObjects = theSubject.getMeshBase().getMeshObjectSetFactory().obtainEmptyImmutableMeshObjectSet();
+            }
+        }
+        return theObjects;
+    }
+    
+    /**
      * Convert to String, for debugging.
      *
      * @return String representation of this object
@@ -121,10 +153,12 @@ public class DefaultViewedMeshObjects
                 this,
                 new String [] {
                     "subject",
-                    "viewlet" },
+                    "viewlet",
+                    "onjects" },
                 new Object [] {
                     theSubject,
-                    theViewlet } );
+                    theViewlet,
+                    theObjects} );
     }
 
     /**
@@ -146,4 +180,14 @@ public class DefaultViewedMeshObjects
      * The Viewlet parameters, if any.
      */
     protected Map<String,Object> theViewletParameters;
+    
+    /**
+     * The TraversalSpecification, if any.
+     */
+    protected TraversalSpecification theTraversalSpecification;
+
+    /**
+     * The set of Objects.
+     */
+    protected MeshObjectSet theObjects;
 }

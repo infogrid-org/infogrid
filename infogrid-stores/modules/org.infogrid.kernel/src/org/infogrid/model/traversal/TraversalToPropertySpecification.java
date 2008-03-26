@@ -170,6 +170,24 @@ public class TraversalToPropertySpecification
     }
 
     /**
+     * Hash code.
+     * 
+     * @return hash code
+     */
+    @Override
+    public int hashCode()
+    {
+        int ret = 17; // random
+        if( theTraversalSpecification != null ) {
+            ret ^= theTraversalSpecification.hashCode();
+        }
+        for( PropertyType current : theDestinationPropertyTypes ) {
+            ret ^= current.hashCode();
+        }
+        return ret;
+    }
+
+    /**
      * Our TraversalSpecification (if any).
      */
     protected TraversalSpecification theTraversalSpecification;

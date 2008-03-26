@@ -95,7 +95,7 @@ public class WikiObjectEditViewlet
 
         String currentContent = sane.getPostArgument( "current-content" );
 
-        theCurrentContent = theAction.process( theSubject, theMode, currentContent );
+        theCurrentContent = theAction.process( getSubject(), theMode, currentContent );
     }
     
     /**
