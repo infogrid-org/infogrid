@@ -65,7 +65,7 @@ public class WikiObjectDisplayViewlet
             NotPermittedException
     {
 //        try {
-            BlobValue oldValue = (BlobValue) theSubject.getPropertyValue( WikiSubjectArea.WIKIOBJECT_CONTENT );
+            BlobValue oldValue = (BlobValue) getSubject().getPropertyValue( WikiSubjectArea.WIKIOBJECT_CONTENT );
             String    ret;
             if( oldValue != null ) {
                 ret = oldValue.getAsString();
