@@ -153,7 +153,7 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="2">
-                    <file>${libs.jstl11.classpath}</file>
+                    <file>${libs.JSTL.classpath}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>

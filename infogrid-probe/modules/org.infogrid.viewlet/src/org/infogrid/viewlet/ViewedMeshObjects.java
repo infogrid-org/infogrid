@@ -14,10 +14,10 @@
 
 package org.infogrid.viewlet;
 
-import org.infogrid.mesh.MeshObject;
-
-import java.beans.*;
 import java.util.Map;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.set.MeshObjectSet;
+import org.infogrid.model.traversal.TraversalSpecification;
 
 /**
  * This interface represents a collection of MeshObjects, plus information about their context,
@@ -55,4 +55,19 @@ public interface ViewedMeshObjects
      * @return the parameters of the viewing Viewlet. This may be null.
      */
     public Map<String,Object> getViewletParameters();
+
+    /**
+     * Obtain the TraversalSpecification that the Viewlet currently uses.
+     * 
+     * @eturn the TraversalSpecification that the Viewlet currently uses
+     */
+    public TraversalSpecification getTraversalSpecification();
+
+    /**
+     * Obtain the Objects, i.e. the MeshObjects reached by traversing from the
+     * Subject via the TraversalSpecification.
+     * 
+     * @return the Objects, or empty set
+     */
+    public MeshObjectSet getObjects();
 }
