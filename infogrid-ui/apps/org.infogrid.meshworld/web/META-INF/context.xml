@@ -13,7 +13,7 @@
     All rights reserved.
 -->
 
-<Context path="/org.infogrid.meshworld">
+<Context path="/org.infogrid.meshworld" cookies="false">
   <Resource auth="Container"
             type="javax.sql.DataSource"
             driverClassName="com.mysql.jdbc.Driver"

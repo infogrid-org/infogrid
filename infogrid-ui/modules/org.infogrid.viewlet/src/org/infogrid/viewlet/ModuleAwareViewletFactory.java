@@ -72,6 +72,7 @@ public class ModuleAwareViewletFactory
     public ViewletFactoryChoice [] determineFactoryChoicesIgnoringType(
             MeshObjectsToView theObjectsToView )
     {
+        // FIXME: this ignores theObjectsToView? Does not sound right ...
         ArrayList<ViewletFactoryChoice> ret = new ArrayList<ViewletFactoryChoice>();
 
         Iterator<StandardModuleAdvertisement> iter = theModuleRegistry.standardAdvertisementIterator();
@@ -85,7 +86,6 @@ public class ModuleAwareViewletFactory
             
         }
         return ArrayHelper.copyIntoNewArray( ret, ViewletFactoryChoice.class );
-        
     }
 
     /**

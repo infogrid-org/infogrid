@@ -14,30 +14,24 @@
 
 package org.infogrid.jee.servlet.net;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.rest.RestfulRequest;
-import org.infogrid.jee.rest.net.NetRestfulRequest;
 import org.infogrid.jee.rest.net.DefaultNetRestfulRequest;
+import org.infogrid.jee.rest.net.NetRestfulRequest;
 import org.infogrid.jee.sane.SaneServletRequest;
+import org.infogrid.jee.viewlet.templates.StructuredResponse;
 import org.infogrid.jee.servlet.ViewletDispatcherServlet;
 import org.infogrid.jee.viewlet.JeeViewlet;
-
 import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.Proxy;
-
 import org.infogrid.util.logging.Log;
+import org.infogrid.viewlet.CannotViewException;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 /**
  * Extends ViewletDispatcherServlet to also be able to render Shadows and Proxies.
@@ -58,34 +52,40 @@ public class NetViewletDispatcherServlet
      */
     @Override
     protected void performService(
-            HttpServletRequest  realRequest,
-            HttpServletResponse realResponse )
+            RestfulRequest     restful,
+            StructuredResponse structured )
         throws
+            MeshObjectAccessException,
+            CannotViewException,
+            URISyntaxException,
+            IllegalArgumentException,
             ServletException,
             IOException
     {
+        NetRestfulRequest realRestful    = (NetRestfulRequest) restful;
         InfoGridWebApp    app            = InfoGridWebApp.getSingleton();
-        NetRestfulRequest restfulRequest = (NetRestfulRequest) realRequest.getAttribute( RestfulRequest.class.getName() );
 
-        try {
-            NetMeshBaseIdentifier proxyIdentifier = restfulRequest.determineRequestedProxyIdentifier();
-            if( proxyIdentifier != null ) {
-                // trying to show a Proxy
-                Proxy p = restfulRequest.determineRequestedProxy();
-                if( p != null ) {
-                    showInViewlet( p, proxyIdentifier, realRequest, realResponse );
-                } else {
-                    app.reportProblem( new IllegalArgumentException( "Cannot find specified Proxy with identifier " + proxyIdentifier ));
-                }
-            } else {
-                super.performService( realRequest, realResponse);
-            }
-        } catch( MeshObjectAccessException ex ) {
-            app.reportProblem( ex );
-
-        } catch( URISyntaxException ex ) {
-            app.reportProblem( ex );
+        NetMeshBaseIdentifier proxyIdentifier = realRestful.determineRequestedProxyIdentifier();
+        if( proxyIdentifier == null ) {
+            // not trying to show a Proxy
+            super.performService( restful, structured );
+            
+            return;
         }
+                
+        Proxy p = realRestful.determineRequestedProxy();
+        if( p == null ) {
+            // not finding the proxy
+            new IllegalArgumentException( "Cannot find specified Proxy with identifier " + proxyIdentifier );
+        }
+
+        // showing a Proxy
+        restful.getDelegate().setAttribute( JeeViewlet.SUBJECT_ATTRIBUTE_NAME, p );
+
+        String            servletPath = "/v/org/infogrid/jee/viewlet/meshbase/net/Proxy.jsp";
+        RequestDispatcher dispatcher  = app.findLocalizedRequestDispatcher( servletPath, restful.getSaneRequest().acceptLanguageIterator(), getServletContext() );
+
+        runRequestDispatcher( dispatcher, restful, structured );
     }
 
     /**
@@ -105,46 +105,5 @@ public class NetViewletDispatcherServlet
                 lidRequest,
                 context );
         return ret;
-    }
-
-    /**
-     * Show a subject, if any, in a Viewlet.
-     *
-     * @param subject the subject
-     * @param subjectIdentifier the MeshObjectIdentifier of the subject that may or may not have been found
-     * @param realRequest the incoming request
-     * @param realResponse the outgoing response
-     * @throws ServletException a problem occurred
-     */
-    protected void showInViewlet(
-            Proxy                 subject,
-            NetMeshBaseIdentifier subjectIdentifier,
-            HttpServletRequest    realRequest,
-            HttpServletResponse   realResponse  )
-        throws
-            ServletException
-    {
-        InfoGridWebApp             app            = InfoGridWebApp.getSingleton();
-        SaneServletRequest         lidRequest     = (SaneServletRequest) realRequest.getAttribute( SaneServletRequest.class.getName() );
-        ServletContext             servletContext = getServletContext();
-        HttpServletResponseWrapper childResponse  = new HttpServletResponseWrapper( realResponse );
-
-        if( subject != null ) {
-            realRequest.setAttribute( JeeViewlet.SUBJECT_ATTRIBUTE_NAME, subject );
-        }
-
-        String            servletPath = "/v/org/infogrid/jee/viewlet/meshbase/net/Proxy.jsp";
-        RequestDispatcher dispatcher  = null;
-
-        if( servletPath != null ) {
-            dispatcher = app.findLocalizedRequestDispatcher( servletPath, lidRequest.acceptLanguageIterator(), servletContext );
-        }
-
-        try {
-            dispatcher.include( realRequest, childResponse );
-
-        } catch( Throwable t ) {
-            app.reportProblem( t );
-        }
     }
 }

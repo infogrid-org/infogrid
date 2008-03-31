@@ -97,46 +97,4 @@
    <rtexprvalue>true</rtexprvalue>
   </attribute>
  </tag>
-
- <tag>
-  <name>tabbediterate</name>
-  <tag-class>org.infogrid.jee.taglib.candy.TabbedCursorIteratorTag</tag-class>
-  <attribute>
-   <name>cursorIteratorName</name>
-   <required>true</required>
-   <rtexprvalue>true</rtexprvalue>
-  </attribute>
-  <attribute>
-   <name>loopVar</name>
-   <rtexprvalue>true</rtexprvalue>
-  </attribute>
-  <attribute>
-   <name>filter</name>
-   <rtexprvalue>true</rtexprvalue>
-  </attribute>
-  <attribute>
-   <name>ignore</name>
-   <rtexprvalue>true</rtexprvalue>
-  </attribute>
-  <attribute>
-   <name>scope</name>
-   <rtexprvalue>true</rtexprvalue>
-  </attribute>
- </tag>
-
- <tag>
-  <name>tabbediterateheader</name>
-  <tag-class>org.infogrid.jee.taglib.candy.TabbedCursorIteratorHeaderTag</tag-class>
- </tag>
-    
- <tag>
-  <name>tabbediteratecontentrow</name>
-  <tag-class>org.infogrid.jee.taglib.candy.TabbedCursorIteratorContentRowTag</tag-class>
- </tag>
-    
- <tag>
-  <name>tabbediteratenocontent</name>
-  <tag-class>org.infogrid.jee.taglib.candy.TabbedCursorIteratorNoContentTag</tag-class>
- </tag>
-
 </taglib>

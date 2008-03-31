@@ -134,7 +134,7 @@ public class HttpShellFilter
             performFactoryOperations( lidRequest );
         
         } catch( Exception ex ) {
-            app.reportProblem( ex );
+            log.error( ex );
         }
         chain.doFilter( realRequest, realResponse );
     }
