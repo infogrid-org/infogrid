@@ -14,26 +14,22 @@
 
 package org.infogrid.jee.viewlet.bulk;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Iterator;
+import javax.servlet.ServletException;
 import org.infogrid.context.Context;
-import org.infogrid.jee.app.InfoGridWebApp;
+import org.infogrid.jee.rest.RestfulRequest;
+import org.infogrid.jee.viewlet.templates.StructuredResponse;
 import org.infogrid.jee.viewlet.SimpleJeeViewlet;
-
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.externalized.xml.BulkExternalizedMeshObjectXmlEncoder;
-
 import org.infogrid.meshbase.BulkLoadException;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
-
-import org.infogrid.util.logging.Log;
 import org.infogrid.util.http.SaneRequest;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
-
-import java.io.*;
-import java.util.Iterator;
+import org.infogrid.util.logging.Log;
 
 /**
  * This Viewlet allows the user to bulk-load data into the MeshBase.
@@ -79,14 +75,15 @@ public class BulkLoaderViewlet
      */
     @Override
     public void performBefore(
-            ServletContext      context,
-            HttpServletRequest  request,
-            HttpServletResponse response )
+            RestfulRequest     request,
+            StructuredResponse response )
+        throws
+            ServletException
     {
-        if( !"POST".equals( request.getMethod() )) {
+        if( !"POST".equals( request.getDelegate().getMethod() )) {
             return;
         }
-        SaneRequest theSaneRequest = (SaneRequest) request.getAttribute( SaneRequest.class.getName() );
+        SaneRequest theSaneRequest = (SaneRequest) request.getDelegate().getAttribute( SaneRequest.class.getName() );
         
         String bulkXml = theSaneRequest.getPostArgument( "bulkXml" );
 
@@ -110,8 +107,8 @@ public class BulkLoaderViewlet
             }
             
         } catch( BulkLoadException ex ) {
-            InfoGridWebApp.getSingleton().reportProblem( ex );
             theBulkXml = bulkXml;
+            throw new ServletException( ex );
 
         } catch( TransactionException ex ) {
             log.error( ex );
