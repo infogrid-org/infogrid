@@ -28,10 +28,12 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
+
     <tag>
         <name>refresh</name>
         <tag-class>org.infogrid.jee.taglib.util.RefreshTag</tag-class>
     </tag>
+
     <tag>
         <name>rotatingTr</name>
         <tag-class>org.infogrid.jee.taglib.util.RotatingTrTag</tag-class>
@@ -55,6 +57,54 @@
         </attribute>
         <attribute>
             <name>lastRowHtmlClass</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>timeStamp</name>
+        <tag-class>org.infogrid.jee.taglib.util.TimeStampTag</tag-class>
+        <attribute>
+            <name>objectName</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>formatString</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>filter</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>ignore</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>scope</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>toExternalForm</name>
+        <tag-class>org.infogrid.jee.taglib.util.ToExternalFormTag</tag-class>
+        <attribute>
+            <name>objectName</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>filter</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>ignore</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>scope</name>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
