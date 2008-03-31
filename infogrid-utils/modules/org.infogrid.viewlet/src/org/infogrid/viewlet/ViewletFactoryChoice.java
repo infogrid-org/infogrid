@@ -136,6 +136,7 @@ public abstract class ViewletFactoryChoice
      * @param other the Object to compare to
      * @return true if the Objects are equal
      */
+    @Override
     public boolean equals(
             Object other )
     {
@@ -146,6 +147,18 @@ public abstract class ViewletFactoryChoice
             return ret;
         }
         return false;
+    }
+
+    /**
+     * Hash code.
+     * 
+     * @return the hash code
+     */
+    @Override
+    public int hashCode()
+    {
+        int ret = getImplementationName().hashCode();
+        return ret;
     }
 
     /**

@@ -34,7 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * <p>Main dispatcher for the different request types, e.g. canvas vs. not, include files etc.</p>
+ * <p>Main dispatcher for the different request types.</p>
  * <p>The rules are as follows:</p>
  * <ul>
  *  <li>If the path matches the <code>REST_REGEX</code> regular expression as specified
@@ -46,9 +46,6 @@ import java.util.regex.Pattern;
  * <p>REST-ful processing here means that the incoming URL is interpreted as a request for
  *    a <code>MeshObject</code>, and control is passed to the
  *    {@link org.infogrid.jee.servlet.ViewletDispatcherServlet ViewletDispatcherServlet}.</p>
- * <p>If <code>CANVAS_PATH</code> has been specified in the <code>web.xml</code> file for this
- *    Filter, control is passed on to the canvas, which in turn has the responsibility to
- *    pass on control to the <code>ViewletDispatcherServlet</code>.</p>
  * <p>The following Filter parameters are available in the <code>web.xml</code> file:</p>
  * <table class="infogrid-border">
  *  <thead>
@@ -64,11 +61,6 @@ import java.util.regex.Pattern;
  *    <td>Java regular expression that categorizes requests into REST-ful requests (regex matches) and
  *        others (regex does not match)</td>
  *    <td>Optional. Defaults to &quot;at least four characters in the first segment of the path, or <code>/</code> itself.</td>
- *   </tr>
- *   <tr>
- *    <td><code>CANVAS_PATH</code></td>
- *    <td>Filter parameter specifying the path to the canvas.</td>
- *    <td>Optional. No default.</td>
  *   </tr>
  *   <tr>
  *    <td><code>VIEWLET_DISPATCHER_SERVLET_NAME</code></td>
@@ -132,17 +124,7 @@ public class MainDispatcherFilter
                 // no canvas
                 theRequestDispatcher = context.getNamedDispatcher( theViewletDispatcherServletName );
             }
-            if( theRequestDispatcher == null ) {
-                throw new ServletException(
-                        getClass().getName()
-                        + " is misconfigured: cannot find RequestDispatcher via parameter "
-                        + CANVAS_PATH_PARAMETER
-                        + " nor servlet "
-                        + theViewletDispatcherServletName
-                        + "." );
-            }
             
-            response.setContentType( "text/html" );
             theRequestDispatcher.include( request, response );
 
         } else {
@@ -171,8 +153,6 @@ public class MainDispatcherFilter
         }
         theRestPattern = Pattern.compile( restRegex );
 
-        theCanvasPath = filterConfig.getInitParameter( CANVAS_PATH_PARAMETER );
-        
         theViewletDispatcherServletName = filterConfig.getInitParameter( VIEWLET_DISPATCHER_SERVLET_NAME_PARAMETER );
         if( theViewletDispatcherServletName == null || theViewletDispatcherServletName.length() == 0 ) {
             theViewletDispatcherServletName = VIEWLET_DISPATCHER_SERVLET_NAME_DEFAULT;
@@ -209,11 +189,6 @@ public class MainDispatcherFilter
      */
     public static final String REST_REGEX_DEFAULT = "^/([^/]{4,}(.*))?$"; // anything that has more than 3 characters in the first segment, or / itself
 
-    /**
-     * Name of the Filter configuration parameter that contains the path to the canvas.
-     */
-    public static final String CANVAS_PATH_PARAMETER = "CANVAS_PATH";
-    
     /**
      * Name of the Filter configuration parameter that identifies the servlet name of the ViewletDispatcherServlet.
      */

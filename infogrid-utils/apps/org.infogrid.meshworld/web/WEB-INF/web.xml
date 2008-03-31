@@ -41,21 +41,8 @@
  </filter>
 
  <filter>
-  <filter-name>ErrorReportingTextSubstitutionFilter</filter-name>
-  <filter-class>org.infogrid.jee.servlet.ErrorReportingTextSubstitutionFilter</filter-class>
-  <init-param>
-   <param-name>ERROR_FILTER_PARAMETER</param-name>
-   <param-value>@ERRORS@</param-value>
-  </init-param>
- </filter>
-
- <filter>
   <filter-name>MainDispatcherFilter</filter-name>
   <filter-class>org.infogrid.jee.servlet.MainDispatcherFilter</filter-class>
-  <init-param>
-   <param-name>CANVAS_PATH</param-name>
-   <param-value>/s/canvas/canvas.jsp</param-value>
-  </init-param>
  </filter>
 
  <filter>
@@ -70,11 +57,6 @@
 
  <filter-mapping>
   <filter-name>InitializationFilter</filter-name>
-  <url-pattern>/*</url-pattern>
- </filter-mapping>
-
- <filter-mapping>
-  <filter-name>ErrorReportingTextSubstitutionFilter</filter-name>
   <url-pattern>/*</url-pattern>
  </filter-mapping>
 

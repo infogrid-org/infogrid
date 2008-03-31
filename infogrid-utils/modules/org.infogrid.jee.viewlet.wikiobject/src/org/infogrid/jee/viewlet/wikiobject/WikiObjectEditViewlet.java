@@ -27,10 +27,9 @@ import org.infogrid.model.Wiki.WikiSubjectArea;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.infogrid.jee.rest.RestfulRequest;
+import org.infogrid.jee.viewlet.templates.StructuredResponse;
 
 /**
  * Viewlet that can display and edit WikiObjects.
@@ -77,21 +76,20 @@ public class WikiObjectEditViewlet
      */
     @Override
     public void performBefore(
-            ServletContext      context,
-            HttpServletRequest  request,
-            HttpServletResponse response )
+            RestfulRequest     request,
+            StructuredResponse response )
         throws
             ServletException
     {
-        SaneRequest sane = (SaneRequest) request.getAttribute( SaneRequest.class.getName() );
+        SaneRequest sane = request.getSaneRequest();
 
         String actionName = sane.getPostArgument( "action" );
         Action theAction  = Action.findAction( actionName );
         
         Mode theMode = theAction.determineMode();
 
-        request.setAttribute( "action", theAction.getName() );
-        request.setAttribute( "mode",   theMode.getName() );
+        request.getDelegate().setAttribute( "action", theAction.getName() );
+        request.getDelegate().setAttribute( "mode",   theMode.getName() );
 
         String currentContent = sane.getPostArgument( "current-content" );
 

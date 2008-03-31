@@ -50,6 +50,7 @@ import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import org.infogrid.jee.viewlet.templates.DefaultStructuredResponseTemplateFactory;
 
 /**
  * MeshWorldApp application class.
@@ -174,7 +175,12 @@ public class MeshWorldApp
             NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer,
             SimpleContext                           applicationContext )
     {
-        super( mainMeshBase, meshBaseNameServer, new MeshWorldViewletFactory(), null, applicationContext );
+        super(  mainMeshBase,
+                meshBaseNameServer,
+                new MeshWorldViewletFactory(),
+                null,
+                DefaultStructuredResponseTemplateFactory.create(),
+                applicationContext );
     }
 
     /**

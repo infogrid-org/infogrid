@@ -25,7 +25,6 @@ import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.util.FactoryException;
-import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
 
 import org.infogrid.viewlet.CannotViewException;
@@ -39,10 +38,13 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import org.infogrid.jee.viewlet.templates.JspStructuredResponseTemplate;
+import org.infogrid.jee.viewlet.templates.StructuredResponse;
+import org.infogrid.jee.viewlet.templates.StructuredResponseTemplate;
+import org.infogrid.model.traversal.TraversalDictionary;
 import org.infogrid.model.traversal.TraversalSpecification;
 
 /**
@@ -71,14 +73,31 @@ public class ViewletDispatcherServlet
             ServletException,
             IOException
     {
+        InfoGridWebApp      app            = InfoGridWebApp.getSingleton();
         HttpServletRequest  realRequest    = (HttpServletRequest)  request;
         HttpServletResponse realResponse   = (HttpServletResponse) response;
-        SaneServletRequest  saneRequest    = (SaneServletRequest) request.getAttribute( SaneServletRequest.class.getName() );
+        SaneServletRequest  saneRequest    = (SaneServletRequest)  request.getAttribute( SaneServletRequest.class.getName() );
         RestfulRequest      restfulRequest = createRestfulRequest( saneRequest, realRequest.getContextPath() );
 
         realRequest.setAttribute( RestfulRequest.class.getName(), restfulRequest );
 
-        performService( realRequest, realResponse );
+        ServletContext     servletContext = getServletContext();
+        StructuredResponse structured     = StructuredResponse.create( realResponse, servletContext );
+
+        try {
+            performService( restfulRequest, structured );
+            
+        } catch( Throwable ex ) {
+            structured.reportProblem( ex );
+        }
+
+        try {
+            StructuredResponseTemplate template = app.getStructuredResponseTemplateFactory().obtainFor( restfulRequest, structured );
+            template.doOutput( realResponse, structured );
+
+        } catch( FactoryException ex ) {
+            throw new ServletException( ex );
+        }
     }
 
     /**
@@ -90,75 +109,37 @@ public class ViewletDispatcherServlet
      * @throws IOException thrown if an I/O error occurred
      */
     protected void performService(
-            HttpServletRequest  realRequest,
-            HttpServletResponse realResponse )
+            RestfulRequest     restful,
+            StructuredResponse structured )
         throws
+            MeshObjectAccessException,
+            CannotViewException,
+            URISyntaxException,
+            IllegalArgumentException,
             ServletException,
             IOException
     {
-        InfoGridWebApp app            = InfoGridWebApp.getSingleton();
-        RestfulRequest restfulRequest = (RestfulRequest) realRequest.getAttribute( RestfulRequest.class.getName() );
+        InfoGridWebApp       app               = InfoGridWebApp.getSingleton();
+        MeshObject           subject           = restful.determineRequestedMeshObject();
+        MeshObjectIdentifier subjectIdentifier = restful.determineRequestedMeshObjectIdentifier();
+        String               viewletClassName  = restful.getRequestedViewletClassName();
+        String               traversalString   = restful.getRequestedTraversal();
+        TraversalDictionary  traversalDict     = app.getTraversalDictionary();
 
-        try {
-            MeshObject           subject           = restfulRequest.determineRequestedMeshObject();
-            MeshObjectIdentifier subjectIdentifier = restfulRequest.determineRequestedMeshObjectIdentifier();
+        TraversalSpecification traversal = ( traversalDict != null ) ? traversalDict.translate( subject, traversalString ) : null;
+        MeshObjectsToView      toView    = MeshObjectsToView.create( subject, null, viewletClassName, null, traversal );
 
-            showInViewlet( subject, subjectIdentifier, realRequest, realResponse );
-
-        } catch( MeshObjectAccessException ex ) {
-            app.reportProblem( ex );
-
-        } catch( URISyntaxException ex ) {
-            app.reportProblem( ex );
+        if( subject == null ) {
+            throw new CannotViewException.NoSubject( subjectIdentifier );
         }
-    }
 
-    /**
-     * Show a subject, if any, in a Viewlet.
-     *
-     * @param subject the subject
-     * @param subjectIdentifier the MeshObjectIdentifier of the subject that may or may not have been found
-     * @param realRequest the incoming request
-     * @param realResponse the outgoing response
-     * @throws ServletException a problem occurred
-     */
-    protected void showInViewlet(
-            MeshObject           subject,
-            MeshObjectIdentifier subjectIdentifier,
-            HttpServletRequest   realRequest,
-            HttpServletResponse  realResponse  )
-        throws
-            ServletException
-    {
-        InfoGridWebApp             app            = InfoGridWebApp.getSingleton();
-        Context                    c              = app.getApplicationContext();
-        SaneServletRequest         lidRequest     = (SaneServletRequest) realRequest.getAttribute( SaneServletRequest.class.getName() );
-        ServletContext             servletContext = getServletContext();
-        HttpServletResponseWrapper childResponse  = new HttpServletResponseWrapper( realResponse );
-        MeshObjectsToView          toView         = null;
-        JeeViewlet                 viewlet        = null;
+        Context        c              = app.getApplicationContext();
+        JeeViewlet     viewlet        = null;
 
         if( subject != null ) {
-            realRequest.setAttribute( JeeViewlet.SUBJECT_ATTRIBUTE_NAME, subject );
+            restful.getDelegate().setAttribute( JeeViewlet.SUBJECT_ATTRIBUTE_NAME, subject );
 
             try {
-                // Look for the lid-format string
-                String lidFormat        = realRequest.getParameter( LID_FORMAT_PARAMETER_NAME );
-                String viewletClassName = null;
-
-                if( lidFormat != null && lidFormat.startsWith( VIEWLET_PREFIX )) {
-                    viewletClassName = lidFormat.substring( VIEWLET_PREFIX.length() );
-                }
-
-                // Look for the lid-xpath string
-                String                 lidXpath  = realRequest.getParameter( LID_XPATH_PARAMETER_NAME );
-                TraversalSpecification traversal = null;
-                if( lidXpath != null && lidXpath.length() > 0 ) {
-                    traversal = app.getTraversalDictionary().translate( subject, lidXpath );
-                }
-                
-                toView = MeshObjectsToView.create( subject, null, viewletClassName, null, traversal );
-
                 viewlet = (JeeViewlet) app.getViewletFactory().obtainFor( toView, c );
 
             } catch( FactoryException ex ) {
@@ -174,50 +155,106 @@ public class ViewletDispatcherServlet
         }
 
         if( servletPath != null ) {
-            dispatcher = app.findLocalizedRequestDispatcher( servletPath, lidRequest.acceptLanguageIterator(), servletContext );
+            dispatcher = app.findLocalizedRequestDispatcher( servletPath, restful.getSaneRequest().acceptLanguageIterator(), structured.getServletContext() );
+
         } else if( viewlet != null ) {
             log.error( "Viewlet " + viewlet + " returned null servletPath" );
         }
 
-        if( subject == null ) {
-            app.reportProblem( new CannotViewException.NoSubject( subjectIdentifier ));
-
-        } else if( dispatcher != null ) {
+        if( dispatcher != null ) {
 
             // create a stack of Viewlets
-            JeeViewlet oldViewlet = (JeeViewlet) realRequest.getAttribute( JeeViewlet.VIEWLET_ATTRIBUTE_NAME );
-            realRequest.setAttribute( JeeViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
+            JeeViewlet oldViewlet = (JeeViewlet) restful.getDelegate().getAttribute( JeeViewlet.VIEWLET_ATTRIBUTE_NAME );
+            restful.getDelegate().setAttribute( JeeViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
 
-            Throwable thrown = null;
+            StructuredResponse oldStructuredResponse = (StructuredResponse) restful.getDelegate().getAttribute( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
+            restful.getDelegate().setAttribute( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME, structured );
 
             synchronized( viewlet ) {
+                Throwable thrown  = null;
                 try {
                     viewlet.setSubject( subject );
-                    viewlet.performBefore( servletContext, realRequest, childResponse );
+                    viewlet.performBefore( restful, structured );
 
-                    viewlet.setCurrentRequest( realRequest );
+                    viewlet.setCurrentRequest( restful );
 
-                    dispatcher.include( realRequest, childResponse );
+                    runRequestDispatcher( dispatcher, restful, structured );
+                    
 
-                } catch( Throwable t ) {
+                } catch( RuntimeException t ) {
                     thrown = t;
+                    throw (RuntimeException) thrown; // notice the finally block
 
-                    app.reportProblem( t );
+                } catch( CannotViewException t ) {
+                    thrown = t;
+                    throw (CannotViewException) thrown; // notice the finally block
+
+                } catch( ServletException t ) {
+                    thrown = t;
+                    throw (ServletException) thrown; // notice the finally block
+
+                } catch( IOException t ) {
+                    thrown = t;
+                    throw (IOException) thrown; // notice the finally block
 
                 } finally {
-                    viewlet.performAfter( servletContext, realRequest, childResponse, thrown );
-                    realRequest.setAttribute( JeeViewlet.VIEWLET_ATTRIBUTE_NAME, oldViewlet );
+                    viewlet.performAfter( restful, structured, thrown );
+
+                    restful.getDelegate().setAttribute( JeeViewlet.VIEWLET_ATTRIBUTE_NAME, oldViewlet );
+                    restful.getDelegate().setAttribute( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME, oldStructuredResponse );
                 }
             }
 
         } else if( viewlet != null ) {
-            app.reportProblem( new CannotViewException.InvalidViewlet( viewlet, toView ));
+            throw new CannotViewException.InvalidViewlet( viewlet, toView );
 
         } else {
-            app.reportProblem( new CannotViewException.NoViewletFound( toView ));
+            throw new CannotViewException.NoViewletFound( toView );
         }
     }
 
+    /**
+     * Invoke the RequestDispatcher, can catch the results in the default section of the StructuredResponse.
+     * 
+     * @param dispatcher the RequestDispatcher to invoke
+     * @param restful the incoming request
+     * @param structured the outgoing response
+     * @throws javax.servlet.ServletException processing failed
+     * @throws java.io.IOException I/O error
+     */
+    protected void runRequestDispatcher(
+            RequestDispatcher  dispatcher,
+            RestfulRequest     restful,
+            StructuredResponse structured )
+        throws
+            ServletException,
+            IOException
+    {
+        BufferedServletResponse bufferedResponse = new BufferedServletResponse( structured.getDelegate() );
+
+        dispatcher.include( restful.getDelegate(), bufferedResponse );
+
+        byte [] bufferedBytes  = bufferedResponse.getBufferedServletOutputStreamOutput();
+        String  bufferedString = bufferedResponse.getBufferedPrintWriterOutput();
+
+        if( bufferedBytes != null ) {
+            if( bufferedString != null ) {
+                // don't know what to do here -- defaults to "string gets processed, bytes ignore"
+                log.warn( "Have both String and byte content, don't know what to do: " + restful );
+                structured.setDefaultSectionContent( bufferedString ); // do something is better than nothing
+
+            } else {
+                structured.setDefaultSectionContent( bufferedBytes );
+            }
+
+        } else if( bufferedString != null ) {
+            structured.setDefaultSectionContent( bufferedString );
+        } else {
+            // do nothing
+        }
+        structured.setMimeType( bufferedResponse.getContentType() );
+    }
+                
     /**
      * Construct a RestfulRequest object that is suitable to the URL-to-MeshObject mapping
      * applied by this application.
@@ -235,24 +272,4 @@ public class ViewletDispatcherServlet
                 context );
         return ret;
     }
-    
-    /**
-     * Name of the LID format parameter.
-     */
-    public static final String LID_FORMAT_PARAMETER_NAME = "lid-format";
-
-    /**
-     * The prefix in the lid-format string that indicates the name of a viewlet.
-     */
-    public static final String VIEWLET_PREFIX = "viewlet:";
-    
-    /**
-     * Name of the LID Xpath parameter.
-     */
-    public static final String LID_XPATH_PARAMETER_NAME = "lid-xpath";
-
-    /**
-     * Our ResourceHelper.
-     */
-    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( ViewletDispatcherServlet.class );
 }
