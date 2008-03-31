@@ -22,6 +22,8 @@ import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.util.http.SaneRequest;
 
 import java.net.URISyntaxException;
+import javax.servlet.http.HttpServletRequest;
+import org.infogrid.jee.sane.SaneServletRequest;
 
 /**
  *
@@ -34,8 +36,8 @@ public abstract class AbstractRestfulRequest
      * Constructor.
      */
     protected AbstractRestfulRequest(
-            SaneRequest lidRequest,
-            String      contextPath )
+            SaneServletRequest lidRequest,
+            String             contextPath )
     {
         theSaneRequest = lidRequest;
         theContextPath = contextPath;
@@ -77,17 +79,40 @@ public abstract class AbstractRestfulRequest
     }
 
     /**
+     * Determine the requested traversal, if any.
+     * 
+     * @return the traversal
+     */
+    public String getRequestedTraversal()
+    {
+        if( theRequestedTraversal == null ) {
+            String format = theSaneRequest.getArgument( LID_TRAVERSAL_PARAMETER_NAME );
+
+            if( format != null ) {
+                theRequestedTraversal = format;
+            } else {
+                theRequestedTraversal = NO_ANSWER_STRING;
+            }
+        }
+        if( (Object) theRequestedTraversal != (Object) NO_ANSWER_STRING ) { // typecast to avoid warning
+            return theRequestedTraversal;
+        } else {
+            return null;
+        }        
+    }
+    
+    /**
      * Obtain the name of the requested Viewlet, if any.
      *
      * @return class name of the requested Viewlet
      */
-    public String getRequestedViewletClass()
+    public String getRequestedViewletClassName()
     {
         if( theRequestedViewletClass == null ) {
-            String format = theSaneRequest.getArgument( "lid-format" );
-            final String tag = "viewlet:";
-            if( format != null && format.startsWith( tag )) {
-                theRequestedViewletClass = format.substring( tag.length() );
+            String format = theSaneRequest.getArgument( LID_FORMAT_PARAMETER_NAME );
+
+            if( format != null && format.startsWith( VIEWLET_PREFIX )) {
+                theRequestedViewletClass = format.substring( VIEWLET_PREFIX.length() );
             } else {
                 theRequestedViewletClass = NO_ANSWER_STRING;
             }
@@ -99,6 +124,31 @@ public abstract class AbstractRestfulRequest
         }
     }
     
+    /**
+     * Obtain the name of the requested layout, if any.
+     * 
+     * @return class name of the requested layout, if any
+     */
+    public String getRequestedTemplate()
+    {
+        if( theRequestedTemplate == null ) {
+            theRequestedTemplate = theSaneRequest.getArgument( LID_TEMPLATE_PARAMETER_NAME );
+
+            if( theRequestedTemplate == null ) {
+                theRequestedTemplate = theSaneRequest.getCookieValue( LID_TEMPLATE_COOKIE_NAME );
+                
+                if( theRequestedTemplate == null ) {
+                    theRequestedTemplate = NO_ANSWER_STRING;
+                }
+            }
+        }
+        if( (Object) theRequestedTemplate != (Object) NO_ANSWER_STRING ) { // typecast to avoid warning
+            return theRequestedTemplate;
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Determine the identifier of the requested MeshBase.
      * 
@@ -156,9 +206,19 @@ public abstract class AbstractRestfulRequest
     }
 
     /**
+     * Determine the underlying HttpServletRequest.
+     * 
+     * @return the delegate
+     */
+    public HttpServletRequest getDelegate()
+    {
+        return theSaneRequest.getDelegate();
+    }
+
+    /**
      * The underlying SaneRequest.
      */
-    protected SaneRequest theSaneRequest;
+    protected SaneServletRequest theSaneRequest;
 
     /**
      * The context path of the web application.
@@ -169,11 +229,21 @@ public abstract class AbstractRestfulRequest
      * The calculated absolute context path.
      */
     protected String theAbsoluteContextPath;
-    
+
+    /**
+     * The requested traversal, if any. (buffered)
+     */
+    protected String theRequestedTraversal = null;
+
     /**
      * The requested Viewlet class, if any. (buffered)
      */
     protected String theRequestedViewletClass = null;
+
+    /**
+     * The requested formatting template, if any.
+     */
+    protected String theRequestedTemplate = null;
 
     /**
      * The requested MeshBaseIdentifier.
@@ -195,4 +265,40 @@ public abstract class AbstractRestfulRequest
      * find an answer."
      */
     protected static final String NO_ANSWER_STRING = new String( "" ); // don't want to do String.intern() here
+
+    /**
+     * Name of the LID format parameter.
+     */
+    public static final String LID_FORMAT_PARAMETER_NAME = "lid-format";
+
+    /**
+     * The prefix in the lid-format string that indicates the name of a viewlet.
+     */
+    public static final String VIEWLET_PREFIX = "viewlet:";
+    
+    /**
+     * Name of the LID traversal parameter.
+     */
+    public static final String LID_TRAVERSAL_PARAMETER_NAME = "lid-traversal";
+    
+    /**
+     * The prefix in the lid-traversal string that indicates an Xpath.
+     */
+    public static final String XPATH_PREFIX = "xpath:";
+    
+    /**
+     * Name of the LID template parameter.
+     */
+    public static final String LID_TEMPLATE_PARAMETER_NAME = "lid-template";
+    
+    /**
+     * Name of the cookie representing the LID template.
+     */
+    public static final String LID_TEMPLATE_COOKIE_NAME = "org.netmesh.lid-template";
+
+    /**
+     * The prefix in the lid-template string that indicates the name of a class.
+     */
+    public static final String CLASS_PREFIX = "class:";
+    
 }

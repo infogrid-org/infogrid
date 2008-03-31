@@ -22,6 +22,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 
 import java.io.IOException;
+import org.infogrid.jee.rest.RestfulRequest;
+import org.infogrid.jee.viewlet.templates.JspStructuredResponseTemplate;
+import org.infogrid.jee.viewlet.templates.StructuredResponse;
+import org.infogrid.jee.viewlet.templates.TextHtmlStructuredResponseSection;
         
 /**
  * <p>Generates a consistent refresh button.
@@ -61,6 +65,15 @@ public class RefreshTag
             JspException,
             IgnoreException
     {
+        StructuredResponse theResponse = (StructuredResponse) lookupOrThrow(
+                JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
+
+        // this needs to be simple lookup so the periods in the class name don't trigger nestedLookup
+        RestfulRequest restful = (RestfulRequest) InfoGridJspUtils.simpleLookup(
+                pageContext,
+                RestfulRequest.class.getName(),
+                getScope() );
+
         HttpServletRequest realRequest = ((HttpServletRequest)pageContext.getRequest());
         
         String href  = realRequest.getRequestURI();
@@ -76,6 +89,16 @@ public class RefreshTag
         buf.append( "<a href=\"" ).append( href ).append( "\">" );
 
         print( buf.toString() );
+
+        StringBuilder css = new StringBuilder();
+        css.append( "<link rel=\"stylesheet\" href=\"" );
+        css.append( restful.getContextPath() );
+        css.append( "/v/" );
+        css.append( getClass().getName().replace( '.' , '/' ));
+        css.append( ".css" );
+        css.append( "\" />\n" );
+
+        theResponse.appendToSectionContent( TextHtmlStructuredResponseSection.HTML_HEAD_SECTION, css.toString() );
 
         return EVAL_BODY_INCLUDE;
     }
