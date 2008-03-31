@@ -53,6 +53,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.jee.viewlet.templates.DefaultStructuredResponseTemplateFactory;
 import org.infogrid.meshbase.net.NetMeshBase;
 
 /**
@@ -201,7 +202,12 @@ public class NetMeshWorldApp
             NameServer<NetMeshBaseIdentifier,NetMeshBase> meshBaseNameServer,
             SimpleContext                                 applicationContext )
     {
-        super( mainMeshBase, (NameServer) meshBaseNameServer, new NetMeshWorldViewletFactory(), null, applicationContext );
+        super(  mainMeshBase,
+                (NameServer) meshBaseNameServer,
+                new NetMeshWorldViewletFactory(),
+                null,
+                DefaultStructuredResponseTemplateFactory.create(),
+                applicationContext );
     }
 
     /**

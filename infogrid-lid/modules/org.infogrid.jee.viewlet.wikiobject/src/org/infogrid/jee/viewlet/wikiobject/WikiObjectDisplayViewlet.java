@@ -21,8 +21,6 @@ import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.Wiki.WikiSubjectArea;
 
-import org.infogrid.util.logging.Log;
-
 /**
  * Viewlet that can display a WikiObject.
  */
@@ -30,8 +28,6 @@ public class WikiObjectDisplayViewlet
         extends
             SimpleJeeViewlet
 {
-    private static final Log log = Log.getLogInstance( WikiObjectDisplayViewlet.class ); // our own, private logger
-
     /**
      * Factory method.
      *
@@ -64,18 +60,13 @@ public class WikiObjectDisplayViewlet
         throws
             NotPermittedException
     {
-//        try {
-            BlobValue oldValue = (BlobValue) getSubject().getPropertyValue( WikiSubjectArea.WIKIOBJECT_CONTENT );
-            String    ret;
-            if( oldValue != null ) {
-                ret = oldValue.getAsString();
-            } else {
-                ret = "";
-            }
-            return ret;
-
-//        } catch( NotPermittedException ex ) {
-//            throw new ServletException( ex );
-//        }        
+        BlobValue oldValue = (BlobValue) getSubject().getPropertyValue( WikiSubjectArea.WIKIOBJECT_CONTENT );
+        String    ret;
+        if( oldValue != null ) {
+            ret = oldValue.getAsString();
+        } else {
+            ret = "";
+        }
+        return ret;
     }
 }

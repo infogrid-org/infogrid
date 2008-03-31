@@ -22,12 +22,12 @@ import org.infogrid.meshbase.MeshObjectAccessException;
 
 import org.infogrid.util.NameServer;
 import org.infogrid.util.http.HTTP;
-import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
 
 import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.jee.sane.SaneServletRequest;
 
 /**
  * Default implementation of RestfulRequest.
@@ -42,8 +42,8 @@ public class DefaultRestfulRequest
      * Factory method.
      */
     public static DefaultRestfulRequest create(
-            SaneRequest lidRequest,
-            String      contextPath )
+            SaneServletRequest lidRequest,
+            String             contextPath )
     {
         return new DefaultRestfulRequest( lidRequest, contextPath );
     }
@@ -52,8 +52,8 @@ public class DefaultRestfulRequest
      * Constructor.
      */
     protected DefaultRestfulRequest(
-            SaneRequest lidRequest,
-            String      contextPath )
+            SaneServletRequest lidRequest,
+            String             contextPath )
     {
         super( lidRequest, contextPath );
     }

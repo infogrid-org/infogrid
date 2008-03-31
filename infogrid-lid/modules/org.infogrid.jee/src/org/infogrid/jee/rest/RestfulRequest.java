@@ -22,10 +22,10 @@ import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.util.http.SaneRequest;
 
 import java.net.URISyntaxException;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Encapsulates parameter parsing according to InfoGrid REST conventions.
- * The extraction is only being performed when needed.
  */
 public interface RestfulRequest
 {
@@ -72,6 +72,7 @@ public interface RestfulRequest
             throws
                 MeshObjectAccessException,
                 URISyntaxException;
+
     /**
      * Determine the requested MeshObject.
      * 
@@ -83,9 +84,30 @@ public interface RestfulRequest
                 URISyntaxException;
 
     /**
+     * Determine the requested traversal, if any.
+     * 
+     * @return the traversal
+     */
+    public String getRequestedTraversal();
+    
+    /**
      * Obtain the name of the requested Viewlet, if any.
      *
      * @return class name of the requested Viewlet
      */
-    public String getRequestedViewletClass();
+    public String getRequestedViewletClassName();
+    
+    /**
+     * Obtain the name of the requested layout, if any.
+     * 
+     * @return class name of the requested layout, if any
+     */
+    public String getRequestedTemplate();
+
+    /**
+     * Determine the underlying HttpServletRequest.
+     * 
+     * @return the delegate
+     */
+    public HttpServletRequest getDelegate();
 }
