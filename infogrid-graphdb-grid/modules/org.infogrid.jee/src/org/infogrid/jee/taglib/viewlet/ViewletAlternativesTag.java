@@ -35,6 +35,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 
 import java.util.HashMap;
+import org.infogrid.jee.rest.RestfulRequest;
+import org.infogrid.jee.viewlet.templates.JspStructuredResponseTemplate;
+import org.infogrid.jee.viewlet.templates.StructuredResponse;
+import org.infogrid.jee.viewlet.templates.TextHtmlStructuredResponseSection;
 
 /**
  * Allows the user to select an alternate JeeViewlet to display the current subject.
@@ -73,7 +77,17 @@ public class ViewletAlternativesTag
             JspException,
             IgnoreException
     {
-        Viewlet currentViewlet = (Viewlet) lookupOrThrow( JeeViewlet.VIEWLET_ATTRIBUTE_NAME );
+        StructuredResponse theResponse = (StructuredResponse) lookupOrThrow(
+                JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
+
+        // this needs to be simple lookup so the periods in the class name don't trigger nestedLookup
+        RestfulRequest restful = (RestfulRequest) InfoGridJspUtils.simpleLookup(
+                pageContext,
+                RestfulRequest.class.getName(),
+                getScope() );
+
+        Viewlet currentViewlet = (Viewlet) lookupOrThrow(
+                JeeViewlet.VIEWLET_ATTRIBUTE_NAME );
         
         MeshObject subject = currentViewlet.getSubject();
         Context    c       = currentViewlet.getContext();
@@ -112,6 +126,26 @@ public class ViewletAlternativesTag
                 }
                 println( "</ul>" );
                 println( "</div>" );
+
+                StringBuilder js = new StringBuilder();
+                js.append( "<script src=\"" );
+                js.append( restful.getContextPath() );
+                js.append( "/v/" );
+                js.append( getClass().getName().replace( '.' , '/' ));
+                js.append( ".js" );
+                js.append( "\" type=\"text/javascript\"></script>\n" );
+
+                StringBuilder css = new StringBuilder();
+                css.append( "<link rel=\"stylesheet\" href=\"" );
+                css.append( restful.getContextPath() );
+                css.append( "/v/" );
+                css.append( getClass().getName().replace( '.' , '/' ));
+                css.append( ".css" );
+                css.append( "\" />\n" );
+                
+                theResponse.appendToSectionContent( TextHtmlStructuredResponseSection.HTML_HEAD_SECTION, js.toString() );
+                theResponse.appendToSectionContent( TextHtmlStructuredResponseSection.HTML_HEAD_SECTION, css.toString() );
+            
             }
 
         } catch( CannotViewException ex ) {

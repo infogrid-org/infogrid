@@ -26,11 +26,10 @@ import java.io.StringWriter;
 
 /**
  * <p>A ServletResponse that buffers all content. It does not write any content
- * to the delegate stream; the caller must do that.</p>
+ *    to the delegate stream; the caller must do that.</p>
  * 
- * <p>Both a byte[] and a String buffer
- * may be created, in order to avoid converting to and from String / byte all
- * the time.</p>
+ * <p>Both a byte[] and a String buffer may be created, in order to avoid converting
+ *    to and from String and byte [] all the time.</p>
  */
 @SuppressWarnings("deprecation")
 public class BufferedServletResponse
@@ -208,6 +207,16 @@ public class BufferedServletResponse
         theContentType = contentType;
         
         super.setContentType( contentType );
+    }
+
+    /**
+     * I can't believe that there is no API to obtain the set content type.
+     *
+     * @return the content type
+     */
+    public String getContentType()
+    {
+        return theContentType;
     }
 
     /**

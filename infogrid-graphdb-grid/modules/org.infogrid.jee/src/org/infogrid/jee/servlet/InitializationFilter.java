@@ -148,6 +148,7 @@ public class InitializationFilter
                     log.error( "root cause: ", ((ServletException)thrown).getRootCause() );
                 }
 
+                // these three lines of code are for the debugger's benefit only
                 StringWriter w = new StringWriter();
                 thrown.printStackTrace( new PrintWriter( w ));
                 String error = w.getBuffer().toString();

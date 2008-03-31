@@ -1,10 +1,13 @@
-<%@    taglib prefix="set"   uri="/v/org/infogrid/jee/taglib/mesh/objectset/objectset.tld"
+<%@    page contentType="text/html"
+ %><%@ taglib prefix="set"   uri="/v/org/infogrid/jee/taglib/mesh/objectset/objectset.tld"
  %><%@ taglib prefix="mesh"  uri="/v/org/infogrid/jee/taglib/mesh/mesh.tld"
  %><%@ taglib prefix="candy" uri="/v/org/infogrid/jee/taglib/candy/candy.tld"
  %><%@ taglib prefix="u"     uri="/v/org/infogrid/jee/taglib/util/util.tld"
  %><%@ taglib prefix="v"     uri="/v/org/infogrid/jee/taglib/viewlet/viewlet.tld"
+ %><%@ taglib prefix="tmpl"  uri="/v/org/infogrid/jee/taglib/viewlet/templates/templates.tld"
  %><%@ taglib prefix="c"     uri="http://java.sun.com/jsp/jstl/core"
  %>
+<tmpl:stylesheet href="${CONTEXT}/v/org/infogrid/jee/viewlet/modelbase/AllMeshTypesViewlet.css"/>
 <v:viewletAlternatives />
 <u:refresh>Reload page</u:refresh>
 <v:viewlet>
@@ -13,7 +16,7 @@
   <table class="sa">
    <tr class="satitle">
     <td>
-     <a name="<mesh:meshTypeId meshTypeName="sa" filter="true" stringRepresentation="Plain"/>"></a>
+     <a name="<mesh:meshTypeId meshTypeName="sa" stringRepresentation="Plain" filter="true" />"></a>
      <span class="label">Subject&nbsp;Area:</span>
      <b><mesh:type meshTypeName="sa" propertyName="name"/></b>
      (Version <mesh:type meshTypeName="sa" propertyName="versionNumber" nullString="&lt;none given&gt;"/>)
@@ -24,7 +27,7 @@
      <table class="sacontent">
       <tr>
        <td class="label">Identifier</td>
-       <td><code><mesh:meshTypeId meshTypeName="sa" filter="true" stringRepresentation="Plain"/></code></td>
+       <td><code><mesh:meshTypeId meshTypeName="sa" stringRepresentation="Plain" filter="true" /></code></td>
       </tr>
       <tr>
        <td class="label">Name:</td>
@@ -45,7 +48,7 @@
        <td>
         <ul>
          <c:forEach var="current" items="${sa.subjectAreaDependencies}">
-          <li><a href="#<mesh:meshTypeId meshTypeName="current" filter="true" stringRepresentation="Plain"/>"><mesh:type meshTypeName="current" propertyName="name"/></a></li>
+          <li><a href="#<mesh:meshTypeId meshTypeName="current" stringRepresentation="Plain" filter="true" />"><mesh:type meshTypeName="current" propertyName="name"/></a></li>
          </c:forEach>
         </ul>
        </td>
@@ -66,7 +69,7 @@
       <table class="amo">
        <tr class="amotitle">
         <td>
-         <a name="<mesh:meshTypeId meshTypeName="amo" filter="true" stringRepresentation="Plain"/>"></a>
+         <a name="<mesh:meshTypeId meshTypeName="amo" stringRepresentation="Plain" filter="true" />"></a>
          <span class="label">Entity&nbsp;Type:</span>
          <b><mesh:type meshTypeName="amo" propertyName="name"/></b>
         </td>
@@ -76,7 +79,7 @@
          <table class="entitycontent">
           <tr>
            <td class="label">Identifier:</td>
-           <td><code><mesh:meshTypeId meshTypeName="amo" filter="true" stringRepresentation="Plain"/></code></td>
+           <td><code><mesh:meshTypeId meshTypeName="amo" stringRepresentation="Plain" filter="true" /></code></td>
           </tr>
           <tr>
            <td class="label">Name:</td>
@@ -106,7 +109,7 @@
                 <ul>
                  <c:forEach var="current" items="${superpath}">
                   <li>
-                   <a href="#<mesh:meshTypeId meshTypeName="current" filter="true" stringRepresentation="Plain"/>"><mesh:type meshTypeName="current" propertyName="name" filter="false"/></a>
+                   <a href="#<mesh:meshTypeId meshTypeName="current" stringRepresentation="Plain" filter="true" />"><mesh:type meshTypeName="current" propertyName="name" filter="false"/></a>
                   </li>
                  </c:forEach>
                 </ul>
@@ -131,7 +134,7 @@
            <td class="properties">
             <ul class="properties">
              <c:forEach var="prop" items="${amo.inheritedPropertyTypes}">
-              <li><a href="#<mesh:meshTypeId meshTypeName="prop" filter="true" stringRepresentation="Plain"/>"><mesh:type meshTypeName="prop" propertyName="name" /></a></li>
+              <li><a href="#<mesh:meshTypeId meshTypeName="prop" stringRepresentation="Plain" filter="true" />"><mesh:type meshTypeName="prop" propertyName="name" /></a></li>
              </c:forEach>
             </ul>
            </td>
@@ -142,7 +145,7 @@
              <table class="property">
               <tr class="propertytitle">
                <td>
-                <a name="<mesh:meshTypeId meshTypeName="prop" filter="true" stringRepresentation="Plain"/>"></a>
+                <a name="<mesh:meshTypeId meshTypeName="prop" stringRepresentation="Plain" filter="true" />"></a>
                 <span class="label">Property&nbsp;Type:</span>
                 <b><mesh:type meshTypeName="prop" propertyName="name"/></b>
                </td>
@@ -152,7 +155,7 @@
                 <table class="propertycontent">
                  <tr>
                   <td class="label">Identifier:</td>
-                  <td><code><mesh:meshTypeId meshTypeName="prop" filter="true" stringRepresentation="Plain"/></code></td>
+                  <td><code><mesh:meshTypeId meshTypeName="prop" stringRepresentation="Plain" filter="true" /></code></td>
                  </tr>
                  <tr>
                   <td class="label">Name:</td>
@@ -179,8 +182,7 @@
                 </table>
                </td>
               </tr>
-             </tr>
-            </table>
+             </table>
             </c:forEach>
            </td>
           </tr>
@@ -194,7 +196,7 @@
       <table class="amo">
        <tr class="amotitle">
         <td>
-         <a name="<mesh:meshTypeId meshTypeName="amo" filter="true" stringRepresentation="Plain"/>"></a>
+         <a name="<mesh:meshTypeId meshTypeName="amo" stringRepresentation="Plain" filter="true" />"></a>
          <span class="label">Relationship&nbsp;Type:</span>
          <b><mesh:type meshTypeName="amo" propertyName="name"/></b>
         </td>
@@ -204,7 +206,7 @@
          <table class="relationshipcontent">
           <tr>
            <td class="label">Identifier:</td>
-           <td><code><mesh:meshTypeId meshTypeName="amo" filter="true" stringRepresentation="Plain"/></code></td>
+           <td><code><mesh:meshTypeId meshTypeName="amo" stringRepresentation="Plain" filter="true" /></code></td>
           </tr>
           <tr>
            <td class="label">Name:</td>
@@ -230,7 +232,7 @@
                 <ul>
                  <c:forEach var="current" items="${superpath}">
                   <li>
-                   <a href="#<mesh:meshTypeId meshTypeName="current" filter="true" stringRepresentation="Plain"/>"><mesh:type meshTypeName="current" propertyName="name" filter="false"/></a>
+                   <a href="#<mesh:meshTypeId meshTypeName="current" stringRepresentation="Plain" filter="true" />"><mesh:type meshTypeName="current" propertyName="name" filter="false"/></a>
                   </li>
                  </c:forEach>
                 </ul>
@@ -260,8 +262,8 @@
              </tr>
              <tr>
               <td class="label">Identifier:</td>
-              <td><code><mesh:meshTypeId meshTypeName="amo.source.identifier" filter="true" stringRepresentation="Plain"/></code></td>
-              <td><code><mesh:meshTypeId meshTypeName="amo.destination.identifier" filter="true" stringRepresentation="Plain"/></code></td>
+              <td><code><mesh:meshTypeId meshTypeName="amo.source.identifier" stringRepresentation="Plain" filter="true" /></code></td>
+              <td><code><mesh:meshTypeId meshTypeName="amo.destination.identifier" stringRepresentation="Plain" filter="true" /></code></td>
              </tr>
             </table>
            </td>
@@ -269,7 +271,6 @@
           <tr>
            <td class="label">Description:</td>
            <td><mesh:type meshTypeName="amo" propertyName="userVisibleDescription" filter="false"/></td>
-           </td>
           </tr>
           <c:forEach var="current" items="${amo.userVisibleDescriptionMap.pairIterator}">
            <tr>
