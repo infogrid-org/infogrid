@@ -95,7 +95,6 @@ public class TextSubstitutionFilter
                             log = Log.getLogInstance( TextSubstitutionFilter.class ); // our own, private logger
                         }
                         log.warn( "Have both String and byte content, don't know what to do: " + request );
-
                     }
                 } else if( bufferedString == null ) {
                     // both null, i.e. there is no content (e.g. because of not-modified-since.). Do nothing.

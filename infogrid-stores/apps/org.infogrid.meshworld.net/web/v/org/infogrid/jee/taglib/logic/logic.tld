@@ -257,42 +257,4 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
-    
-    <tag>
-        <name>ifRelated</name>
-        <tagclass>org.infogrid.jee.taglib.logic.IfRelatedTag</tagclass>
-        <attribute>
-            <name>meshObjectName</name>
-            <rtexprvalue>true</rtexprvalue>
-            <required>true</required>
-        </attribute>
-        <attribute>
-            <name>traversalSpecification</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>traversalSpecificationName</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>minFound</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>maxFound</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>filter</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>ignore</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>scope</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-    </tag>
 </taglib>

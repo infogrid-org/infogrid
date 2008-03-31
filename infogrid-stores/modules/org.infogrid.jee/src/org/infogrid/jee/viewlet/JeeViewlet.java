@@ -16,10 +16,9 @@ package org.infogrid.jee.viewlet;
 
 import org.infogrid.viewlet.Viewlet;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.infogrid.jee.rest.RestfulRequest;
+import org.infogrid.jee.viewlet.templates.StructuredResponse;
 
 /**
  * <p>A software component of an application's user interface.
@@ -44,16 +43,14 @@ public interface JeeViewlet
      * the JeeViewlet can perform whatever operations needed prior to the execution of the servlet, e.g.
      * the evaluation of POST commands. Subclasses will often override this.</p>
      * 
-     * @param context the ServletContext
      * @param request the incoming request
      * @param response the response to be assembled
      * @throws ServletException thrown if an error occurred
      * @see #performAfter
      */
     public void performBefore(
-            ServletContext      context,
-            HttpServletRequest  request,
-            HttpServletResponse response )
+            RestfulRequest     request,
+            StructuredResponse response )
         throws
             ServletException;
 
@@ -62,7 +59,6 @@ public interface JeeViewlet
      * the JeeViewlet can perform whatever operations needed after to the execution of the servlet, e.g.
      * logging. Subclasses will often override this.</p>
      * 
-     * @param context the ServletContext
      * @param request the incoming request
      * @param response the response to be assembled
      * @param thrown if this is non-null, it is the Throwable indicating a problem that occurred
@@ -71,10 +67,9 @@ public interface JeeViewlet
      * @see #performBefore
      */
     public void performAfter(
-            ServletContext      context,
-            HttpServletRequest  request,
-            HttpServletResponse response,
-            Throwable           thrown )
+            RestfulRequest     request,
+            StructuredResponse response,
+            Throwable          thrown )
         throws
             ServletException;
 
@@ -84,7 +79,7 @@ public interface JeeViewlet
      * @param newRequest the new request
      */
     public void setCurrentRequest(
-            HttpServletRequest newRequest );
+            RestfulRequest newRequest );
 
     /**
      * Obtain the path to the Servlet for this JeeViewlet. JeeViewlet may implement this in different ways,

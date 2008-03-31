@@ -18,9 +18,12 @@ function overlay_show( overlayId, parameters ) {
             }
         }
     }
-
     if( !overlayCanvas ) {
-        overlayCanvas = document.createElement( "div" );
+        if (typeof document.createElementNS != 'undefined') {
+            overlayCanvas = document.createElementNS('http://www.w3.org/1999/xhtml', "div" );
+        } else {
+            overlayCanvas = document.createElement("div");
+        }
         overlayCanvas.id = "org-infogrid-jee-taglib-candy-OverlayTagCanvas";
 
         body = document.getElementsByTagName( 'body' )[0];
@@ -29,6 +32,7 @@ function overlay_show( overlayId, parameters ) {
 
     overlay.style.display    = 'block';
     overlay.style.visibility = 'visible';
+
     overlayCanvas.style.display    = 'block';
     overlayCanvas.style.visibility = 'visible';
 }
