@@ -1667,6 +1667,45 @@ public class AnetMeshObject
     }
     
     /**
+     * Obtain a StringRepresentation of this MeshObject that can be shown to the user.
+     * 
+     * @return String representation
+     */
+    @Override
+    public String toStringRepresentation(
+            StringRepresentation rep,
+            String               contextPath,
+            boolean              isDefaultMeshBase )
+    {
+        String key;
+        if( isDefaultMeshBase ) {
+            if( isHomeObject() ) {
+                key = DEFAULT_MESH_BASE_HOME_ENTRY;
+            } else {
+                key = DEFAULT_MESH_BASE_ENTRY;
+            }
+        } else {
+            if( isHomeObject() ) {
+                key = NON_DEFAULT_MESH_BASE_HOME_ENTRY;
+            } else {
+                key = NON_DEFAULT_MESH_BASE_ENTRY;
+            }
+        }
+
+        String meshObjectExternalForm = theIdentifier.toExternalForm();
+        String meshBaseExternalForm   = theMeshBase.getIdentifier().toExternalForm();
+
+        String ret = rep.formatEntry(
+                ResourceHelper.getInstance( getClass() ), // dispatch to the right subclass
+                key,
+                meshObjectExternalForm,
+                contextPath,
+                meshBaseExternalForm );
+
+        return ret;
+    }
+
+    /**
      * Obtain the start part of a StringRepresentation of this MeshObject that acts
      * as a link/hyperlink and can be shown to the user.
      * 
