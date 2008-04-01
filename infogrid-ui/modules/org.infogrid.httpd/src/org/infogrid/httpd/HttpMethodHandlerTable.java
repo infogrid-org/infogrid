@@ -32,8 +32,9 @@ public class HttpMethodHandlerTable
     public void put(
             HttpMethodHandler handler )
     {
-        if( theTable.get( handler.getMethodName() ) != null )
+        if( theTable.get( handler.getMethodName() ) != null ) {
             throw new IllegalArgumentException( "Handler for method " + handler.getMethodName() + " installed already" );
+        }
 
         theTable.put( handler.getMethodName(), handler );
     }
