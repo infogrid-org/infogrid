@@ -48,7 +48,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-
 /**
  * This class knows how to generate Java source code classs that implement
  * ModelLoader for one or more Subject Areas.

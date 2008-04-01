@@ -46,7 +46,6 @@ public class HttpAcceptor
       *
       * @param portNumber the port number at which we accept connections
       * @throws IOException thrown if the ServerSocket could not be created for this Thread
-      * @throws NullPointerException thrown if the provided ResponseFactory is null
       */
     public HttpAcceptor(
             int portNumber )
@@ -63,7 +62,6 @@ public class HttpAcceptor
       * @param numberThreads the number of Threads that may be spawned to respond. If 0,
       *                      all responses will be handled on this Thread itself
       * @throws IOException thrown if the ServerSocket could not be created for this Thread
-      * @throws NullPointerException thrown if the provided ResponseFactory is null
       */
     public HttpAcceptor(
             int portNumber,
@@ -77,8 +75,9 @@ public class HttpAcceptor
             theThreads      = new Thread[ numberThreads ];
 
             theServerSocket.setSoTimeout( 1000 ); // so we can ever stop this again
+
         } catch( IOException ex ) {
-            throw ex; // for better debugging
+            throw ex; // for easier debugging
         }
     }
 
@@ -135,14 +134,12 @@ public class HttpAcceptor
     {
         theIsActive = true;
 
-        for( int i=0 ; i<theThreads.length ; ++i )
-        {
+        for( int i=0 ; i<theThreads.length ; ++i ) {
             theThreads[i] = new Thread( new Worker(), "AcceptThread / WorkerThread " + i );
             theThreads[i].start();
         }
 
-        while( theIsActive )
-        {
+        while( theIsActive ) {
             Socket newSocket = null;
             try {
                 newSocket = theServerSocket.accept();
@@ -152,18 +149,16 @@ public class HttpAcceptor
             } catch( IOException ex ) {
                 ex.printStackTrace();
             }
-            if( theIsActive && newSocket != null )
-            {
-                if( theThreads.length == 0 )
-                {   // no worker threads, we execute synchronously
+            
+            if( theIsActive && newSocket != null ) {
+                if( theThreads.length == 0 ) {
+                    // no worker threads, we execute synchronously
                     try {
                         dispatch( newSocket );
                     } catch( Throwable ex ) {
                         ex.printStackTrace();
                     }
-                }
-                else
-                {
+                } else {
                     synchronized( theWorkQueue ) {
                         theWorkQueue.addFirst( newSocket );
                         theWorkQueue.notify();
@@ -246,6 +241,7 @@ public class HttpAcceptor
 
         } catch( Exception ex ) {
             log.error( ex );
+
         } finally {
 
             try {
@@ -289,7 +285,6 @@ public class HttpAcceptor
      * The currently only protocol that we support.
      */
     protected static final String ONLY_PROTOCOL = "http";
-
 
     /**
      * The port whose incoming requests we accept.
@@ -348,22 +343,20 @@ public class HttpAcceptor
          */
         public void run()
         {
-            while( theIsActive )
-            {
+            while( theIsActive ) {
                 Socket theSocket = null;
                 synchronized( theWorkQueue ) {
                     while( theSocket == null )
-                        if( theWorkQueue.isEmpty() )
-                        {
+                        if( theWorkQueue.isEmpty() ) {
                             try {
                                 theWorkQueue.wait();
                             } catch( InterruptedException ex ) {
                                 if( !theIsActive )
                                     return;
                             }
-                        }
-                        else
+                        } else {
                             theSocket = (Socket) theWorkQueue.removeLast();
+                        }
                 }
                 dispatch( theSocket );
             }

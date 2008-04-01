@@ -142,12 +142,18 @@ public class PingPongTest1
     protected boolean done = false;
     
     /**
-     *
+     * This listener memorizes incoming events.
      */
     class MyListener
             implements
                 PingPongMessageEndpointListener<String>
     {
+        /**
+         * Constructor.
+         * 
+         * @param name 
+         * @param p
+         */
         public MyListener(
                 String name,
                 String p )
