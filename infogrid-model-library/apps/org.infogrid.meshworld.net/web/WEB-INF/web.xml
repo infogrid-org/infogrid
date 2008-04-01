@@ -31,12 +31,8 @@
    <param-value>org.infogrid.meshworld.net.NetMeshWorldApp</param-value>
   </init-param>
   <init-param>
-   <param-name>DataSourceJndiPath</param-name>
-   <param-value>java:comp/env/jdbc/netmeshworldDB</param-value>
-  </init-param>
-  <init-param>
-   <param-name>SITE_URL</param-name>
-   <param-value>http://localhost:8084/org.infogrid.meshworld.net/</param-value>
+   <param-name>DefaultMeshBaseIdentifier</param-name>
+   <param-value>http://netmeshworld.infogrid.org/</param-value>
   </init-param>  
  </filter>
 

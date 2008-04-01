@@ -64,12 +64,10 @@ public class MeshWorldApp
     /**
      * Factory method.
      *
-     * @param siteUrl the URL of the site
-     * @param theDataSourceJndiPath name of the DataSource in JNDI
+     * @param defaultMeshBaseIdentifier the MeshBaseIdentifier of the default MeshBase
      */
     public static MeshWorldApp create(
-            String siteUrl,
-            String theDataSourceJndiPath )
+            String defaultMeshBaseIdentifier )
         throws
             NamingException
     {
@@ -135,7 +133,7 @@ public class MeshWorldApp
         // Database access via JNDI
         
         InitialContext ctx           = new InitialContext();
-        DataSource     theDataSource = (DataSource) ctx.lookup( theDataSourceJndiPath );        
+        DataSource     theDataSource = (DataSource) ctx.lookup( "java:comp/env/jdbc/meshworldDB" );        
 
         SqlStore store = SqlStore.create( theDataSource, ResourceHelper.getInstance( MeshWorldApp.class ).getResourceString( "MeshObjectTable" ) );
         store.initializeIfNecessary();
@@ -146,7 +144,7 @@ public class MeshWorldApp
         // Only one MeshBase
         MeshBaseIdentifier mbId;
         try {
-            mbId = MeshBaseIdentifier.create( siteUrl );
+            mbId = MeshBaseIdentifier.create( defaultMeshBaseIdentifier );
 
         } catch( URISyntaxException ex ) {
             throw new RuntimeException( ex );
