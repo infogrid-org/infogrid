@@ -15,6 +15,7 @@
 
 <standardmodule>
  <name>org.infogrid.ALLTESTS</name>
+ <userdescription>This module invokes all the automatable tests in InfoGrid.</userdescription>
  <runclass>org.infogrid.ALLTESTS.AllTests</runclass>
  <activationclass>org.infogrid.ALLTESTS.AllTests</activationclass>
  <provides>

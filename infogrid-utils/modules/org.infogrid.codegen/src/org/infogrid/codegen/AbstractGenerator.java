@@ -56,7 +56,7 @@ public abstract class AbstractGenerator
     /**
       * Generate code for all MeshTypes in the specified SubjectAreas.
       *
-      * @param sas the SubjectAreas for whose MeshTypes code shall be generated
+      * @param sas the SubjectAreas to generate code from
       * @throws IOException thrown if an I/O error occurred during code generation
       */
     public void generateForAll(
@@ -255,15 +255,6 @@ public abstract class AbstractGenerator
         throws
             IOException
     {
-        SubjectArea theSubjectArea;
-        if( theType instanceof AttributableMeshType ) {
-            theSubjectArea = ((AttributableMeshType)theType).getSubjectArea();
-        } else if( theType instanceof SubjectArea ) {
-            theSubjectArea = (SubjectArea) theType;
-        } else {
-            return null;
-        }
-
         StringBuffer buf = new StringBuffer( 256 );
         buf.append( theOutputDir );
         buf.append( File.separator );
@@ -309,7 +300,7 @@ public abstract class AbstractGenerator
     }
 
     /**
-     * This is a helper that can generate the content of an L10Map in HTML format.
+     * A helper that can generate the content of an L10Map in HTML format.
      *
      * @param theMap the L10Map containing the internationalized content
      * @param prefix prefix to prepend to the line
@@ -322,17 +313,18 @@ public abstract class AbstractGenerator
             String      postfix,
             PrintWriter w )
     {
-        if( theMap == null )
+        if( theMap == null ) {
             return;
-        if( theMap.isEmpty() && theMap.getDefault() == null )
+        }
+        if( theMap.isEmpty() && theMap.getDefault() == null ) {
             return;
+        }
         w.print( prefix );
         w.print( "<table><tr><td>default locale:</td><td>" );
         w.print( PropertyValue.toStringRepresentation( theMap.getDefault(), ModelPrimitivesStringRepresentation.TEXT_HTML ));
         w.print( "</td></tr>" );
         Iterator<String> theIter = theMap.keyIterator();
-        while( theIter.hasNext() )
-        {
+        while( theIter.hasNext() ) {
             String key = theIter.next();
             w.print( "<tr><td>" );
             w.print( key );
@@ -375,24 +367,19 @@ public abstract class AbstractGenerator
       * This notice appears that beginning of every file that is being generated.
       */
     protected static final String legalNotice
-= "//\n"
-+ "// THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED\n"
-+ "// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES\n"
-+ "// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n"
-+ "// DISCLAIMED. IN NO EVENT SHALL NETMESH INC. BE LIABLE FOR ANY DIRECT,\n"
-+ "// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n"
-+ "// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n"
-+ "// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)\n"
-+ "// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,\n"
-+ "// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n"
-+ "// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED\n"
-+ "// OF THE POSSIBILITY OF SUCH DAMAGE.\n"
-+ "//\n"
-+ "// The use of this software is governed by a license agreement that\n"
-+ "// is contained in the package that you downloaded.\n"
-+ "//\n"
-+ "// $Date$\n"
-+ "//";
+            = "//\n"
+            + "// This file is part of InfoGrid(tm). You may not use this file except in\n"
+            + "// compliance with the InfoGrid license. The InfoGrid license and important\n"
+            + "// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should\n"
+            + "// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt\n"
+            + "// or you do not consent to all aspects of the license and the disclaimers,\n"
+            + "// no license is granted; do not use this file.\n"
+            + "// \n"
+            + "// For more information about InfoGrid go to http://infogrid.org/\n"
+            + "//\n"
+            + "// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst\n"
+            + "// All rights reserved.\n"
+            + "//\n";
 
     /**
      * Determines how date/time stamps are formatted in the generated code.
