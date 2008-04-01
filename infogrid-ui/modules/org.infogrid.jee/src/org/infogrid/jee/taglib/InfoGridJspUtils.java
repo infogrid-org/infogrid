@@ -45,6 +45,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.rest.RestfulRequest;
 
 /**
@@ -1019,9 +1020,11 @@ public abstract class InfoGridJspUtils
     {
         StringRepresentation rep = determineStringRepresentation( stringRepresentation );
 
-        boolean contextImpliesThisMeshBase = doesFullContextImplyThisMeshBase( pageContext, mesh.getMeshBase() );
+        RestfulRequest req         = (RestfulRequest) ((HttpServletRequest)pageContext.getRequest()).getAttribute( RestfulRequest.class.getName());
+        String         contextPath = req.getContextPath();
+        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, mesh.getMeshBase() );
 
-        String ret = mesh.toStringRepresentation( rep, contextImpliesThisMeshBase );
+        String ret = mesh.toStringRepresentation( rep, contextPath, isDefaultMeshBase );
         return ret;
     }
 
@@ -1060,16 +1063,16 @@ public abstract class InfoGridJspUtils
 
         String contextPath;
         if( rootPath != null ) {
-            contextPath        = rootPath;
+            contextPath = rootPath;
 
         } else {
             RestfulRequest req = (RestfulRequest) ((HttpServletRequest)pageContext.getRequest()).getAttribute( RestfulRequest.class.getName());
             contextPath        = req.getContextPath();
         }
 
-        boolean contextImpliesThisMeshBase = doesFullContextImplyThisMeshBase( pageContext, mesh.getMeshBase() );
+        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, mesh.getMeshBase() );
 
-        String ret = mesh.toStringRepresentationLinkStart( rep, contextPath, contextImpliesThisMeshBase );
+        String ret = mesh.toStringRepresentationLinkStart( rep, contextPath, isDefaultMeshBase );
         return ret;
     }
 
@@ -1097,9 +1100,9 @@ public abstract class InfoGridJspUtils
             contextPath = ((HttpServletRequest)pageContext.getRequest()).getContextPath() + "/";
         }
 
-        boolean contextImpliesThisMeshBase = doesFullContextImplyThisMeshBase( pageContext, mesh.getMeshBase() );
+        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, mesh.getMeshBase() );
 
-        String ret = mesh.toStringRepresentationLinkEnd( rep, contextPath, contextImpliesThisMeshBase );
+        String ret = mesh.toStringRepresentationLinkEnd( rep, contextPath, isDefaultMeshBase );
         return ret;
 }
 
@@ -1139,7 +1142,7 @@ public abstract class InfoGridJspUtils
     {
         StringRepresentation rep = determineStringRepresentation( stringRepresentation );
 
-        boolean contextImpliesThisMeshBase = doesFullContextImplyThisMeshBase( pageContext, base );
+        boolean contextImpliesThisMeshBase = isDefaultMeshBase( pageContext, base );
 
         String ret = base.toStringRepresentation( rep, contextImpliesThisMeshBase );
         return ret;
@@ -1185,9 +1188,9 @@ public abstract class InfoGridJspUtils
             contextPath = ((HttpServletRequest)pageContext.getRequest()).getContextPath() + "/";
         }
 
-        boolean contextImpliesThisMeshBase = doesFullContextImplyThisMeshBase( pageContext, base );
+        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, base );
 
-        String ret = base.toStringRepresentationLinkStart( rep, contextPath, contextImpliesThisMeshBase );
+        String ret = base.toStringRepresentationLinkStart( rep, contextPath, isDefaultMeshBase );
         return ret;
     }
 
@@ -1215,9 +1218,9 @@ public abstract class InfoGridJspUtils
             contextPath = ((HttpServletRequest)pageContext.getRequest()).getContextPath() + "/";
         }
 
-        boolean contextImpliesThisMeshBase = doesFullContextImplyThisMeshBase( pageContext, base );
+        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, base );
 
-        String ret = base.toStringRepresentationLinkEnd( rep, contextPath, contextImpliesThisMeshBase );
+        String ret = base.toStringRepresentationLinkEnd( rep, contextPath, isDefaultMeshBase );
         return ret;
     }
 
@@ -1249,23 +1252,31 @@ public abstract class InfoGridJspUtils
      * Determine whether the fully-qualified context path that cane be determined from a
      * PageContext identifies this MeshBase as the default MeshBase.
      */
-    public static boolean doesFullContextImplyThisMeshBase(
+    public static boolean isDefaultMeshBase(
             PageContext pageContext,
             MeshBase    mb )
     {
         String mbIdentifier = mb.getIdentifier().toExternalForm();
         
-        // construct the full URL
-        HttpServletRequest realRequest = (HttpServletRequest) pageContext.getRequest();
-        RestfulRequest     restRequest = (RestfulRequest)     realRequest.getAttribute( RestfulRequest.class.getName() );
-
-        String absoluteContextPath = restRequest.getAbsoluteContextPath();
+        String defaultMbIdentifier = InfoGridWebApp.getSingleton().getDefaultMeshBase().getIdentifier().toExternalForm();
         
-        if( mbIdentifier.equals( absoluteContextPath + "/" )) {
+        if( defaultMbIdentifier.equals( mbIdentifier )) {
             return true;
         } else {
             return false;
         }
+        
+//        // construct the full URL
+//        HttpServletRequest realRequest = (HttpServletRequest) pageContext.getRequest();
+//        RestfulRequest     restRequest = (RestfulRequest)     realRequest.getAttribute( RestfulRequest.class.getName() );
+//
+//        String absoluteContextPath = restRequest.getAbsoluteContextPath();
+//        
+//        if( mbIdentifier.equals( absoluteContextPath + "/" )) {
+//            return true;
+//        } else {
+//            return false;
+//        }
     }
 
     /**

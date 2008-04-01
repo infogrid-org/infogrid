@@ -50,9 +50,10 @@ public class DefaultNetRestfulRequest
      */
     public static DefaultNetRestfulRequest create(
             SaneServletRequest lidRequest,
-            String             contextPath )
+            String             contextPath,
+            String             defaultMeshBaseIdentifier )
     {
-        return new DefaultNetRestfulRequest( lidRequest, contextPath );
+        return new DefaultNetRestfulRequest( lidRequest, contextPath,defaultMeshBaseIdentifier );
     }
 
     /**
@@ -60,9 +61,12 @@ public class DefaultNetRestfulRequest
      */
     protected DefaultNetRestfulRequest(
             SaneServletRequest lidRequest,
-            String             contextPath )
+            String             contextPath,
+            String             defaultMeshBaseIdentifier )
     {
         super( lidRequest, contextPath );
+        
+        theDefaultMeshBaseIdentifier = defaultMeshBaseIdentifier;
     }
 
     /**
@@ -85,8 +89,6 @@ public class DefaultNetRestfulRequest
             String proxyIdentifierString;
             String meshObjectIdentifierString;
             
-            // String fallBackMeshBaseIdentifierString = theSaneRequest.getRootUri() + theContextPath + "/"; // context does not have a slash at the end
-
             Matcher m = theUrlPattern.matcher( trailer );
             if( m.matches() ) {
                 meshBaseIdentifierString   = m.group( 2 );
@@ -98,34 +100,21 @@ public class DefaultNetRestfulRequest
                 proxyIdentifierString      = null;
                 meshObjectIdentifierString = trailer;
             }
-            // if( meshBaseIdentifierString == null ) {
-            //     meshBaseIdentifierString = fallBackMeshBaseIdentifierString;
-            // }
+            if( meshBaseIdentifierString == null ) {
+                meshBaseIdentifierString = theDefaultMeshBaseIdentifier;
+            }
             if( meshObjectIdentifierString == null ) {
                 meshObjectIdentifierString = "";
             }
-            
-            MeshBase mb;
-            if( meshBaseIdentifierString == null ) {
-                mb = InfoGridWebApp.getSingleton().getDefaultMeshBase();
-            } else {
-                theRequestedMeshBaseIdentifier = NetMeshBaseIdentifier.create( meshBaseIdentifierString );
-            
-                NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = InfoGridWebApp.getSingleton().getMeshBaseNameServer();
-            
-                mb = meshBaseNameServer.get( theRequestedMeshBaseIdentifier );
-            }
-//            if( mb == null && !fallBackMeshBaseIdentifierString.equals( meshBaseIdentifierString )) {
-//                log.warn( "Could not find requested MeshBase: " + theRequestedMeshBaseIdentifier );
-//
-//                MeshBaseIdentifier fallBackMeshBaseIdentifier = NetMeshBaseIdentifier.create( fallBackMeshBaseIdentifierString );
-//
-//                mb = meshBaseNameServer.get( fallBackMeshBaseIdentifier );
-//            }
+            theRequestedMeshBaseIdentifier = NetMeshBaseIdentifier.create( meshBaseIdentifierString );
 
-            //if( mb == null ) {
-            //    throw new IllegalStateException( "Illegal configuration: cannot find default MeshBase at " + fallBackMeshBaseIdentifierString );
-            //}
+            NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = InfoGridWebApp.getSingleton().getMeshBaseNameServer();
+
+            MeshBase mb = meshBaseNameServer.get( theRequestedMeshBaseIdentifier );
+
+            if( mb == null ) {
+                throw new URISyntaxException( meshBaseIdentifierString, "Cannot find a MeshBase with this identifier" );
+            }
             
             if( proxyIdentifierString != null ) {
                 theRequestedProxyIdentifier = NetMeshBaseIdentifier.create( proxyIdentifierString );
@@ -173,6 +162,11 @@ public class DefaultNetRestfulRequest
         return theRequestedProxy;
     }
     
+    /**
+     * The identifier of the default MeshBase.
+     */
+    protected String theDefaultMeshBaseIdentifier;
+
     /**
      * The identifier of the requested Proxy, if any.
      */

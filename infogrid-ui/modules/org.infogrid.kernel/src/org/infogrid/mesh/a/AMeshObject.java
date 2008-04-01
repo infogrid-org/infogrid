@@ -1791,6 +1791,7 @@ public class AMeshObject
      */
     public String toStringRepresentation(
             StringRepresentation rep,
+            String               contextPath,
             boolean              isDefaultMeshBase )
     {
         String key;
@@ -1815,6 +1816,7 @@ public class AMeshObject
                 ResourceHelper.getInstance( getClass() ), // dispatch to the right subclass
                 key,
                 meshObjectExternalForm,
+                contextPath,
                 meshBaseExternalForm );
 
         return ret;
