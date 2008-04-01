@@ -31,13 +31,9 @@
    <param-value>org.infogrid.meshworld.MeshWorldApp</param-value>
   </init-param>
   <init-param>
-   <param-name>DataSourceJndiPath</param-name>
-   <param-value>java:comp/env/jdbc/meshworldDB</param-value>
+   <param-name>DefaultMeshBaseIdentifier</param-name>
+   <param-value>http://meshworld.infogrid.org/</param-value>
   </init-param>
-  <init-param>
-   <param-name>SITE_URL</param-name>
-   <param-value>http://localhost:8084/org.infogrid.meshworld/</param-value>
-  </init-param>  
  </filter>
 
  <filter>

@@ -43,9 +43,10 @@ public class DefaultRestfulRequest
      */
     public static DefaultRestfulRequest create(
             SaneServletRequest lidRequest,
-            String             contextPath )
+            String             contextPath,
+            String             defaultMeshBaseIdentifier )
     {
-        return new DefaultRestfulRequest( lidRequest, contextPath );
+        return new DefaultRestfulRequest( lidRequest, contextPath, defaultMeshBaseIdentifier );
     }
 
     /**
@@ -53,9 +54,12 @@ public class DefaultRestfulRequest
      */
     protected DefaultRestfulRequest(
             SaneServletRequest lidRequest,
-            String             contextPath )
+            String             contextPath,
+            String             defaultMeshBaseIdentifier )
     {
         super( lidRequest, contextPath );
+        
+        theDefaultMeshBaseIdentifier = defaultMeshBaseIdentifier;
     }
 
     /**
@@ -77,8 +81,6 @@ public class DefaultRestfulRequest
             String meshBaseIdentifierString;
             String meshObjectIdentifierString;
             
-            String fallBackMeshBaseIdentifierString = theSaneRequest.getRootUri() + theContextPath + "/"; // does not have a slash at the end
-
             Matcher m = theUrlPattern.matcher( trailer );
             if( m.matches() ) {
                 meshBaseIdentifierString   = m.group( 2 );
@@ -89,7 +91,7 @@ public class DefaultRestfulRequest
                 meshObjectIdentifierString = trailer;
             }
             if( meshBaseIdentifierString == null ) {
-                meshBaseIdentifierString = fallBackMeshBaseIdentifierString;
+                meshBaseIdentifierString = theDefaultMeshBaseIdentifier;
             }
             if( meshObjectIdentifierString == null ) {
                 meshObjectIdentifierString = "";
@@ -99,18 +101,11 @@ public class DefaultRestfulRequest
             NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = InfoGridWebApp.getSingleton().getMeshBaseNameServer();
             
             MeshBase mb = meshBaseNameServer.get( theRequestedMeshBaseIdentifier );
-            if( mb == null && !fallBackMeshBaseIdentifierString.equals( meshBaseIdentifierString )) {
-                log.warn( "Could not find requested MeshBase: " + theRequestedMeshBaseIdentifier );
-
-                MeshBaseIdentifier fallBackMeshBaseIdentifier = MeshBaseIdentifier.create( fallBackMeshBaseIdentifierString );
-
-                mb = meshBaseNameServer.get( fallBackMeshBaseIdentifier );
-            }
 
             if( mb == null ) {
-                throw new URISyntaxException( meshBaseIdentifierString, "Cannot find default MeshBase at " + fallBackMeshBaseIdentifierString );
+                throw new URISyntaxException( meshBaseIdentifierString, "Cannot find a MeshBase with this identifier" );
             }
-            
+
             theRequestedMeshObjectIdentifier = mb.getMeshObjectIdentifierFactory().fromExternalForm( meshObjectIdentifierString );
             theRequestedMeshObject           = mb.accessLocally( theRequestedMeshObjectIdentifier );
             
@@ -119,6 +114,11 @@ public class DefaultRestfulRequest
         }
     }
     
+    /**
+     * The identifier of the default MeshBase.
+     */
+    protected String theDefaultMeshBaseIdentifier;
+
     /**
      * The pattern for URL parsing after the context path.
      */
