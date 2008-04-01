@@ -21,7 +21,7 @@ import org.infogrid.comm.pingpong.m.MPingPongMessageEndpoint;
 import org.infogrid.util.logging.Log;
 
 /**
- * Tests remote procedure call (RPC) functionality.
+ * Tests remote procedure call (RPC) functionality in regular operating mode.
  */
 public class PingPongRpcTest1
         extends
@@ -122,12 +122,17 @@ public class PingPongRpcTest1
     private static Log log = Log.getLogInstance( PingPongRpcTest1.class );
 
     /**
-     *
+     * A listener that automatically responds.
      */
     class MyListener
             extends
                 AbstractPingPongRpcListener
     {
+        /**
+         * Constructor.
+         * 
+         * @param end the endpoint where this listener listens
+         */
         public MyListener(
                 MessageEndpoint<PingPongRpcTestMessage> end )
         {
@@ -137,6 +142,7 @@ public class PingPongRpcTest1
         /**
          * Called when an incoming message has arrived.
          *
+         * @param endpoint the PingPongMessageEndpoint that sent this event
          * @param msg the received message
          */
         public void messageReceived(

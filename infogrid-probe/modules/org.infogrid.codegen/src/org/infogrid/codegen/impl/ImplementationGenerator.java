@@ -20,7 +20,6 @@ import org.infogrid.model.primitives.AttributableMeshType;
 import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.MeshType;
-import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.ModelPrimitivesStringRepresentation;
 import org.infogrid.model.primitives.ProjectedPropertyType;
 import org.infogrid.model.primitives.PropertyType;
@@ -391,8 +390,6 @@ public class ImplementationGenerator
             return;
         }
 
-        MeshTypeIdentifier propertyTypeIdentifier = thePropertyType.getIdentifier();
-
         String propertyTypeName = thePropertyType.getName().value();
         String propertyTypeType = thePropertyType.getDataType().getCorrespondingJavaClass().getName();
 
@@ -451,6 +448,7 @@ public class ImplementationGenerator
         // inner class for projected properties
         if( thePropertyType instanceof ProjectedPropertyType ) {
             ProjectedPropertyType realPropertyType = (ProjectedPropertyType) thePropertyType;
+            // FIXME reinsert support for ProjectedPropertyTypes.
 
 //            outStream.println( "    /**" );
 //            outStream.println( "      * Recalculation code for ProjectedPropertyType " + realPropertyType.getIdentifier().toExternalForm() );

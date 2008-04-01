@@ -59,7 +59,9 @@ public abstract class AbstractPingPongRpcTest
                 CarriesInvocationId
     {
         /**
-         * Constructor with payload
+         * Constructor with payload.
+         * 
+         * @param payload the payload
          */
         public PingPongRpcTestMessage(
                 long payload )
@@ -148,12 +150,17 @@ public abstract class AbstractPingPongRpcTest
     }
 
     /**
-     *
+     * Factors out common functionality for listeners in PingPongRpcTests.
      */
     abstract class AbstractPingPongRpcListener
             implements
                 PingPongMessageEndpointListener<PingPongRpcTestMessage>
     {
+        /**
+         * Constructor.
+         * 
+         * @param end the endpoint where this listener listens
+         */
         public AbstractPingPongRpcListener(
                 MessageEndpoint<PingPongRpcTestMessage> end )
         {
@@ -189,6 +196,7 @@ public abstract class AbstractPingPongRpcTest
         /**
          * Called when an outoing message failed to be sent.
          *
+         * @param endpoint the PingPongMessageEndpoint that sent this event
          * @param msg the outgoing message
          */
         public void messageSendingFailed(
@@ -201,7 +209,9 @@ public abstract class AbstractPingPongRpcTest
         /**
          * Called when the receiving endpoint threw the EndpointIsDeadException.
          *
+         * @param endpoint the PingPongMessageEndpoint that sent this event
          * @param msg the status of the outgoing queue
+         * @param t the disabling error
          */
         public void disablingError(
                 MessageEndpoint<PingPongRpcTestMessage> endpoint,
@@ -226,11 +236,14 @@ public abstract class AbstractPingPongRpcTest
             // ignore
         }
 
+        /**
+         * The endpoint to which this listener listens.
+         */
         MessageEndpoint<PingPongRpcTestMessage> theEndpoint;
     }
     
     /**
-     *
+     * A client-side endpoint for the PingPongRpcTests.
      */
     class PingPongRpcClientEndpoint
             extends
@@ -238,6 +251,8 @@ public abstract class AbstractPingPongRpcTest
     {
         /**
          * Constructor.
+         * 
+         * @param ep the underlying MessageEndPoint
          */
         public PingPongRpcClientEndpoint(
                 MessageEndpoint<PingPongRpcTestMessage> ep )
@@ -247,6 +262,9 @@ public abstract class AbstractPingPongRpcTest
         
         /**
          * Marshal an RPC argument into an outgoing message.
+         * 
+         * @param arg the argument
+         * @return the marshalled argument
          */
         protected PingPongRpcTestMessage marshal(
                 Long arg )
@@ -257,7 +275,10 @@ public abstract class AbstractPingPongRpcTest
         }
 
         /**
-         * Unmarshal an incoming message into an RPC result
+         * Unmarshal an incoming message into an RPC result.
+         * 
+         * @param msg the marshalled result
+         * @return the result
          */
         protected Long unmarshal(
                 PingPongRpcTestMessage msg )

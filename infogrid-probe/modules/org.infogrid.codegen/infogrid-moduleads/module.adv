@@ -16,6 +16,8 @@
 <standardmodule>
  <name>org.infogrid.codegen</name>
  <username>InfoGrid code generator</username>
+ <userdescription>The InfoGrid code generator generates interfaces, implementation
+   classes, and documentation from models.</userdescription>
  <activationclass>org.infogrid.codegen.CodeGenerator</activationclass>
  <runclass>org.infogrid.codegen.CodeGenerator</runclass>
  <provides>

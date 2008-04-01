@@ -21,7 +21,8 @@ import org.infogrid.comm.pingpong.m.MPingPongMessageEndpoint;
 import org.infogrid.util.logging.Log;
 
 /**
- * Tests remote procedure call (RPC) functionality where the servant responds only on the second message back.
+ * Tests remote procedure call (RPC) functionality where the servant responds
+ * only on the second message back.
  */
 public class PingPongRpcTest2
         extends
@@ -122,12 +123,17 @@ public class PingPongRpcTest2
     private static Log log = Log.getLogInstance( PingPongRpcTest2.class );
 
     /**
-     *
+     * Listener that responds only on the second message.
      */
     class MyListener
             extends
                 AbstractPingPongRpcListener
     {
+        /**
+         * Constructor.
+         * 
+         * @param end the endpoint to which this listener listenes
+         */
         public MyListener(
                 MessageEndpoint<PingPongRpcTestMessage> end )
         {
@@ -137,6 +143,7 @@ public class PingPongRpcTest2
         /**
          * Called when an incoming message has arrived.
          *
+         * @param endpoint the PingPongMessageEndpoint that sent this event
          * @param msg the received message
          */
         public void messageReceived(

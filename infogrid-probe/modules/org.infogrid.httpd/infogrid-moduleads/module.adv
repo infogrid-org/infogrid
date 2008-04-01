@@ -16,6 +16,7 @@
 <standardmodule>
  <name>org.infogrid.httpd</name>
  <username>The InfoGrid minimalistic HTTP server</username>
+ <userdescription>A minimalistic HTTP server that is very extensible and very efficient.</userdescription>
  <dependencies>
   <requires name="org.infogrid.util"/>
  </dependencies>
