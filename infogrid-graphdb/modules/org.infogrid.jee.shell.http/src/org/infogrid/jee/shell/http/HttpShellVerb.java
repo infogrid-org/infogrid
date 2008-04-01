@@ -1001,19 +1001,12 @@ public enum HttpShellVerb
         MeshBase meshBase = null;
         if( meshBaseName != null ) {
             meshBase = meshBaseNameServer.get( meshBaseName );
+        } else {
+            meshBase = app.getDefaultMeshBase();
         }
 
         if( meshBase == null ) {
-            try {
-                meshBaseName = app.createMeshBaseIdentifier( lidRequest.getAbsoluteContextUri() + "/" );
-
-            } catch( URISyntaxException ex ) {
-                throw new HttpShellException( ex );
-            }
-            meshBase = meshBaseNameServer.get( meshBaseName );
-        }
-        if( meshBase == null ) {
-            throw new HttpShellException( new RuntimeException( "Meshbase is still null" ));
+            throw new HttpShellException( new RuntimeException( "Meshbase cannot be found" ));
         }
         
         MeshObjectIdentifier subjectName;

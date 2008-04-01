@@ -77,7 +77,7 @@ public class ViewletDispatcherServlet
         HttpServletRequest  realRequest    = (HttpServletRequest)  request;
         HttpServletResponse realResponse   = (HttpServletResponse) response;
         SaneServletRequest  saneRequest    = (SaneServletRequest)  request.getAttribute( SaneServletRequest.class.getName() );
-        RestfulRequest      restfulRequest = createRestfulRequest( saneRequest, realRequest.getContextPath() );
+        RestfulRequest      restfulRequest = createRestfulRequest( saneRequest, realRequest.getContextPath(), app.getDefaultMeshBase().getIdentifier().toExternalForm() );
 
         realRequest.setAttribute( RestfulRequest.class.getName(), restfulRequest );
 
@@ -261,15 +261,18 @@ public class ViewletDispatcherServlet
      *
      * @param lidRequest the incoming request
      * @param context the context path of the application
+     * @param defaultMeshBaseIdentifier String form of the identifier of the default MeshBase
      * @return the created RestfulRequest
      */
     protected RestfulRequest createRestfulRequest(
             SaneServletRequest lidRequest,
-            String             context )
+            String             context,
+            String             defaultMeshBaseIdentifier )
     {
         DefaultRestfulRequest ret = DefaultRestfulRequest.create(
                 lidRequest,
-                context );
+                context,
+                defaultMeshBaseIdentifier );
         return ret;
     }
 }
