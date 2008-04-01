@@ -101,7 +101,6 @@ public class CodeGenerator
 
         ResourceHelper.initializeLogging();
 
-        
         final String intfcName = "org.infogrid.modelbase.ModelBase";
         ModuleAdvertisement [] advs = theModuleRegistry.findAdvertisementsForInterface( intfcName, 1 );
         if( advs == null || advs.length == 0 ) {
@@ -110,7 +109,7 @@ public class CodeGenerator
         }
         Module modelBaseModule = theModuleRegistry.resolve( advs[0], true );
 
-        Object base = modelBaseModule.activateRecursively();
+        Object base = modelBaseModule.activateRecursively(); // return value is ignored but may be helpful in debugging
 
         CodeGenerator generator         = new CodeGenerator( outputDir );
         List<File>    moduleDirectories = theModuleRegistry.getSoftwareInstallation().getInstallModuleDirectories();

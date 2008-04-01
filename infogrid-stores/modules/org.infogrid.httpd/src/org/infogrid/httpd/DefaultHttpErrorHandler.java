@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 
 /**
- * The very simple default implementation of the HttpErrorHandler.
+ * A very simple default implementation of the HttpErrorHandler.
  */
 public class DefaultHttpErrorHandler
     implements

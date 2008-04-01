@@ -172,4 +172,3 @@ public class TraceableOutputStream
       */
     protected OutputStream theDebug;
 }
-

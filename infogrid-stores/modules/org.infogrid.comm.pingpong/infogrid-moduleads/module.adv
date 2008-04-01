@@ -16,6 +16,10 @@
 <standardmodule>
  <name>org.infogrid.comm.pingpong</name>
  <username>The PingPong Communications Module</username>
+ <userdescription>The PingPong communications module provides an abstract framework,
+   and an in-memory implementation of a peer-to-peer, symmetric communications framework
+   in which endpoints can send messages to each other. It also implements RPC-style
+   call-response patterns on top.</userdescription>
  <dependencies>
   <requires name="org.infogrid.util"/>
  </dependencies>
