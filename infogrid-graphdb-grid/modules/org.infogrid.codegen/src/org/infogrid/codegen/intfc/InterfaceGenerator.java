@@ -503,5 +503,4 @@ public class InterfaceGenerator
 
         return dirName + File.separatorChar + "package.html";
     }
-
 }

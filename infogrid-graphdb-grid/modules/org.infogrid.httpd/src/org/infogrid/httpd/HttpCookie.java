@@ -124,15 +124,17 @@ public class HttpCookie
     public boolean equals(
             Object other )
     {
-        if( other instanceof HttpCookie )
-        {
+        if( other instanceof HttpCookie ) {
             HttpCookie realOther = (HttpCookie) other;
 
-            return     ArrayHelper.equals( theName,    realOther.theName )
+            boolean ret =
+                       ArrayHelper.equals( theName,    realOther.theName )
                     && ArrayHelper.equals( theValue,   realOther.theValue )
                     && ArrayHelper.equals( theDomain,  realOther.theDomain )
                     && ArrayHelper.equals( thePath,    realOther.thePath )
                     && ArrayHelper.equals( theExpires, realOther.theExpires );
+            
+            return ret;
         }
         return false;
     }

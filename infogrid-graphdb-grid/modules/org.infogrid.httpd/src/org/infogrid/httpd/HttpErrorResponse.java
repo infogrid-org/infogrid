@@ -14,7 +14,11 @@
 
 package org.infogrid.httpd;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.Writer;
 
 /**
   * A Response indicating an error.
@@ -105,8 +109,7 @@ public class HttpErrorResponse
     {
         super.writeResponseHeader( theWriter );
 
-        if( theChallenge != null )
-        {
+        if( theChallenge != null ) {
             // WWW-Authenticate: needed for password-protected URL
             theWriter.write( HttpResponseHeaderFields.WWW_AUTHENTICATE_TAG );
             theWriter.write( HttpResponseHeaderFields.SEPARATOR );
@@ -127,18 +130,17 @@ public class HttpErrorResponse
             IOException
     {
         HttpErrorHandler handler = theErrorHandler; // this trick allows us to not synchronize
-        if( handler != null )
-        {
+        if( handler != null ) {
             InputStream theInStream = handler.obtainContentForError( getRequest(), getReturnCode() );
 
             byte [] buf = new byte[ 512 ];
             int count;
 
-            while( ( count = theInStream.read( buf, 0, buf.length )) > 0 )
+            while( ( count = theInStream.read( buf, 0, buf.length )) > 0 ) {
                 theOutStream.write( buf, 0, count );
-        }
-        else
-        {
+            }
+
+        } else {
             PrintStream print = new PrintStream( theOutStream );
             print.print( "<html><head><title>Error: not configured.</title></head>\n"
                 + "<body><h1>This web server has been insufficiently configured.</h1>\n"

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * Tests that graceful die works.
+ * Tests that ping-ponging endpoints gracefully die.
  */
 public class PingPongTest4
         extends
@@ -216,6 +216,7 @@ public class PingPongTest4
         /**
          * Called when an outoing message failed to be sent.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the outgoing message
          */
         public void messageSendingFailed(
@@ -228,7 +229,9 @@ public class PingPongTest4
         /**
          * Called when the receiving endpoint threw the EndpointIsDeadException.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the status of the outgoing queue
+         * @param t the disabling error
          */
         public void disablingError(
                 MessageEndpoint<String> endpoint,
@@ -240,11 +243,19 @@ public class PingPongTest4
             }
         }
 
+        /**
+         * Clear the stored event long.
+         */
         public void clear()
         {
             messages = new ArrayList<String>();
         }
         
+        /**
+         * Convert to String representation, for debugging only.
+         * 
+         * @return String representation
+         */
         @Override
         public String toString()
         {
