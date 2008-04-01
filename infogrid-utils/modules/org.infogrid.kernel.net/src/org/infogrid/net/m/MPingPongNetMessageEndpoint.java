@@ -81,7 +81,7 @@ public class MPingPongNetMessageEndpoint
     /**
      * Factory method.
      */
-    public static MPingPongNetMessageEndpoint create(
+    public static MPingPongNetMessageEndpoint restore(
             String                                                  name,
             NetMeshBaseIdentifier                                   partnerIdentifier,
             NetMeshBaseIdentifier                                   myIdentifier,
@@ -118,7 +118,6 @@ public class MPingPongNetMessageEndpoint
     }
     
     /**
-     * }
      * Constructor.
      *
      * @param name the name of the PingPongMessageEndpoint (for debugging only)

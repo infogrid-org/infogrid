@@ -869,11 +869,13 @@ public interface MeshObject
      * Obtain a String representation of this MeshObject that can be shown to the user.
      * 
      * @param rep the StringRepresentation
+     * @param contextPath the context path
      * @param isDefaultMeshBase true if the enclosing MeshBase is the default MeshBase
      * @return String representation
      */
     public abstract String toStringRepresentation(
             StringRepresentation rep,
+            String               contextPath,
             boolean              isDefaultMeshBase );
 
     /**

@@ -57,18 +57,9 @@ import java.lang.reflect.Method;
  *    <td>Required</td>
  *   </tr>
  *   <tr>
- *    <td><code>SITE_URL</code></td>
- *    <td>Filter parameter specifying the name of the site of this web application.
- *        While under some circumstances, this could be derived from the information contained
- *        in <code>HttpServletRequest</code>, it cannot always (e.g. for web applications
- *        whose URLs span several host names like <code>www.example.com</code> and
- *        <code>images.example.com</code>). Thus this optional parameter.</td>
- *    <td>Optional</td>
- *   </tr>
- *   <tr>
- *    <td><code>DataSourceJndiPath</code></td>
- *    <td>Name of the entry in the JNDI directory that identifies the DataSource to use for
- *        this application.</td>
+ *    <td><code>DefaultMeshBaseIdentifier</code></td>
+ *    <td>Filter parameter specifying the identifier of the default MeshBase in the
+ *        application.</td>
  *    <td>Required</td>
  *   </tr>
  *  </tbody>
@@ -113,10 +104,6 @@ public class InitializationFilter
         try {
             initializeInfoGridWebApp();
 
-            if( theSiteUrl != null ) {
-                request.setAttribute( SITE_URL_PARAMETER, theSiteUrl );
-            }
-            
             SaneRequest lidRequest = SaneServletRequest.create( realRequest );
             // doing both doesn't hurt, and there are arguments in favor of both
             realRequest.setAttribute( SaneRequest.class.getName(), lidRequest );
@@ -177,9 +164,9 @@ public class InitializationFilter
 
             try {                
                 Class  appClass      = Class.forName( className );
-                Method factoryMethod = appClass.getMethod( "create", String.class, String.class );
+                Method factoryMethod = appClass.getMethod( "create", String.class );
 
-                theApp = (InfoGridWebApp) factoryMethod.invoke( null, theSiteUrl, theDataSourceJndiPath );
+                theApp = (InfoGridWebApp) factoryMethod.invoke( null, theDefaultMeshBaseIdentifier );
 
             } catch( ClassNotFoundException ex ) {
                 throw new ServletException( "Cannot find class " + className + " specified as parameter " + INFOGRID_WEB_APP_CLASS_NAME_PARAMETER + " in Filter configuration (web.xml)", ex  );
@@ -221,8 +208,10 @@ public class InitializationFilter
     {
         theFilterConfig = filterConfig;
         
-        theSiteUrl            = theFilterConfig.getInitParameter( SITE_URL_PARAMETER );
-        theDataSourceJndiPath = theFilterConfig.getInitParameter( DATA_SOURCE_JNDI_PATH_PARAMETER );
+        theDefaultMeshBaseIdentifier = theFilterConfig.getInitParameter( DEFAULT_MESH_BASE_IDENTIFIER_PARAMETER );
+        if( theDefaultMeshBaseIdentifier == null || theDefaultMeshBaseIdentifier.length() == 0 ) {
+            throw new ServletException( getClass().getName() + "'s configuration required the " + DEFAULT_MESH_BASE_IDENTIFIER_PARAMETER + " filter parameter" );
+        }
     }
 
     /**
@@ -231,15 +220,10 @@ public class InitializationFilter
     public static final String INFOGRID_WEB_APP_CLASS_NAME_PARAMETER = InfoGridWebApp.class.getName();
 
     /**
-     * Name of the Filter parameter that contains the JNDI name of the DataSource to use.
+     * Name of the String in the RequestContext that contains the identifier of the default
+     * MeshBase.
      */
-    public static final String DATA_SOURCE_JNDI_PATH_PARAMETER = "DataSourceJndiPath";
-
-    /**
-     * Name of the String in the RequestContext that contains the URL of the site (as opposed
-     * to any particular section in, or object managed by the site).
-     */
-    public static final String SITE_URL_PARAMETER = "SITE_URL";
+    public static final String DEFAULT_MESH_BASE_IDENTIFIER_PARAMETER = "DefaultMeshBaseIdentifier";
 
     /**
      * Name of the String in the RequestContext that is the context path of the application.
@@ -263,12 +247,7 @@ public class InitializationFilter
     protected FilterConfig theFilterConfig;
     
     /**
-     * The Site URL.
+     * The default MeshBaseIdentifier, in String form,
      */
-    protected String theSiteUrl;
-    
-    /**
-     * The DataSource's name in JNDI.
-     */
-    protected String theDataSourceJndiPath;
+    protected String theDefaultMeshBaseIdentifier;
 }
