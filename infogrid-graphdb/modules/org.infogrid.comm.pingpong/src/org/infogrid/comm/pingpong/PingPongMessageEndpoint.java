@@ -36,7 +36,12 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Endpoint for bidirectional communications using the ping-pong protocol.
+ * <p>Endpoint for bidirectional communications using the ping-pong protocol.
+ *    This is abstract: subclasses need to implement the atual message transfer mechanism.</p>
+ * <p>In order to avoid difficult timing conditions, all time constants are continually modified with
+ *    a slight, random delta.</p>
+ * <p>This class supports a regular and a low-level logger, which reflect application-developer
+ *    vs. protocol-developer-centric views of logging.</p>
  */
 public abstract class PingPongMessageEndpoint<T>
         implements
@@ -53,11 +58,11 @@ public abstract class PingPongMessageEndpoint<T>
      * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
      * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
      *                     was not received by the partner PingPongMessageEndpoint, and resends
-     * @param exec the ScheduledExecutorService to use for threading
+     * @param exec the ScheduledExecutorService to schedule timed tasks
      * @param lastSentToken the last token sent in a previous instantiation of this MessageEndpoint
      * @param lastReceivedToken the last token received in a previous instantiation of this MessageEndpoint
      * @param messagesSentLast the last set of Messages sent in a previous instantiation of this MessageEndpoint
-     * @param messageToBeSent the Messages to be sent as soon as possible
+     * @param messagesToBeSent the Messages to be sent as soon as possible
      */
     protected PingPongMessageEndpoint(
             String                   name,
@@ -307,6 +312,7 @@ public abstract class PingPongMessageEndpoint<T>
      *
      * @param token the integer representing the token
      * @param content the payload, if any
+     * @throws MessageSendException thrown if the message could not be sent
      */
     protected abstract void sendMessage(
             long    token,
@@ -571,6 +577,10 @@ public abstract class PingPongMessageEndpoint<T>
         
         /**
          * Send the event.
+         * 
+         * @param sender the endpoint that sent the event
+         * @param listener the listener to which the event should be sent
+         * @param event the event Object itself
          */
         abstract public <T> void fireEvent(
                 PingPongMessageEndpoint<T> sender,
@@ -579,7 +589,7 @@ public abstract class PingPongMessageEndpoint<T>
     }
 
     /**
-     * The set of MessageEndpointListeners.
+     * The current set of MessageEndpointListeners.
      */
     protected AbstractListenerSet<MessageEndpointListener<T>,Object,Object> theListeners
             = new FlexibleListenerSet<MessageEndpointListener<T>,Object,Object>()
@@ -625,6 +635,7 @@ public abstract class PingPongMessageEndpoint<T>
         /**
          * Constructor.
          *
+         * @param ep the endpoint that is supposed to respond. This is kept internally as a WeakReference
          * @param tag for debugging
          */
         public TimedTask(

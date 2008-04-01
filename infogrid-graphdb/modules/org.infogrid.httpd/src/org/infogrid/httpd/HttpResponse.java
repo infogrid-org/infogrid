@@ -35,7 +35,7 @@ import java.util.TimeZone;
   * This class represents an HTTP Response. This is an abstract class; more
   * concrete classes represent different types of Responses.
   *
-  * FIXME: does not do secure Cookies right now
+  * FIXME: does not do secure Cookies right now.
   */
 public abstract class HttpResponse
 {
@@ -217,12 +217,10 @@ public abstract class HttpResponse
         // Vary: skipped
         // WWW-Authenticate: skipped -- only in ErrorResponse.
 
-        if( ! theCookiesToSend.isEmpty() )
-        {
-            Iterator iter = theCookiesToSend.iterator();
-            while( iter.hasNext() )
-            {
-                HttpCookie current = (HttpCookie) iter.next();
+        if( ! theCookiesToSend.isEmpty() ) {
+            Iterator<HttpCookie> iter = theCookiesToSend.iterator();
+            while( iter.hasNext() ) {
+                HttpCookie current = iter.next();
 
                 String name   = current.getName();
                 String value  = current.getValue();
@@ -236,8 +234,7 @@ public abstract class HttpResponse
                 theWriter.write( HttpResponseHeaderFields.EQUALS );
                 theWriter.write( HTTP.encodeUrl( value ) );
 
-                if( expires != null )
-                {
+                if( expires != null ) {
                     theWriter.write( HttpResponseHeaderFields.SEMI_SEPARATOR );
                     theWriter.write( HttpResponseHeaderFields.BLANK_SEPARATOR );
 
@@ -245,8 +242,7 @@ public abstract class HttpResponse
                     theWriter.write( HttpResponseHeaderFields.EQUALS );
                     theWriter.write( theCookieExpiresFormat.format( expires ));
                 }
-                if( domain != null )
-                {
+                if( domain != null ) {
                     theWriter.write( HttpResponseHeaderFields.SEMI_SEPARATOR );
                     theWriter.write( HttpResponseHeaderFields.BLANK_SEPARATOR );
 
@@ -254,8 +250,7 @@ public abstract class HttpResponse
                     theWriter.write( HttpResponseHeaderFields.EQUALS );
                     theWriter.write( domain );
                 }
-                if( path != null )
-                {
+                if( path != null ) {
                     theWriter.write( HttpResponseHeaderFields.SEMI_SEPARATOR );
                     theWriter.write( HttpResponseHeaderFields.BLANK_SEPARATOR );
 
@@ -267,9 +262,9 @@ public abstract class HttpResponse
             }
         }
 
-        Iterator keyIter = theHeaders.keyIterator();
+        Iterator<String> keyIter = theHeaders.keyIterator();
         while( keyIter.hasNext() ) {
-            String key   = (String) keyIter.next();
+            String key   = keyIter.next();
             String value = theHeaders.get( key );
 
             theWriter.write( key );
@@ -299,6 +294,7 @@ public abstract class HttpResponse
         for( Iterator iter = theCookiesToSend.iterator() ; iter.hasNext() ; ) {
             HttpCookie current = (HttpCookie) iter.next();
             // current.setRemoved();
+            // FIXME? Why was this commented out?
         }
     }
 

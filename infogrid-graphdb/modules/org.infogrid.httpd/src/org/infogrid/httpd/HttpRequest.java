@@ -27,9 +27,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
+import org.infogrid.util.StringHelper;
 
 /**
   * This represents an incoming HTTP Request.
@@ -72,24 +72,24 @@ public class HttpRequest
         method = firstLine.substring( 0, index1 );
 
         int index2 = firstLine.indexOf( ' ', index1+1 );
-        if( index2 > 0 )
-        {
+        if( index2 > 0 ) {
             relativeFullUri = firstLine.substring( index1+1, index2 );
             httpVersion     = firstLine.substring( index2+1 );
-        }
-        else
+        } else {
             relativeFullUri = firstLine.substring( index1+1 );
+        }
 
-        while( true )
-        {
+        while( true ) {
             String currentLine = readLine( theBufferedInStream );
-            if( currentLine.length() == 0 )
+            if( currentLine.length() == 0 ) {
                 break;
+            }
 
             int index = currentLine.indexOf( ": " ); // separator of keyword and value
-            if( index < 0 )
+            if( index < 0 ) {
                 throw new MalformedHttpHeaderException();
-
+            }
+            
             String key   = currentLine.substring( 0, index );
             String value = currentLine.substring( index+2 ); // +2 because we are looking for 2 characters
 
@@ -154,12 +154,10 @@ public class HttpRequest
         theArguments = new NameValueList();
 
         int q = relativeFullUri.indexOf( '?' );
-        if( q < 0 )
-        {
+        if( q < 0 ) {
             theRelativeBaseUri = relativeFullUri;
-        }
-        else
-        {
+
+        } else {
             theRelativeBaseUri = relativeFullUri.substring( 0, q );
             String argsString  = relativeFullUri.substring( q+1 );
 
@@ -354,10 +352,12 @@ public class HttpRequest
     public String getBasicAuthorizationString()
     {
         String encoded = theParameters.get( HttpRequestHeaderFields.AUTHORIZATION_TAG );
-        if( encoded == null )
+        if( encoded == null ) {
             return null;
-        if( !encoded.startsWith( BASIC_AUTHENTICATION_TAG ))
+        }
+        if( !encoded.startsWith( BASIC_AUTHENTICATION_TAG )) {
             return null;
+        }
         encoded = encoded.substring( BASIC_AUTHENTICATION_TAG.length() );
 
         byte [] decoded = Base64.base64decode( encoded );
@@ -376,12 +376,14 @@ public class HttpRequest
         // FIXME this can be made much more efficient
 
         String decodedString = getBasicAuthorizationString();
-        if( decodedString == null )
+        if( decodedString == null ) {
             return null;
+        }
 
         int colon = decodedString.indexOf( ":" );
-        if( colon < 0 )
+        if( colon < 0 ) {
             return null;
+        }
 
         String user = decodedString.substring( 0, colon );
 
@@ -398,12 +400,14 @@ public class HttpRequest
         // FIXME this can be made much more efficient
 
         String decodedString = getBasicAuthorizationString();
-        if( decodedString == null )
+        if( decodedString == null ) {
             return null;
+        }
 
         int colon = decodedString.indexOf( ":" );
-        if( colon < 0 )
+        if( colon < 0 ) {
             return null;
+        }
 
         String pass = decodedString.substring( colon+1 );
 
@@ -418,15 +422,17 @@ public class HttpRequest
     public String getByteRangeString()
     {
         String range = getHttpParameters().get( HttpRequestHeaderFields.RANGE_TAG );
-        if( range == null )
+        if( range == null ) {
             return null;
-        if( !range.startsWith( HttpEntityHeaderFields.CONTENT_RANGE_BYTES_TAG ))
+        }
+        if( !range.startsWith( HttpEntityHeaderFields.CONTENT_RANGE_BYTES_TAG )) {
             return null;
+        }
         range = range.substring( HttpEntityHeaderFields.CONTENT_RANGE_BYTES_TAG.length() );
 
-        if( range.indexOf( ',' ) < 0 )
+        if( range.indexOf( ',' ) < 0 ) {
             return null; // we don't support complex ranges
-
+        }
         return range;
     }
 
@@ -439,12 +445,14 @@ public class HttpRequest
     {
         // FIXME, this could be done a lot more efficiently
         String range = getByteRangeString();
-        if( range == null )
+        if( range == null ) {
             return 0;
+        }
 
         int dash = range.indexOf( '-' );
-        if( dash < 0 )
+        if( dash < 0 ) {
             return 0;
+        }
 
         String minString = range.substring( 0, dash );
         String maxString = range.substring( dash+1 );
@@ -452,17 +460,20 @@ public class HttpRequest
         int min;
         int max;
 
-        if( minString.length() > 0 )
+        if( minString.length() > 0 ) {
             min = Integer.parseInt( minString );
-        else
+        } else {
             min = 0;
-        if( maxString.length() > 0 )
+        }
+        if( maxString.length() > 0 ) {
             max = Integer.parseInt( maxString );
-        else
+        } else {
             max = -1;
+        }
 
-        if( max != -1 && min > max )
+        if( max != -1 && min > max ) {
             return 0;
+        }
 
         return min;
     }
@@ -476,12 +487,14 @@ public class HttpRequest
     {
         // FIXME, this could be done a lot more efficiently
         String range = getByteRangeString();
-        if( range == null )
+        if( range == null ) {
             return -1;
+        }
 
         int dash = range.indexOf( '-' );
-        if( dash < 0 )
+        if( dash < 0 ) {
             return -1;
+        }
 
         String minString = range.substring( 0, dash );
         String maxString = range.substring( dash+1 );
@@ -489,17 +502,19 @@ public class HttpRequest
         int min;
         int max;
 
-        if( minString.length() > 0 )
+        if( minString.length() > 0 ) {
             min = Integer.parseInt( minString );
-        else
+        } else {
             min = 0;
-        if( maxString.length() > 0 )
+        }
+        if( maxString.length() > 0 ) {
             max = Integer.parseInt( maxString );
-        else
+        } else {
             max = -1;
-
-        if( max != -1 && min > max )
+        }
+        if( max != -1 && min > max ) {
             return -1;
+        }
 
         return max;
     }
@@ -569,18 +584,17 @@ public class HttpRequest
         String [] lines = theParameters.getAll( HttpRequestHeaderFields.COOKIE_TAG.toLowerCase() );
 
         ArrayList<HttpCookie> ret = new ArrayList<HttpCookie>();
-        for( int i=0 ; i<lines.length ; ++i )
-        {
+        for( int i=0 ; i<lines.length ; ++i ) {
             StringTokenizer token = new StringTokenizer( lines[i], "; " );
-            while( token.hasMoreTokens() )
-            {
+            while( token.hasMoreTokens() ) {
                 String pair = token.nextToken();
                 String name    = null;
                 String value   = null;
 
                 int equals = pair.indexOf( '=' );
-                if( equals < 0 )
+                if( equals < 0 ) {
                     continue;
+                }
                 name  = pair.substring( 0, equals );
                 value = pair.substring( equals+1 );
 
@@ -606,11 +620,11 @@ public class HttpRequest
             String name )
     {
         HttpCookie [] coo = getCookies();
-        for( int i=0 ; i<coo.length ; ++i )
-        {
+        for( int i=0 ; i<coo.length ; ++i ) {
             String cookieName = coo[i].getName();
-            if( name.equals( cookieName ))
+            if( name.equals( cookieName )) {
                 return coo[i];
+            }
         }
         return null;
     }
@@ -697,31 +711,20 @@ public class HttpRequest
     @Override
     public String toString()
     {
-        StringBuffer ret = new StringBuffer( 200 );
-        ret.append( "<" );
-        ret.append( super.toString() );
-        ret.append( "{ method: " );
-        ret.append( theMethod );
-        ret.append( ", baseUri: " );
-        ret.append( theRelativeBaseUri );
-        ret.append( ", version: " );
-        ret.append( theHttpVersion );
-
-        ret.append( ", parameters: { " );
-        Iterator iter = theParameters.keyIterator();
-        while( iter.hasNext() )
-        {
-            String key = (String) iter.next();
-            ret.append( key );
-            ret.append( "=\"" );
-            ret.append( theParameters.get( key ));
-            ret.append( "\"" );
-
-            if( iter.hasNext() )
-                ret.append( ", " );
-        }
-        ret.append( " }" );
-        return ret.toString();
+        return StringHelper.objectLogString(
+                this,
+                new String [] {
+                    "method",
+                    "relativeBaseUri",
+                    "httpVersion",
+                    "parameters"
+                },
+                new Object [] {
+                    theMethod,
+                    theRelativeBaseUri,
+                    theHttpVersion,
+                    theParameters
+                } );
     }
 
     /**

@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * In-memory implementation of PingPongMessageEndpoint.
+ * In-memory implementation of PingPongMessageEndpoint. This implementation supports
+ * the on-disk storage of a snapshot of this PingPongMessageEndpoint, and its recovery
+ * later, with a special factory method for that purpose.
  */
 public class MPingPongMessageEndpoint<T>
         extends
@@ -38,6 +40,9 @@ public class MPingPongMessageEndpoint<T>
 
     /**
      * Factory method.
+     * 
+     * @param exec the ScheduledExecutorService to schedule timed tasks
+     * @return the created MPingPongMessageEndpoint
      */
     public static <T> MPingPongMessageEndpoint<T> create(
             ScheduledExecutorService exec )
@@ -73,7 +78,7 @@ public class MPingPongMessageEndpoint<T>
      * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
      * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
      *                     was not received by the partner PingPongMessageEndpoint, and resends
-     * @param exec the ScheduledExecutorService to use for threading
+     * @param exec the ScheduledExecutorService to schedule timed tasks
      * @return the created MPingPongMessageEndpoint
      */
     public static <T> MPingPongMessageEndpoint<T> create(
@@ -99,6 +104,47 @@ public class MPingPongMessageEndpoint<T>
     }
 
     /**
+     * Factory method.
+     *
+     * @param name the name of the PingPongMessageEndpoint (for debugging only)
+     * @param deltaRespond the number of milliseconds until this PingPongMessageEndpoint returns the token
+     * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
+     * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
+     *                     was not received by the partner PingPongMessageEndpoint, and resends
+     * @param exec the ScheduledExecutorService to schedule timed tasks
+     * @param lastSentToken the last token sent in a previous instantiation of this MessageEndpoint
+     * @param lastReceivedToken the last token received in a previous instantiation of this MessageEndpoint
+     * @param messagesSentLast the last set of Messages sent in a previous instantiation of this MessageEndpoint
+     * @param messagesToBeSent the Messages to be sent from a previous instantiation of this MessageEndpoint
+     * @return the created MPingPongMessageEndpoint
+     */
+    public static <T> MPingPongMessageEndpoint<T> restore(
+            String                   name,
+            long                     deltaRespond,
+            long                     deltaResend,
+            long                     deltaRecover,
+            double                   randomVariation,
+            ScheduledExecutorService exec,
+            long                     lastSentToken,
+            long                     lastReceivedToken,
+            List<T>                  messagesSentLast,
+            List<T>                  messagesToBeSent )
+    {
+        MPingPongMessageEndpoint<T> ret = new MPingPongMessageEndpoint<T>(
+                name,
+                deltaRespond,
+                deltaResend,
+                deltaRecover,
+                randomVariation,
+                exec,
+                lastSentToken,
+                lastReceivedToken,
+                messagesSentLast,
+                messagesToBeSent );
+        return ret;
+    }
+
+    /**
      * Constructor.
      *
      * @param name the name of the PingPongMessageEndpoint (for debugging only)
@@ -106,11 +152,11 @@ public class MPingPongMessageEndpoint<T>
      * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
      * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
      *                     was not received by the partner PingPongMessageEndpoint, and resends
-     * @param exec the ScheduledExecutorService to use for threading
+     * @param exec the ScheduledExecutorService to schedule timed tasks
      * @param lastSentToken the last token sent in a previous instantiation of this MessageEndpoint
      * @param lastReceivedToken the last token received in a previous instantiation of this MessageEndpoint
      * @param messagesSentLast the last set of Messages sent in a previous instantiation of this MessageEndpoint
-     * @param messageToBeSent the Messages to be sent as soon as possible
+     * @param messagesToBeSent the Messages to be sent from a previous instantiation of this MessageEndpoint
      */
     protected MPingPongMessageEndpoint(
             String                   name,
@@ -177,6 +223,7 @@ public class MPingPongMessageEndpoint<T>
      *
      * @param token the token of the message
      * @param content the content to send.
+     * @throws MessageSendException thrown if the message could not be sent
      */
     protected void sendMessage(
             long    token,
@@ -266,16 +313,6 @@ public class MPingPongMessageEndpoint<T>
             theFuture = null;
         }
     }
-
-//    /**
-//     * Allow the setting of breakpoints.
-//     */
-//    public void finalize()
-//    {
-//        if( log.isDebugEnabled() ) {
-//            log.debug( this + ".finalize()" );
-//        }
-//    }
 
     /**
      * The partner PingPongMessageEndpoint.

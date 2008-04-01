@@ -15,7 +15,7 @@
 
 <standardmodule>
  <name>org.infogrid.comm.pingpong.TEST</name>
- <username>Testing the PingPong Module</username>
+ <username>Tests the PingPong Module</username>
  <runclass>org.infogrid.comm.pingpong.TEST.AllTests</runclass>
  <dependencies>
   <requires name="org.infogrid.comm.pingpong"/>
