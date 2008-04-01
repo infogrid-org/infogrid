@@ -16,6 +16,8 @@
 <standardmodule>
  <name>org.infogrid.crypto</name>
  <username>A currently very small library of cryptographic methods</username>
+ <userdescription>Currently very small module that collects all cryptographic
+    functionality otherwise needed by InfoGrid.</userdescription>
  <provides>
   <jar>org.infogrid.crypto.jar</jar>
  </provides>

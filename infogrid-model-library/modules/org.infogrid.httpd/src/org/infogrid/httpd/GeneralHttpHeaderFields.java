@@ -15,7 +15,7 @@
 package org.infogrid.httpd;
 
 /**
- * An HTTP General Header field. We don't do Cache-Control at this time (FIXME?)
+ * An HTTP General Header field. We don't do Cache-Control at this time (FIXME?).
  */
 public interface GeneralHttpHeaderFields
 {

@@ -32,6 +32,7 @@ $Date$
   <property name="all.modules.dirs"    value=".." />
 
   <property name="thismoduledir"       value="${infogrid.org.modules}/${ant.project.name}"/>
+  <property name="thistestdir"         value="${infogrid.org.tests}/${ant.project.name}"/>
 
   <property name="javadoc.windowtitle" value="InfoGrid Module '${ant.project.name}'" />
 

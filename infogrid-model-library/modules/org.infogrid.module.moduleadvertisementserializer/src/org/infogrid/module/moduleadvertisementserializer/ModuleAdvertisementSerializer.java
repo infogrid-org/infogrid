@@ -262,20 +262,17 @@ public class ModuleAdvertisementSerializer
     {
         PrintWriter out = new PrintWriter( theStream );
         out.println( "//" );
-        out.println( "// THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED" );
-        out.println( "// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES" );
-        out.println( "// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" );
-        out.println( "// DISCLAIMED. IN NO EVENT SHALL NETMESH INC. BE LIABLE FOR ANY DIRECT," );
-        out.println( "// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" );
-        out.println( "// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR" );
-        out.println( "// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)" );
-        out.println( "// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT," );
-        out.println( "// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)" );
-        out.println( "// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED" );
-        out.println( "// OF THE POSSIBILITY OF SUCH DAMAGE." );
+        out.println( "// This file is part of InfoGrid(tm). You may not use this file except in" );
+        out.println( "// compliance with the InfoGrid license. The InfoGrid license and important" );
+        out.println( "// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should" );
+        out.println( "// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt" );
+        out.println( "// or you do not consent to all aspects of the license and the disclaimers," );
+        out.println( "// no license is granted; do not use this file." );
         out.println( "//" );
-        out.println( "// The use of this software is governed by a license agreement that" );
-        out.println( "// is contained in the package that you downloaded." );
+        out.println( "// For more information about InfoGrid go to http://infogrid.org/" );
+        out.println( "//" );
+        out.println( "// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst" );
+        out.println( "// All rights reserved." );
         out.println( "//" );
         out.println();
 
@@ -291,7 +288,7 @@ public class ModuleAdvertisementSerializer
         }
 
         out.println( "/**" );
-        out.print( "  * Instantiates Module " + adv.getModuleName() );
+        out.print(   "  * Instantiates Module " + adv.getModuleName() );
         if( adv.getModuleVersion() != null ) {
             out.print( " in version " + adv.getModuleVersion() );
         } else {
