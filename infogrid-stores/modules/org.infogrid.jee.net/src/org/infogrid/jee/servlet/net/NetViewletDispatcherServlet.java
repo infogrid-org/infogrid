@@ -23,9 +23,10 @@ import org.infogrid.jee.rest.RestfulRequest;
 import org.infogrid.jee.rest.net.DefaultNetRestfulRequest;
 import org.infogrid.jee.rest.net.NetRestfulRequest;
 import org.infogrid.jee.sane.SaneServletRequest;
-import org.infogrid.jee.viewlet.templates.StructuredResponse;
 import org.infogrid.jee.servlet.ViewletDispatcherServlet;
 import org.infogrid.jee.viewlet.JeeViewlet;
+import org.infogrid.jee.viewlet.templates.JspStructuredResponseTemplate;
+import org.infogrid.jee.viewlet.templates.StructuredResponse;
 import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.Proxy;
@@ -85,7 +86,15 @@ public class NetViewletDispatcherServlet
         String            servletPath = "/v/org/infogrid/jee/viewlet/meshbase/net/Proxy.jsp";
         RequestDispatcher dispatcher  = app.findLocalizedRequestDispatcher( servletPath, restful.getSaneRequest().acceptLanguageIterator(), getServletContext() );
 
-        runRequestDispatcher( dispatcher, restful, structured );
+        StructuredResponse oldStructuredResponse = (StructuredResponse) restful.getDelegate().getAttribute( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
+        restful.getDelegate().setAttribute( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME, structured );
+
+        try {
+            runRequestDispatcher( dispatcher, restful, structured );
+            
+        } finally {
+            restful.getDelegate().setAttribute( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME, oldStructuredResponse );            
+        }
     }
 
     /**
@@ -94,16 +103,19 @@ public class NetViewletDispatcherServlet
      *
      * @param lidRequest the incoming request
      * @param context the context path of the application
+     * @param defaultMeshBaseIdentifier String form of the identifier of the default MeshBase
      * @return the created RestfulRequest
      */
     @Override
     protected NetRestfulRequest createRestfulRequest(
             SaneServletRequest lidRequest,
-            String             context )
+            String             context,
+            String             defaultMeshBaseIdentifier )
     {
         DefaultNetRestfulRequest ret = DefaultNetRestfulRequest.create(
                 lidRequest,
-                context );
+                context,
+                defaultMeshBaseIdentifier );
         return ret;
     }
 }

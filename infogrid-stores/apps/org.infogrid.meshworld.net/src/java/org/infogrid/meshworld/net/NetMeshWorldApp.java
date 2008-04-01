@@ -68,12 +68,10 @@ public class NetMeshWorldApp
     /**
      * Factory method.
      *
-     * @param siteUrl the URL of the site
-     * @param theDataSourceJndiPath name of the DataSource in JNDI
+     * @param defaultMeshBaseIdentifier the MeshBaseIdentifier of the default MeshBase
      */
     public static NetMeshWorldApp create(
-            String siteUrl,
-            String theDataSourceJndiPath )
+            String defaultMeshBaseIdentifier )
         throws
             NamingException,
             URISyntaxException
@@ -145,7 +143,7 @@ public class NetMeshWorldApp
         // Database access via JNDI
         
         InitialContext ctx           = new InitialContext();
-        DataSource     theDataSource = (DataSource) ctx.lookup( theDataSourceJndiPath );        
+        DataSource     theDataSource = (DataSource) ctx.lookup( "java:comp/env/jdbc/netmeshworldDB" );        
 
         SqlStore meshStore        = SqlStore.create( theDataSource, theResourceHelper.getResourceString( "MeshObjectTable" ) );
         SqlStore proxyStore       = SqlStore.create( theDataSource, theResourceHelper.getResourceString( "ProxyStoreTable" ));
@@ -157,12 +155,8 @@ public class NetMeshWorldApp
         shadowStore.initializeIfNecessary();
         shadowProxyStore.initializeIfNecessary();
 
-        if( siteUrl == null ) {
-            throw new RuntimeException( "SiteUrl parameter must not be null" );
-        }
-
         // NetMeshBaseIdentifier
-        NetMeshBaseIdentifier theNetworkIdentifier = NetMeshBaseIdentifier.create( siteUrl );
+        NetMeshBaseIdentifier mbId = NetMeshBaseIdentifier.create( defaultMeshBaseIdentifier );
 
         // AccessManager
         NetAccessManager accessMgr = null; // NetMeshWorldAccessManager.create();
@@ -172,7 +166,7 @@ public class NetMeshWorldApp
 
         // MeshBase
         IterableLocalNetStoreMeshBase meshBase = IterableLocalNetStoreMeshBase.create(
-                theNetworkIdentifier,
+                mbId,
                 modelBase,
                 accessMgr,
                 meshStore,

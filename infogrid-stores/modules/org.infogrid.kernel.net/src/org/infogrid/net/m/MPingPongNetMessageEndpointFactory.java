@@ -113,7 +113,7 @@ public class MPingPongNetMessageEndpointFactory
         throws
             FactoryException
     {
-        MPingPongNetMessageEndpoint ret = MPingPongNetMessageEndpoint.create(
+        MPingPongNetMessageEndpoint ret = MPingPongNetMessageEndpoint.restore(
                 "Endpoint " + myIdentifier.toExternalForm() + " -> " + partnerIdentifier.toExternalForm(),
                 partnerIdentifier,
                 myIdentifier,
