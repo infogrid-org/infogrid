@@ -224,6 +224,7 @@ public class ModuleClassLoader
      * @param name the name of the resource
      * @return the URL of the resource, if found
      */
+    @Override
     protected synchronized URL findResource(
             String name )
     {
@@ -361,6 +362,7 @@ public class ModuleClassLoader
      *
      * @return string representation of this object
      */
+    @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer( 100 ); // fudge

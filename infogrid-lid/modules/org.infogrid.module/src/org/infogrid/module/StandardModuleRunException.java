@@ -47,6 +47,7 @@ public class StandardModuleRunException
      *
      * @return this object in printable format
      */
+    @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer( 100 );

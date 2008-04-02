@@ -153,6 +153,7 @@ public class ModuleRequirement
      *
      * @return string representation of this object
      */
+    @Override
     public String toString()
     {
         return getClass().getName() + ": " + theRequiredModuleName;
@@ -162,6 +163,7 @@ public class ModuleRequirement
      * Create a String expression in the Java language that, when executed, creates
      * an instance of ModuleRequirement that is equal to this ModuleRequirement.
      *
+     * @param tabs the number of tabs to insert
      * @return the String expression
      */
     public String getJavaConstructorString(
