@@ -20,7 +20,7 @@ import java.net.*;
 import java.util.*;
 
 /**
- * This represents a software Module in the Module Framework. More concrete suclasses
+ * A software Module in the Module Framework. More concrete suclasses
  * represent particular types of software Modules.
  */
 public abstract class Module

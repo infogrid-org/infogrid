@@ -32,7 +32,6 @@ import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 
 import java.util.ArrayList;
@@ -185,6 +184,7 @@ public class ModuleAdvertisementXmlParser
      * @see org.xml.sax.ContentHandler#setDocumentLocator
      * @see org.xml.sax.Locator
      */
+    @Override
     public void setDocumentLocator(
             Locator locator )
     {
@@ -212,6 +212,7 @@ public class ModuleAdvertisementXmlParser
      * @throws SAXException if an error occurred
      * @see #endElement
      */
+    @Override
     public void startElement(
             String     namespaceURI,
             String     sName,
@@ -378,6 +379,7 @@ public class ModuleAdvertisementXmlParser
      * @param start The start position in the array.
      * @param length The number of characters to read from the array.
      */
+    @Override
     public void characters(
             char [] ch,
             int     start,
@@ -403,6 +405,7 @@ public class ModuleAdvertisementXmlParser
      *        empty string if qualified names are not available.
      * @throws SAXException a parse error occurred
      */
+    @Override
     public void endElement(
             String namespaceURI,
             String sName,
@@ -711,7 +714,7 @@ public class ModuleAdvertisementXmlParser
     /**
      * Simple Locator implementation.
      */
-    private static class MyLocator
+    protected static class MyLocator
         implements
             Locator
     {

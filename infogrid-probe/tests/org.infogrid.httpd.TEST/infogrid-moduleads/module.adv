@@ -19,7 +19,6 @@
  <runclass>org.infogrid.httpd.TEST.AllTests</runclass>
  <dependencies>
   <requires name="org.infogrid.httpd"/>
-  <requires name="org.infogrid.httpd.server"/>
   <requires name="org.infogrid.testharness"/>
   <requires name="org.infogrid.util"/>
  </dependencies>

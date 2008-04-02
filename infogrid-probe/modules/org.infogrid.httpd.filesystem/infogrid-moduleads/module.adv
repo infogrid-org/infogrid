@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.httpd.filesystem</name>
- <username>The minimalistic HTTP server serving files from the file system</username>
+ <username>Simple HTTP file system server</username>
+ <userdescription>The minimalistic HTTP server serving files from the file system</userdescription>
  <dependencies>
   <requires name="org.infogrid.httpd"/>
   <requires name="org.infogrid.util"/>
