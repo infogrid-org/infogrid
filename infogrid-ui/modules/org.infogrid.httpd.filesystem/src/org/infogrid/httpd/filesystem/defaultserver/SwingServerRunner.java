@@ -27,9 +27,10 @@ import java.io.File;
 import java.util.HashMap;
 
 /**
- * A simple executable that can run the HttpFilesystemServer.
+ * A simple executable that can run the HttpFilesystemServer, with a primitive Swing GUI
+ * to start and stop the server.
  */
-public class ServerRunner
+public class SwingServerRunner
 {
     /**
      * Main program.

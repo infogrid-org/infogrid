@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * This tests POST of our Web Server.
+ * Tests POSTs of our Web Server.
  */
 public class HttpdPostTest1
         extends

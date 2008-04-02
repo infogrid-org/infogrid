@@ -44,6 +44,7 @@ public class ModuleResolutionException
      * @return  the detail message string of this <tt>Throwable</tt> instance
      *          (which may be <tt>null</tt>).
      */
+    @Override
     public String getMessage()
     {
         StringBuffer buf = new StringBuffer( 100 ); // fudge

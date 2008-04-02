@@ -20,7 +20,7 @@ import java.net.URL;
 import java.util.Iterator;
 
 /**
- * This centralizes error handling within the Module Framework. As the Module Framework
+ * Centralizes error handling within the Module Framework. As the Module Framework
  * cannot expect any logging capabilities to be present, this is fairly minimalist.
  * All methods are statics.
  */

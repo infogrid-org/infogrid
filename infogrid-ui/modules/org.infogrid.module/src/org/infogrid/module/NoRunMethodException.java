@@ -47,6 +47,7 @@ public class NoRunMethodException
      *
      * @return this object in printable format
      */
+    @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer( 100 );
