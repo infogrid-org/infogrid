@@ -22,7 +22,6 @@
  <dependencies>
   <requires name="org.infogrid.util.logging.log4j"/>
   <requires name="org.infogrid.httpd"/>
-  <requires name="org.infogrid.httpd.server"/>
   <requires name="org.infogrid.kernel"/>
   <requires name="org.infogrid.modelbase.m"/>
   <requires name="org.infogrid.kernel.net"/>

@@ -17,7 +17,7 @@ package org.infogrid.module;
 import java.io.*;
 
 /**
- * This represents one capability of a Module. A ModuleCapability is a pair of a set of
+ * One capability of a Module. A ModuleCapability is a pair of a set of
  * interface names and exactly one implementation name. An interface name must be a valid
  * name for a Java interface or class, and an implementation name must be a valid name for
  * a Java class that is a subclass of (or supports the interface of) all of the
@@ -110,6 +110,7 @@ public class ModuleCapability
      *
      * @return this object in string format
      */
+    @Override
     public String toString()
     {
         StringBuffer ret = new StringBuffer( 100 );

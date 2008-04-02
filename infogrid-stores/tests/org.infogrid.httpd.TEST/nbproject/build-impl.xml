@@ -306,7 +306,6 @@
             -->
     <target depends="init" name="deps-jar" unless="no.deps">
         <ant antfile="${project.org_infogrid_httpd}/build.xml" inheritall="false" target="jar"/>
-        <ant antfile="${project.org_infogrid_httpd_server}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.org_infogrid_module}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.org_infogrid_module_commandline}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.org_infogrid_testharness}/build.xml" inheritall="false" target="jar"/>
@@ -623,7 +622,6 @@
             -->
     <target depends="init" name="deps-clean" unless="no.deps">
         <ant antfile="${project.org_infogrid_httpd}/build.xml" inheritall="false" target="clean"/>
-        <ant antfile="${project.org_infogrid_httpd_server}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.org_infogrid_module}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.org_infogrid_module_commandline}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.org_infogrid_testharness}/build.xml" inheritall="false" target="clean"/>

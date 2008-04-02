@@ -15,7 +15,7 @@
 package org.infogrid.module;
 
 /**
- * This is the abstract superclass of all Module Framework-related Exceptions.
+ * The abstract superclass of all Module Framework-related Exceptions.
  */
 public abstract class ModuleException
     extends
