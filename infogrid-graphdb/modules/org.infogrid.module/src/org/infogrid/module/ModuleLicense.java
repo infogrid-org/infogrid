@@ -14,7 +14,7 @@
 
 package org.infogrid.module;
 
-import java.io.*;
+import java.io.Serializable;
 
 /**
  * This represents the license for a Module.

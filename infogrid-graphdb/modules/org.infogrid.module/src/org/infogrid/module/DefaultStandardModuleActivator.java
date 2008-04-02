@@ -91,7 +91,7 @@ public class DefaultStandardModuleActivator
                     dependentModules,
                     activationClassName,
                     deactivationMethodName,
-                theModule.getClassLoader() );
+                    theModule.getClassLoader() );
         } catch( MalformedURLException ex ) {
             throw new ModuleActivationException( theModule.getModuleAdvertisement(), ex );
         }
@@ -104,6 +104,7 @@ public class DefaultStandardModuleActivator
      * @param dependentModule the dependent Module to activate
      * @return the ModuleActivator for the dependent Module
      */
+    @Override
     public ModuleActivator dependentModuleActivator(
             Module dependentModule )
         throws

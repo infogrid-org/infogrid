@@ -61,10 +61,12 @@ public class HttpFilesystemServer
     {
         super( acceptPort );
 
-        if( !documentRoot.exists() )
+        if( !documentRoot.exists() ) {
             throw new IOException( "Document root does not exist" );
-        if( !documentRoot.isDirectory() )
+        }
+        if( !documentRoot.isDirectory() ) {
             throw new IOException( "Document root is not a directory" );
+        }
 
         theDocumentRoot = documentRoot;
 
@@ -94,17 +96,17 @@ public class HttpFilesystemServer
         File    documentRoot = (File)    parameters.get( DOCUMENT_ROOT_PARAMETER_NAME );
         Integer portNumber   = (Integer) parameters.get( ACCEPT_PORT_PARAMETER_NAME );
 
-        if( documentRoot == null )
-        {
+        if( documentRoot == null ) {
             throw new ModuleConfigurationException(
                     thisModule.getModuleAdvertisement(),
                     "No " + DOCUMENT_ROOT_PARAMETER_NAME + " parameter given" );
         }
 
-        if( portNumber != null )
+        if( portNumber != null ) {
             theSingleton = new HttpFilesystemServer( documentRoot, portNumber.intValue() );
-        else
+        } else {
             theSingleton = new HttpFilesystemServer( documentRoot );
+        }
     }
 
     /**

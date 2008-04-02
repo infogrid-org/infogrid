@@ -17,7 +17,7 @@ package org.infogrid.module;
 import java.io.*;
 
 /**
- * This is a ModelModuleActivator that overrides one or more features of another ModelModuleActivator.
+ * A ModelModuleActivator that overrides one or more features of another ModelModuleActivator.
  */
 public class OverridingModelModuleActivator
         extends
