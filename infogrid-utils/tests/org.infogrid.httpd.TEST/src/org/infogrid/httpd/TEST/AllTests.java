@@ -17,7 +17,7 @@ package org.infogrid.httpd.TEST;
 import org.infogrid.testharness.AbstractTestGroup;
 
 /**
- * Tests the Probe framework.
+ * Tests the simplistic HTTPD server.
  */
 public class AllTests
         extends
