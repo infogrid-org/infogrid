@@ -14,12 +14,19 @@
 
 package org.infogrid.module;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.net.URL;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
 
 /**
- * This represents an advertisement for a software Module. More specific subclasses
+ * An advertisement for a software Module. More specific subclasses
  * are instantiable, this is an abstract superclass.
  */
 public abstract class ModuleAdvertisement

@@ -20,12 +20,42 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * This tests POST of our Web Server.
+ * Tests multithreaded POSTs of our Web Server.
  */
 public class HttpdPostTest2
         extends
             AbstractHttpdTest
 {
+    /**
+     * Test run.
+     *
+     * @throws Exception this code may throw any Exception
+     */
+    public void run()
+            throws
+                Exception
+    {
+        Thread [] t = new Thread[ THREADS ];
+        for( int i=0 ; i<t.length ; ++i ) {
+            t[i] = new Thread( new MyRunnable( i ));
+            t[i].start();
+        }
+
+        while( true ) {
+            Thread.sleep( 1000L );
+            boolean cont = false;
+            for( int i=0 ; i<t.length ; ++i ) {
+                if( t[i].isAlive() ) {
+                    cont = true;
+                    break;
+                }
+            }
+            if( !cont ) {
+                break;
+            }
+        }
+    }
+
     /**
       * Main program.
       *
@@ -75,36 +105,6 @@ public class HttpdPostTest2
     }
 
     /**
-     * Test run.
-     *
-     * @throws Exception this code may throw any Exception
-     */
-    public void run()
-            throws
-                Exception
-    {
-        Thread [] t = new Thread[ THREADS ];
-        for( int i=0 ; i<t.length ; ++i ) {
-            t[i] = new Thread( new MyRunnable( i ));
-            t[i].start();
-        }
-
-        while( true ) {
-            Thread.sleep( 1000L );
-            boolean cont = false;
-            for( int i=0 ; i<t.length ; ++i ) {
-                if( t[i].isAlive() ) {
-                    cont = true;
-                    break;
-                }
-            }
-            if( !cont ) {
-                break;
-            }
-        }
-    }
-
-   /**
      * The number of concurrent threads.
      */
     protected static final int THREADS = 20;

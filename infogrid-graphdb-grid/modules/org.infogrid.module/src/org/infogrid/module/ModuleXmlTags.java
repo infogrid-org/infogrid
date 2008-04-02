@@ -17,7 +17,7 @@ package org.infogrid.module;
 import java.text.DateFormat;
 
 /**
- *
+ * Collects the tag names in the ModuleAdvertisements' XML format.
  */
 public interface ModuleXmlTags
 {

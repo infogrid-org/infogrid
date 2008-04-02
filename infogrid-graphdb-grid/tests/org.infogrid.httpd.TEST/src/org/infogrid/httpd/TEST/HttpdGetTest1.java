@@ -17,7 +17,7 @@ package org.infogrid.httpd.TEST;
 import org.infogrid.util.http.HTTP;
 
 /**
- * This tests GET of our Web Server.
+ * Tests GETs of our Web Server.
  */
 public class HttpdGetTest1
         extends

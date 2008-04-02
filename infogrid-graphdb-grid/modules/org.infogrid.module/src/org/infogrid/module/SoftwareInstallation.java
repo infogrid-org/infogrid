@@ -19,8 +19,9 @@ import java.net.*;
 import java.util.*;
 
 /**
- * This represents a software installation. Subclasses implement this differently,
- * depending on the run-time environment (e.g. JEE vs. JME).
+ * A software installation, i.e. a number of Modules and activation meta-data.
+ * Subclasses implement this differently, depending on the run-time environment
+ * (e.g. JEE vs. JME).
  */
 public abstract class SoftwareInstallation
 {
@@ -153,7 +154,7 @@ public abstract class SoftwareInstallation
 
             String modifiedValue = replaceVariables( currentValue );
 
-            if( currentValue != modifiedValue ) {
+            if( (Object) currentValue != (Object) modifiedValue ) { // typecast to avoid String == comparison warning
                 ret.setProperty( currentKey, modifiedValue );
             }
         }

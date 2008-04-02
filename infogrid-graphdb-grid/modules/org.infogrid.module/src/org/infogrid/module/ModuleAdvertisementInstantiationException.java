@@ -41,6 +41,7 @@ public class ModuleAdvertisementInstantiationException
      *
      * @return a string representation of this object
      */
+    @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer( 100 ); // fudge
