@@ -139,11 +139,21 @@ public final class IntegerValue
     }
 
     /**
-      * Convert value back to int.
+      * Convert value back to Long.
       *
-      * @return the value as int
+      * @return the value as Long
       */
     public Long value()
+    {
+        return theValue;
+    }
+
+    /**
+      * Convert value back to long.
+      *
+      * @return the value as long
+      */
+    public long longValue()
     {
         return theValue;
     }

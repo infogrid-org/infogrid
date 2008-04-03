@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
@@ -160,9 +161,12 @@ public abstract class HTTP
         throws
             IOException
     {
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        URLConnection conn = url.openConnection();
+        if( conn instanceof HttpURLConnection ) {
+            HttpURLConnection realConn = (HttpURLConnection) conn;
 
-        conn.setInstanceFollowRedirects( followRedirects );
+            realConn.setInstanceFollowRedirects( followRedirects );
+        }
 
         if( cookies != null && !cookies.isEmpty() ) {
             StringBuffer cookieString = new StringBuffer();
@@ -183,7 +187,7 @@ public abstract class HTTP
         }
 
         InputStream              input        = conn.getInputStream();
-        int                      status       = conn.getResponseCode();
+        int                      status       = (conn instanceof HttpURLConnection) ? ((HttpURLConnection)conn).getResponseCode() : 200;
         long                     lastModified = conn.getLastModified();
         Map<String,List<String>> headers      = conn.getHeaderFields();
         

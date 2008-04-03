@@ -25,7 +25,6 @@ import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
-import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.logging.Log;
 
@@ -163,9 +162,4 @@ public abstract class AbstractProbeTest
      * The ModelBase.
      */
     protected static ModelBase theModelBase = ModelBaseSingleton.getSingleton();
-
-    /**
-     * The ProbeDirectory.
-     */
-    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 }
