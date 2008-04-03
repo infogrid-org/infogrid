@@ -30,7 +30,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 /**
- * This represents the local software installation of a server-side J2EE installation.
+ * A SoftwareInstallation of a server-side J2EE installation.
  * Use this to obtain all paths, for example.
  */
 public class ServletSoftwareInstallation
@@ -293,10 +293,8 @@ public class ServletSoftwareInstallation
      * The about text for this version. FIXME, needs to be internationalized.
      */
     protected static String theAboutText
-            = "NetMesh(R)\n"
-            + "Version: @PRODUCTID@\n\n"
-            + "\u00A9 1998-2008 NetMesh Inc.\n"
+            = "InfoGrid.org(tm)\n"
+            + "\u00A9 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst\n"
             + "All rights reserved.\n"
-            + "This product may include software developed by the\n"
-            + "Apache Software Foundation (www.apache.org).\n";
+            + "For more information about InfoGrid go to http://infogrid.org/";
 }
