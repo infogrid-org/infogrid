@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This represents the local software installation of a client-side installation.
+ * A local software installation.
  * Use this to obtain all paths, for example.
  */
 public class CommandlineSoftwareInstallation
@@ -52,7 +52,6 @@ public class CommandlineSoftwareInstallation
     {
         String            userDataDirName                    = null;
         ArrayList<String> installModuleDirNames              = new ArrayList<String>();
-        String            applicationDirName                 = null;
         String            homeObjectUrlName                  = null;
         String            rootModuleName                     = null;
         String            activationClassName                = null;
@@ -241,7 +240,7 @@ public class CommandlineSoftwareInstallation
     }
 
     /**
-     * Private constructor, use factory  method.
+     * Private constructor, use factory method.
      *
      * @param platform the platform on which we run, one of the pre-defined values in this class
      * @param installModuleDirNames names of the installation directories in which the Modules can be found
@@ -261,6 +260,7 @@ public class CommandlineSoftwareInstallation
      * @param isDeveloper if true, run in developer mode
      * @param isDemo if true, run in demo mode
      * @param isErrorTextOnly if true, do not pop up dialog for module error messages
+     * @param sleepPeriodBeforeExit the number of milliseconds to sleep prior to exiting the VM
      * @param isShowModuleRegistry if true, print the content of the ModuleRegistry to the terminal
      * @param moduleDebugStream a stream for Module-related debug information (may be null)
      * @param remainingArguments the arguments on the command line not used by SoftwareInstallation itself
