@@ -30,13 +30,14 @@ import java.io.PrintStream;
 import java.util.Iterator;
 
 /**
- * This class acts as the main() program in a Module-based application.
- * Based on passed-in parameters, it instantiates a ModuleRegistry, figures
- * out what Modules are available, resolves and activates the top-most Module and
- * all its mandatory dependencies, and runs it.
+ * <p>Acts as the main() program in a Module-based application.
+ *    Based on passed-in parameters, it instantiates a ModuleRegistry, figures
+ *    out what Modules are available, resolves and activates the top-most Module and
+ *    all its mandatory dependencies, and runs it.</p>
  *
- * Recognized arguments to the main program are described in class SoftwareInstallation.
- * Additional arguments can be passed in, which will be passed to the root module.
+ * <p>Recognized arguments to the main program are described in class
+ *    CommandlineSoftwareInstallation. Additional arguments can be passed in, which
+ *    will be passed to the root module.</p>
  */
 public class CommandlineBootLoader
 {
