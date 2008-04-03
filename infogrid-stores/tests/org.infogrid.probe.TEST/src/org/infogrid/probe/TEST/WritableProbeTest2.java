@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
   * Tests whether Property updates propagate into the WritableProbe and back to
@@ -268,6 +269,11 @@ public class WritableProbeTest2
 
     // Our Logger
     private static Log log = Log.getLogInstance( WritableProbeTest2.class );
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     /**
      * the test protocol, in the real world this would be something like "jdbc"

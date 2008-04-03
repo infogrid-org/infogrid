@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
   * Tests multi-threaded behavior of Probes / Shadows.
@@ -263,6 +264,11 @@ public class ProbeTest8
      * The ModelObjectRepository that we use to test.
      */
     protected LocalNetMMeshBase theMeshBase;
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     // Our Logger
     private static Log log = Log.getLogInstance(ProbeTest8.class);

@@ -14,6 +14,9 @@
 
 package org.infogrid.probe.TEST;
 
+import java.io.File;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.net.CoherenceSpecification;
@@ -22,13 +25,11 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
 import org.infogrid.meshbase.transaction.ChangeSet;
+import org.infogrid.probe.ProbeDirectory;
+import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.testharness.util.IteratorElementCounter;
 import org.infogrid.util.logging.Log;
-
-import java.io.File;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Reads (via the Probe framework) test1.xml into a NetMeshBase.
@@ -48,8 +49,9 @@ public class ShadowTest1
     {
         log.info( "Setting up" );
         
+        ProbeDirectory        dir  = MProbeDirectory.create();
         NetMeshBaseIdentifier here = NetMeshBaseIdentifier.create( "http://here.local/" ); // this is not going to work for communications
-        LocalNetMMeshBase     base = LocalNetMMeshBase.create( here, theModelBase, null, exec, theProbeDirectory, rootContext );
+        LocalNetMMeshBase     base = LocalNetMMeshBase.create( here, theModelBase, null, exec, dir, rootContext );
 
         //
         

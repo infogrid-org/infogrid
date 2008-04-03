@@ -30,6 +30,7 @@ import org.infogrid.probe.ApiProbe;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;
+import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.testharness.util.IteratorElementCounter;
 import org.infogrid.util.logging.Log;
@@ -54,8 +55,8 @@ public class ShadowTest2
         throws
             Exception
     {
-        NetMeshBaseIdentifier    here = NetMeshBaseIdentifier.create( "http://here.local/" ); // this is not going to work for communications
-        LocalNetMMeshBase        base = LocalNetMMeshBase.create( here, theModelBase, null, exec, theProbeDirectory, rootContext );
+        NetMeshBaseIdentifier here = NetMeshBaseIdentifier.create( "http://here.local/" ); // this is not going to work for communications
+        LocalNetMMeshBase     base = LocalNetMMeshBase.create( here, theModelBase, null, exec, theProbeDirectory, rootContext );
 
         //
         
@@ -188,6 +189,10 @@ public class ShadowTest2
         exec.shutdown();
     }
     
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     // Our Logger
     private static Log log = Log.getLogInstance( ShadowTest2.class );
