@@ -36,6 +36,7 @@ import org.infogrid.util.logging.Log;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
   * Tests the standard ProbeUpdateCalculator implementations.
@@ -230,7 +231,12 @@ public class ProbeUpdateCalculatorTest1
 
     // Our Logger
     private static Log log = Log.getLogInstance( ProbeUpdateCalculatorTest1.class );
-    
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
+
     protected ScheduledExecutorService theExec = Executors.newSingleThreadScheduledExecutor();
     
     protected MPingPongNetMessageEndpointFactory theShadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( theExec );
