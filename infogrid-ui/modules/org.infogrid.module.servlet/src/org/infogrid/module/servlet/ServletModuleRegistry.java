@@ -25,8 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * A ModuleRegistry is a place where Modules can be found and resolved. There is typically
- * only one ModuleRegistry per virtual machine.
+ * A ModuleRegistry particularly appropriate for servlet environments.
  */
 public class ServletModuleRegistry
     extends
@@ -50,6 +49,7 @@ public class ServletModuleRegistry
         ServletModuleRegistry registry = new ServletModuleRegistry( theInstallation );
 
         ModuleAdvertisement rootAd = registry.loadModuleAdvertisementRecursively( theInstallation.getRootModuleRequirement() );
+        // rootAd only there for debugging
         
         return registry;
     }

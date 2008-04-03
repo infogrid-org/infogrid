@@ -158,6 +158,7 @@ public abstract class ServletBootLoader
         try {
             Object ret = theRootModule.activateRecursively( act );
                     // may throw an exception
+                    // ret is only there for debugging
 
             theRootModule.configureRecursively( rootConfigParameters ); // FIXME
 
