@@ -23,6 +23,7 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.model.primitives.StringValue;
+import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.util.logging.Log;
 
 
@@ -173,6 +174,11 @@ public class ProbeTest4
      * Our ThreadPool.
      */
     protected ScheduledExecutorService exec = Executors.newScheduledThreadPool( 1 );
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     // Our Logger
     private static Log log = Log.getLogInstance( ProbeTest4.class);

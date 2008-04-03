@@ -37,6 +37,7 @@ import org.infogrid.util.logging.Log;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.regex.Pattern;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
  * Tests exact and pattern-based URL matching.
@@ -153,6 +154,11 @@ public class ProbeMatchTest1
 
     // Our Logger
     private static Log log = Log.getLogInstance( ProbeMatchTest1.class);
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     /**
      * Our ThreadPool.

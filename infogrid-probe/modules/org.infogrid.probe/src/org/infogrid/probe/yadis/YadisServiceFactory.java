@@ -385,9 +385,9 @@ public class YadisServiceFactory
         
     public void addYadisServicesFromHtml(
             NetMeshBaseIdentifier sourceIdentifier,
-            String            content,
-            MeshObject        subject,
-            MeshBase          base )
+            String                content,
+            MeshObject            subject,
+            MeshBase              base )
         throws
             TransactionException,
             NotPermittedException,
@@ -425,8 +425,8 @@ public class YadisServiceFactory
                 try {
                     int yadisLocationStart = yadisHttpEquivMatcher.start( 1 );
 
-                    String            yadisLocation          = yadisHttpEquivMatcher.group( 1 );
-                    NetMeshBaseIdentifier yadisNetworkIdentifier = NetMeshBaseIdentifier.guessAndCreate( yadisLocation );
+                    String                yadisLocation          = yadisHttpEquivMatcher.group( 1 );
+                    NetMeshBaseIdentifier yadisNetworkIdentifier = NetMeshBaseIdentifier.guessAndCreate( sourceIdentifier, yadisLocation );
 
                     yadisLocation = yadisNetworkIdentifier.getUriString();
 

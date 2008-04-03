@@ -41,6 +41,7 @@ import org.infogrid.util.logging.Log;
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.probe.m.MProbeDirectory;
 
 
 /**
@@ -173,6 +174,11 @@ public class ProbeTest5
     {
         exec.shutdown();
     }
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     /**
      * A counter that is incremented every time the Probe is run.
