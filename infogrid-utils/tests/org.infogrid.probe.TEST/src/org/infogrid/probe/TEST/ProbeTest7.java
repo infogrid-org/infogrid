@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
  * Make sure PingPong stops if a Probe fails.
@@ -219,6 +220,11 @@ public class ProbeTest7
 
     // Our Logger
     private static Log log = Log.getLogInstance(ProbeTest7.class);
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     /**
      * The NetMeshBaseIdentifier identifying this Probe.

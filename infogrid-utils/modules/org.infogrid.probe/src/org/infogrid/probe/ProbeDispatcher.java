@@ -416,11 +416,9 @@ public class ProbeDispatcher
         byte []               content          = null;
         String                contentAsString  = null;
         String                contentType      = null;
-        String                charset          = null;
         NetMeshBaseIdentifier sourceIdentifier = theShadowMeshBase.getIdentifier();
         String                protocol         = sourceIdentifier.getUrlProtocol();
         URL                   url              = sourceIdentifier.toUrl();
-        String                uriString        = sourceIdentifier.getUriString();
 
         String yadisServicesXml  = null;
         String yadisServicesHtml = null;
@@ -507,9 +505,12 @@ public class ProbeDispatcher
             } else if( "text/xml".equals( contentType )) {
                 contentType = XML_MIME_TYPE; // makes it easier down the road
 
-            } else if(    yadisServicesXml == null
-                       && ( "text/html".equals( contentType ) || "text/xhtml".equals( contentType )) ) {
-                
+            }
+            if(    yadisServicesXml == null
+                && (    "text/html".equals( contentType )
+                     || "text/xhtml".equals( contentType )
+                     || "application/xhtml+xml".equals( contentType )) )
+            {
                 if( contentAsString == null ) {
                     contentAsString = new String( content );
                 }
@@ -520,17 +521,15 @@ public class ProbeDispatcher
                 log.debug( this + " in handleStream(): content type is " + contentType );
             }
 
-            InputStream inStream   = new ByteArrayInputStream( content );
-            Class       probeClass = null;
-
+            InputStream inStream = new ByteArrayInputStream( content );
             try {
                 if( XML_MIME_TYPE.equals( contentType )) {
-                    probeClass = handleXml(
+                    handleXml(
                             base,
                             coherence,
                             inStream );
                 } else {
-                    probeClass = handleNonXml(
+                    handleNonXml(
                             base,
                             coherence,
                             contentType,
@@ -910,7 +909,7 @@ public class ProbeDispatcher
         Class                 foundClass       = null;
         String                foundClassName   = null;
         ClassLoader           foundClassLoader = null;
-        Map<String,Object>    foundParameters  = null;
+        Map<String,Object>    foundParameters  = null; // FIXME what are they used for?
         NetMeshBaseIdentifier sourceIdentifier = theShadowMeshBase.getIdentifier();
 
         ProbeDirectory.StreamProbeDescriptor desc = theProbeDirectory.getStreamProbeDescriptorByMimeType( contentType );
