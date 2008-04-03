@@ -36,6 +36,7 @@ import org.infogrid.util.logging.Log;
 import java.net.URISyntaxException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
  * Tests resolving ForwardReferences in API Probes. Same as ForwardReferenceTest1, just with ApiProbes instead of files.
@@ -147,6 +148,11 @@ public class ForwardReferenceTest2
 
     // Our Logger
     private static Log log = Log.getLogInstance( ForwardReferenceTest2.class);
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     /**
      * URL for the outer Probe.

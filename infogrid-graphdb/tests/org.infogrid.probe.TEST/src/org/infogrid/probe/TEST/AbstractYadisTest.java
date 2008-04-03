@@ -39,6 +39,7 @@ import org.infogrid.util.logging.Log;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URISyntaxException;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
  * Factors out the commonalities of the Yadis tests.
@@ -171,7 +172,12 @@ public abstract class AbstractYadisTest
         }
         theNetworkIdentifier = temp;
     }
-    
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
+
     /**
      * The ProbeManager that we use for the first Probe.
      */

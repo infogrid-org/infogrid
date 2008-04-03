@@ -40,6 +40,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
  * Tests the reading of file probetest1.xml.
@@ -216,4 +217,9 @@ public class ProbeTest1
      * The ProbeManager that we use for the first Probe.
      */
     protected PassiveProbeManager theProbeManager1;
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 }
