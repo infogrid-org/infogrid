@@ -36,9 +36,14 @@ import java.util.Iterator;
 import java.util.Properties;
 
 /**
- * This helper program takes XML advertisements and converts them into a representation
- * that takes less resources to load. Currently, we support Java Serialization (-ser argument)
- * and Java code generation (-java argument).
+ * <p>This helper program takes XML ModuleAdvertisements and converts them into a representation
+ * that takes less resources to load. Currently, the following formats are supported:</p>
+ * <ul>
+ *  <li>Java Serialization (<code>-ser</code> argument)</li>
+ *  <li>XML Serialization (<code>-xml</code> argument)</li>
+ *  <li>Java code generation (<code>-java</code> argument)</li>
+ * </ul>
+ * <p>In addition, some debug output options are supported.
  */
 public class ModuleAdvertisementSerializer
 {
@@ -463,11 +468,9 @@ public class ModuleAdvertisementSerializer
     {
         System.err.println( "Synopsys: (alternatives)" );
         System.err.println( "-ser        <XML advertisement file> <output directory>" );
+        System.err.println( "-xml        <XML advertisement file> <output directory>" );
         System.err.println( "-java       <XML advertisement file> <output directory>" );
         System.err.println( "-debug      <XML advertisement file> <output directory>" );
-        System.err.println( "-serlist    <list of XML advertisement files> <output directory>" );
-        System.err.println( "-javalist   <list of XML advertisement files> <output directory>" );
-        System.err.println( "-debuglist  <list of XML advertisement files> <output directory>" );
         System.err.println( "Called with:" );
         for( int i=0 ; i<args.length ; ++i ) {
             System.err.println( "    [" + i + "]: " + args[i] );
@@ -476,4 +479,3 @@ public class ModuleAdvertisementSerializer
         System.exit( 1 );
     }
 }
-
