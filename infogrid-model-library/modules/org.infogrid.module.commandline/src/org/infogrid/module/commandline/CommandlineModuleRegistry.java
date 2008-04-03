@@ -30,8 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A ModuleRegistry is a place where Modules can be found and resolved. There is typically
- * only one ModuleRegistry per virtual machine.
+ * A ModuleRegistry particularly appropriate for the CommandlineBootLoader.
  */
 public class CommandlineModuleRegistry
     extends
@@ -217,15 +216,15 @@ public class CommandlineModuleRegistry
     /**
      * The name of the Module XML file.
      */
-    private static final String MODULE_XML_FILE = "module.adv";
+    public static final String MODULE_XML_FILE = "module.adv";
 
     /**
      * The name of the directory in which we find any built module.adv file.
      */
-    private static final String BUILD_DIR = "dist";
+    public static final String BUILD_DIR = "dist";
 
     /**
      * The name of the directory in which we find the JAR files.
      */
-    private static final String DIST_DIR = "dist";
+    public static final String DIST_DIR = "dist";
 }
