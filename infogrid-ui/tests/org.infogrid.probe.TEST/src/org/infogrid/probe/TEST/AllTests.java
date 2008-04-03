@@ -90,6 +90,11 @@ public class AllTests
                 new TestSpec(
                         YadisTest4.class,
                         noArgs ),
+                new TestSpec(
+                        YadisTest5.class,
+                        new String [] {
+                                AbstractTest.fileSystemFile( YadisTest5.class, "YadisTest5.xml" )
+                        } ),
 
                 new TestSpec(
                         WritableProbeTest1.class,
@@ -107,7 +112,7 @@ public class AllTests
 //                        WritableProbeTest4.class,
 //                        noArgs ),
 
-            new TestSpec(
+                new TestSpec(
                         ShadowTest1.class,
                         new String [] {
                                 AbstractTest.fileSystemFile( ShadowTest1.class, "ProbeTest1.xml" )
@@ -115,6 +120,11 @@ public class AllTests
                 new TestSpec(
                         ShadowTest2.class,
                         noArgs ),
+                new TestSpec(
+                        ShadowTest3.class,
+                        new String [] {
+                                AbstractTest.fileSystemFile( ShadowTest3.class, "ShadowTest3a.html" ) // ShadowTest3b.xml referenced from ShadowTest3a.html
+                        } ),
 
                 new TestSpec(
                         ProbeUpdateCalculatorTest1.class,

@@ -38,6 +38,7 @@ import org.infogrid.util.logging.Log;
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
   * The simplest WritableProbeTest that I could think of: modify a single property.
@@ -169,6 +170,11 @@ public class WritableProbeTest1
 
     // Our Logger
     private static Log log = Log.getLogInstance( WritableProbeTest1.class );
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     /**
      * the test protocol, in the real world this would be something like "jdbc"

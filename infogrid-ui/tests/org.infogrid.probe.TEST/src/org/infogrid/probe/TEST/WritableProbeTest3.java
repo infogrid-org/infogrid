@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
   * Tests whether deletions propagate into the WritableProbe and back to
@@ -329,6 +330,11 @@ MeshObjectSet set = home.traverseToNeighborMeshObjects();
      * Our ThreadPool.
      */
     protected ScheduledExecutorService exec = Executors.newScheduledThreadPool( 1 );
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     /**
      * The first URL that we are accessing.

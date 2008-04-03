@@ -29,6 +29,7 @@ import org.infogrid.util.logging.Log;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
  * Tests running Probes manually, tracking the changes of a data source correctly.
@@ -218,6 +219,11 @@ public class ProbeTest2
 
     // Our Logger
     private static Log log = Log.getLogInstance( ProbeTest2.class);
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     /**
      * Our ThreadPool.

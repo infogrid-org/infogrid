@@ -26,6 +26,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.probe.m.MProbeDirectory;
 
 /**
  * Tests expiration of MeshObjects in the context of Shadows.
@@ -203,6 +204,11 @@ public class ProbeTest6
      * The test URL that we access
      */
     protected NetMeshBaseIdentifier theTestUrl;
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     /**
      * Our ThreadPool.
