@@ -42,7 +42,7 @@ public class ArrayCursorIteratorTest1
             "h"  // [7]
         };
 
-        ArrayCursorIterator<String> iter = new ArrayCursorIterator<String>( testData );
+        ArrayCursorIterator<String> iter = ArrayCursorIterator.<String>create( testData );
 
         runWith( testData, iter, log );
     }

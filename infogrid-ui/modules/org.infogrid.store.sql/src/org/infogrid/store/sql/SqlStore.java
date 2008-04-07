@@ -244,7 +244,7 @@ public class SqlStore
         } finally {
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
 
-            firePutPerformed( key, value );
+            firePutPerformed( value );
         }
     }
 
@@ -371,7 +371,7 @@ public class SqlStore
         } finally {
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
 
-            fireUpdatePerformed( key, value );
+            fireUpdatePerformed( value );
         }
     }
 
@@ -518,9 +518,9 @@ public class SqlStore
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
 
             if( ret ) {
-                fireUpdatePerformed( key, value );
+                fireUpdatePerformed( value );
             } else {
-                firePutPerformed( key, value );
+                firePutPerformed( value );
             }
         }        
     }
@@ -625,7 +625,11 @@ public class SqlStore
             throw new SqlStoreIOException( ex );
 
         } finally {
-            fireGetPerformed( key, ret );
+            if( ret != null ) {
+                fireGetPerformed( ret );
+            } else {
+                fireGetFailed( key );
+            }
         }
     }
     
@@ -1157,7 +1161,7 @@ public class SqlStore
     }
     
     /**
-     * Determine the number of StoreValues in this Store whose key starts with this String
+     * Determine the number of StoreValues in this Store whose key starts with this String.
      *
      * @param startsWith the String the key starts with
      * @return the number of StoreValues in this Store whose key starts with this String

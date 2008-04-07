@@ -55,6 +55,7 @@ public class UnifiedCollectionFacade<E>
      *
      * @return <tt>true</tt> if this Collection contains no elements
      */
+    @Override
     public boolean isEmpty()
     {
         for( int i=0 ; i<theCollections.length ; ++i ) {
@@ -75,6 +76,7 @@ public class UnifiedCollectionFacade<E>
      * @return <tt>true</tt> if this collection contains the specified
      *         element
      */
+    @Override
     public boolean contains(
             Object o )
     {
@@ -122,6 +124,7 @@ public class UnifiedCollectionFacade<E>
      *
      * @throws UnsupportedOperationException always thrown
      */
+    @Override
     public void clear()
     {
         for( int i=0 ; i<theCollections.length ; ++i ) {
@@ -142,7 +145,7 @@ public class UnifiedCollectionFacade<E>
                 Iterator<E>
     {
         /**
-         * Construct one.
+         * Constructor.
          */
         public MyIterator()
         {

@@ -19,13 +19,13 @@ import org.infogrid.util.text.StringRepresentation;
 import java.net.URISyntaxException;
 
 /**
- * A factory for Identifiers.
+ * An abstract factory for {@link Identifier Identifiers}.
  */
 public interface IdentifierFactory
 {
     /**
-     * Create an Identifier given its external form.
-     * This is the opposite of Identifier.toExternalForm().
+     * Create an {@link Identifier} given its external form.
+     * This is the opposite of {@link Identifier#toExternalForm()}.
      *
      * @param externalForm the externalForm
      * @return the Identifier
@@ -36,11 +36,12 @@ public interface IdentifierFactory
             URISyntaxException;
 
     /**
-     * Convert this StringRepresentation back to an Identifier.
+     * Convert a String in a given {@link org.infogrid.util.text.StringRepresentation}
+     * back to an {@link Identifier}.
      *
      * @param representation the StringRepresentation in which this String is represented
      * @param s the String to parse
-     * @return the created MeshObjectIdentifier
+     * @return the created Identifier
      */
     public Identifier fromStringRepresentation(
             StringRepresentation representation,

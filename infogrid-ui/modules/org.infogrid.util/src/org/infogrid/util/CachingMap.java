@@ -17,7 +17,7 @@ package org.infogrid.util;
 import java.util.Map;
 
 /**
- * Extends the Map interface to add some methods suitable for Maps that have a local
+ * Extends the <code>Map</code> interface to add some methods suitable for <code>Maps</code> that have a local
  * cache.
  */
 public interface CachingMap<K,V>
@@ -73,19 +73,54 @@ public interface CachingMap<K,V>
 
     /**
       * Add a listener.
+      * This listener is added directly to the listener list, which prevents the
+      * listener from being garbage-collected before this Object is being garbage-collected.
       *
       * @param newListener the to-be-added listener
+      * @see #addSoftCachingMapListener
+      * @see #addWeakCachingMapListener
       * @see #removeCachingMapListener
       */
     public void addDirectCachingMapListener(
             CachingMapListener newListener );
 
     /**
-     * Remove a listener.
-     * 
-     * @param oldListener the to-be-removed listener
-     * @see #addCachingMapListener
-     */
+      * Add a listener.
+      * This listener is added to the listener list using a <code>java.lang.ref.SoftReference</code>,
+      * which allows the listener to be garbage-collected before this Object is being garbage-collected
+      * according to the semantics of Java references.
+      *
+      * @param newListener the to-be-added listener
+      * @see #addDirectCachingMapListener
+      * @see #addWeakCachingMapListener
+      * @see #removeCachingMapListener
+      */
+    public void addSoftCachingMapListener(
+            CachingMapListener newListener );
+
+    /**
+      * Add a listener.
+      * This listener is added to the listener list using a <code>java.lang.ref.WeakReference</code>,
+      * which allows the listener to be garbage-collected before this Object is being garbage-collected
+      * according to the semantics of Java references.
+      *
+      * @param newListener the to-be-added listener
+      * @see #addDirectCachingMapListener
+      * @see #addSoftCachingMapListener
+      * @see #removeCachingMapListener
+      */
+    public void addWeakCachingMapListener(
+            CachingMapListener newListener );
+
+    /**
+      * Remove a listener.
+      * This method is the same regardless how the listener was subscribed to events.
+      * 
+      * @param oldListener the to-be-removed listener
+      * @see #addDirectCachingMapListener
+      * @see #addSoftCachingMapListener
+      * @see #addWeakCachingMapListener
+      */
     public void removeCachingMapListener(
             CachingMapListener oldListener );
 

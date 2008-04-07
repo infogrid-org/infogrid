@@ -33,11 +33,11 @@ import org.infogrid.model.primitives.PointValue;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.model.primitives.TimePeriodValue;
 import org.infogrid.model.primitives.TimeStampValue;
+import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.util.logging.Log;
 
 import java.awt.Color;
 import java.util.Date;
-import org.infogrid.model.Test.TestSubjectArea;
 
 /**
  * Reproduces a StoreMeshBase integrity problem found 2007-06-22.

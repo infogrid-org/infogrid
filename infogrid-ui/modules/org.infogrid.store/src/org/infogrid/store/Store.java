@@ -63,7 +63,8 @@ import java.io.IOException;
 public interface Store
 {
     /**
-     * Put a data element into the Store for the first time. Throw an Exception if a data
+     * Put a data element into the Store for the first time. Throw a
+     * {@link StoreKeyExistsAlreadyException} if a data
      * element has already been store using the same key.
      *
      * @param key the key with which the specified data element is to be associated
@@ -92,7 +93,8 @@ public interface Store
             IOException;
 
     /**
-     * Put a data element into the Store for the first time. Throw an Exception if a data
+     * Put a data element into the Store for the first time. Throw a
+     * {@link StoreKeyExistsAlreadyException} if a data
      * element has already been store using the same key.
      *
      * @param toStore the StoreValue to store
@@ -109,8 +111,8 @@ public interface Store
             IOException;
 
     /**
-     * Update a data element that already exists in the Store, by overwriting it with a new value. Throw an
-     * Exception if a data element with this key does not exist already.
+     * Update a data element that already exists in the Store, by overwriting it with a new value. Throw a
+     * {@link StoreKeyDoesNotExistException} if a data element with this key does not exist already.
      *
      * @param key the key with which the specified data element is already, and will continue to be stored
      * @param encodingId the id of the encoding that was used to encode the data element.
@@ -138,8 +140,8 @@ public interface Store
             IOException;
 
     /**
-     * Update a data element that already exists in the Store, by overwriting it with a new value. Throw an
-     * Exception if a data element with this key does not exist already.
+     * Update a data element that already exists in the Store, by overwriting it with a new value. Throw a
+     * {@link StoreKeyDoesNotExistException} if a data element with this key does not exist already.
      *
      * @param toUpdate the StoreValue to update
      * @param data the data element, expressed as a sequence of bytes
@@ -247,18 +249,55 @@ public interface Store
             IOException;
 
     /**
-     * Add a StoreListener.
-     *
-     * @param newListener the new StoreListener
-     */
-    public void addStoreListener(
+      * Add a listener.
+      * This listener is added directly to the listener list, which prevents the
+      * listener from being garbage-collected before this Object is being garbage-collected.
+      *
+      * @param newListener the to-be-added listener
+      * @see #addSoftStoreListener
+      * @see #addWeakStoreListener
+      * @see #removeStoreListener
+      */
+    public void addDirectStoreListener(
             StoreListener newListener );
-    
+
     /**
-     * Remove a StoreListener.
-     *
-     * @param oldListener the old StoreListener
-     */
+      * Add a listener.
+      * This listener is added to the listener list using a <code>java.lang.ref.SoftReference</code>,
+      * which allows the listener to be garbage-collected before this Object is being garbage-collected
+      * according to the semantics of Java references.
+      *
+      * @param newListener the to-be-added listener
+      * @see #addDirectStoreListener
+      * @see #addWeakStoreListener
+      * @see #removeStoreListener
+      */
+    public void addSoftStoreListener(
+            StoreListener newListener );
+
+    /**
+      * Add a listener.
+      * This listener is added to the listener list using a <code>java.lang.ref.WeakReference</code>,
+      * which allows the listener to be garbage-collected before this Object is being garbage-collected
+      * according to the semantics of Java references.
+      *
+      * @param newListener the to-be-added listener
+      * @see #addDirectStoreListener
+      * @see #addSoftStoreListener
+      * @see #removeStoreListener
+      */
+    public void addWeakStoreListener(
+            StoreListener newListener );
+
+    /**
+      * Remove a listener.
+      * This method is the same regardless how the listener was subscribed to events.
+      * 
+      * @param oldListener the to-be-removed listener
+      * @see #addDirectStoreListener
+      * @see #addSoftStoreListener
+      * @see #addWeakStoreListener
+      */
     public void removeStoreListener(
             StoreListener oldListener );
 }

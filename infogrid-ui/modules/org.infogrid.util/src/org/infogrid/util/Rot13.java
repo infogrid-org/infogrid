@@ -15,11 +15,27 @@
 package org.infogrid.util;
 
 /**
- * Simplistic obfuscation
+ * Simplistic obfuscation via Rot13.
  */
-public class Rot13 {
-
-    public static String rot(String in) {
+public abstract class Rot13
+{
+    /**
+     * Private constructor to prevent subclassing.
+     */
+    private Rot13()
+    {
+        // no op
+    }
+    
+    /**
+     * Perform a Rot13 operation
+     * 
+     * @param in the input String
+     * @return return output String
+     */
+    public static String rot(
+            String in )
+    {
         StringBuffer tempReturn = new StringBuffer();
         int abyte = 0;
         for (int i = 0; i < in.length(); i++) {

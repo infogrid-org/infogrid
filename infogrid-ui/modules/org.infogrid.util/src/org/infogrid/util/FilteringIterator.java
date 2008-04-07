@@ -18,19 +18,20 @@ import java.util.Iterator;
 
 /**
  * This Iterator iterates over a subset of the Objects returned by a delegate Iterator.
- * The subset is determined by a Filter, which may or may not select an Object to be returned
- * This iterator always reads one object ahead to know whether we have more elements or not.
+ * The subset is determined by a {@link Filter}, which may or may not select an
+ * Object to be returned This iterator always reads one object ahead to know whether
+ * \we have more elements or not.
  */
 public class FilteringIterator<T>
         implements
             Iterator<T>
 {
     /**
-      * Construct one.
-      *
-      * @param delegate the Iterator from whom we are taking the candidate objects
-      * @param filt the filter algorithm
-      */
+     * Construct one.
+     *
+     * @param delegate the Iterator from whom we are taking the candidate objects
+     * @param filt the filter algorithm
+     */
     public FilteringIterator(
             Iterator<T> delegate,
             Filter<T>   filt )

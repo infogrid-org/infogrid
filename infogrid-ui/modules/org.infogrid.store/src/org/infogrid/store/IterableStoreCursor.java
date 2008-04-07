@@ -19,7 +19,7 @@ import org.infogrid.util.CursorIterator;
 import java.util.NoSuchElementException;
 
 /**
- * Adds a few methods to CursorIterator<StoreValue> that make life easier.
+ * Adds a few methods to <code>CursorIterator&lt;StoreValue&gt;</code> that make life easier.
  */
 public interface IterableStoreCursor
         extends

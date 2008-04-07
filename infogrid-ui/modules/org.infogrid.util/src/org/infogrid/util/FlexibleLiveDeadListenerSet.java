@@ -15,7 +15,7 @@
 package org.infogrid.util;
 
 /**
- * This is a WeakListenerSet for LiveDeadEvents.
+ * A {@link FlexibleListenerSet} for events raised by {@link LiveDeadObject}s.
  */
 public class FlexibleLiveDeadListenerSet
     extends

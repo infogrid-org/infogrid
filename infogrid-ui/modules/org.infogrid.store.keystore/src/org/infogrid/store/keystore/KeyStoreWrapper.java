@@ -30,7 +30,7 @@ import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 
 /**
- * Given the less-than-optimal API of the Java java.security.KeyStore class, this class
+ * Given the less-than-optimal API of the Java <code>java.security.KeyStore</code> class, this class
  * wraps around it, and makes sure that the KeyStore is initialized by reading
  * from a Store, and updated contents are written back to the Store. As a result,
  * clients can use the KeyStore API while the actual content of the keystore is held
