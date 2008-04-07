@@ -14,12 +14,16 @@
 
 package org.infogrid.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import org.infogrid.util.logging.Log;
 
-import java.util.*;
-
 /**
- * A very simple, in-memory only implementation of NameServer. This NameServer
+ * A very simple, in-memory only implementation of {@link NameServer}. This NameServer
  * keeps mappings locally, and if not found, it will delegate to (optional) delegate
  * NameServers.
  */
@@ -64,6 +68,7 @@ public class MNameServer<K,V>
     
     /**
      * Obtain an already existing value for a provided key.
+     * 
      * @param key the key for which we want to obtain a value
      * @return the already existing value, or null
      */
@@ -97,7 +102,7 @@ public class MNameServer<K,V>
 
     /**
      * Obtain the keys for an existing value. This is the opposite operation
-     * of {@see #get}. Depending on the implementation of this interface,
+     * of {@link #get}. Depending on the implementation of this interface,
      * this operation may take a long time.
      * 
      * @param value the value whose keys need to be found

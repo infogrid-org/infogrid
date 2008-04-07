@@ -25,7 +25,7 @@ import org.infogrid.util.StringHelper;
 import java.io.IOException;
 
 /**
- * This <code>Store</code> delegates to another <code>Store</code>, but prefixes all keys with
+ * This {@link Store} delegates to another <code>Store</code>, but prefixes all keys with
  * a constant prefix. This is useful to build a hierarchical namespace of <code>Store</code>
  * keys.
  */
@@ -45,22 +45,6 @@ public class PrefixingStore
             Store  delegate )
     {
         return new PrefixingStore( prefix + DEFAULT_SEPARATOR, delegate );
-    }
-
-    /**
-     * Factory method.
-     *
-     * @param prefix the prefix for all keys
-     * @param separator the separator String between prefix and the key
-     * @param delegate the Store that this PrefixingStore delegates to
-     * @return the created PrefixingStore
-     */
-    public static PrefixingStore create(
-            String prefix,
-            String separator,
-            Store  delegate )
-    {
-        return new PrefixingStore( prefix + separator, delegate );
     }
 
     /**
@@ -116,7 +100,7 @@ public class PrefixingStore
             throw new PrefixingStoreKeyExistsAlreadyException( this, key, ex );
 
         } finally {
-            firePutPerformed( key, value );
+            firePutPerformed( value );
         }
     }
 
@@ -153,7 +137,7 @@ public class PrefixingStore
             throw new PrefixingStoreKeyExistsAlreadyException( this, toStore.getKey(), ex );
 
         } finally {
-            firePutPerformed( toStore.getKey(), toStore );
+            firePutPerformed( toStore );
         }
     }
 
@@ -197,7 +181,7 @@ public class PrefixingStore
             throw new PrefixingStoreKeyDoesNotExistException( this, key, ex );
 
         } finally {
-            fireUpdatePerformed( key, value );
+            fireUpdatePerformed( value );
         }
     }
 
@@ -235,7 +219,7 @@ public class PrefixingStore
             throw new StoreKeyDoesNotExistException( this, toUpdate.getKey(), ex );
 
         } finally {
-            fireUpdatePerformed( toUpdate.getKey(), toUpdate );
+            fireUpdatePerformed( toUpdate );
         }
     }
 
@@ -273,9 +257,9 @@ public class PrefixingStore
         StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
         
         if( !updated ) {
-            firePutPerformed( key, value );
+            firePutPerformed( value );
         } else {
-            fireUpdatePerformed( key, value );
+            fireUpdatePerformed( value );
         }
         
         return updated;
@@ -308,9 +292,9 @@ public class PrefixingStore
                     toStoreOrUpdate.getData() );
 
         if( !updated ) {
-            firePutPerformed( toStoreOrUpdate.getKey(), toStoreOrUpdate );
+            firePutPerformed( toStoreOrUpdate );
         } else {
-            fireUpdatePerformed( toStoreOrUpdate.getKey(), toStoreOrUpdate );
+            fireUpdatePerformed( toStoreOrUpdate );
         }
         
         return updated;
@@ -347,7 +331,11 @@ public class PrefixingStore
             throw new PrefixingStoreKeyDoesNotExistException( this, key, ex );
 
         } finally {
-            fireGetPerformed( key, ret );
+            if( ret != null ) {
+                fireGetPerformed( ret );
+            } else {
+                fireGetFailed( key );
+            }
         }
     }
 

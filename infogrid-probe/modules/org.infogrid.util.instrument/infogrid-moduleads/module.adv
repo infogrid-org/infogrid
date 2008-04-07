@@ -16,6 +16,8 @@
 <standardmodule>
  <name>org.infogrid.util.instrument</name>
  <username>InfoGrid instrumentation module</username>
+ <userdescription>This module enables the instrumentation of Java code
+  not all that differently from what a debugger would do.</userdescription>
  <dependencies>
   <requires name="org.infogrid.util"/>
  </dependencies>

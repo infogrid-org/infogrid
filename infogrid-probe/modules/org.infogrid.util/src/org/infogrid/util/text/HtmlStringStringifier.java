@@ -15,7 +15,8 @@
 package org.infogrid.util.text;
 
 /**
- *
+ * Stringifies a String until valid HTML symtax. For example, this replaces
+ * <code>&gt;</code> with <code>&amp;gt;</code>.
  */
 public class HtmlStringStringifier
         extends
@@ -24,7 +25,7 @@ public class HtmlStringStringifier
     /**
      * Factory method.
      *
-     * @return the created StringStringifier
+     * @return the created HtmlStringStringifier
      */
     public static HtmlStringStringifier create()
     {
@@ -53,7 +54,7 @@ public class HtmlStringStringifier
         
         String ret = stringToHtml( raw );
         
-        return (String) ret;
+        return ret;
     }
 
     /**
@@ -77,7 +78,7 @@ public class HtmlStringStringifier
     }
 
     /**
-     * Escape HTML characters in String. Inspired by at http://www.rgagnon.com/javadetails/java-0306.html
+     * Escape HTML characters in String. Inspired by <code>http://www.rgagnon.com/javadetails/java-0306.html</code>
      *
      * @param s the unescaped String
      * @return the escaped String

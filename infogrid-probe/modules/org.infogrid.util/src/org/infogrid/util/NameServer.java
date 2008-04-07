@@ -19,12 +19,15 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Represents a NameServer.
+ * Represents a NameServer, i.e. an object that can return objects based on a key.
+ * 
+ * @see org.infogrid.util.WritableNameServer
  */
 public interface NameServer<K,V>
 {
     /**
      * Obtain an already existing value for a provided key.
+     * 
      * @param key the key for which we want to obtain a value
      * @return the already existing value, or null
      */
@@ -33,7 +36,7 @@ public interface NameServer<K,V>
 
     /**
      * Obtain the keys for an existing value. This is the opposite operation
-     * of {@ see #get}. Depending on the implementation of this interface,
+     * of {@link #get}. Depending on the implementation of this interface,
      * this operation may take a long time.
      * 
      * @param value the value whose keys need to be found

@@ -274,7 +274,7 @@ public class BasicLog
     protected static PrintStream out = System.err;
 
     /**
-     * This is the implementor of LogFactory for the log4j Logger.
+     * The implementor of LogFactory for the basic Logger.
      */
     public static class Factory
         extends

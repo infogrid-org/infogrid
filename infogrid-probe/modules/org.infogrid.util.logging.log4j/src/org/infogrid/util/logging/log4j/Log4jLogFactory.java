@@ -18,7 +18,7 @@ import org.infogrid.util.logging.Log;
 import org.infogrid.util.logging.LogFactory;
 
 /**
- * This is the implementor of LogFactory for the log4j Logger.
+ * Implements of <code>LogFactory</code> for the log4j Logger.
  */
 public class Log4jLogFactory
         extends

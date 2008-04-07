@@ -76,21 +76,11 @@ public class DoubleDimension
     }
 
     /**
-     * Set the size.
-     *
-     * @param d new dimension
-     */
-    public void setSize(
-            Dimension2D d )
-    {
-        setSize(d.getWidth(), d.getHeight());
-    }
-
-    /**
      * Override clone().
      *
      * @return cloned Object
      */
+    @Override
     public Object clone()
     {
         return new DoubleDimension( width, height );

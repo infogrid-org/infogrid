@@ -375,6 +375,7 @@ public class TimeSpaceLimitedCache<K,V>
          * @param other the Object to compare with
          * @return true if the objects are equal
          */
+        @Override
         public boolean equals(
                 Object other )
         {
@@ -395,6 +396,7 @@ public class TimeSpaceLimitedCache<K,V>
          * 
          * @return the hashCode
          */
+        @Override
         public int hashCode()
         {
             if( theKey != null ) {

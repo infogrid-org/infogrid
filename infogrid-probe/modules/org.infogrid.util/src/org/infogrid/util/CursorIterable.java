@@ -15,7 +15,7 @@
 package org.infogrid.util;
 
 /**
- * This interface is supported by those Iterables that return a
+ * This interface is supported by those <code>java.lang.Iterable</code>s that return a
  * {@link CursorIterator CursorIterator} instead of just a plain <code>Iterator</code>.
  */
 public interface CursorIterable<T>
@@ -23,18 +23,18 @@ public interface CursorIterable<T>
             Iterable<T>
 {
     /**
-     * Obtain a CursorIterable instead of an Iterator.
+     * Obtain a @{link CursorIterable} instead of a <code>java.util.Iterator</code>.
      *
-     * @return the CursorIterable
+     * @return the <code>CursorIterable</code>
      */
     public CursorIterator<T> iterator();
 
     /**
-     * Obtain a CursorIterable. This performs the exact same operation as
-     * @link #iterator iterator}, but is friendlier towards JSPs and other software
+     * Obtain a @{link CursorIterable}. This performs the exact same operation as
+     * {@link #iterator iterator}, but is friendlier towards JSPs and other software
      * that likes to use JavaBeans conventions.
      *
-     * @return the CursorIterable
+     * @return the <code>CursorIterable</code>
      */
     public CursorIterator<T> getIterator();
 }

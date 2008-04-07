@@ -17,9 +17,8 @@ package org.infogrid.util;
 import java.util.*;
 
 /**
-  * An Iterator for arrays. It supports the Enumeration, Iterator and CursorIterator interfaces.
-  * To iterate over a sub-array, use a SubsettingCursorIterator that delegates to an instance of
-  * this class.
+  * An interator for arrays. It supports the <code>java.util.Enumeration</code>,
+  * <code>java.util.Iterator</code> and {@link CursorIterator} interfaces.
   */
 public class ArrayCursorIterator<E>
         extends
@@ -28,30 +27,47 @@ public class ArrayCursorIterator<E>
             CursorIterator<E>
 {
     /**
-      * Constructor. Position cursor at the beginning of the array. Iterate over the
+      * Factory method. Position cursor at the beginning of the array. Iterate over the
       * entire array.
       *
       * @param array the array to iterate over
       */
-    public ArrayCursorIterator(
+    public static <E> ArrayCursorIterator<E> create(
             E [] array )
     {
-        this( array, 0, 0, array.length );
+        return new ArrayCursorIterator<E>( array, 0, 0, array.length );
     }
 
     /**
-     * Constructor. Position cursor at a given position of the array. Iterate over the
+     * Factory method. Position cursor at a given position of the array. Iterate over the
      * entire array.
      * 
      * @param array the array to iterate over
      * @param startPosition the start position
      */
-    @SuppressWarnings(value={"unchecked"})
-    public ArrayCursorIterator(
+    public static <E> ArrayCursorIterator<E> create(
             E [] array,
             int  startPosition )
     {
-        this( array, startPosition, 0, array.length );
+        return new ArrayCursorIterator<E>( array, startPosition, 0, array.length );
+    }
+
+    /**
+     *  Factory method. Position cursor at a given position of the array. Iterate over the
+     * slice of the array defined by lowerBound (inclusive) and upperBound (exclusive).
+     * 
+     * @param array the array to iterate over
+     * @param startPosition the start position
+     * @param lowerBound the lowest index in the array to return (inclusive)
+     * @param upperBound the highest index in the array to return (exclusive)
+     */
+    public static <E> ArrayCursorIterator<E> create(
+            E [] array,
+            int  startPosition,
+            int  lowerBound,
+            int  upperBound )
+    {
+        return new ArrayCursorIterator<E>( array, startPosition, lowerBound, upperBound );
     }
 
     /**
@@ -64,7 +80,7 @@ public class ArrayCursorIterator<E>
      * @param upperBound the highest index in the array to return (exclusive)
      */
     @SuppressWarnings(value={"unchecked"})
-    public ArrayCursorIterator(
+    protected ArrayCursorIterator(
             E [] array,
             int  startPosition,
             int  lowerBound,
@@ -99,7 +115,7 @@ public class ArrayCursorIterator<E>
      * Obtain the next element, without iterating forward.
      *
      * @return the next element
-     * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+     * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
     public E peekNext()
     {
@@ -109,12 +125,12 @@ public class ArrayCursorIterator<E>
             throw new NoSuchElementException();
         }
     }
-    
+
     /**
-     * Obtain the previous element, without iterating backwards.
+     * Obtain the previous element, without iterating backward.
      *
      * @return the previous element
-     * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+     * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
     public E peekPrevious()
     {
@@ -126,15 +142,12 @@ public class ArrayCursorIterator<E>
     }
 
     /**
-     * Returns <tt>true</tt> if the iteration has at least N more elements in the forward direction.
+     * Returns <tt>true</tt> if the iteration has more elements in the forward direction.
      *
-     * @return <tt>true</tt> if the iterator has at least N more elements in the forward direction.
-     *
-     * @param n the number of elements for which to check
-     * @return true if there at least N next elements
-     * @see #hasNext()
+     * @return <tt>true</tt> if the iterator has more elements in the forward direction.
      * @see #hasPrevious()
      * @see #hasPrevious(int)
+     * @see #hasNext(int)
      */
     public boolean hasNext(
             int n )
@@ -144,14 +157,11 @@ public class ArrayCursorIterator<E>
     }
 
     /**
-     * Returns <tt>true</tt> if the iteration has at least N more elements in the backwards direction.
+     * Returns <tt>true</tt> if the iteration has more elements in the backward direction.
      *
-     * @return <tt>true</tt> if the iterator has at least N more elements in the backwards direction.
-     *
-     * @param n the number of elements for which to check
-     * @return true if there at least N previous elements
+     * @return <tt>true</tt> if the iterator has more elements in the backward direction.
      * @see #hasNext()
-     * @see #hasPrevious()
+     * @see #hasPrevious(int)
      * @see #hasNext(int)
      */
     public boolean hasPrevious(

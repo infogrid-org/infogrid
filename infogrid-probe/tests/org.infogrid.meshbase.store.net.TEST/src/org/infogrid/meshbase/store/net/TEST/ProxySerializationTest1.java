@@ -200,6 +200,10 @@ public class ProxySerializationTest1
 
     /**
      * Run one test.
+     * 
+     * @param parentDir the parent directory
+     * @param testCase the actual test
+     * @throws Exception may throw any exception, it's a test after all
      */
     protected void runTest(
             File     parentDir,
@@ -296,6 +300,9 @@ public class ProxySerializationTest1
         theMeshBaseIdentifier = temp;
     }
 
+    /**
+     * An ExternalizedNetMeshObjectFactory for the test.
+     */
     protected ParserFriendlyExternalizedNetMeshObjectFactory theExternalizedMeshObjectFactory
             = new ParserFriendlyExternalizedNetMeshObjectFactory() {
                     public ParserFriendlyExternalizedNetMeshObject createParserFriendlyExternalizedMeshObject() {
@@ -303,9 +310,15 @@ public class ProxySerializationTest1
                     }
             };
     
+    /**
+     * A NetMeshObjectIdentifierFactory for the test.
+     */
     protected NetMeshObjectIdentifierFactory theNetMeshObjectIdentifierFactory
             = DefaultAnetMeshObjectIdentifierFactory.create( null );
 
+    /**
+     * A MeshTypeIdentifierFactory for the test.
+     */
     protected MeshTypeIdentifierFactory theMeshTypeIdentifierFactory
             = MMeshTypeIdentifierFactory.create();
 
@@ -371,7 +384,9 @@ public class ProxySerializationTest1
         public XprisoMessage[]   theLastMessagesSent;
     }
 
-    
+    /**
+     * Adds a constructor to SimpleXprisoMessage that makes it easier to use in this test.
+     */
     static class TestXprisoMessage
             extends
                 SimpleXprisoMessage

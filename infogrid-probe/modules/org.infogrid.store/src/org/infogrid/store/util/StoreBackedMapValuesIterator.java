@@ -23,7 +23,7 @@ import org.infogrid.util.CursorIterator;
 import java.util.NoSuchElementException;
 
 /**
- * Iterates over the values in a StoreBackedMap
+ * Iterates over the values in a StoreBackedMap.
  */
 public class StoreBackedMapValuesIterator<K,V>
         extends
@@ -35,6 +35,8 @@ public class StoreBackedMapValuesIterator<K,V>
      * @param delegate the underling Iterator over the StoreValues in the Store
      * @param cache the in-memory cache in the StoreMeshBase
      * @param mapper the mapper to use
+     * @param keysArrayComponentClass the Class to use when returning arrays of keys
+     * @param valuesArrayComponentClass the Class to use when returning arrays of values
      */
     public StoreBackedMapValuesIterator(
             IterableStoreCursor   delegate,
@@ -49,6 +51,8 @@ public class StoreBackedMapValuesIterator<K,V>
 
     /**
      * Private copy-constructor.
+     * 
+     * @param old the StoreBackedMapValuesIterator to clone
      */
     protected StoreBackedMapValuesIterator(
             StoreBackedMapValuesIterator<K,V> old )
@@ -62,7 +66,7 @@ public class StoreBackedMapValuesIterator<K,V>
      * Obtain the next element, without iterating forward.
      *
      * @return the next element
-     * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+     * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
     public V peekNext()
     {
@@ -73,10 +77,10 @@ public class StoreBackedMapValuesIterator<K,V>
     }
     
     /**
-     * Obtain the previous element, without iterating backwards.
+     * Obtain the previous element, without iterating backward.
      *
      * @return the previous element
-     * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+     * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
     public V peekPrevious()
     {
@@ -101,9 +105,9 @@ public class StoreBackedMapValuesIterator<K,V>
     }
 
     /**
-     * Returns <tt>true</tt> if the iteration has more elements in the backwards direction.
+     * Returns <tt>true</tt> if the iteration has more elements in the backward direction.
      *
-     * @return <tt>true</tt> if the iterator has more elements in the backwards direction.
+     * @return <tt>true</tt> if the iterator has more elements in the backward direction.
      * @see #hasNext()
      * @see #hasPrevious(int)
      * @see #hasNext(int)
@@ -132,9 +136,9 @@ public class StoreBackedMapValuesIterator<K,V>
     }
 
     /**
-     * Returns <tt>true</tt> if the iteration has at least N more elements in the backwards direction.
+     * Returns <tt>true</tt> if the iteration has at least N more elements in the backward direction.
      *
-     * @return <tt>true</tt> if the iterator has at least N more elements in the backwards direction.
+     * @return <tt>true</tt> if the iterator has at least N more elements in the backward direction.
      *
      * @param n the number of elements for which to check
      * @return true if there at least N previous elements
@@ -231,7 +235,7 @@ public class StoreBackedMapValuesIterator<K,V>
      * Throws NoSuchElementException if the position does not exist.
      *
      * @param n the number of positions to move
-     * @exception NoSuchElementException
+     * @throws NoSuchElementException
      */
     @Override
     public void moveBy(
@@ -247,10 +251,10 @@ public class StoreBackedMapValuesIterator<K,V>
      * Removes from the underlying collection the last element returned by the
      * iterator (optional operation). This is the same as the current element.
      *
-     * @exception UnsupportedOperationException if the <tt>remove</tt>
+     * @throws UnsupportedOperationException if the <tt>remove</tt>
      *		  operation is not supported by this Iterator.
      
-     * @exception IllegalStateException if the <tt>next</tt> method has not
+     * @throws IllegalStateException if the <tt>next</tt> method has not
      *		  yet been called, or the <tt>remove</tt> method has already
      *		  been called after the last call to the <tt>next</tt>
      *		  method.

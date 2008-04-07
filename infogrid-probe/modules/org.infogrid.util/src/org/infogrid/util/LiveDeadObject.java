@@ -15,17 +15,17 @@
 package org.infogrid.util;
 
 /**
- * This interface is implemented by certain Objects that need an explicit die() invocation to get rid
- * of allocated resources, subscriptions, etc. It supports a listener mechanism to provide callbacks
- * if/when that happens.
+ * This interface is implemented by certain Objects that need an explicit <code>die()</code>
+ * invocation to get rid of allocated resources, subscriptions, etc. It supports a
+ * listener mechanism to provide callbacks if/when that happens.
  */
 public interface LiveDeadObject
 {
     /**
-      * Tell this object that we don't need it any more.
-      *
-      * @throws IsDeadException thrown if this object is dead already
-      */
+     * Tell this object that we don't need it any more.
+     *
+     * @throws IsDeadException thrown if this object is dead already
+     */
     public void die()
         throws
             IsDeadException;
