@@ -34,16 +34,14 @@ public class TestStoreListener
      * in which an actual <code>put</code> was performed.
      *
      * @param store the Store that emitted this event
-     * @param key the key with which the data element was stored
      * @param value the StoreValue that was put
      */
     public void putPerformed(
             Store      store,
-            String     key,
             StoreValue value )
     {
         if( log.isDebugEnabled()) {
-            log.debug( this + ".putPerformed( " + store + ", " + key + ", " + value + " )", new RuntimeException("marker") );
+            log.debug( this + ".putPerformed( " + store + ", " + value + " )", new RuntimeException("marker") );
         }
     }
 
@@ -53,16 +51,14 @@ public class TestStoreListener
      * in which an actual <code>update</code> was performed.
      *
      * @param store the Store that emitted this event
-     * @param key the key with which the data element was stored
      * @param value the StoreValue that was updated
      */
     public void updatePerformed(
             Store      store,
-            String     key,
             StoreValue value )
     {
         if( log.isDebugEnabled()) {
-            log.debug( this + ".updatePerformed( " + store + ", " + key + ", " + value + " )" );
+            log.debug( this + ".updatePerformed( " + store + ", " + value + " )" );
         }
     }
 
@@ -75,11 +71,25 @@ public class TestStoreListener
      */
     public void getPerformed(
             Store      store,
-            String     key,
             StoreValue value )
     {
         if( log.isDebugEnabled()) {
-            log.debug( this + ".getPerformed( " + store + ", " + key + ", " + value + " )" );
+            log.debug( this + ".getPerformed( " + store + ", " + value + " )" );
+        }
+    }
+
+    /**
+     * A get operation was attempted but not value could be found.
+     *
+     * @param store the Store that emitted this event
+     * @param key the key that was attempted
+     */
+    public void getFailed(
+            Store  store,
+            String key )
+    {
+        if( log.isDebugEnabled()) {
+            log.debug( this + ".getFailed( " + store + ", " + key + " )" );
         }
     }
 

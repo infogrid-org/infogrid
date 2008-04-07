@@ -965,6 +965,11 @@ public class AMeshObject
     {
         checkAlive();
 
+        if( theTraverseSpec == null ) {
+            MeshObjectSet ret = traverseToNeighborMeshObjects( considerEquivalents );
+            return ret;
+        }
+
         MeshObject [] starts;
         if( considerEquivalents ) {
             starts = getEquivalents().getMeshObjects();

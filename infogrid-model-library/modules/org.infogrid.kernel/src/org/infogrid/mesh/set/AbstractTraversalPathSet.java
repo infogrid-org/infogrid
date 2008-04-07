@@ -124,7 +124,7 @@ public abstract class AbstractTraversalPathSet
      */
     public CursorIterator<TraversalPath> iterator()
     {
-        return new ArrayCursorIterator<TraversalPath>( getTraversalPaths() );
+        return ArrayCursorIterator.<TraversalPath>create( getTraversalPaths() );
     }
 
     /**

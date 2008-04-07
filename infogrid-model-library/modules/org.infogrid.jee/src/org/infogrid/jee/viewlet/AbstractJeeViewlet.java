@@ -19,6 +19,7 @@ import org.infogrid.context.Context;
 import org.infogrid.jee.rest.RestfulRequest;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;
 import org.infogrid.util.http.HTTP;
+import org.infogrid.viewlet.AbstractViewedMeshObjects;
 import org.infogrid.viewlet.AbstractViewlet;
 
 /**
@@ -33,12 +34,14 @@ public abstract class AbstractJeeViewlet
     /**
      * Constructor, for subclasses only.
      * 
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected AbstractJeeViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        super( c );
+        super( viewed, c );
     }
     
     /**

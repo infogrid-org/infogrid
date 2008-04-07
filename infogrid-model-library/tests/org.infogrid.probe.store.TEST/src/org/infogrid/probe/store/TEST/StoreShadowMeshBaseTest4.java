@@ -155,7 +155,7 @@ public class StoreShadowMeshBaseTest4
         theSqlStore.deleteStore();
         theSqlStore.initialize();
 
-        theSqlStore.addStoreListener( theTestStoreListener );
+        theSqlStore.addDirectStoreListener( theTestStoreListener );
         
         IterablePrefixingStore theShadowStore      = IterablePrefixingStore.create( "Shadow",      theSqlStore );
         IterablePrefixingStore theShadowProxyStore = IterablePrefixingStore.create( "ShadowProxy", theSqlStore );
