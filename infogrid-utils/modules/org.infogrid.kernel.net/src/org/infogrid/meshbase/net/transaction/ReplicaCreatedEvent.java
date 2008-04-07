@@ -31,11 +31,12 @@ public class ReplicaCreatedEvent
      * Constructor.
      */
     public ReplicaCreatedEvent(
-            NetMeshBase       mb,
-            NetMeshObject     replica,
+            NetMeshBase           mb,
+            NetMeshBaseIdentifier mbIdentifier,
+            NetMeshObject         replica,
             NetMeshBaseIdentifier incomingProxy,
-            long              updateTime )
+            long                  updateTime )
     {
-        super( mb, replica, incomingProxy, updateTime );
+        super( mb, mbIdentifier, replica, incomingProxy, updateTime );
     }
 }

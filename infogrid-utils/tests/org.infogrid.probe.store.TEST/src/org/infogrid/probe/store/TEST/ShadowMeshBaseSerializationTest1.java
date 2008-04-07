@@ -79,7 +79,6 @@ public class ShadowMeshBaseSerializationTest1
                                 -1 )
                     }
             )
-
         };
         
         for( int i=0 ; i<testCases.length ; ++i ) {
@@ -89,6 +88,9 @@ public class ShadowMeshBaseSerializationTest1
 
     /**
      *  Run one test.
+     * 
+     * @param parentDir the parent directory
+     * @param testCase the test case to run
      */
     protected void runTest(
             File     parentDir,
@@ -165,8 +167,14 @@ public class ShadowMeshBaseSerializationTest1
     // Our Logger
     private static Log log = Log.getLogInstance( ShadowMeshBaseSerializationTest1.class );
     
+    /**
+     * A NetMeshBaseIdentifier for the test.
+     */
     protected NetMeshBaseIdentifier nmbid1 = NetMeshBaseIdentifier.fromExternalForm( "https://foo.exampe.com/%27" );
 
+    /**
+     * A ExternalizedNetMeshObjectFactory for the test.
+     */
     protected ParserFriendlyExternalizedNetMeshObjectFactory theExternalizedMeshObjectFactory
             = new ParserFriendlyExternalizedNetMeshObjectFactory() {
                     public ParserFriendlyExternalizedNetMeshObject createParserFriendlyExternalizedMeshObject() {
@@ -174,9 +182,15 @@ public class ShadowMeshBaseSerializationTest1
                     }
             };
     
+    /**
+     * A NetMeshObjectIdentifierFactory for the test.
+     */
     protected NetMeshObjectIdentifierFactory theNetMeshObjectIdentifierFactory
             = DefaultAnetMeshObjectIdentifierFactory.create( nmbid1 );
 
+    /**
+     * A MeshTypeIdentifierFactory for the test.
+     */
     protected MeshTypeIdentifierFactory theMeshTypeIdentifierFactory
             = MMeshTypeIdentifierFactory.create();
     

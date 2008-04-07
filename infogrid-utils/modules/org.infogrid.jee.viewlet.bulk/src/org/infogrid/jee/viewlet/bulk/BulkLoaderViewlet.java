@@ -30,6 +30,8 @@ import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
+import org.infogrid.viewlet.AbstractViewedMeshObjects;
+import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
 /**
  * This Viewlet allows the user to bulk-load data into the MeshBase.
@@ -49,18 +51,24 @@ public class BulkLoaderViewlet
     public static BulkLoaderViewlet create(
             Context c )
     {
-        return new BulkLoaderViewlet( c );
+        DefaultViewedMeshObjects viewed = new DefaultViewedMeshObjects();
+        BulkLoaderViewlet        ret    = new BulkLoaderViewlet( viewed, c );
+
+        viewed.setViewlet( ret );
+        return ret;
     }
 
     /**
      * Constructor. This is protected: use factory method or subclass.
      *
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected BulkLoaderViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        super( c );
+        super( viewed, c );
     }
     
     /**

@@ -35,12 +35,13 @@ public class ReplicaPurgedEvent
      */
     public ReplicaPurgedEvent(
             NetMeshBase             mb,
-            NetMeshObjectIdentifier canonicalIdentifier,
+            NetMeshBaseIdentifier   mbIdentifier,
             NetMeshObject           replica,
-            NetMeshBaseIdentifier       incomingProxy,
+            NetMeshObjectIdentifier canonicalIdentifier,
+            NetMeshBaseIdentifier   incomingProxy,
             long                    updateTime )
     {
-        super( mb, canonicalIdentifier, replica, incomingProxy, updateTime );
+        super( mb, mbIdentifier, replica, canonicalIdentifier, incomingProxy, updateTime );
     }
 
     /**

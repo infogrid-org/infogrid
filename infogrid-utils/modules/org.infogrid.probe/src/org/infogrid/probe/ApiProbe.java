@@ -60,15 +60,15 @@ public interface ApiProbe
     /**
      * Read from the API and instantiate corresponding MeshObjects.
      * 
-     * @param networkId the NetMeshBaseIdentifier that is being accessed
+     * @param dataSourceIdentifier identifies the data source that is being accessed
      * @param coherenceSpecification the type of data coherence that is requested by the application. Probe
      *         implementors may ignore this parameter, letting the Probe framework choose its own policy.
      *         If the Probe chooses to define its own policy (considering or ignoring this parameter), the
      *         Probe must bless the Probe's HomeObject with a subtype of ProbeUpdateSpecification (defined
-     *         in the <code>org.infogrid.model.Probe</code>) that reflects the policy.
-     * @param mb the StagingMeshBase in which the corresponding MeshObjects are instantiated by the Probe
-     * @throws IdeMeshObjectIdentifierNotUniqueExceptionrown if the Probe developer incorrectly
-     *         assigned duplicate Identifiers to created MeshObjects
+     *         in the <code>org.infogrid.model.Probe</code> Subject Area) that reflects the policy.
+     * @param mb the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe
+     * @throws MeshObjectIdentifierNotUniqueException thrown if the Probe developer incorrectly
+     *         assigned duplicate MeshObjectsIdentifiers to created MeshObjects
      * @throws RelatedAlreadyException thrown if the Probe developer incorrectly attempted to
      *         relate two already-related MeshObjects
      * @throws TransactionException this Exception is declared to make programming easier,
@@ -80,7 +80,7 @@ public interface ApiProbe
      * @throws URISyntaxException thrown if a URI was constructed in an invalid way
      */
     public void readFromApi(
-            NetMeshBaseIdentifier  networkId,
+            NetMeshBaseIdentifier  dataSourceIdentifier,
             CoherenceSpecification coherence,
             StagingMeshBase        mb )
         throws
