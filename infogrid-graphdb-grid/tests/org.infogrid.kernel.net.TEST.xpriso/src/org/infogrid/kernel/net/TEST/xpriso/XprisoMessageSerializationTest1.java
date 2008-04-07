@@ -66,7 +66,7 @@ public class XprisoMessageSerializationTest1
     {
         XprisoMessage [] testMessages = constructTestMessages();
         
-        for( int i=2 ; i<testMessages.length ; ++i ) {
+        for( int i=0 ; i<testMessages.length ; ++i ) {
             runOne( i, testMessages[i] );
         }
     }
@@ -151,7 +151,7 @@ public class XprisoMessageSerializationTest1
         
         // Message 2
         
-        ParserFriendlyXprisoMessage two = ParserFriendlyXprisoMessage.create( 222, 0, null, null );
+        ParserFriendlyXprisoMessage two = ParserFriendlyXprisoMessage.create( 222, 0, id3, id1 );
         two.addConveyedMeshObject( SimpleExternalizedNetMeshObject.create(
                 nmo_ref1, // identifier
                 new MeshTypeIdentifier[] {
@@ -192,9 +192,10 @@ public class XprisoMessageSerializationTest1
         
         // Message 3
         
-        ParserFriendlyXprisoMessage three = ParserFriendlyXprisoMessage.create( 333, -27, null, null );
+        ParserFriendlyXprisoMessage three = ParserFriendlyXprisoMessage.create( 333, -27, id3, id1 );
         three.addCreation( new NetMeshObjectCreatedEvent(
                 null,
+                id2,
                 SimpleExternalizedNetMeshObject.create(
                         nmo_ref2, // identifier
                         new MeshTypeIdentifier[] {
@@ -231,14 +232,15 @@ public class XprisoMessageSerializationTest1
                 id3 ));
         three.addDeleteChange( new NetMeshObjectDeletedEvent(
                 null,
-                nmo_ref4,
+                id2,
                 null,
+                nmo_ref4,
                 id3,
                 5834L ));
 
         // Message 4
         
-        ParserFriendlyXprisoMessage four = ParserFriendlyXprisoMessage.create( 444, -11111, null, null );
+        ParserFriendlyXprisoMessage four = ParserFriendlyXprisoMessage.create( 444, -11111, id2, id3 );
         four.addResynchronizeDependentReplica( SimpleExternalizedNetMeshObject.create(
                         nmo_ref1, // identifier
                         new MeshTypeIdentifier[] {

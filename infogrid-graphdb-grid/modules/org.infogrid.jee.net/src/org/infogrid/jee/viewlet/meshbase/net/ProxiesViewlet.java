@@ -19,6 +19,8 @@ import org.infogrid.jee.viewlet.AbstractCursorIterableViewlet;
 import org.infogrid.context.Context;
 
 import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.viewlet.AbstractViewedMeshObjects;
+import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
 /**
  * A Viewlet that shows a NetMeshBase's Proxies.
@@ -31,22 +33,29 @@ public class ProxiesViewlet
      * Factory method.
      *
      * @param c the application context
-     * @return the created AllMeshObjectsViewlet
+     * @return the created PropertySheetViewlet
      */
     public static ProxiesViewlet create(
             Context c )
     {
-        return new ProxiesViewlet( c );
+        DefaultViewedMeshObjects viewed = new DefaultViewedMeshObjects();
+        ProxiesViewlet           ret    = new ProxiesViewlet( viewed, c );
+
+        viewed.setViewlet( ret );
+
+        return ret;
     }
 
     /**
-     * Constructor.
+     * Constructor. This is protected: use factory method or subclass.
      *
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected ProxiesViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        super( c );
+        super( viewed, c );
     }
 }

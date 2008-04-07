@@ -215,7 +215,7 @@ public class AMeshBaseLifecycleManager
             current.delete();
             removeFromStore( current.getIdentifier() );
 
-            tx.addChange( createDeletedEvent( currentIdentifier, current, now ));
+            tx.addChange( createDeletedEvent( current, currentIdentifier, now ));
         }
     }
 

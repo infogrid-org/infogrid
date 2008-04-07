@@ -104,7 +104,7 @@ public abstract class AbstractTestGroup
             Log          testClassLog = Log.getLogInstance( theTestClass );
 
             testClassLog.debug( "Attempting to activate TestSpec " + theTestName );
-            Constructor [] constr = theTestClass.getDeclaredConstructors();
+
             try {
                 Constructor<? extends AbstractTest> con = theTestClass.getConstructor( new Class[] { String[].class } );
 
@@ -113,7 +113,7 @@ public abstract class AbstractTestGroup
                 log.info( "Running TestSpec " + theTestName );
                 test.run();
                 
-                ret = test.errorCount;
+                ret = AbstractTest.errorCount;
 
             } catch( Throwable ex ) {
                 log.error( ex );
