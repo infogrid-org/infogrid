@@ -28,12 +28,15 @@ public abstract class AbstractViewlet
     /**
      * Constructor, for subclasses only.
      * 
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected AbstractViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        theContext = c;
+        theViewedMeshObjects = viewed;
+        theContext           = c;
     }
     
     /**
@@ -120,7 +123,7 @@ public abstract class AbstractViewlet
     /**
      * The objects being viewed.
      */
-    protected DefaultViewedMeshObjects theViewedMeshObjects = new DefaultViewedMeshObjects( this );
+    protected AbstractViewedMeshObjects theViewedMeshObjects;
 
     /**
      * The application context

@@ -188,7 +188,7 @@ public abstract class AbstractMMeshObjectSet
      */
     public CursorIterator<MeshObject> iterator()
     {
-        return new ArrayCursorIterator<MeshObject>( currentContent );
+        return ArrayCursorIterator.<MeshObject>create( currentContent );
     }
 
     /**

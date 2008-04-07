@@ -403,6 +403,7 @@ public class AStagingMeshBaseLifecycleManager
 
             tx.addChange( new NetMeshObjectCreatedEvent(
                     realBase,
+                    realBase.getIdentifier(),
                     ret,
                     incomingProxyIdentifier ));
 

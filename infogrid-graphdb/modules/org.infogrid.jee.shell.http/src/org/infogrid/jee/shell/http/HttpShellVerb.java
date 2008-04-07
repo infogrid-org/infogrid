@@ -1169,11 +1169,11 @@ public enum HttpShellVerb
     {
         EntityType [] entityTypes = determineEntityTypes( lidRequest, mb );
         if( throwExceptions ) {
-            if( entityTypes.length == 0 ) {
+            if( entityTypes == null || entityTypes.length == 0 ) {
                 throw new EssentialArgumentMissingException( this, HttpShellFilter.SUBJECT_TYPE_TAG );
             }
             subject.bless( entityTypes );
-        } else {
+        } else if( entityTypes != null && entityTypes.length > 0 ) {
             try {
                 subject.bless( entityTypes );
             } catch( Throwable t ) {

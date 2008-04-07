@@ -19,6 +19,7 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
 
 import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.Proxy;
@@ -36,7 +37,7 @@ public class NetMeshObjectDeletedEvent
         extends
             MeshObjectDeletedEvent
         implements
-            NetChange<MeshBase,MeshBase,MeshObject,MeshObjectIdentifier>
+            NetChange<MeshBase,MeshBaseIdentifier,MeshObject,MeshObjectIdentifier>
 {
     private static final Log log = Log.getLogInstance( NetMeshObjectDeletedEvent.class ); // our own, private logger
 
@@ -48,12 +49,13 @@ public class NetMeshObjectDeletedEvent
      */
     public NetMeshObjectDeletedEvent(
             NetMeshBase           meshBase,
-            MeshObjectIdentifier  canonicalIdentifier,
+            NetMeshBaseIdentifier meshBaseIdentifier,
             NetMeshObject         createdObject,
+            MeshObjectIdentifier  canonicalIdentifier,
             NetMeshBaseIdentifier incomingProxy,
             long                  updateTime )
     {
-        super( meshBase, canonicalIdentifier, createdObject, updateTime );
+        super( meshBase, meshBaseIdentifier, createdObject, canonicalIdentifier, updateTime );
         
         theIncomingProxy = incomingProxy;
     }

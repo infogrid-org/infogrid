@@ -25,6 +25,8 @@ import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.util.NameServer;
 
 import java.util.Iterator;
+import org.infogrid.viewlet.AbstractViewedMeshObjects;
+import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
 /**
  * A Viewlet that shows all locally known MeshBases.
@@ -39,23 +41,30 @@ public class AllMeshBasesViewlet
      * Factory method.
      *
      * @param c the application context
-     * @return the created AllMeshObjectsViewlet
+     * @return the created PropertySheetViewlet
      */
     public static AllMeshBasesViewlet create(
             Context c )
     {
-        return new AllMeshBasesViewlet( c );
+        DefaultViewedMeshObjects viewed = new DefaultViewedMeshObjects();
+        AllMeshBasesViewlet      ret    = new AllMeshBasesViewlet( viewed, c );
+
+        viewed.setViewlet( ret );
+
+        return ret;
     }
 
     /**
-     * Constructor.
+     * Constructor. This is protected: use factory method or subclass.
      *
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected AllMeshBasesViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        super( c );
+        super( viewed, c );
     }
 
     /**

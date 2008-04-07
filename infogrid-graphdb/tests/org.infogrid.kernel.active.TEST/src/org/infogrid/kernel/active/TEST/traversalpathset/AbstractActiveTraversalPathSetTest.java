@@ -14,6 +14,7 @@
 
 package org.infogrid.kernel.active.TEST.traversalpathset;
 
+import java.net.URISyntaxException;
 import org.infogrid.context.Context;
 import org.infogrid.context.SimpleContext;
 import org.infogrid.kernel.active.TEST.AllTests;
@@ -24,6 +25,7 @@ import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.set.TraversalPathSet;
 import org.infogrid.mesh.set.active.m.ActiveMMeshObjectSetFactory;
 import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
 import org.infogrid.meshbase.m.MMeshBase;
 import org.infogrid.meshbase.transaction.TransactionException;
@@ -52,7 +54,8 @@ public abstract class AbstractActiveTraversalPathSetTest
     protected AbstractActiveTraversalPathSetTest(
             Class testClass )
         throws
-            MeshTypeNotFoundException
+            MeshTypeNotFoundException,
+            URISyntaxException
     {
         super( localFile( AllTests.class, "/ResourceHelper" ),
                localFile( AllTests.class, "/Log.properties" ));
@@ -62,7 +65,7 @@ public abstract class AbstractActiveTraversalPathSetTest
         typeAR2A = theModelBase.findRelationshipType( "org.infogrid.model.Test", null, "AR2A" );
         typeX    = theModelBase.findPropertyType( typeAA, "X" );
         
-        theMeshBase = MMeshBase.create( null, theModelBase, null, rootContext );
+        theMeshBase = MMeshBase.create( MeshBaseIdentifier.create( "testMeshBase" ), theModelBase, null, rootContext );
 
         theMeshObjectSetFactory = ActiveMMeshObjectSetFactory.create();
         theMeshObjectSetFactory.setMeshBase( theMeshBase );

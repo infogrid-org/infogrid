@@ -17,12 +17,13 @@ package org.infogrid.probe.TEST;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.EntityNotBlessedException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
-// import org.infogrid.model.Blob.BlobSubjectArea;
+import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.probe.ProbeDirectory.StreamProbeDescriptor;
 import org.infogrid.probe.blob.BlobProbe;
 import org.infogrid.probe.m.MProbeDirectory;
@@ -65,18 +66,39 @@ public class ShadowTest3
         
         //
 
-        log.info( "relating to other object" );
+        log.info( "Creating some other objects" );
         
         Transaction tx = base.createTransactionNow();
-        
-        MeshObject other = base.getMeshBaseLifecycleManager().createMeshObject();
+
+        MeshObject other1 = base.getMeshBaseLifecycleManager().createMeshObject();
+        MeshObject other2 = base.getMeshBaseLifecycleManager().createMeshObject();
         
         tx.commitTransaction();
 
+        //
+        
+        log.info( "Incorrectly relating to other object" );
+
+        try {
+            tx = base.createTransactionNow();
+        
+            other1.relateAndBless( TestSubjectArea.RR.getSource(), home ); // source and dest entities are invalid for this relationship
+            
+            reportError( "Should have thrown an Exception" );
+            
+        } catch( EntityNotBlessedException ex ) {
+            log.debug( "Corrently thrown exception", ex );
+
+        } finally {
+            tx.commitTransaction();
+        }
+        //
+        
+        log.info( "correctly relating to other object" );
         
         tx = base.createTransactionNow();
         
-        other.relate( home );
+        other2.relate( home );
         
         tx.commitTransaction();
         
@@ -84,9 +106,9 @@ public class ShadowTest3
         
         log.info( "Traversing from other object to Yadis services" );
         
-        MeshObjectSet found = other.traverseToNeighborMeshObjects().traverseToNeighborMeshObjects();
+        MeshObjectSet found = other2.traverseToNeighborMeshObjects().traverseToNeighborMeshObjects();
         
-        checkEquals( found.size(), 10, "Wrong number of objects found" ); // that's the 9 Yadis services and other itself
+        checkEquals( found.size(), 11, "Wrong number of objects found" ); // that's the 9 Yadis services, other1 and other2
     }
 
     /**

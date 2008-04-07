@@ -30,6 +30,8 @@ import org.infogrid.util.logging.Log;
 import javax.servlet.ServletException;
 import org.infogrid.jee.rest.RestfulRequest;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;
+import org.infogrid.viewlet.AbstractViewedMeshObjects;
+import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
 /**
  * Viewlet that can display and edit WikiObjects.
@@ -43,24 +45,32 @@ public class WikiObjectEditViewlet
     /**
      * Factory method.
      *
+     * @param path the path for the RequestDispatcher
      * @param c the application context
      * @return the created Viewlet
      */
     public static WikiObjectEditViewlet create(
             Context c )
     {
-        return new WikiObjectEditViewlet( c );
+        DefaultViewedMeshObjects viewed = new DefaultViewedMeshObjects();
+        WikiObjectEditViewlet    ret    = new WikiObjectEditViewlet( viewed, c );
+
+        viewed.setViewlet( ret );
+
+        return ret;
     }
 
     /**
      * Constructor. This is protected: use factory method or subclass.
      *
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected WikiObjectEditViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        super( c );
+        super( viewed, c );
     }
 
     /**

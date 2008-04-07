@@ -191,8 +191,7 @@ public class StoreShadowMeshBaseTest9
         collectGarbage();
 
         testFile1    = args[0];
-
-        testFile1Id    = NetMeshBaseIdentifier.create( new File( testFile1 ) );
+        testFile1Id  = NetMeshBaseIdentifier.create( new File( testFile1 ) );
 
         //
         

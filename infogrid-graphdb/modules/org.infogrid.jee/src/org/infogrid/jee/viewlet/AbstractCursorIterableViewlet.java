@@ -17,6 +17,7 @@ package org.infogrid.jee.viewlet;
 import org.infogrid.context.Context;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.util.CursorIterator;
+import org.infogrid.viewlet.AbstractViewedMeshObjects;
 
 /**
  * Factors out common functionality for Viewlets that display sets through
@@ -27,16 +28,18 @@ public abstract class AbstractCursorIterableViewlet<T>
             AbstractJeeViewlet
 {
     /**
-     * Constructor.
+     * Constructor. This is protected: use factory method or subclass.
      *
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected AbstractCursorIterableViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        super( c );
+        super( viewed, c );
     }
-    
+
     /**
      * Obtain the CursorIterator.
      *

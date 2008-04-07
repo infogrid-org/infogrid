@@ -142,7 +142,7 @@ public class IterableMeshBaseDifferencer
                 // If the MeshObject from BASE does not exist in COMPARISON,
                 // add MeshObjectObsoletionChange in the ChangeSet
 
-                AbstractMeshObjectLifecycleEvent obsoletionChange = createMeshObjectDeletedEvent( identifier, meshObjectInBase, now );
+                AbstractMeshObjectLifecycleEvent obsoletionChange = createMeshObjectDeletedEvent( meshObjectInBase, identifier, now );
                 entityChanges.addChange( obsoletionChange );
 
             } else {
@@ -419,6 +419,7 @@ public class IterableMeshBaseDifferencer
 
                 AbstractMeshObjectLifecycleEvent creationChange = new MeshObjectCreatedEvent(
                         comparisonBase,
+                        comparisonBase.getIdentifier(),
                         meshObjectInComparison,
                         meshObjectInComparison.getTimeCreated() );
                 entityChanges.addChange( creationChange );
@@ -543,14 +544,15 @@ public class IterableMeshBaseDifferencer
      * @return the MeshObjectDeletedEvent or subclass
      */
     protected MeshObjectDeletedEvent createMeshObjectDeletedEvent(
+            MeshObject           obj,
             MeshObjectIdentifier canonicalIdentifier,
-            MeshObject      obj,
-            long            time )
+            long                 time )
     {
         MeshObjectDeletedEvent ret = new MeshObjectDeletedEvent(
                 obj.getMeshBase(),
-                canonicalIdentifier,
+                obj.getMeshBase().getIdentifier(),
                 obj,
+                canonicalIdentifier,
                 time );
 
         return ret;

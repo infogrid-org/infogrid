@@ -65,17 +65,16 @@ public class StoreShadowMeshBaseTest7
                 @Override
                 public void putPerformed(
                         Store      store,
-                        String     key,
                         StoreValue value )
                 {
-                    log.debug( "Put performed on " + store + " with key: " + key );
+                    log.debug( "Put performed on " + store + " with key: " + value.getKey() );
                 }
         };
         
-        theMeshStore.addStoreListener( listener );
-        theProxyStore.addStoreListener( listener );
-        theShadowStore.addStoreListener( listener );
-        theShadowProxyStore.addStoreListener( listener );
+        theMeshStore.addDirectStoreListener( listener );
+        theProxyStore.addDirectStoreListener( listener );
+        theShadowStore.addDirectStoreListener( listener );
+        theShadowProxyStore.addDirectStoreListener( listener );
         
         //
         

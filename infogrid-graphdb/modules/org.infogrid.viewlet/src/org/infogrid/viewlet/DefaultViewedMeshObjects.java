@@ -16,29 +16,40 @@ package org.infogrid.viewlet;
 
 import java.util.Map;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.model.traversal.TraversalSpecification;
-import org.infogrid.util.StringHelper;
 
 /**
  * This is the default implementation of ViewedMeshObjects. This is useful for
  * a wide variety of Viewlets.
  */
 public class DefaultViewedMeshObjects
-        implements
-            ViewedMeshObjects
+        extends
+            AbstractViewedMeshObjects
 {
+    /**
+      * Constructor, specifying a default TraversalSpecification.
+      *
+      * @param traversal the default TraversalSpecification
+      */
+    public DefaultViewedMeshObjects(
+            TraversalSpecification traversal )
+    {
+        super();
+        
+        theDefaultTraversalSpecification = traversal;
+        theTraversalSpecification        = traversal;
+    }
+
     /**
       * Constructor. Initializes to empty content.
       *
       * @param v the Viewlet that we belong to.
       */
-    public DefaultViewedMeshObjects(
-            Viewlet v )
+    public DefaultViewedMeshObjects()
     {
-        theViewlet = v;
+        super();
     }
-
+    
     /**
      * Through this method, the Viewlet that this object belongs to updates this object.
      *
@@ -46,148 +57,24 @@ public class DefaultViewedMeshObjects
      * @param subjectParameters the parameters of the newly selected subject, if any
      * @param viewletParameters the parameters of the Viewlet, if any
      */
+    @Override
     public void update(
             MeshObject             subject,
             Map<String,Object>     subjectParameters,
             Map<String,Object>     viewletParameters,
             TraversalSpecification traversal )
     {
-        theSubject                = subject;
-        theSubjectParameters      = subjectParameters;
-        theViewletParameters      = viewletParameters;
-        theTraversalSpecification = traversal;
-    }
+        super.update( subject, subjectParameters, viewletParameters, traversal );
 
-    /**
-     * Through this convenience method, the Viewlet that this object belongs to updates this object.
-     *
-     * @param newObjectsToView the new objects accepted to be viewed by the Viewlet
-     */
-    public void updateFrom(
-            MeshObjectsToView newObjectsToView )
-    {
-        update( newObjectsToView.getSubject(),
-                newObjectsToView.getSubjectParameters(),
-                newObjectsToView.getViewletParameters(),
-                newObjectsToView.getTraversalSpecification() );
-    }
-
-    /**
-     * Obtain the current subject of the Viewlet. As long as the Viewlet
-     * displays any information whatsoever, this is non-null.
-     *
-     * @return the subject MeshObject
-     */
-    public final MeshObject getSubject()
-    {
-        return theSubject;
-    }
-
-    /**
-     * Obtain the parameters for the subject.
-     *
-     * @return the parameters for the subject, if any.
-     */
-    public Map<String,Object> getSubjectParameters()
-    {
-        return theSubjectParameters;
-    }
-
-    /**
-      * Obtain the Viewlet by which these objects are viewed.
-      *
-      * @return the Viewlet by which these objects are viewed.
-      */
-    public Viewlet getViewlet()
-    {
-        return theViewlet;
-    }
-
-    /**
-     * Obtain the parameters of the viewing Viewlet.
-     *
-     * @return the parameters of the viewing Viewlet, if any.
-     */
-    public Map<String,Object> getViewletParameters()
-    {
-        return theViewletParameters;
-    }
-
-    /**
-     * Obtain the TraversalSpecification that the Viewlet currently uses.
-     * 
-     * @eturn the TraversalSpecification that the Viewlet currently uses
-     */
-    public TraversalSpecification getTraversalSpecification()
-    {
-        return theTraversalSpecification;
-    }
-
-    /**
-     * Obtain the Objects, i.e. the MeshObjects reached by traversing from the
-     * Subject via the TraversalSpecification.
-     * 
-     * @return the Objects
-     */
-    public MeshObjectSet getObjects()
-    {
-        if( theObjects == null ) {
-            if( theTraversalSpecification != null ) {
-                theObjects = theSubject.traverse( theTraversalSpecification );
-            } else {
-                theObjects = theSubject.getMeshBase().getMeshObjectSetFactory().obtainEmptyImmutableMeshObjectSet();
-            }
+        if( theTraversalSpecification == null ) {
+            // insert default
+            theTraversalSpecification = theDefaultTraversalSpecification;
         }
-        return theObjects;
-    }
-    
-    /**
-     * Convert to String, for debugging.
-     *
-     * @return String representation of this object
-     */
-    @Override
-    public String toString()
-    {
-        return StringHelper.objectLogString(
-                this,
-                new String [] {
-                    "subject",
-                    "viewlet",
-                    "onjects" },
-                new Object [] {
-                    theSubject,
-                    theViewlet,
-                    theObjects} );
     }
 
     /**
-     * The Viewlet that this object belongs to.
+     * The default TraversalSpecification, to be used if no other TraversalSpecification
+     * has been given.
      */
-    protected Viewlet theViewlet;
-
-    /**
-     * The current subject of the Viewlet.
-     */
-    protected MeshObject theSubject;
-
-    /**
-     * The parameters for the subject, if any.
-     */
-    protected Map<String,Object> theSubjectParameters;
-
-    /**
-     * The Viewlet parameters, if any.
-     */
-    protected Map<String,Object> theViewletParameters;
-    
-    /**
-     * The TraversalSpecification, if any.
-     */
-    protected TraversalSpecification theTraversalSpecification;
-
-    /**
-     * The set of Objects.
-     */
-    protected MeshObjectSet theObjects;
+    protected TraversalSpecification theDefaultTraversalSpecification;
 }

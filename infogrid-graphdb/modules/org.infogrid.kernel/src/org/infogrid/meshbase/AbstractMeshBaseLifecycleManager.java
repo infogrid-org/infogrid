@@ -402,7 +402,11 @@ public abstract class AbstractMeshBaseLifecycleManager
     protected Change createCreatedEvent(
             MeshObject createdObject )
     {
-        Change ret = new MeshObjectCreatedEvent( theMeshBase, createdObject, createdObject.getTimeCreated() );
+        Change ret = new MeshObjectCreatedEvent(
+                theMeshBase,
+                theMeshBase.getIdentifier(),
+                createdObject,
+                createdObject.getTimeCreated() );
         return ret;
     } 
 
@@ -414,11 +418,16 @@ public abstract class AbstractMeshBaseLifecycleManager
      * @return the created event
      */
     protected Change createDeletedEvent(
+            MeshObject           deletedObject,
             MeshObjectIdentifier canonicalIdentifier,
-            MeshObject      deletedObject,
-            long            time )
+            long                 time )
     {
-        Change ret = new MeshObjectDeletedEvent( theMeshBase, canonicalIdentifier, deletedObject, time );
+        Change ret = new MeshObjectDeletedEvent(
+                theMeshBase,
+                theMeshBase.getIdentifier(),
+                deletedObject,
+                canonicalIdentifier,
+                time );
         return ret;
     }
 
