@@ -17,7 +17,7 @@ package org.infogrid.util;
 import java.util.NoSuchElementException;
 
 /**
- * A CursorIterator the moves over a subset of another CursorIterator.
+ * A {@link CursorIterator} that iterates over a subset of another <code>CursorIterator</code>.
  */
 public class SubsettingCursorIterator<E>
         extends
@@ -289,7 +289,7 @@ public class SubsettingCursorIterator<E>
     }
 
     /**
-     * Move the cursor to this element, i.e. return this element when {@link #get get} is invoked
+     * Move the cursor to this element, i.e. return this element when {@link #next} is invoked
      * right afterwards.
      *
      * @param pos the element to move the cursor to
@@ -333,7 +333,7 @@ public class SubsettingCursorIterator<E>
     }
     
     /**
-     * Move the cursor to this element, i.e. return this element when {@link #get get} is invoked
+     * Move the cursor to this element, i.e. return this element when {@link #previous} is invoked
      * right afterwards.
      *
      * @param pos the element to move the cursor to

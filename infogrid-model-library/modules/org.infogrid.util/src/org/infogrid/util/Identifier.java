@@ -23,7 +23,7 @@ public interface Identifier
 {
     /**
      * Obtain an external form for this Identifier, similar to
-     * URL's getExternalForm().
+     * <code>java.net.URL.toExternalForm()</code>.
      *
      * @return external form of this Identifier
      */

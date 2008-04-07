@@ -19,12 +19,12 @@ import java.util.*;
 import java.lang.reflect.Array;
 
 /**
-  * This class provides some helper functions that deal with arrays. It cannot be instantiated.
+  * Provides helper functions that deal with arrays. It cannot be instantiated.
   */
 public abstract class ArrayHelper
 {
     /**
-     * This is an "equals" method on Object that also works for null
+     * An "equals" method on Object that also works for null
      * pointers.
      *
      * @param one first Object, or null
@@ -42,7 +42,7 @@ public abstract class ArrayHelper
     }
 
     /**
-     * This is essentially an "equals" method on Object arrays which
+     * Essentially an "equals" method on Object arrays which
      * compares for the same content in the same sequence.
      *
      * @param one first argument to compare
@@ -98,8 +98,10 @@ public abstract class ArrayHelper
     {
         try {
             one[ fromOne ] = two;
+
         } catch( ArrayStoreException ex ) {
             throw new ArrayStoreException( "tried storing " + two + " in array of type " + one.getClass().getComponentType() );
+
         } catch( ArrayIndexOutOfBoundsException ex ) {
             throw new ArrayIndexOutOfBoundsException( "index: " + fromOne + ", array: " + arrayToString( one ));
         }

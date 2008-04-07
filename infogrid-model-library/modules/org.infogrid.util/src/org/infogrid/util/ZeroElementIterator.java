@@ -18,6 +18,7 @@ import java.util.*;
 
 /**
  * This Iterator is always past the last element and never returns anything.
+ * It is surprising how useful this class can be.
  */
 public final class ZeroElementIterator<T>
         implements

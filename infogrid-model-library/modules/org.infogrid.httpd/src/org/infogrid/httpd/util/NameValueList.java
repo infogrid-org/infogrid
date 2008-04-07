@@ -105,7 +105,7 @@ public class NameValueList
      */
     public Iterator<String> keyIterator()
     {
-        return new ArrayCursorIterator<String>( theNames, 0, 0, mark );
+        return ArrayCursorIterator.create( theNames, 0, 0, mark );
     }
 
     /**

@@ -19,7 +19,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * A more fully-featured Iterator that can move backwards, and N steps at a time.
+ * A more fully-featured version of <code>java.util.Iterator</code> that can move
+ * backwards just as well as forwards, and take N steps at a time instead of just one.
  */
 public interface CursorIterator<E>
         extends
@@ -31,15 +32,15 @@ public interface CursorIterator<E>
      * Obtain the next element, without iterating forward.
      *
      * @return the next element
-     * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+     * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
     public E peekNext();
-    
+
     /**
-     * Obtain the previous element, without iterating backwards.
+     * Obtain the previous element, without iterating backward.
      *
      * @return the previous element
-     * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+     * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
     public E peekPrevious();
 
@@ -54,9 +55,9 @@ public interface CursorIterator<E>
     public boolean hasNext();
 
     /**
-     * Returns <tt>true</tt> if the iteration has more elements in the backwards direction.
+     * Returns <tt>true</tt> if the iteration has more elements in the backward direction.
      *
-     * @return <tt>true</tt> if the iterator has more elements in the backwards direction.
+     * @return <tt>true</tt> if the iterator has more elements in the backward direction.
      * @see #hasNext()
      * @see #hasPrevious(int)
      * @see #hasNext(int)
@@ -66,10 +67,8 @@ public interface CursorIterator<E>
     /**
      * Returns <tt>true</tt> if the iteration has at least N more elements in the forward direction.
      *
-     * @return <tt>true</tt> if the iterator has at least N more elements in the forward direction.
-     *
      * @param n the number of elements for which to check
-     * @return true if there at least N next elements
+     * @return <tt>true</tt> if the iterator has at least N more elements in the forward direction.
      * @see #hasNext()
      * @see #hasPrevious()
      * @see #hasPrevious(int)
@@ -78,12 +77,10 @@ public interface CursorIterator<E>
             int n );
 
     /**
-     * Returns <tt>true</tt> if the iteration has at least N more elements in the backwards direction.
-     *
-     * @return <tt>true</tt> if the iterator has at least N more elements in the backwards direction.
+     * Returns <tt>true</tt> if the iteration has at least N more elements in the backward direction.
      *
      * @param n the number of elements for which to check
-     * @return true if there at least N previous elements
+     * @return <tt>true</tt> if the iterator has at least N more elements in the backward direction.
      * @see #hasNext()
      * @see #hasPrevious()
      * @see #hasNext(int)
@@ -124,7 +121,7 @@ public interface CursorIterator<E>
      * <p>Note that the elements
      * will be ordered in the opposite direction as you might expect: they are
      * returned in the sequence in which the CursorIterator visits them, not in the
-     * sequence in which the underlying Iterable stores them.</p>
+     * sequence in which the underlying {@link CursorIterable} stores them.</p>
      *
      * @return the previous no more than N elements
      * @see #next(int)
@@ -134,11 +131,10 @@ public interface CursorIterator<E>
 
     /**
      * Move the cursor by N positions. Positive numbers indicate forward movemement;
-     * negative numbers indicate backwards movement.
-     * Throws NoSuchElementException if the position does not exist.
+     * negative numbers indicate backward movement.
      *
      * @param n the number of positions to move
-     * @exception NoSuchElementException
+     * @throws NoSuchElementExceptionif the position does not exist
      */
     public void moveBy(
             int n )
@@ -146,12 +142,14 @@ public interface CursorIterator<E>
             NoSuchElementException;
 
     /**
-     * Move the cursor to just before this element, i.e. return this element when {@link #next next} is invoked
-     * right afterwards.
+     * Move the cursor to just before this element, i.e. return this element when
+     * {@link #next next} is invoked right afterwards.
      *
      * @param pos the element to move the cursor to
-     * @return the number of steps that were taken to move. Positive number means forward, negative backward
-     * @exception NoSuchElementException thrown if this element is not actually part of the collection to iterate over
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     * @throws NoSuchElementException thrown if this element is not actually part
+     *         of the underlying {@link CursorIterable}
      */
     public int moveToBefore(
             E pos )
@@ -159,12 +157,14 @@ public interface CursorIterator<E>
             NoSuchElementException;
 
     /**
-     * Move the cursor to just after this element, i.e. return this element when {@link #previous previous} is invoked
-     * right afterwards.
+     * Move the cursor to just after this element, i.e. return this element when
+     * {@link #previous previous} is invoked right afterwards.
      *
      * @param pos the element to move the cursor to
-     * @return the number of steps that were taken to move. Positive number means forward, negative backward
-     * @exception NoSuchElementException thrown if this element is not actually part of the collection to iterate over
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     * @throws NoSuchElementException thrown if this element is not actually part
+     *         of the underlying {@link CursorIterable}
      */
     public int moveToAfter(
             E pos )
@@ -172,19 +172,21 @@ public interface CursorIterator<E>
             NoSuchElementException;
 
     /**
-     * 
      * Removes from the underlying collection the last element returned by the
      * iterator (optional operation). This is the same as the current element.
      *
-     * @exception UnsupportedOperationException if the <tt>remove</tt>
+     * @throws UnsupportedOperationException if the <tt>remove</tt>
      *		  operation is not supported by this Iterator.
      
-     * @exception IllegalStateException if the <tt>next</tt> method has not
+     * @throws IllegalStateException if the <tt>next</tt> method has not
      *		  yet been called, or the <tt>remove</tt> method has already
      *		  been called after the last call to the <tt>next</tt>
      *		  method.
      */
-    public void remove();
+    public void remove()
+        throws
+            UnsupportedOperationException,
+            IllegalStateException;
     
     /**
      * Clone this position.
@@ -197,8 +199,8 @@ public interface CursorIterator<E>
      * Set this CursorIterator to the position represented by the provided CursorIterator.
      *
      * @param position the position to set this CursorIterator to
-     * @throws IllegalArgumentException thrown if the provided CursorIterator did not work on the same CursorIterable,
-     *         or the implementations were incompatible.
+     * @throws IllegalArgumentException thrown if the provided CursorIterator does
+     *         not work on the same CursorIterable, or the implementations were incompatible.
      */
     public void setPositionTo(
             CursorIterator<E> position )

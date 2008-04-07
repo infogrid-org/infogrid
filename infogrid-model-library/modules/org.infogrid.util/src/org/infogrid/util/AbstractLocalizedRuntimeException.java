@@ -17,7 +17,7 @@ package org.infogrid.util;
 import java.text.MessageFormat;
 
 /**
- * Supertype for RuntimeExceptions that knows how to internationalize themselves.
+ * Superclass for RuntimeExceptions that knows how to internationalize themselves.
  * Given that Exceptions carry all their data, it is a lot easier to to
  * ask the Exception how to internationalize itself, then to write outside
  * code to do so.
@@ -29,14 +29,14 @@ public abstract class AbstractLocalizedRuntimeException
         LocalizedException
 {
     /**
-     * Construct one with no message.
+     * Constructor with no message.
      */
     public AbstractLocalizedRuntimeException()
     {
     }
 
     /**
-     * Construct one with a message.
+     * Constructor with a message.
      *
      * @param msg the message
      */
@@ -47,7 +47,7 @@ public abstract class AbstractLocalizedRuntimeException
     }
 
     /**
-     * Construct one with no message but a cause.
+     * Constructor with no message but a cause.
      *
      * @param cause the Throwable that caused this Exception
      */
@@ -58,7 +58,7 @@ public abstract class AbstractLocalizedRuntimeException
     }
 
     /**
-     * Construct one with a message and a cause.
+     * Constructor one with a message and a cause.
      *
      * @param msg the message
      * @param cause the Exception that caused this Exception

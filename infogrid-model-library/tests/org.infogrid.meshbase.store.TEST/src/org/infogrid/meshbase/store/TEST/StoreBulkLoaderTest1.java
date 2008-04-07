@@ -83,7 +83,6 @@ public class StoreBulkLoaderTest1
         //
         
         checkEquals( mb.size(), 5+1, "Wrong number of MeshObjects found" ); // don't forget home object
-        
     }
 
     /**

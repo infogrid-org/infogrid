@@ -19,12 +19,12 @@ import org.infogrid.util.logging.Log;
 import java.util.*;
 
 /**
- * <p>A {@link SmartFactory SmartFactory} specifically for there case where the creation of a new object
- *    is a very time-consuming operation. In this case, access to the PatientSmartFactory
+ * <p>A {@link SmartFactory SmartFactory} specifically for there case where the creation of a
+ *    new object is a time-consuming operation. In this case, access to the PatientSmartFactory
  *    is only blocked for those Threads that attempt to obtain the same object; all
  *    other Threads can continue without being blocked.</p>
  * 
- * <p>It does the actual object creation by delegating to another Factory.</p>
+ * <p>It performs the actual object creation by delegating to another {@link Factory}.</p>
  *
  * <p>This currently blocks while objects are removed. This could potentially be made to
  *    be more friendly to Threads.</p>

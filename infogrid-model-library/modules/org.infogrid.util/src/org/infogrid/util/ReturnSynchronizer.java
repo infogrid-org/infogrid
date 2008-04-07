@@ -14,9 +14,10 @@
 
 package org.infogrid.util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import org.infogrid.util.logging.Log;
-
-import java.util.*;
 
 /**
  * <p>A generic synchronizer for collecting the results of N queries executive in parallel.</p>
@@ -32,14 +33,15 @@ public class ReturnSynchronizer<K,R>
     private static Log log = Log.getLogInstance( ReturnSynchronizer.class ); // our own, private logger
 
     /**
-     * Construct one with no name.
+     * Constructor.
      */
     public ReturnSynchronizer()
     {
+       // no op
     }
 
     /**
-     * Construct one with a name, for debugging only.
+     * Construct one with a name, which is to be used for debugging only.
      *
      * @param name a name for this object
      */
@@ -273,75 +275,23 @@ public class ReturnSynchronizer<K,R>
      *
      * @return string representation of this object
      */
+    @Override
     public synchronized String toString()
     {
-        StringBuffer buf = new StringBuffer();
-        buf.append( "<" );
-        buf.append( super.toString() );
-
-        buf.append( "{ " );
-        if( theName != null ) {
-            buf.append( "name: " );
-            buf.append( theName );
-            buf.append( ", " );
-        }
-
-        buf.append( "threadToMonitorTable: {" );
-        Iterator<Thread> theIter1 = threadToMonitorTable.keySet().iterator();
-        while( theIter1.hasNext() ) {
-            Thread key = theIter1.next();
-            buf.append( key.getName() );
-            buf.append( '=' );
-            buf.append( threadToMonitorTable.get( key ));
-            if( theIter1.hasNext() ) {
-                buf.append( ", " );
-            }
-        }
-
-        buf.append( "}, queryToThreadsTable: {" );
-        Iterator theIter2 = queryToThreadsTable.keySet().iterator();
-        while( theIter2.hasNext() ) {
-            Object key = theIter2.next();
-            buf.append( key );
-            buf.append( "={" );
-            Collection c = (Collection) queryToThreadsTable.get( key );
-            Iterator iter2 = c.iterator();
-            while( iter2.hasNext() ) {
-                Thread t = (Thread) iter2.next();
-                if( t != null ) {
-                    buf.append( t.getName() );
-                } else {
-                    buf.append( "null" );
-                }
-                if( iter2.hasNext()) {
-                    buf.append( "," );
-                }
-            }
-            buf.append( "}" );
-            if( theIter2.hasNext() ) {
-                buf.append( ", " );
-            }
-        }
-
-        buf.append( "}, theResultsTable: {" );
-        Iterator<K> theIter3 = theResultsTable.keySet().iterator();
-        while( theIter3.hasNext() ) {
-            K key = theIter3.next();
-            buf.append( key );
-            buf.append( '=' );
-            Object value = theResultsTable.get( key );
-            if( value == this ) {
-                buf.append( "<in progress>" );
-            } else {
-                buf.append( value );
-            }
-            if( theIter3.hasNext() ) {
-                buf.append( ", " );
-            }
-        }
-
-        buf.append( "}}" );
-        return buf.toString();
+        return StringHelper.objectLogString(
+                this,
+                new String[] {
+                    "name",
+                    "threadToMonitorTable",
+                    "queryToThreadsTable",
+                    "theResultsTable"
+                },
+                new Object[] {
+                    theName,
+                    threadToMonitorTable,
+                    queryToThreadsTable,
+                    theResultsTable
+                });
     }
 
     /**
@@ -369,7 +319,7 @@ public class ReturnSynchronizer<K,R>
     /**
      * This is some version of a counting semaphore.
      */
-    static class CS
+    protected static class CS
     {
         /**
          * Wait until our value has been decremented to zero, or we timed out.
@@ -425,6 +375,7 @@ public class ReturnSynchronizer<K,R>
          *
          * @return this instance in String format
          */
+        @Override
         public String toString()
         {
             return "CS" + hashCode() + "(" + counter + ")";

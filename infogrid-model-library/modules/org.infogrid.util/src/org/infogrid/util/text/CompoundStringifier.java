@@ -14,11 +14,9 @@
 
 package org.infogrid.util.text;
 
+import java.util.Iterator;
 import org.infogrid.util.ArrayFacade;
-import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.OneElementIterator;
 
-import java.util.*;
 
 /**
  * Abstract superclass for compound Stringifiers that delegate to N child Stringifiers.
@@ -72,9 +70,8 @@ public abstract class CompoundStringifier<T>
         return theComponents;
     }
     
-    
     /**
-     * Format an Object using this Stringifier. This may be null.
+     * Format an Object using this Stringifier.
      *
      * @param arg the Object to format, or null
      * @return the formatted String
@@ -89,13 +86,12 @@ public abstract class CompoundStringifier<T>
             String found = current.format( arg );
             
             ret.append( found );
-            
         }
         return ret.toString();
     }
     
     /**
-     * Format an Object using this Stringifier. This may be null.
+     * Format an Object using this Stringifier.
      *
      * @param arg the Object to format, or null
      * @return the formatted String
@@ -163,12 +159,13 @@ public abstract class CompoundStringifier<T>
 
     /**
      * Obtain an iterator that iterates through all the choices that exist for this Stringifier to
-     * parse the String.
+     * parse the String. The iterator returns zero elements if the String could not be parsed
+     * by this Stringifier.
      *
      * @param rawString the String to parse
      * @param startIndex the position at which to parse rawString
      * @param endIndex the position at which to end parsing rawString
-     * @param max the maximum number of choices returned by the Iterator.
+     * @param max the maximum number of choices to be returned by the Iterator.
      * @param matchAll if true, only return those matches that match the entire String from startIndex to endIndex.
      *                 If false, return other matches that only match the beginning of the String.
      * @return the Iterator
@@ -180,7 +177,16 @@ public abstract class CompoundStringifier<T>
             int     max,
             boolean matchAll )
     {
-        return new CompoundStringifierIterator<T>( this, theComponents, rawString, startIndex, endIndex, max, matchAll );
+        CompoundStringifierIterator<T> ret = new CompoundStringifierIterator<T>(
+                this,
+                theComponents,
+                rawString,
+                startIndex,
+                endIndex,
+                max,
+                matchAll );
+        
+        return ret;
     }
 
     /**

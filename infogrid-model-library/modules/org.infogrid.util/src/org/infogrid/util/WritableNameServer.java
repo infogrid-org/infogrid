@@ -15,14 +15,14 @@
 package org.infogrid.util;
 
 /**
- * Represents a NameServer whose content may be changed.
+ * A {@link NameServer} whose content may be changed.
  */
 public interface WritableNameServer<K,V>
         extends
             NameServer<K,V>
 {
     /**
-     * Add a new key and a new value without going through the obtain method.
+     * Add a new key and a new value.
      *
      * @param key the key
      * @param value the value for the key

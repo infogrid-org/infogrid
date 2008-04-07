@@ -23,7 +23,7 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import java.sql.SQLException;
 
 /**
- *
+ * Factors out common functionality of SqlStoreTests.
  */
 public abstract class AbstractSqlStoreTest
         extends
@@ -31,6 +31,8 @@ public abstract class AbstractSqlStoreTest
 {
     /**
      * Constructor.
+     * 
+     * @param testClass the actual test Class
      */
     public AbstractSqlStoreTest(
             Class testClass )
@@ -72,6 +74,9 @@ public abstract class AbstractSqlStoreTest
      */
     public static final String TEST_TABLE_NAME = "SqlStoreTest";
 
+    /**
+     * Holds the driver.
+     */
     static Object theSqlDriver;
 
     static {

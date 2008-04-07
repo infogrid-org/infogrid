@@ -28,7 +28,7 @@ public abstract class ObjectStoreException
      * Constructor.
      *
      * @param objectStore the ObjectStore that threw the Exception
-     * @param key the key in the ObjectStore that caused the Exception
+     * @param key the key in the ObjectStore related to which the Exception occurred
      * @param message a message
      * @param cause the underlying cause for this Exception
      */
@@ -55,7 +55,7 @@ public abstract class ObjectStoreException
     }
     
     /**
-     * Obtain the key that exists already in the Store.
+     * Obtain the key in the ObjectStore related to which the Exception occurred
      *
      * @return the key
      */

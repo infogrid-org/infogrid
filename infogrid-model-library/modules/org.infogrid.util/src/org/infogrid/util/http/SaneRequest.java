@@ -32,8 +32,8 @@ public abstract class SaneRequest
 
     /**
      * Obtain the requested root URI.
-     * In a Request to URL http://example.com:123/foo/bar?abc=def
-     * that would be http://example.com:123 (no trailing slash)
+     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
+     * that would be <code>http://example.com:123</code> (no trailing slash).
      *
      * @return the requested root URI
      */
@@ -51,8 +51,8 @@ public abstract class SaneRequest
 
     /**
      * Determine the requested, relative base URI.
-     * In a Request to URL http://example.com:123/foo/bar?abc=def
-     * that would be /foo/bar
+     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
+     * that would be <code>/foo/bar</code>.
      *
      * @return the requested base URI
      */
@@ -60,8 +60,8 @@ public abstract class SaneRequest
 
     /**
      * Determine the requested, absolute base URI.
-     * In a Request to URL http://example.com:123/foo/bar?abc=def
-     * that would be http://example.com:123/foo/bar
+     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
+     * that would be <code>http://example.com:123/foo/bar</code>.
      *
      * @return the requested absolute base URI
      */
@@ -75,8 +75,8 @@ public abstract class SaneRequest
 
     /**
      * Determine the requested, relative full URI.
-     * In a Request to URL http://example.com:123/foo/bar?abc=def
-     * that would be /foo/bar?abc=def
+     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
+     * that would be <code>/foo/bar?abc=def</code>.
      *
      * @return the requested relative full URI
      */
@@ -84,8 +84,8 @@ public abstract class SaneRequest
 
     /**
      * Determine the requested, absolute full URI.
-     * In a Request to URL http://example.com:123/foo/bar?abc=def
-     * that would be http://example.com:123/foo/bar?abc=def
+     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
+     * that would be <code>http://example.com:123/foo/bar?abc=def</code>.
      *
      * @return the requested absolute full URI
      */

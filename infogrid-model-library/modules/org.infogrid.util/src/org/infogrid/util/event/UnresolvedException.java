@@ -52,7 +52,7 @@ public abstract class UnresolvedException
     protected ExternalizableEvent theEvent;
     
     /**
-     * Indicates that the source of the ExternalizableEvent was not resolved.
+     * Indicates that the source of an ExternalizableEvent was not resolved.
      */
     public static class Source
             extends
@@ -84,7 +84,7 @@ public abstract class UnresolvedException
     }
 
     /**
-     * Indicates that the value of the ExternalizableEvent was not resolved.
+     * Indicates that a value carried by an ExternalizableEvent was not resolved.
      */
     public static class Value
             extends
@@ -116,7 +116,7 @@ public abstract class UnresolvedException
     }
 
     /**
-     * Indicates that the property of the ExternalizablePropertyChangeEvent was not resolved.
+     * Indicates that a property of an ExternalizablePropertyChangeEvent was not resolved.
      */
     public static class Property
             extends
@@ -125,7 +125,7 @@ public abstract class UnresolvedException
         /**
          * Constructor.
          *
-         * @param event the ExternalizableEvent that was not resolved
+         * @param event the ExternalizablePropertyChangeEvent that was not resolved
          */
         public Property(
                 ExternalizablePropertyChangeEvent event )
@@ -147,9 +147,9 @@ public abstract class UnresolvedException
         }
 
         /**
-         * Obtain the ExternalizableEvent that was not resolved.
+         * Obtain the ExternalizablePropertyChangeEvent that was not resolved.
          * 
-         * @return the ExternalizableEvent that was not resolved
+         * @return the ExternalizablePropertyChangeEvent that was not resolved
          */
         @Override
         public final ExternalizablePropertyChangeEvent getEvent()
@@ -159,7 +159,7 @@ public abstract class UnresolvedException
     }
 
     /**
-     * Indicates that some other component of the ExternalizableEvent was not resolved.
+     * Indicates that some other component of an ExternalizableEvent was not resolved.
      */
     public static class Other
             extends

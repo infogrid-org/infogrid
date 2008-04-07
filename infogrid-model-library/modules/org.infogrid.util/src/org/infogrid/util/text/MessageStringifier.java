@@ -14,12 +14,10 @@
 
 package org.infogrid.util.text;
 
-import org.infogrid.util.ArrayFacade;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.StringHelper;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -51,7 +49,7 @@ public abstract class MessageStringifier<T>
             CompoundStringifier<T>
 {
     /**
-     * Constructor.
+     * Constructor, for subclasses only.
      *
      * @param formatString the formatString
      * @param childStringifiers the child Stringifiers, keyed by a String per {@link CompoundStringifier CompoundStringifier}.
@@ -161,6 +159,7 @@ public abstract class MessageStringifier<T>
      *
      * @return String representation
      */
+    @Override
     public String toString()
     {
         return StringHelper.objectLogString(

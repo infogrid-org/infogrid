@@ -70,10 +70,10 @@ public class InstrumentedThread
     }
 
     /**
-     * Advance this thread to a provided Breakpoints, and suspend it there.
+     * Advance this InstrumentedThread to a provided {@link Breakpoint}, and suspend it there.
      *
-     * @param bp the Breakpoint to which the thread will advance
-     * @throws java.lang.InterruptedException thrown if the waiting Thread got interrupted
+     * @param bp the Breakpoint to which the InstrumentedThread will advance
+     * @throws java.lang.InterruptedException thrown if the Thread got interrupted
      */
     public void advanceTo(
             Breakpoint bp )
@@ -112,9 +112,9 @@ public class InstrumentedThread
     }
 
     /**
-     * Calling this causes this thread to complete its run, and only after this thread has
+     * Calling this causes this thread to complete its run, and only after this InstrumentedThread has
      * completed, the calling thread will return from the call. This is different from
-     * advanceNormally in that it waits until this thread has completed, and does not
+     * {@link #advanceNormally} in that it waits until this thread has completed, and does not
      * immediately return as advanceNormally would. Note that if this thread does not
      * finish, the calling thread will be suspended indefinitely.
      *
@@ -135,7 +135,7 @@ public class InstrumentedThread
     }
 
     /**
-     * Determine which Breakpoint this thread is supposed to stop at next.
+     * Determine which {@link Breakpoint} this thread is supposed to stop at next.
      *
      * @return the BreakPoint at which we stop next, or null if we don't
      */

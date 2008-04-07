@@ -15,7 +15,7 @@
 package org.infogrid.util;
 
 /**
- * A listener for events created by CachingMaps.
+ * A listener for events created by {@link CachingMap}s.
  */
 public interface CachingMapListener
 {
