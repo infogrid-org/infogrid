@@ -25,10 +25,10 @@ import java.lang.ref.WeakReference;
   * <p>This manager acts as a synchronizer to enable a defined "quit".
   * There is typically only one QuitManager per Java VM.</p>
   *
-  * <p>Objects implementing the QuitListener interface register with the
-  * QuitManager. When a quit is requested (by an invocation of initiateQuit)
-  * the QuitManager will call prepareForQuit() on all registered QuitListeners
-  * followed by a final die() on all of them.</p>
+  * <p>Objects implementing the {@link QuitListener} interface register with the
+  * QuitManager. When a quit is requested (by an invocation of {@link #initiateQuit}),
+  * the QuitManager will call {@link QuitListener#prepareForQuit} on all registered QuitListeners
+  * followed by a final {@link QuitListener#die} on all of them.</p>
   */
 public class QuitManager
 {
@@ -64,7 +64,7 @@ public class QuitManager
     public void initiateQuit()
     {
         synchronized( this ) {
-            if (haveInitiatedQuit) {
+            if( haveInitiatedQuit ) {
                 return;
             }
 
@@ -80,7 +80,7 @@ public class QuitManager
     }
 
     /**
-      * Add a quit listener.
+      * Add a listener.
       *
       * @param newListener the new listener
       * @see #removeQuitListener
@@ -94,7 +94,7 @@ public class QuitManager
     }
 
     /**
-      * Remove a quit listener.
+      * Remove a listener.
       *
       * @param oldListener the to-be-removed listener
       * @see #addQuitListener

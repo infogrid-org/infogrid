@@ -15,7 +15,8 @@
 package org.infogrid.util;
 
 /**
- * Simplifies CachingMapListener implementations.
+ * Simplifies {@link CachingMapListener} implementations that only wish to
+ * listen to some of the possible events.
  */
 public abstract class AbstractCachingMapListener
         implements

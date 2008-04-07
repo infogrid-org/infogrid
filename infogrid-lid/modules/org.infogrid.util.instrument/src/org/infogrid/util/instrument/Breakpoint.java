@@ -18,10 +18,10 @@ import org.infogrid.util.StringHelper;
 import org.infogrid.util.logging.Log;
 
 /**
- * This is pretty much the same thing as what a debugger calls a Breakpoint, except that
- * this one can be run without the debugger. It collaborates with InstrumentedThread,
- * and can only be used on Threads that are InstrumentedThread. The run-time overhead
- * is fairly small, so it can be incorporated in production code.
+ * This is pretty much the same thing as what a debugger calls a breakpoint, except that
+ * this one can be run without the debugger. It collaborates with {@link InstrumentedThread},
+ * and can only be used on Threads that are of class InstrumentedThread. The run-time overhead
+ * is fairly small, so it can be incorporated in production code if needed.
  */
 public class Breakpoint
 {
@@ -36,8 +36,8 @@ public class Breakpoint
     }
 
     /**
-     * Constructor, with a name. The name is provided only for identification purposes
-     * during debugging.
+     * Constructor, with a name for this Breakpoint. The name is provided only for
+     * identification purposes during debugging and/or logging.
      *
      * @param name a name for this Breakpoint
      * @param delay the maximum time to stop at the breakpoint, in milliseconds. 0 means forever

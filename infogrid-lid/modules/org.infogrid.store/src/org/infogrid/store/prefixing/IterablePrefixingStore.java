@@ -23,7 +23,7 @@ import org.infogrid.util.FilteringCursorIterator;
 import java.util.NoSuchElementException;
 
 /**
- * A <code>PrefixingStore</code> that is also an <code>IterableStore</code>.
+ * A {@link PrefixingStore} that is also an {@link IterableStore}.
  */
 public class IterablePrefixingStore
         extends
@@ -35,8 +35,8 @@ public class IterablePrefixingStore
      * Factory method.
      *
      * @param prefix the prefix for all keys
-     * @param delegate the Store that this PrefixingStore delegates to
-     * @return the created PrefixingStore
+     * @param delegate the IterableStore that this IterablePrefixingStore delegates to
+     * @return the created IterablePrefixingStore
      */
     public static IterablePrefixingStore create(
             String        prefix,
@@ -50,8 +50,8 @@ public class IterablePrefixingStore
      *
      * @param prefix the prefix for all keys
      * @param separator the separator String between prefix and the key
-     * @param delegate the Store that this PrefixingStore delegates to
-     * @return the created PrefixingStore
+     * @param delegate the IterableStore that this IterablePrefixingStore delegates to
+     * @return the created IterablePrefixingStore
      */
     public static IterablePrefixingStore create(
             String        prefix,
@@ -65,7 +65,7 @@ public class IterablePrefixingStore
      * Constructor.
      *
      * @param prefixAndSeparator the prefix for all keys, including any separator
-     * @param delegate the Store that this PrefixingStore delegates to
+     * @param delegate the IterableStore that this IterablePrefixingStore delegates to
      */
     protected IterablePrefixingStore(
             String        prefixAndSeparator,
@@ -107,6 +107,7 @@ public class IterablePrefixingStore
     /**
      * Determine the number of StoreValues in this Store with this prefix.
      *
+     * @param prefix the prefix
      * @return the number of StoreValues in this Store with this prefix
      */
     public int size(
@@ -141,7 +142,7 @@ public class IterablePrefixingStore
     };
 
     /**
-     * Our iterator implementation.
+     * Our IterableStoreCursor implementation.
      */
     class MyIterator
             implements
@@ -149,6 +150,8 @@ public class IterablePrefixingStore
     {
         /**
          * Constructor.
+         * 
+         * @param delegateIter an Iterator over the underlying delegate IterableStore
          */
         public MyIterator(
                 IterableStoreCursor delegateIter )

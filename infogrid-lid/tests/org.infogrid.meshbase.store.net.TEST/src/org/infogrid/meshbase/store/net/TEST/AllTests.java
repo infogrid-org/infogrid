@@ -14,12 +14,8 @@
 
 package org.infogrid.meshbase.store.net.TEST;
 
-import org.infogrid.module.ModuleRegistry;
 import org.infogrid.testharness.AbstractTestGroup;
 import org.infogrid.testharness.AbstractTestGroup.TestSpec;
-import org.infogrid.testharness.ModuleRegistryContext;
-
-import java.io.File;
 
 /**
  * Tests the Store implementation of MeshBase.

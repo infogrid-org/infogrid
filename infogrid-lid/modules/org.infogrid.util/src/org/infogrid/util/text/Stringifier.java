@@ -17,11 +17,13 @@ package org.infogrid.util.text;
 import java.util.Iterator;
 
 /**
- * <p>Marks objects that know how to turn an Object into a String, and parse it again. Many
- * implementations are possible, including:</p>
+ * <p>Interface supported by objects that know how to turn an Object into a String,
+ *    and parse it again. Many implementations are possible, including:</p>
  * <ul>
- *  <li>implementations that stringify a single, simple object, such as {@link IntegerStringifier IntegerStringifier}.</li>
- *  <li>implementations that stringify a complex object, such as {@link MessageStringifier MessageStringifier}.</li>
+ *  <li>implementations that stringify a single, simple object, such as
+ *      {@link IntegerStringifier IntegerStringifier}.</li>
+ *  <li>implementations that stringify a complex object, such as
+ *      {@link MessageStringifier MessageStringifier}.</li>
  * </ul>
  * <p>The original motivation for this interface and its related classes and interfaces were
  *    several perceived deficiencies of the <code>java.text.MessageFormat</code> class. It is mostly
@@ -32,7 +34,7 @@ import java.util.Iterator;
 public interface Stringifier<T>
 {
     /**
-     * Format an Object using this Stringifier. This may be null.
+     * Format an Object using this Stringifier.
      *
      * @param arg the Object to format, or null
      * @return the formatted String
@@ -67,12 +69,13 @@ public interface Stringifier<T>
 
     /**
      * Obtain an iterator that iterates through all the choices that exist for this Stringifier to
-     * parse the String.
+     * parse the String. The iterator returns zero elements if the String could not be parsed
+     * by this Stringifier.
      *
      * @param rawString the String to parse
      * @param startIndex the position at which to parse rawString
      * @param endIndex the position at which to end parsing rawString
-     * @param max the maximum number of choices returned by the Iterator.
+     * @param max the maximum number of choices to be returned by the Iterator.
      * @param matchAll if true, only return those matches that match the entire String from startIndex to endIndex.
      *                 If false, return other matches that only match the beginning of the String.
      * @return the Iterator

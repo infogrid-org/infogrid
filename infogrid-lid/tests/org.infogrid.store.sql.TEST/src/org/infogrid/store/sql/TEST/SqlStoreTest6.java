@@ -88,9 +88,11 @@ public class SqlStoreTest6
         
         //
         
-        log.info( "Iterating over what's in the SQL Store" );
+        int count;
         
-        int count = 0;
+//        log.info( "Iterating over what's in the SQL Store" );
+//        
+//        count = 0;
 //        for( StoreValue current : theSqlStore ) {
 //            log.debug( "Found " + count + ": " + current.getKey() );
 //            ++count;

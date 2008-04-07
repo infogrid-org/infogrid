@@ -26,14 +26,14 @@ import java.io.IOException;
 
 /**
  * This class can store arbitrary Java objects, by delegating to an underlying,
- * configurable <code>Store</code> and a <code>StoreEntryMapper</code>.
+ * configurable {@link Store} and a {@link StoreEntryMapper}.
  */
 public class ObjectStore<K,V>
 {
     /**
      * Constructor.
      * 
-     * @param mapper the SStoreEntryMapperto use
+     * @param mapper the StoreEntryMapper to use
      * @param delegate the underlying Store
      */
     public ObjectStore(

@@ -19,7 +19,7 @@ import java.text.MessageFormat;
 /**
  * This is a supertype for Exceptions that knows how to internationalize themselves.
  * Given that Exceptions carry all their data, it is a lot easier to to
- * ask the exception how to internationalize itself, then to write outside
+ * ask the Exception how to internationalize itself, than to write outside
  * code to do so.
  */
 public abstract class AbstractLocalizedException
@@ -29,14 +29,14 @@ public abstract class AbstractLocalizedException
             LocalizedException
 {
     /**
-     * Construct one with no message.
+     * Constructor.
      */
     public AbstractLocalizedException()
     {
     }
 
     /**
-     * Construct one with a message.
+     * Constructor with a message.
      *
      * @param msg the message
      */
@@ -47,7 +47,7 @@ public abstract class AbstractLocalizedException
     }
 
     /**
-     * Construct one with no message but a cause.
+     * Constructor with no message but a cause.
      *
      * @param cause the Throwable that caused this Exception
      */
@@ -58,7 +58,7 @@ public abstract class AbstractLocalizedException
     }
 
     /**
-     * Construct one with a message and a cause.
+     * Constructor with a message and a cause.
      *
      * @param msg the message
      * @param cause the Exception that caused this Exception

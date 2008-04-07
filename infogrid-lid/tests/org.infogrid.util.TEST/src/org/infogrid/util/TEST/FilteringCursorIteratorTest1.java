@@ -57,7 +57,7 @@ public class FilteringCursorIteratorTest1
             "l+H",  // [11]  [7]
         };
 
-        ArrayCursorIterator<String> baseIterator = new ArrayCursorIterator<String>( baseData );
+        ArrayCursorIterator<String> baseIterator = ArrayCursorIterator.<String>create( baseData );
         
         FilteringCursorIterator<String> filterIterator = FilteringCursorIterator.<String>create(
                 baseIterator,

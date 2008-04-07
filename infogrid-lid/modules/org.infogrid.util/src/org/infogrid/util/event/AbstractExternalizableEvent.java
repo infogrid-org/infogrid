@@ -19,8 +19,8 @@ import org.infogrid.util.StringHelper;
 import java.util.EventObject;
 
 /**
- * A general-purpose event implementation. It inherits from EventObject in
- * order to be compatible with the Java APIs.
+ * A general-purpose {@link ExternalizableEvent} implementation. It inherits from
+ * <code>java.util.EventObject</code> in order to be compatible with the Java APIs.
  */
 public abstract class AbstractExternalizableEvent<S,SID,V,VID>
         extends
@@ -30,6 +30,12 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
 {
     /**
      * Constructor.
+     * 
+     * @param source the object that is the source of the event
+     * @param sourceIdentifier the identifier representing the source of the event
+     * @param deltaValue the value that changed
+     * @param deltaValueIdentifier the identifier of the value that changed
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     protected AbstractExternalizableEvent(
             S    source,
@@ -40,21 +46,30 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
     {
         super( DUMMY_SENDER );
 
-        theSource             = source;
-        theSourceIdentifier   = sourceIdentifier;
+        if( sourceIdentifier == null ) {
+            throw new NullPointerException( "Null source identifier given" );
+        }
+        if( deltaValueIdentifier == null ) {
+            throw new NullPointerException( "Null delta identifier given" );
+        }
+        theSource               = source;
+        theSourceIdentifier     = sourceIdentifier;
         theDeltaValue           = deltaValue;
         theDeltaValueIdentifier = deltaValueIdentifier;
-        theTimeEventOccurred  = timeEventOccurred;
+        theTimeEventOccurred    = timeEventOccurred;
     }
 
     /**
-     * Obtain the source of the event. This may throw an UnresolvedException.
+     * Obtain the source of the event.
      *
      * @return the source of the event
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the source failed
      */
-    public final synchronized S getSource()
+    @Override
+    public synchronized S getSource()
         throws
-            UnresolvedException
+            UnresolvedException.Source
     {
         if( theSource == null ) {
             theSource = resolveSource();
@@ -76,6 +91,8 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
      * Obtain the new value of the data item whose change triggered the event.
      *
      * @return the new value of the data item
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the delta value failed
      */
     public final synchronized V getDeltaValue()
     {
@@ -99,16 +116,24 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
      * Enable subclass to resolve the source of the event.
      *
      * @return the source of the event
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the source failed
      */
-    protected abstract S resolveSource();
+    protected abstract S resolveSource()
+            throws
+                UnresolvedException.Source;
     
     /**
      * Enable subclass to resolve a value of the event.
      *
      * @return a value of the event
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
      */
     protected abstract V resolveValue(
-            VID vid );
+            VID vid )
+       throws
+           UnresolvedException;
     
     /**
      * Obtain the time at which the event occurred.
@@ -134,6 +159,7 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
      *
      * @return this instance in string form
      */
+    @Override
     public String toString()
     {
         return StringHelper.objectLogString(
@@ -181,7 +207,7 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
     
     /**
      * Object we use as a source for java.util.EventObject instead of the real one,
-     * because java.util.EventObject is rather broken.
+     * because <code>java.util.EventObject</code> is rather broken.
      */
     private static final Object DUMMY_SENDER = new Object();
 }

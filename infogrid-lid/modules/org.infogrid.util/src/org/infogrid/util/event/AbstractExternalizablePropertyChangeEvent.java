@@ -19,7 +19,9 @@ import org.infogrid.util.StringHelper;
 import java.beans.PropertyChangeEvent;
 
 /**
- *
+ * A general-purpose implementation of {@link ExternalizablePropertyChangeEvent}.
+ * It inherits from <code>java.beans.PropertyChangeEvent</code> in order to be
+ * compatible with the Java APIs.
  */
 public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
         extends
@@ -29,6 +31,18 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
 {
     /**
      * Constructor.
+     * 
+     * @param source the object that is the source of the event
+     * @param sourceIdentifier the identifier representing the source of the event
+     * @param property an object representing the property of the event
+     * @param propertyIdentifier the identifier representing the property of the event
+     * @param oldValue the old value of the property, prior to the event
+     * @param oldValueIdentifier the identifier representing the old value of the property, prior to the event
+     * @param deltaValue the value that changed
+     * @param deltaValueIdentifier the identifier of the value that changed
+     * @param newValue the new value of the property, after the event
+     * @param newValueIdentifier the identifier representing the new value of the property, after the event
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     protected AbstractExternalizablePropertyChangeEvent(
             S    source,
@@ -59,14 +73,16 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
     }
 
     /**
-     * Obtain the source of the event. This may throw an UnresolvedException.
+     * Obtain the source of the event.
      *
      * @return the source of the event
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
      */
     @Override
-    public final synchronized S getSource()
+    public synchronized S getSource()
         throws
-            UnresolvedException
+            UnresolvedException.Source
     {
         if( theSource == null ) {
             theSource = resolveSource();
@@ -79,7 +95,7 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
      *
      * @return the source identifier
      */
-    public final SID getSourceIdentifier()
+    public SID getSourceIdentifier()
     {
         return theSourceIdentifier;
     }
@@ -88,8 +104,10 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
      * Obtain the new value of the data item whose change triggered the event.
      *
      * @return the new value of the data item
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
      */
-    public final synchronized V getDeltaValue()
+    public synchronized V getDeltaValue()
     {
         if( theDeltaValue == null ) {
             theDeltaValue = resolveValue( getDeltaValueIdentifier() );
@@ -102,43 +120,19 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
      *
      * @return the new-value identifier
      */
-    public final VID getDeltaValueIdentifier()
+    public VID getDeltaValueIdentifier()
     {
         return theDeltaValueIdentifier;
     }
 
     /**
-     * Enable subclass to resolve the source of the event.
-     *
-     * @return the source of the event
-     */
-    protected abstract S resolveSource();
-    
-    /**
-     * Enable subclass to resolve a value of the event.
-     *
-     * @param vid the identifier for a value of the event
-     * @return a value of the event
-     */
-    protected abstract V resolveValue(
-            VID vid );
-    
-    /**
-     * Obtain the time at which the event occurred.
-     *
-     * @return the time at which the event occurred, in System.currentTimeMillis() format
-     */
-    public final long getTimeEventOccurred()
-    {
-        return theTimeEventOccurred;
-    }
-
-    /**
-     * Obtain the property of the event. This may throw an UnresolvedException.
+     * Obtain the property of the event.
      *
      * @return the property of the event
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
      */
-    public final synchronized P getProperty()
+    public synchronized P getProperty()
         throws
             UnresolvedException
     {
@@ -153,44 +147,25 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
      *
      * @return the property identifier
      */
-    public final PID getPropertyIdentifier()
+    public PID getPropertyIdentifier()
     {
         return thePropertyIdentifier;
     }
 
     /**
-     * Enable subclass to resolve the property of the event.
-     *
-     * @return the property of the event
-     */
-    protected abstract P resolveProperty();
-    
-    /**
-     * Obtain the old value of the property prior to the event. This may throw an UnresolvedException.
+     * Obtain the old value of the property prior to the event.
      *
      * @return the old value of the property
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
      */
     @Override
-    public final synchronized V getOldValue()
+    public synchronized V getOldValue()
     {
         if( theOldValue == null ) {
             theOldValue = resolveValue( getOldValueIdentifier() );
         }
         return theOldValue;
-    }
-    
-    /**
-     * Obtain the new value of the property after the event. This may throw an UnresolvedException.
-     *
-     * @return the new value of the property
-     */
-    @Override
-    public final synchronized V getNewValue()
-    {
-        if( theNewValue == null ) {
-            theNewValue = resolveValue( getNewValueIdentifier() );
-        }
-        return theNewValue;
     }
     
     /**
@@ -204,6 +179,22 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
     }
 
     /**
+     * Obtain the new value of the property after the event.
+     *
+     * @return the new value of the property
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
+     */
+    @Override
+    public synchronized V getNewValue()
+    {
+        if( theNewValue == null ) {
+            theNewValue = resolveValue( getNewValueIdentifier() );
+        }
+        return theNewValue;
+    }
+
+    /**
      * Obtain the new-value identifier of the event.
      *
      * @return the new-value identifier
@@ -212,6 +203,50 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
     {
         return theNewValueIdentifier;
     }
+
+    /**
+     * Obtain the time at which the event occurred.
+     *
+     * @return the time at which the event occurred, in System.currentTimeMillis() format
+     */
+    public final long getTimeEventOccurred()
+    {
+        return theTimeEventOccurred;
+    }
+
+    /**
+     * Enable subclass to resolve the source of the event.
+     *
+     * @return the source of the event
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the source failed
+     */
+    protected abstract S resolveSource()
+            throws
+                UnresolvedException.Source;
+    
+    /**
+     * Enable subclass to resolve the property of the event.
+     *
+     * @return the property of the event
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the property failed
+     */
+    protected abstract P resolveProperty()
+            throws
+                UnresolvedException.Property;
+    
+    /**
+     * Enable subclass to resolve a value of the event.
+     *
+     * @return a value of the event
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving a value failed
+     */
+    protected abstract V resolveValue(
+            VID vid )
+       throws
+           UnresolvedException;
 
     /**
      * Clear cached objects to force a re-resolve.
