@@ -20,7 +20,7 @@ import java.lang.ref.*;
 import java.util.*;
 
 /**
- * A SwappingHashMap that stores data in memory only.
+ * A {@link SwappingHashMap} that stores data in memory only.
  */
 public abstract class MSwappingHashMap<K,V,A>
         extends

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A degenerate implementation of CachingMap that uses a memory-only HashMap.
+ * A degenerate implementation of {@link CachingMap} that uses a memory-only <code>HashMap</code>.
  */
 public class MCachingHashMap<K,V>
         extends
@@ -37,7 +37,7 @@ public class MCachingHashMap<K,V>
     }
 
     /**
-     * Constructor.
+     * Factory method.
      * 
      * @param delegate the Map whose mappings are to be placed in this map.
      * @return the created MCachingHashMap
@@ -49,7 +49,7 @@ public class MCachingHashMap<K,V>
     }
 
     /**
-     * Constructor.
+     * Factory method.
      * 
      * @param initialCapacity the initial capacity of the CachingHashMap
      * @return the created MCachingHashMap
@@ -61,7 +61,7 @@ public class MCachingHashMap<K,V>
     }
 
     /**
-     * Constructor.
+     * Factory method.
      * 
      * @param initialCapacity the initial capacity of the CachingHashMap
      * @param loadFactor the load factor
@@ -228,8 +228,12 @@ public class MCachingHashMap<K,V>
 
     /**
       * Add a listener.
+      * This listener is added directly to the listener list, which prevents the
+      * listener from being garbage-collected before this Object is being garbage-collected.
       *
       * @param newListener the to-be-added listener
+      * @see #addSoftCachingMapListener
+      * @see #addWeakCachingMapListener
       * @see #removeCachingMapListener
       */
     public void addDirectCachingMapListener(
@@ -239,11 +243,48 @@ public class MCachingHashMap<K,V>
     }
 
     /**
-     * Remove a listener.
-     * 
-     * @param oldListener the to-be-removed listener
-     * @see #addCachingMapListener
-     */
+      * Add a listener.
+      * This listener is added to the listener list using a <code>java.lang.ref.SoftReference</code>,
+      * which allows the listener to be garbage-collected before this Object is being garbage-collected
+      * according to the semantics of Java references.
+      *
+      * @param newListener the to-be-added listener
+      * @see #addDirectCachingMapListener
+      * @see #addWeakCachingMapListener
+      * @see #removeCachingMapListener
+      */
+    public void addSoftCachingMapListener(
+            CachingMapListener newListener )
+    {
+        theListeners.addSoft( newListener );
+    }
+
+    /**
+      * Add a listener.
+      * This listener is added to the listener list using a <code>java.lang.ref.WeakReference</code>,
+      * which allows the listener to be garbage-collected before this Object is being garbage-collected
+      * according to the semantics of Java references.
+      *
+      * @param newListener the to-be-added listener
+      * @see #addDirectCachingMapListener
+      * @see #addSoftCachingMapListener
+      * @see #removeCachingMapListener
+      */
+    public void addWeakCachingMapListener(
+            CachingMapListener newListener )
+    {
+        theListeners.addWeak( newListener );        
+    }
+
+    /**
+      * Remove a listener.
+      * This method is the same regardless how the listener was subscribed to events.
+      * 
+      * @param oldListener the to-be-removed listener
+      * @see #addDirectCachingMapListener
+      * @see #addSoftCachingMapListener
+      * @see #addWeakCachingMapListener
+      */
     public void removeCachingMapListener(
             CachingMapListener oldListener )
     {
@@ -258,7 +299,7 @@ public class MCachingHashMap<K,V>
                     protected void fireEventToListener(
                             CachingMapListener l,
                             CachingMapEvent    e,
-                            Integer              p )
+                            Integer            p )
                     {
                         switch( p.intValue() ) {
                             case 0:

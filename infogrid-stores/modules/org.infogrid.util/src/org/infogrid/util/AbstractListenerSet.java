@@ -20,6 +20,8 @@ import org.infogrid.util.logging.Log;
  * Factors out common functionality of sets of listeners.
  */
 public abstract class AbstractListenerSet<T,E,P>
+        implements
+            ListenerSet<T,E,P>
 {
     private static final Log log = Log.getLogInstance( AbstractListenerSet.class ); // our own, private logger
 

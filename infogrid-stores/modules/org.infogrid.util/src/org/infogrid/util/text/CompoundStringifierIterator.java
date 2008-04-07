@@ -31,7 +31,7 @@ class CompoundStringifierIterator<T>
      * Constructor.
      *
      * @param stringifier the CompoundStringifier to which this iterator belongs
-     * @param components the CompoundStringifierComponent in the stringifier
+     * @param components the CompoundStringifierComponent in the CompoundStringifier
      * @param rawString the String to parse
      * @param startIndex the start index (inclusive) of the String to parse
      * @param endIndex the end index (exclusive) of the String to parse

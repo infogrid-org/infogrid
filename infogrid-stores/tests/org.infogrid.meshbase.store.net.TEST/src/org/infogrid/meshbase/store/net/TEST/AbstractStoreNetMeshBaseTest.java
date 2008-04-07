@@ -35,7 +35,7 @@ import org.infogrid.testharness.AbstractTest;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 /**
- *
+ * Factors out common functionality of StoreNetMeshBaseTests.
  */
 public abstract class AbstractStoreNetMeshBaseTest
         extends
@@ -148,7 +148,7 @@ public abstract class AbstractStoreNetMeshBaseTest
     }
     
     /**
-     * Check the position of the Proxies
+     * Report and error if the position of the Proxies is wrong.
      *
      * @param obj the NetMeshObject whose proxies are checked
      * @param proxiesTowards the NetMeshBases to which the proxies are supposed to be pointing
@@ -253,6 +253,9 @@ public abstract class AbstractStoreNetMeshBaseTest
      */
     public static final String TEST_TABLE_NAME = "SqlStoreMeshBaseTest";
 
+    /**
+     * Holds the SQL driver.
+     */
     static Object theSqlDriver;
     static {
         try {

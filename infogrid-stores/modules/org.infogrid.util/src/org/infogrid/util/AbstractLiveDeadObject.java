@@ -17,7 +17,8 @@ package org.infogrid.util;
 import java.util.*;
 
 /**
- * This is a simple, abstract implementation of LiveDeadObject that can be used as "mixin".
+ * This is a simple, abstract implementation of {@link LiveDeadObject}
+ * that can be used as "mixin".
  */
 public abstract class AbstractLiveDeadObject
     implements

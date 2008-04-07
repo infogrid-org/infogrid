@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -157,9 +158,16 @@ public class ServletSoftwareInstallation
         }
 
         // determine product name and version
-        String productName = System.getProperty( PRODUCT_NAME_PROPERTY );
-        String productId   = System.getProperty( PRODUCT_ID_PROPERTY );
+        String productName = "unknown";
+        String productId   = "unknown";
 
+        try {
+            productName = System.getProperty( PRODUCT_NAME_PROPERTY );
+            productId   = System.getProperty( PRODUCT_ID_PROPERTY );
+            
+        } catch( AccessControlException ex ) {
+            ModuleErrorHandler.informThrowable( ex );
+        }
         // determine platform
         platform = determinePlatform();
 

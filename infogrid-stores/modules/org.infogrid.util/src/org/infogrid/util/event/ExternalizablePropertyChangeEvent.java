@@ -15,20 +15,25 @@
 package org.infogrid.util.event;
 
 /**
- *
+ * Extends {@link ExternalizableEvent} for the specific purpose of communicating
+ * the change in a property. This interface relates to <code>ExternalizableEvent</code>
+ * in the same manner <code>java.beans.PropertyChangeEvent</code> relates to
+ * <code>java.util.EventObject</code>.
  */
 public interface ExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
         extends
             ExternalizableEvent<S,SID,V,VID>
 {
     /**
-     * Obtain the property of the event. This may throw an UnresolvedException.
+     * Obtain the property of the event.
      *
      * @return the property of the event
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
      */
     public P getProperty()
         throws
-            UnresolvedException;
+            UnresolvedException.Property;
     
     /**
      * Obtain the property identifier of the event.
@@ -38,16 +43,38 @@ public interface ExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
     public PID getPropertyIdentifier();
 
     /**
-     * Obtain the old value of the property prior to the event. This may throw an UnresolvedException.
+     * Obtain the old value of the property prior to the event.
      *
      * @return the old value of the property
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
      */
-    public V getOldValue();
+    public V getOldValue()
+        throws
+            UnresolvedException.Value;
     
     /**
-     * Obtain the new value of the property after the event. This may throw an UnresolvedException.
+     * Obtain the old-value identifier of the event.
+     *
+     * @return the old-value identifier
+     */
+    public VID getOldValueIdentifier();
+
+    /**
+     * Obtain the new value of the property after the event.
      *
      * @return the new value of the property
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
      */
-    public V getNewValue();
+    public V getNewValue()
+        throws
+            UnresolvedException.Value;
+
+    /**
+     * Obtain the new-value identifier of the event.
+     *
+     * @return the new-value identifier
+     */
+    public VID getNewValueIdentifier();
 }

@@ -50,7 +50,7 @@ public class SqlStoreTest3
         theSqlStore.initialize();
         
         MyListener listener = new MyListener();
-        theTestStore.addStoreListener( listener );
+        theTestStore.addDirectStoreListener( listener );
 
         //
         
@@ -72,10 +72,11 @@ public class SqlStoreTest3
             }
         }
 
-        checkEquals( listener.thePuts.size(),    firstSet.length, "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), 0,               "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    0,               "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), 0,               "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       firstSet.length, "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    0,               "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       0,               "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), 0,               "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    0,               "Wrong number of deletes" );
         listener.reset();
 
         for( int i=0 ; i<firstSet.length ; ++i ) {
@@ -94,10 +95,11 @@ public class SqlStoreTest3
             }
         }
 
-        checkEquals( listener.thePuts.size(),    0,               "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), 0,               "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    firstSet.length, "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), 0,               "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       0,               "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    0,               "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       firstSet.length, "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), 0,               "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    0,               "Wrong number of deletes" );
         listener.reset();
 
         //
@@ -140,10 +142,11 @@ public class SqlStoreTest3
             }
         }
 
-        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), secondSet.length, "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    0,                "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), 0,                "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    secondSet.length, "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       0,                "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), 0,                "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    0,                "Wrong number of deletes" );
         listener.reset();
 
         for( int i=0 ; i<secondSet.length ; ++i ) {
@@ -162,10 +165,11 @@ public class SqlStoreTest3
             }
         }
 
-        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), 0,                "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    secondSet.length, "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), 0,                "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    0,                "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       secondSet.length, "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), 0,                "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    0,                "Wrong number of deletes" );
         listener.reset();
 
         //
@@ -181,10 +185,11 @@ public class SqlStoreTest3
             }
         }
 
-        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), 0,                "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    0,                "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), thirdSet.length,  "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    0,                "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       0,                "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), 0,                "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    thirdSet.length,  "Wrong number of deletes" );
         listener.reset();
 
         for( int i=0 ; i<thirdSet.length ; ++i ) {
@@ -202,10 +207,11 @@ public class SqlStoreTest3
                 // noop
             }
         }
-        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), 0,                "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    thirdSet.length,  "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), 0,                "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    0,                "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       0,                "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), thirdSet.length,  "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    0,                "Wrong number of deletes" );
         listener.reset();
     }
 

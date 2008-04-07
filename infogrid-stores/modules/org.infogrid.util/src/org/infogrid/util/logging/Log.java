@@ -22,20 +22,19 @@ import org.infogrid.util.ResourceHelper;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-/** This is the central class in the org.infogrid.util.logging package.
-  *
-  * <p>How to use it (simplest case):
+/** 
+  * <p>The central class in the org.infogrid.util.logging package.</p>
+  * <p>How to use it (simplest case):</p>
   * <ol>
   *  <li> import this class "<code>import org.infogrid.util.logging.Log;</code>"</li>
   *  <li> put a "<code>private static final Log log = Log.getLogInstance( &lt;myClass&gt;.class );</code>"
   *       into your class,<br>
-  *       where "<code>&lt;myClass&gt;</code>" ist the name of your class </li>
+  *       where "<code>&lt;myClass&gt;</code>" is your class </li>
   *  <li> use the logger, eg "<code>log.warn("this is a warning"); <BR>
   *       log.debug( "Finished parsing file: " + file.getName() );</code>"</li>
   * </ol>
-  *
   * <p>Unlike in previous versions, this class now defaults to basic logging-to-System.err
-  * instead of logging to log4j.
+  * instead of logging to log4j.</p>
   */
 public abstract class Log
 {

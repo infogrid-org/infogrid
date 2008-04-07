@@ -17,7 +17,7 @@ package org.infogrid.util.text;
 import org.infogrid.util.AbstractLocalizedException;
 
 /**
- * Superclass for exceptions raised by Stringifiers.
+ * Superclass for Exceptions raised by Stringifiers.
  */
 public abstract class StringifierException
         extends

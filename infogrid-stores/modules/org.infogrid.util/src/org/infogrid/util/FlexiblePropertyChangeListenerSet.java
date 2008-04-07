@@ -17,14 +17,14 @@ package org.infogrid.util;
 import java.beans.*;
 
 /**
- * This is a FlexibleListenerSet for PropertyChangeEvents.
+ * This is a {@link FlexibleListenerSet} for <code>java.util.PropertyChangeEvent</code>s.
  */
 public class FlexiblePropertyChangeListenerSet
     extends
         FlexibleListenerSet<PropertyChangeListener,PropertyChangeEvent,Object>
 {
     /**
-     * Construct one.
+     * Constructor.
      */
     public FlexiblePropertyChangeListenerSet()
     {
@@ -32,7 +32,7 @@ public class FlexiblePropertyChangeListenerSet
     }
 
     /**
-     * Construct one with an initial size.
+     * Constructor with an initial size.
      *
      * @param size the initial size
      */

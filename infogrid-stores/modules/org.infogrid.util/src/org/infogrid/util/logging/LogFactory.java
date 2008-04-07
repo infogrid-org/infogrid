@@ -16,7 +16,8 @@ package org.infogrid.util.logging;
 
 /**
  * Interface for objects that know how to create Log instances. This is the interface
- * between NetMesh logging and underlying loggers such as log4j.
+ * between InfoGrid logging and underlying loggers such as <code>Basic</code> and
+ * <code>log4j</code>.
  */
 public abstract class LogFactory
 {

@@ -44,7 +44,7 @@ public class StringStringifier
     }
 
     /**
-     * Format an Object using this Stringifier. This may be null.
+     * Format an Object using this Stringifier.
      *
      * @param arg the Object to format, or null
      * @return the formatted String
@@ -114,12 +114,14 @@ public class StringStringifier
 
     /**
      * Obtain an iterator that iterates through all the choices that exist for this Stringifier to
-     * parse the String. FIXME: This won't work correctly for escaped Strings.
+     * parse the String. The iterator returns zero elements if the String could not be parsed
+     * by this Stringifier.
+     * FIXME: This doesn't work correctly for escaped Strings.
      *
      * @param rawString the String to parse
      * @param startIndex the position at which to parse rawString
      * @param endIndex the position at which to end parsing rawString
-     * @param max the maximum number of choices returned by the Iterator.
+     * @param max the maximum number of choices to be returned by the Iterator.
      * @param matchAll if true, only return those matches that match the entire String from startIndex to endIndex.
      *                 If false, return other matches that only match the beginning of the String.
      * @return the Iterator
@@ -184,6 +186,9 @@ public class StringStringifier
                     throw new UnsupportedOperationException();
                 }
 
+                /**
+                 * How far have we parsed so far.
+                 */
                 protected int currentEnd = startIndex;
             };
         }

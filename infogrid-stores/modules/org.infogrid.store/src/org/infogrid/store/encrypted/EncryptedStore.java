@@ -122,7 +122,7 @@ public class EncryptedStore
         } finally {
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
 
-            firePutPerformed( key, value );
+            firePutPerformed( value );
         }
     }
 
@@ -189,7 +189,7 @@ public class EncryptedStore
         } finally {
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
 
-            fireUpdatePerformed( key, value );
+            fireUpdatePerformed( value );
         }
     }
 
@@ -258,9 +258,9 @@ public class EncryptedStore
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
 
             if( ret ) {
-                fireUpdatePerformed( key, value );
+                fireUpdatePerformed( value );
             } else {
-                firePutPerformed( key, value );
+                firePutPerformed( value );
             }
         }
         return ret;
@@ -313,7 +313,11 @@ public class EncryptedStore
             return ret;
 
         } finally {
-            fireGetPerformed( key, ret );
+            if( ret != null ) {
+                fireGetPerformed( ret );
+            } else {
+                fireGetFailed( key );
+            }
         }
     }
 

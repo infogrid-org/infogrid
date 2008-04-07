@@ -33,7 +33,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
- * Makes sure we do the right number of writes and reads.
+ * Test that we do the right number of writes and reads.
  */
 public class StoreMeshBaseTest1
         extends
@@ -65,7 +65,7 @@ public class StoreMeshBaseTest1
         theSqlStore.initialize();
         
         MyListener listener = new MyListener();
-        theSqlStore.addStoreListener( listener );
+        theSqlStore.addDirectStoreListener( listener );
 
         //
 
@@ -83,10 +83,11 @@ public class StoreMeshBaseTest1
 
         MeshBaseLifecycleManager life = mb.getMeshBaseLifecycleManager();
 
-        checkEquals( listener.thePuts.size(),    1, "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), 0, "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    2, "Wrong number of gets" ); // twice for a non-existing home object
-        checkEquals( listener.theDeletes.size(), 0, "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       1, "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    0, "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       0, "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), 2, "Wrong number of failedGets" ); // twice for a non-existing home object
+        checkEquals( listener.theDeletes.size(),    0, "Wrong number of deletes" );
         listener.reset();
 
         //
@@ -95,7 +96,7 @@ public class StoreMeshBaseTest1
         
         Transaction tx = mb.createTransactionNow();
 
-        MeshObject []     mesh  = new MeshObject[ theTestSize ];
+        MeshObject []           mesh  = new MeshObject[ theTestSize ];
         MeshObjectIdentifier [] names = new MeshObjectIdentifier[ theTestSize ];
         
         WeakReference [] refs = new WeakReference[ theTestSize ];
@@ -119,10 +120,11 @@ public class StoreMeshBaseTest1
         tx.commitTransaction();
         tx = null;
 
-        checkEquals( listener.thePuts.size(),    theTestSize, "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), updateCount, "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    theTestSize, "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), 0,           "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       theTestSize, "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    updateCount, "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       0,           "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), theTestSize, "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    0,           "Wrong number of deletes" );
         listener.reset();
 
         //
@@ -143,10 +145,11 @@ public class StoreMeshBaseTest1
             checkObject( mesh[i], "Could not retrieve MeshObject with Identifier " + names[i] );
         }
 
-        checkEquals( listener.thePuts.size(),    0,            "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), 0,            "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    names.length, "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), 0,            "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       0,            "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    0,            "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       names.length, "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), 0,            "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    0,            "Wrong number of deletes" );
         listener.reset();
     }
 
@@ -220,15 +223,13 @@ public class StoreMeshBaseTest1
          * in which an actual <code>put</code> was performed.
          *
          * @param store the Store that emitted this event
-         * @param key the key with which the data element was stored
          * @param value the StoreValue that was put
          */
         public void putPerformed(
                 Store      store,
-                String     key,
                 StoreValue value )
         {
-            thePuts.add( key );
+            thePuts.add( value.getKey() );
         }
 
         /**
@@ -237,31 +238,40 @@ public class StoreMeshBaseTest1
          * in which an actual <code>update</code> was performed.
          *
          * @param store the Store that emitted this event
-         * @param key the key with which the data element was stored
          * @param value the StoreValue that was updated
          */
         public void updatePerformed(
                 Store      store,
-                String     key,
                 StoreValue value )
         {
-            theUpdates.add( key );
+            theUpdates.add( value.getKey() );
         }
 
         /**
          * A get operation was performed.
          *
          * @param store the Store that emitted this event
-         * @param key the key with which the data element was stored
          * @param value the StoreValue that was obtained
          */
         public void getPerformed(
                 Store      store,
-                String     key,
                 StoreValue value )
         {            
-            theGets.add( key );
+            theGets.add( value.getKey() );
         }                
+
+        /**
+         * A get operation was attempted but not value could be found.
+         *
+         * @param store the Store that emitted this event
+         * @param key the key that was attempted
+         */
+        public void getFailed(
+                Store  store,
+                String key )
+        {
+            theFailedGets.add( key );
+        }
 
         /**
          * A delete operation was performed.
@@ -297,6 +307,7 @@ public class StoreMeshBaseTest1
             thePuts.clear();
             theUpdates.clear();
             theGets.clear();
+            theFailedGets.clear();
             theDeletes.clear();
             theAllDeletes.clear();
         }
@@ -304,6 +315,7 @@ public class StoreMeshBaseTest1
         protected ArrayList<String> thePuts       = new ArrayList<String>();
         protected ArrayList<String> theUpdates    = new ArrayList<String>();
         protected ArrayList<String> theGets       = new ArrayList<String>();
+        protected ArrayList<String> theFailedGets = new ArrayList<String>();
         protected ArrayList<String> theDeletes    = new ArrayList<String>();
         protected ArrayList<String> theAllDeletes = new ArrayList<String>();
     }

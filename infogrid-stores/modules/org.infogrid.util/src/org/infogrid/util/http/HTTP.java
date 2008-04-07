@@ -76,7 +76,8 @@ public abstract class HTTP
     }
 
     /**
-     * Perform an HTTP GET and follow redirects.
+     * Perform an HTTP GET and follow redirects. Specify which content types
+     * are acceptable.
      *
      * @param url the URL on which to perform the HTTP GET
      * @param acceptHeader value of the accept header, if any 
@@ -93,7 +94,8 @@ public abstract class HTTP
     }
 
     /**
-     * Perform an HTTP GET and follow redirects.
+     * Perform an HTTP GET and follow redirects. Specify which content types
+     * are acceptable.
      *
      * @param url the URL on which to perform the HTTP GET
      * @param acceptHeader value of the accept header, if any 
@@ -144,7 +146,10 @@ public abstract class HTTP
     }
 
     /**
-     * Perform an HTTP GET.
+     * Perform an HTTP GET. Specify which content types
+     * are acceptable, whether to follow redirects, and which Cookies to convey.
+     * For simplicity, this can also open non-HTTP URLs although redirects,
+     * acceptable content types, and cookies are then ignored.
      *
      * @param url the URL on which to perform the HTTP GET
      * @param acceptHeader value of the accept header, if any 
@@ -195,7 +200,10 @@ public abstract class HTTP
     }
 
     /**
-     * Perform an HTTP GET.
+     * Perform an HTTP GET. Specify which content types
+     * are acceptable, whether to follow redirects, and which Cookies to convey.
+     * For simplicity, this can also open non-HTTP URLs although redirects,
+     * acceptable content types, and cookies are then ignored.
      *
      * @param url the URL on which to perform the HTTP GET
      * @param acceptHeader value of the accept header, if any 
@@ -227,9 +235,9 @@ public abstract class HTTP
        throws
            IOException
     {
-        HttpURLConnection conn    = (HttpURLConnection) url.openConnection();
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-        conn.setFollowRedirects( true );
+        conn.setInstanceFollowRedirects( true );
 
         InputStream  input = conn.getInputStream();
         return input;
@@ -251,7 +259,7 @@ public abstract class HTTP
     }
 
     /**
-     * Perform an HTTP POST.
+     * Perform an HTTP POST. Specify the POST parameters, and whether to follow redirects.
      *
      * @param url the URL on which to perform the HTTP POST
      * @param pars the name-value pairs such as from an HTML form
@@ -284,7 +292,7 @@ public abstract class HTTP
     }
 
     /**
-     * Perform an HTTP POST.
+     * Perform an HTTP POST. Specify the POST parameters, and whether to follow redirects.
      *
      * @param url the URL on which to perform the HTTP POST
      * @param pars the name-value pairs such as from an HTML form
@@ -303,7 +311,7 @@ public abstract class HTTP
     }
 
     /**
-     * Perform an HTTP POST.
+     * Perform an HTTP POST. Specify the POST payload, and whether to follow redirects.
      *
      * @param url the URL on which to perform the HTTP POST
      * @param contentType the MIME type of the content to be posted to the URL
@@ -324,7 +332,7 @@ public abstract class HTTP
     }
 
     /**
-     * Perform an HTTP POST.
+     * Perform an HTTP POST. Specify the POST payload, and whether to follow redirects.
      *
      * @param url the URL on which to perform the HTTP POST
      * @param contentType the MIME type of the content to be posted to the URL
@@ -345,7 +353,7 @@ public abstract class HTTP
     }
 
     /**
-     * Perform an HTTP POST.
+     * Perform an HTTP POST. Specify the POST payload, and whether to follow redirects.
      *
      * @param url the URL on which to perform the HTTP POST
      * @param contentType the MIME type of the content to be posted to the URL
@@ -371,21 +379,29 @@ public abstract class HTTP
         String urlString = url.toExternalForm();
 
         // This implementation is similar to the implementation of LWP::Simple::_trivial_http_get
-        Pattern p = Pattern.compile( "^https?://([^/:\\@]+)(?::(\\d+))?(/\\S*)?$" );
+        Pattern p = Pattern.compile( "^(https?)://([^/:\\@]+)(?::(\\d+))?(/\\S*)?$" );
         Matcher m = p.matcher( urlString );
         if( !m.matches()) {
-            return null;
+            throw new IllegalArgumentException( "Not a valid URL to HTTP POST to: " + url.toExternalForm() );
         }
 
-        String host = m.group( 1 );
-        String port = m.group( 2 );
+        String proto = m.group( 1 );
+        String host  = m.group( 2 );
+        String port  = m.group( 3 );
+
+        String standardPort;
+        if( "http".equals( proto )) {
+            standardPort = "80";
+        } else {
+            standardPort = "443";
+        }
         if( port == null || port.length() == 0 ) {
-            port = "80";
+            port = standardPort;
         }
         // String path = m.group( 3 );
 
         String netloc = host;
-        if( !"80".equals( port )) {
+        if( !standardPort.equals( port )) {
             netloc += ":" + port;
         }
 
@@ -641,6 +657,7 @@ public abstract class HTTP
             throws
                 IOException
         {
+            theUrl          = url;
             theResponseCode = responseCode;
             theLastModified = lastModified;
 
@@ -790,7 +807,7 @@ public abstract class HTTP
          */
         public String getLocation()
         {
-            return (String) theHeaderFields.get( "location" );
+            return getHttpHeaderField( "location" );
         }
 
         /**
@@ -821,6 +838,7 @@ public abstract class HTTP
          *
          * @return String representation
          */
+        @Override
         public String toString()
         {
             return StringHelper.objectLogString(

@@ -44,6 +44,7 @@ public abstract class CachingMapEvent<K,V>
      * @return the sending SmartFactory
      */
     @SuppressWarnings(value={"unchecked"})
+    @Override
     public CachingMap<K,V> getSource()
     {
         return (CachingMap<K,V>) super.getSource();

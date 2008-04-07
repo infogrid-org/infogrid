@@ -18,9 +18,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 /**
- * Subclass of IOException that can carry a SQLException as a payload. Unfortunately
- * Java IOException's constructor does not allow us to specify a cause directly, so
- * this class is a workaround.
+ * Subclass of <code>java.io.IOException</code> that can carry a SQLException as a
+ * payload. Unfortunately Java IOException's constructor does not allow us to specify
+ * a cause directly, so this class is a workaround.
  */
 public class SqlStoreIOException
         extends
