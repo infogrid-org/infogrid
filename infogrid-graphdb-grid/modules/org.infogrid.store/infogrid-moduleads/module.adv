@@ -15,6 +15,9 @@
 
 <standardmodule>
  <name>org.infogrid.store</name>
+ <username>The InfoGrid Store Module</username>
+ <userdescription>Provides the Store abstraction for storage in InfoGrid,
+   and some utilities that are useful regardless of the Store implementation chosen.</userdescription>
  <provides>
   <jar>org.infogrid.store.jar</jar>
  </provides>

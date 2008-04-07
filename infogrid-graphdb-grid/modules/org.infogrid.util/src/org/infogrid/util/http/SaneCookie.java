@@ -18,7 +18,7 @@ import java.util.Date;
 
 /**
  * Interface to HTTP Cookies. This is an interface so we can implement a delegation
- * model to the Java servlet cookies. This interface is used both for incoming
+ * model to the Java servlet cookies. This interface can be used both for incoming
  * and outgoing cookies.
  */
 public interface SaneCookie

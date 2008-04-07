@@ -16,7 +16,7 @@ package org.infogrid.util.event;
 
 /**
  * <p>Supported by events that are potentially serialized / externalized. May be used
- *    in addition or as an alternative to <code>java.util.EventObject</code>.</p>
+ *    as an alternative to <code>java.util.EventObject</code>.</p>
  * <p>Similarly to <code>java.util.EventObject</code>, <code>ExternalizableEvent</code>s
  *    has a source, of type <code>S</code>. The <code>DeltaValue</code> property
  *    holds the difference that the event indicates, which is of type <code>T</code>.</p>
@@ -25,14 +25,15 @@ package org.infogrid.util.event;
  *    respectively. These are identifiers for the source and the delta value,
  *    which enables a receiver of this event to re-create source and/or delta value
  *    if those could not be serialized directly.</p>
- *
  */
 public interface ExternalizableEvent<S,SID,V,VID>
 {
     /**
      * Obtain the source of the event.
      * 
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized, and no resolver has been set.
+     * @return the source of the event
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
      */
     public S getSource()
         throws
@@ -49,7 +50,8 @@ public interface ExternalizableEvent<S,SID,V,VID>
      * Obtain the delta value of the data item whose change triggered the event.
      * 
      * @return the delta value
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized, and no resolver has been set.
+     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
      */
     public V getDeltaValue()
         throws

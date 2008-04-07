@@ -165,10 +165,6 @@ public class SqlStoreTest2
             b = Math.sqrt( a );
         }
         
-        public String k;
-        public int    a;
-        public double b;
-        
         @Override
         public int hashCode()
         {
@@ -201,5 +197,9 @@ public class SqlStoreTest2
                 return one.equals( two );
             }
         }
+
+        public String k;
+        public int    a;
+        public double b;        
     }
 }

@@ -18,7 +18,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 
 /**
- * This is a very simple Iterator that returns only one element and then stops.
+ * A very simple Iterator that returns only one element and then stops.
+ * It is surprising how often this is useful.
  */
 public class OneElementIterator<T>
     implements

@@ -31,9 +31,9 @@ public abstract class NumberStringifier
     }
     
     /**
-     * Format an Object using this Stringifier.
+     * Format a numeric value using this Stringifier.
      *
-     * @param arg the Object to format, or null
+     * @param arg the numerica value, as long
      * @return the formatted String
      */
     protected String format(

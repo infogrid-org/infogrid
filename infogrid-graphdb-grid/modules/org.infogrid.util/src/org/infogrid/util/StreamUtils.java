@@ -14,11 +14,14 @@
 
 package org.infogrid.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
- * Utility functions for IO Streams.
+ * Utility functions for I/O Streams.
  */
 public abstract class StreamUtils
 {

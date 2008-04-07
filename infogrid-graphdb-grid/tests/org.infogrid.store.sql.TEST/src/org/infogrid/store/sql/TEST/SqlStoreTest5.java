@@ -256,10 +256,10 @@ public class SqlStoreTest5
         }
 
         /**
-         * Invoked only by objects held in this CachingMap, this enables
-         * the held objects to indicate to the CachingMap that they have been updated.
-         * Depending on the implementation of the CachingMap, that may cause the
-         * CachingMap to write changes to disk, for example.
+         * Invoked only by objects held in this DynamicLoadFromStoreMap, this enables
+         * the held objects to indicate to the DynamicLoadFromStoreMap that they have been updated.
+         * Depending on the implementation of the DynamicLoadFromStoreMap, that may cause the
+         * DynamicLoadFromStoreMap to write changes to disk, for example.
          *
          * @param key the key
          * @Param value the value

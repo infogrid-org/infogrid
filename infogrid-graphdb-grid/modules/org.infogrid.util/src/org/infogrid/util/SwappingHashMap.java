@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class is basically the opposite of the JDK's java.util.WeakHashMap. While
+ * This class is basically the opposite of the JDK's <code>java.util.WeakHashMap</code>. While
  * WeakHashMap deallocates entries when the key is not referenced any more, this
  * class references all of its values via References, and thus may lose the
  * value (which in turn prompts the removal of the key). This class contains
@@ -55,7 +55,7 @@ public abstract class SwappingHashMap<K,V>
     }
 
     /**
-     * Factory method for the References.
+     * Factory method for a subclass of Reference.
      *
      * @param key the key
      * @param value the value
@@ -155,6 +155,9 @@ public abstract class SwappingHashMap<K,V>
     /**
      * Returns <tt>true</tt> if this SwappingHashMap maps one or more keys to the
      * specified value.
+     * 
+     * @param value the value to check for
+     * @throws UnsupportedOperationException this is currently not implemented (FIXME)
      */
     public boolean containsValue(
             Object value )
@@ -277,7 +280,7 @@ public abstract class SwappingHashMap<K,V>
      * (optional operation).
      *
      * @param t the Map whose content is to be added
-     * @throws UnsupportedOperationException always thrown
+     * @throws UnsupportedOperationException always thrown as this is currently not implemented (FIXME)
      */
     public void putAll(
             Map<? extends K, ? extends V> t )

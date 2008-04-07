@@ -23,5 +23,6 @@ package org.infogrid.util;
 public interface LocalizedException
         extends
             LocalizedObject
+            // Exception -- we would love to say this here, but Java won't let us
 {
 }

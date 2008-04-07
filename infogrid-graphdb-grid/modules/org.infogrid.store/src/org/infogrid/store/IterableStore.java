@@ -17,7 +17,7 @@ package org.infogrid.store;
 import org.infogrid.util.CursorIterable;
 
 /**
- * A <code>Store</code> over whose contained data elements clients can iterate. Because some
+ * A {@link Store} over whose contained data elements clients can iterate. Because some
  * <code>Stores</code> may be large and distributed, not all <code>Stores</code> are
  * necessarily <code>IterableStores</code>.
  */
@@ -27,11 +27,18 @@ public interface IterableStore
             CursorIterable<StoreValue>
 {
     /**
-     * A more specific subtype of CursorIterable.
+     * Return a more specific subtype of CursorIterable as an iterator.
      *
      * @return the Iterator
      */
     public abstract IterableStoreCursor iterator();
+
+    /**
+     * Return a more specific subtype of CursorIterable as an iterator.
+     *
+     * @return the Iterator
+     */
+    public abstract IterableStoreCursor getIterator();
 
     /**
      * Determine the number of data elements in this Store. Some classes implementing

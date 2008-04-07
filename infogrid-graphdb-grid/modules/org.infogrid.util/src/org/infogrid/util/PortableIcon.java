@@ -102,20 +102,6 @@ public abstract class PortableIcon
     }
 
     /**
-     * Obtain the width of the icon.
-     *
-     * @return the width of the icon
-     */
-    // public abstract int getIconWidth();
-
-    /**
-     * Obtain the height of the icon.
-     *
-     * @return the height of the icon
-     */
-    // public abstract int getIconHeight();
-
-    /**
      * Constant for alignment specification.
      */
     protected static final int _NORTH = 0x10;
@@ -331,7 +317,7 @@ public abstract class PortableIcon
          * @return the original PortableIcon
          */
         public PortableIcon getOriginal()
-       {
+        {
             return theOriginal;
         }
 
@@ -386,4 +372,3 @@ public abstract class PortableIcon
         protected int theVAlign;
     }
 }
-

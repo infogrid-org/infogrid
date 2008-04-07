@@ -27,7 +27,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * This is a <code>java.util.Map</code> that stores the values in the <code>IterableStore</code>
+ * This is a <code>java.util.Map</code> that stores the values in the
+ * {@link org.infogrid.store.IterableStore IterableStore}
  * and keeps only <code>References</code> to them in memory.
  */
 public abstract class IterableStoreBackedMap<K,V>

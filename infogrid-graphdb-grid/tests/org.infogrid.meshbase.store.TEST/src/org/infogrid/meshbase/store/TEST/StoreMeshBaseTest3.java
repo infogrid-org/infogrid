@@ -25,7 +25,7 @@ import org.infogrid.model.primitives.EntityType;
 import org.infogrid.util.logging.Log;
 
 /**
- * Tests whether the EquivalentSet works with the StoreMeshBase.
+ * Tests whether the EquivalenceSet works with the StoreMeshBase.
  */
 public class StoreMeshBaseTest3
         extends

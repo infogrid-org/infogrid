@@ -18,8 +18,9 @@ import java.util.Iterator;
 import java.util.Enumeration;
 
 /**
-  * This is a simple Iterator implementation which returns elements
-  * of a two-dimensional array. It supports both the Enumeration and the Iterator interfaces.
+  * A simple Iterator implementation which returns elements
+  * of a two-dimensional array. It supports both the Enumeration
+  * and the Iterator interfaces.
   */
 public class DoubleArrayEnumeration<T>
         implements
