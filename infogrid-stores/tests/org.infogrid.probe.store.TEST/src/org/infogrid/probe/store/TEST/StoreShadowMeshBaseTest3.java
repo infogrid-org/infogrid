@@ -34,7 +34,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * Tests that ProbeManagers resume Shadows correctly with manual trigger after having been swapped out.
+ * Tests that ProbeManagers resume Shadows correctly with manual trigger
+ * after having been swapped out.
  */
 public class StoreShadowMeshBaseTest3
         extends

@@ -20,6 +20,8 @@ import org.infogrid.mesh.NotPermittedException;
 
 import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.Wiki.WikiSubjectArea;
+import org.infogrid.viewlet.AbstractViewedMeshObjects;
+import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
 /**
  * Viewlet that can display a WikiObject.
@@ -31,26 +33,34 @@ public class WikiObjectDisplayViewlet
     /**
      * Factory method.
      *
+     * @param path the path for the RequestDispatcher
      * @param c the application context
      * @return the created Viewlet
      */
     public static WikiObjectDisplayViewlet create(
             Context c )
     {
-        return new WikiObjectDisplayViewlet( c );
+        DefaultViewedMeshObjects viewed = new DefaultViewedMeshObjects();
+        WikiObjectDisplayViewlet ret    = new WikiObjectDisplayViewlet( viewed, c );
+
+        viewed.setViewlet( ret );
+
+        return ret;
     }
 
     /**
      * Constructor. This is protected: use factory method or subclass.
      *
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected WikiObjectDisplayViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        super( c );
+        super( viewed, c );
     }
-    
+
     /**
      * Obtain the current content of the WikiObject.
      *

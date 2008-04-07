@@ -17,6 +17,7 @@ package org.infogrid.meshbase.transaction;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.util.event.AbstractExternalizableEvent;
 import org.infogrid.util.event.UnresolvedException;
 
@@ -26,9 +27,9 @@ import org.infogrid.util.event.UnresolvedException;
   */
 public abstract class AbstractMeshObjectLifecycleEvent
         extends
-            AbstractExternalizableEvent<MeshBase, MeshBase, MeshObject, MeshObjectIdentifier>
+            AbstractExternalizableEvent<MeshBase,MeshBaseIdentifier,MeshObject,MeshObjectIdentifier>
         implements
-            Change<MeshBase,MeshBase,MeshObject,MeshObjectIdentifier>
+            Change<MeshBase,MeshBaseIdentifier,MeshObject,MeshObjectIdentifier>
 {
     /**
       * Private constructor, use subclasses.
@@ -38,12 +39,13 @@ public abstract class AbstractMeshObjectLifecycleEvent
       * @param meshObject the MeshObject that experienced a lifecycle event
       */
     protected AbstractMeshObjectLifecycleEvent(
-            MeshBase       meshBase,
-            MeshObject     meshObject,
+            MeshBase             meshBase,
+            MeshBaseIdentifier   meshBaseIdentifier,
+            MeshObject           meshObject,
             MeshObjectIdentifier canonicalMeshObjectName,
-            long           updateTime )
+            long                 updateTime )
     {
-        super( meshBase, null, meshObject, canonicalMeshObjectName, updateTime );
+        super( meshBase, meshBaseIdentifier, meshObject, canonicalMeshObjectName, updateTime );
     }
 
     /**
@@ -85,7 +87,7 @@ public abstract class AbstractMeshObjectLifecycleEvent
      */
     protected MeshBase resolveSource()
     {
-        return getSourceIdentifier();
+        throw new UnsupportedOperationException(); // Should this be implemented, and do what exactly?
     }
 
     /**
