@@ -15,7 +15,7 @@
 package org.infogrid.store;
 
 /**
- * Thrown to indicate that a key does not exist already in the Store, for an operation
+ * Thrown to indicate that a key does not exist already in the {@link Store}, for an operation
  * that requires that the key exists already.
  */
 public class StoreKeyDoesNotExistException
@@ -25,8 +25,8 @@ public class StoreKeyDoesNotExistException
     /**
      * Constructor.
      *
-     * @param key the key that does not exist in the Store
      * @param store the Store in which the key did not exist
+     * @param key the key that does not exist in the Store
      */
     public StoreKeyDoesNotExistException(
             Store  store,

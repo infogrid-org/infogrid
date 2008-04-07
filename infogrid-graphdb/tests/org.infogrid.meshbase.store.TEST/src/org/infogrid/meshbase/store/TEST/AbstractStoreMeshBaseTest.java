@@ -24,7 +24,7 @@ import org.infogrid.testharness.AbstractTest;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 /**
- *
+ * Factors out common functionality of StoreMeshBaseTests.
  */
 public abstract class AbstractStoreMeshBaseTest
         extends
@@ -32,6 +32,8 @@ public abstract class AbstractStoreMeshBaseTest
 {
     /**
      * Constructor.
+     * 
+     * @param testClass the actual test class being run
      */
     public AbstractStoreMeshBaseTest(
             Class testClass )
@@ -74,6 +76,10 @@ public abstract class AbstractStoreMeshBaseTest
      * The name of the table that we use to store test data.
      */
     public static final String TEST_TABLE_NAME = "SqlStoreMeshBaseTest";
+
+    /**
+     * Holds the SQL driver.
+     */
 
     static Object theSqlDriver;
     static {

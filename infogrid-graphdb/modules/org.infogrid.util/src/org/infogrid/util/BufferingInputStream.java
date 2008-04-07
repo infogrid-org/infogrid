@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * A drop-in InputStream that buffers all information that comes by.
+ * A drop-in <code>java.io.InputStream</code> that buffers all information that comes by.
  */
 public class BufferingInputStream
         extends

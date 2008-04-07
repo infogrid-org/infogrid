@@ -21,11 +21,11 @@ package org.infogrid.util;
 public interface QuitListener
 {
     /**
-      * This announces that a quit is imminent. Note that because of
+      * Announces that a quit is imminent. Note that because of
       * potential communication between various Objects that receive this
       * notification in arbitrary order, the Object still needs to be
       * functional after it has received this message and react to other
-      * object's requests (if any).
+      * Objects' requests (if any).
       */
     public abstract void prepareForQuit();
 

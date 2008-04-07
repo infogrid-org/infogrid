@@ -15,7 +15,7 @@
 package org.infogrid.store;
 
 /**
- * Makes it easier to  implement StoreListeners.
+ * Makes it easier to implement {@link StoreListener}s.
  */
 public abstract class AbstractStoreListener
         implements
@@ -27,12 +27,10 @@ public abstract class AbstractStoreListener
      * in which an actual <code>put</code> was performed.
      *
      * @param store the Store that emitted this event
-     * @param key the key with which the data element was stored
      * @param value the StoreValue that was put
      */
     public void putPerformed(
             Store      store,
-            String     key,
             StoreValue value )
     {
         // noop
@@ -44,30 +42,39 @@ public abstract class AbstractStoreListener
      * in which an actual <code>update</code> was performed.
      *
      * @param store the Store that emitted this event
-     * @param key the key with which the data element was stored
      * @param value the StoreValue that was updated
      */
     public void updatePerformed(
             Store      store,
-            String     key,
             StoreValue value )
     {
         // noop
     }
 
     /**
-     * A get operation was performed.
+     * A get operation was performed successfully.
      *
      * @param store the Store that emitted this event
-     * @param key the key with which the data element was stored
      * @param value the StoreValue that was obtained
      */
     public void getPerformed(
             Store      store,
-            String     key,
             StoreValue value )
     {
         // noop
+    }
+
+    /**
+     * A get operation was attempted but not value could be found.
+     *
+     * @param store the Store that emitted this event
+     * @param key the key that was attempted
+     */
+    public void getFailed(
+            Store  store,
+            String key )
+    {
+        // no op
     }
 
     /**

@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.Enumeration;
 
 /**
-  * This is a simple Iterator implementation which returns elements
+  * A simple Iterator implementation which returns elements
   * of an array. It supports both the Enumeration and the Iterator interfaces.
   */
 public class SimpleArrayIterator<T>
@@ -27,7 +27,7 @@ public class SimpleArrayIterator<T>
             Iterator<T>
 {
     /**
-      * Construct one.
+      * Constructor.
       *
       * @param array the array to iterate over
       */
@@ -38,7 +38,7 @@ public class SimpleArrayIterator<T>
     }
 
     /**
-      * Construct one.
+      * Constructor.
       *
       * @param array the array to iterate over
       * @param start the start index
@@ -51,7 +51,7 @@ public class SimpleArrayIterator<T>
     }
 
     /**
-      * Construct one.
+      * Constructor.
       *
       * @param array the array to iterate over
       * @param start the start index
@@ -86,7 +86,7 @@ public class SimpleArrayIterator<T>
       *
       * @return true if we have more elements
       */
-    public boolean hasMoreElements()
+    public final boolean hasMoreElements()
     {
         return hasNext();
     }
@@ -106,7 +106,7 @@ public class SimpleArrayIterator<T>
       *
       * @return the next element
       */
-    public T nextElement()
+    public final T nextElement()
     {
         return next();
     }

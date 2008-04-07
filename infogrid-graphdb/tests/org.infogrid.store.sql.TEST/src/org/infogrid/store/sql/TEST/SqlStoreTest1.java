@@ -54,7 +54,7 @@ public class SqlStoreTest1
         theSqlStore.initialize();
         
         MyListener listener = new MyListener();
-        theTestStore.addStoreListener( listener );
+        theTestStore.addDirectStoreListener( listener );
 
         //
         
@@ -90,10 +90,11 @@ public class SqlStoreTest1
             checkEqualByteArrays( current.theData,            value.getData(),            "not the same content" );
         }
 
-        checkEquals( listener.thePuts.size(),    0,               "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), 0,               "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    firstSet.length, "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), 0,               "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       0,               "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    0,               "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       firstSet.length, "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), 0,               "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    0,               "Wrong number of deletes" );
         listener.reset();
 
         //
@@ -133,10 +134,11 @@ public class SqlStoreTest1
                     current.theData );
         }
 
-        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), secondSet.length, "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    0,                "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), 0,                "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    secondSet.length, "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       0,                "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), 0,                "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    0,                "Wrong number of deletes" );
         listener.reset();
 
         for( int i=0 ; i<secondSet.length ; ++i ) {
@@ -151,10 +153,11 @@ public class SqlStoreTest1
             checkEqualByteArrays( current.theData,            value.getData(),            "not the same content" );
         }
 
-        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), 0,                "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    secondSet.length, "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), 0,                "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    0,                "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       secondSet.length, "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), 0,                "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    0,                "Wrong number of deletes" );
         listener.reset();
 
         //
@@ -166,10 +169,11 @@ public class SqlStoreTest1
             theTestStore.delete( current.theKey );
         }
 
-        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), 0,                "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    0,                "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), thirdSet.length,  "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    0,                "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       0,                "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), 0,                "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    thirdSet.length,  "Wrong number of deletes" );
         listener.reset();
 
         for( int i=0 ; i<thirdSet.length ; ++i ) {
@@ -183,10 +187,11 @@ public class SqlStoreTest1
                 // noop
             }
         }
-        checkEquals( listener.thePuts.size(),    0,                "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(), 0,                "Wrong number of updates" );
-        checkEquals( listener.theGets.size(),    thirdSet.length,  "Wrong number of gets" );
-        checkEquals( listener.theDeletes.size(), 0,                "Wrong number of deletes" );
+        checkEquals( listener.thePuts.size(),       0,                "Wrong number of puts" );
+        checkEquals( listener.theUpdates.size(),    0,                "Wrong number of updates" );
+        checkEquals( listener.theGets.size(),       0,                "Wrong number of gets" );
+        checkEquals( listener.theFailedGets.size(), thirdSet.length,  "Wrong number of failedGets" );
+        checkEquals( listener.theDeletes.size(),    0,                "Wrong number of deletes" );
         listener.reset();
     }
 
@@ -332,14 +337,13 @@ public class SqlStoreTest1
          * in which an actual <code>put</code> was performed.
          *
          * @param store the Store that emitted this event
-         * @param key the key with which the data element was stored
+         * @param value the StoreValue that was put
          */
         public void putPerformed(
                 Store      store,
-                String     key,
                 StoreValue value )
         {
-            thePuts.add( key );
+            thePuts.add( value.getKey() );
         }
 
         /**
@@ -348,14 +352,13 @@ public class SqlStoreTest1
          * in which an actual <code>update</code> was performed.
          *
          * @param store the Store that emitted this event
-         * @param key the key with which the data element was stored
+         * @param value the StoreValue that was updated
          */
         public void updatePerformed(
                 Store      store,
-                String     key,
                 StoreValue value )
         {
-            theUpdates.add( key );
+            theUpdates.add( value.getKey() );
         }
 
         /**
@@ -363,13 +366,26 @@ public class SqlStoreTest1
          *
          * @param store the Store that emitted this event
          * @param key the key with which the data element was stored
+         * @param value the StoreValue that was gotten
          */
         public void getPerformed(
                 Store      store,
-                String     key,
                 StoreValue value )
         {
-            theGets.add( key );
+            theGets.add( value.getKey() );
+        }
+
+        /**
+         * A get operation was attempted but not value could be found.
+         *
+         * @param store the Store that emitted this event
+         * @param key the key that was attempted
+         */
+        public void getFailed(
+                Store  store,
+                String key )
+        {
+            theFailedGets.add( key );
         }
 
         /**
@@ -406,12 +422,14 @@ public class SqlStoreTest1
             thePuts.clear();
             theUpdates.clear();
             theGets.clear();
+            theFailedGets.clear();
             theDeletes.clear();
         }
 
-        protected ArrayList<String> thePuts    = new ArrayList<String>();
-        protected ArrayList<String> theUpdates = new ArrayList<String>();
-        protected ArrayList<String> theGets    = new ArrayList<String>();
-        protected ArrayList<String> theDeletes = new ArrayList<String>();
+        protected ArrayList<String> thePuts       = new ArrayList<String>();
+        protected ArrayList<String> theUpdates    = new ArrayList<String>();
+        protected ArrayList<String> theGets       = new ArrayList<String>();
+        protected ArrayList<String> theFailedGets = new ArrayList<String>();
+        protected ArrayList<String> theDeletes    = new ArrayList<String>();
     }
 }

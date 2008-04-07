@@ -66,6 +66,7 @@ public abstract class ModuleErrorHandler
             errorStream.println( "</throwable>" );
         }
     }
+
     /**
      * We are told that we are about to download a file.
      *

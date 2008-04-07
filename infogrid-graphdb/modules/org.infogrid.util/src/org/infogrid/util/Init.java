@@ -76,11 +76,11 @@ public abstract class Init
     /**
      * Name of the Module configuration parameter that specifies the name of the LogFactory class.
      */
-    public static final String LOG_FACTORY_CLASS_PARAMETER_NAME = "org.util.logging.LogFactory.Class";
+    public static final String LOG_FACTORY_CLASS_PARAMETER_NAME = "org.infogrid.util.logging.LogFactory.Class";
 
     /**
      * Name of the Module configuration parameter that specifies the name of the Module in which the
      * LogFactory class can be found.
      */
-    public static final String LOG_FACTORY_MODULE_PARAMETER_NAME = "org.util.logging.LogFactory.Module";
+    public static final String LOG_FACTORY_MODULE_PARAMETER_NAME = "org.infogrid.util.logging.LogFactory.Module";
 }

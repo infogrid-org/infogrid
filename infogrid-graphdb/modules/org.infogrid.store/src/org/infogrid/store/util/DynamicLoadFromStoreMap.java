@@ -29,7 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A CachingMap whose cache is either entirely empty or complete.
+ * A <code>org.infogrid.util.CachingMap} whose cache is either entirely empty or complete,
+ * and if empty, is transparently reloaded from the specified {@link org.infogrid.store.Store}.
  */
 public abstract class DynamicLoadFromStoreMap<K,V>
         extends
@@ -40,6 +41,8 @@ public abstract class DynamicLoadFromStoreMap<K,V>
     /**
      * Constructor.
      *
+     * @param store the underlying Store
+     * @param storeEntryKey the key used to write the entire content of the Map into the Store
      */
     protected DynamicLoadFromStoreMap(
             Store  store,
@@ -201,6 +204,10 @@ public abstract class DynamicLoadFromStoreMap<K,V>
 
     /**
      * Associates the specified value with the specified key in this map.
+     * 
+     * @param key the key
+     * @param value the value
+     * @return the old value previously stored using the same key, if any
      */
     public V put(
             K key,
@@ -216,6 +223,9 @@ public abstract class DynamicLoadFromStoreMap<K,V>
 
     /**
      * Removes the mapping for this key from this map if it is present.
+     * 
+     * @param key the key
+     * @return the old value previously stored using the same key, if any
      */
     public V remove(
             Object key )

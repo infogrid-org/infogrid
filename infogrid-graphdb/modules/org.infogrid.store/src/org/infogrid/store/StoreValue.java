@@ -20,8 +20,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
- * <p>A <code>StoreValue</code> encapsulates the data and meta-data retrieved
- * from a Store.</p>
+ * <p>A <code>StoreValue</code> encapsulates into one Oject the data and meta-data written to
+ * and read from a Store for a given key.</p>
  */
 public class StoreValue
 {

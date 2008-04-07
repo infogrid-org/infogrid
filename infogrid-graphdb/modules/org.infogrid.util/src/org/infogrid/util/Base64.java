@@ -18,6 +18,8 @@ import org.infogrid.util.logging.Log;
 
 import java.io.IOException;
 
+// We are not supposed to import from this package, but well, the code is there,
+// why duplicate as long as it works? FIXME?
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 

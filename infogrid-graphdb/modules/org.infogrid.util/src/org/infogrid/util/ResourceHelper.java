@@ -14,21 +14,27 @@
 
 package org.infogrid.util;
 
-import org.infogrid.util.logging.Log;
-
 import java.lang.ref.WeakReference;
 import java.net.URL;
-import java.text.*;
-import java.util.*;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
+import org.infogrid.util.logging.Log;
 
 /**
-  * <p>This class collects a number of useful helper functionality that
+  * <p>Collects a number of useful helper functionalities that
   * deal with resources. These are on a somewhat higher level than the
   * ones provided by the JDK, and in fact they mostly delegate to them.</p>
   *
-  * <p>A client that needs a resource typically finds a ResourceHelper by
-  * using the getInstance method. From there, it can look up its own
-  * resources by name.</p>
+  * <p>A client that needs a resource typically finds a <code>ResourceHelper</code> by
+  * using the {@link #getInstance} method. From there, it can look up its own
+  * resources by name. By convention, the argument to the <code>getInstance</code>
+  * method is the class looking for the resource, called a channel in the API.</p>
   *
   * <p>A ResourceHelper may delegate, if a resource was not found locally,
   * to another ResourceHelper specified at construction time.</p>
@@ -42,7 +48,7 @@ import java.util.*;
   * avoid naming conflicts across channels.</p>
   *
   * <p>In this file, we instantiate the logger when we have our resources
-  * set, in order to avoid a bootstrap problem with Log.class.</p>
+  * set, in order to avoid a bootstrap problem with {@link org.infogrid.util.logging.Log}.</p>
   *
   * <p>This class is final. In order to define additional convenience methods,
   * create a utility class (such as with only static methods, taking a ResourceHelper
@@ -108,8 +114,8 @@ public final class ResourceHelper
     }
 
     /**
-      * <p>Method for getting hold of the ResourceHelper instance for a particular Class.
-      * It employs as smart factory pattern. We pass in a channel,
+      * <p>Method for getting hold of the ResourceHelper instance for a particular
+      * Class. It employs as smart factory pattern. We pass in a channel,
       * which typically is the name of the class/component that wants
       * a resource, or the central name for a set of related classes.</p>
       *
@@ -126,8 +132,8 @@ public final class ResourceHelper
     }
 
     /**
-      * <p>Method for getting hold of the ResourceHelper instance for a particular Class,
-      * using another ResourceHelper as a delegate (which may be null ).
+      * <p>Method for getting hold of the ResourceHelper instance for a particular
+      * Class, using another ResourceHelper as a delegate (which may be null ).
       * It employs as smart factory pattern. We pass in a channel,
       * which typically is the name of the class/component that wants
       * a resource, or the central name for a set of related classes.</p>
@@ -147,8 +153,8 @@ public final class ResourceHelper
     }
 
     /**
-      * <p>Method for getting hold of the ResourceHelper instance for a particular Class
-      * whose name is provided.
+      * <p>Method for getting hold of the ResourceHelper instance for a particular
+      * Class whose name is provided.
       * It employs as smart factory pattern. We pass in a channel,
       * which typically is the name of the class/component that wants
       * a resource, or the central name for a set of related classes.</p>
@@ -245,7 +251,8 @@ public final class ResourceHelper
     }
 
     /**
-     * Obtain the values from a String that were inserted by getResourceStringWithArguments.
+     * Obtain the values from a String that were inserted by
+     * {@link #getResourceStringWithArguments}.
      *
      * @param resourceName the name of the resource we are looking for
      * @param toParse the String to parse
@@ -257,9 +264,9 @@ public final class ResourceHelper
         throws
             ParseException
     {
-        String raw = getResourceString( resourceName );
+        String        raw    = getResourceString( resourceName );
         MessageFormat format = new MessageFormat( raw );
-        Object [] ret = format.parse( toParse );
+        Object []     ret    = format.parse( toParse );
         return ret;
     }
     
@@ -507,7 +514,7 @@ public final class ResourceHelper
      * @return the value of the resource, or the default
      */
     public boolean getResourceBooleanOrDefault(
-            String resourceName,
+            String  resourceName,
             boolean defaultBoolean )
     {
         String value = getResourceStringOrDefault( resourceName, null );
@@ -631,8 +638,7 @@ public final class ResourceHelper
     }
 
     /**
-     * This is invoked when we cannot find a resource. This is public in order to
-     * be able to invoke this from AwtResourceHelperUtils etc.
+     * This is invoked when we cannot find a resource.
      *
      * @param resourceName the name of the resource we could not find
      */
@@ -723,6 +729,7 @@ public final class ResourceHelper
      * @param other the Object to compare against
      * @return true if the Objects are equal
      */
+    @Override
     public boolean equals(
             Object other )
     {
@@ -744,6 +751,7 @@ public final class ResourceHelper
      *
      * @return hash code
      */
+    @Override
     public int hashCode()
     {
         if( theDelegate == null ) {
@@ -758,6 +766,7 @@ public final class ResourceHelper
      *
      * @return this instance in string form
      */
+    @Override
     public String toString()
     {
         return super.toString() + "<" + theName + ">";
@@ -765,8 +774,7 @@ public final class ResourceHelper
 
     /**
       * This a reference to the resource bundle we actually use. Only allocated when needed,
-      * and because it is a Reference, de-allocated as soon as we don't need it any more.<br>
-      * WeakReference&lt;ResourceBundle&gt;
+      * and because it is a Reference, de-allocated as soon as we don't need it any more.
       */
     protected WeakReference<ResourceBundle> theBundleReference;
 
@@ -817,11 +825,12 @@ public final class ResourceHelper
         }
 
         /**
-         * We are equal if our componets are equal.
+         * We are equal if our components are equal.
          *
          * @param other the Object to compare against
          * @return true if the Objects are equal
          */
+        @Override
         public boolean equals(
                 Object other )
         {
@@ -843,6 +852,7 @@ public final class ResourceHelper
          *
          * @return the hash code
          */
+        @Override
         public int hashCode()
         {
             if( theDelegate == null ) {
@@ -852,7 +862,14 @@ public final class ResourceHelper
             }
         }
 
+        /**
+         * The channel component.
+         */
         private String theChannel;
+        
+        /**
+         *  The delegate, if any.
+         */
         private ResourceHelper theDelegate;
     }
 }

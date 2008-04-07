@@ -29,7 +29,7 @@ public class DoubleStringifier
     /**
      * Factory method.
      *
-     * @return the created IntegerStringifier
+     * @return the created DoubleStringifier
      */
     public static DoubleStringifier create()
     {
@@ -101,12 +101,13 @@ public class DoubleStringifier
 
     /**
      * Obtain an iterator that iterates through all the choices that exist for this Stringifier to
-     * parse the String.
+     * parse the String. The iterator returns zero elements if the String could not be parsed
+     * by this Stringifier.
      *
      * @param rawString the String to parse
      * @param startIndex the position at which to parse rawString
      * @param endIndex the position at which to end parsing rawString
-     * @param max the maximum number of choices returned by the Iterator.
+     * @param max the maximum number of choices to be returned by the Iterator.
      * @param matchAll if true, only return those matches that match the entire String from startIndex to endIndex.
      *                 If false, return other matches that only match the beginning of the String.
      * @return the Iterator
@@ -281,46 +282,5 @@ public class DoubleStringifier
          * The next double to return.
          */
         protected Double theNext;
-    }
-    
-    /**
-     * Is this a valid char for this Stringifier.
-     *
-     * @param pos position
-     * @param min limits the considered String by this minimum position (inclusive)
-     * @param max limits the considered String by this maximum position (exclusive)
-     * @param s the String on whose position we find the char
-     * @return true or false
-     */
-    boolean validChar(
-            int    pos,
-            int    min,
-            int    max,
-            String s )
-    {
-        int length = s.length();
-        if( max > length ) {
-            return false;
-        }
-        if( pos >= length ) {
-            return false;
-        }
-        if( pos < min ) {
-            return false;
-        }
-
-        char c = s.charAt( pos );
-
-        if( pos == min && length > min ) {
-            if( c == '+' || c == '-' ) {
-                if( validChar( pos+1, min, max, s )) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        boolean ret = Character.isDigit( c );
-        return ret;
     }
 }

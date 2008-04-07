@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
-  * This is a bundle of helper functions for frequently used operations
+  * A bundle of helper functions for frequently used operations
   * that deal with classes and instances.
   */
 public abstract class ClassInstanceHelper
@@ -80,7 +80,7 @@ public abstract class ClassInstanceHelper
                 }
             }
             // not found on this level
-            currentClasses = getSupertypesOfClassesInVector( currentClasses );
+            currentClasses = getSupertypesOfClasses( currentClasses );
             ++level;
         }
         return -1;
@@ -105,13 +105,13 @@ public abstract class ClassInstanceHelper
     }
 
     /**
-      * This is an internal helper to find all superclasses of all classes
+      * An internal helper to find all superclasses of all classes
       * in an ArrayList.
       *
       * @param theClasses the input data
       * @return the list of all superclasses
       */
-    private static ArrayList<Class> getSupertypesOfClassesInVector(
+    private static ArrayList<Class> getSupertypesOfClasses(
             ArrayList<Class> theClasses )
     {
         ArrayList<Class> ret     = new ArrayList<Class>();

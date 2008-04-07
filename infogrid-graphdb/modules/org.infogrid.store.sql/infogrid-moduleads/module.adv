@@ -15,6 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.store.sql</name>
+ <username>SQL Store</username>
+ <userdescription>Implements the Store abstraction using a SQL database</userdescription>
  <provides>
   <jar>org.infogrid.store.sql.jar</jar>
  </provides>

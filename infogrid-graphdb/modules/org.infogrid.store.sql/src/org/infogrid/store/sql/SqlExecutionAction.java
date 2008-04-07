@@ -45,7 +45,8 @@ abstract class SqlExecutionAction<R>
     /**
      * Execute the action.
      *
-     * @return 
+     * @return the return value, if any
+     * @throws SQLException a SQL exception occurred
      */
     public R execute()
         throws
@@ -94,6 +95,9 @@ abstract class SqlExecutionAction<R>
 
     /**
      * Execute the actual SQL.
+     * 
+     * @param stm the PreparedStatement to execute
+     * @param conn the Connection object to use
      */
     protected abstract R perform(
             PreparedStatement stm,
