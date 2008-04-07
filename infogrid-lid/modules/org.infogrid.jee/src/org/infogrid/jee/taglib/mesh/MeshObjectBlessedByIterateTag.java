@@ -116,7 +116,7 @@ public class MeshObjectBlessedByIterateTag
     {
         MeshObject obj = (MeshObject) lookupOrThrow( theMeshObjectName );
 
-        theIterator = new ArrayCursorIterator<EntityType>( obj.getTypes() );
+        theIterator = ArrayCursorIterator.<EntityType>create( obj.getTypes() );
 
         int ret = iterateOnce();
         return ret;

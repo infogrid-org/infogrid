@@ -26,7 +26,7 @@ import org.infogrid.testharness.AbstractTest;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 /**
- *
+ * Factors out common functionality of StoreProbeTests.
  */
 public abstract class AbstractStoreProbeTest
         extends
@@ -34,6 +34,8 @@ public abstract class AbstractStoreProbeTest
 {
     /**
      * Constructor.
+     * 
+     * @param testClass identifies the actual test to be run
      */
     public AbstractStoreProbeTest(
             Class testClass )
@@ -93,6 +95,9 @@ public abstract class AbstractStoreProbeTest
      */
     public static final String TEST_TABLE_NAME = "StoreProbeTest";
 
+    /**
+     * The SQL driver.
+     */
     static Object theSqlDriver;
     static {
         try {

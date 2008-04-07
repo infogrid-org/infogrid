@@ -143,7 +143,7 @@ public class MeshObjectRoleIterateTag
         MeshObject destination = (MeshObject) lookupOrThrow( theDestinationMeshObjectName );
 
         RoleType [] types = start.getRoleTypes( destination );
-        theIterator = new ArrayCursorIterator<RoleType>( types );
+        theIterator = ArrayCursorIterator.<RoleType>create( types );
 
         int ret = iterateOnce();
         return ret;

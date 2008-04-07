@@ -1022,7 +1022,7 @@ public abstract class InfoGridJspUtils
 
         RestfulRequest req         = (RestfulRequest) ((HttpServletRequest)pageContext.getRequest()).getAttribute( RestfulRequest.class.getName());
         String         contextPath = req.getContextPath();
-        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, mesh.getMeshBase() );
+        boolean isDefaultMeshBase  = isDefaultMeshBase( pageContext, mesh.getMeshBase() );
 
         String ret = mesh.toStringRepresentation( rep, contextPath, isDefaultMeshBase );
         return ret;

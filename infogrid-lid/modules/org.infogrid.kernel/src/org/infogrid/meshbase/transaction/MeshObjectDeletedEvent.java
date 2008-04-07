@@ -18,7 +18,7 @@ import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 
 import org.infogrid.meshbase.MeshBase;
-
+import org.infogrid.meshbase.MeshBaseIdentifier;
 
 /**
  * A MeshObject was semantically deleted.
@@ -36,11 +36,16 @@ public class MeshObjectDeletedEvent
      */
     public MeshObjectDeletedEvent(
             MeshBase             meshBase,
-            MeshObjectIdentifier canonicalIdentifier,
+            MeshBaseIdentifier   meshBaseIdentifier,
             MeshObject           deletedMeshObject,
+            MeshObjectIdentifier deletedMeshObjectIdentifier,
             long                 updateTime )
     {
-        super( meshBase, deletedMeshObject, canonicalIdentifier, updateTime );
+        super(  meshBase,
+                meshBaseIdentifier,
+                deletedMeshObject,
+                deletedMeshObjectIdentifier,
+                updateTime );
     }
 
     /**

@@ -21,6 +21,8 @@ import org.infogrid.model.primitives.SubjectArea;
 import org.infogrid.modelbase.ModelBase;
 
 import java.util.Iterator;
+import org.infogrid.viewlet.AbstractViewedMeshObjects;
+import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
 /**
  * Displays all MeshTypes in the ModelBase.
@@ -29,27 +31,34 @@ public class AllMeshTypesViewlet
         extends
             AbstractJeeViewlet
 {
-   /**
+    /**
      * Factory method.
      *
      * @param c the application context
-     * @return the created AllMeshObjectsViewlet
+     * @return the created PropertySheetViewlet
      */
     public static AllMeshTypesViewlet create(
             Context c )
     {
-        return new AllMeshTypesViewlet( c );
+        DefaultViewedMeshObjects viewed = new DefaultViewedMeshObjects();
+        AllMeshTypesViewlet     ret    = new AllMeshTypesViewlet( viewed, c );
+
+        viewed.setViewlet( ret );
+
+        return ret;
     }
 
     /**
-     * Constructor.
+     * Constructor. This is protected: use factory method or subclass.
      *
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected AllMeshTypesViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        super( c );
+        super( viewed, c );
     }
 
     /**

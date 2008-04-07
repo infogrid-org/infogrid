@@ -449,7 +449,7 @@ public class SaneServletRequest
                 theRequestedMimeTypes = new String[0];
             }
         }
-        return new ArrayCursorIterator<String>( theRequestedMimeTypes );
+        return ArrayCursorIterator.<String>create( theRequestedMimeTypes );
     }
 
     /**
