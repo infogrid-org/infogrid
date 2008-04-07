@@ -14,9 +14,10 @@
 
 package org.infogrid.jee.viewlet.propertysheet;
 
-import org.infogrid.jee.viewlet.AbstractJeeViewlet;
-
 import org.infogrid.context.Context;
+import org.infogrid.jee.viewlet.AbstractJeeViewlet;
+import org.infogrid.viewlet.AbstractViewedMeshObjects;
+import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
 /**
  * A Viewlet that shows a PropertySheet for its subject.
@@ -34,17 +35,24 @@ public class PropertySheetViewlet
     public static PropertySheetViewlet create(
             Context c )
     {
-        return new PropertySheetViewlet( c );
+        DefaultViewedMeshObjects viewed = new DefaultViewedMeshObjects();
+        PropertySheetViewlet     ret    = new PropertySheetViewlet( viewed, c );
+
+        viewed.setViewlet( ret );
+
+        return ret;
     }
 
     /**
-     * Constructor, for subclasses only.
+     * Constructor. This is protected: use factory method or subclass.
      *
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected PropertySheetViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        super( c );
+        super( viewed, c );
     }
 }

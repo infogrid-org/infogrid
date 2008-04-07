@@ -708,7 +708,7 @@ public class AnetMeshObject
      */
     public CursorIterator<Proxy> proxyIterator()
     {
-        return new ArrayCursorIterator<Proxy>( theProxies );
+        return ArrayCursorIterator.<Proxy>create( theProxies );
     }
 
     /**

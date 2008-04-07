@@ -19,6 +19,7 @@ import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 
 import org.infogrid.meshbase.MeshBase;
 
+import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
@@ -50,11 +51,16 @@ public class MeshObjectCreatedEvent
      * @param createdObject the MeshObject that experienced a lifecycle event
      */
     public MeshObjectCreatedEvent(
-            MeshBase   meshBase,
-            MeshObject createdObject,
-            long       updateTime )
+            MeshBase           meshBase,
+            MeshBaseIdentifier meshBaseIdentifier,
+            MeshObject         createdObject,
+            long               updateTime )
     {
-        super( meshBase, createdObject, createdObject.getIdentifier(), updateTime );
+        super(  meshBase,
+                meshBaseIdentifier,
+                createdObject,
+                createdObject.getIdentifier(),
+                updateTime );
         
         theExternalizedMeshObject = createdObject.asExternalized();
     }
@@ -67,10 +73,15 @@ public class MeshObjectCreatedEvent
      */
     public MeshObjectCreatedEvent(
             MeshBase               meshBase,
+            MeshBaseIdentifier     meshBaseIdentifier,
             ExternalizedMeshObject createdObject,
             long                   updateTime )
     {
-        super( meshBase, null, createdObject.getIdentifier(), updateTime );
+        super(  meshBase,
+                meshBaseIdentifier,
+                null,
+                createdObject.getIdentifier(),
+                updateTime );
         
         theExternalizedMeshObject = createdObject;
     }

@@ -173,7 +173,7 @@ public class ViewletDispatcherServlet
             synchronized( viewlet ) {
                 Throwable thrown  = null;
                 try {
-                    viewlet.setSubject( subject );
+                    viewlet.view( toView );
                     viewlet.performBefore( restful, structured );
 
                     viewlet.setCurrentRequest( restful );

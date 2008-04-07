@@ -15,8 +15,10 @@
 package org.infogrid.jee.viewlet.propertysheet.net;
 
 import org.infogrid.jee.viewlet.AbstractJeeViewlet;
+import org.infogrid.viewlet.AbstractViewedMeshObjects;
 
 import org.infogrid.context.Context;
+import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
 /**
  * A Viewlet that shows a Net-extended PropertySheet for its subject.
@@ -34,18 +36,24 @@ public class NetPropertySheetViewlet
     public static NetPropertySheetViewlet create(
             Context c )
     {
-        return new NetPropertySheetViewlet( c );
+        DefaultViewedMeshObjects viewed = new DefaultViewedMeshObjects();
+        NetPropertySheetViewlet  ret    = new NetPropertySheetViewlet( viewed, c );
+
+        viewed.setViewlet( ret );
+        return ret;
     }
 
     /**
      * Constructor, for subclasses only.
      *
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected NetPropertySheetViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        super( c );
+        super( viewed, c );
     }
 }
 

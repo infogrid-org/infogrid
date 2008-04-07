@@ -19,6 +19,7 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.Proxy;
@@ -38,7 +39,7 @@ public class NetMeshObjectCreatedEvent
         extends
             MeshObjectCreatedEvent
         implements
-            NetChange<MeshBase,MeshBase,MeshObject,MeshObjectIdentifier>
+            NetChange<MeshBase,MeshBaseIdentifier,MeshObject,MeshObjectIdentifier>
 {
     private static final Log log = Log.getLogInstance( NetMeshObjectCreatedEvent.class ); // our own, private logger
 
@@ -50,10 +51,11 @@ public class NetMeshObjectCreatedEvent
      */
     public NetMeshObjectCreatedEvent(
             NetMeshBase           meshBase,
+            NetMeshBaseIdentifier meshBaseIdentifier,
             NetMeshObject         createdObject,
             NetMeshBaseIdentifier incomingProxy )
     {
-        super( meshBase, createdObject, createdObject.getTimeCreated() );
+        super( meshBase, meshBaseIdentifier, createdObject, createdObject.getTimeCreated() );
         
         theIncomingProxy = incomingProxy;
     }
@@ -66,10 +68,11 @@ public class NetMeshObjectCreatedEvent
      */
     public NetMeshObjectCreatedEvent(
             NetMeshBase               meshBase,
+            NetMeshBaseIdentifier     meshBaseIdentifier,
             ExternalizedNetMeshObject createdObject,
             NetMeshBaseIdentifier     incomingProxy )
     {
-        super( meshBase, createdObject, createdObject.getTimeCreated() );
+        super( meshBase, meshBaseIdentifier, createdObject, createdObject.getTimeCreated() );
         
         theIncomingProxy = incomingProxy;
     }
@@ -82,11 +85,12 @@ public class NetMeshObjectCreatedEvent
      */
     protected NetMeshObjectCreatedEvent(
             NetMeshBase           meshBase,
+            NetMeshBaseIdentifier meshBaseIdentifier,
             NetMeshObject         createdObject,
             NetMeshBaseIdentifier incomingProxy,
             long                  timeUpdated )
     {
-        super( meshBase, createdObject, timeUpdated );
+        super( meshBase, meshBaseIdentifier, createdObject, timeUpdated );
         
         theIncomingProxy = incomingProxy;
     }
