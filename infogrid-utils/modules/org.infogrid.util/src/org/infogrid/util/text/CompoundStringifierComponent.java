@@ -26,7 +26,7 @@ import java.util.Iterator;
 public interface CompoundStringifierComponent<T>
 {
     /**
-     * Format zero or one Objects.
+     * Format zero or one Objects in the ArrayFacade.
      *
      * @param arg the Object to format
      * @return the formatted String
@@ -36,8 +36,14 @@ public interface CompoundStringifierComponent<T>
     
     /**
      * Obtain an iterator that goes with this CompoundStringifierComponent.
-     * 
-     * @return the iterator
+     *
+     * @param rawString the String to parse
+     * @param startIndex the position at which to parse rawString
+     * @param endIndex the position at which to end parsing rawString
+     * @param max the maximum number of choices to be returned by the Iterator.
+     * @param matchAll if true, only return those matches that match the entire String from startIndex to endIndex.
+     *                 If false, return other matches that only match the beginning of the String.
+     * @return the Iterator
      */
     public Iterator<? extends StringifierParsingChoice<? extends T>> parsingChoiceIterator(
             String  rawString,

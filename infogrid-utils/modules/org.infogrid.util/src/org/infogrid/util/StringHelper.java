@@ -14,15 +14,13 @@
 
 package org.infogrid.util;
 
-import org.infogrid.util.logging.Log;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
+import org.infogrid.util.logging.Log;
 
 /**
   * A collection of String manipulation methods that we found

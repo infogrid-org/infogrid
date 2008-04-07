@@ -15,7 +15,7 @@
 package org.infogrid.util;
 
 /**
- * Simplifies SwappingHashMapListener development.
+ * Simplifies {@link SwappingHashMapListener} development.
  */
 public abstract class AbstractSwappingHashMapListener<K,V>
         implements

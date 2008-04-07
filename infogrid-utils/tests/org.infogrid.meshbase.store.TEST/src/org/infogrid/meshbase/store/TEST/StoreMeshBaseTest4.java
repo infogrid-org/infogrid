@@ -23,7 +23,6 @@ import org.infogrid.meshbase.store.StoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.util.logging.Log;
 
-
 /**
  * Tests large amounts of data in a StoreMeshBase.
  */

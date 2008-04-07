@@ -19,7 +19,7 @@ import org.infogrid.util.ArrayFacade;
 import java.util.Map;
 
 /**
- * A MessageStringifier that works on Objects and not more specific subclasses.
+ * A MessageStringifier that works on Objects and does not require more specific subclasses.
  */
 public class AnyMessageStringifier
         extends

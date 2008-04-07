@@ -52,7 +52,7 @@ public abstract class StoreException
     }
     
     /**
-     * Obtain the key that exists already in the Store.
+     * Obtain the key related to which the Exception occurred.
      *
      * @return the key
      */
@@ -67,7 +67,7 @@ public abstract class StoreException
     protected Store theStore;
 
     /**
-     * The key that caused this Exception.
+     * The key related to which this Exception occurred.
      */
     protected String theKey;
 }

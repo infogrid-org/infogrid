@@ -52,7 +52,7 @@ public class PrefixingStoreKeyDoesNotExistException
     }
 
     /**
-     * Obtain the underlying exception, which we know to be a StoreKeyDoesNotExistException
+     * Obtain the underlying exception, which we know to be a StoreKeyDoesNotExistException.
      *
      * @return the underlying StoreKeyDoesNotExistException
      */

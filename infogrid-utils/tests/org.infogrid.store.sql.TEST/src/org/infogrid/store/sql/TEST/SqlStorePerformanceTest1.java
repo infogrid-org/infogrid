@@ -18,7 +18,7 @@ import org.infogrid.store.StoreValue;
 import org.infogrid.util.logging.Log;
 
 /**
- *
+ * Tests the SqlStore and measures performance.
  */
 public class SqlStorePerformanceTest1
         extends

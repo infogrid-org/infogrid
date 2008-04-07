@@ -44,6 +44,7 @@ public abstract class SmartFactoryEvent<K,V,A>
      * @return the sending SmartFactory
      */
     @SuppressWarnings(value={"unchecked"})
+    @Override
     public SmartFactory<K,V,A> getSource()
     {
         return (SmartFactory<K,V,A>) super.getSource();

@@ -15,7 +15,7 @@
 package org.infogrid.store;
 
 /**
- * Thrown if decoding of a <code>StoreValue</code> is not possible.
+ * Thrown if decoding of a {@link StoreValue} failed.
  */
 public class StoreValueDecodingException
         extends

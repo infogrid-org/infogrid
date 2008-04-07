@@ -14,7 +14,7 @@
 
 package org.infogrid.store;
 
-import java.util.ArrayList;
+import org.infogrid.util.FlexibleListenerSet;
 
 /**
  * An abstract implementation of <code>Store</code> that captures the event
@@ -24,26 +24,67 @@ public abstract class AbstractStore
         implements
             Store
 {
+
     /**
-     * Add a StoreListener.
-     *
-     * @param newListener the new StoreListener
-     */
-    public synchronized void addStoreListener(
+      * Add a listener.
+      * This listener is added directly to the listener list, which prevents the
+      * listener from being garbage-collected before this Object is being garbage-collected.
+      *
+      * @param newListener the to-be-added listener
+      * @see #addSoftStoreListener
+      * @see #addWeakStoreListener
+      * @see #removeStoreListener
+      */
+    public void addDirectStoreListener(
             StoreListener newListener )
     {
-        if( theStoreListeners == null ) {
-            theStoreListeners = new ArrayList<StoreListener>();
-        }
-        theStoreListeners.add( newListener );
+        theStoreListeners.addDirect( newListener );
     }
-    
+
     /**
-     * Remove a StoreListener.
-     *
-     * @param oldListener the old StoreListener
-     */
-    public synchronized void removeStoreListener(
+      * Add a listener.
+      * This listener is added to the listener list using a <code>java.lang.ref.SoftReference</code>,
+      * which allows the listener to be garbage-collected before this Object is being garbage-collected
+      * according to the semantics of Java references.
+      *
+      * @param newListener the to-be-added listener
+      * @see #addDirectStoreListener
+      * @see #addWeakStoreListener
+      * @see #removeStoreListener
+      */
+    public void addSoftStoreListener(
+            StoreListener newListener )
+    {
+        theStoreListeners.addSoft( newListener );
+    }
+
+    /**
+      * Add a listener.
+      * This listener is added to the listener list using a <code>java.lang.ref.WeakReference</code>,
+      * which allows the listener to be garbage-collected before this Object is being garbage-collected
+      * according to the semantics of Java references.
+      *
+      * @param newListener the to-be-added listener
+      * @see #addDirectStoreListener
+      * @see #addSoftStoreListener
+      * @see #removeStoreListener
+      */
+    public void addWeakStoreListener(
+            StoreListener newListener )
+    {
+        theStoreListeners.addWeak( newListener );
+    }
+
+    /**
+      * Remove a listener.
+      * This method is the same regardless how the listener was subscribed to events.
+      * 
+      * @param oldListener the to-be-removed listener
+      * @see #addDirectStoreListener
+      * @see #addSoftStoreListener
+      * @see #addWeakStoreListener
+      */
+    public void removeStoreListener(
             StoreListener oldListener )
     {
         theStoreListeners.remove( oldListener );
@@ -52,122 +93,104 @@ public abstract class AbstractStore
     /**
      * Fire a Store put event.
      *
-     * @param key the used key in the Store
-     * @param value the corresponding value
+     * @param value the value put into the Store
      */
     protected void firePutPerformed(
-            String     key,
             StoreValue value )
     {
-        ArrayList<StoreListener> listeners;
-        synchronized( this ) {
-            if( theStoreListeners == null || theStoreListeners.isEmpty() ) {
-                return;
-            }
-            listeners = cloneStoreListeners();
-        }
-        for( StoreListener current : listeners ) {
-            current.putPerformed( this, key, value );
-        }
+        theStoreListeners.fireEvent( value, 0 );
     }
     
     /**
      * Fire a Store update event.
      *
-     * @param key the used key in the Store
-     * @param value the corresponding value
+     * @param value the value updated into the Store
      */
     protected void fireUpdatePerformed(
-            String     key,
             StoreValue value )
     {
-        ArrayList<StoreListener> listeners;
-        synchronized( this ) {
-            if( theStoreListeners == null || theStoreListeners.isEmpty() ) {
-                return;
-            }
-            listeners = cloneStoreListeners();
-        }
-        for( StoreListener current : listeners ) {
-            current.updatePerformed( this, key, value );
-        }
+        theStoreListeners.fireEvent( value, 1 );
     }
     
     /**
-     * Fire a Store get event.
+     * Fire a Store get successed event.
      *
-     * @param key the used key in the Store
-     * @param value the corresponding value
+     * @param value the obtained value
      */
     protected void fireGetPerformed(
-            String     key,
             StoreValue value )
     {
-        ArrayList<StoreListener> listeners;
-        synchronized( this ) {
-            if( theStoreListeners == null || theStoreListeners.isEmpty() ) {
-                return;
-            }
-            listeners = cloneStoreListeners();
-        }
-        for( StoreListener current : listeners ) {
-            current.getPerformed( this, key, value );
-        }
+        theStoreListeners.fireEvent( value, 2 );
+    }
+    
+    /**
+     * Fire a Store get failed event.
+     *
+     * @param key the key that failed
+     */
+    protected void fireGetFailed(
+            String key )
+    {
+        theStoreListeners.fireEvent( key, 3 );
     }
     
     /**
      * Fire a Store delete event.
      *
-     * @param key the used key in the Store
+     * @param key the key that was deleted
      */
     protected void fireDeletePerformed(
             String key )
     {
-        ArrayList<StoreListener> listeners;
-        synchronized( this ) {
-            if( theStoreListeners == null || theStoreListeners.isEmpty() ) {
-                return;
-            }
-            listeners = cloneStoreListeners();
-        }
-        for( StoreListener current : listeners ) {
-            current.deletePerformed( this, key );
-        }
+        theStoreListeners.fireEvent( key, 4 );
     }
     
     /**
      * Fire a Store deleteAll event.
      *
-     * @param prefix the prefix, if any, of the keys that were deleted
+     * @param prefix the prefix if all the keys that were deleted
      */
     protected void fireDeleteAllPerformed(
             String prefix )
     {
-        ArrayList<StoreListener> listeners;
-        synchronized( this ) {
-            if( theStoreListeners == null || theStoreListeners.isEmpty() ) {
-                return;
-            }
-            listeners = cloneStoreListeners();
-        }
-        for( StoreListener current : listeners ) {
-            current.deleteAllPerformed( this, prefix );
-        }
+        theStoreListeners.fireEvent( prefix, 5 );
     }
     
     /**
-     * We factor this out to reduce the number of places where we have to suppress warnings.
-     *
-     * @return a cloned list of StoreListeners
-     */
-    @SuppressWarnings(value={"unchecked"})
-    protected final ArrayList<StoreListener> cloneStoreListeners()
-    {
-        return (ArrayList<StoreListener>) theStoreListeners.clone();
-    }
-
-    /**
      * The StoreListeners.
      */
-    protected ArrayList<StoreListener> theStoreListeners = null;
+    private FlexibleListenerSet<StoreListener,Object,Integer> theStoreListeners
+            = new FlexibleListenerSet<StoreListener,Object,Integer>() {
+                    protected void fireEventToListener(
+                            StoreListener l,
+                            Object        e,
+                            Integer       p )
+                    {
+                        switch( p.intValue() ) {
+                            case 0:
+                                l.putPerformed( AbstractStore.this, (StoreValue) e );
+                                break;
+
+                            case 1:
+                                l.updatePerformed( AbstractStore.this, (StoreValue) e );
+                                break;
+
+                            case 2:
+                                l.getPerformed( AbstractStore.this, (StoreValue) e );
+                                break;
+
+                            case 3:
+                                l.getFailed( AbstractStore.this, (String) e );
+                                break;
+
+                            case 4:
+                                l.deletePerformed( AbstractStore.this, (String) e );
+                                break;
+
+                            case 5:
+                                l.deleteAllPerformed( AbstractStore.this, (String) e );
+                                break;
+                        }
+                    }
+    };
 }

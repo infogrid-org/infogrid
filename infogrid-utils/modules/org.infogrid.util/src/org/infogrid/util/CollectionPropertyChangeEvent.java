@@ -19,8 +19,8 @@ import java.beans.PropertyChangeEvent;
 import java.util.*;
 
 /**
- * This subclasses PropertyChangeEvent to make it easier to process PropertyChangeEvents
- * that deal with Set values for the changed properties.
+ * This subclasses <code>java.beans.PropertyChangeEvent</code> to make it easier
+ * to process PropertyChangeEvents that deal with Set values for the changed properties.
  */
 public abstract class CollectionPropertyChangeEvent<T>
         extends

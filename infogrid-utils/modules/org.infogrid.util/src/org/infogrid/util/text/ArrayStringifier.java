@@ -15,12 +15,13 @@
 package org.infogrid.util.text;
 
 import org.infogrid.util.ArrayFacade;
-import org.infogrid.util.ZeroElementIterator;
 
 import java.util.Iterator;
 
 /**
- * A Stringifier that processes arrays.
+ * A Stringifier that processes arrays. Arrays must be passed as
+ * {@link org.infogrid.util.ArrayFacade}, as Java generics aren't working well
+ * enough to do without that intermediate class.
  */
 public class ArrayStringifier<T>
         implements
@@ -78,7 +79,8 @@ public class ArrayStringifier<T>
     /**
      * Factory method. This creates an ArrayStringifier that joins the
      * individual components after each other with a string in the middle,
-     * prepends a start and appends an end.
+     * prepends a start and appends an end, or uses a special empty String if
+     * the array is empty.
      *
      * @param delegate the delegate to which all element stringifications are delegated
      * @param start the string to insert at the beginning
@@ -151,7 +153,7 @@ public class ArrayStringifier<T>
     }
 
     /**
-     * Format an Object using this Stringifier. This may be null.
+     * Format an Object using this Stringifier.
      *
      * @param arg the Object to format, or null
      * @return the formatted String
@@ -196,7 +198,7 @@ public class ArrayStringifier<T>
     }
     
     /**
-     * Format an Object using this Stringifier. This may be null.
+     * Format an Object using this Stringifier.
      *
      * @param arg the Object to format, or null
      * @return the formatted String
@@ -249,12 +251,14 @@ public class ArrayStringifier<T>
 
     /**
      * Obtain an iterator that iterates through all the choices that exist for this Stringifier to
-     * parse the String.
+     * parse the String. The iterator returns zero elements if the String could not be parsed
+     * by this Stringifier.
+     * FIXME: This is not implemented right now.
      *
      * @param rawString the String to parse
      * @param startIndex the position at which to parse rawString
      * @param endIndex the position at which to end parsing rawString
-     * @param max the maximum number of choices returned by the Iterator.
+     * @param max the maximum number of choices to be returned by the Iterator.
      * @param matchAll if true, only return those matches that match the entire String from startIndex to endIndex.
      *                 If false, return other matches that only match the beginning of the String.
      * @return the Iterator
