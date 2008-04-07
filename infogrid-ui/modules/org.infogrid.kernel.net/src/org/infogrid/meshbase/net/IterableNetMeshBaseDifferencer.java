@@ -67,14 +67,15 @@ public class IterableNetMeshBaseDifferencer
      */
     @Override
     protected NetMeshObjectDeletedEvent createMeshObjectDeletedEvent(
+            MeshObject           obj,
             MeshObjectIdentifier canonicalIdentifier,
-            MeshObject      obj,
-            long            time )
+            long                 time )
     {
         NetMeshObjectDeletedEvent ret = new NetMeshObjectDeletedEvent(
                 (NetMeshBase) obj.getMeshBase(),
-                canonicalIdentifier,
+                (NetMeshBaseIdentifier) obj.getMeshBase().getIdentifier(),
                 (NetMeshObject) obj,
+                canonicalIdentifier,
                 (NetMeshBaseIdentifier) null,
                 time );
 

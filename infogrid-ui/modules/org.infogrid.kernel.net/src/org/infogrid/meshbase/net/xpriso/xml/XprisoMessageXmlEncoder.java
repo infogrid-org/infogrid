@@ -433,7 +433,7 @@ public class XprisoMessageXmlEncoder
             try {
                 MeshObjectIdentifier ref  = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
                 long                 time = parseLong( attrs, TIME_UPDATED_TAG, -1L );
-                theMessage.addDeleteChange( new NetMeshObjectDeletedEvent( null, ref, null, theMessage.getSenderIdentifier(), time ));
+                theMessage.addDeleteChange( new NetMeshObjectDeletedEvent( null, theMessage.getSenderIdentifier(), null, ref, theMessage.getSenderIdentifier(), time ));
             } catch( URISyntaxException ex ) {
                 log.warn( ex );
             }
@@ -605,6 +605,7 @@ public class XprisoMessageXmlEncoder
         } else if( MESH_OBJECT_CREATED_TAG.equals( qName )) {
             theMessage.addCreation( new NetMeshObjectCreatedEvent(
                     null,
+                    theMessage.getSenderIdentifier(),
                     (ExternalizedNetMeshObject) theMeshObjectBeingParsed,
                     theMessage.getSenderIdentifier() ));
             

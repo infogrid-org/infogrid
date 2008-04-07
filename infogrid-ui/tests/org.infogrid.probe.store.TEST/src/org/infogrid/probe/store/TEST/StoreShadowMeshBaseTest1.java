@@ -234,16 +234,6 @@ public class StoreShadowMeshBaseTest1
          *         Probe must bless the Probe's HomeObject with a subtype of ProbeUpdateSpecification (defined
          *         in the <code>org.infogrid.model.Probe</code>) that reflects the policy.
          * @param mb the StagingMeshBase in which the corresponding MeshObjects are instantiated by the Probe
-         * @throws IdeMeshObjectIdentifierNotUniqueExceptionrown if the Probe developer incorrectly
-         *         assigned duplicate Identifiers to created MeshObjects
-         * @throws RelatedAlreadyException thrown if the Probe developer incorrectly attempted to
-         *         relate two already-related MeshObjects
-         * @throws TransactionException this Exception is declared to make programming easier,
-         *         although actually throwing it would be a programming error
-         * @throws NotPermittedException thrown if an operation performed by the Probe was not permitted
-         * @throws ProbeException a Probe error occurred per the possible subclasses defined in ProbeException
-         * @throws IOException an input/output error occurred during execution of the Probe
-         * @throws ModuleException thrown if a Module required by the Probe could not be loaded
          */
         public void readFromApi(
                 NetMeshBaseIdentifier  networkId,

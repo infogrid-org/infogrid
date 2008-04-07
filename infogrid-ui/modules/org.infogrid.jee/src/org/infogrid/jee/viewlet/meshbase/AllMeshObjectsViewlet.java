@@ -19,6 +19,8 @@ import org.infogrid.jee.viewlet.AbstractCursorIterableViewlet;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.meshbase.IterableMeshBase;
 import org.infogrid.util.CursorIterator;
+import org.infogrid.viewlet.AbstractViewedMeshObjects;
+import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
 /**
  * A Viewlet that shows all MeshObjects in a MeshBase.
@@ -31,23 +33,30 @@ public class AllMeshObjectsViewlet
      * Factory method.
      *
      * @param c the application context
-     * @return the created AllMeshObjectsViewlet
+     * @return the created PropertySheetViewlet
      */
     public static AllMeshObjectsViewlet create(
             Context c )
     {
-        return new AllMeshObjectsViewlet( c );
+        DefaultViewedMeshObjects viewed = new DefaultViewedMeshObjects();
+        AllMeshObjectsViewlet    ret    = new AllMeshObjectsViewlet( viewed, c );
+
+        viewed.setViewlet( ret );
+
+        return ret;
     }
 
     /**
-     * Constructor.
+     * Constructor. This is protected: use factory method or subclass.
      *
+     * @param viewed the AbstractViewedMeshObjects implementation to use
      * @param c the application context
      */
     protected AllMeshObjectsViewlet(
-            Context c )
+            AbstractViewedMeshObjects viewed,
+            Context                   c )
     {
-        super( c );
+        super( viewed, c );
     }
 
     /**
