@@ -61,7 +61,6 @@ public class IterableStoreMeshBase
       * @param theHomeObjectTypes the EntityTypes with which to bless the home object, if not initialized yet
       * @param store the IterableStore in which to store the MeshObjects
       * @param c the Context in which this MeshBase will run
-      * @throws IsAbstractException thrown if the given EntityType for the home object is abstract and cannot be instantiated
       */
     public static IterableStoreMeshBase create(
             MeshBaseIdentifier identifier,
@@ -69,8 +68,6 @@ public class IterableStoreMeshBase
             AccessManager      accessMgr,
             IterableStore      meshObjectStore,
             Context            c )
-        throws
-            IsAbstractException
     {
         ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create();
 
@@ -87,7 +84,6 @@ public class IterableStoreMeshBase
       * @param theHomeObjectTypes the EntityTypes with which to bless the home object, if not initialized yet
       * @param store the IterableStore in which to store the MeshObjects
       * @param c the Context in which this MeshBase will run
-      * @throws IsAbstractException thrown if the given EntityType for the home object is abstract and cannot be instantiated
       */
     public static IterableStoreMeshBase create(
             MeshBaseIdentifier   identifier,
@@ -96,8 +92,6 @@ public class IterableStoreMeshBase
             AccessManager        accessMgr,
             IterableStore        meshObjectStore,
             Context              c )
-        throws
-            IsAbstractException
     {
         StoreMeshBaseEntryMapper objectMapper = new StoreMeshBaseEntryMapper();
         

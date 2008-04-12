@@ -14,6 +14,9 @@
 
 package org.infogrid.mesh;
 
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+
 /**
  * Thrown if an attempt is made to relate a MeshObject to itself.
  */
@@ -23,22 +26,32 @@ public class CannotRelateToItselfException
 {
     /**
      * Constructor.
+     *
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param meshObject the MeshObject
+     * @param meshObjectIdentifier the MeshObjectIdentifier of the MeshObject
      */
     public CannotRelateToItselfException(
-            MeshObject obj )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           meshObject,
+            MeshObjectIdentifier meshObjectIdentifier )
     {
-        super( obj, obj );
+        super( mb, originatingMeshBaseIdentifier, meshObject, meshObjectIdentifier, meshObject, meshObjectIdentifier );
     }
 
     /**
-     * Obtain parameters for the internationalization.
+     * More convenient simple constructor for the most common case.
      *
-     * @return the parameters
+     * @param meshObject the MeshObject
      */
-    @Override
-    public Object [] getLocalizationParameters()
+    public CannotRelateToItselfException(
+            MeshObject meshObject )
     {
-        return new Object[] { theMeshObject };
+        this(   meshObject.getMeshBase(),
+                meshObject.getMeshBase().getIdentifier(),
+                meshObject,
+                meshObject.getIdentifier() );
     }
-
 }

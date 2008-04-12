@@ -22,6 +22,8 @@ import java.util.Iterator;
 /**
  * Iterator for a CompoundStringifier. This is basically an iterative implementation of a
  * depth-first search algorithm similar to how PROLOG works.
+ * 
+ * @param T the type of the Objects to be stringified
  */
 class CompoundStringifierIterator<T>
         implements
@@ -36,7 +38,7 @@ class CompoundStringifierIterator<T>
      * @param startIndex the start index (inclusive) of the String to parse
      * @param endIndex the end index (exclusive) of the String to parse
      * @param max the maximum number of elements to return
-     * @param if true, only return StringifierParsingChoice that consume the entire String
+     * @param matchAll if true, only return StringifierParsingChoice that consume the entire String
      */
     public CompoundStringifierIterator(
             CompoundStringifier<T>             stringifier,

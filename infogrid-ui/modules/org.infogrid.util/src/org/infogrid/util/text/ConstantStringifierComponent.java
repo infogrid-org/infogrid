@@ -22,6 +22,8 @@ import java.util.Iterator;
 
 /**
  * The constant blocks of text inside a (compound) MessageStringifier.
+ * 
+ * @param T the type of the Objects to be stringified
  */
 public class ConstantStringifierComponent<T>
         implements

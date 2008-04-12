@@ -17,6 +17,7 @@ package org.infogrid.kernel.net.TEST.xpriso;
 import org.infogrid.context.Context;
 import org.infogrid.context.SimpleContext;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.set.MeshObjectSelector;
 import org.infogrid.mesh.set.MeshObjectSet;
@@ -119,6 +120,8 @@ public abstract class AbstractXprisoTest
             NetMeshObject one,
             NetMeshObject two,
             String        msg )
+        throws
+            NotRelatedException
     {
         boolean ret = true;
         

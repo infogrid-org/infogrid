@@ -24,6 +24,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import org.infogrid.context.Context;
 import org.infogrid.jee.rest.RestfulRequest;
+import org.infogrid.jee.security.FormTokenService;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;
 import org.infogrid.jee.viewlet.templates.StructuredResponseTemplate;
 import org.infogrid.meshbase.MeshBase;
@@ -89,6 +90,7 @@ public abstract class InfoGridWebApp
             ViewletFactory                                                        viewletFactory,
             TraversalDictionary                                                   traversalDictionary,
             Factory<RestfulRequest,StructuredResponseTemplate,StructuredResponse> structuredResponseTemplateFactory,
+            FormTokenService                                                      formTokenService,
             Context                                                               applicationContext )
     {        
         theMainMeshBase                      = mainMeshBase;
@@ -96,6 +98,7 @@ public abstract class InfoGridWebApp
         theViewletFactory                    = viewletFactory;
         theTraversalDictionary               = traversalDictionary;
         theApplicationContext                = applicationContext;
+        theFormTokenService                  = formTokenService;
         theStructuredResponseTemplateFactory = structuredResponseTemplateFactory;
         
         theApplicationContext.addContextObject( theViewletFactory );
@@ -353,6 +356,16 @@ public abstract class InfoGridWebApp
     }
 
     /**
+     * Obtain a FormTokenService.
+     * 
+     * @return the FormTokenService
+     */
+    public FormTokenService getFormTokenService()
+    {
+        return theFormTokenService;
+    }
+
+    /**
      * The NameServer that knows the Meshbase(s) in this application.
      */
     protected NameServer<MeshBaseIdentifier,MeshBase> theMeshBaseNameServer;
@@ -361,6 +374,11 @@ public abstract class InfoGridWebApp
      * The ViewletFactory for this application.
      */
     protected ViewletFactory theViewletFactory;
+
+    /**
+     * The FormTokenService to use.
+     */
+    protected FormTokenService theFormTokenService;
 
     /**
      * The application context.

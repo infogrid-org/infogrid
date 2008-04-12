@@ -143,15 +143,15 @@ public interface RoleType
     public String [] getLocalRoleTypeGuardClassNames();
 
     /**
-     * Check whether the given caller is allowed to change the time of auto-delete property
+     * Check whether the given caller is allowed to change the expirationTime
      * on a given MeshObject.
      *
-     * @param obj the MeshObject whose auto-delete property shall be changed
+     * @param obj the MeshObject whose expirationTime property shall be changed
      * @param newValue the new value of the property
      * @param caller the MeshObject representing the caller
      * @throws NotPermittedException thrown if this caller is not permitted to do this 
      */
-    public void checkPermittedSetTimeAutoDeletes(
+    public void checkPermittedSetTimeExpires(
             MeshObject obj,
             long       newValue,
             MeshObject caller )
@@ -280,6 +280,37 @@ public interface RoleType
         throws
             NotPermittedException;
 
+    /**
+     * Check whether the given caller is allowed to make one and two members of the same
+     * equivalence set.
+     * 
+     * @param one the first MeshObject
+     * @param two the second MeshObject
+     * @param caller the MeshObject representing the caller
+     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     */
+    public void checkPermittedAddAsEquivalent(
+            MeshObject  one,
+            MeshObject  two,
+            MeshObject  caller )
+        throws
+            NotPermittedException;
+    
+    /**
+     * Check whether the given caller is allowed to remove the MeshObject from its
+     * equivalence set
+     * 
+     * @param one the first MeshObject
+     * @param two the second MeshObject
+     * @param caller the MeshObject representing the caller
+     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     */
+    public void checkPermittedRemoveAsEquivalent(
+            MeshObject  obj,
+            MeshObject  caller )
+        throws
+            NotPermittedException;
+    
     /**
       * Appended to the Identifier of a RelationshipType to create a "source" RoleType's Identifier.
       * Note: an application programmer should not depend on this; use provided methods instead to

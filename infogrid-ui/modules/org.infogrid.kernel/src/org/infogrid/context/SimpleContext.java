@@ -25,7 +25,8 @@ import java.util.Iterator;
   * A simple implementation of the Context interface.
   */
 public class SimpleContext
-        implements Context
+        implements
+            Context
 {
     private static final Log log = Log.getLogInstance(SimpleContext.class); // our own, private logger
 
@@ -241,7 +242,7 @@ public class SimpleContext
 
     /**
      * <p>The currently known context objects.</p>
-     * <p>This uses an array list (rather than a hashtable) because
+     * <p>This uses an array list (rather than a hash table) because
      * we need to check against all supertypes, not only the concrete
      * subtype that happens to have been added to this context.</p>
      * <p>This is allocated dynamically.</p>

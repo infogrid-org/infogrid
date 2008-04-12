@@ -53,6 +53,7 @@ public abstract class StandardModuleActivator
      * @param activationClassName name of the activating class
      * @param activationMethodName name of the activating method in the activating class
      * @param loader the ClassLoader that can find the activationClass
+     * @return Module-specific return Object, or null
      * @throws ModuleActivationException thrown if the Module could not be activated
      */
     protected Object activate(
@@ -176,6 +177,7 @@ public abstract class StandardModuleActivator
      *
      * @param dependentModule the dependent Module to activate
      * @return the ModuleActivator for the dependent Module
+     * @throws ModuleActivationException thrown if the ModuleActivator could not be instantiated
      */
     public ModuleActivator dependentModuleActivator(
             Module dependentModule )

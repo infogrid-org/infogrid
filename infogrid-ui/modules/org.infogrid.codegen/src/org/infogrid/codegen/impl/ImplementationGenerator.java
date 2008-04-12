@@ -97,7 +97,7 @@ public class ImplementationGenerator
         outStream.println( "// This file has been generated AUTOMATICALLY. DO NOT MODIFY." );
         outStream.println( "// on " + currentDateTime() );
         outStream.println( "//" );
-        outStream.println( "//" );
+        outStream.println( "// DO NOT MODIFY -- re-generate!" );
         outStream.println( "" );
 
         // package
@@ -220,9 +220,6 @@ public class ImplementationGenerator
                 + getInterfaceSubPackageName()
                 + ".*;");
         outStream.println();
-
-        outStream.println( "import org.infogrid.util.logging.Log;" );
-        outStream.println();
     }
 
     /**
@@ -315,16 +312,19 @@ public class ImplementationGenerator
         outStream.println( "    /**" );
         outStream.println( "      * Initializes the MeshObject to its default values." );
         outStream.println( "      *");
-        outStream.println( "      * @param obj the MeshObject to initialize ");
-        outStream.println( "      * @throws MeshTypeNotFoundException thrown if a MeshType could not be found");
-        outStream.println( "      * @throws NotPermittedException thrown if this caller did not have permission to perform this operation");
-        outStream.println( "      * @throws TransactionException thrown if invoked outside proper transaction boundaries");
+        outStream.println( "      * @param init the TypeInitializer");
+        outStream.println( "      * @param timeUpdated the timeUpdated to use");
+        outStream.println( "      * @throws org.infogrid.mesh.IllegalPropertyTypeException should not be thrown -- codegenerator faulty");
+        outStream.println( "      * @throws org.infogrid.mesh.IllegalPropertyValueException should not be thrown -- codegenerator faulty");
+        outStream.println( "      * @throws org.infogrid.mesh.NotPermittedException should not be thrown -- codegenerator faulty");
+        outStream.println( "      * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty");
         outStream.println( "      */" );
         outStream.println( "    public static void initializeDefaultValues(" );
         outStream.println( "            TypeInitializer init," );
         outStream.println( "            long            timeUpdated )" );
         outStream.println( "        throws" );
-        outStream.println( "            org.infogrid.modelbase.MeshTypeNotFoundException," );
+        outStream.println( "            org.infogrid.mesh.IllegalPropertyTypeException," );
+        outStream.println( "            org.infogrid.mesh.IllegalPropertyValueException," );
         outStream.println( "            org.infogrid.mesh.NotPermittedException," );
         outStream.println( "            org.infogrid.meshbase.transaction.TransactionException" );
         outStream.println( "    {" );
@@ -400,7 +400,7 @@ public class ImplementationGenerator
             outStream.println( "      *" );
             outStream.println( "      * @param newValue the new value for the property" );
             outStream.println( "      * @throws NotPermittedException thrown if this caller did not have permission to perform this operation");
-            outStream.println( "      * @throws TransactionException thrown if invoked outside proper transaction boundaries");
+            outStream.println( "      * @throws org.infogrid.meshbase.transaction.TransactionException thrown if invoked outside proper transaction boundaries");
             if(    ( !thePropertyType.getIsOptional().value())
                 || ( thePropertyType.getDataType().getPerformDomainCheck() ))
             {
@@ -426,7 +426,14 @@ public class ImplementationGenerator
             outStream.println( "        }" );
             outStream.println();
 
-            outStream.println( "        the_Delegate.setPropertyValue( " + propertyTypeName.toUpperCase() + ", newValue );" );
+            outStream.println( "        try {" );
+            outStream.println( "            the_Delegate.setPropertyValue( " + propertyTypeName.toUpperCase() + ", newValue );" );
+            outStream.println();
+            outStream.println( "        } catch( IllegalPropertyValueException ex ) {" );
+            outStream.println( "            log.error( ex );" );
+            outStream.println( "        } catch( IllegalPropertyTypeException ex ) {" );
+            outStream.println( "            log.error( ex );" );
+            outStream.println( "        }" );
             outStream.println( "    }" );
             outStream.println();
         }
@@ -441,7 +448,12 @@ public class ImplementationGenerator
         outStream.println( "        throws" );
         outStream.println( "            org.infogrid.mesh.NotPermittedException" );
         outStream.println( "    {" );
-        outStream.println( "        return (" + propertyTypeType + ") the_Delegate.getPropertyValue( " + propertyTypeName.toUpperCase() + " );" );
+        outStream.println( "        try {" );
+        outStream.println( "            return (" + propertyTypeType + ") the_Delegate.getPropertyValue( " + propertyTypeName.toUpperCase() + " );" );
+        outStream.println( "        } catch( IllegalPropertyTypeException ex ) {" );
+        outStream.println( "            log.error( ex );" );        
+        outStream.println( "            return null;" );
+        outStream.println( "        }" );
         outStream.println( "    }" );
         outStream.println();
 

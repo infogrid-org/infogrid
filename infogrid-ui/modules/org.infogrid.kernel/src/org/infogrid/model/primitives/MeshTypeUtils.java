@@ -14,6 +14,8 @@
 
 package org.infogrid.model.primitives;
 
+import org.infogrid.mesh.MeshObject;
+
 /**
  * Collection of utility methods for MeshTypes.
  */
@@ -31,7 +33,7 @@ public abstract class MeshTypeUtils
      * Construct an array of MeshTypeIdentifiers from an array of MeshTypes.
      *
      * @param types the MeshTypeIdentifiers
-     * @return the MeshObjectIdentifiers of the MeshObjects
+     * @return the MeshTypeIdentifiers of the MeshTypes
      */
     public static MeshTypeIdentifier [] meshTypeIdentifiers(
             MeshType [] types )
@@ -46,4 +48,24 @@ public abstract class MeshTypeUtils
         return ret;
     }
 
+    /**
+     * Construct an array of MeshTypeIdentifiers from the MeshTypes by which
+     * a MeshObject is blessed.
+     *
+     * @param obj the MeshObject
+     * @return the MeshTypeIdentifiers of the MeshTypes of the MeshObject
+     */
+    public static MeshTypeIdentifier [] meshTypeIdentifiers(
+            MeshObject obj )
+    {
+        if( obj == null ) {
+            return null;
+        }
+        MeshType           [] types = obj.getTypes();
+        MeshTypeIdentifier [] ret = new MeshTypeIdentifier[ types.length ];
+        for( int i=0 ; i<ret.length ; ++i ) {
+            ret[i] = types[i].getIdentifier();
+        }
+        return ret;
+    }
 }

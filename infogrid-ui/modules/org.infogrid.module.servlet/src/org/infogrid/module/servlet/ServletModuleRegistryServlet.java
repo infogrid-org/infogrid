@@ -34,6 +34,8 @@ public class ServletModuleRegistryServlet
         extends
             HttpServlet
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -105,6 +107,10 @@ public class ServletModuleRegistryServlet
     
     /**
      * Print a single ModuleAdvertisement.
+     * 
+     * @param adv the ModuleAdvertisement to print
+     * @param w the PrintWriter to print to
+     * @throws IOException thrown if an I/O error occurred
      */
     protected void printOne(
             ModuleAdvertisement adv,

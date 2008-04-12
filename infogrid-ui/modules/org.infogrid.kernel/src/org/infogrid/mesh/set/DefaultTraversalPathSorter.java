@@ -23,6 +23,7 @@ import org.infogrid.util.ArrayHelper;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import org.infogrid.mesh.IllegalPropertyTypeException;
 
 /**
  * This is a default TraversalPathSorter implementation leveraging the Java collections API.
@@ -320,6 +321,9 @@ public class DefaultTraversalPathSorter
                 PropertyValue twoValue = getMeshObjectFrom( two ).getPropertyValue( thePropertyType );
 
                 return PropertyValue.compare( oneValue, twoValue );
+
+            } catch( IllegalPropertyTypeException ex ) {
+                return 0;
 
             } catch( NotPermittedException ex ) {
                 return 0;

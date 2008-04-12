@@ -259,4 +259,44 @@ public class MeshObject_HasAccessTo_ProtectionDomain_DestinationGuard
     {
         // noop, but you can override
     }
+
+    /**
+     * Check whether the given caller is allowed to make one and two members of the same
+     * equivalence set.
+     * 
+     * @param type the RoleType
+     * @param one the first MeshObject
+     * @param two the second MeshObject
+     * @param caller the MeshObject representing the caller
+     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     */
+    public void checkPermittedAddAsEquivalent(
+            RoleType      type,
+            MeshObject    one,
+            MeshObject    two,
+            MeshObject    caller )
+        throws
+            NotPermittedException
+    {
+        // noop, but you can override
+    }
+
+    /**
+     * Check whether the given caller is allowed to remove the MeshObject from its
+     * equivalence set.
+     * 
+     * @param type the RoleType
+     * @param obj the MeshObject
+     * @param caller the MeshObject representing the caller
+     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     */
+    public void checkPermittedRemoveAsEquivalent(
+            RoleType      type,
+            MeshObject    obj,
+            MeshObject    caller )
+        throws
+            NotPermittedException
+    {
+        // noop, but you can override
+    }
 }

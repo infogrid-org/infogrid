@@ -22,6 +22,8 @@ import java.util.Iterator;
  * A component in the CompoundStringifier. This is not quite symmetric: the <code>format</code> argument
  * takes all arguments of the CompoundStringifier (and picks out the ones that apply), while the
  * Iterator only returns this CompoundStringifierComponent's contribution.
+ * 
+ * @param T the type of the Objects to be stringified
  */
 public interface CompoundStringifierComponent<T>
 {

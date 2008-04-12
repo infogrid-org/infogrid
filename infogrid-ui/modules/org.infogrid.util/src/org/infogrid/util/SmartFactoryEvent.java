@@ -18,6 +18,10 @@ import java.util.EventObject;
 
 /**
  * Event sent by SmartFactories. Specific subclasses are defined as inner classes.
+ * 
+ * @param K the type of key
+ * @param V the type of value
+ * @param A the type of argument
  */
 public abstract class SmartFactoryEvent<K,V,A>
         extends
@@ -67,11 +71,17 @@ public abstract class SmartFactoryEvent<K,V,A>
     
     /**
      * This event indicates that a value was added to the values held by the SmartFactory.
+     * 
+     * @param K the type of key
+     * @param V the type of value
+     * @param A the type of argument
      */
     public static class Added<K,V,A>
             extends
                 SmartFactoryEvent<K,V,A>
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -82,8 +92,7 @@ public abstract class SmartFactoryEvent<K,V,A>
         public Added(
                 SmartFactory<K,V,A> factory,
                 K                   key,
-                V                   value,
-                A                   argument )
+                V                   value )
         {
             super( factory, key );
             
@@ -108,11 +117,17 @@ public abstract class SmartFactoryEvent<K,V,A>
     
     /**
      * This event indicates that a value was removed from the values held by the SmartFactory.
+     * 
+     * @param K the type of key
+     * @param V the type of value
+     * @param A the type of argument
      */
     public static class Removed<K,V,A>
             extends
                 SmartFactoryEvent<K,V,A>
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *

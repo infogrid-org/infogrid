@@ -179,6 +179,7 @@ class SqlStoreIterator
      * <p>Obtain the next N elements. If fewer than N elements are available, return
      * as many elements are available in a shorter array.</p>
      * 
+     * @param n the number of elements to obtain
      * @return the next no more than N elements
      * @see #previous(int)
      */
@@ -220,6 +221,7 @@ class SqlStoreIterator
      * returned in the sequence in which the CursorIterator visits them, not in the
      * sequence in which the underlying Iterable stores them.</p>
      *
+     * @param n the number of elements to obtain
      * @return the previous no more than N elements
      * @see #next(int)
      */
@@ -293,7 +295,7 @@ class SqlStoreIterator
      * Move the cursor to this element, i.e. return this element when {@link #next next} is invoked
      * right afterwards.
      *
-     * @param pos the element to move the cursor to
+     * @param key the element to move the cursor to
      * @return the number of steps that were taken to move. Positive number means forward, negative backward
      * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
      */
@@ -318,7 +320,7 @@ class SqlStoreIterator
      * Move the cursor to this element, i.e. return this element when {@link #previous previous} is invoked
      * right afterwards.
      *
-     * @param pos the element to move the cursor to
+     * @param key the element to move the cursor to
      * @return the number of steps that were taken to move. Positive number means forward, negative backward
      * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
      */

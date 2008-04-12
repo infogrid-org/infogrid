@@ -170,11 +170,28 @@ public class ViewletDispatcherServlet
             StructuredResponse oldStructuredResponse = (StructuredResponse) restful.getDelegate().getAttribute( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
             restful.getDelegate().setAttribute( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME, structured );
 
+            boolean isSafePost   = false;
+            boolean isUnsafePost = false;
+            
+            if( "POST".equalsIgnoreCase( restful.getSaneRequest().getMethod() )) {
+                Boolean safeUnsafe = (Boolean) restful.getDelegate().getAttribute( SafeUnsafePostFilter.SAFE_UNSAFE_FLAG );
+                if( safeUnsafe != null && !safeUnsafe.booleanValue() ) {
+                    isUnsafePost = true;
+                } else {
+                    isSafePost = true;
+                }
+            }
             synchronized( viewlet ) {
                 Throwable thrown  = null;
                 try {
                     viewlet.view( toView );
-                    viewlet.performBefore( restful, structured );
+                    if( isSafePost ) {                        
+                        viewlet.performBeforeSafePost( restful, structured );
+                    } else if( isUnsafePost ) {
+                        viewlet.performBeforeUnsafePost( restful, structured );
+                    } else {
+                        viewlet.performBeforeGet( restful, structured );
+                    }
 
                     viewlet.setCurrentRequest( restful );
 

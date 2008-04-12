@@ -17,6 +17,8 @@ package org.infogrid.util;
 /**
  * This interface is supported by those <code>java.lang.Iterable</code>s that return a
  * {@link CursorIterator CursorIterator} instead of just a plain <code>Iterator</code>.
+ * 
+ * @param T the type of element to iterate over
  */
 public interface CursorIterable<T>
         extends

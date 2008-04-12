@@ -30,6 +30,8 @@ import java.util.Iterator;
  *    meant as a more powerful and particularly more extensible replacement. For example, and unlike
  *    <code>java.text.MessageFormat</code>, this framework allows the specification of sub-formatters
  *    for specific arguments; they are not hard-coded as in case of <code>java.text.MessageFormat</code>.</p>
+ * 
+ * @param T the type of the Objects to be stringified
  */
 public interface Stringifier<T>
 {

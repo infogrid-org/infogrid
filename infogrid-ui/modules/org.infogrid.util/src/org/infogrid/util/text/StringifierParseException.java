@@ -21,6 +21,8 @@ public class StringifierParseException
         extends
             StringifierException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

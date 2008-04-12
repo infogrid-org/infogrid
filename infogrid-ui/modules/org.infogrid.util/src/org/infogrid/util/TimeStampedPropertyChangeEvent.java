@@ -23,6 +23,8 @@ import java.beans.PropertyChangeEvent;
 public class TimeStampedPropertyChangeEvent
         extends PropertyChangeEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
       * Constructor.
       *

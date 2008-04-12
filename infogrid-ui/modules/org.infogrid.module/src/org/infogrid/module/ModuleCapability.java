@@ -27,6 +27,8 @@ public class ModuleCapability
         implements
             Serializable
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Factory method.
      *
@@ -221,6 +223,8 @@ public class ModuleCapability
         implements
             Serializable
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Private constructor, use factory method in outer class.
          *

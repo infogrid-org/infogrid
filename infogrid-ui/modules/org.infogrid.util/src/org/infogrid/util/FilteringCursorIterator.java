@@ -21,6 +21,8 @@ import java.util.NoSuchElementException;
  * CursorIterator. The position of the Iterator is assumed to be on the next element
  * to be returned going forward, and one after than the next element to be returned
  * going backwards.
+ * 
+ * @param E the type of element to iterate over
  */
 public class FilteringCursorIterator<E>
         extends

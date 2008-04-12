@@ -23,6 +23,10 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * An abstract communications endpoint for Remote-Procedure-Style communications.
  * Subclasses add marshalling and unmarshalling functionality.
+ * 
+ * @param A the type of the argument of the RPC call
+ * @param R the type of the return value of the RPC call
+ * @param T the message type
  */
 public abstract class RpcClientEndpoint<A,R,T extends CarriesInvocationId>
         extends
@@ -49,6 +53,7 @@ public abstract class RpcClientEndpoint<A,R,T extends CarriesInvocationId>
      * @param arg the argument
      * @return the return value
      * @throws RemoteQueryTimeoutException thrown if the invocation timed out
+     * @throws InvocationTargetException thrown if the invocation produced an Exception
      */
     public R invoke(
             A arg )
@@ -66,6 +71,7 @@ public abstract class RpcClientEndpoint<A,R,T extends CarriesInvocationId>
      * @param timeout the timeout, in milliseconds, until the call times out
      * @return the return value
      * @throws RemoteQueryTimeoutException thrown if the invocation timed out
+     * @throws InvocationTargetException thrown if the invocation produced an Exception
      */
     public R invoke(
             A    arg,

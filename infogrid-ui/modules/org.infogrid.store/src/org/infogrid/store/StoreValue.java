@@ -33,7 +33,7 @@ public class StoreValue
      * @param timeCreated the time at which the data element was created originally
      * @param timeUpdated the time at which the data element was successfully updated the most recent time
      * @param timeRead the time at which the data element was last read by some client
-     * @param timeAutoDeletes the time at which the data element should be deleted
+     * @param timeExpires the time at which the data element expires
      * @param data the data element, expressed as a sequence of bytes
      */
     public StoreValue(

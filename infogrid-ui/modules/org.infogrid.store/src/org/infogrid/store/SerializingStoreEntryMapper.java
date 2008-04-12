@@ -26,6 +26,9 @@ import java.io.ObjectStreamClass;
  * A StoreEntryMapper that uses Java Serialization, and thus can store and retrieve arbitrary
  * Java object graphs in a <code>Store</code>. It uses the key's <code>toString</code> method
  * to construct the String key needed by <code>Store</code>.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public abstract class SerializingStoreEntryMapper<K,V>
         implements

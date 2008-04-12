@@ -15,14 +15,12 @@
 package org.infogrid.mesh.a;
 
 import org.infogrid.mesh.AbstractMeshObject;
-import org.infogrid.mesh.BlessedAlreadyException;
 import org.infogrid.mesh.CannotRelateToItselfException;
 import org.infogrid.mesh.EntityNotBlessedException;
 import org.infogrid.mesh.EquivalentAlreadyException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-import org.infogrid.mesh.NotEquivalentException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.RelatedAlreadyException;
@@ -65,7 +63,7 @@ public class AMeshObject
     /**
      * Constructor for regular instantiation.
      * 
-     * @param identifier the value for the Identifier
+     * @param identifier the MeshObjectIdentifier of the MeshObject
      * @param meshBase the MeshBase that this MeshObject belongs to
      * @param created the time this MeshObject was created
      * @param updated the time this MeshObject was last updated
@@ -74,11 +72,11 @@ public class AMeshObject
      */
     public AMeshObject(
             MeshObjectIdentifier identifier,
-            AMeshBase       meshBase,
-            long            created,
-            long            updated,
-            long            read,
-            long            expires )
+            AMeshBase            meshBase,
+            long                 created,
+            long                 updated,
+            long                 read,
+            long                 expires )
     {
         super( identifier, meshBase, created, updated, read, expires );
     }
@@ -86,7 +84,7 @@ public class AMeshObject
     /**
      * Constructor for re-instantion from external storage.
      * 
-     * @param identifier the value for the Identifier
+     * @param identifier the MeshObjectIdentifier of the MeshObject
      * @param meshBase the MeshBase that this MeshObject belongs to
      * @param created the time this MeshObject was created
      * @param updated the time this MeshObject was last updated
@@ -202,7 +200,7 @@ public class AMeshObject
                 if( otherSides[s] == null ) {
                     continue;
                 }
-                MeshObject [] add = findRelatedMeshObjects( otherSides[s] );
+                MeshObject [] add = findRelatedMeshObjects( theMeshBase, otherSides[s] );
 
                 for( int i=0 ; i<add.length ; ++i ) {
                     if( add[i] == null ) {
@@ -228,18 +226,22 @@ public class AMeshObject
     }
 
     /**
-     * Find MeshObjects known by their Identifiers, in the context of this MeshObject.
-     * This internal helper method may be overridden by subclasses.
+     * Find neighbor MeshObjects of this MeshObject that are known by their
+     * MeshObjectIdentifiers.
+     * We pass in the MeshBase to use because this may be invoked when a MeshObject's member
+     * variable has been zero'd out already.
      *
-     * @param names the Identifiers of the MeshObjects we are looking for
+     * @param mb the MeshBase to use
+     * @param identifiers the MeshObjectIdentifiers of the MeshObjects we are looking for
      * @return the MeshObjects that we found
      */
     protected MeshObject [] findRelatedMeshObjects(
-            MeshObjectIdentifier[] names )
+            MeshBase                mb,
+            MeshObjectIdentifier [] identifiers )
     {
         MeshObject [] ret;
         try {
-            ret = theMeshBase.accessLocally( names );
+            ret = mb.accessLocally( identifiers );
 
         } catch( MeshObjectAccessException ex ) {
             log.error( ex );
@@ -250,16 +252,21 @@ public class AMeshObject
     }
 
     /**
-     * Find a MeshObject known by its Identifier, in the context of this MeshObject.
+     * Find a single neighbor MeshObject of this MeshObject that is known by its
+     * MeshObjectIdentifier.
+     * We pass in the MeshBase to use because this may be invoked when a MeshObject's member
+     * variable has been zero'd out already.
      * This internal helper method may be overridden by subclasses.
      *
-     * @param name the Identifier of the MeshObject we are looking for
+     * @param mb the MeshBase to use
+     * @param identifier the MeshObjectIdentifier of the MeshObject we are looking for
      * @return the MeshObject that we found
      */
     protected MeshObject findRelatedMeshObject(
-            MeshObjectIdentifier name )
+            MeshBase             mb,
+            MeshObjectIdentifier identifier )
     {
-        MeshObject [] ret = findRelatedMeshObjects( new MeshObjectIdentifier[] { name } );
+        MeshObject [] ret = findRelatedMeshObjects( mb, new MeshObjectIdentifier[] { identifier } );
         return ret[0];
     }
 
@@ -269,7 +276,7 @@ public class AMeshObject
      *
      * @return the set of other sides
      */
-    public MeshObjectIdentifier[] getNeighborNames()
+    public MeshObjectIdentifier [] getInternalNeighborList()
     {
         return theOtherSides;
     }
@@ -280,18 +287,20 @@ public class AMeshObject
      *
      * @return the RoleTypes played by the other sides
      */
-    public RoleType [][] getNeighborRoleTypes()
+    public RoleType [][] getInternalNeighborRoleTypes()
     {
         return theRoleTypes;
     }
 
     /**
-     * Relate this MeshObject to another MeshObject.
+     * Relate this MeshObject to another MeshObject. This does not bless the relationship.
      *
      * @param otherObject the MeshObject to relate to
      * @throws RelatedAlreadyException thrown to indicate that this MeshObject is already related
      *         to the otherObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @see #unrelate
+     * @see #relateAndBless
      */
     public void relate(
             MeshObject otherObject )
@@ -408,12 +417,13 @@ public class AMeshObject
     }
 
     /**
-     * Unrelate this MeshObject from another MeshObject.
+     * Unrelate this MeshObject from another MeshObject. This will also remove all blessings from the relationship.
      *
      * @param otherObject the MeshObject to unrelate from
      * @throws NotRelatedException thrown if this MeshObject is not already related to the otherObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @see #relate
      */
     public void unrelate(
             MeshObject otherObject )
@@ -429,6 +439,8 @@ public class AMeshObject
      * Internal helper to unrelate that also works for already-dead MeshObjects.
      *
      * @param otherObject the MeshObject to unrelate from
+     * @param mb the MeshBase that this MeshObject does or used to belong to
+     * @param isMaster true if this is the master replica
      * @throws NotRelatedException thrown if this MeshObject is not already related to the otherObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the operation is not permitted
@@ -511,13 +523,13 @@ public class AMeshObject
                 // check that all other Roles let us
                 for( int i=0 ; i<theOtherSides.length ; ++i ) {
                     if( i != foundHere && theRoleTypes[i] != null ) {
-                        MeshObject realOtherSide = findRelatedMeshObject( theOtherSides[i] );
+                        MeshObject realOtherSide = findRelatedMeshObject( mb, theOtherSides[i] );
                         checkPermittedUnbless( theRoleTypes[foundHere], otherObject, theRoleTypes[i], realOtherSide );
                     }
                 }
                 for( int i=0 ; i<realOtherObject.theOtherSides.length ; ++i ) {
                     if( i != foundOther && realOtherObject.theRoleTypes[i] != null ) {
-                        MeshObject realOtherSide = findRelatedMeshObject( realOtherObject.theOtherSides[i] );
+                        MeshObject realOtherSide = findRelatedMeshObject( mb, realOtherObject.theOtherSides[i] );
                         realOtherObject.checkPermittedUnbless( realOtherObject.theRoleTypes[foundOther], this, realOtherObject.theRoleTypes[i], realOtherSide );
                     }
                 }
@@ -561,6 +573,7 @@ public class AMeshObject
      * Determine whether this MeshObject is related to another MeshObject.
      *
      * @param otherObject the MeshObject to which this MeshObject may be related
+     * @return true if this MeshObject is currently related to otherObject
      */
     public boolean isRelated(
             MeshObject otherObject )
@@ -588,20 +601,27 @@ public class AMeshObject
     }
 
     /**
-     * Make a relationship of this MeshObject to another MeshObject support the provided ByRoleType.
+     * Make a relationship of this MeshObject to another MeshObject support the provided RoleTypes.
+     * As a result, this relationship will support either all RoleTypes or none.
      * 
-     * @param thisEnds the ByRoleType of the RelationshipType that is instantiated at this object
-     * @param otherObject the other MeshObject to relate to
-     * @throws NotBlessedException.ByRoleType thrown if the relationship to the other MeshObject does not support the ByRoleType
+     * @param thisEnds the RoleTypes of the RelationshipTypes that are instantiated at the end that this MeshObject is attached to
+     * @param otherObject the MeshObject whose relationship to this MeshObject shall be blessed
+     * @throws RoleTypeBlessedAlreadyException thrown if the relationship to the other MeshObject is blessed
+     *         already with one ore more of the given RoleTypes
      * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
+     * @throws IsAbstractException thrown if one of the RoleTypes belong to an abstract RelationshipType
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @see #relate
+     * @see #relateAndBless
+     * @see #unrelate
      */
     public void blessRelationship(
             RoleType [] thisEnds,
             MeshObject  otherObject )
         throws
-            BlessedAlreadyException,
+            RoleTypeBlessedAlreadyException,
+            EntityNotBlessedException,
             NotRelatedException,
             IsAbstractException,
             TransactionException,
@@ -611,8 +631,19 @@ public class AMeshObject
     }
     
     /**
-     * Internal helper to implement a method. While on this level, it does not appear that factoring out
-     * this method makes any sense, subclasses may appreciate it.
+     * Internal helper to implement a method. While on this level, it does not appear that
+     * factoring out this method makes any sense, subclasses may appreciate it.
+     * 
+     * @param roleTypesToAddHere the RoleTypes of the RelationshipTypes that are instantiated at the end that this MeshObject is attached to
+     * @param otherObject the MeshObject whose relationship to this MeshObject shall be blessed
+     * @param isMaster if true, this is the master replica
+     * @param forgiving if true, attempt to ignore errors
+     * @throws RoleTypeBlessedAlreadyException thrown if the relationship to the other MeshObject is blessed
+     *         already with one ore more of the given RoleTypes
+     * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
+     * @throws IsAbstractException thrown if one of the RoleTypes belong to an abstract RelationshipType
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     protected void internalBless(
             RoleType [] roleTypesToAddHere,
@@ -620,7 +651,8 @@ public class AMeshObject
             boolean     isMaster,
             boolean     forgiving )
         throws
-            BlessedAlreadyException,
+            RoleTypeBlessedAlreadyException,
+            EntityNotBlessedException,
             NotRelatedException,
             IsAbstractException,
             TransactionException,
@@ -634,7 +666,7 @@ public class AMeshObject
                 throw new IllegalArgumentException( "null RoleType" );
             }
             if( thisEnd.getRelationshipType().getIsAbstract().value() ) {
-                throw new IsAbstractException( thisEnd.getRelationshipType() );
+                throw new IsAbstractException( this, thisEnd.getRelationshipType() );
             }
         }
         
@@ -763,7 +795,7 @@ public class AMeshObject
                 checkPermittedBless( roleTypesToAddHere, otherObject ); // implementation does everything else
                 for( int i=0 ; i<theOtherSides.length ; ++i ) {
                     if( i != foundHere && theRoleTypes[i] != null ) {
-                        MeshObject realOtherSide = findRelatedMeshObject( theOtherSides[i] );
+                        MeshObject realOtherSide = findRelatedMeshObject( theMeshBase, theOtherSides[i] );
                         checkPermittedBless( roleTypesToAddHere, otherObject, theRoleTypes[i], realOtherSide );
                     }
                 }
@@ -807,11 +839,14 @@ public class AMeshObject
     }
 
     /**
-     * Make a relationship of this MeshObject to another MeshObject stop supporting the provided RoleTypes
+     * Make a relationship of this MeshObject to another MeshObject stop supporting the provided RoleType.
      * 
-     * @param thisEnds the ByRoleType of the RelationshipType that is removed at this object
-     * @param otherObject the other MeshObject to relate to
-     * @throws NotBlessedException thrown if the relationship to the other MeshObject does not support the type
+     * @param thisEnds the RoleType of the RelationshipType at the end that this MeshObject is attached to, and that shall be removed
+     * @param otherObject the other MeshObject whose relationship to this MeshObject shall be unblessed
+     * @throws RoleTypeNotBlessedException thrown if the relationship to the other MeshObject does not support the RoleType
+     * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public void unblessRelationship(
             RoleType [] thisEnds,
@@ -826,8 +861,16 @@ public class AMeshObject
     }
     
     /**
-     * Internal helper to implement a method. While on this level, it does not appear that factoring out
-     * this method makes any sense, subclasses may appreciate it.
+     * Internal helper to implement a method. While on this level, it does not appear that
+     * factoring out this method makes any sense, subclasses may appreciate it.
+     * 
+     * @param roleTypesToRemoveHere the RoleType of the RelationshipType at the end that this MeshObject is attached to, and that shall be removed
+     * @param otherObject the other MeshObject whose relationship to this MeshObject shall be unblessed
+     * @param isMaster if true, this is the master replica
+     * @throws RoleTypeNotBlessedException thrown if the relationship to the other MeshObject does not support the RoleType
+     * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     protected void internalUnbless(
             RoleType [] roleTypesToRemoveHere,
@@ -916,13 +959,13 @@ public class AMeshObject
 
                 for( int i=0 ; i<theOtherSides.length ; ++i ) {
                     if( i != foundHere && theRoleTypes[i] != null ) {
-                        MeshObject realOtherSide = findRelatedMeshObject( theOtherSides[i] );
+                        MeshObject realOtherSide = findRelatedMeshObject( theMeshBase, theOtherSides[i] );
                         checkPermittedUnbless( roleTypesToRemoveHere, otherObject, theRoleTypes[i], realOtherSide );
                     }
                 }
                 for( int i=0 ; i<realOtherObject.theOtherSides.length ; ++i ) {
                     if( i != foundThere && realOtherObject.theRoleTypes[i] != null ) {
-                        MeshObject realOtherSide = findRelatedMeshObject( realOtherObject.theOtherSides[i] );
+                        MeshObject realOtherSide = findRelatedMeshObject( theMeshBase, realOtherObject.theOtherSides[i] );
                         realOtherObject.checkPermittedUnbless( roleTypesToRemoveThere, this, realOtherObject.theRoleTypes[i], realOtherSide );
                     }
                 }
@@ -1024,7 +1067,7 @@ public class AMeshObject
         if( max < almost.length ) {
             almost = ArrayHelper.copyIntoNewArray( almost, 0, max, MeshObjectIdentifier.class );
         }
-        MeshObject [] almostRet = findRelatedMeshObjects( almost );
+        MeshObject [] almostRet = findRelatedMeshObjects( theMeshBase, almost );
         MeshObject [] ret       = new MeshObject[ almostRet.length ];
 
         int index = 0;
@@ -1047,9 +1090,8 @@ public class AMeshObject
 
     /**
      * Obtain the RoleTypes that this MeshObject currently participates in. This will return only one
-     * instance of the same ByRoleType object, even if the MeshObject participates in this ByRoleType
-     * multiple times with different other sides. This may only return the subset of RoleTypes
-     * that the caller is allowed to see. Specify whether relationships of equivalent MeshObjects
+     * instance of the same RoleType object, even if the MeshObject participates in this RoleType
+     * multiple times with different other MeshObjects. Specify whether equivalent MeshObjects
      * should be considered as well.
      * 
      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
@@ -1090,7 +1132,7 @@ public class AMeshObject
             if( otherSides[s] == null ) {
                 continue;
             }
-            MeshObject [] realOtherSides = findRelatedMeshObjects( otherSides[s] );
+            MeshObject [] realOtherSides = findRelatedMeshObjects( theMeshBase, otherSides[s] );
 
             if( roleTypes[s] != null ) {
                 for( int i=0 ; i<roleTypes[s].length ; ++i ) {
@@ -1119,14 +1161,17 @@ public class AMeshObject
     }
 
     /**
-     * Obtain the RoleTypes that this MeshObject plays with a given neighbor MeshObject identified
-     * by its Identifier.
+     * Obtain the MeshTypeIdentifiers of the RoleTypes that this MeshObject plays with a
+     * given neighbor MeshObject identified by its MeshObjectIdentifier.
      * 
-     * @param neighborIdentifier the Identifier of the neighbor MeshObject
+     * @param neighborIdentifier the MeshObjectIdentifier of the neighbor MeshObject
      * @return the RoleTypes
+     * @throws NotRelatedException thrown if the specified MeshObject is not actually a neighbor
      */
     public synchronized MeshTypeIdentifier [] getRoleTypeIdentifiers(
             MeshObjectIdentifier neighborIdentifier )
+        throws
+            NotRelatedException
     {
         if( theOtherSides != null ) {
             for( int i=0 ; i<theOtherSides.length ; ++i ) {
@@ -1143,15 +1188,15 @@ public class AMeshObject
                 }
             }
         }
-        return new MeshTypeIdentifier[0];
+        throw new NotRelatedException( theMeshBase, theMeshBase.getIdentifier(), this, theIdentifier, null, neighborIdentifier );
     }
     
     /**
-     * Obtain the Roles that this MeshObject currently participates in. This may only return the subset
-     * of Roles that the caller is allowed to see. Specify whether relationships of equivalent MeshObjects
+     * Obtain the Roles that this MeshObject currently participates in.
+     * Specify whether relationships of equivalent MeshObjects
      * should be considered as well.
      *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
+     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
      *        if false, only this MeshObject will be used as the start
      * @return the Roles that this MeshObject currently participates in.
      */
@@ -1191,7 +1236,7 @@ public class AMeshObject
 
         for( int s=0 ; s<starts.length ; ++s ) {
             if( otherSides[s] != null ) {
-                MeshObject [] realOtherSides = findRelatedMeshObjects( otherSides[s] );
+                MeshObject [] realOtherSides = findRelatedMeshObjects( theMeshBase, otherSides[s] );
 
                 for( int i=0 ; i<roleTypes[s].length ; ++i ) {
                     if( roleTypes[s][i] != null ) {
@@ -1266,7 +1311,7 @@ public class AMeshObject
             }
             AMeshObject current = (AMeshObject) starts[s];
 
-            MeshObject [] realOtherSides = findRelatedMeshObjects( otherSides[s] );
+            MeshObject [] realOtherSides = findRelatedMeshObjects( mb, otherSides[s] );
         
             for( int i=0 ; i<roleTypes[s].length ; ++i ) {
                 if( roleTypes[s][i] != null ) {
@@ -1282,14 +1327,15 @@ public class AMeshObject
 
     /**
      * Obtain the RoleTypes that this MeshObject currently participates in with the
-     * specified other MeshObject. This may only return the subset of RoleTypes that the caller
-     * is allowed to see. Specify whether relationships of equivalent MeshObjects should be considered
+     * specified other MeshObject.
+     * Specify whether relationships of equivalent MeshObjects should be considered
      * as well.
      *
      * @param otherObject the other MeshObject
      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
      *        if false, only this MeshObject will be used as the start
      * @return the RoleTypes that this MeshObject currently participates in.
+     * @throws NotRelatedException thrown if this MeshObject and otherObject are not related
      */
     public RoleType [] getRoleTypes(
             MeshObject otherObject,
@@ -1374,8 +1420,9 @@ public class AMeshObject
      * added MeshObject, are now equivalent.
      *
      * @param equiv the new equivalent
+     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public void addAsEquivalent(
             MeshObject equiv )
@@ -1388,8 +1435,14 @@ public class AMeshObject
     }
 
     /**
-     * Internal helper to implement a method. While on this level, it does not appear that factoring out
-     * this method makes any sense, subclasses may appreciate it.
+     * Internal helper to implement a method. While on this level, it does not appear that
+     * factoring out this method makes any sense, subclasses may appreciate it.
+     * 
+     * @param equiv the new equivalent
+     * @param isMaster is true, this is the master replica
+     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     protected synchronized void internalAddAsEquivalent(
             MeshObject equiv,
@@ -1428,6 +1481,8 @@ public class AMeshObject
             }
         }
         
+        checkPermittedAddAsEquivalent( equiv );
+
         // now insert, being mindful that we might be joining to chains here
         
         AMeshObject leftMostHere = this;
@@ -1500,63 +1555,38 @@ public class AMeshObject
     }
     
     /**
-     * Remove this MeshObject as an equivalent from the set of equivalents.
-     * This works even if the MeshObject is dead already.
+     * Remove this MeshObject as an equivalent from the set of equivalents. If this MeshObject
+     * is not currently equivalent to any other MeshObject, this does nothing.
      *
-     * @param remainingEquivalentSetRepresentative one of the MeshObjects that remain in the set of equivalents
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
-    public void removeAsEquivalent(
-            MeshObject remainingEquivalentSetRepresentative )
+    public void removeAsEquivalent()
         throws
-            NotEquivalentException,
             TransactionException,
             NotPermittedException
     {
-        internalRemoveAsEquivalent( remainingEquivalentSetRepresentative, true );
+        internalRemoveAsEquivalent( true );
     }
     
     /**
-     * Internal helper to implement a method. While on this level, it does not appear that factoring out
-     * this method makes any sense, subclasses may appreciate it.
+     * Internal helper to implement a method. While on this level, it does not appear that
+     * factoring out this method makes any sense, subclasses may appreciate it.
+     * 
+     * @param isMaster if true, this is the master replica
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     protected void internalRemoveAsEquivalent(
-            MeshObject remainingEquivalentSetRepresentative,
             boolean    isMaster )
         throws
-            NotEquivalentException,
             TransactionException,
             NotPermittedException
     {
         checkAlive();
-        remainingEquivalentSetRepresentative.checkAlive();
-
-        if( theMeshBase != remainingEquivalentSetRepresentative.getMeshBase() ) {
-            throw new IllegalArgumentException( "Cannot unrelate MeshObjects held in different MeshBases" );
-        }
-
-        // first check
-        boolean found = false;
-        AMeshObject temp = this;
-        while( ( temp = temp.getLeftEquivalentObject( theMeshBase ) ) != null ) {
-            if( temp == remainingEquivalentSetRepresentative ) {
-                found = true;
-                break;
-            }
-        }
-        if( !found ) {
-            temp = this;
-            while( ( temp = temp.getRightEquivalentObject( theMeshBase ) ) != null ) {
-                if( temp == remainingEquivalentSetRepresentative ) {
-                    found = true;
-                    break;
-                }
-            }
-        }
-        if( !found ) {
-            throw new NotEquivalentException( this, remainingEquivalentSetRepresentative );
-        }
+        checkTransaction();
+        
+        checkPermittedRemoveAsEquivalent();
         
         AMeshObject theLeft  = getLeftEquivalentObject( theMeshBase );
         AMeshObject theRight = getRightEquivalentObject( theMeshBase );
@@ -1577,10 +1607,10 @@ public class AMeshObject
      * For clients that know we are an AMeshObject, we can also return our internal representation.
      * Please do not modify the content of this array, bad things may happen.
      *
-     * @return the Identifier of the left and right equivalent MeshObject. Either may be null. The
-     * return value may be null, too.
+     * @return the MeshObjectIdentifiers of the left and right equivalent MeshObject. Either may be null. The
+     *         return value may be null, too.
      */
-    public MeshObjectIdentifier[] getLeftRightEquivalentNames()
+    public MeshObjectIdentifier[] getInternalEquivalentList()
     {
         return theEquivalenceSetPointers;
     }
@@ -1588,6 +1618,9 @@ public class AMeshObject
     /**
      * Delete this MeshObject. This must only be invoked by our MeshObjectLifecycleManager
      * and thus is defined down here, not higher up in the inheritance hierarchy.
+     * 
+     * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public void delete()
         throws
@@ -1598,8 +1631,12 @@ public class AMeshObject
     }
     
     /**
-     * Internal helper to implement a method. While on this level, it does not appear that factoring out
-     * this method makes any sense, subclasses may appreciate it.
+     * Internal helper to implement a method. While on this level, it does not appear that
+     * factoring out this method makes any sense, subclasses may appreciate it.
+     * 
+     * @param isMaster true if this is the master replica
+     * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     protected void internalDelete(
             boolean isMaster )
@@ -1616,17 +1653,22 @@ public class AMeshObject
         AMeshObject theLeft  = getLeftEquivalentObject( oldMeshBase );
         AMeshObject theRight = getRightEquivalentObject( oldMeshBase );
         if( theLeft != null ) {
-            try {
-                removeAsEquivalent( theLeft );
-            } catch( NotEquivalentException ex ) {
-                // noop
+            if( theRight != null ) {
+                // we are in the middle
+                theLeft.theEquivalenceSetPointers[1]  = theRight.theIdentifier;
+                theRight.theEquivalenceSetPointers[0] = theLeft.theIdentifier;
+            } else {
+                if( theLeft.theEquivalenceSetPointers[0] == null ) {
+                    theLeft.theEquivalenceSetPointers = null; // don't need them any more
+                } else {
+                    theLeft.theEquivalenceSetPointers[1] = null;
+                }
             }
-        }
-        if( theRight != null ) {
-            try {
-                removeAsEquivalent( theRight );
-            } catch( NotEquivalentException ex ) {
-                // noop
+        } else if( theRight != null ) {
+            if( theRight.theEquivalenceSetPointers[1] == null ) {
+                theRight.theEquivalenceSetPointers = null; // don't need them any more
+            } else {
+                theRight.theEquivalenceSetPointers[0] = null;
             }
         }
 
@@ -1660,8 +1702,8 @@ public class AMeshObject
 
     /**
      * Internal helper to obtain the left equivalent MeshObject, if any.
-     * We pass in the MeshBase to use because this may be invoked when a MeshObject's member variable
-     * has been zero'd out already.
+     * We pass in the MeshBase to use because this may be invoked when a MeshObject's member
+     * variable has been zero'd out already.
      *
      * @param mb the MeshBase to use
      * @return the left equivalent MeshObject, if any
@@ -1675,14 +1717,14 @@ public class AMeshObject
         if( theEquivalenceSetPointers[0] == null ) {
             return null;
         }
-        MeshObject ret = findRelatedMeshObject( theEquivalenceSetPointers[0] );
+        MeshObject ret = findRelatedMeshObject( mb, theEquivalenceSetPointers[0] );
         return (AMeshObject) ret;
     }
 
     /**
      * Internal helper to obtain the right equivalent MeshObject, if any.
-     * We pass in the MeshBase to use because this may be invoked when a MeshObject's member variable
-     * has been zero'd out already.
+     * We pass in the MeshBase to use because this may be invoked when a MeshObject's member
+     * variable has been zero'd out already.
      *
      * @param mb the MeshBase to use
      * @return the left equivalent MeshObject, if any
@@ -1696,14 +1738,14 @@ public class AMeshObject
         if( theEquivalenceSetPointers[1] == null ) {
             return null;
         }
-        MeshObject ret = findRelatedMeshObject( theEquivalenceSetPointers[1] );
+        MeshObject ret = findRelatedMeshObject( mb, theEquivalenceSetPointers[1] );
         return (AMeshObject) ret;
     }
 
     /**
-     * Obtain the same MeshObject as SimpleExternalizedMeshObject so it can be easily serialized.
+     * Obtain the same MeshObject as ExternalizedMeshObject so it can be easily serialized.
      * 
-     * @return this MeshObject as ESimpleExternalizedMeshObject
+     * @return this MeshObject as ExternalizedMeshObject
      */
     public SimpleExternalizedMeshObject asExternalized()
     {
@@ -1790,8 +1832,11 @@ public class AMeshObject
     }
 
     /**
-     * Obtain a StringRepresentation of this MeshObject that can be shown to the user.
+     * Obtain a String representation of this MeshObject that can be shown to the user.
      * 
+     * @param rep the StringRepresentation to use
+     * @param contextPath the context path
+     * @param isDefaultMeshBase true if the enclosing MeshBase is the default MeshBase
      * @return String representation
      */
     public String toStringRepresentation(
@@ -1828,9 +1873,12 @@ public class AMeshObject
     }
 
     /**
-     * Obtain the start part of a StringRepresentation of this MeshObject that acts
+     * Obtain the start part of a String representation of this MeshObject that acts
      * as a link/hyperlink and can be shown to the user.
      * 
+     * @param rep the StringRepresentation to use
+     * @param contextPath the context path
+     * @param isDefaultMeshBase true if the enclosing MeshBase is the default MeshBase
      * @return String representation
      */
     public String toStringRepresentationLinkStart(
@@ -1867,9 +1915,12 @@ public class AMeshObject
     }
 
     /**
-     * Obtain the end part of a StringRepresentation of this MeshObject that acts
+     * Obtain the end part of a String representation of this MeshObject that acts
      * as a link/hyperlink and can be shown to the user.
      * 
+     * @param rep the StringRepresentation to use
+     * @param contextPath the context path
+     * @param isDefaultMeshBase true if the enclosing MeshBase is the default MeshBase
      * @return String representation
      */
     public String toStringRepresentationLinkEnd(
@@ -1907,7 +1958,7 @@ public class AMeshObject
     
     /**
      * The set of MeshObjecs to which this MeshObject is directly related. This is
-     * expressed as a set of Identifiers in order to not prevent garbage collection.
+     * expressed as a set of MeshObjectIdentifiers in order to not prevent garbage collection.
      */
     protected MeshObjectIdentifier [] theOtherSides;
 
