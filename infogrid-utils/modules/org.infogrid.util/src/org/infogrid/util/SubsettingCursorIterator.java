@@ -18,6 +18,8 @@ import java.util.NoSuchElementException;
 
 /**
  * A {@link CursorIterator} that iterates over a subset of another <code>CursorIterator</code>.
+ * 
+ * @param E the type of element to iterate over
  */
 public class SubsettingCursorIterator<E>
         extends

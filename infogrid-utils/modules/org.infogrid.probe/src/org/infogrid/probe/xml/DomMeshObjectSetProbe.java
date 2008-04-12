@@ -68,6 +68,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.NotRelatedException;
 
 /**
  * The NetMesh Xml Probe.
@@ -401,43 +407,53 @@ public class DomMeshObjectSetProbe
 
             for( ExternalizedMeshObject currentObject : theBufferedObjects ) {
 
-                MeshObject            realCurrentObject;
-                NetMeshBaseIdentifier proxy             = currentObject.getProxyTowardsHome();
-                String                currentIdentifier = currentObject.getIdentifier();
-                
-//                if(    currentObject.getIdentifier().getLocalId() == null
-//                    && currentObject.getIdentifier().getPrefix()  == null
-//                    && proxy == null )
-                
-                if( currentIdentifier.indexOf( '#' ) < 0 && proxy == null ) {
-                    realCurrentObject = mb.getHomeObject();
-                    
-                    realCurrentObject.bless( lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ));
+                try {
+                    MeshObject            realCurrentObject;
+                    NetMeshBaseIdentifier proxy             = currentObject.getProxyTowardsHome();
+                    String                currentIdentifier = currentObject.getIdentifier();
 
-                } else if( proxy == null ) {
-                    realCurrentObject = life.createMeshObject(
-                            constructIdentifier( theNetworkIdentifier, null, currentObject.getIdentifier()),
-                            lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ),
-                            currentObject.getTimeCreated(),
-                            currentObject.getTimeUpdated(),
-                            currentObject.getTimeRead(),
-                            currentObject.getTimeAutoDeletes());
+    //                if(    currentObject.getIdentifier().getLocalId() == null
+    //                    && currentObject.getIdentifier().getPrefix()  == null
+    //                    && proxy == null )
 
-                } else {
-                    // ForwardReference
-                    
-                    NetMeshObjectIdentifier fwdRefName = constructIdentifier( theNetworkIdentifier, proxy, currentObject.getIdentifier() );
-                            
-                    realCurrentObject = life.createForwardReference(
-                            proxy,
-                            fwdRefName,
-                            lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ));
-                }
+                    if( currentIdentifier.indexOf( '#' ) < 0 && proxy == null ) {
+                        realCurrentObject = mb.getHomeObject();
 
-                for( int i=currentObject.thePropertyTypes.size()-1 ; i>=0 ; --i ) {
-                    PropertyType  type  = lookupPropertyType( currentObject.thePropertyTypes.get( i ), theModelBase );
-                    PropertyValue value = currentObject.thePropertyValues.get( i );
-                    realCurrentObject.setPropertyValue( type, value );
+                        realCurrentObject.bless( lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ));
+
+                    } else if( proxy == null ) {
+                        realCurrentObject = life.createMeshObject(
+                                constructIdentifier( theNetworkIdentifier, null, currentObject.getIdentifier()),
+                                lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ),
+                                currentObject.getTimeCreated(),
+                                currentObject.getTimeUpdated(),
+                                currentObject.getTimeRead(),
+                                currentObject.getTimeAutoDeletes());
+
+                    } else {
+                        // ForwardReference
+
+                        NetMeshObjectIdentifier fwdRefName = constructIdentifier( theNetworkIdentifier, proxy, currentObject.getIdentifier() );
+
+                        realCurrentObject = life.createForwardReference(
+                                proxy,
+                                fwdRefName,
+                                lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ));
+                    }
+
+                    for( int i=currentObject.thePropertyTypes.size()-1 ; i>=0 ; --i ) {
+                        PropertyType  type  = lookupPropertyType( currentObject.thePropertyTypes.get( i ), theModelBase );
+                        PropertyValue value = currentObject.thePropertyValues.get( i );
+                        realCurrentObject.setPropertyValue( type, value );
+                    }
+                } catch( IsAbstractException ex ) {
+                    log.error( ex );
+                } catch( EntityBlessedAlreadyException ex ) {
+                    log.error( ex );
+                } catch( IllegalPropertyTypeException ex ) {
+                    log.error( ex );
+                } catch( IllegalPropertyValueException ex ) {
+                    log.error( ex );
                 }
             }
 
@@ -463,6 +479,12 @@ public class DomMeshObjectSetProbe
                         realCurrentObject.blessRelationship( lookupRoleTypes( currentRelationship.theRoleTypes, theModelBase ), otherSide );
                     } catch( BlessedAlreadyException ex ) {
                         // this must be the other side of what we related already
+                    } catch( EntityNotBlessedException ex ) {
+                        log.error( ex );
+                    } catch( NotRelatedException ex ) {
+                        log.error( ex );
+                    } catch( IsAbstractException ex ) {
+                        log.error( ex );
                     }
                 }
             }

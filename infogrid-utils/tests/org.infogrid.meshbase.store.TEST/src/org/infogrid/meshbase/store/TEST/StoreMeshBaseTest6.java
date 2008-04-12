@@ -165,10 +165,11 @@ public class StoreMeshBaseTest6
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception anything can go wrong in a test
+     */
     public StoreMeshBaseTest6(
             String [] args )
         throws
@@ -243,6 +244,20 @@ public class StoreMeshBaseTest6
     {
         /**
          * Constructor.
+         * 
+         * @param identifier the identifier
+         * @param tBlob the BlobValue
+         * @param tBoolean the BooleanValue
+         * @param tColor the ColorValue
+         * @param tEnumerated the EnumeratedValue
+         * @param tExtent the ExtentValue
+         * @param tFloat the FloatValue
+         * @param tInteger the IntegerValue
+         * @param tMultiplicity the MultiplicityValue
+         * @param tPoint the PointValue
+         * @param tString the StringValue
+         * @param tTimePeriod the TimePeriodValue
+         * @param tTimeStamp the TimeStampValue
          */
         public DataSet(
                 String            identifier,

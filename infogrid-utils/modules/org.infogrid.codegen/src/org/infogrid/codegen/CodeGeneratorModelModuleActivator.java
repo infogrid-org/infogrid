@@ -65,7 +65,8 @@ public class CodeGeneratorModelModuleActivator
      *
      * @param name the name of the ModelModule
      * @param version the version of the ModelModule
-     * @param moduleDirectory the ModuleDirectory
+     * @param moduleDirectories the list of ModuleDirectories
+     * @return the created InputStream
      * @throws IOException thrown if an I/O problem occurred
      */
     static InputStream createStreamFor(

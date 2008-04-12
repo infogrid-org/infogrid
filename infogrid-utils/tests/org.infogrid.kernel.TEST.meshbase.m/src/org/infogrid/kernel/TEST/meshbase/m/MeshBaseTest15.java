@@ -14,7 +14,7 @@
 
 package org.infogrid.kernel.TEST.meshbase.m;
 
-import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
@@ -56,7 +56,7 @@ public class MeshBaseTest15
         tx.commitTransaction();
         
         PropertyType [] types = obj.getAllPropertyTypes();
-        checkEquals( types.length, 3, "Wrong number of Properties" );
+        checkEquals( types.length, 4, "Wrong number of Properties" );
         
         //
         
@@ -80,7 +80,7 @@ public class MeshBaseTest15
                 
                 reportError( "Accessed non-existing property successfully: " + current + " -> " + value );
 
-            } catch( EntityNotBlessedException ex ) {
+            } catch( IllegalPropertyTypeException ex ) {
                 log.debug( "Correctly received exception", ex );
             }
         }

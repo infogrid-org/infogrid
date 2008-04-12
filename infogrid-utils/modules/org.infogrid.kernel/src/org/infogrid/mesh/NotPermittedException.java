@@ -14,7 +14,9 @@
 
 package org.infogrid.mesh;
 
-import org.infogrid.util.AbstractLocalizedException;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.meshbase.MeshObjectAccessException;
 
 /**
  * <p>This exception is thrown if an operation is attempted on a MeshObject
@@ -23,40 +25,96 @@ import org.infogrid.util.AbstractLocalizedException;
  */
 public abstract class NotPermittedException
         extends
-            AbstractLocalizedException
+            AbstractMeshException
 {
     /**
      * Constructor.
      *
-     * @param obj the MeshObject whose attempted modification triggered this Exception
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param identifier the MeshObjectIdentifier for the MeshObject on which the illegal operation was attempted
      */
     protected NotPermittedException(
-            MeshObject obj )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           obj,
+            MeshObjectIdentifier identifier )
     {
-        theMeshObject = obj;
+        super( mb, originatingMeshBaseIdentifier );
+
+        theMeshObject           = obj;
+        theMeshObjectIdentifier = identifier;
     }
     
     /**
      * Constructor.
      *
-     * @param obj the MeshObject whose attempted modification triggered this Exception
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param identifier the MeshObjectIdentifier for the MeshObject on which the illegal operation was attempted
+     * @param cause the underlying cause
      */
     protected NotPermittedException(
-            MeshObject obj,
-            Throwable  cause )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           obj,
+            MeshObjectIdentifier identifier,
+            Throwable            cause )
     {
-        super( cause );
+        super( mb, originatingMeshBaseIdentifier, cause );
         
-        theMeshObject = obj;
+        theMeshObject           = obj;
+        theMeshObjectIdentifier = identifier;
     }
     
     /**
-     * Obtain the MeshObject whose attemped modification triggered this Exception.
+     * More convenient simple constructor for the most common case.
      *
-     * @return the MeshObject
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
      */
-    public final MeshObject getMeshObject()
+    protected NotPermittedException(
+            MeshObject           obj )
     {
+        this(   obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                obj.getIdentifier() );
+    }
+    
+    /**
+     * More convenient simple constructor for the most common case.
+     *
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param cause the underlying cause
+     */
+    protected NotPermittedException(
+            MeshObject           obj,
+            Throwable            cause )
+    {
+        this(   obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                obj.getIdentifier(),
+                cause );
+    }
+    
+    /**
+     * Obtain the MeshObject on which the illegal operation was attempted.
+     * 
+     * @return the MeshObject
+     * @throws MeshObjectAccessException thrown if something went wrong accessing the MeshObject
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     */
+    public synchronized MeshObject getMeshObject()
+        throws
+            MeshObjectAccessException,
+            IllegalStateException
+    {
+        if( theMeshObject == null ) {
+            theMeshObject = resolve( theMeshObjectIdentifier );
+        }
         return theMeshObject;
     }
 
@@ -67,11 +125,16 @@ public abstract class NotPermittedException
      */
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theMeshObject };
+        return new Object[] { theMeshObjectIdentifier };
     }
 
     /**
-     * The MeshObject whose attempted modification triggered this Exception.
+     * The MeshObject on which the illegal operation was attempted.
      */
     protected transient MeshObject theMeshObject;
+    
+    /**
+     * The MeshObjectIdentifier of the MeshObject on which the illegal operation was attempted.
+     */
+    protected MeshObjectIdentifier theMeshObjectIdentifier;
 }

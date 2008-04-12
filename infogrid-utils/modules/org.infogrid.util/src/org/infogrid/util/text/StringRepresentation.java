@@ -35,6 +35,7 @@ public class StringRepresentation
      * Smart factory method, using the default StringifierMap.
      *
      * @param tagName the tag name.
+     * @return the created StringRepresentation
      */
     public static synchronized StringRepresentation create(
             String tagName )
@@ -47,6 +48,7 @@ public class StringRepresentation
      *
      * @param tagName the tag name.
      * @param map the StringifierMap to use
+     * @return the created StringRepresentation
      */
     public static synchronized StringRepresentation create(
             String                                    tagName,
@@ -69,6 +71,7 @@ public class StringRepresentation
      * Constructor.
      *
      * @param prefix name of the prefix in the resource file.
+     * @param map the map of Stringifiers
      */
     protected StringRepresentation(
             String                                    prefix,
@@ -113,6 +116,7 @@ public class StringRepresentation
      * @param rh the ResourceHelper to use
      * @param entry the entry in the ResourceHelper (but qualified by the prefix of this StringRepresentation)
      * @param args the arguments for the entry in the ResourceHelper
+     * @return the formatted String
      */
     public String formatEntry(
             ResourceHelper rh,
@@ -139,7 +143,7 @@ public class StringRepresentation
      * @param entry the entry (prefixed by thePrefix) of the resource
      * @param s the to-be-parsed String
      * @return the found values
-     * @throws ParseException thrown if the String could not be parsed.
+     * @throws StringifierException thrown if the String could not be parsed.
      */
     public Object [] parseEntry(
             ResourceHelper rh,

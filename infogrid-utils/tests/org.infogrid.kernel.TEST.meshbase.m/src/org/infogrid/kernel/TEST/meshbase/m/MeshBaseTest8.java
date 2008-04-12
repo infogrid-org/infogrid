@@ -162,7 +162,7 @@ public class MeshBaseTest8
         
         tx = theMeshBase.createTransactionNow();
 
-        obj13.removeAsEquivalent( obj22 );
+        obj13.removeAsEquivalent(); // obj22 );
         
         tx.commitTransaction();
         
@@ -187,7 +187,7 @@ public class MeshBaseTest8
         
         tx = theMeshBase.createTransactionNow();
 
-        obj11.removeAsEquivalent( obj22 );
+        obj11.removeAsEquivalent(); //  obj22 );
         
         tx.commitTransaction();
         
@@ -211,7 +211,7 @@ public class MeshBaseTest8
         
         tx = theMeshBase.createTransactionNow();
 
-        obj23.removeAsEquivalent( obj22 );
+        obj23.removeAsEquivalent(); //  obj22 );
         
         tx.commitTransaction();
         
@@ -283,10 +283,11 @@ public class MeshBaseTest8
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception anything may go wrong in a test
+     */
     public MeshBaseTest8(
             String [] args )
         throws

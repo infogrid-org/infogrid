@@ -36,6 +36,7 @@ public interface ExternalizedMeshObjectEncoder
      * @param obj the input ExternalizedMeshObject
      * @param out the OutputStream to which to append the ExternalizedMeshObject
      * @throws EncodingException thrown if a problem occurred during encoding
+     * @throws IOException thrown if a problem occurred during writing the output
      */
     public void encodeExternalizedMeshObject(
             ExternalizedMeshObject obj,
@@ -48,9 +49,12 @@ public interface ExternalizedMeshObjectEncoder
      * Deserialize an ExternalizedMeshObject from a byte stream.
      *
      * @param s the InputStream from which to read
-     * @param life the MeshBaseLifecycleManager appropriate to create an appropriate ExternalizedMeshObject
-     * @return return the just-instantiated AMeshObject, as convenience
+     * @param externalizedMeshObjectFactory the factory for ParserFriendlyExternalizedMeshObjects
+     * @param meshObjectIdentifierFactory the factory for MeshObjectIdentifiers
+     * @param meshTypeIdentifierFactory the factory for MeshTypeIdentifiers
+     * @return return the just-instantiated ExternalizedMeshObject
      * @throws DecodingException thrown if a problem occurred during decoding
+     * @throws IOException thrown if a problem occurred during writing the output
      */
     public ExternalizedMeshObject decodeExternalizedMeshObject(
             InputStream                                 s,

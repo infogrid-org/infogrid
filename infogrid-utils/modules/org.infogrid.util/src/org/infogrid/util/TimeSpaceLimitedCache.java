@@ -18,6 +18,9 @@ import java.util.*;
 
 /**
  * A cache with a limited size, and a maximum age for elements.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public class TimeSpaceLimitedCache<K,V>
     implements
@@ -308,6 +311,9 @@ public class TimeSpaceLimitedCache<K,V>
     /**
      * Our entry contains the object to be stored as well as a time stamp
      * when this entry was last accessed.
+     * 
+     * @param K the type of key
+     * @param V the type of value
      */
     protected static class CacheEntry<K,V>
     {
@@ -323,8 +329,8 @@ public class TimeSpaceLimitedCache<K,V>
                 V    value,
                 long expiration )
         {
-            theKey   = key;
-            theValue = value;
+            theKey        = key;
+            theValue      = value;
             theExpiration = expiration;
         }
 
@@ -426,6 +432,9 @@ public class TimeSpaceLimitedCache<K,V>
     /**
      * Iterator that knows how to iterate over the values, given an iterator over a set
      * of CacheEntry.
+     * 
+     * @param K the type of key
+     * @param V the type of value
      */
     static class ValueIterator<K,V>
             implements

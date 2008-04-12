@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import org.infogrid.jee.servlet.SafeUnsafePostFilter;
 
 /**
  * <p>Recognizes <code>MeshObject</code> change-related requests as part of the incoming HTTP
@@ -156,12 +157,24 @@ public class HttpShellFilter
             return;
         }
 
-        HttpShellVerb v = HttpShellVerb.findApplicableVerb( lidRequest );
-        if( v == null ) {
-            return;
+        boolean isSafePost;
+        Boolean safeUnsafe = (Boolean) lidRequest.getDelegate().getAttribute( SafeUnsafePostFilter.SAFE_UNSAFE_FLAG );
+        if( safeUnsafe != null && !safeUnsafe.booleanValue() ) {
+            isSafePost = false;
+        } else {
+            isSafePost = true;
         }
-        
-        v.performVerb( lidRequest );
+
+        if( isSafePost ) {
+            HttpShellVerb v = HttpShellVerb.findApplicableVerb( lidRequest );
+            if( v == null ) {
+                return;
+            }
+            v.performVerb( lidRequest );
+
+        } else {
+            log.warn( "Ignoring unsafe POST " + lidRequest );
+        }
     }
 
     /**

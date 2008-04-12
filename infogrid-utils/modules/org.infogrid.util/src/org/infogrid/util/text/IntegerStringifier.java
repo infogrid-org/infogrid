@@ -154,6 +154,7 @@ public class IntegerStringifier
                  *
                  * @return the next element
                  */
+                @SuppressWarnings( "fallthrough" )
                 public StringifierParsingChoice<Integer> next()
                 {
                     char c = rawString.charAt( currentEnd++ );

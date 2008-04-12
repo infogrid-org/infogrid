@@ -53,6 +53,8 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.jee.security.FormTokenService;
+import org.infogrid.jee.security.StoreFormTokenService;
 import org.infogrid.jee.viewlet.templates.DefaultStructuredResponseTemplateFactory;
 import org.infogrid.meshbase.net.NetMeshBase;
 
@@ -149,11 +151,13 @@ public class NetMeshWorldApp
         SqlStore proxyStore       = SqlStore.create( theDataSource, theResourceHelper.getResourceString( "ProxyStoreTable" ));
         SqlStore shadowStore      = SqlStore.create( theDataSource, theResourceHelper.getResourceString( "ShadowTable" ) );
         SqlStore shadowProxyStore = SqlStore.create( theDataSource, theResourceHelper.getResourceString( "ShadowProxyTable" ));
+        SqlStore formTokenStore   = SqlStore.create( theDataSource, theResourceHelper.getResourceString( "FormTokenTable" ) );
 
         meshStore.initializeIfNecessary();
         proxyStore.initializeIfNecessary();
         shadowStore.initializeIfNecessary();
         shadowProxyStore.initializeIfNecessary();
+        formTokenStore.initializeIfNecessary();
 
         // NetMeshBaseIdentifier
         NetMeshBaseIdentifier mbId = NetMeshBaseIdentifier.create( defaultMeshBaseIdentifier );
@@ -178,9 +182,12 @@ public class NetMeshWorldApp
                 theResourceHelper.getResourceLongOrDefault( "TimeShadowNotNeededTillExpires", 120000L ), // 2 min 
                 rootContext );
 
-        NameServer<NetMeshBaseIdentifier,NetMeshBase> ns = meshBase.getLocalNameServer();
+        NameServer<NetMeshBaseIdentifier,NetMeshBase> nameServer = meshBase.getLocalNameServer();
         
-        NetMeshWorldApp ret = new NetMeshWorldApp( meshBase, ns, rootContext );
+        // FormTokenService
+        StoreFormTokenService formTokenService = StoreFormTokenService.create( formTokenStore );
+
+        NetMeshWorldApp ret = new NetMeshWorldApp( meshBase, nameServer, formTokenService, rootContext );
         return ret;
     }
 
@@ -194,6 +201,7 @@ public class NetMeshWorldApp
     protected NetMeshWorldApp(
             NetMeshBase                                   mainMeshBase,
             NameServer<NetMeshBaseIdentifier,NetMeshBase> meshBaseNameServer,
+            FormTokenService                              formTokenService,
             SimpleContext                                 applicationContext )
     {
         super(  mainMeshBase,
@@ -201,6 +209,7 @@ public class NetMeshWorldApp
                 new NetMeshWorldViewletFactory(),
                 null,
                 DefaultStructuredResponseTemplateFactory.create(),
+                formTokenService,
                 applicationContext );
     }
 

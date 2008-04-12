@@ -111,8 +111,9 @@ public class HttpAcceptor
     public void setResponseFactory(
             HttpResponseFactory factory )
     {
-        if( factory == null )
+        if( factory == null ) {
             throw new NullPointerException( "Cannot set a null ResponseFactory for an AcceptThread" );
+        }
 
         theResponseFactory = factory;
     }
@@ -346,17 +347,19 @@ public class HttpAcceptor
             while( theIsActive ) {
                 Socket theSocket = null;
                 synchronized( theWorkQueue ) {
-                    while( theSocket == null )
+                    while( theSocket == null ) {
                         if( theWorkQueue.isEmpty() ) {
                             try {
                                 theWorkQueue.wait();
                             } catch( InterruptedException ex ) {
-                                if( !theIsActive )
+                                if( !theIsActive ) {
                                     return;
+                                }
                             }
                         } else {
-                            theSocket = (Socket) theWorkQueue.removeLast();
+                            theSocket = theWorkQueue.removeLast();
                         }
+                    }
                 }
                 dispatch( theSocket );
             }

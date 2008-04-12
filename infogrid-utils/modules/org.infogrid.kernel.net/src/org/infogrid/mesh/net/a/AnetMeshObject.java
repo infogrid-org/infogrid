@@ -21,7 +21,6 @@ import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-import org.infogrid.mesh.NotEquivalentException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.RelatedAlreadyException;
@@ -69,6 +68,8 @@ import org.infogrid.util.logging.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.RoleTypeRequiresEntityTypeException;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.text.StringRepresentation;
 
@@ -193,10 +194,11 @@ public class AnetMeshObject
      */
     @Override
     protected NetMeshObject [] findRelatedMeshObjects(
+            MeshBase                mb,
             MeshObjectIdentifier [] identifiers )
     {
         Proxy       homeProxy = getProxyTowardsHomeReplica();
-        NetMeshBase realBase  = (NetMeshBase) theMeshBase;
+        NetMeshBase realBase  = (NetMeshBase) mb;
         
         NetMeshObject [] ret = new NetMeshObject[ identifiers.length ]; // make compiler happy
         if( homeProxy != null ) {
@@ -352,11 +354,14 @@ public class AnetMeshObject
             EntityType [] types )
         throws
             EntityBlessedAlreadyException,
-            IsAbstractException,
             TransactionException,
             NotPermittedException
     {
-        internalBless( types, false, false, false );
+        try {
+            internalBless( types, false, false, false );
+        } catch( IsAbstractException ex ) {
+            log.error( ex );
+        }
     }
 
     /**
@@ -982,6 +987,7 @@ public class AnetMeshObject
     public void rippleUnbless(
             EntityType [] types )
         throws
+            RoleTypeRequiresEntityTypeException,
             EntityNotBlessedException,
             TransactionException,
             NotPermittedException
@@ -1188,20 +1194,12 @@ public class AnetMeshObject
      * 
      * @param identifierOfEquivalent the Identifier of the replica NetMeshObject
      */
-    public void rippleRemoveAsEquivalent(
-            NetMeshObjectIdentifier identifierOfEquivalent )
+    public void rippleRemoveAsEquivalent()
         throws
-            NotEquivalentException,
             TransactionException,
             NotPermittedException
     {
-        try {
-            MeshObject equivalent = getMeshBase().accessLocally( identifierOfEquivalent );
-            internalRemoveAsEquivalent( equivalent, false );
-
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-        }
+        internalRemoveAsEquivalent( false );
     }
 
     /**
@@ -1215,6 +1213,7 @@ public class AnetMeshObject
             PropertyType []  types,
             PropertyValue [] values )
         throws
+            IllegalPropertyTypeException,
             NotPermittedException,
             IllegalPropertyValueException,
             TransactionException
@@ -1231,6 +1230,7 @@ public class AnetMeshObject
     public void rippleSetPropertyValues(
             Map<PropertyType,PropertyValue> map )
         throws
+            IllegalPropertyTypeException,
             NotPermittedException,
             IllegalPropertyValueException,
             TransactionException
@@ -1359,6 +1359,7 @@ public class AnetMeshObject
             long             timeUpdated,
             boolean          isMaster )
         throws
+            IllegalPropertyTypeException,
             NotPermittedException,
             IllegalPropertyValueException,
             TransactionException

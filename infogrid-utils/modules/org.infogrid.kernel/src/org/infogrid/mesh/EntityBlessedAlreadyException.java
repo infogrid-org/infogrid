@@ -14,13 +14,15 @@
 
 package org.infogrid.mesh;
 
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.model.primitives.EntityType;
-import org.infogrid.model.primitives.MeshTypeUtils;
-
-import org.infogrid.util.StringHelper;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
+import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 
 /**
- * A MeshObject is already blessed with a particular EntityType.
+ * This Exception is thrown if an operation requires a MeshObject to
+ * be not blessed with a certain EntityType, but it is already.
  */
 public class EntityBlessedAlreadyException
         extends
@@ -29,51 +31,56 @@ public class EntityBlessedAlreadyException
     /**
      * Constructor.
      *
-     * @param obj the MeshObject that is blessed already
-     * @param type the EntityType with which this MeshObject is blessed already
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param identifier the MeshObjectIdentifier for the MeshObject on which the illegal operation was attempted
+     * @param type the MeshType of the already-existing blessing
+     * @param typeIdentifier the MeshTypeIdentifier of the MeshType of the already-existing blessing
      */
     public EntityBlessedAlreadyException(
-            MeshObject obj,
-            EntityType type )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           obj,
+            MeshObjectIdentifier identifier,
+            EntityType           type,
+            MeshTypeIdentifier   typeIdentifier )
     {
-        super( obj );
-        theMeshType = type;
-    }
-    
-    /**
-      * Obtain String representation, for debugging.
-      *
-      * @return String representation
-      */
-    @Override
-    public String toString()
-    {
-        return StringHelper.objectLogString(
-                this,
-                new String[]{
-                    "meshObject",
-                    "meshType",
-                    "types"
-                },
-                new Object[] {
-                    theMeshObject,
-                    theMeshType.getIdentifier().toExternalForm(),
-                    MeshTypeUtils.meshTypeIdentifiers( theMeshObject.getTypes() )
-                });
+        super( mb, originatingMeshBaseIdentifier, obj, identifier, type, typeIdentifier );
     }
 
     /**
-     * Obtain parameters for the internationalization.
+     * More convenient simple constructor for the most common case.
      *
-     * @return the parameters
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param type the MeshType of the already-existing blessing
      */
-    public Object [] getLocalizationParameters()
+    public EntityBlessedAlreadyException(
+            MeshObject           obj,
+            EntityType           type )
     {
-        return new Object[] { theMeshObject, theMeshType };
+        this(   obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                obj.getIdentifier(),
+                type,
+                type.getIdentifier() );
     }
 
     /**
-     * The EntityType with which this MeshObject is blessed already.
+     * Obtain the EntityType of the already-existing blessing.
+     * 
+     * @return the MeshType
+     * @throws MeshTypeWithIdentifierNotFoundException thrown if the EntityType could not be found
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     * @throws ClassCastException thrown if the type identifier identified a MeshType that is not an EntityType
      */
-    protected transient EntityType theMeshType;
+    @Override
+    public synchronized EntityType getType()
+        throws
+            MeshTypeWithIdentifierNotFoundException,
+            IllegalStateException
+    {
+        return (EntityType) super.getType();
+    }
 }

@@ -18,6 +18,8 @@ import org.infogrid.util.StringHelper;
 
 /**
  * A simple implementation of StringifierParsingChoice that holds its own values.
+ * 
+ * @param T the type of the Objects to be stringified
  */
 public class StringifierValueParsingChoice<T>
         extends

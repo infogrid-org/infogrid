@@ -30,6 +30,9 @@ import java.util.Set;
  * This is a <code>java.util.Map</code> that stores the values in the
  * {@link org.infogrid.store.IterableStore IterableStore}
  * and keeps only <code>References</code> to them in memory.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public abstract class IterableStoreBackedMap<K,V>
         extends
@@ -220,6 +223,9 @@ public abstract class IterableStoreBackedMap<K,V>
     
     /**
      * This class is instantiated to create a "projection" of the keys in the Store.
+     * 
+     * @param K the type of key
+     * @param V the type of value
      */
     protected static class MyKeySet<K,V>
             extends
@@ -265,6 +271,9 @@ public abstract class IterableStoreBackedMap<K,V>
 
     /**
      * Iterator over the MyValueCollection.
+     * 
+     * @param K the type of key
+     * @param V the type of value
      */
     static class MyKeyIterator<K,V>
             implements

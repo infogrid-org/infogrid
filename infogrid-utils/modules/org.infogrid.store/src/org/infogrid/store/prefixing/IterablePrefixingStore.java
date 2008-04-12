@@ -212,10 +212,8 @@ public class IterablePrefixingStore
         /**
          * Returns <tt>true</tt> if the iteration has at least N more elements in the forward direction.
          *
-         * @return <tt>true</tt> if the iterator has at least N more elements in the forward direction.
-         *
          * @param n the number of elements for which to check
-         * @return true if there at least N next elements
+         * @return <tt>true</tt> if the iterator has at least N more elements in the forward direction.
          * @see #hasNext()
          * @see #hasPrevious()
          * @see #hasPrevious(int)
@@ -229,10 +227,8 @@ public class IterablePrefixingStore
         /**
          * Returns <tt>true</tt> if the iteration has at least N more elements in the backwards direction.
          *
-         * @return <tt>true</tt> if the iterator has at least N more elements in the backwards direction.
-         *
          * @param n the number of elements for which to check
-         * @return true if there at least N previous elements
+         * @return <tt>true</tt> if the iterator has at least N more elements in the backwards direction.
          * @see #hasNext()
          * @see #hasPrevious()
          * @see #hasNext(int)
@@ -259,6 +255,7 @@ public class IterablePrefixingStore
          * <p>Obtain the next N elements. If fewer than N elements are available, return
          * as many elements are available in a shorter array.</p>
          * 
+         * @param n the number of elements to return
          * @return the next no more than N elements
          * @see #previous(int)
          */
@@ -294,6 +291,7 @@ public class IterablePrefixingStore
          * returned in the sequence in which the CursorIterator visits them, not in the
          * sequence in which the underlying Iterable stores them.</p>
          *
+         * @param n the number of elements to return
          * @return the previous no more than N elements
          * @see #next(int)
          */
@@ -505,7 +503,7 @@ public class IterablePrefixingStore
         /**
          * Constructor.
          *
-         * @param delegatIter the Iterator over the underlying Store
+         * @param delegateIter the Iterator over the underlying Store
          */
         public MyFilteringIterator(
                 IterableStoreCursor delegateIter )

@@ -14,6 +14,9 @@
 
 package org.infogrid.mesh;
 
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.util.StringHelper;
 
 /**
@@ -25,37 +28,96 @@ public class NotRelatedException
             IllegalOperationTypeException
 {
     /**
-     * Constructor.
+     * Construct one.
      *
-     * @param obj the MeshObject that is related already
-     * @param other the MeshObject to which this MeshObject is not related
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param meshObject the first MeshObject that was unrelated, if available
+     * @param meshObjectIdentifier the MeshObjectIdentifier for the first MeshObject that was unrelated
+     * @param other the MeshObject at the other end of the non-existing relationship, if available
+     * @param otherIdentifier the MeshObjectIdentifier for the MeshObject at the other end of the non-existing relationship, if available
      */
     public NotRelatedException(
-            MeshObject obj,
-            MeshObject other )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           meshObject,
+            MeshObjectIdentifier meshObjectIdentifier,
+            MeshObject           other,
+            MeshObjectIdentifier otherIdentifier )
     {
-        super( obj );
-
-        theOtherObject = other;
+        super( mb, originatingMeshBaseIdentifier, meshObject, meshObjectIdentifier );
+        
+        theOther                = other;
+        theOtherIdentifier      = otherIdentifier;
     }
 
     /**
-      * Obtain String representation, for debugging.
-      *
-      * @return String representation
-      */
+     * More convenient simple constructor for the most common case.
+     *
+     * @param meshObject the first MeshObject that was unrelated, if available
+     * @param other the MeshObject at the other end of the non-existing relationship, if available
+     */
+    public NotRelatedException(
+            MeshObject           meshObject,
+            MeshObject           other )
+    {
+        this(   meshObject.getMeshBase(),
+                meshObject.getMeshBase().getIdentifier(),
+                meshObject,
+                meshObject.getIdentifier(),
+                other,
+                other.getIdentifier() );
+    }
+
+    /**
+     * Obtain the MeshObject at the other end of the relationship that did not exist.
+     * 
+     * @return the other MeshObject
+     * @throws MeshObjectAccessException thrown if the MeshObject could not be found
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     */
+    public synchronized MeshObject getOtherMeshObject()
+        throws
+            MeshObjectAccessException,
+            IllegalStateException
+    {
+        if( theOther == null ) {
+            theOther = resolve( theOtherIdentifier );
+        }
+        return theOther;
+    }
+
+    /**
+     * Obtain the MeshObjectIdentifier of the MeshObject at the other end of the relationship that did not exist.
+     *
+     * @return the MeshObjectIdentifier
+     */
+    public MeshObjectIdentifier getOtherMeshObjectIdentifier()
+    {
+        return theOtherIdentifier;
+    }
+
+    /**
+     * Return this object in string form, for debugging.
+     *
+     * @return string form of this object
+     */
     @Override
     public String toString()
     {
         return StringHelper.objectLogString(
                 this,
                 new String[] {
-                    "meshObject",
-                    "otherObject"
+                    "theMeshObject",
+                    "theMeshObjectIdentifier",
+                    "theOther",
+                    "theOtherIdentifier",
                 },
                 new Object[] {
                     theMeshObject,
-                    theOtherObject,
+                    theMeshObjectIdentifier,
+                    theOther,
+                    theOtherIdentifier
                 });
     }
 
@@ -66,11 +128,17 @@ public class NotRelatedException
      */
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theMeshObject, theOtherObject };
+        return new Object[] { theMeshObjectIdentifier, theOtherIdentifier };
     }
 
     /**
-     * The MeshObject to which this MeshObject is not related to.
+     * The MeshObject at the other end of the relationship for which we discovered a violation.
      */
-    protected transient MeshObject theOtherObject;
+    protected transient MeshObject theOther;
+
+    /**
+     * The MeshObjectIdentifier of the MeshObject at the other end of the relationship for which we discovered a violation.
+     */
+    protected MeshObjectIdentifier theOtherIdentifier;
 }
+

@@ -15,7 +15,6 @@
 package org.infogrid.meshbase;
 
 import org.infogrid.mesh.BlessedAlreadyException;
-import org.infogrid.mesh.EntityNotBlessedException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotBlessedException;
@@ -57,6 +56,7 @@ import org.infogrid.util.StringHelper;
 import org.infogrid.util.logging.Log;
 
 import java.util.ArrayList;
+import org.infogrid.mesh.IllegalPropertyTypeException;
 
 /**
   * <p>Provides the functionality to perform a diff on any two IterableMeshBases.</p>
@@ -211,10 +211,10 @@ public class IterableMeshBaseDifferencer
 
                                 entityChanges.addChange( propertyChange );
                             }
+                        } catch( IllegalPropertyTypeException ex ) {
+                            // that's fine -- PropertyType does not exist on the old version
                         } catch( NotPermittedException ex ) {
                             log.error( ex );
-                        } catch( EntityNotBlessedException ex ) {
-                            // that's fine (FIXME?)
                         }
 
                         if( checkDates ) {
@@ -276,35 +276,43 @@ public class IterableMeshBaseDifferencer
                 for( MeshObject currentOtherSideInComparison : otherSidesInComparison ) {
                     if( ! otherSidesInBase.contains( currentOtherSideInComparison.getIdentifier() ) ) {
                         // in this case, we have to do things anyway
-                        
-                        RoleType [] addedRoleTypes = meshObjectInComparison.getRoleTypes( currentOtherSideInComparison );
-                        
-                        AbstractMeshObjectNeighborChangeEvent relChange = createMeshObjectNeighborAddedEvent(
-                                meshObjectInBase,
-                                meshObjectInComparison,
-                                otherSidesInBase,
-                                currentOtherSideInComparison,
-                                otherSidesInComparison,
-                                addedRoleTypes );
+                        try {
+                            RoleType [] addedRoleTypes = meshObjectInComparison.getRoleTypes( currentOtherSideInComparison );
 
-                        graphChanges.addChange( relChange );
+                            AbstractMeshObjectNeighborChangeEvent relChange = createMeshObjectNeighborAddedEvent(
+                                    meshObjectInBase,
+                                    meshObjectInComparison,
+                                    otherSidesInBase,
+                                    currentOtherSideInComparison,
+                                    otherSidesInComparison,
+                                    addedRoleTypes );
+
+                            graphChanges.addChange( relChange );
+
+                        } catch( NotRelatedException ex ) {
+                            log.error( ex );
+                        }
                     }
 
                     // in any case, check the RoleTypes
                     MeshObject currentOtherSideInBase = theBaselineBase.findMeshObjectByIdentifier( currentOtherSideInComparison.getIdentifier() );
                     if( currentOtherSideInBase != null ) {
-                        RoleType [] roleTypesInBase;
-                        RoleType [] roleTypesInComparison;
+                        RoleType [] roleTypesInBase       = null;
+                        RoleType [] roleTypesInComparison = null;
 
                         if( meshObjectInBase.isRelated( currentOtherSideInBase )) {
-                            roleTypesInBase = meshObjectInBase.getRoleTypes( currentOtherSideInBase );
-                        } else {
-                            roleTypesInBase = null;
+                            try {
+                                roleTypesInBase = meshObjectInBase.getRoleTypes( currentOtherSideInBase );
+                            } catch( NotRelatedException ex ) {
+                                log.error( ex );
+                            }
                         }
                         if( meshObjectInComparison.isRelated( currentOtherSideInComparison )) {
-                            roleTypesInComparison = meshObjectInComparison.getRoleTypes( currentOtherSideInComparison );
-                        } else {
-                            roleTypesInComparison = null;
+                            try {
+                                roleTypesInComparison = meshObjectInComparison.getRoleTypes( currentOtherSideInComparison );
+                            } catch( NotRelatedException ex ) {
+                                log.error( ex );
+                            }
                         }
 
                         RoleType [] hypotheticalMinRoleTypes = new RoleType[0];
@@ -441,6 +449,9 @@ public class IterableMeshBaseDifferencer
                                 entityChanges.addChange( propertyChange );
                             }
 
+                        } catch( IllegalPropertyTypeException ex ) {
+                            log.error( ex );
+
                         } catch( NotPermittedException ex ) {
                             log.error( ex );
                         }
@@ -452,23 +463,28 @@ public class IterableMeshBaseDifferencer
 
                 for( MeshObject currentOtherSideInComparison : otherSidesInComparison ) {
 
-                    RoleType [] addedRoleTypes = meshObjectInComparison.getRoleTypes( currentOtherSideInComparison );
+                    try {
+                        RoleType [] addedRoleTypes = meshObjectInComparison.getRoleTypes( currentOtherSideInComparison );
 
-                    MeshObjectSet newOtherSides = comparisonBase.getMeshObjectSetFactory().createImmutableMeshObjectSetUnification(
-                            oldOtherSides,
-                            currentOtherSideInComparison );
+                        MeshObjectSet newOtherSides = comparisonBase.getMeshObjectSetFactory().createImmutableMeshObjectSetUnification(
+                                oldOtherSides,
+                                currentOtherSideInComparison );
 
-                    AbstractMeshObjectNeighborChangeEvent relChange = createMeshObjectNeighborAddedEvent(
-                            meshObjectInComparison,
-                            meshObjectInComparison,
-                            comparisonBase.getMeshObjectSetFactory().obtainEmptyImmutableMeshObjectSet(),
-                            currentOtherSideInComparison,
-                            newOtherSides,
-                            addedRoleTypes );
+                        AbstractMeshObjectNeighborChangeEvent relChange = createMeshObjectNeighborAddedEvent(
+                                meshObjectInComparison,
+                                meshObjectInComparison,
+                                comparisonBase.getMeshObjectSetFactory().obtainEmptyImmutableMeshObjectSet(),
+                                currentOtherSideInComparison,
+                                newOtherSides,
+                                addedRoleTypes );
 
-                    graphChanges.addChange( relChange );
-                    
-                    oldOtherSides = newOtherSides;
+                        graphChanges.addChange( relChange );
+
+                        oldOtherSides = newOtherSides;
+
+                    } catch( NotRelatedException ex ) {
+                        log.error( ex );
+                    }
                 }
                 
                 MeshObjectSet equivalentsInComparison = meshObjectInComparison.getEquivalents();
@@ -541,6 +557,7 @@ public class IterableMeshBaseDifferencer
      * 
      * @param canonicalIdentifier the canonical Identifier of the MeshObject that was deleted
      * @param obj the MeshObject that was deleted
+     * @param time the time at which the deletion occurred
      * @return the MeshObjectDeletedEvent or subclass
      */
     protected MeshObjectDeletedEvent createMeshObjectDeletedEvent(
@@ -563,7 +580,9 @@ public class IterableMeshBaseDifferencer
      *
      * @param meshObjectInBase the MeshObject in the baseline
      * @param meshObjectInComparison the MeshObject in the comparison
+     * @param oldTypes the set of old types, prior to the change
      * @param addedTypes the added EntityTypes
+     * @param newTypes the set of new types after the change
      * @return the MeshObjectTypeAddedEvent or subclass
      */
     protected MeshObjectTypeAddedEvent createMeshObjectTypesAddedEvent(
@@ -588,7 +607,9 @@ public class IterableMeshBaseDifferencer
      *
      * @param meshObjectInBase the MeshObject in the baseline
      * @param meshObjectInComparison the MeshObject in the comparison
+     * @param oldTypes the set of old types, prior to the change
      * @param removedTypes the removed EntityTypes
+     * @param newTypes the set of new types after the change
      * @return the MeshObjectTypeRemovedEvent or subclass
      */
     protected MeshObjectTypeRemovedEvent createMeshObjectTypesRemovedEvent(
@@ -697,7 +718,9 @@ public class IterableMeshBaseDifferencer
      *
      * @param meshObjectInBase the MeshObject in the baseline
      * @param meshObjectInComparison the MeshObject in the comparison
+     * @param oldRoleTypes the set of old RoleTypes, prior to the change
      * @param addedRoleTypes the RoleTypes that were added
+     * @param newRoleTypes the set of new RoleTypes, after the change
      * @param otherSideInBase the "other side" MeshObject in the baseline
      * @return the MeshObjectRoleAddedEvent or subclass
      */
@@ -725,7 +748,9 @@ public class IterableMeshBaseDifferencer
      *
      * @param meshObjectInBase the MeshObject in the baseline
      * @param meshObjectInComparison the MeshObject in the comparison
+     * @param oldRoleTypes the set of old RoleTypes, prior to the change
      * @param removedRoleTypes the RoleTypes that were removed
+     * @param newRoleTypes the set of new RoleTypes, after the change
      * @param otherSideInBase the "other side" MeshObject in the baseline
      * @return the MeshObjectRoleRemovedEvent or subclass
      */
@@ -753,7 +778,9 @@ public class IterableMeshBaseDifferencer
      *
      * @param meshObjectInBase the MeshObject in the baseline
      * @param meshObjectInComparison the MeshObject in the comparison
+     * @param oldEquivalents the set of equivalents, before the change
      * @param added the MeshObjects that were added as neighbors
+     * @param newEquivalents the set of equivalents, after the change
      * @return the MeshObjectDeletedEvent or subclass
      */
     protected MeshObjectEquivalentsAddedEvent createMeshObjectEquivalentsAddedEvent(
@@ -778,8 +805,9 @@ public class IterableMeshBaseDifferencer
      *
      * @param meshObjectInBase the MeshObject in the baseline
      * @param meshObjectInComparison the MeshObject in the comparison
+     * @param oldEquivalents the set of equivalents, before the change
      * @param removed the Identifiers of the MeshObjects that were removed as equivalents
-     * @param remainingEquivalents the remaining equivalents
+     * @param newEquivalents the set of equivalents, after the change
      * @return the MeshObjectEquivalentsRemovedEvent or subclass
      */
     protected MeshObjectEquivalentsRemovedEvent createMeshObjectEquivalentsRemovedEvent(

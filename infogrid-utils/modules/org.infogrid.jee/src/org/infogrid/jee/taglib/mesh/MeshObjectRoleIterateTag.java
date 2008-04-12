@@ -27,6 +27,7 @@ import javax.servlet.jsp.JspException;
 
 import java.io.IOException;
 import java.util.Iterator;
+import org.infogrid.mesh.NotRelatedException;
 
 /**
  * Tag that iterates over the <code>RoleTypes</code> in which a start <code>MeshObject</code>
@@ -142,11 +143,16 @@ public class MeshObjectRoleIterateTag
         MeshObject start       = (MeshObject) lookupOrThrow( theStartMeshObjectName );
         MeshObject destination = (MeshObject) lookupOrThrow( theDestinationMeshObjectName );
 
-        RoleType [] types = start.getRoleTypes( destination );
-        theIterator = ArrayCursorIterator.<RoleType>create( types );
+        try {
+            RoleType [] types = start.getRoleTypes( destination );
+            theIterator = ArrayCursorIterator.<RoleType>create( types );
 
-        int ret = iterateOnce();
-        return ret;
+            int ret = iterateOnce();
+            return ret;
+
+        } catch( NotRelatedException ex ) {
+            throw new JspException( ex );
+        }
     }
     
 

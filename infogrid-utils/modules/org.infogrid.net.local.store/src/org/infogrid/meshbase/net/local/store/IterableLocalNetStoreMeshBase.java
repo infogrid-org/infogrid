@@ -81,8 +81,6 @@ public class IterableLocalNetStoreMeshBase
             ProbeDirectory           probeDirectory,
             long                     timeNotNeededTillExpires,
             Context                  c )
-       throws
-            IsAbstractException
     {
         IterableStore meshStore        = IterablePrefixingStore.create( "mesh",        store );
         IterableStore proxyStore       = IterablePrefixingStore.create( "proxy",       store );
@@ -120,8 +118,6 @@ public class IterableLocalNetStoreMeshBase
             ProbeDirectory           probeDirectory,
             long                     timeNotNeededTillExpires,
             Context                  c )
-       throws
-            IsAbstractException
     {
         IterableStore meshStore        = IterablePrefixingStore.create( "mesh",        store );
         IterableStore proxyStore       = IterablePrefixingStore.create( "proxy",       store );
@@ -163,8 +159,6 @@ public class IterableLocalNetStoreMeshBase
             ScheduledExecutorService exec,
             long                     timeNotNeededTillExpires,
             Context                  c )
-       throws
-            IsAbstractException
     {
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 
@@ -218,8 +212,6 @@ public class IterableLocalNetStoreMeshBase
             ScheduledExecutorService exec,
             long                     timeNotNeededTillExpires,
             Context                  c )
-       throws
-            IsAbstractException
     {
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 
@@ -270,8 +262,6 @@ public class IterableLocalNetStoreMeshBase
             IterableStore             proxyStore,
             NetMessageEndpointFactory endpointFactory,
             Context                   c )
-        throws
-            IsAbstractException
     {
         ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create();
 
@@ -305,8 +295,6 @@ public class IterableLocalNetStoreMeshBase
             IterableStore             proxyStore,
             NetMessageEndpointFactory endpointFactory,
             Context                   c )
-        throws
-            IsAbstractException
     {
         DefaultProxyFactory proxyFactory = DefaultProxyFactory.create( endpointFactory );
 

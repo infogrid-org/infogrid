@@ -14,10 +14,19 @@
 
 package org.infogrid.probe.TEST;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.mesh.security.CallerHasInsufficientPermissionsException;
 import org.infogrid.mesh.security.PropertyReadOnlyException;
@@ -25,7 +34,7 @@ import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
 import org.infogrid.meshbase.transaction.TransactionException;
-import org.infogrid.model.primitives.MeshTypeIdentifier;
+import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.module.ModuleActivationException;
 import org.infogrid.module.ModuleAdvertisementInstantiationException;
 import org.infogrid.module.ModuleConfigurationException;
@@ -36,12 +45,8 @@ import org.infogrid.probe.ApiProbe;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;
-import org.infogrid.util.logging.Log;
-
-import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.probe.m.MProbeDirectory;
+import org.infogrid.util.logging.Log;
 
 
 /**
@@ -237,33 +242,41 @@ public class ProbeTest5
          * @throws ModuleException thrown if a Module required by the Probe could not be loaded
          */
         public void readFromApi(
-                NetMeshBaseIdentifier      networkId,
+                NetMeshBaseIdentifier  networkId,
                 CoherenceSpecification coherence,
                 StagingMeshBase        mb )
             throws
-                MeshObjectIdentifierNotUniqueException,
+                IsAbstractException,
+                EntityBlessedAlreadyException,
+                EntityNotBlessedException,
                 RelatedAlreadyException,
+                NotRelatedException,
+                MeshObjectIdentifierNotUniqueException,
+                IllegalPropertyTypeException,
+                IllegalPropertyValueException,
                 TransactionException,
                 NotPermittedException,
                 ProbeException,
                 IOException,
-                ModuleException
+                ModuleException,
+                URISyntaxException
         {
-            String message = "Exception for case " + probeRunCounter;
+            String     message     = "Exception for case " + probeRunCounter;
+            MeshObject placeholder = mb.getHomeObject();
 
             switch( probeRunCounter ) {
                 case 0:
-                    throw new CallerHasInsufficientPermissionsException( null, null );
+                    throw new CallerHasInsufficientPermissionsException( placeholder, null );
                 case 1:
-                    throw new PropertyReadOnlyException( null, null );
+                    throw new PropertyReadOnlyException( placeholder, TestSubjectArea.A_READONLY );
                 case 2:
-                    throw new IsAbstractException( (MeshTypeIdentifier) null );
+                    throw new IsAbstractException( placeholder, TestSubjectArea.A );
                 case 3:
-                    throw new MeshObjectIdentifierNotUniqueException( null );
+                    throw new MeshObjectIdentifierNotUniqueException( placeholder );
                 case 4:
-                    throw new RelatedAlreadyException( null, null );
+                    throw new RelatedAlreadyException( placeholder, placeholder );
                 case 5:
-                    throw new TransactionException.NotWithinTransactionBoundaries( null );
+                    throw new TransactionException.NotWithinTransactionBoundaries( mb );
                 case 6:
                     throw new ProbeException.EmptyDataSource( networkId );
                 case 7:

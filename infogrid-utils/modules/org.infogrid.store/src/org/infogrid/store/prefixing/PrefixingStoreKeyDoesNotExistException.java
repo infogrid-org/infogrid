@@ -25,6 +25,8 @@ public class PrefixingStoreKeyDoesNotExistException
         extends
             StoreKeyDoesNotExistException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

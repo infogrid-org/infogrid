@@ -44,6 +44,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.module.ModuleException;
 import org.infogrid.probe.m.MProbeDirectory;
 
 /**
@@ -356,12 +363,19 @@ public class WritableProbeTest2
                 CoherenceSpecification coherence,
                 StagingMeshBase        mb )
             throws
-                MeshObjectIdentifierNotUniqueException,
+                IsAbstractException,
+                EntityBlessedAlreadyException,
+                EntityNotBlessedException,
                 RelatedAlreadyException,
+                NotRelatedException,
+                MeshObjectIdentifierNotUniqueException,
+                IllegalPropertyTypeException,
+                IllegalPropertyValueException,
                 TransactionException,
                 NotPermittedException,
                 ProbeException,
                 IOException,
+                ModuleException,
                 URISyntaxException
         {
             if( log.isDebugEnabled() ) {

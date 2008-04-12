@@ -273,4 +273,70 @@ public class MeshObject_HasOwner_MeshObject_SourceGuard
     {
         // noop, but you can override
     }    
+
+    /**
+     * Check whether the given caller is allowed to make one and two members of the same
+     * equivalence set.
+     * 
+     * @param type the RoleType
+     * @param one the first MeshObject
+     * @param two the second MeshObject
+     * @param caller the MeshObject representing the caller
+     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     */
+    public void checkPermittedAddAsEquivalent(
+            RoleType      type,
+            MeshObject    one,
+            MeshObject    two,
+            MeshObject    caller )
+        throws
+            NotPermittedException
+    {
+        try {
+            MeshObjectSet startOwners = one.traverse( AclBasedSecuritySubjectArea.MESHOBJECT_HASOWNER_MESHOBJECT.getSource() );
+
+            if( startOwners.isEmpty() ) { // FIXME? This means anybody can grab an orphaned object
+                return;
+            }
+            if( caller != null && startOwners.contains( caller )) {
+                return;
+            }
+            
+        } catch( Exception ex ) {
+            log.error( ex );
+        }
+        throw new CallerHasInsufficientPermissionsException( one, caller );
+    }
+
+    /**
+     * Check whether the given caller is allowed to remove the MeshObject from its
+     * equivalence set.
+     * 
+     * @param type the RoleType
+     * @param obj the MeshObject
+     * @param caller the MeshObject representing the caller
+     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     */
+    public void checkPermittedRemoveAsEquivalent(
+            RoleType      type,
+            MeshObject    obj,
+            MeshObject    caller )
+        throws
+            NotPermittedException
+    {
+        try {
+            MeshObjectSet startOwners = obj.traverse( AclBasedSecuritySubjectArea.MESHOBJECT_HASOWNER_MESHOBJECT.getSource() );
+
+            if( startOwners.isEmpty() ) { // FIXME? This means anybody can grab an orphaned object
+                return;
+            }
+            if( caller != null && startOwners.contains( caller )) {
+                return;
+            }
+            
+        } catch( Exception ex ) {
+            log.error( ex );
+        }
+        throw new CallerHasInsufficientPermissionsException( obj, caller );
+    }
 }

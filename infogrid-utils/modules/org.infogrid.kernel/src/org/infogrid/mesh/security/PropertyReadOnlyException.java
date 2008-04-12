@@ -15,8 +15,15 @@
 package org.infogrid.mesh.security;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
+import org.infogrid.model.primitives.MeshTypeUtils;
 import org.infogrid.model.primitives.PropertyType;
+import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
+import org.infogrid.util.StringHelper;
 
 /**
  * This Exception indicates that a property is read-only and could not be modified.
@@ -30,26 +37,99 @@ public class PropertyReadOnlyException
     /**
      * Constructor.
      *
-     * @param obj the MeshObject whose attempted modification triggered this Exception
-     * @param type identifies the property on this MeshObject whose attempted modification triggered this Exception
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param obj the MeshObject whose property it is, if available
+     * @param identifier the MeshObjectIdentifier for the MeshObject whose property it is
+     * @param pt the PropertyType that was read-onl, if available
+     * @param typeIdentifier the MeshTypeIdentifier for the PropertyType that was read-only
      */
     public PropertyReadOnlyException(
-            MeshObject   obj,
-            PropertyType type)
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           obj,
+            MeshObjectIdentifier identifier,
+            PropertyType         pt,
+            MeshTypeIdentifier   typeIdentifier )
     {
-        super( obj );
+        super( mb, originatingMeshBaseIdentifier, obj, identifier );
         
-        thePropertyType = type;
+        if( typeIdentifier == null ) {
+            throw new IllegalArgumentException( "typeIdentifier must not be null" );
+        }
+        if( pt != null && !pt.getIsReadOnly().value() ) {
+            throw new IllegalArgumentException( "PropertyType must be read-only, but isn't: " + pt );
+        }
+        thePropertyType           = pt;
+        thePropertyTypeIdentifier = typeIdentifier;
     }
-    
-    /**
-     * Obtain the PropertyType whose attempted modification triggered this Exception.
+
+   /**
+     * More convenient simple constructor for the most common case.
      *
-     * @return the PropertyType
+     * @param obj the MeshObject whose property it is, if available
+     * @param pt the PropertyType that was read-onl, if available
      */
-    public final PropertyType getPropertyType()
+    public PropertyReadOnlyException(
+            MeshObject           obj,
+            PropertyType         pt )
     {
+        this(   obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                obj.getIdentifier(),
+                pt,
+                pt.getIdentifier() );
+    }
+
+    /**
+     * Obtain the PropertyType that identified a non-existing Property.
+     * 
+     * @return the PropertyType
+     * @throws MeshTypeWithIdentifierNotFoundException thrown if the PropertyType could not be found
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     * @throws ClassCastException thrown if the type identifier identified a MeshType which is not a PropertyType
+     */
+    public synchronized PropertyType getPropertyType()
+        throws
+            MeshTypeWithIdentifierNotFoundException,
+            IllegalStateException
+    {
+        if( thePropertyType == null ) {
+            thePropertyType = (PropertyType) resolve( thePropertyTypeIdentifier );
+            if( !thePropertyType.getIsReadOnly().value() ) {
+                throw new IllegalStateException( "PropertyType must be read-only, but isn't: " + thePropertyType );
+            }
+        }
         return thePropertyType;
+    }
+
+    /**
+      * Obtain String representation, for debugging.
+      *
+      * @return String representation
+      */
+    @Override
+    public String toString()
+    {
+        return StringHelper.objectLogString(
+                this,
+                new String[] {
+                    "resolvingMeshBase",
+                    "meshObject",
+                    "meshObjectIdentifier",
+                    "propertyType",
+                    "propertyTypeIdentifier",
+                    "types"
+                },
+                new Object[] {
+                    theResolvingMeshBase,
+                    theMeshObject,
+                    theMeshObjectIdentifier,
+                    thePropertyType,
+                    thePropertyTypeIdentifier,
+                    MeshTypeUtils.meshTypeIdentifiers( theMeshObject )
+                });
     }
 
     /**
@@ -60,11 +140,16 @@ public class PropertyReadOnlyException
     @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theMeshObject, thePropertyType };
+        return new Object[] { theMeshObjectIdentifier, thePropertyTypeIdentifier };
     }
 
     /**
-     * The PropertyType whose attempted modification triggered this Exception.
+     * The PropertyType that was illegal on the MeshObject.
      */
-    protected transient final PropertyType thePropertyType;
-}
+    protected transient PropertyType thePropertyType;
+    
+    /**
+     * The identifier of the PropertyType that was illegal on the MeshObject.
+     */
+    protected MeshTypeIdentifier thePropertyTypeIdentifier;
+    }
