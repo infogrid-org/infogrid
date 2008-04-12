@@ -21,6 +21,12 @@ import java.util.EventObject;
 /**
  * A general-purpose {@link ExternalizableEvent} implementation. It inherits from
  * <code>java.util.EventObject</code> in order to be compatible with the Java APIs.
+ * 
+ * 
+ * @param S the type of the event source
+ * @param SID the type of the identifier of the event source
+ * @param V the type of the value
+ * @param VID the type of the identifier of the value
  */
 public abstract class AbstractExternalizableEvent<S,SID,V,VID>
         extends
@@ -116,7 +122,7 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
      * Enable subclass to resolve the source of the event.
      *
      * @return the source of the event
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     * @throws UnresolvedException.Source thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the source failed
      */
     protected abstract S resolveSource()
@@ -126,14 +132,15 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
     /**
      * Enable subclass to resolve a value of the event.
      *
+     * @param vid the identifier of the value of the event
      * @return a value of the event
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     * @throws UnresolvedException.Value thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     protected abstract V resolveValue(
             VID vid )
        throws
-           UnresolvedException;
+           UnresolvedException.Value;
     
     /**
      * Obtain the time at which the event occurred.

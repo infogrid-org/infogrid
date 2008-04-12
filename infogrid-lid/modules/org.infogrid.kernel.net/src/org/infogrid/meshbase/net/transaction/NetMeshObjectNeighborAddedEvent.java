@@ -14,7 +14,6 @@
 
 package org.infogrid.meshbase.net.transaction;
 
-import org.infogrid.mesh.RelatedAlreadyException;
 
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
@@ -260,12 +259,6 @@ public class NetMeshObjectNeighborAddedEvent
 
         } catch( TransactionException ex ) {
             throw ex;
-
-        } catch( RelatedAlreadyException ex ) {
-            // that's fine
-            if( log.isDebugEnabled() ) {
-                log.debug( this + " related already" );
-            }
 
         } catch( Throwable ex ) {
             throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, ex );

@@ -365,65 +365,6 @@ public abstract class ProbeException
     }
 
     /**
-     * This is a special type of ProbeException: the Probe did not specify
-     * the type of the home object, which is against the rules set by the API.
-     */
-    public static class HomeObjectNotSet
-            extends
-                ProbeException
-    {
-        /**
-         * Constructor.
-         * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
-         * @param buggyProbe the Probe class that was buggy
-         */
-        public HomeObjectNotSet(
-                NetMeshBaseIdentifier id,
-                Class             buggyProbe )
-        {
-            this( id, null, buggyProbe );
-        }
-
-        /**
-         * Constructor.
-         *
-         * @param u the URL of the data source that we accessed
-         * @param org the original Throwable that caused this
-         * @param buggyProbe the Probe class that was buggy
-         */
-        public HomeObjectNotSet(
-                NetMeshBaseIdentifier id,
-                Throwable         org,
-                Class             buggyProbe )
-        {
-            super( id, null, org );
-
-            theBuggyProbe = buggyProbe;
-        }
-
-        /**
-         * Obtain resource parameters for the internationalization.
-         *
-         * @return the resource parameters
-         */
-        @Override
-        public Object [] getLocalizationParameters()
-        {
-            if( theBuggyProbe != null ) {
-                return new Object[] { theNetworkIdentifier.getCanonicalForm(), theBuggyProbe.getName() };
-            } else {
-                return new Object[] { theNetworkIdentifier.getCanonicalForm() };
-            }
-        }
-
-        /**
-         * The Probe class that is buggy.
-         */
-        protected Class theBuggyProbe;
-    }
-
-    /**
      * This is a special type of ProbeException: we were trying to access
      * a file-URL that is not on our host.
      */

@@ -75,8 +75,6 @@ public class LocalNetMMeshBase
             ScheduledExecutorService exec,
             ProbeDirectory           probeDirectory,
             Context                  c )
-       throws
-            IsAbstractException
     {
         long theTimeNotNeededTillExpires = theResourceHelper.getResourceLongOrDefault( "ShadowTimeNotNeededTillExpires", 60000L ); // 1 min
 
@@ -104,8 +102,6 @@ public class LocalNetMMeshBase
             ScheduledExecutorService exec,
             ProbeDirectory           probeDirectory,
             Context                  c )
-       throws
-            IsAbstractException
     {
         long theTimeNotNeededTillExpires = theResourceHelper.getResourceLongOrDefault( "ShadowTimeNotNeededTillExpires", 60000L ); // 1 min
 
@@ -134,8 +130,6 @@ public class LocalNetMMeshBase
             ProbeDirectory           probeDirectory,
             long                     timeNotNeededTillExpires,
             Context                  c )
-       throws
-            IsAbstractException
     {
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 
@@ -177,8 +171,6 @@ public class LocalNetMMeshBase
             ProbeDirectory           probeDirectory,
             long                     timeNotNeededTillExpires,
             Context                  c )
-       throws
-            IsAbstractException
     {
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 

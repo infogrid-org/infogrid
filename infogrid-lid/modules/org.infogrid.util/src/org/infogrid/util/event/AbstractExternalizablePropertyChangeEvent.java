@@ -22,6 +22,13 @@ import java.beans.PropertyChangeEvent;
  * A general-purpose implementation of {@link ExternalizablePropertyChangeEvent}.
  * It inherits from <code>java.beans.PropertyChangeEvent</code> in order to be
  * compatible with the Java APIs.
+ * 
+ * @param S the type of the event source
+ * @param SID the type of the identifier of the event source
+ * @param P the type of the property
+ * @param PID type of the identifier of the property
+ * @param V the type of the value
+ * @param VID the type of the identifier of the value
  */
 public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
         extends
@@ -218,7 +225,7 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
      * Enable subclass to resolve the source of the event.
      *
      * @return the source of the event
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     * @throws UnresolvedException.Source thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the source failed
      */
     protected abstract S resolveSource()
@@ -229,7 +236,7 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
      * Enable subclass to resolve the property of the event.
      *
      * @return the property of the event
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     * @throws UnresolvedException.Property thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the property failed
      */
     protected abstract P resolveProperty()
@@ -239,6 +246,7 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
     /**
      * Enable subclass to resolve a value of the event.
      *
+     * @param vid the identifier for the value of the event
      * @return a value of the event
      * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving a value failed

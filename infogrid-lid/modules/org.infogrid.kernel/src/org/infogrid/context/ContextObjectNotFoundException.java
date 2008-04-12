@@ -15,7 +15,7 @@
 package org.infogrid.context;
 
 /**
- * Thrown if a context object could not be found.
+ * Thrown if a Context could not find an object that it was asked for.
  */
 public class ContextObjectNotFoundException
         extends

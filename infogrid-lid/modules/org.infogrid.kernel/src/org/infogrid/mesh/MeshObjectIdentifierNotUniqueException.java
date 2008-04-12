@@ -14,41 +14,68 @@
 
 package org.infogrid.mesh;
 
-import org.infogrid.util.AbstractLocalizedException;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.meshbase.MeshObjectAccessException;
 
 /**
-  * <p>This Exception is thrown if an attempt is made to create a new MeshObject with an
-  *    Identifier that is used already for a different MeshObject. This typically indicates a
-  *    programming error by the application programmer.</p>
+  * <p>This Exception is thrown if an attempt is made to create a new MeshObject with a
+  *    MeshObjectIdentifier that is used already for a different MeshObject. This
+  *    typically indicates a programming error by the application programmer.</p>
   */
 public class MeshObjectIdentifierNotUniqueException
     extends
-        AbstractLocalizedException
+        AbstractMeshException
 {
     /**
-      * Constructor.
-      *
-      * @param existing the MeshObject that exists already with the same Identifier
-      */
+     * Constructor.
+     *
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param existing the MeshObject that exists already with the same MeshObjectIdentifier
+     * @param existingIdentifier the MeshObjectIdentifier of the MeshObject that exists already with the same MeshObjectIdentifier
+     */
     public MeshObjectIdentifierNotUniqueException(
-            MeshObject existing )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           existing,
+            MeshObjectIdentifier existingIdentifier )
     {
-        super( existing != null
-                 ? "MeshObject with Identifier " + existing.getIdentifier().toExternalForm() + " exists already, use different Identifier when creating a new MeshObject"
-                 : "MeshObject exists already, use different Identifier when creating a new MeshObject" );
+        super( mb, originatingMeshBaseIdentifier );
 
-        theExisting     = existing;
-        theExistingName = existing != null ? existing.getIdentifier() : null;
+        theExisting           = existing;
+        theExistingIdentifier = existingIdentifier;
     }
 
     /**
-     * Obtain the MeshObject that existed already with the same Identifier. This method
-     * may return null if this Exception was serialized/deserialized.
+     * More convenient simple constructor for the most common case.
      *
-     * @return the MeshObject that existed already with the same Identifier, or null if not available.
+     * @param obj the MeshObject that exists already with the same MeshObjectIdentifier
      */
-    public final MeshObject getExistingMeshObject()
+    public MeshObjectIdentifierNotUniqueException(
+            MeshObject obj )
     {
+        this(   obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                obj.getIdentifier() );
+    }
+
+    /**
+     * Obtain the MeshObject that already existed with this MeshObjectIdentifier
+     * 
+     * @return the already-existing MeshObject
+     * @throws MeshObjectAccessException thrown if the MeshObject could not be found
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     */
+    public synchronized MeshObject getExistingMeshObject()
+        throws
+            MeshObjectAccessException,
+            IllegalStateException
+    {
+        if( theExisting == null ) {
+            theExisting = resolve( theExistingIdentifier );
+        }
         return theExisting;
     }
 
@@ -60,7 +87,7 @@ public class MeshObjectIdentifierNotUniqueException
      */
     public final MeshObjectIdentifier getExistingMeshObjectIdentifier()
     {
-        return theExistingName;
+        return theExistingIdentifier;
     }
 
     /**
@@ -70,7 +97,7 @@ public class MeshObjectIdentifierNotUniqueException
      */
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theExisting, theExistingName != null ? theExistingName.toExternalForm() : null };
+        return new Object[] { theExistingIdentifier };
     }
 
     /**
@@ -81,5 +108,5 @@ public class MeshObjectIdentifierNotUniqueException
     /**
      * The Identifier of the already-existing MeshObject.
      */
-    protected MeshObjectIdentifier theExistingName;
+    protected MeshObjectIdentifier theExistingIdentifier;
 }

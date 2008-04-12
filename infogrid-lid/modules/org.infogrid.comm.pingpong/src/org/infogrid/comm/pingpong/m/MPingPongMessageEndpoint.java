@@ -31,6 +31,8 @@ import java.util.List;
  * In-memory implementation of PingPongMessageEndpoint. This implementation supports
  * the on-disk storage of a snapshot of this PingPongMessageEndpoint, and its recovery
  * later, with a special factory method for that purpose.
+ * 
+ * @param T the message type
  */
 public class MPingPongMessageEndpoint<T>
         extends
@@ -78,6 +80,7 @@ public class MPingPongMessageEndpoint<T>
      * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
      * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
      *                     was not received by the partner PingPongMessageEndpoint, and resends
+     * @param randomVariation the random component to add to the various times
      * @param exec the ScheduledExecutorService to schedule timed tasks
      * @return the created MPingPongMessageEndpoint
      */
@@ -111,6 +114,7 @@ public class MPingPongMessageEndpoint<T>
      * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
      * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
      *                     was not received by the partner PingPongMessageEndpoint, and resends
+     * @param randomVariation the random component to add to the various times
      * @param exec the ScheduledExecutorService to schedule timed tasks
      * @param lastSentToken the last token sent in a previous instantiation of this MessageEndpoint
      * @param lastReceivedToken the last token received in a previous instantiation of this MessageEndpoint
@@ -152,6 +156,7 @@ public class MPingPongMessageEndpoint<T>
      * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
      * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
      *                     was not received by the partner PingPongMessageEndpoint, and resends
+     * @param randomVariation the random component to add to the various times
      * @param exec the ScheduledExecutorService to schedule timed tasks
      * @param lastSentToken the last token sent in a previous instantiation of this MessageEndpoint
      * @param lastReceivedToken the last token received in a previous instantiation of this MessageEndpoint

@@ -34,14 +34,40 @@ import org.infogrid.util.IsDeadException;
 import org.infogrid.util.text.StringRepresentation;
 
 import java.beans.PropertyChangeListener;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
-  * This interface is implemented by all MeshObjects. MeshObjects are all
-  * independent objects that are managed by InfoGrid. Pairs of MeshObjects
-  * may define Relationships, which are dependent objects as each relationship
-  * depends on the MeshObjects that it connects.
-  */
+ * <p>The core abstraction in InfoGrid.</p>
+ * 
+ * <p>Each MeshObject is identified by a {@link MeshObjectIdentifier}, which
+ * is globally unique. Each MeshObject is managed by exactly one
+ * {@link org.infogrid.meshbase.MeshBase}.</p>
+ * 
+ * <p>Each MeshObject may be blessed by one or more {@link org.infogrid.model.primitives.EntityType}s,
+ * which may define properties for the MeshObject (by means of
+ * {@link org.infogrid.model.primitives.PropertyType}).</p>
+ * 
+ * <p>Each MeshObject can stand on its own; pairs of MeshObjects may enter into relationships,
+ * each of which may be blessed by one or more {@link org.infogrid.model.primitives.RelationshipType}s.</p>
+ * 
+ * <p>Properties of MeshObjects may be read, and relationships may be traversed outside
+ * of {@link org.infogrid.meshbase.transaction.Transaction} boundaries; for updates, Transactions
+ * are needed. (See {@link org.infogrid.meshbase.MeshBase#createTransactionNow} and similar
+ * methods)</p>
+ * 
+ * <p>A MeshObject may be part of an equivalence set. In InfoGrid, an equivalence set of
+ * MeshObjects collects one or more MeshObjects and considers them semantically equivalent.
+ * When traversing relationships, all relationships of the MeshObjects in the equivalence
+ * set are considered as if they were relationships of the same MeshObject.</p>
+ * 
+ * <p>A caller may or may not have the appropriate authorization to perform any of the
+ * operations that may throw NotPermittedException, in which this exception is thrown.
+ * Other operations may silently return only a subset of the information they could return
+ * to some callers. The interface does not make any statements on this level about
+ * the exact behavior, other than stating that the experienced behavior may be different
+ * for different callers.</p>
+ */
 public interface MeshObject
 {
     /**
@@ -63,7 +89,7 @@ public interface MeshObject
      * Obtain the time of creation of this MeshObject. This is immutable for the
      * lifetime of the MeshObject.
      *
-     * @return the time this MeshObject was created in milliseconds
+     * @return the time this MeshObject was created in <code>System.currentTimeMillis()</code> format
      */
     public abstract long getTimeCreated();
 
@@ -71,7 +97,7 @@ public interface MeshObject
      * Obtain the time of last update of this MeshObject. This changes automatically
      * every time the MeshObject is changed.
      *
-     * @return the time this MeshObject was last updated in milliseconds
+     * @return the time this MeshObject was last updated in <code>System.currentTimeMillis()</code> format
      */
     public abstract long getTimeUpdated();
 
@@ -79,22 +105,28 @@ public interface MeshObject
      * Obtain the time of the last reading operation of this MeshObject. This changes automatically
      * every time the MeshObject is read.
      *
-     * @return the time this MeshObject was last read in milliseconds
+     * @return the time this MeshObject was last read in <code>System.currentTimeMillis()</code> format
      */
     public abstract long getTimeRead();
 
     /**
      * Set the time when this MeshObject expires. If -1, it never does.
      *
-     * @param newValue the new value, in milliseconds
+     * @param newValue the new value, in <code>System.currentTimeMillis()</code> format
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void setTimeExpires(
-            long newValue );
+            long newValue )
+        throws
+            NotPermittedException;
 
     /**
      * Obtain the time when this MeshObject expires. If this returns -1, it never does.
+     * This may return a time before the present, indicating that the MeshObject is stale
+     * and needs to be refreshed in some fashion. Being stale is different from being dead
+     * (see {@link #getIsDead}).
      *
-     * @return the time at which this MeshObject expires
+     * @return the time at which this MeshObject expires, in <code>System.currentTimeMillis()</code> format
      */
     public abstract long getTimeExpires();
 
@@ -107,7 +139,7 @@ public interface MeshObject
 
     /**
      * Throw an IsDeadException if this MeshObject is dead and should not be used any further.
-     * Do nothing if this MeshObject is alive.
+     * Does nothing as long as this MeshObject is alive.
      *
      * @throws IsDeadException thrown if this MeshObject is dead already
      */
@@ -125,154 +157,20 @@ public interface MeshObject
 // --
 
     /**
-     * Obtain the value of a Property, given its PropertyType.
+     * Obtain the value of a Property.
      *
-     * @param thePropertyType the PropertyType whose value we want to determine for this MeshObject
-     * @return the current value of the PropertyValue
+     * @param thePropertyType the PropertyType that identifies the correct Property of this MeshObject
+     * @return the current value of the Property
+     * @throws IllegalPropertyTypeException thrown if the PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      * @see #setPropertyValue
      */
     public abstract PropertyValue getPropertyValue(
             PropertyType thePropertyType )
         throws
-            NotPermittedException,
-            EntityNotBlessedException;
-
-    /**
-     * Set the value of a Property, given its PropertyType and a PropertyValue.
-     * 
-     * @param thePropertyType the PropertyType whose value we want to set
-     * @param newValue the new value for the PropertyType for this MeshObject
-     * @return old value of the Property
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this PropertyType
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @see #getPropertyValue
-     */
-    public abstract PropertyValue setPropertyValue(
-            PropertyType  thePropertyType,
-            PropertyValue newValue )
-        throws
-            NotPermittedException,
-            IllegalPropertyValueException,
-            EntityNotBlessedException,
-            TransactionException;
-
-    /**
-     * Set the value of a Property, given its PropertyType and a PropertyValue, and specify a time when
-     * that change happened. The caller must have the appropriate rights to invoke this; typical callers
-     * do not have the rights because this call is mostly intended for system-internal reasons.
-     * 
-     * @param thePropertyType the PropertyType whose value we want to set
-     * @param newValue the new value for the PropertyType for this MeshObject
-     * @param timeUpdated the time at which this change occurred
-     * @return old value of the Property
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this PropertyType
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @see #getPropertyValue
-     */
-    public abstract PropertyValue setPropertyValue(
-            PropertyType  thePropertyType,
-            PropertyValue newValue,
-            long          timeUpdated )
-        throws
-            NotPermittedException,
-            IllegalPropertyValueException,
-            EntityNotBlessedException,
-            TransactionException;
-
-    /**
-     * Set the value of several Properties, given their PropertyTypes and PropertyValues, in the same sequence.
-     * This method sets either all values, or none.
-     *
-     * @param thePropertyTypes the PropertyTypes whose values we want to set
-     * @param thePropertyValues the new values for the PropertyTypes for this MeshObject
-     * @return old value of the Properties
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this PropertyType
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     */
-    public abstract PropertyValue [] setPropertyValues(
-            PropertyType []  thePropertyTypes,
-            PropertyValue [] thePropertyValues )
-        throws
-            NotPermittedException,
-            IllegalPropertyValueException,
-            EntityNotBlessedException,
-            TransactionException;
-
-    /**
-     * Set the value of several Properties, given their PropertyTypes and PropertyValues,
-     * and specify a time when that change happened. This method sets either all values, or none.
-     * The caller must have the appropriate rights to invoke this.
-     *
-     * @param newValues Map of PropertyType to PropertyValue
-     * @param timeUpdated the time at which this change occurred
-     * @return old value of the Properties
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this PropertyType
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     */
-    public abstract void setPropertyValues(
-            Map<PropertyType,PropertyValue> newValues )
-        throws
-            NotPermittedException,
-            IllegalPropertyValueException,
-            EntityNotBlessedException,
-            TransactionException;
-
-    /**
-     * Set the value of several Properties, given their PropertyTypes and PropertyValues, in the same sequence,
-     * and specify a time when that change happened. This method sets either all values, or none.
-     * The caller must have the appropriate rights to invoke this.
-     *
-     * @param thePropertyTypes the PropertyTypes whose values we want to set
-     * @param thePropertyValues the new values for the PropertyTypes for this MeshObject
-     * @param timeUpdated the time at which this change occurred
-     * @return old value of the Properties
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this PropertyType
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     */
-    public abstract PropertyValue [] setPropertyValues(
-            PropertyType []  thePropertyTypes,
-            PropertyValue [] thePropertyValues,
-            long             timeUpdated )
-        throws
-            NotPermittedException,
-            IllegalPropertyValueException,
-            EntityNotBlessedException,
-            TransactionException;
-
-    /**
-     * Set the value of several Properties, given their PropertyTypes and PropertyValues,
-     * and specify a time when that change happened. This method sets either all values, or none.
-     * The caller must have the appropriate rights to invoke this.
-     *
-     * @param newValues Map of PropertyType to PropertyValue
-     * @param timeUpdated the time at which this change occurred
-     * @return old value of the Properties
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this PropertyType
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     */
-    public abstract void setPropertyValues(
-            Map<PropertyType,PropertyValue> newValues,
-            long                            timeUpdated )
-        throws
-            NotPermittedException,
-            IllegalPropertyValueException,
-            EntityNotBlessedException,
-            TransactionException;
-
-    /**
-     * Obtain the set of all PropertyTypes currently used with this MeshObject. This may return only the
-     * subset of PropertyTypes that the caller is allowed to see.
-     *
-     * @return the set of all PropertyTypes
-     */
-    public abstract PropertyType [] getAllPropertyTypes();
+            IllegalPropertyTypeException,
+            NotPermittedException;
 
     /**
      * Obtain all PropertyValues for the PropertyTypes provided, in the same sequence as the provided
@@ -281,33 +179,175 @@ public interface MeshObject
      *
      * @param thePropertyTypes the PropertyTypes
      * @return the PropertyValues, in the same sequence as PropertyTypes
+     * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract PropertyValue [] getPropertyValues(
             PropertyType [] thePropertyTypes )
         throws
-            NotPermittedException,
-            EntityNotBlessedException;
+            IllegalPropertyTypeException,
+            NotPermittedException;
 
     /**
-     * This is a convenience method to obtain the value of a property by providing the
-     * name of the property. If such a property could be found, return its value. If not,
-     * throw an Exception.
+     * Set the value of a Property.
+     * 
+     * @param thePropertyType the PropertyType that identifies the correct Property of this MeshObject
+     * @param newValue the new value of the Property
+     * @return old value of the Property
+     * @throws IllegalPropertyTypeException thrown if the PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
+     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this Property
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @see #getPropertyValue
+     */
+    public abstract PropertyValue setPropertyValue(
+            PropertyType  thePropertyType,
+            PropertyValue newValue )
+        throws
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
+            NotPermittedException,
+            TransactionException;
+
+    /**
+     * Set the value of a Property, and specify a time when that change happened. The caller must
+     * have the appropriate rights to invoke this; typical callers do not have the rights because this
+     * call is mostly intended for system-internal purposes.
+     * 
+     * @param thePropertyType the PropertyType that identifies the correct Property of this MeshObject
+     * @param newValue the new value of the Property
+     * @param timeUpdated the time at which this change occurred
+     * @return old value of the Property
+     * @throws IllegalPropertyTypeException thrown if the PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
+     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this Property
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @see #getPropertyValue
+     */
+    public abstract PropertyValue setPropertyValue(
+            PropertyType  thePropertyType,
+            PropertyValue newValue,
+            long          timeUpdated )
+        throws
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
+            NotPermittedException,
+            TransactionException;
+
+    /**
+     * Set the value of several Properties at the same time. The PropertyTypes identifying the Properties
+     * and their new PropertyValues are given in the same sequence. This method sets either all values, or none.
      *
-     * Warning: sometimes, MeshObjects carry two Properties with the same (short) name.
-     * This will only return one of them.
+     * @param thePropertyTypes the PropertyTypes that identify the correct Properties of this MeshObject
+     * @param thePropertyValues the new values of the Properties
+     * @return old values of the Properties
+     * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
+     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this Property
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     */
+    public abstract PropertyValue [] setPropertyValues(
+            PropertyType []  thePropertyTypes,
+            PropertyValue [] thePropertyValues )
+        throws
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
+            NotPermittedException,
+            TransactionException;
+
+    /**
+     * Set the value of several Properties at the same time. The PropertyTypes identifying the Properties
+     * and their new PropertyValues are given as paids in the Map. This method sets either all values, or none.
+
+     * @param newValues Map of PropertyType to PropertyValue
+     * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
+     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this Property
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     */
+    public abstract void setPropertyValues(
+            Map<PropertyType,PropertyValue> newValues )
+        throws
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
+            NotPermittedException,
+            TransactionException;
+
+    /**
+     * Set the value of several Properties, given their PropertyTypes and PropertyValues, in the same sequence,
+     * and specify a time when that change happened. This method sets either all values, or none.
+     *
+     * @param thePropertyTypes the PropertyTypes whose values we want to set
+     * @param thePropertyValues the new values for the PropertyTypes for this MeshObject
+     * @param timeUpdated the time at which this change occurred
+     * @return old value of the Properties
+     * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
+     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this Property
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     */
+    public abstract PropertyValue [] setPropertyValues(
+            PropertyType []  thePropertyTypes,
+            PropertyValue [] thePropertyValues,
+            long             timeUpdated )
+        throws
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
+            NotPermittedException,
+            TransactionException;
+
+    /**
+     * Set the value of several Properties, given their PropertyTypes and PropertyValues,
+     * and specify a time when that change happened. This method sets either all values, or none.
+     *
+     * @param newValues Map of PropertyType to PropertyValue
+     * @param timeUpdated the time at which this change occurred
+     * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
+     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this Property
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     */
+    public abstract void setPropertyValues(
+            Map<PropertyType,PropertyValue> newValues,
+            long                            timeUpdated )
+        throws
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
+            NotPermittedException,
+            TransactionException;
+
+    /**
+     * Obtain the set of all PropertyTypes currently used with this MeshObject.
+     *
+     * @return the set of all PropertyTypes
+     */
+    public abstract PropertyType [] getAllPropertyTypes();
+
+    /**
+     * <p>This is a convenience method to obtain the value of a property by providing the
+     * name of the property. If such a property could be found, this call returns its value. If not,
+     * it throws an MeshTypeNotFoundException.</p>
+     *
+     * <p>Warning: sometimes, a MeshObject may carry two Properties with the same (short) name.
+     * It is undefined which of the PropertyValues this call will return.</p>
      *
      * @param propertyName the name of the property
-     * @return the value of the property
+     * @return the PropertyValue
      * @throws MeshTypeNotFoundException thrown if a Property by this name could not be found
-     * @throws NotPermittedException thrown if the client was not allowed to access this property
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract PropertyValue getPropertyValueByName(
             String propertyName )
         throws
             MeshTypeNotFoundException,
-            NotPermittedException,
-            EntityNotBlessedException;
+            NotPermittedException;
 
     /**
      * Traverse from this MeshObject to all directly related MeshObjects. Directly
@@ -331,32 +371,23 @@ public interface MeshObject
             boolean considerEquivalents );
 
     /**
-     * Obtain the Identifiers of the neighbors of this MeshObject. This is sometimes a
-     * more efficient operation than to traverse to the neighbors and determine the Identifiers
-     * from there.
+     * Obtain the MeshObjectIdentifier of the neighbors of this MeshObject. This is sometimes a
+     * more efficient operation than to traverse to the neighbors and determine the
+     * MeshObjectIdentifiers from there.
      *
-     * @return the Identifiers of the neighbors
+     * @return the MeshObjectIdentifier of the neighbors, if any
      */
     public abstract MeshObjectIdentifier [] getNeighborMeshObjectIdentifiers();
     
     /**
-     * Obtain the RoleTypes that this MeshObject plays with a given neighbor MeshObject identified
-     * by its Identifier.
-     * 
-     * @param neighborIdentifier the Identifier of the neighbor MeshObject
-     * @return the RoleTypes
-     */
-    public abstract MeshTypeIdentifier [] getRoleTypeIdentifiers(
-            MeshObjectIdentifier neighborIdentifier );
-    
-    /**
-     * Relate this MeshObject to another MeshObject.
+     * Relate this MeshObject to another MeshObject. This does not bless the relationship.
      *
      * @param otherObject the MeshObject to relate to
      * @throws RelatedAlreadyException thrown to indicate that this MeshObject is already related
      *         to the otherObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @see #unrelate
+     * @see #relateAndBless
      */
     public abstract void relate(
             MeshObject otherObject )
@@ -370,7 +401,7 @@ public interface MeshObject
      * @param otherObject the MeshObject to unrelate from
      * @throws NotRelatedException thrown if this MeshObject is not already related to the otherObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      * @see #relate
      */
     public abstract void unrelate(
@@ -394,11 +425,11 @@ public interface MeshObject
     /**
      * Make this MeshObject support the provided EntityType.
      * 
-     * @param type the new ByEntityType to be supported by this MeshObject
-     * @throws BlessedAlreadyException.ByEntityType thrown if this MeshObject is blessed already with this ByEntityType
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @param type the new EntityType to be supported by this MeshObject
+     * @throws EntityBlessedAlreadyException thrown if this MeshObject is blessed already with this EntityType
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void bless(
             EntityType type )
@@ -409,14 +440,14 @@ public interface MeshObject
             NotPermittedException;
 
     /**
-     * Make this MeshObject support one more more provided EntityTypes. The MeshObject will either be
-     * blessed with all of the EntityTypes, or none.
+     * Make this MeshObject support the provided one or more EntityTypes. As a result, the
+     * MeshObject will either be blessed with all of the EntityTypes, or none.
      * 
      * @param types the new EntityTypes to be supported by this MeshObject
-     * @throws BlessedAlreadyException.ByEntityType thrown if this MeshObject is blessed already with at least one of these EntityTypes
-     * @throws IsAbstractException thrown if one of the EntityTypes is abstract and cannot be instantiated
+     * @throws EntityBlessedAlreadyException thrown if this MeshObject is blessed already with at least one of these EntityTypes
+     * @throws IsAbstractException thrown if at least one of the EntityTypes is abstract and cannot be instantiated
      * @throws TransactionException thrown if invoked outside of proper transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void bless(
             EntityType [] types )
@@ -427,16 +458,17 @@ public interface MeshObject
             NotPermittedException;
 
     /**
-     * Makes this MeshObject stop supporting the provided ByEntityType. This may fail with an
-     * RoleTypeRequiresEntityTypeException because the RoleType of a relationship in which this MeshObject participates
-     * requires this MeshObject to have the EntityType that is supposed to be unblessed. To avoid this,
-     * unbless relationships first.
+     * Makes this MeshObject stop supporting the provided EntityType. This may fail with an
+     * RoleTypeRequiresEntityTypeException because the RoleType of a relationship in which
+     * this MeshObject participates requires this MeshObject to have the EntityType
+     * that is supposed to be unblessed. To avoid this, unbless the relevant relationship(s)
+     * first.
      * 
-     * @param type the ByEntityType that the MeshObject will stop supporting
-     * @throws RoleTypeRequiresEntityTypeException if this MeshObject plays a role that requires the MeshObject to remain being blessed with this type
-     * @throws EntityNotBlessedException thrown if this MeshObject does not currently support this ByEntityType
+     * @param type the EntityType that the MeshObject will stop supporting
+     * @throws RoleTypeRequiresEntityTypeException thrown if this MeshObject plays a role that requires the MeshObject to remain being blessed with this EntityType
+     * @throws EntityNotBlessedException thrown if this MeshObject does not currently support this EntityType
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public void unbless(
             EntityType type )
@@ -447,17 +479,18 @@ public interface MeshObject
             NotPermittedException;
 
     /**
-     * Makes this MeshObject stop supporting the provided EntityTypes. The MeshObject will either be
-     * unblessed from all of the EntityTypes, or none.  This may fail with an
-     * RoleTypeRequiresEntityTypeException because the RoleType of a relationship in which this MeshObject participates
-     * requires this MeshObject to have the EntityType that is supposed to be unblessed. To avoid this,
-     * unbless relationships first.
+     * Makes this MeshObject stop supporting all of the provided EntityTypes. As a result,
+     * the MeshObject will either be unblessed from all of the EntityTypes, or none. 
+     * This may fail with an
+     * RoleTypeRequiresEntityTypeException because the RoleType of a relationship in which
+     * this MeshObject participates requires this MeshObject to have the EntityType
+     * that is supposed to be unblessed. To avoid this, unbless the relevant relationship(s) first.
      * 
      * @param types the EntityTypes that the MeshObject will stop supporting
-     * @throws RoleTypeRequiresEntityTypeException if this MeshObject plays a role that requires the MeshObject to remain being blessed with this type
-     * @throws NotBlessedException.ByEntityType thrown if this MeshObject does not support at least one of the given EntityTypes
+     * @throws RoleTypeRequiresEntityTypeException thrown if this MeshObject plays one or more roles that requires the MeshObject to remain being blessed with at least one of the EntityTypes
+     * @throws EntityNotBlessedException thrown if this MeshObject does not support at least one of the given EntityTypes
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public void unbless(
             EntityType [] types )
@@ -468,30 +501,28 @@ public interface MeshObject
             NotPermittedException;
 
     /**
-     * Obtain the EntityTypes that this MeshObject is currently blessed with. This may only return
-     * the subset of EntityTypes that the caller is allowed to see.
+     * Obtain the EntityTypes that this MeshObject is currently blessed with.
      *
-     * @return the types of this MeshObject
+     * @return the EntityTypes
      */
     public abstract EntityType [] getTypes();
 
     /**
-     * Determine whether this MeshObject currently supports this MeshType. This may return false, even if
-     * the MeshObject is blessed by this ByEntityType, if the caller is not allowed to see this ByEntityType.
-     * By default, this returns true even if the MeshObject is blessed by a subtype of the provided type.
+     * Determine whether this MeshObject currently supports this EntityType.
+     * By default, this returns true even if the MeshObject is blessed by a
+     * subtype of the provided EntityType instead of the EntityType directly.
      * 
-     * @param type the ByEntityType to look for
-     * @return true if this MeshObject supports this MeshType
+     * @param type the EntityType to look for
+     * @return true if this MeshObject supports this MeshType or a subtype
      */
     public abstract boolean isBlessedBy(
             EntityType type );
 
     /**
-     * Determine whether this MeshObject currently supports this MeshType. This may return false, even if
-     * the MeshObject is blessed by this ByEntityType, if the caller is not allowed to see this ByEntityType.
-     * Specify whether or not subtypes of the provided type should be considered.
+     * Determine whether this MeshObject currently supports this EntityType.
+     * Specify whether or not subtypes of the provided EntityType should be considered.
      * 
-     * @param type the ByEntityType to look for
+     * @param type the EntityType to look for
      * @param considerSubtypes if true, return true even if only a subtype matches
      * @return true if this MeshObject supports this MeshType
      */
@@ -500,26 +531,48 @@ public interface MeshObject
             boolean    considerSubtypes );
 
     /**
-     * Determine the specific subtype of the provided EntityType with which this MeshObject has been blessed.
-     * If this MeshObject has not been blessed with a subtype of the provided EntityType, return <code>null</code>.
-     * If blessed with more than one subtype, throw an Exception.
+     * Determine the specific subtypes of the provided EntityType with which this
+     * MeshObject has been blessed. If this MeshObject has not been blessed with a
+     * subtype of the provided EntityType, return a zero-length array. If this MeshObject
+     * has not been blessed with the provided EntityType either, throw an
+     * EntityNotBlessedException.
      *
      * @param type the EntityType
-     * @return the sub-type, if any
-     * @throws IllegalStateException thrown if the MeshObject is blessed by more than one subtype
+     * @return the subtypes, if any
+     * @throws EntityNotBlessedException thrown if the MeshObject is not blessed by the EntityType
+     * @see #determineSingleBlessedSubtype
      */
-    public abstract EntityType determineBlessedSubtype(
+    public abstract EntityType [] determineBlessedSubtypes(
             EntityType type )
         throws
+            EntityNotBlessedException;
+
+    /**
+     * Convenience method to determine the single subtype of the provided EntityType with
+     * which this MeshObject has been blessed. If this MeshObject has not been blessed with a
+     * subtype of the provided EntityType, return <code>null</code>. If it has
+     * been blessed with more than one subtype, throw an IllegalStateException. If this MeshObject
+     * has not been blessed with the provided EntityType either, throw an
+     * EntityNotBlessedException.
+     *
+     * @param type the EntityType
+     * @return the subtype, if any
+     * @throws EntityNotBlessedException thrown if the MeshObject is not blessed by the EntityType
+     * @throws IllegalStateException thrown if the MeshObject is blessed by more than one subtype
+     * @see #determineBlessedSubtypes
+     */
+    public abstract EntityType determineSingleBlessedSubtype(
+            EntityType type )
+        throws
+            EntityNotBlessedException,
             IllegalStateException;
 
     /**
-     * If the provided TypedMeshObjectFacade is a facade of this instance, get the ByEntityType
+     * If the provided TypedMeshObjectFacade is a facade of this instance, get the EntityType
      * that corresponds to this TypedMeshObjectFacade.
      * 
-     * 
      * @param obj the TypedMeshObjectFacade
-     * @return the ByEntityType that corresponds to this TypedMeshObjectFacade
+     * @return the EntityType that corresponds to this TypedMeshObjectFacade
      * @throws IllegalArgumentException thrown if the TypedMeshObjectFacade is not a facade of this MeshObject
      */
     public abstract EntityType getTypeFor(
@@ -529,14 +582,12 @@ public interface MeshObject
 
     /**
      * Obtain an instance of (a subclass of) TypedMeshObjectFacade that provides the type-safe interface
-     * to this MeshObject for a particular ByEntityType. Throw NotBlessedException
-     * if this MeshObject does not current support this ByEntityType, or if the caller is not allowed to
-     * see this ByEntityType.
+     * to this MeshObject for a particular EntityType. Throw NotBlessedException
+     * if this MeshObject does not current support this EntityType.
      * 
-     * 
-     * @param type the ByEntityType
+     * @param type the EntityType
      * @return the TypedMeshObjectFacade for this MeshObject
-     * @throws NotBlessedException thrown if this MeshObject does not currently support this ByEntityType
+     * @throws NotBlessedException thrown if this MeshObject does not currently support this EntityType
      */
     public abstract TypedMeshObjectFacade getTypedFacadeFor(
             EntityType type )
@@ -544,98 +595,121 @@ public interface MeshObject
             NotBlessedException;
 
     /**
-     * Make a relationship of this MeshObject to another MeshObject support the provided ByRoleType.
+     * Make a relationship of this MeshObject to another MeshObject support the provided RoleType.
      * 
-     * 
-     * @param thisEnd the ByRoleType of the RelationshipType that is instantiated at this object
-     * @param otherObject the other MeshObject whose relationship to this MeshObject shall be blessed
-     * @throws BlessedAlreadyException.ByRoleType thrown if the relationship to the other MeshObject is blessed
-     *         already with this ByRoleType
+     * @param thisEnd the RoleType of the RelationshipType that is instantiated at the end that this MeshObject is attached to
+     * @param otherObject the MeshObject whose relationship to this MeshObject shall be blessed
+     * @throws RoleTypeBlessedAlreadyException thrown if the relationship to the other MeshObject is blessed
+     *         already with this RoleType
+     * @throws EntityNotBlessedException thrown if this MeshObject is not blessed by a requisite EntityType
      * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
+     * @throws IsAbstractException thrown if the RoleType belongs to an abstract RelationshipType
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @see #relate
+     * @see #relateAndBless
+     * @see #unrelate
      */
     public void blessRelationship(
             RoleType   thisEnd,
             MeshObject otherObject )
         throws
             RoleTypeBlessedAlreadyException,
+            EntityNotBlessedException,
             NotRelatedException,
+            IsAbstractException,
             TransactionException,
             NotPermittedException;
     
     /**
      * Make a relationship of this MeshObject to another MeshObject support the provided RoleTypes.
-     * This is either successful as a whole or not at all.
+     * As a result, this relationship will support either all RoleTypes or none.
      * 
-     * 
-     * @param thisEnd the ByRoleType of the RelationshipType that is instantiated at this object
-     * @param otherObject the other MeshObject whose relationship to this MeshObject shall be blessed
-     * @throws BlessedAlreadyException.ByRoleType thrown if the relationship to the other MeshObject is blessed
-     *         already with this ByRoleType
+     * @param thisEnd the RoleTypes of the RelationshipTypes that are instantiated at the end that this MeshObject is attached to
+     * @param otherObject the MeshObject whose relationship to this MeshObject shall be blessed
+     * @throws RoleTypeBlessedAlreadyException thrown if the relationship to the other MeshObject is blessed
+     *         already with one ore more of the given RoleTypes
+     * @throws EntityNotBlessedException thrown if this MeshObject is not blessed by a requisite EntityType
      * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
+     * @throws IsAbstractException thrown if one of the RoleTypes belong to an abstract RelationshipType
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @see #relate
+     * @see #relateAndBless
+     * @see #unrelate
      */
     public void blessRelationship(
             RoleType [] thisEnd,
             MeshObject  otherObject )
         throws
             RoleTypeBlessedAlreadyException,
+            EntityNotBlessedException,
             NotRelatedException,
+            IsAbstractException,
             TransactionException,
             NotPermittedException;
     
     /**
-     * Relate this MeshObject to another MeshObject, and bless the new relationship with the provided ByRoleType.
-     * This is either successful as a whole or not at all. This is a convenience method.
+     * Convenience method to relate this MeshObject to another MeshObject, and bless the new relationship
+     * with the provided RoleType.
      * 
-     * @param thisEnd the ByRoleType of the RelationshipType that is instantiated at this object
-     * @param otherObject the MeshObject to relate to
-     * @see #unrelate
+     * @param thisEnd the RoleType of the RelationshipType that is instantiated at the end that this MeshObject is attached to
+     * @param otherObject the MeshObject to which a relationship is to be created and blessed
      * @throws RelatedAlreadyException thrown to indicate that this MeshObject is already related
      *         to the otherObject
+     * @throws EntityNotBlessedException thrown if this MeshObject is not blessed by a requisite EntityType
+     * @throws IsAbstractException thrown if the provided RoleType belongs to an abstract RelationshipType
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @see #relate
+     * @see #blessRelationship
+     * @see #unrelate
      */
     public abstract void relateAndBless(
             RoleType   thisEnd,
             MeshObject otherObject )
         throws
+            EntityNotBlessedException,
             RelatedAlreadyException,
+            IsAbstractException,
             TransactionException,
             NotPermittedException;
 
     /**
-     * Relate this MeshObject to another MeshObject, and bless the new relationship with the provided RoleTypes.
-     * This is either successful as a whole or not at all. This is a convenience method.
+     * Convenience method to relate this MeshObject to another MeshObject, and bless the new relationship
+     * with all of the provided RoleTypes. As a result, this relationship will support either all RoleTypes or none.
      * 
-     * @param thisEnd the ByRoleType of the RelationshipType that is instantiated at this object
-     * @param otherObject the MeshObject to relate to
-     * @see #unrelate
+     * @param thisEnd the RoleTypes of the RelationshipTypes that are to be instantiated at the end that this MeshObject is attached to
+     * @param otherObject the MeshObject to which a relationship is to be created and blessed
      * @throws RelatedAlreadyException thrown to indicate that this MeshObject is already related
      *         to the otherObject
+     * @throws EntityNotBlessedException thrown if this MeshObject is not blessed by a requisite EntityType
+     * @throws IsAbstractException thrown if one of the provided RoleTypes belongs to an abstract RelationshipType
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @see #relate
+     * @see #blessRelationship
+     * @see #unrelate
      */
     public abstract void relateAndBless(
             RoleType [] thisEnd,
             MeshObject  otherObject )
         throws
+            EntityNotBlessedException,
             RelatedAlreadyException,
+            IsAbstractException,
             TransactionException,
             NotPermittedException;
 
     /**
-     * Make a relationship of this MeshObject to another MeshObject stop supporting the provided ByRoleType.
+     * Make a relationship of this MeshObject to another MeshObject stop supporting the provided RoleType.
      * 
-     * 
-     * @param thisEnd the ByRoleType of the RelationshipType that is removed at this object
+     * @param thisEnd the RoleType of the RelationshipType at the end that this MeshObject is attached to, and that shall be removed
      * @param otherObject the other MeshObject whose relationship to this MeshObject shall be unblessed
-     * @throws NotBlessedException.ByRoleType thrown if the relationship to the other MeshObject does not support the ByRoleType
+     * @throws RoleTypeNotBlessedException thrown if the relationship to the other MeshObject does not support the RoleType
      * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public void unblessRelationship(
             RoleType   thisEnd,
@@ -648,15 +722,14 @@ public interface MeshObject
 
     /**
      * Make a relationship of this MeshObject to another MeshObject stop supporting the provided RoleTypes.
-     * This is either successful as a whole or not at all.
+     * As a result, either all RoleTypes will be unblessed or none.
      * 
-     * 
-     * @param thisEnd the ByRoleType of the RelationshipType that is removed at this object
+     * @param thisEnd the RoleTypes of the RelationshipTypes at the end that this MeshObject is attached to, and that shall be removed
      * @param otherObject the other MeshObject whose relationship to this MeshObject shall be unblessed
-     * @throws NotBlessedException.ByRoleType thrown if the relationship to the other MeshObject does not support the ByRoleType
+     * @throws RoleTypeNotBlessedException thrown if the relationship to the other MeshObject does not support at least one of the RoleTypes
      * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public void unblessRelationship(
             RoleType [] thisEnd,
@@ -692,19 +765,17 @@ public interface MeshObject
 
     /**
      * Obtain the RoleTypes that this MeshObject currently participates in. This will return only one
-     * instance of the same ByRoleType object, even if the MeshObject participates in this ByRoleType
-     * multiple times with different other sides. This may only return the subset of RoleTypes
-     * that the caller is allowed to see.
+     * instance of the same RoleType object, even if the MeshObject participates in this RoleType
+     * multiple times with different other MeshObjects.
      * 
      * @return the RoleTypes that this MeshObject currently participates in.
      */
     public abstract RoleType [] getRoleTypes();
-    
+
     /**
      * Obtain the RoleTypes that this MeshObject currently participates in. This will return only one
-     * instance of the same ByRoleType object, even if the MeshObject participates in this ByRoleType
-     * multiple times with different other sides. This may only return the subset of RoleTypes
-     * that the caller is allowed to see. Specify whether relationships of equivalent MeshObjects
+     * instance of the same RoleType object, even if the MeshObject participates in this RoleType
+     * multiple times with different other MeshObjects. Specify whether equivalent MeshObjects
      * should be considered as well.
      * 
      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
@@ -715,16 +786,28 @@ public interface MeshObject
             boolean considerEquivalents );
     
     /**
-     * Obtain the Roles that this MeshObject currently participates in. This may only return the subset
-     * of Roles that the caller is allowed to see.
+     * Obtain the MeshTypeIdentifiers of the RoleTypes that this MeshObject plays with a
+     * given neighbor MeshObject identified by its MeshObjectIdentifier.
+     * 
+     * @param neighborIdentifier the MeshObjectIdentifier of the neighbor MeshObject
+     * @return the RoleTypes
+     * @throws NotRelatedException thrown if the specified MeshObject is not actually a neighbor
+     */
+    public abstract MeshTypeIdentifier [] getRoleTypeIdentifiers(
+            MeshObjectIdentifier neighborIdentifier )
+        throws
+            NotRelatedException;
+    
+    /**
+     * Obtain the Roles that this MeshObject currently participates in.
      *
      * @return the Roles that this MeshObject currently participates in.
      */
     public abstract Role [] getRoles();
     
     /**
-     * Obtain the Roles that this MeshObject currently participates in. This may only return the subset
-     * of Roles that the caller is allowed to see. Specify whether relationships of equivalent MeshObjects
+     * Obtain the Roles that this MeshObject currently participates in.
+     * Specify whether relationships of equivalent MeshObjects
      * should be considered as well.
      *
      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
@@ -736,29 +819,34 @@ public interface MeshObject
     
     /**
      * Obtain the RoleTypes that this MeshObject currently participates in with the
-     * specified other MeshObject. This may only return the subset of RoleTypes that the caller
-     * is allowed to see.
+     * specified other MeshObject.
      *
      * @param otherObject the other MeshObject
      * @return the RoleTypes that this MeshObject currently participates in.
+     * @throws NotRelatedException thrown if this MeshObject and otherObject are not related
      */
     public abstract RoleType [] getRoleTypes(
-            MeshObject otherObject );
+            MeshObject otherObject )
+        throws
+            NotRelatedException;
 
     /**
      * Obtain the RoleTypes that this MeshObject currently participates in with the
-     * specified other MeshObject. This may only return the subset of RoleTypes that the caller
-     * is allowed to see. Specify whether relationships of equivalent MeshObjects should be considered
+     * specified other MeshObject.
+     * Specify whether relationships of equivalent MeshObjects should be considered
      * as well.
      *
      * @param otherObject the other MeshObject
      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
      *        if false, only this MeshObject will be used as the start
      * @return the RoleTypes that this MeshObject currently participates in.
+     * @throws NotRelatedException thrown if this MeshObject and otherObject are not related
      */
     public abstract RoleType [] getRoleTypes(
             MeshObject otherObject,
-            boolean    considerEquivalents );
+            boolean    considerEquivalents )
+        throws
+            NotRelatedException;
 
     /**
      * Add another MeshObject as an equivalent. All MeshObjects that are already equivalent
@@ -766,9 +854,9 @@ public interface MeshObject
      * added MeshObject, are now equivalent.
      *
      * @param equiv the new equivalent
-     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent
+     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public void addAsEquivalent(
             MeshObject equiv )
@@ -787,60 +875,73 @@ public interface MeshObject
     
     /**
      * Obtain the Identifiers of the equivalent MeshObjects. This is sometimes more efficient than
-     * traversing to the equivalents, and determining the IdentifierValues.
+     * traversing to the equivalents, and determining the MeshObjectIdentifiers.
      *
-     * @return the Identifiers of the equivalents
+     * @return the MeshObjectIdentifiers of the equivalents
      */
     public MeshObjectIdentifier [] getEquivalentMeshObjectIdentifiers();
-    
+
     /**
-     * Remove this MeshObject as an equivalent from the set of equivalents.
+     * Remove this MeshObject as an equivalent from the set of equivalents. If this MeshObject
+     * is not currently equivalent to any other MeshObject, this does nothing.
      *
-     * @param remainingEquivalentSetRepresentative one of the MeshObjects that remain in the set of equivalents
-     * @throws NotEquivalentException thrown if the provided MeshBase in not equivalent
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
-    public void removeAsEquivalent(
-            MeshObject remainingEquivalentSetRepresentative )
+    public void removeAsEquivalent()
         throws
-            NotEquivalentException,
             TransactionException,
             NotPermittedException;
 
     /**
-      * Add a PropertyChangeListener.
-      *
-      * @param newListener the to-be-added PropertyChangeListener
-      * @see #removePropertyChangeListener
-      */
+     * Add a PropertyChangeListener.
+     * This listener is added directly to the listener list, which prevents the
+     * listener from being garbage-collected before this Object is being garbage-collected.
+     *
+     * @param newListener the to-be-added PropertyChangeListener
+     * @see #addWeakPropertyChangeListener
+     * @see #addSoftPropertyChangeListener
+     * @see #removePropertyChangeListener
+     */
     public abstract void addDirectPropertyChangeListener(
             PropertyChangeListener newListener );
 
     /**
-      * Add a PropertyChangeListener.
-      *
-      * @param newListener the to-be-added PropertyChangeListener
-      * @see #removePropertyChangeListener
-      */
+     * Add a PropertyChangeListener.
+     * This listener is added to the listener list using a <code>java.lang.ref.SoftReference</code>,
+     * which allows the listener to be garbage-collected before this Object is being garbage-collected
+     * according to the semantics of Java references.
+     *
+     * @param newListener the to-be-added PropertyChangeListener
+     * @see #addDirectPropertyChangeListener
+     * @see #addSoftPropertyChangeListener
+     * @see #removePropertyChangeListener
+     */
     public abstract void addWeakPropertyChangeListener(
             PropertyChangeListener newListener );
 
     /**
-      * Add a PropertyChangeListener.
-      *
-      * @param newListener the to-be-added PropertyChangeListener
-      * @see #removePropertyChangeListener
-      */
+     * Add a PropertyChangeListener.
+     * This listener is added to the listener list using a <code>java.lang.ref.WeakReference</code>,
+     * which allows the listener to be garbage-collected before this Object is being garbage-collected
+     * according to the semantics of Java references.
+     *
+     * @param newListener the to-be-added PropertyChangeListener
+     * @see #addDirectPropertyChangeListener
+     * @see #addWeakPropertyChangeListener
+     * @see #removePropertyChangeListener
+     */
     public abstract void addSoftPropertyChangeListener(
             PropertyChangeListener newListener );
 
     /**
-      * Remove a PropertyChangeListener.
-      *
-      * @param oldListener the to-be-removed PropertyChangeListener
-      * @see #addPropertyChangeListener
-      */
+     * Remove a PropertyChangeListener.
+     *
+     * @param oldListener the to-be-removed PropertyChangeListener
+     * @see #addDirectPropertyChangeListener
+     * @see #addWeakPropertyChangeListener
+     * @see #addSoftPropertyChangeListener
+     */
     public abstract void removePropertyChangeListener(
             PropertyChangeListener oldListener );
 
@@ -852,7 +953,7 @@ public interface MeshObject
     public abstract boolean hasPropertyChangeListener();
 
     /**
-     * This method returns an iterator over the currently subscribed PropertyChangeListeners.
+     * This method returns an Iterator over the currently subscribed PropertyChangeListeners.
      *
      * @return the Iterator over the currently subscribed PropertyChangeListeners
      */
@@ -868,7 +969,7 @@ public interface MeshObject
     /**
      * Obtain a String representation of this MeshObject that can be shown to the user.
      * 
-     * @param rep the StringRepresentation
+     * @param rep the StringRepresentation to use
      * @param contextPath the context path
      * @param isDefaultMeshBase true if the enclosing MeshBase is the default MeshBase
      * @return String representation
@@ -882,7 +983,7 @@ public interface MeshObject
      * Obtain the start part of a String representation of this MeshObject that acts
      * as a link/hyperlink and can be shown to the user.
      * 
-     * @param rep the StringRepresentation
+     * @param rep the StringRepresentation to use
      * @param contextPath the context path
      * @param isDefaultMeshBase true if the enclosing MeshBase is the default MeshBase
      * @return String representation
@@ -896,7 +997,7 @@ public interface MeshObject
      * Obtain the end part of a String representation of this MeshObject that acts
      * as a link/hyperlink and can be shown to the user.
      * 
-     * @param rep the StringRepresentation
+     * @param rep the StringRepresentation to use
      * @param contextPath the context path
      * @param isDefaultMeshBase true if the enclosing MeshBase is the default MeshBase
      * @return String representation
@@ -920,8 +1021,8 @@ public interface MeshObject
     
     /**
      * The name of a pseudo-property that indicates the RoleTypes in which this MeshObject
-     * participates. This pseudo-property changes when the MeshObject's participation in
-     * a relationship changes.
+     * participates. This pseudo-property changes when the MeshObject's roles in
+     * a relationship change.
      */
     public static final String _MESH_OBJECT_ROLES_PROPERTY = "_MeshObjectRoles";
     

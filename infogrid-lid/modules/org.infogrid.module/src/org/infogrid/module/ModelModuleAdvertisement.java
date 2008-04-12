@@ -14,9 +14,10 @@
 
 package org.infogrid.module;
 
-import java.io.*;
+import java.io.File;
 import java.net.URL;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * This ModuleAdvertisement is for Models, aka Schemas.
@@ -24,6 +25,8 @@ import java.util.*;
 public class ModelModuleAdvertisement
         extends ModuleAdvertisement
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Factory method that constructs a ModuleAdvertisement from specified data.
      *

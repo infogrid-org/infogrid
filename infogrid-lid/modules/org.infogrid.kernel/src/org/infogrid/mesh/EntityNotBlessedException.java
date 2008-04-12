@@ -14,13 +14,15 @@
 
 package org.infogrid.mesh;
 
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.model.primitives.EntityType;
-import org.infogrid.model.primitives.MeshTypeUtils;
-
-import org.infogrid.util.StringHelper;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
+import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 
 /**
- * Indicates that a MeshObject was not blessed with this EntityType.
+ * This Exception is thrown if an operation requires a MeshObject to
+ * be blessed with a certain EntityType, but it is not.
  */
 public class EntityNotBlessedException
         extends
@@ -28,61 +30,57 @@ public class EntityNotBlessedException
 {
     /**
      * Constructor.
-     * 
-     * @param obj the MeshObject that is not blessed
-     * @param type the ByEntityType with which this MeshObject is not blessed
+     *
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param identifier the MeshObjectIdentifier for the MeshObject on which the illegal operation was attempted
+     * @param type the MeshType of the missing blessing
+     * @param typeIdentifier the MeshTypeIdentifier of the MeshType of the missing blessing
      */
     public EntityNotBlessedException(
-            MeshObject obj,
-            EntityType requiredType )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           obj,
+            MeshObjectIdentifier identifier,
+            EntityType           type,
+            MeshTypeIdentifier   typeIdentifier )
     {
-        super( obj );
-        theRequiredType = requiredType;
+        super( mb, originatingMeshBaseIdentifier, obj, identifier, type, typeIdentifier );
     }
+
     /**
-      * Obtain String representation, for debugging.
-      *
-      * @return String representation
-      */
+     * More convenient simple constructor for the most common case.
+     *
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param type the MeshType of the already-existing blessing
+     */
+    public EntityNotBlessedException(
+            MeshObject           obj,
+            EntityType           type )
+    {
+        super(  obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                obj.getIdentifier(),
+                type,
+                type.getIdentifier() );
+    }
+
+    /**
+     * Obtain the EntityType of the missing blessing.
+     * 
+     * @return the MeshType
+     * @throws MeshTypeWithIdentifierNotFoundException thrown if the EntityType could not be found
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     * @throws ClassCastException thrown if the type identifier identified a MeshType that is not an EntityType
+     */
     @Override
-    public String toString()
+    public synchronized EntityType getType()
+        throws
+            MeshTypeWithIdentifierNotFoundException,
+            IllegalStateException
     {
-        return StringHelper.objectLogString(
-                this,
-                new String[] {
-                    "theMeshObject",
-                    "theRequiredType",
-                    "types"
-                },
-                new Object[] {
-                    theMeshObject,
-                    theRequiredType.getIdentifier().toExternalForm(),
-                    MeshTypeUtils.meshTypeIdentifiers( theMeshObject.getTypes() )
-                } );
+        return (EntityType) super.getType();
     }
-
-    /**
-     * Obtain the EntityType with which this MeshObject is not blessed.
-     *
-     * @return the EntityType
-     */
-    public final EntityType getRequiredEntityType()
-    {
-        return theRequiredType;
-    }
-
-    /**
-     * Obtain parameters for the internationalization.
-     *
-     * @return the parameters
-     */
-    public Object [] getLocalizationParameters()
-    {
-        return new Object[] { theMeshObject, theRequiredType };
-    }
-
-    /**
-     * The EntityType with which this MeshObject is not blessed.
-     */
-    protected transient EntityType theRequiredType;
 }

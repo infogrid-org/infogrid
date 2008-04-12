@@ -19,6 +19,8 @@ import org.infogrid.util.StringHelper;
 
 /**
  * A StringifierParsingChoice for CompoundStringifiers.
+ * 
+ * @param T the type of the Objects to be stringified
  */
 class CompoundStringifierChildChoice<T>
         extends
@@ -30,7 +32,7 @@ class CompoundStringifierChildChoice<T>
      * @param stringifier the Stringifier this choice belongs to
      * @param componentChoices the choices of the child Stringifiers, in sequence from left to right
      * @param startIndex the startIndex of the String match (inclusive)
-     * @Param endIndex the endIndex of the String match (exclusive)
+     * @param endIndex the endIndex of the String match (exclusive)
      */
     public CompoundStringifierChildChoice(
             CompoundStringifier<T>           stringifier,

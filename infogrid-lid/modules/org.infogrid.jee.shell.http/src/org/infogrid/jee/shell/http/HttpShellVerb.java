@@ -50,6 +50,16 @@ import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
 
 import java.net.URISyntaxException;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.mesh.RelatedAlreadyException;
+import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
+import org.infogrid.mesh.RoleTypeNotBlessedException;
+import org.infogrid.mesh.RoleTypeRequiresEntityTypeException;
 
 /**
  * The verbs recognized by the {@link org.infogrid.jee.shell.http.HttpShellFilter HttpShellFilter}
@@ -140,12 +150,19 @@ public enum HttpShellVerb
                 MeshObject           object,
                 MeshBase             mb )
             throws
+                IsAbstractException,
+                EntityBlessedAlreadyException,
                 EssentialArgumentMissingException,
                 MeshObjectIdentifierNotUniqueException,
                 InconsistentArgumentsException,
                 MeshTypeNotFoundException,
+                IllegalPropertyTypeException,
                 NotPermittedException,
                 PropertyValueParsingException,
+                RelatedAlreadyException,
+                RoleTypeBlessedAlreadyException,
+                EntityNotBlessedException,
+                NotRelatedException,
                 TransactionException,
                 URISyntaxException
         {
@@ -257,13 +274,20 @@ public enum HttpShellVerb
                 MeshObject           object,
                 MeshBase             mb )
             throws
+                IsAbstractException,
+                EntityBlessedAlreadyException,
                 EssentialArgumentMissingException,
                 MeshObjectIdentifierNotUniqueException,
                 InconsistentArgumentsException,
+                IllegalPropertyTypeException,
                 MeshObjectAccessException,
                 MeshTypeNotFoundException,
                 NotPermittedException,
+                RelatedAlreadyException,
                 PropertyValueParsingException,
+                RoleTypeBlessedAlreadyException,
+                EntityNotBlessedException,
+                NotRelatedException,
                 TransactionException,
                 URISyntaxException
         {
@@ -425,12 +449,19 @@ public enum HttpShellVerb
                 MeshObject           object,
                 MeshBase             mb )
             throws
+                IsAbstractException,
+                EntityBlessedAlreadyException,
                 EssentialArgumentMissingException,
                 InconsistentArgumentsException,
                 MeshObjectsNotFoundException,
                 MeshTypeNotFoundException,
+                IllegalPropertyTypeException,
+                RelatedAlreadyException,
                 NotPermittedException,
                 PropertyValueParsingException,
+                RoleTypeBlessedAlreadyException,
+                EntityNotBlessedException,
+                NotRelatedException,
                 TransactionException
         {
             if( subject == null ) {
@@ -493,8 +524,10 @@ public enum HttpShellVerb
                 MeshObject           object,
                 MeshBase             mb )
             throws
+                EntityNotBlessedException,
                 MeshObjectsNotFoundException,
                 MeshTypeNotFoundException,
+                RoleTypeRequiresEntityTypeException,
                 NotPermittedException,
                 TransactionException
         {
@@ -587,12 +620,19 @@ public enum HttpShellVerb
                 MeshObject           object,
                 MeshBase             mb )
             throws
+                IsAbstractException,
+                EntityBlessedAlreadyException,
+                IllegalPropertyTypeException,
                 EssentialArgumentMissingException,
                 InconsistentArgumentsException,
                 MeshObjectsNotFoundException,
                 MeshTypeNotFoundException,
+                RelatedAlreadyException,
                 NotPermittedException,
                 PropertyValueParsingException,
+                RoleTypeBlessedAlreadyException,
+                EntityNotBlessedException,
+                NotRelatedException,
                 TransactionException
         {
             if( subject == null ) {
@@ -664,8 +704,10 @@ public enum HttpShellVerb
                 EssentialArgumentMissingException,
                 InconsistentArgumentsException,
                 MeshObjectsNotFoundException,
+                NotRelatedException,
                 MeshTypeNotFoundException,
                 NotPermittedException,
+                IllegalPropertyTypeException,
                 PropertyValueParsingException,
                 TransactionException
         {
@@ -759,12 +801,18 @@ public enum HttpShellVerb
                 MeshObject           object,
                 MeshBase             mb )
             throws
+                IsAbstractException,
                 EssentialArgumentMissingException,
                 InconsistentArgumentsException,
                 MeshTypeNotFoundException,
                 MeshObjectsNotFoundException,
                 NotPermittedException,
+                RelatedAlreadyException,
+                IllegalPropertyTypeException,
                 PropertyValueParsingException,
+                RoleTypeBlessedAlreadyException,
+                EntityNotBlessedException,
+                NotRelatedException,
                 TransactionException
         {
             if( subject == null ) {
@@ -843,7 +891,10 @@ public enum HttpShellVerb
                 InconsistentArgumentsException,
                 MeshObjectsNotFoundException,
                 MeshTypeNotFoundException,
+                RoleTypeNotBlessedException,
                 NotPermittedException,
+                IllegalPropertyTypeException,
+                NotRelatedException,
                 PropertyValueParsingException,
                 TransactionException
         {
@@ -926,6 +977,7 @@ public enum HttpShellVerb
                 InconsistentArgumentsException,
                 MeshObjectsNotFoundException,
                 MeshTypeNotFoundException,
+                IllegalPropertyTypeException,
                 NotPermittedException,
                 PropertyValueParsingException,
                 TransactionException
@@ -1038,10 +1090,37 @@ public enum HttpShellVerb
         } catch( EssentialArgumentMissingException ex ) {
             throw new HttpShellException( ex );
 
+        } catch( IsAbstractException ex ) {
+            throw new HttpShellException( ex );
+
+        } catch( EntityBlessedAlreadyException ex ) {
+            throw new HttpShellException( ex );
+
+        } catch( IllegalPropertyTypeException ex ) {
+            throw new HttpShellException( ex );
+
+        } catch( RoleTypeBlessedAlreadyException ex ) {
+            throw new HttpShellException( ex );
+
         } catch( MeshObjectIdentifierNotUniqueException ex ) {
             throw new HttpShellException( ex );
 
         } catch( InconsistentArgumentsException ex ) {
+            throw new HttpShellException( ex );
+
+        } catch( EntityNotBlessedException ex ) {
+            throw new HttpShellException( ex );
+
+        } catch( RelatedAlreadyException ex ) {
+            throw new HttpShellException( ex );
+
+        } catch( RoleTypeRequiresEntityTypeException ex ) {
+            throw new HttpShellException( ex );
+
+        } catch( RoleTypeNotBlessedException ex ) {
+            throw new HttpShellException( ex );
+
+        } catch( NotRelatedException ex ) {
             throw new HttpShellException( ex );
 
         } catch( MeshTypeNotFoundException ex ) {
@@ -1092,12 +1171,21 @@ public enum HttpShellVerb
             MeshObject           object,
             MeshBase             mb )
         throws
+            IsAbstractException,
+            EntityNotBlessedException,
             EssentialArgumentMissingException,
             MeshObjectIdentifierNotUniqueException,
             InconsistentArgumentsException,
+            IllegalPropertyTypeException,
             MeshObjectAccessException,
             MeshTypeNotFoundException,
+            RoleTypeRequiresEntityTypeException,
+            RoleTypeNotBlessedException,
+            NotRelatedException,
+            EntityBlessedAlreadyException,
             NotPermittedException,
+            RelatedAlreadyException,
+            RoleTypeBlessedAlreadyException,
             PropertyValueParsingException,
             TransactionException,
             URISyntaxException;
@@ -1162,8 +1250,10 @@ public enum HttpShellVerb
             MeshBase           mb,
             boolean            throwExceptions )
         throws
+            IsAbstractException,
             NotPermittedException,
             MeshTypeNotFoundException,
+            EntityBlessedAlreadyException,
             EssentialArgumentMissingException,
             TransactionException
     {
@@ -1204,6 +1294,7 @@ public enum HttpShellVerb
             MeshTypeNotFoundException,
             EssentialArgumentMissingException,
             InconsistentArgumentsException,
+            IllegalPropertyTypeException,
             PropertyValueParsingException,
             TransactionException
     {
@@ -1245,7 +1336,11 @@ public enum HttpShellVerb
                     value = propertyType.fromStringRepresentation( ModelPrimitivesStringRepresentation.TEXT_PLAIN, propertyValuesStrings[i] );
                 }
 
-                subject.setPropertyValue( propertyType, value );
+                try {
+                    subject.setPropertyValue( propertyType, value );
+                } catch( IllegalPropertyValueException ex ) {
+                    log.error( ex );
+                }
 
             } else {
                 try {
@@ -1253,6 +1348,8 @@ public enum HttpShellVerb
 
                     subject.setPropertyValue( propertyType, value );
 
+                } catch( IllegalPropertyValueException ex ) {
+                    log.error( ex );
                 } catch( Throwable t ) {
                     log.info( t );
                 }
@@ -1279,9 +1376,14 @@ public enum HttpShellVerb
             MeshBase           mb,
             boolean            throwExceptions )
         throws
+            IsAbstractException,
             NotPermittedException,
             MeshTypeNotFoundException,
             EssentialArgumentMissingException,
+            RelatedAlreadyException,
+            RoleTypeBlessedAlreadyException,
+            EntityNotBlessedException,
+            NotRelatedException,
             TransactionException
     {
         if( throwExceptions ) {

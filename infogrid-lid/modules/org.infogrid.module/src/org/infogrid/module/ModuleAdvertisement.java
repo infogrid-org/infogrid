@@ -567,6 +567,7 @@ public abstract class ModuleAdvertisement
      * Escape new-line characters in Strings into Java-escaped strings.
      * 
      * @param raw the raw String
+     * @return the escaped String
      */
     static String stringToJavaString(
             String raw )

@@ -16,6 +16,9 @@ package org.infogrid.util;
 
 /**
  * Factors out common functionality for {@link CachingMap} implementations.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public abstract class AbstractCachingMap<K,V>
         implements

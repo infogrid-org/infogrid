@@ -27,6 +27,7 @@ public class OverridingStandardModuleActivator
      *
      * @param delegate the StandardModuleActivator to override
      * @param overridingActivationClassName name of the activation class to use instead
+     * @param overridingActivationMethodName name of the activation method to use instead
      * @param overridingDeactivationMethodName name of the activation method in the activation class to use instead
      * @param loader ClassLoader that knows where to find overridingActivationClass
      */

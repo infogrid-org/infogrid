@@ -17,6 +17,9 @@ package org.infogrid.util;
 /**
  * Similar to Java's <code>Runnable</code>, this interface also supports a parameter
  * to the run method.
+ * 
+ * @param K the type of the invocation argument
+ * @param V the type of the return value
  */
 public interface Invocable<K,V>
 {

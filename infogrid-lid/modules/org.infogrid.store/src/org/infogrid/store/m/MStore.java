@@ -162,7 +162,6 @@ public class MStore
      * Exception if a data element with this key does not exist already.
      *
      * @param toUpdate the StoreValue to update
-     * @param data the data element, expressed as a sequence of bytes
      * @throws StoreKeyDoesNotExistException thrown if no data element exists in the Store using this key
      * @throws IOException thrown if an I/O error occurred
      *
@@ -427,6 +426,9 @@ public class MStore
     {
         /**
          * Factory method.
+         * 
+         * @param delegate the HashMap that stores the content
+         * @return the IterableStoreCursor
          */
         @SuppressWarnings(value={"unchecked"})
         public static MyIterableStoreCursor create(
@@ -440,13 +442,17 @@ public class MStore
 
         /**
          * Constructor.
+         * 
+         * @param delegate the HashMap that stores the content
+         * @param entries the entries in the HashMap, in a sequence
+         * @param delegateIter the delegate iterator over the entries in a sequence
          */
         protected MyIterableStoreCursor(
-                Map<String,StoreValue>                        map,
+                Map<String,StoreValue>                        delegate,
                 Entry<String,StoreValue> []                   entries,
-                ArrayCursorIterator<Entry<String,StoreValue>> delegate )
+                ArrayCursorIterator<Entry<String,StoreValue>> delegateIter )
         {
-            super( map, String.class, StoreValue.class, entries, delegate );
+            super( delegate, String.class, StoreValue.class, entries, delegateIter );
         }
 
         /**

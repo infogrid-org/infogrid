@@ -46,6 +46,7 @@ public class EncryptedStore
      * @param transformation the name of the transformation, e.g., DES/CBC/PKCS5Padding, see <code>javax.crypto.Cipher.getInstance(String)</code>
      * @param key the secret key to be used for encryption and decryption
      * @param delegate the Store that does the actual storing
+     * @return the created EncryptedStore
      * @throws InvalidKeyException thrown if the key is invalid or does not match the specified transformation
      * @throws NoSuchAlgorithmException thrown if the specified transformation is not available in the default provider package or any of the other provider packages that were searched. 
      * @throws NoSuchPaddingException thrown if transformation contains a padding scheme that is not available.
@@ -90,10 +91,10 @@ public class EncryptedStore
      *
      * @param key the key under which the data element will be stored
      * @param encodingId the id of the encoding that was used to encode the data element. This must be 64 bytes or less.
-     * @param timeCreated the time at which the data element in the inStream was created originally
-     * @param timeUpdated the time at which the data element in the inStream was successfully updated the most recent time
-     * @param timeRead the time at which the data element in the inStream was last read by some client
-     * @param timeAutoDeletes the time at which the data element in the inStream should be deleted
+     * @param timeCreated the time at which the data element was created originally
+     * @param timeUpdated the time at which the data element was successfully updated the most recent time
+     * @param timeRead the time at which the data element was last read by some client
+     * @param timeExpires the time at which the data element expires
      * @param data the data element, expressed as a sequence of bytes
      * @throws StoreKeyExistsAlreadyException thrown if a data element is already stored in the Store using this key
      * @throws IOException thrown if an I/O error occurred
@@ -157,10 +158,10 @@ public class EncryptedStore
      *
      * @param key the key under which the data element is already, and will continue to be stored
      * @param encodingId the id of the encoding that was used to encode the data element
-     * @param timeCreated the time at which the data element in the inStream was created originally
-     * @param timeUpdated the time at which the data element in the inStream was successfully updated the most recent time
-     * @param timeRead the time at which the data element in the inStream was last read by some client
-     * @param timeAutoDeletes the time at which the data element in the inStream should be deleted
+     * @param timeCreated the time at which the data element was created originally
+     * @param timeUpdated the time at which the data element was successfully updated the most recent time
+     * @param timeRead the time at which the data element was last read by some client
+     * @param timeExpires the time at which the data element expires
      * @param data the data element, expressed as a sequence of bytes
      * @throws StoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
      * @throws IOException thrown if an I/O error occurred
@@ -198,7 +199,6 @@ public class EncryptedStore
      * Exception if a data element with this key does not exist already.
      *
      * @param toUpdate the StoreValue to update
-     * @param data the data element, expressed as a sequence of bytes
      * @throws StoreKeyDoesNotExistException thrown if no data element exists in the Store using this key
      * @throws IOException thrown if an I/O error occurred
      *
@@ -225,10 +225,10 @@ public class EncryptedStore
      *
      * @param key the key under which the data element may already, and will continue to be stored
      * @param encodingId the id of the encoding that was used to encode the data element. This must be 64 bytes or less.
-     * @param timeCreated the time at which the data element in the inStream was created originally
-     * @param timeUpdated the time at which the data element in the inStream was successfully updated the most recent time
+     * @param timeCreated the time at which the data element was created originally
+     * @param timeUpdated the time at which the data element was successfully updated the most recent time
      * @param timeRead the time at which the data element in the inStream was last read by some client
-     * @param timeAutoDeletes the time at which the data element in the inStream should be deleted
+     * @param timeExpires the time at which the data element expires
      * @param data the data element, expressed as a sequence of bytes
      * @return true if the value was updated, false if it was put
      * @throws IOException thrown if an I/O error occurred

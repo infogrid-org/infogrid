@@ -19,6 +19,14 @@ package org.infogrid.util.event;
  * the change in a property. This interface relates to <code>ExternalizableEvent</code>
  * in the same manner <code>java.beans.PropertyChangeEvent</code> relates to
  * <code>java.util.EventObject</code>.
+ * 
+ * 
+ * @param S the type of the event source
+ * @param SID the type of the identifier of the event source
+ * @param P the type of the property
+ * @param PID type of the identifier of the property
+ * @param V the type of the value
+ * @param VID the type of the identifier of the value
  */
 public interface ExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
         extends
@@ -28,7 +36,7 @@ public interface ExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
      * Obtain the property of the event.
      *
      * @return the property of the event
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     * @throws UnresolvedException.Property thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     public P getProperty()
@@ -46,7 +54,7 @@ public interface ExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
      * Obtain the old value of the property prior to the event.
      *
      * @return the old value of the property
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     * @throws UnresolvedException.Value thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     public V getOldValue()
@@ -64,7 +72,7 @@ public interface ExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
      * Obtain the new value of the property after the event.
      *
      * @return the new value of the property
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     * @throws UnresolvedException.Value thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     public V getNewValue()

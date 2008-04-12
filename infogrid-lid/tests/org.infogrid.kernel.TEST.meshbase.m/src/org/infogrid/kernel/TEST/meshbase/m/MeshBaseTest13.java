@@ -99,14 +99,10 @@ public class MeshBaseTest13
 
         log.info( "Trying to bless with RR, should downcast" );
 
-        try {
-            tx = theMeshBase.createTransactionAsap();
+        tx = theMeshBase.createTransactionAsap();
 
-            aa.blessRelationship( typeRR.getSource(), b );
+        aa.blessRelationship( typeRR.getSource(), b );
 
-        } catch( RelatedAlreadyException ex ) {
-            reportError( "Unexpected exception", ex );
-        }
         tx.commitTransaction();
 
         checkEquals( aa.getRoleTypes().length, 1, "wrong number of role types" );
@@ -132,14 +128,10 @@ public class MeshBaseTest13
 
         log.info( "Trying to bless instead (S)" );
 
-        try {
-            tx = theMeshBase.createTransactionAsap();
+        tx = theMeshBase.createTransactionAsap();
 
-            aa.blessRelationship( typeS.getSource(), b );
+        aa.blessRelationship( typeS.getSource(), b );
 
-        } catch( RelatedAlreadyException ex ) {
-            reportError( "Unexpected exception", ex );
-        }
         tx.commitTransaction();
 
         //

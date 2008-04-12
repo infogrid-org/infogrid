@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import org.infogrid.mesh.IllegalPropertyTypeException;
 
 /**
  * Tag that iterates over all, or a subset, of a <code>MeshObject</code>'s properties.
@@ -297,6 +298,8 @@ public class MeshObjectPropertyIterateTag
      * Factors out common code for doStartTag and doAfterBody.
      */
     protected int iterateOnce()
+            throws
+                JspException
     {
         while( theIterator.hasNext() ) {
 
@@ -321,6 +324,8 @@ public class MeshObjectPropertyIterateTag
                 
             } catch( NotPermittedException ex ) {
                 // skipping this row seems like a reasonable approach
+            } catch( IllegalPropertyTypeException ex ) {
+                throw new JspException( ex );
             }
         }
         return SKIP_BODY;

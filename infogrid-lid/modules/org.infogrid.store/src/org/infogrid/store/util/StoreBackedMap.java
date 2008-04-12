@@ -33,6 +33,9 @@ import java.lang.ref.Reference;
 /**
  * This is a <code>java.util.Map</code> that stores the values in the <code>Store</code>
  * and keeps only <code>References</code> to them in memory.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public abstract class StoreBackedMap<K,V>
         extends
@@ -48,8 +51,8 @@ public abstract class StoreBackedMap<K,V>
      * @return the created <code>StoreBackedMap</code>
      */
     public static <K,V> StoreBackedMap<K,V> createSoft(
-            StoreEntryMapper<K, V> mapper,
-            Store            store )
+            StoreEntryMapper<K,V> mapper,
+            Store                 store )
     {
         return createSoft( DEFAULT_INITIAL_CAPACITY, mapper, store );
     }
@@ -63,9 +66,9 @@ public abstract class StoreBackedMap<K,V>
      * @return the created <code>StoreBackedMap</code>
      */
     public static <K,V> StoreBackedMap<K,V> createSoft(
-            int              initialSize,
-            StoreEntryMapper<K, V> mapper,
-            Store            store )
+            int                   initialSize,
+            StoreEntryMapper<K,V> mapper,
+            Store                 store )
     {
         return new StoreBackedMap<K,V>( initialSize, mapper, store ) {
                 protected Reference<V> createReference(
@@ -170,7 +173,7 @@ public abstract class StoreBackedMap<K,V>
                 log.error( ex );
             }
             if( ret != null ) {
-                theDelegate.put( key, createReference( (K) key, ret ));
+                theDelegate.put( key, createReference( key, ret ));
             }
         }
         return ret;        
@@ -290,7 +293,7 @@ public abstract class StoreBackedMap<K,V>
         }
 
         try {
-            String  stringKey = theMapper.keyToString( (K) key );
+            String  stringKey = theMapper.keyToString( key );
             byte [] data      = theMapper.asBytes( newValue ); 
         
             theStore.putOrUpdate(

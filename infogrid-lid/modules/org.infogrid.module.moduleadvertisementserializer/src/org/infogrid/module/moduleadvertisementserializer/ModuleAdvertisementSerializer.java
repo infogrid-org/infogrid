@@ -334,6 +334,10 @@ public class ModuleAdvertisementSerializer
 
     /**
      * Write the package.html documentation file to a stream.
+     * 
+     * @param adv the ModuleAdvertisement to write
+     * @param theStream the OutputStream to write to
+     * @throws IOException thrown if an I/O error occurred
      */
     public static void writeJavaPackageHtmlFile(
              ModuleAdvertisement adv,
@@ -432,8 +436,9 @@ public class ModuleAdvertisementSerializer
 
         out.println( "    JARS:" );
         String [] jars = adv.getProvidesJars();
-        for( int i=0 ; i<jars.length ; ++i )
+        for( int i=0 ; i<jars.length ; ++i ) {
             out.println( "        " + jars[i] );
+        }
 
         if( adv.getLocalParameterValues() != null )
         {

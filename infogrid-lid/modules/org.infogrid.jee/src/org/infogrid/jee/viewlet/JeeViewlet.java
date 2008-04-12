@@ -39,16 +39,58 @@ public interface JeeViewlet
             Viewlet
 {
     /**
-     * <p>Invoked prior to the execution of the Servlet. It is the hook by which
-     * the JeeViewlet can perform whatever operations needed prior to the execution of the servlet, e.g.
-     * the evaluation of POST commands. Subclasses will often override this.</p>
+     * <p>Invoked prior to the execution of the Servlet if the GET method has been requested.
+     *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
+     *    the GET execution of the servlet.</p>
      * 
      * @param request the incoming request
      * @param response the response to be assembled
      * @throws ServletException thrown if an error occurred
+     * @see #performBeforeSafePost
+     * @see #performBeforeUnsafePost
      * @see #performAfter
      */
-    public void performBefore(
+    public void performBeforeGet(
+            RestfulRequest     request,
+            StructuredResponse response )
+        throws
+            ServletException;
+
+    /**
+     * <p>Invoked prior to the execution of the Servlet if the POST method has been requested
+     *    and the FormTokenService determined that the incoming POST was safe.
+     *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
+     *    the POST execution of the servlet, e.g. the evaluation of POST commands.</p>
+     * 
+     * @param request the incoming request
+     * @param response the response to be assembled
+     * @throws ServletException thrown if an error occurred
+     * @see #performBeforeGet
+     * @see #performBeforeUnsafePost
+     * @see #performAfter
+     */
+    public void performBeforeSafePost(
+            RestfulRequest     request,
+            StructuredResponse response )
+        throws
+            ServletException;
+
+    /**
+     * <p>Invoked prior to the execution of the Servlet if the POST method has been requested
+     *    and the FormTokenService determined that the incoming POST was <b>not</b> safe.
+     *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
+     *    the GET execution of the servlet.</p>
+     * <p>It is strongly recommended that JeeViewlets do not regularly process the incoming
+     *    POST data, as the request is likely unsafe (e.g. a Cross-Site Request Forgery).</p>
+     * 
+     * @param request the incoming request
+     * @param response the response to be assembled
+     * @throws ServletException thrown if an error occurred
+     * @see #performBeforeGet
+     * @see #performBeforeSafePost
+     * @see #performAfter
+     */
+    public void performBeforeUnsafePost(
             RestfulRequest     request,
             StructuredResponse response )
         throws

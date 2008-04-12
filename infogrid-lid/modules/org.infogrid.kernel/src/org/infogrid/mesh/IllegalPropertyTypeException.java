@@ -14,9 +14,12 @@
 
 package org.infogrid.mesh;
 
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MeshTypeUtils;
 import org.infogrid.model.primitives.PropertyType;
-
+import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 import org.infogrid.util.StringHelper;
 
 /**
@@ -28,19 +31,70 @@ public class IllegalPropertyTypeException
         extends
             IllegalOperationTypeException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *
-     * @param obj the MeshObject that did not have the PropertyType
-     * @param pt the PropertyType that was illegal on this MeshObject
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param obj the MeshObject that did not have the PropertyType, if available
+     * @param identifier the MeshObjectIdentifier for the MeshObject that did not have the PropertyType
+     * @param pt the PropertyType that was illegal on this MeshObject, if available
+     * @param typeIdentifier the MeshTypeIdentifier for the PropertyType that was illegal on this MeshObject
      */
     public IllegalPropertyTypeException(
-            MeshObject   obj,
-            PropertyType pt )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           obj,
+            MeshObjectIdentifier identifier,
+            PropertyType         pt,
+            MeshTypeIdentifier   typeIdentifier )
     {
-        super( obj );
+        super( mb, originatingMeshBaseIdentifier, obj, identifier );
         
-        thePropertyType = pt;
+        if( typeIdentifier == null ) {
+            throw new IllegalArgumentException( "typeIdentifier must not be null" );
+        }
+        thePropertyType           = pt;
+        thePropertyTypeIdentifier = typeIdentifier;
+    }
+
+   /**
+     * More convenient simple constructor for the most common case.
+     *
+     * @param obj the MeshObject that did not have the PropertyType, if available
+     * @param pt the PropertyType that was illegal on this MeshObject, if available
+     */
+    public IllegalPropertyTypeException(
+            MeshObject           obj,
+            PropertyType         pt )
+    {
+        this(   obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                obj.getIdentifier(),
+                pt,
+                pt.getIdentifier() );
+    }
+
+    /**
+     * Obtain the PropertyType that identified a non-existing Property.
+     * 
+     * @return the PropertyType
+     * @throws MeshTypeWithIdentifierNotFoundException thrown if the PropertyType could not be found
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     * @throws ClassCastException thrown if the type identifier identified a MeshType which is not a PropertyType
+     */
+    public synchronized PropertyType getPropertyType()
+        throws
+            MeshTypeWithIdentifierNotFoundException,
+            IllegalStateException
+    {
+        if( thePropertyType == null ) {
+            thePropertyType = (PropertyType) resolve( thePropertyTypeIdentifier );
+        }
+        return thePropertyType;
     }
 
     /**
@@ -54,14 +108,20 @@ public class IllegalPropertyTypeException
         return StringHelper.objectLogString(
                 this,
                 new String[] {
+                    "resolvingMeshBase",
                     "meshObject",
+                    "meshObjectIdentifier",
                     "propertyType",
+                    "propertyTypeIdentifier",
                     "types"
                 },
                 new Object[] {
+                    theResolvingMeshBase,
                     theMeshObject,
-                    thePropertyType.getIdentifier(),
-                    MeshTypeUtils.meshTypeIdentifiers( theMeshObject.getTypes() )
+                    theMeshObjectIdentifier,
+                    thePropertyType,
+                    thePropertyTypeIdentifier,
+                    MeshTypeUtils.meshTypeIdentifiers( theMeshObject )
                 });
     }
 
@@ -72,11 +132,16 @@ public class IllegalPropertyTypeException
      */
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theMeshObject, thePropertyType };
+        return new Object[] { theMeshObjectIdentifier, thePropertyTypeIdentifier };
     }
 
     /**
-     * The PropertyType that was illegal on theMeshObject.
+     * The PropertyType that was illegal on the MeshObject.
      */
     protected transient PropertyType thePropertyType;
+    
+    /**
+     * The identifier of the PropertyType that was illegal on the MeshObject.
+     */
+    protected MeshTypeIdentifier thePropertyTypeIdentifier;
 }

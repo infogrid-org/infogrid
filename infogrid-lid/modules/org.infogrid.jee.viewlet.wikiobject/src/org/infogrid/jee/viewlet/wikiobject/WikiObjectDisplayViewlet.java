@@ -16,6 +16,7 @@ package org.infogrid.jee.viewlet.wikiobject;
 
 import org.infogrid.context.Context;
 import org.infogrid.jee.viewlet.SimpleJeeViewlet;
+import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.NotPermittedException;
 
 import org.infogrid.model.primitives.BlobValue;
@@ -68,6 +69,7 @@ public class WikiObjectDisplayViewlet
      */
     public String getContent()
         throws
+            IllegalPropertyTypeException,
             NotPermittedException
     {
         BlobValue oldValue = (BlobValue) getSubject().getPropertyValue( WikiSubjectArea.WIKIOBJECT_CONTENT );

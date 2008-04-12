@@ -57,6 +57,13 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 
 /**
  * This class knows how to instantiate YadisService, and subclasses of YadisService, given
@@ -126,6 +133,9 @@ public class YadisServiceFactory
 
         } catch( BlessedAlreadyException ex ) {
             log.warn( ex );
+        } catch( IsAbstractException ex ) {
+            log.error( ex );
+            return;
         }
 
         NodeList rootList = dom.getChildNodes();
@@ -153,11 +163,16 @@ public class YadisServiceFactory
                     }
                     
                     String prefix = "YadisService-" + String.valueOf( serviceCount++ );
-                    MeshObject serviceMeshObject = base.getMeshBaseLifecycleManager().createMeshObject(
-                            base.getMeshObjectIdentifierFactory().fromExternalForm( prefix ),
-                            // MeshObjectIdentifier.create( sourceIdentifier.toExternalForm(), prefix ),
-                            Service._TYPE );
-
+                    MeshObject serviceMeshObject;
+                    try {
+                        serviceMeshObject = base.getMeshBaseLifecycleManager().createMeshObject(
+                                base.getMeshObjectIdentifierFactory().fromExternalForm( prefix ),
+                                // MeshObjectIdentifier.create( sourceIdentifier.toExternalForm(), prefix ),
+                                Service._TYPE );
+                    } catch( IsAbstractException ex ) {
+                        log.error( ex );
+                        continue;
+                    }
                     createService( sourceIdentifier, (Element) serviceNode, serviceMeshObject, prefix, base );
                     
                     try {
@@ -167,8 +182,14 @@ public class YadisServiceFactory
                     }
                     try {
                         serviceMeshObject.blessRelationship( Service._Site_MakesUseOf_Service_DESTINATION, subject );
-                    } catch( RelatedAlreadyException ex ) {
+                    } catch( RoleTypeBlessedAlreadyException ex ) {
                         // ignore
+                    } catch( EntityNotBlessedException ex ) {
+                        log.error( ex );
+                    } catch( NotRelatedException ex ) {
+                        log.error( ex );
+                    } catch( IsAbstractException ex ) {
+                        log.error( ex );
                     }
                 }
             }
@@ -194,7 +215,16 @@ public class YadisServiceFactory
             MeshObjectIdentifierNotUniqueException,
             URISyntaxException
     {
-        serviceMeshObject.setPropertyValue( Service.PRIORITY, decodePriorityValue( serviceNode ));
+        try {
+            serviceMeshObject.setPropertyValue( Service.PRIORITY, decodePriorityValue( serviceNode ));
+
+        } catch( IllegalPropertyTypeException ex ) {
+            log.error( ex );
+            return;
+        } catch( IllegalPropertyValueException ex ) {
+            log.error( ex );
+            return;
+        }
 
         NodeList infoList = serviceNode.getChildNodes();
         int endpointIndex = 0;
@@ -214,7 +244,14 @@ public class YadisServiceFactory
                     
                     EntityType type = findEntityType( base.getModelBase(), realFound );
                     if( type != null ) {
-                        serviceMeshObject.bless( type );
+                        try {
+                            serviceMeshObject.bless( type );
+
+                        } catch( EntityBlessedAlreadyException ex ) {
+                            log.error( ex );
+                        } catch( IsAbstractException ex ) {
+                            log.error( ex );
+                        }
                     }
 
                 }
@@ -243,8 +280,15 @@ public class YadisServiceFactory
                     }
                     try {
                         serviceMeshObject.blessRelationship( Service._Service_IsProvidedAtEndpoint_Site_SOURCE, endpoint );
+
                     } catch( BlessedAlreadyException ex ) {
                         // ignore
+                    } catch( EntityNotBlessedException ex ) {
+                        log.error( ex );
+                    } catch( NotRelatedException ex ) {
+                        log.error( ex );
+                    } catch( IsAbstractException ex ) {
+                        log.error( ex );
                     }
                 }
             }
@@ -364,6 +408,8 @@ public class YadisServiceFactory
             ret.bless( type );
         } catch( BlessedAlreadyException ex ) {
             // ignore
+        } catch( IsAbstractException ex ) {
+            log.error( ex );
         }
         return ret;
     }
@@ -499,28 +545,45 @@ public class YadisServiceFactory
 
                 } catch( BlessedAlreadyException ex ) {
                     log.warn( ex );
+                } catch( IsAbstractException ex ) {
+                    log.error( ex );
                 }
 
                 String prefix = "YadisService-0";
-                MeshObject serviceMeshObject = base.getMeshBaseLifecycleManager().createMeshObject(
-                        base.getMeshObjectIdentifierFactory().fromExternalForm( prefix ),
-                        // MeshObjectIdentifier.create( sourceIdentifier.toExternalForm(), prefix ),
-                        Service._TYPE );
+                try {
+                    MeshObject serviceMeshObject = base.getMeshBaseLifecycleManager().createMeshObject(
+                            base.getMeshObjectIdentifierFactory().fromExternalForm( prefix ),
+                            // MeshObjectIdentifier.create( sourceIdentifier.toExternalForm(), prefix ),
+                            Service._TYPE );
 
-                serviceMeshObject.bless( Authentication1_0Service._TYPE ); // FIXME? OpenIDAuthentication.TYPE );
-                if( delegateUrl != null ) {
-                    serviceMeshObject.setPropertyValue( org.infogrid.lid.openid.AuthenticationService.DELEGATE, StringValue.create( delegateUrl ));
+                    serviceMeshObject.bless( Authentication1_0Service._TYPE ); // FIXME? OpenIDAuthentication.TYPE );
+                    if( delegateUrl != null ) {
+                        serviceMeshObject.setPropertyValue( org.infogrid.lid.openid.AuthenticationService.DELEGATE, StringValue.create( delegateUrl ));
+                    }
+
+                    MeshObject endpoint = base.getMeshBaseLifecycleManager().createMeshObject(
+                            base.getMeshObjectIdentifierFactory().fromExternalForm( prefix + "-endpoint-0" ),
+                            // MeshObjectIdentifier.create( sourceIdentifier.getCanonicalForm(), prefix + "-endpoint-0" ),
+                            Site._TYPE );
+
+                    // endpoint.setPropertyValue( ServiceEndPoint.URI_PROPERTYTYPE, StringValue.create( identityServer ));
+
+                    serviceMeshObject.relateAndBless( Service._Service_IsProvidedAtEndpoint_Site_SOURCE, endpoint );
+                    serviceMeshObject.relateAndBless( Service._Site_Offers_Service_DESTINATION, subject );
+
+                } catch( IsAbstractException ex ) {
+                    log.error( ex );
+                } catch( EntityBlessedAlreadyException ex ) {
+                    log.error( ex );
+                } catch( EntityNotBlessedException ex ) {
+                    log.error( ex );
+                } catch( IllegalPropertyTypeException ex ) {
+                    log.error( ex );
+                } catch( IllegalPropertyValueException ex ) {
+                    log.error( ex );
+                } catch( RelatedAlreadyException ex ) {
+                    log.error( ex );
                 }
-
-                MeshObject endpoint = base.getMeshBaseLifecycleManager().createMeshObject(
-                        base.getMeshObjectIdentifierFactory().fromExternalForm( prefix + "-endpoint-0" ),
-                        // MeshObjectIdentifier.create( sourceIdentifier.getCanonicalForm(), prefix + "-endpoint-0" ),
-                        Site._TYPE );
-
-                // endpoint.setPropertyValue( ServiceEndPoint.URI_PROPERTYTYPE, StringValue.create( identityServer ));
-
-                serviceMeshObject.relateAndBless( Service._Service_IsProvidedAtEndpoint_Site_SOURCE, endpoint );
-                serviceMeshObject.relateAndBless( Service._Site_Offers_Service_DESTINATION, subject );
             }
         }
     }

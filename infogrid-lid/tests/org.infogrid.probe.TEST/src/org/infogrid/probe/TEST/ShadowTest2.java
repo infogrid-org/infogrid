@@ -36,8 +36,17 @@ import org.infogrid.testharness.util.IteratorElementCounter;
 import org.infogrid.util.logging.Log;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.module.ModuleException;
 
 /**
   * Tests the ApiProbe mechanism.
@@ -270,11 +279,20 @@ public class ShadowTest2
                 CoherenceSpecification coherence,
                 StagingMeshBase        mb )
             throws
+                IsAbstractException,
+                EntityBlessedAlreadyException,
+                EntityNotBlessedException,
                 RelatedAlreadyException,
+                NotRelatedException,
+                MeshObjectIdentifierNotUniqueException,
+                IllegalPropertyTypeException,
+                IllegalPropertyValueException,
                 TransactionException,
                 NotPermittedException,
                 ProbeException,
-                IOException
+                IOException,
+                ModuleException,
+                URISyntaxException
         {
             MeshBaseLifecycleManager life = mb.getMeshBaseLifecycleManager();
 
@@ -341,11 +359,20 @@ public class ShadowTest2
                 CoherenceSpecification coherence,
                 StagingMeshBase        mb )
             throws
+                IsAbstractException,
+                EntityBlessedAlreadyException,
+                EntityNotBlessedException,
                 RelatedAlreadyException,
+                NotRelatedException,
+                MeshObjectIdentifierNotUniqueException,
+                IllegalPropertyTypeException,
+                IllegalPropertyValueException,
                 TransactionException,
                 NotPermittedException,
                 ProbeException,
-                IOException
+                IOException,
+                ModuleException,
+                URISyntaxException
         {
             throw new ProbeException.EmptyDataSource( networkId );
         }

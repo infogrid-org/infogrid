@@ -42,6 +42,8 @@ import java.util.concurrent.TimeUnit;
  *    a slight, random delta.</p>
  * <p>This class supports a regular and a low-level logger, which reflect application-developer
  *    vs. protocol-developer-centric views of logging.</p>
+ * 
+ * @param T the message type
  */
 public abstract class PingPongMessageEndpoint<T>
         implements
@@ -58,6 +60,7 @@ public abstract class PingPongMessageEndpoint<T>
      * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
      * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
      *                     was not received by the partner PingPongMessageEndpoint, and resends
+     * @param randomVariation the random component to add to the various times
      * @param exec the ScheduledExecutorService to schedule timed tasks
      * @param lastSentToken the last token sent in a previous instantiation of this MessageEndpoint
      * @param lastReceivedToken the last token received in a previous instantiation of this MessageEndpoint

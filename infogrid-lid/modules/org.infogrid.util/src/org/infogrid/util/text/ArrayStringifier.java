@@ -22,6 +22,8 @@ import java.util.Iterator;
  * A Stringifier that processes arrays. Arrays must be passed as
  * {@link org.infogrid.util.ArrayFacade}, as Java generics aren't working well
  * enough to do without that intermediate class.
+ * 
+ * @param T the type of the Objects to be stringified
  */
 public class ArrayStringifier<T>
         implements
