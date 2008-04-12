@@ -402,7 +402,7 @@ public abstract class MRoleType
      * @param caller the MeshObject representing the caller
      * @throws NotPermittedException thrown if this caller is not permitted to do this 
      */
-    public void checkPermittedSetTimeAutoDeletes(
+    public void checkPermittedSetTimeExpires(
             MeshObject obj,
             long       newValue,
             MeshObject caller )
@@ -569,6 +569,46 @@ public abstract class MRoleType
         for( RoleTypeGuard current : getAllRoleTypeGuards() ) {
             current.checkPermittedTraversal( this, start, destination, caller );
         }
+    }
+
+    /**
+     * Check whether the given caller is allowed to make one and two members of the same
+     * equivalence set.
+     * 
+     * @param one the first MeshObject
+     * @param two the second MeshObject
+     * @param caller the MeshObject representing the caller
+     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     */
+    public void checkPermittedAddAsEquivalent(
+            MeshObject  one,
+            MeshObject  two,
+            MeshObject  caller )
+        throws
+            NotPermittedException
+    {
+        for( RoleTypeGuard current : getAllRoleTypeGuards() ) {
+            current.checkPermittedAddAsEquivalent( this, one, two, caller );
+        }        
+    }
+    
+    /**
+     * Check whether the given caller is allowed to remove the MeshObject from its
+     * equivalence set.
+     * 
+     * @param obj the MeshObject
+     * @param caller the MeshObject representing the caller
+     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     */
+    public void checkPermittedRemoveAsEquivalent(
+            MeshObject  obj,
+            MeshObject  caller )
+        throws
+            NotPermittedException
+    {
+        for( RoleTypeGuard current : getAllRoleTypeGuards() ) {
+            current.checkPermittedRemoveAsEquivalent( this, obj, caller );
+        }        
     }
 
     /**

@@ -27,6 +27,13 @@ import org.infogrid.module.ModuleException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 
 /**
  * <p>This interface is supported by all Probes that can
@@ -88,8 +95,15 @@ public interface NonXmlStreamProbe
             String                 theContentType,
             StagingMeshBase        mb )
         throws
-            MeshObjectIdentifierNotUniqueException,
+            IsAbstractException,
+            EntityBlessedAlreadyException,
+            EntityNotBlessedException,
             RelatedAlreadyException,
+            RoleTypeBlessedAlreadyException,
+            NotRelatedException,
+            MeshObjectIdentifierNotUniqueException,
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
             TransactionException,
             NotPermittedException,
             ProbeException,

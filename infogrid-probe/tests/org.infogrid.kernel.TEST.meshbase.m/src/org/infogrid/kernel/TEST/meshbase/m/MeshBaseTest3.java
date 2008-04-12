@@ -15,7 +15,6 @@
 package org.infogrid.kernel.TEST.meshbase.m;
 
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.NotBlessedException;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
@@ -32,6 +31,7 @@ import org.infogrid.util.logging.Log;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import org.infogrid.mesh.IllegalPropertyTypeException;
 
 /**
  * This tests the firing of PropertyChangeEvents upon the changing properties, and blessing of MeshObjects.
@@ -88,7 +88,7 @@ public class MeshBaseTest3
         try {
             obj.setPropertyValue( ptU, StringValue.create( "test 1" ));
             reportError( "Succeeded in changing non-existing property" );
-        } catch( NotBlessedException ex ) {
+        } catch( IllegalPropertyTypeException ex ) {
             // no op
         }
         tx.commitTransaction();

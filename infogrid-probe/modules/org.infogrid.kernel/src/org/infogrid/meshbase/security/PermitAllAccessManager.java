@@ -73,7 +73,7 @@ public class PermitAllAccessManager
      * @param newValue the proposed new value for the auto-delete time
      * @throws NotPermittedException thrown if it is not permitted
      */
-    public void checkPermittedSetTimeAutoDeletes(
+    public void checkPermittedSetTimeExpires(
             MeshObject obj,
             long       newValue )
         throws
@@ -270,6 +270,44 @@ public class PermitAllAccessManager
         // no op
     }
 
+    /**
+     * Check whether it is permitted to make one MeshObject equivalent to another.
+     * 
+     * @param one the first MeshObject
+     * @param two the second MeshObject
+     * @param roleTypesOneToAsk the RoleTypes, of MeshObject one, to ask
+     * @param roleTypesTwoToAsk the RoleTypes, of MeshObject two, to ask
+     * @throws NotPermittedException thrown if it is not permitted
+     */
+    public void checkPermittedAddAsEquivalent(
+            MeshObject  one,
+            RoleType [] roleTypesOneToAsk,
+            MeshObject  two,
+            RoleType [] roleTypesTwoToAsk )
+        throws
+            NotPermittedException
+    {
+        // no op
+    }
+
+    /**
+     * Check whether it is permitted to remove a MeshObject from the equivalence set
+     * it is currently a member of.
+     * Subclasses may override this.
+     * 
+     * @param obj the MeshObject to remove
+     * @param roleTypesToAsk the RoleTypes to ask
+     * @throws NotPermittedException thrown if it is not permitted
+     */
+    public void checkPermittedRemoveAsEquivalent(
+            MeshObject  obj,
+            RoleType [] roleTypesToAsk )
+        throws
+            NotPermittedException
+    {
+        // no op
+    }
+            
     /**
      * Check whether it is permitted to delete this MeshObject. This checks both whether the
      * MeshObject itself may be deleted, and whether the relationships it participates in may

@@ -14,10 +14,9 @@
 
 package org.infogrid.kernel.active.TEST.objectset;
 
-import java.net.URISyntaxException;
 import java.util.Comparator;
+import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.set.DefaultMeshObjectSorter;
 import org.infogrid.mesh.set.MeshObjectSorter;
@@ -26,7 +25,6 @@ import org.infogrid.mesh.set.active.OrderedActiveMeshObjectSet;
 import org.infogrid.mesh.set.active.m.ConstantActiveMMeshObjectSet;
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
 import org.infogrid.meshbase.transaction.Transaction;
-import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
@@ -244,10 +242,7 @@ public class ActiveMeshObjectSetTest8
             PropertyType               pType,
             int                        index )
         throws
-            TransactionException,
-            MeshObjectIdentifierNotUniqueException,
-            NotPermittedException,
-            URISyntaxException
+            Exception
     {
         MeshObject ret = createMeshObject( life, eType, life.getMeshBase().getMeshObjectIdentifierFactory().fromExternalForm( "CPO" + index ) );
         ret.setPropertyValue( pType, StringValue.create( String.valueOf( index )) );
@@ -367,6 +362,8 @@ public class ActiveMeshObjectSetTest8
 
                 return PropertyValue.compare( oneValue, twoValue );
 
+            } catch( IllegalPropertyTypeException ex ) {
+                return 0;
             } catch( NotPermittedException ex ) {
                 return 0;
             }

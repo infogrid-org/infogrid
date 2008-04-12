@@ -19,7 +19,7 @@ import org.infogrid.meshbase.net.Proxy;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 
 /**
- * Some utility methods commonly used in this package.
+ * Utility methods for this package.
  */
 public abstract class Utils
 {

@@ -84,8 +84,6 @@ public class LocalNetStoreMeshBase
             ProbeDirectory           probeDirectory,
             long                     timeNotNeededTillExpires,
             Context                  c )
-       throws
-            IsAbstractException
     {
         Store         meshStore        = PrefixingStore.create(         "mesh",        store );
         IterableStore proxyStore       = IterablePrefixingStore.create( "proxy",       store );
@@ -123,8 +121,6 @@ public class LocalNetStoreMeshBase
             ProbeDirectory           probeDirectory,
             long                     timeNotNeededTillExpires,
             Context                  c )
-       throws
-            IsAbstractException
     {
         Store         meshStore        = PrefixingStore.create(         "mesh",        store );
         IterableStore proxyStore       = IterablePrefixingStore.create( "proxy",       store );
@@ -166,8 +162,6 @@ public class LocalNetStoreMeshBase
             ScheduledExecutorService exec,
             long                     timeNotNeededTillExpires,
             Context                  c )
-       throws
-            IsAbstractException
     {
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 
@@ -221,8 +215,6 @@ public class LocalNetStoreMeshBase
             ScheduledExecutorService exec,
             long                     timeNotNeededTillExpires,
             Context                  c )
-       throws
-            IsAbstractException
     {
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 

@@ -14,7 +14,6 @@
 
 package org.infogrid.meshbase.net.transaction;
 
-import org.infogrid.mesh.NotEquivalentException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectUtils;
 
@@ -140,23 +139,11 @@ public class NetMeshObjectEquivalentsRemovedEvent
         try {
             tx = otherMeshBase.createTransactionNowIfNeeded();
 
-            NetMeshObject    otherObject = (NetMeshObject) getSource();
-            NetMeshObject [] equivalents = (NetMeshObject []) getDeltaValue();
+            NetMeshObject source = (NetMeshObject) getSource();
 
-            // because we don't know which of the other MeshObjects are already equivalent, we simply try
-            // all. Some will fail, in which case we ignore exceptions.
-            for( NetMeshObject current : equivalents ) {
-                try {
-                    otherObject.rippleRemoveAsEquivalent( current.getIdentifier() );
+            source.rippleRemoveAsEquivalent();
 
-                } catch( NotEquivalentException ex ) {
-
-                    if( log.isDebugEnabled()) {
-                        log.debug( ex );
-                    }
-                }
-            }
-            return otherObject;
+            return source;
 
         } catch( TransactionException ex ) {
             throw ex;

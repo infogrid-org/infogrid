@@ -23,6 +23,8 @@ import org.infogrid.util.ArrayFacade;
  * By default, this class assumes that the child Stringifiers are ordered, and that the
  * result of a {@link #format format} operation is a concatenation of the child
  * Stringifiers' results of their respective {@link #format format} operation.
+ * 
+ * @param T the type of the Objects to be stringified
  */
 public abstract class CompoundStringifier<T>
         implements

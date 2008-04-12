@@ -20,6 +20,8 @@ import java.util.Iterator;
 
 /**
  * A component in the CompoundStringifier that is a placeholder for a child Stringifier.
+ * 
+ * @param T the type of the Objects to be stringified
  */
 class CompoundStringifierPlaceholder<T>
         implements

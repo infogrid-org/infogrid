@@ -17,6 +17,9 @@ package org.infogrid.store;
 /**
  * Classes implementing this interface know how to map key-value pairs, of a
  * parameterized type, into and from a <code>Store</code>.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public interface StoreEntryMapper<K,V>
 {
@@ -98,6 +101,7 @@ public interface StoreEntryMapper<K,V>
     /**
      * Obtain the value as a byte array.
      *
+     * @param value the value
      * @return the byte array
      * @throws StoreValueEncodingException thrown if the value could not been encoded
      */

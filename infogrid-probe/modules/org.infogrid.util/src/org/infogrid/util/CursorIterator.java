@@ -21,6 +21,8 @@ import java.util.NoSuchElementException;
 /**
  * A more fully-featured version of <code>java.util.Iterator</code> that can move
  * backwards just as well as forwards, and take N steps at a time instead of just one.
+ * 
+ * @param E the type of element to iterate over
  */
 public interface CursorIterator<E>
         extends

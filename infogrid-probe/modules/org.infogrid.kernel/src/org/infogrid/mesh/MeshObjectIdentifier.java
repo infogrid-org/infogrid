@@ -18,7 +18,10 @@ import org.infogrid.util.Identifier;
 
 /**
  * <p>Represents the identity of a {@link org.infogrid.mesh.MeshObject MeshObject}.
- *    It does not change during the lifetime of the MeshObject.</p>
+ *    A MeshObject's MeshObjectIdentifier does not change during the lifetime of the
+ *    MeshObject.</p>
+ * <p>Different MeshBases may implement MeshObjectIdentifier differently. Use
+ *    a MeshObjectIdentifierFactory to instantiate objects supporting this interface.</p>
  */
 public interface MeshObjectIdentifier
         extends

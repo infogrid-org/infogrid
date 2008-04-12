@@ -14,7 +14,6 @@
 
 package org.infogrid.codegen;
 
-import org.infogrid.model.primitives.AttributableMeshType;
 import org.infogrid.model.primitives.CollectableMeshType;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.L10Map;

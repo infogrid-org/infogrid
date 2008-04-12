@@ -21,6 +21,8 @@ public class MessageEndpointIsDeadException
         extends
             MessageSendException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */

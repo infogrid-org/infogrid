@@ -155,10 +155,11 @@ public class StoreNetMeshBaseTest5
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception anything can go wrong in a test
+     */
     public StoreNetMeshBaseTest5(
             String [] args )
         throws

@@ -134,6 +134,8 @@ public abstract class RemoteQueryTimeoutException
             extends
                 RemoteQueryTimeoutException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Create one.
          *
@@ -158,6 +160,8 @@ public abstract class RemoteQueryTimeoutException
             extends
                 RemoteQueryTimeoutException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Create one with the partial result of the query at the time of creation, if any.
          * This may change over time from havePartialResult=false to havePartialResult=true

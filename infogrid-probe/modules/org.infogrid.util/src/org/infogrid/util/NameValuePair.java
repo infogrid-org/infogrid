@@ -15,8 +15,10 @@
 package org.infogrid.util;
 
 /**
-  * A helper class that represents a pair of name and value.
-  */
+ * A helper class that represents a pair of name and value.
+ * 
+ * @param V the type of value
+ */
 public class NameValuePair<V>
         extends
             Pair<String,V>

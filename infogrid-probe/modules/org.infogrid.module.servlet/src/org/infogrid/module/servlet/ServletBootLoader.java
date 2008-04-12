@@ -196,6 +196,7 @@ public abstract class ServletBootLoader
      * This is called if all hope is lost and we need to exit.
      *
      * @param ex exception, if any, that caused the problem
+     * @throws RuntimeException the fatal problem
      */
     protected static void fatal(
            Throwable ex )

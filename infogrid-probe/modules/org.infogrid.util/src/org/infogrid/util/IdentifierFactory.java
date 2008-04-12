@@ -29,6 +29,7 @@ public interface IdentifierFactory
      *
      * @param externalForm the externalForm
      * @return the Identifier
+     * @throws URISyntaxException thrown if the externalForm could not be successfully parsed
      */
     public Identifier fromExternalForm(
             String externalForm )
@@ -42,6 +43,7 @@ public interface IdentifierFactory
      * @param representation the StringRepresentation in which this String is represented
      * @param s the String to parse
      * @return the created Identifier
+     * @throws URISyntaxException thrown if the String could not be successfully parsed
      */
     public Identifier fromStringRepresentation(
             StringRepresentation representation,

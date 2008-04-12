@@ -20,7 +20,7 @@ import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.text.StringRepresentation;
 
 /**
- * Implements MeshObjectIdentifier for the in-memory MeshBase.
+ * Implements MeshObjectIdentifier for the "A" implementation.
  */
 public class DefaultAMeshObjectIdentifier
         implements
@@ -29,9 +29,8 @@ public class DefaultAMeshObjectIdentifier
     /**
      * Factory method.
      *
-     * @param localId the localId of the to-be-created ReferenceValue
-     * @return the created ReferenceValue
-     * @throws IllegalArgumentException thrown if a non-null localId contains a period.
+     * @param localId the localId of the to-be-DefaultAMeshObjectIdentifier ReferenceValue
+     * @return the created DefaultAMeshObjectIdentifier
      */
     public static DefaultAMeshObjectIdentifier create(
             String localId )
@@ -44,9 +43,9 @@ public class DefaultAMeshObjectIdentifier
     }
 
     /**
-     * Private constructor.
+     * Private constructor, use factory method.
      * 
-     * @param localId the localId of the to-be-created MeshObjectIdentifier
+     * @param localId the localId of the to-be-created DefaultAMeshObjectIdentifier
      */
     protected DefaultAMeshObjectIdentifier(
             String localId )
@@ -76,8 +75,6 @@ public class DefaultAMeshObjectIdentifier
 
     /**
       * Determine hashCode.
-      *
-      * For speed reasons, we only use the localId. This is probably good enough.
       *
       * @return the hash code
       */
@@ -120,10 +117,10 @@ public class DefaultAMeshObjectIdentifier
     }
 
     /**
-     * Obtain an external form for this ReferenceValue, similar to
-     * URL's getExternalForm(). This returns an empty String for local home objects.
+     * Obtain an external form for this Identifier, similar to
+     * <code>java.net.URL.toExternalForm()</code>.
      *
-     * @return external form of this ReferenceValue
+     * @return external form of this Identifier
      */
     public String toExternalForm()
     {
@@ -135,10 +132,10 @@ public class DefaultAMeshObjectIdentifier
     }
 
     /**
-     * Re-construct a ReferenceValue from an external form.
+     * Re-construct a DefaultAMeshObjectIdentifier from an external form.
      *
-     * @param raw the external form of the ReferenceValue
-     * @return the created ReferenceValue
+     * @param raw the external form of the DefaultAMeshObjectIdentifier
+     * @return the created DefaultAMeshObjectIdentifier
      */
     public static MeshObjectIdentifier fromExternalForm(
             String raw )
@@ -150,9 +147,10 @@ public class DefaultAMeshObjectIdentifier
     }
 
     /**
-     * Convert this PropertyValue to its String representation, using the representation scheme.
+     * Convert this Identifier to its String representation, using the given
+     * StringRepresentation.
      *
-     * @param representation the representation scheme
+     * @param representation the StringRrepresentation to use
      * @return the String representation
      */
     public String toStringRepresentation(

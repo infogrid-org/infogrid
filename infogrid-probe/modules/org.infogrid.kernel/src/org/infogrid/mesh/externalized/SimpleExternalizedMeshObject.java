@@ -19,14 +19,13 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.PropertyValue;
 
-import org.infogrid.util.logging.Log;
 import org.infogrid.util.StringHelper;
 
 import java.io.Serializable;
 
 /**
- * This is a representation of a MeshObject that can be easily externalized
- * through Java serialization/externalization.
+ * This implementation of ExternalizedMeshObject is fully initialized in the
+ * constructor.
  */
 public class SimpleExternalizedMeshObject
         extends
@@ -34,10 +33,23 @@ public class SimpleExternalizedMeshObject
         implements
             Serializable
 {
-    private static Log log = Log.getLogInstance( SimpleExternalizedMeshObject.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // help with serialization
 
     /**
      * Factory method.
+     * 
+     * @param identifier the MeshObjectIdentifier of the MeshObject
+     * @param typeNames the MeshTypeIdentifier identifying the EntityTypes with which the MeshObject is currently blessed
+     * @param timeCreated the time the MeshObject was created
+     * @param timeUpdated the time the MeshObject was last updated
+     * @param timeRead the time the MeshObject was last read
+     * @param timeExpires the time the MeshObject will expire
+     * @param propertyTypes the current PropertyTypes of the MeshObject, in the same sequence as propertyValues
+     * @param propertyValues the current values of the PropertyTypes, in the same sequence as propertyTypes
+     * @param neighbors the MeshObjectIdentifiers of the directly related MeshObjects
+     * @param roleTypes the MeshTypeIdentifiers of the RoleTypes applicable to the neighbors, in the same sequence
+     * @param equivalents the MeshObjectIdentifiers of the current left and right equivalent MeshObject, if any
+     * @return the created SimpleExternalizedMeshObject
      */
     public static SimpleExternalizedMeshObject create(
             MeshObjectIdentifier    identifier,
@@ -47,10 +59,10 @@ public class SimpleExternalizedMeshObject
             long                    timeRead,
             long                    timeExpires,
             MeshTypeIdentifier []   propertyTypes,
-            PropertyValue  []       propertyValues,
-            MeshObjectIdentifier[]  neighbors,
+            PropertyValue []        propertyValues,
+            MeshObjectIdentifier [] neighbors,
             MeshTypeIdentifier [][] roleTypes,
-            MeshObjectIdentifier[]  equivalents )
+            MeshObjectIdentifier [] equivalents )
     {
         // do some sanity checking
         if( identifier == null ) {
@@ -117,14 +129,17 @@ public class SimpleExternalizedMeshObject
     /**
      * Construct one from externalized data.
      *
-     * @param identifier the MeshObject's Identifier
-     * @param typeNames the MeshObject types' Identifiers
+     * @param identifier the MeshObjectIdentifier of the MeshObject
+     * @param typeNames the MeshTypeIdentifier identifying the EntityTypes with which the MeshObject is currently blessed
      * @param timeCreated the time the MeshObject was created
      * @param timeUpdated the time the MeshObject was last updated
      * @param timeRead the time the MeshObject was last read
      * @param timeExpires the time the MeshObject will expire
-     * @param propertyTypes the Identifiers of the MeshObject's properties
-     * @param propertyValues the values of the MeshObject's properties, in the same sequence as propertyTypes
+     * @param propertyTypes the current PropertyTypes of the MeshObject, in the same sequence as propertyValues
+     * @param propertyValues the current values of the PropertyTypes, in the same sequence as propertyTypes
+     * @param neighbors the MeshObjectIdentifiers of the directly related MeshObjects
+     * @param roleTypes the MeshTypeIdentifiers of the RoleTypes applicable to the neighbors, in the same sequence
+     * @param equivalents the MeshObjectIdentifiers of the current left and right equivalent MeshObject, if any
      */
     protected SimpleExternalizedMeshObject(
             MeshObjectIdentifier    identifier,
@@ -196,9 +211,9 @@ public class SimpleExternalizedMeshObject
     }
 
     /**
-     * Obtain the Identifiers of our EntityTypes.
+     * Obtain the MeshTypeIdentifiers of the MeshObject's EntityTypes.
      *
-     * @return the Identifiers of our EntityTypes
+     * @return the MeshTypeIdentifiers of the MeshObject's EntityTypes
      */
     public final MeshTypeIdentifier [] getExternalTypeIdentifiers()
     {
@@ -206,9 +221,9 @@ public class SimpleExternalizedMeshObject
     }
 
     /**
-     * Obtain the Identifiers of the MeshObject's PropertyTpyes.
+     * Obtain the MeshTypeIdentifier of the MeshObject's PropertyTpyes.
      *
-     * @return the Identifiers of the MeshObject's PropertyTypes
+     * @return the MeshTypeIdentifier of the MeshObject's PropertyTypes
      * @see #getPropertyValues()
      */
     public final MeshTypeIdentifier [] getPropertyTypes()
@@ -229,12 +244,12 @@ public class SimpleExternalizedMeshObject
     }
 
     /**
-     * Obtain the Identifiers of the neighbors of this MeshObject.
+     * Obtain the MeshObjectIdentifier of the neighbors of this MeshObject.
      *
-     * @return the Identifiers of the neighbors
+     * @return the MeshObjectIdentifier of the neighbors
      * @see #getRoleTypes
      */
-    public MeshObjectIdentifier[] getNeighbors()
+    public MeshObjectIdentifier [] getNeighbors()
     {
         return theNeighbors;
     }
@@ -243,6 +258,7 @@ public class SimpleExternalizedMeshObject
      * Obtain the RoleTypes played by this MeshObject with respect to
      * a given neighbor.
      *
+     * @param neighbor the neighbor
      * @return the RoleTypes
      */
     public MeshTypeIdentifier [] getRoleTypesFor(
@@ -263,12 +279,12 @@ public class SimpleExternalizedMeshObject
     }
 
     /**
-     * Obtain the Identifiers of the MeshObjects that participate in an equivalence
-     * set with this MeshObject.
+     * Obtain the MeshObjectIdentifiers of the left and right MeshObjects that
+     * participate in an equivalence set with this MeshObject.
      *
-     * @return the Identifiers. May be null.
+     * @return the MeshObjectIdentifier. May be null.
      */
-    public MeshObjectIdentifier[] getEquivalents()
+    public MeshObjectIdentifier [] getEquivalents()
     {
         return theEquivalents;
     }

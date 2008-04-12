@@ -53,7 +53,6 @@ public class StoreMeshBase
       * @param accessMgr the AccessManager that controls access to this MeshBase
       * @param store the Store in which to store the MeshObjects
       * @param c the Context in which this MeshBase will run
-      * @throws IsAbstractException thrown if the given EntityTypes for the home object are abstract and cannot be instantiated
       */
     public static StoreMeshBase create(
             MeshBaseIdentifier identifier,
@@ -61,8 +60,6 @@ public class StoreMeshBase
             AccessManager      accessMgr,
             Store              meshObjectStore,
             Context            c )
-        throws
-            IsAbstractException
     {
         ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create();
 
@@ -78,7 +75,6 @@ public class StoreMeshBase
       * @param accessMgr the AccessManager that controls access to this MeshBase
       * @param store the Store in which to store the MeshObjects
       * @param c the Context in which this MeshBase will run
-      * @throws IsAbstractException thrown if the given EntityTypes for the home object are abstract and cannot be instantiated
       */
     public static StoreMeshBase create(
             MeshBaseIdentifier   identifier,
@@ -87,8 +83,6 @@ public class StoreMeshBase
             AccessManager        accessMgr,
             Store                meshObjectStore,
             Context              c )
-        throws
-            IsAbstractException
     {
         StoreMeshBaseEntryMapper objectMapper = new StoreMeshBaseEntryMapper();
         

@@ -87,7 +87,7 @@ public class InterfaceGenerator
         outStream.println( "// on " + currentDateTime() );
         outStream.println( "//" );
         outStream.println( "// DO NOT MODIFY -- re-generate!" );
-        outStream.println( "" );
+        outStream.println();
 
         String packageName = thePackageNameTranslatorWithoutVersion.translateSubjectArea( theSa );
 
@@ -98,8 +98,6 @@ public class InterfaceGenerator
         outStream.println( "import org.infogrid.model.primitives.*;" );
         outStream.println( "import org.infogrid.mesh.*;" );
         outStream.println( "import org.infogrid.modelbase.ModelBaseSingleton;" );
-        outStream.println();
-        outStream.println( "import org.infogrid.meshbase.transaction.TransactionException;" );
         outStream.println();
 
         // JavaDoc comment
@@ -161,7 +159,9 @@ public class InterfaceGenerator
             outStream.println( "," );
             outStream.print( "            " + supertypeName );
         }
-        outStream.println();
+        if( supertypes.length >= 1 ) {
+            outStream.println();
+        }
         outStream.println( "{" );
 
         outStream.println( "    /**" );

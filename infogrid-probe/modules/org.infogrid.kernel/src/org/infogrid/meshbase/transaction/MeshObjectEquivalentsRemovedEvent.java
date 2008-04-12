@@ -17,7 +17,6 @@ package org.infogrid.meshbase.transaction;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectUtils;
-import org.infogrid.mesh.NotEquivalentException;
 
 import org.infogrid.meshbase.MeshBase;
 
@@ -48,7 +47,7 @@ public class MeshObjectEquivalentsRemovedEvent
             MeshObject [] newEquivalents,
             long          updateTime )
     {
-        this(  meshObject,
+        this(   meshObject,
                 meshObject.getIdentifier(),
                 oldEquivalents,
                 MeshObjectUtils.meshObjectIdentifiers( oldEquivalents ),
@@ -125,23 +124,11 @@ public class MeshObjectEquivalentsRemovedEvent
         try {
             tx = otherMeshBase.createTransactionNowIfNeeded();
 
-            MeshObject    otherObject = getSource();
-            MeshObject [] equivalents = getDeltaValue();
+            MeshObject source = getSource();
 
-            // because we don't know which of the other MeshObjects are already equivalent, we simply try
-            // all. Some will fail, in which case we ignore exceptions.
-            for( MeshObject current : equivalents ) {
-                try {
-                    otherObject.removeAsEquivalent( current );
+            source.removeAsEquivalent();
 
-                } catch( NotEquivalentException ex ) {
-
-                    if( log.isDebugEnabled()) {
-                        log.debug( ex );
-                    }
-                }
-            }
-            return otherObject;
+            return source;
 
         } catch( TransactionException ex ) {
             throw ex;
