@@ -66,9 +66,9 @@ public class HttpRequest
 
         String firstLine = readLine( theBufferedInStream );
         int index1 = firstLine.indexOf( ' ' );
-        if( index1 < 0 )
+        if( index1 < 0 ) {
             throw new MalformedHttpHeaderException();
-
+        }
         method = firstLine.substring( 0, index1 );
 
         int index2 = firstLine.indexOf( ' ', index1+1 );
@@ -239,9 +239,9 @@ public class HttpRequest
             buf.append( "://" );
             buf.append( getHttpHost() );
             int port = getPort();
-            if( port != 80 )
+            if( port != 80 ) {
                 buf.append( ':' ).append( port );
-
+            }
             theRootUri = buf.toString();
         }
         return theRootUri;
@@ -577,8 +577,9 @@ public class HttpRequest
     public HttpCookie [] getCookies()
     {
         // this is not efficient in a multi-threaded environment, but works correctly
-        if( theCookies != null )
+        if( theCookies != null ) {
             return theCookies;
+        }
 
         // support multiple lines, with multiple cookies each
         String [] lines = theParameters.getAll( HttpRequestHeaderFields.COOKIE_TAG.toLowerCase() );

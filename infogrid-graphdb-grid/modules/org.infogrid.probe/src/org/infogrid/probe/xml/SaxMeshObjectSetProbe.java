@@ -68,6 +68,13 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.module.ModuleException;
 
 
 /**
@@ -111,11 +118,19 @@ public class SaxMeshObjectSetProbe
             NetMeshBaseIdentifier theNetworkIdentifier,
             StagingMeshBase   mb )
         throws
-            NotPermittedException,
+            IsAbstractException,
+            EntityBlessedAlreadyException,
+            EntityNotBlessedException,
+            RelatedAlreadyException,
+            NotRelatedException,
             MeshObjectIdentifierNotUniqueException,
-            ProbeException,
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
             TransactionException,
+            NotPermittedException,
+            ProbeException,
             IOException,
+            ModuleException,
             URISyntaxException
     {
         MeshBaseLifecycleManager life = mb.getMeshBaseLifecycleManager();

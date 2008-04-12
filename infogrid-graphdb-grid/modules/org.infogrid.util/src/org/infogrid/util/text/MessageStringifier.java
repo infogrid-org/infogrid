@@ -43,6 +43,8 @@ import java.util.Map;
  *    other matches of parsing the String (and potentially leaving characters at the end). If <code>true</code> had been
  *    specified, only one match would be returned (the same as the one found using <code>unformat</code> because this
  *    particular format String can only be parsed in one way without leaving out characters.</p>
+ * 
+ * @param T the type of the Objects to be stringified
  */
 public abstract class MessageStringifier<T>
         extends
@@ -72,7 +74,7 @@ public abstract class MessageStringifier<T>
         throws
             CompoundStringifierCompileException
     {
-        ArrayList<CompoundStringifierComponent> ret = new ArrayList<CompoundStringifierComponent>();
+        ArrayList<CompoundStringifierComponent<T>> ret = new ArrayList<CompoundStringifierComponent<T>>();
         
         int           len           = theFormatString.length();
         int           bracketCount  = 0;
@@ -84,7 +86,7 @@ public abstract class MessageStringifier<T>
                 case OPEN_BRACKET:
                     if( bracketCount == 0 ) {
                         if( currentBuffer.length() > 0 ) {
-                            ret.add( new ConstantStringifierComponent( currentBuffer.toString() ));
+                            ret.add( new ConstantStringifierComponent<T>( currentBuffer.toString() ));
                             currentBuffer = new StringBuffer();
                         }
                     } else {
@@ -111,19 +113,22 @@ public abstract class MessageStringifier<T>
             }
         }
         if( currentBuffer.length() > 0 ) {
-            ret.add( new ConstantStringifierComponent( currentBuffer.toString() ));
+            ret.add( new ConstantStringifierComponent<T>( currentBuffer.toString() ));
         }
-        return withoutWarning( ret );
+        return copyIntoNewArrayWithoutWarning( ret );
     }
 
     /**
      * Factored out so we don't get compiler warnings.
+     * 
+     * @param values the values to copy into new array
+     * @return the new array
      */
     @SuppressWarnings(value={"unchecked"})
-    protected CompoundStringifierComponent<T> [] withoutWarning(
-            ArrayList<CompoundStringifierComponent> ret )
+    protected CompoundStringifierComponent<T> [] copyIntoNewArrayWithoutWarning(
+            ArrayList<CompoundStringifierComponent<T>> values )
     {
-        return (CompoundStringifierComponent<T> []) ArrayHelper.copyIntoNewArray( ret, CompoundStringifierComponent.class );
+        return (CompoundStringifierComponent<T> []) ArrayHelper.copyIntoNewArray( values, CompoundStringifierComponent.class );
     }
 
     /**
@@ -131,10 +136,9 @@ public abstract class MessageStringifier<T>
      *
      * @param expression the expression
      * @return the created CompoundComponent
-     * @throws IncompleteParameterException thrown if the parameter was specified incompletely
-     * @throws SymbolicChildNameUndefinedException thrown if the symbolic child name, in the expression, was undefined
+     * @throws CompoundStringifierCompileException thrown if the expression could not be compiled
      */
-    protected CompoundStringifierComponent expressionToComponent(
+    protected CompoundStringifierComponent<T> expressionToComponent(
             String expression )
         throws
             CompoundStringifierCompileException

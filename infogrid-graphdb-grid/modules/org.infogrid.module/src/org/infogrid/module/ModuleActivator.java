@@ -56,6 +56,7 @@ public interface ModuleActivator
      *
      * @param dependentModule the dependent Module to activate
      * @return the ModuleActivator for the dependent Module
+     * @throws ModuleActivationException thrown if the ModuleActivator could not be instantiated
      */
     public ModuleActivator dependentModuleActivator(
             Module dependentModule )

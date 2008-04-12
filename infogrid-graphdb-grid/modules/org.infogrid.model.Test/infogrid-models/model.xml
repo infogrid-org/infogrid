@@ -46,6 +46,17 @@
                 </datatype>
                 <isoptional/>
             </propertytype>
+
+            <propertytype ID="org.infogrid.model.Test#A/ReadOnly">
+                <name>ReadOnly</name>
+                <username>The ReadOnly PropertyType of the A EntityType</username>
+                <userdescription>A property.</userdescription>
+                <datatype>
+                    <BooleanDataType/>
+                </datatype>
+                <defaultvalue>TRUE</defaultvalue>
+                <isreadonly/>
+            </propertytype>
         </entitytype>
 
         <entitytype ID="org.infogrid.model.Test#AA">

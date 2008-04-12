@@ -87,7 +87,7 @@ public interface MeshBase
      * @throws MeshObjectAccessException thrown if something went wrong accessing one or more MeshObjects
      */
     public abstract MeshObject [] accessLocally(
-            MeshObjectIdentifier[] identifiers )
+            MeshObjectIdentifier [] identifiers )
         throws
             MeshObjectAccessException;
 

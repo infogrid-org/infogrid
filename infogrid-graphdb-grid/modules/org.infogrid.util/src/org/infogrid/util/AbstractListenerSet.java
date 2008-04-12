@@ -18,6 +18,9 @@ import org.infogrid.util.logging.Log;
 
 /**
  * Factors out common functionality of sets of listeners.
+ * @param T the type of the listener
+ * @param E the type of the event
+ * @param P the type of parameter that allows this AbstractListenerSet to invoke the right listener method
  */
 public abstract class AbstractListenerSet<T,E,P>
         implements
@@ -27,6 +30,8 @@ public abstract class AbstractListenerSet<T,E,P>
 
     /**
      * Constructor.
+     * 
+     * @param catchRuntimeExceptions if true, any event will be fired to all listeners, even if the listeners throw RuntimeExceptions
      */
     protected AbstractListenerSet(
             boolean catchRuntimeExceptions )

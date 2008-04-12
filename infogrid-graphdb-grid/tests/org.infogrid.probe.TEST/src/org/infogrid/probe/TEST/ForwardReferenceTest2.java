@@ -14,6 +14,7 @@
 
 package org.infogrid.probe.TEST;
 
+import java.io.IOException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
@@ -36,6 +37,13 @@ import org.infogrid.util.logging.Log;
 import java.net.URISyntaxException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.module.ModuleException;
 import org.infogrid.probe.m.MProbeDirectory;
 
 /**
@@ -218,11 +226,20 @@ public class ForwardReferenceTest2
                 CoherenceSpecification coherence,
                 StagingMeshBase        mb )
             throws
-                MeshObjectIdentifierNotUniqueException,
+                IsAbstractException,
+                EntityBlessedAlreadyException,
+                EntityNotBlessedException,
                 RelatedAlreadyException,
-                NotPermittedException,
+                NotRelatedException,
+                MeshObjectIdentifierNotUniqueException,
+                IllegalPropertyTypeException,
+                IllegalPropertyValueException,
                 TransactionException,
-                ProbeException
+                NotPermittedException,
+                ProbeException,
+                IOException,
+                ModuleException,
+                URISyntaxException
         {
             StagingMeshBaseLifecycleManager life = mb.getMeshBaseLifecycleManager();
 
@@ -268,11 +285,20 @@ public class ForwardReferenceTest2
                 CoherenceSpecification coherence,
                 StagingMeshBase        mb )
             throws
-                MeshObjectIdentifierNotUniqueException,
+                IsAbstractException,
+                EntityBlessedAlreadyException,
+                EntityNotBlessedException,
                 RelatedAlreadyException,
-                NotPermittedException,
+                NotRelatedException,
+                MeshObjectIdentifierNotUniqueException,
+                IllegalPropertyTypeException,
+                IllegalPropertyValueException,
                 TransactionException,
-                ProbeException
+                NotPermittedException,
+                ProbeException,
+                IOException,
+                ModuleException,
+                URISyntaxException
         {
             MeshObject home = mb.getHomeObject();
             

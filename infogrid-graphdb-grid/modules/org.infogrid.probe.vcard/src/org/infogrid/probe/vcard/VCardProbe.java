@@ -14,29 +14,6 @@
 
 package org.infogrid.probe.vcard;
 
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
-import org.infogrid.mesh.NotPermittedException;
-import org.infogrid.mesh.RelatedAlreadyException;
-
-import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.transaction.TransactionException;
-
-import org.infogrid.model.VCard.VCardSubjectArea;
-import org.infogrid.model.primitives.BooleanValue;
-import org.infogrid.model.primitives.StringValue;
-
-import org.infogrid.module.ModuleException;
-
-import org.infogrid.probe.NonXmlStreamProbe;
-import org.infogrid.probe.ProbeException;
-import org.infogrid.probe.StagingMeshBase;
-import org.infogrid.probe.StagingMeshBaseLifecycleManager;
-
-import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.StringHelper;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +21,30 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
+import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.mesh.RelatedAlreadyException;
+import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
+import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.transaction.TransactionException;
+import org.infogrid.model.primitives.BooleanValue;
+import org.infogrid.model.primitives.StringValue;
+import org.infogrid.model.VCard.VCardSubjectArea;
+import org.infogrid.module.ModuleException;
+import org.infogrid.probe.NonXmlStreamProbe;
+import org.infogrid.probe.ProbeException;
+import org.infogrid.probe.StagingMeshBase;
+import org.infogrid.probe.StagingMeshBaseLifecycleManager;
+import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.StringHelper;
 
 /**
  * This Probe knows how to read VCards (RFC 2426). It instantiates VCard, subtypes of
@@ -90,8 +91,15 @@ public class VCardProbe
             String                 theContentType,
             StagingMeshBase        mb )
         throws
-            MeshObjectIdentifierNotUniqueException,
+            IsAbstractException,
+            EntityBlessedAlreadyException,
+            EntityNotBlessedException,
             RelatedAlreadyException,
+            RoleTypeBlessedAlreadyException,
+            NotRelatedException,
+            MeshObjectIdentifierNotUniqueException,
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
             TransactionException,
             NotPermittedException,
             ProbeException,

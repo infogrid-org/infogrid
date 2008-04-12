@@ -20,6 +20,8 @@ import java.util.Enumeration;
 /**
   * A simple Iterator implementation which returns elements
   * of an array. It supports both the Enumeration and the Iterator interfaces.
+ * 
+ * @param T the type of element to iterate over
   */
 public class SimpleArrayIterator<T>
         implements

@@ -36,6 +36,7 @@ public abstract class SoftwareInstallation
      * @param productName the product name
      * @param productId the product id
      * @param useModuleClassLoaders if true, use ModuleClassLoaders to load the Modules
+     * @param allowDefaultClassPathForRootModule if true, enable the default ClassLoader for the root Module
      * @param isDeveloper if true, run in developer mode
      * @param isDemo if true, run in demo mode
      * @param isShowModuleRegistry if true, print the content of the ModuleRegistry to the terminal
@@ -144,8 +145,9 @@ public abstract class SoftwareInstallation
         } catch( MalformedURLException ex ) {
             log4jconfigUrl = relativeTo.getResource( theLog4jconfigUrlName );
         }
-        if( log4jconfigUrl != null )
+        if( log4jconfigUrl != null ) {
             ret.load( new BufferedInputStream( log4jconfigUrl.openStream() ));
+        }
 
         Enumeration theEnum = ret.propertyNames();
         while( theEnum.hasMoreElements() ) {

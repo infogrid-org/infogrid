@@ -41,8 +41,9 @@ public class Log4jLog
     public static void configure(
             Properties newProperties )
     {
-        if( newProperties == null || newProperties.isEmpty() )
+        if( newProperties == null || newProperties.isEmpty() ) {
             return;
+        }
 
         // what a hack. Otherwise log4j will try the Thread context ClassLoader
         ClassLoader currentContextLoader = Thread.currentThread().getContextClassLoader();

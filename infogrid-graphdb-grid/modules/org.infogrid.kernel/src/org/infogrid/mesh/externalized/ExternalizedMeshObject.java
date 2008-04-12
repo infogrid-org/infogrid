@@ -20,56 +20,56 @@ import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.PropertyValue;
 
 /**
- * Representation of a MeshObject that can be easily written and restored.
+ * Representation of a MeshObject that can be easily serialized and deserialized.
  */
 public interface ExternalizedMeshObject
 {
     /**
-     * Obtain the Identifier of the MeshObject.
+     * Obtain the MeshObjectIdentifier of the MeshObject.
      *
-     * @return the Identifier of the MeshObject
+     * @return the MeshObjectIdentifier of the MeshObject
      */
     public abstract MeshObjectIdentifier getIdentifier();
 
     /**
      * Obtain the time the MeshObject was created.
      *
-     * @return the time the MeshObject was created
+     * @return the time the MeshObject was created, in System.currentTimeMillis() format
      */
     public abstract long getTimeCreated();
 
     /**
      * Obtain the time the MeshObject was last updated.
      *
-     * @return the time the MeshObject was last updated
+     * @return the time the MeshObject was last updated, in System.currentTimeMillis() format
      */
     public abstract long getTimeUpdated();
 
     /**
      * Obtain the time the MeshObject was last read.
      *
-     * @return the time the MeshObject was last read
+     * @return the time the MeshObject was last read, in System.currentTimeMillis() format
      */
     public abstract long getTimeRead();
 
     /**
      * Obtain the time when the MeshObject will expire.
      *
-     * @return the time the MeshObject will expire, or -1 if never.
+     * @return the time the MeshObject will expire, in System.currentTimeMillis() format, or -1 if never.
      */
     public abstract long getTimeExpires();
 
     /**
-     * Obtain the Identifiers of our EntityTypes.
+     * Obtain the MeshTypeIdentifiers of the EntityTypes with which the MeshObject has been blessed
      *
-     * @return the Identifiers of our EntityTypes
+     * @return the MeshTypeIdentifiers of the EntityTypes
      */
     public abstract MeshTypeIdentifier [] getExternalTypeIdentifiers();
 
     /**
-     * Obtain the Identifiers of the MeshObject's PropertyTpyes.
+     * Obtain the MeshTypeIdentifiers of the MeshObject's PropertyTpyes.
      *
-     * @return the Identifiers of the MeshObject's PropertyTypes
+     * @return the MeshTypeIdentifiers of the MeshObject's PropertyTypes
      * @see #getPropertyValues()
      */
     public abstract MeshTypeIdentifier [] getPropertyTypes();
@@ -84,27 +84,27 @@ public interface ExternalizedMeshObject
     public abstract PropertyValue [] getPropertyValues();
 
     /**
-     * Obtain the Identifiers of the neighbors of this MeshObject.
+     * Obtain the MeshObjectIdentifiers of the neighbors of this MeshObject.
      *
-     * @return the Identifiers of the neighbors
+     * @return the MeshObjectIdentifiers of the neighbors
      * @see #getRoleTypes
      */
     public abstract MeshObjectIdentifier [] getNeighbors();
 
     /**
-     * Obtain the Identifiers of the RoleTypes played by this MeshObject with respect to
+     * Obtain the MeshTypeIdentifiers of the RoleTypes played by this MeshObject with respect to
      * a given neighbor.
      *
-     * @return the Identifiers of the RoleTypes
+     * @return the MeshTypeIdentifiers of the RoleTypes
      */
     public abstract MeshTypeIdentifier [] getRoleTypesFor(
             MeshObjectIdentifier neighbor );
 
     /**
-     * Obtain the Identifiers of the MeshObjects that participate in an equivalence
+     * Obtain the MeshObjectIdentifiers of the MeshObjects that participate in an equivalence
      * set with this MeshObject.
      *
-     * @return the Identifiers. May be null.
+     * @return the MeshObjectIdentifier. May be null.
      */
     public abstract MeshObjectIdentifier [] getEquivalents();
 }

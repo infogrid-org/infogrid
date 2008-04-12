@@ -63,7 +63,7 @@ public class CommandlineModuleRegistry
 
         if( theParser != null ) {
             // Load the ModuleAdvertisements that are held in XML files.
-            List<File> moduleDirectories = ((CommandlineSoftwareInstallation)theInstallation).getInstallModuleDirectories();
+            List<File> moduleDirectories = theInstallation.getInstallModuleDirectories();
             
             for( File currentModuleDirectory : moduleDirectories ) {
                 File [] candidateModuleDirs = currentModuleDirectory.listFiles();

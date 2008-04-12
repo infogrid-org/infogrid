@@ -16,6 +16,9 @@ package org.infogrid.util;
 
 /**
  * A {@link NameServer} whose content may be changed.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public interface WritableNameServer<K,V>
         extends

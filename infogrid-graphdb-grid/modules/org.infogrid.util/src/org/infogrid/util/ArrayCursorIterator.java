@@ -17,9 +17,11 @@ package org.infogrid.util;
 import java.util.*;
 
 /**
-  * An interator for arrays. It supports the <code>java.util.Enumeration</code>,
-  * <code>java.util.Iterator</code> and {@link CursorIterator} interfaces.
-  */
+ * An interator for arrays. It supports the <code>java.util.Enumeration</code>,
+ * <code>java.util.Iterator</code> and {@link CursorIterator} interfaces.
+ * 
+ * @param E the type of element to iterate over
+ */
 public class ArrayCursorIterator<E>
         extends
             AbstractCursorIterator<E>
@@ -27,11 +29,12 @@ public class ArrayCursorIterator<E>
             CursorIterator<E>
 {
     /**
-      * Factory method. Position cursor at the beginning of the array. Iterate over the
-      * entire array.
-      *
-      * @param array the array to iterate over
-      */
+     * Factory method. Position cursor at the beginning of the array. Iterate over the
+     * entire array.
+     *
+     * @param array the array to iterate over
+     * @return the created ArrayCursorIterator
+     */
     public static <E> ArrayCursorIterator<E> create(
             E [] array )
     {
@@ -44,6 +47,7 @@ public class ArrayCursorIterator<E>
      * 
      * @param array the array to iterate over
      * @param startPosition the start position
+     * @return the created ArrayCursorIterator
      */
     public static <E> ArrayCursorIterator<E> create(
             E [] array,
@@ -60,6 +64,7 @@ public class ArrayCursorIterator<E>
      * @param startPosition the start position
      * @param lowerBound the lowest index in the array to return (inclusive)
      * @param upperBound the highest index in the array to return (exclusive)
+     * @return the created ArrayCursorIterator
      */
     public static <E> ArrayCursorIterator<E> create(
             E [] array,

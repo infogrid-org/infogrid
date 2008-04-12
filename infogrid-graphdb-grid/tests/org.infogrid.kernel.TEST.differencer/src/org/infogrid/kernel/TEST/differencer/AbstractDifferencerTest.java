@@ -17,6 +17,7 @@ package org.infogrid.kernel.TEST.differencer;
 import org.infogrid.context.Context;
 import org.infogrid.context.SimpleContext;
 
+import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
@@ -83,6 +84,7 @@ public abstract class AbstractDifferencerTest
             EntityType                 type,
             long                       now )
         throws
+            IsAbstractException,
             TransactionException,
             MeshObjectIdentifierNotUniqueException,
             NotPermittedException

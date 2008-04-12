@@ -21,6 +21,10 @@ package org.infogrid.util;
  * to store the <code>FactoryCreatedObject<code>. While it typically is the same, this
  * key may be different from the key specified in the <code>SmartFactory</code>'s
  * {@link SmartFactory#obtainFor obtainFor} method.
+ * 
+ * @param K the type of key
+ * @param V the type of value
+ * @param A the type of argument
  */
 public interface FactoryCreatedObject<K,V,A>
 {

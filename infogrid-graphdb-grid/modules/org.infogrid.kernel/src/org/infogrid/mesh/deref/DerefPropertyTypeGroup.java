@@ -29,10 +29,10 @@ import org.infogrid.util.StringHelper;
 import org.infogrid.util.logging.Log;
 
 /**
-  * <p>This represents a combination of a MeshObject and one or more PropertyTypes,
-  *    representing the properties for this MeshObject.</p>
+  * <p>A pair of MeshObject and one or more PropertyTypes,
+  *    representing one or more properties of this MeshObject.</p>
   *
-  * <p>Note: while the sequence in the array has no semantic meaning for the group,
+  * <p>Note: while the sequence in the array has no semantic meaning for the DerefPropertyTypeGroup,
   *    it is essential in getter and setting functions to determine which property
   *    has which value.</p>
   */
@@ -43,7 +43,7 @@ public final class DerefPropertyTypeGroup
     private static final Log log = Log.getLogInstance(DerefPropertyTypeGroup.class); // our own, private logger
 
     /**
-      * Construct one.
+      * Constructor.
       *
       * @param mo the MeshObject
       * @param ptGroup the PropertyTypeGroup
@@ -84,6 +84,7 @@ public final class DerefPropertyTypeGroup
         for( int i=pts.length-1 ; i>=0 ; --i ) {
             try {
                 ret[i] = theMeshObject.getPropertyValue( pts[i] );
+
             } catch( IllegalPropertyTypeException ex ) {
                 log.error( ex );
                 ret[i] = null;
@@ -118,6 +119,7 @@ public final class DerefPropertyTypeGroup
         for( int i=pts.length-1 ; i>=0 ; --i ) {
             try {
                 theMeshObject.setPropertyValue( pts[i], newValues[i] );
+
             } catch( IllegalPropertyTypeException ex ) {
                 log.error( ex );
             }
@@ -125,7 +127,7 @@ public final class DerefPropertyTypeGroup
     }
 
     /**
-     * This is a convenience function that sets the value of the properties contained
+     * A convenience function that sets the value of the properties contained
      * in the PropertyTypeGroup to a reasonable default. The reasonable default is obtained
      * from the PropertyType, and if not present, from the underlying DataType.
      * This is particularly useful when a default value is needed when the
@@ -147,6 +149,7 @@ public final class DerefPropertyTypeGroup
                 theMeshObject.setPropertyValue(
                         pts[i],
                         pts[i].getDataType().instantiate() );
+
             } catch( IllegalPropertyTypeException ex ) {
                 log.error( ex );
             } catch( IllegalPropertyValueException ex ) {
@@ -175,6 +178,19 @@ public final class DerefPropertyTypeGroup
         }
         return false;
     }
+
+    /**
+     * Hash code.
+     * 
+     * @return hash code
+     */
+    @Override
+    public int hashCode()
+    {
+        int hash = theMeshObject.hashCode() ^ thePropertyTypeGroup.hashCode();
+        return hash;
+    }
+
 
     /**
      * Convert to string, for debugging only.

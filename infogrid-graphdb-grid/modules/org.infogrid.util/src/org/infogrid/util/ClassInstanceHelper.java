@@ -24,6 +24,14 @@ import java.util.Iterator;
 public abstract class ClassInstanceHelper
 {
     /**
+     * Private constructur to keep this abstract.
+     */
+    private ClassInstanceHelper()
+    {
+        // no op
+    }
+
+    /**
       * Determine whether an Object is an instance of a certain Class,
       * and if so, whether it is a direct or an indirect instance.
       * Returns -1 if not an instance, 0 for direct instance, and a

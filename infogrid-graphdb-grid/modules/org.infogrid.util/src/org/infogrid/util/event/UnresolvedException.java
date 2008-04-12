@@ -58,6 +58,8 @@ public abstract class UnresolvedException
             extends
                 UnresolvedException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -90,6 +92,8 @@ public abstract class UnresolvedException
             extends
                 UnresolvedException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -122,6 +126,8 @@ public abstract class UnresolvedException
             extends
                 UnresolvedException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -165,6 +171,8 @@ public abstract class UnresolvedException
             extends
                 UnresolvedException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *

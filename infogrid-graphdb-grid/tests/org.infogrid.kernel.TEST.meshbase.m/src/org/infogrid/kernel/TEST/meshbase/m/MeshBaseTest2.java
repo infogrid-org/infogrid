@@ -14,7 +14,6 @@
 
 package org.infogrid.kernel.TEST.meshbase.m;
 
-import org.infogrid.mesh.EntityNotBlessedException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotBlessedException;
@@ -35,6 +34,7 @@ import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.util.logging.Log;
 
 import java.lang.ref.WeakReference;
+import org.infogrid.mesh.IllegalPropertyTypeException;
 
 /**
  * This tests the blessing of MeshObjects, unblessing, and Facade-based access. This does not test
@@ -140,7 +140,7 @@ public class MeshBaseTest2
             PropertyValue v = obj.getPropertyValue( TestSubjectArea.AA_Y );
             reportError( "Accessing property of a non-blessed object should throw exception" );
 
-        } catch( EntityNotBlessedException ex ) {
+        } catch( IllegalPropertyTypeException ex ) {
             // good
         }
 
@@ -149,7 +149,7 @@ public class MeshBaseTest2
             obj.setPropertyValue( TestSubjectArea.A_X, StringValue.create( "wrong value" ) );
             reportError( "Accessing property of a non-blessed object should throw exception" );
 
-        } catch( EntityNotBlessedException ex ) {
+        } catch( IllegalPropertyTypeException ex ) {
             // good
         }
         tx.commitTransaction();

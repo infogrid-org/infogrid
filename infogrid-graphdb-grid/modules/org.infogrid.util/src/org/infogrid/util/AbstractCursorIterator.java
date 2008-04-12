@@ -18,6 +18,8 @@ import java.util.*;
 
 /**
  * Factors out common behaviors of {@link CursorIterator}s.
+ * 
+ * @param E the type of element to iterate over
  */
 public abstract class AbstractCursorIterator<E>
         implements
@@ -64,6 +66,7 @@ public abstract class AbstractCursorIterator<E>
      * <p>Obtain the next N elements. If fewer than N elements are available, return
      * as many elements are available in a shorter array.</p>
      * 
+     * @param n the number of elements to return
      * @return the next no more than N elements
      * @see #previous(int)
      */
@@ -91,6 +94,7 @@ public abstract class AbstractCursorIterator<E>
      * returned in the sequence in which the CursorIterator visits them, not in the
      * sequence in which the underlying {@link CursorIterable} stores them.</p>
      *
+     * @param n the number of elements to return
      * @return the previous no more than N elements
      * @see #next(int)
      */
@@ -114,7 +118,7 @@ public abstract class AbstractCursorIterator<E>
      * negative numbers indicate backward movement.
      *
      * @param n the number of positions to move
-     * @throws NoSuchElementExceptionif the position does not exist
+     * @throws NoSuchElementException thrown if the position does not exist
      */
     public void moveBy(
             int n )

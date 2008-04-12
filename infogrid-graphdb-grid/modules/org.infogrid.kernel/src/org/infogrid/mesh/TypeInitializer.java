@@ -44,6 +44,8 @@ public class TypeInitializer
 
     /**
      * Perform the initialization.
+     * 
+     * @param timeUpdated the timeUpdated time stamp to use, in System.currentTimeMillis() format
      */
     public void initialize(
             long timeUpdated )
@@ -63,18 +65,24 @@ public class TypeInitializer
      *
      * @param propertyTypes the PropertyTypes of the MeshObject to change
      * @param propertyValues the PropertyValues to set them to
-     * @param timeUpdate the time to use as update time
+     * @param timeUpdated the time to use as update time
+     * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
+     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this Property
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      */
     public void setPropertyValues(
             PropertyType  [] propertyTypes,
             PropertyValue [] propertyValues,
             long             timeUpdated )
         throws
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
             NotPermittedException,
             TransactionException
     {
-        AbstractMeshObject realMeshObject = (AbstractMeshObject) theMeshObject;
-        realMeshObject.internalSetPropertyValues( propertyTypes, propertyValues, timeUpdated, false );
+        theMeshObject.internalSetPropertyValues( propertyTypes, propertyValues, timeUpdated, false );
     }
 
     /**

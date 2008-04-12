@@ -177,8 +177,9 @@ public class HttpEntityResponse
             {
                 String current = (String) allowIter.next();
                 theWriter.write( current );
-                if( allowIter.hasNext() )
+                if( allowIter.hasNext() ) {
                     theWriter.write( ", " );
+                }
             }
         }
         theWriter.write( HttpResponseHeaderFields.CR );
@@ -191,11 +192,13 @@ public class HttpEntityResponse
             theWriter.write( HttpEntityHeaderFields.CONTENT_RANGE_TAG );
             theWriter.write( HttpResponseHeaderFields.SEPARATOR );
             theWriter.write( HttpEntityHeaderFields.CONTENT_RANGE_BYTES_TAG );
-            if( min != 0 )
+            if( min != 0 ) {
                 theWriter.write( String.valueOf( min ));
+            }
             theWriter.write( '-' );
-            if( max != -1 )
+            if( max != -1 ) {
                 theWriter.write( String.valueOf( max ));
+            }
             theWriter.write( HttpResponseHeaderFields.CR );
         }
 
@@ -214,12 +217,13 @@ public class HttpEntityResponse
         int contentLength = theEntity.getContentLength();
         if( contentLength >= 0 )
         {
-            if( min > contentLength )
+            if( min > contentLength ) {
                 contentLength = 0;
-            else if( max == -1 || max > contentLength )
+            } else if( max == -1 || max > contentLength ) {
                 contentLength -= min;
-            else
+            } else {
                 contentLength = max-min+1;
+            }
 
             theWriter.write( HttpEntityHeaderFields.CONTENT_LENGTH_TAG );
             theWriter.write( HttpResponseHeaderFields.SEPARATOR );
@@ -280,13 +284,15 @@ public class HttpEntityResponse
         throws
             IOException
     {
-        if( !theSendContent )
+        if( !theSendContent ) {
             return;
+        }
 
         try {
             InputStream theInStream = theEntity.getAsStream();
-            if( theInStream==null )
+            if( theInStream==null ) {
                 return;
+            }
 
             int min = getRequest().getByteRangeStartIndex();
             int max = getRequest().getByteRangeEndIndex();
@@ -302,8 +308,9 @@ public class HttpEntityResponse
                 if( totalCount+currentCount > min )
                 {
                     int startIndex = min-totalCount;
-                    if( startIndex < 0 )
+                    if( startIndex < 0 ) {
                         startIndex = 0;
+                    }
 
                     if( max == -1 || totalCount+currentCount < max )
                     {
@@ -314,8 +321,9 @@ public class HttpEntityResponse
                     else
                     {
                         int endIndex = max-totalCount+1; // +1: inclusive end
-                        if( endIndex > buf.length )
+                        if( endIndex > buf.length ) {
                             endIndex = buf.length;
+                        }
                         int length = endIndex - startIndex;
 
                         // don't write to the end of the buffer

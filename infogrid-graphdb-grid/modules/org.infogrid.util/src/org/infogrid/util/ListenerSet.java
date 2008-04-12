@@ -16,6 +16,10 @@ package org.infogrid.util;
 
 /**
  * Represents a set of listeners.
+ * 
+ * @param T the type of listener
+ * @param E the type of event
+ * @param P the type of parameter
  */
 public interface ListenerSet<T,E,P>
 {
