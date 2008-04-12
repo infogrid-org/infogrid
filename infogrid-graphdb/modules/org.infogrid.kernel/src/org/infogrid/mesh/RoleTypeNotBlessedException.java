@@ -14,14 +14,18 @@
 
 package org.infogrid.mesh;
 
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MeshTypeUtils;
-import org.infogrid.model.primitives.RoleType;
 
+import org.infogrid.model.primitives.RoleType;
+import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 import org.infogrid.util.StringHelper;
 
 /**
- * This Exception indicates that the relationship of two MeshObjects was not
- * blessed with this ByRoleType.
+ * This Exception is thrown if an operation requires a relationship to
+ * be blessed with a certain RoleType, but it is not.
  */
 public class RoleTypeNotBlessedException
         extends
@@ -29,20 +33,69 @@ public class RoleTypeNotBlessedException
 {
     /**
      * Constructor.
-     * 
-     * @param obj the MeshObject that is not blessed
-     * @param type the ByRoleType
-     * @param other the MeshObject on the other end of the relationship that was not blessed with this ByRoleType
+     *
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param identifier the MeshObjectIdentifier for the MeshObject on which the illegal operation was attempted
+     * @param type the MeshType of the missing blessing
+     * @param typeIdentifier the MeshTypeIdentifier of the MeshType of the missing blessing
+     * @param other the MeshObject identifying the other end of the relationship, if available
+     * @param otherIdentifier the MeshObjectIdentifier for the MeshObject identifying the other end of the relationship
      */
     public RoleTypeNotBlessedException(
-            MeshObject obj,
-            RoleType   type,
-            MeshObject other )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           obj,
+            MeshObjectIdentifier identifier,
+            RoleType             type,
+            MeshTypeIdentifier   typeIdentifier,
+            MeshObject           other,
+            MeshObjectIdentifier otherIdentifier )
     {
-        super( obj );
+        super( mb, originatingMeshBaseIdentifier, obj, identifier, type, typeIdentifier );
+        
+        theOther           = other;
+        theOtherIdentifier = otherIdentifier;
+    }
 
-        theRoleType  = type;
-        theOtherSide = other;
+    /**
+     * More convenient simple constructor for the most common case.
+     *
+     * @param obj the MeshObject on which the illegal operation was attempted
+     * @param type the MeshType of the missing blessing
+     * @param other the MeshObject identifying the other end of the relationship
+     */
+    public RoleTypeNotBlessedException(
+            MeshObject           obj,
+            RoleType             type,
+            MeshObject           other )
+    {
+        this(   obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                obj.getIdentifier(),
+                type,
+                type.getIdentifier(),
+                other,
+                other.getIdentifier() );
+    }
+
+    /**
+     * Obtain the RoleType of the missing blessing.
+     * 
+     * @return the RoleType
+     * @throws MeshTypeWithIdentifierNotFoundException thrown if the RoleType could not be found
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     * @throws ClassCastException thrown if the type identifier identified a MeshType that is not an RoleType
+     */
+    @Override
+    public synchronized RoleType getType()
+        throws
+            MeshTypeWithIdentifierNotFoundException,
+            IllegalStateException
+    {
+        return (RoleType) super.getType();
     }
 
     /**
@@ -55,17 +108,23 @@ public class RoleTypeNotBlessedException
     {
         return StringHelper.objectLogString(
                 this,
-                new String[] {
+                new String[]{
                     "meshObject",
-                    "otherSide",
-                    "roleType",
+                    "meshObjectIdentifier",
+                    "meshType",
+                    "meshTypeIdentifier",
+                    "otherObject",
+                    "otherObjectIdentifier",
                     "types"
                 },
                 new Object[] {
                     theMeshObject,
-                    theOtherSide,
-                    theRoleType.getIdentifier().toExternalForm(),
-                    MeshTypeUtils.meshTypeIdentifiers( theMeshObject.getRoleTypes( theOtherSide )  )
+                    theMeshObjectIdentifier,
+                    theType,
+                    theTypeIdentifier,
+                    theOther,
+                    theOtherIdentifier,
+                    MeshTypeUtils.meshTypeIdentifiers( theMeshObject )
                 });
     }
 
@@ -74,18 +133,20 @@ public class RoleTypeNotBlessedException
      *
      * @return the parameters
      */
+    @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theMeshObject, theOtherSide, theRoleType };
+        return new Object[] { theMeshObjectIdentifier, theTypeIdentifier, theOtherIdentifier };
     }
 
     /**
      * The other end of the relationship.
      */
-    protected transient MeshObject theOtherSide;
+    protected transient MeshObject theOther;
 
     /**
-     * The MeshType with which this MeshObject is not blessed.
+     * The identifier of the other end of the relationship.
      */
-    protected transient RoleType theRoleType;
+    protected transient MeshObjectIdentifier theOtherIdentifier;
 }
+

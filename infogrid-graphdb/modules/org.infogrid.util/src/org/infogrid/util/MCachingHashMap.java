@@ -19,6 +19,9 @@ import java.util.Map;
 
 /**
  * A degenerate implementation of {@link CachingMap} that uses a memory-only <code>HashMap</code>.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public class MCachingHashMap<K,V>
         extends

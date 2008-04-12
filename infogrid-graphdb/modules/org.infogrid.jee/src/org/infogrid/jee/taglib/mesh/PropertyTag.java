@@ -234,8 +234,8 @@ public class PropertyTag
             try {
                 value = obj.getPropertyValue( type );
 
-            } catch( NotPermittedException ex ) {
-                // ignore
+            } catch( Exception ex ) {
+                throw new JspException( ex );
             }        
         }
         String text = formatValue( pageContext, value, theNullString, theStringRepresentation );

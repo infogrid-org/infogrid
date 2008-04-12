@@ -20,6 +20,9 @@ import java.util.NoSuchElementException;
 
 /**
  * Provides {@link CursorIterator}s for the keys and values of <code>java.util.HashMap</code>s.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public abstract class MapCursorIterator<K,V>
 {
@@ -29,6 +32,7 @@ public abstract class MapCursorIterator<K,V>
      * @param map the underlying map to iterate over
      * @param keyArrayComponentType the Class to use for arrays containing keys
      * @param valueArrayComponentType the Class to use for arrays containing values
+     * @return the created MapCursorIterator, iterating over the keys
      */
     @SuppressWarnings(value={"unchecked"})
     public static <K,V> Keys<K,V> createForKeys(
@@ -48,6 +52,7 @@ public abstract class MapCursorIterator<K,V>
      * @param map the underlying map to iterate over
      * @param keyArrayComponentType the Class to use for arrays containing keys
      * @param valueArrayComponentType the Class to use for arrays containing values
+     * @return the created MapCursorIterator, iterating over the values
      */
     @SuppressWarnings(value={"unchecked"})
     public static <K,V> Values<K,V> createForValues(
@@ -168,7 +173,7 @@ public abstract class MapCursorIterator<K,V>
      * negative numbers indicate backward movement.
      *
      * @param n the number of positions to move
-     * @throws NoSuchElementExceptionif the position does not exist
+     * @throws NoSuchElementException if the position does not exist
      */
     public void moveBy(
             int n )
@@ -189,11 +194,10 @@ public abstract class MapCursorIterator<K,V>
     }
 
     /**
-     * Set this CursorIterator to the position represented by the provided CursorIterator.
+     * Set this CursorIterator to a particular position.
      *
      * @param n the position to set this CursorIterator to
-     * @throws IllegalArgumentException thrown if the provided CursorIterator does
-     *         not work on the same CursorIterable, or the implementations were incompatible.
+     * @throws NoSuchElementException thrown if this position was not available
      */
     public void setPosition(
             int n )
@@ -244,6 +248,7 @@ public abstract class MapCursorIterator<K,V>
     /**
      * Obtain the next N entries.
      * 
+     * @param n the number of entries to return
      * @return the next N entries
      */
     protected Entry<K,V> [] getNext(
@@ -265,6 +270,7 @@ public abstract class MapCursorIterator<K,V>
     /**
      * Obtain the previous N entries.
      * 
+     * @param n the number of entries to return
      * @return the previous N entries
      */
     protected Entry<K,V> [] getPrevious(
@@ -332,6 +338,9 @@ public abstract class MapCursorIterator<K,V>
     
     /**
      * An iterator over the keys.
+     * 
+     * @param K the type of keys
+     * @param V the type of values
      */
     public static class Keys<K,V>
             extends
@@ -545,7 +554,10 @@ public abstract class MapCursorIterator<K,V>
     }
 
     /**
-     * An iterator over the va;ie.
+     * An iterator over the values.
+     * 
+     * @param K the type of keys
+     * @param V the type of values
      */
     public static class Values<K,V>
             extends

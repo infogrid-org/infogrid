@@ -25,6 +25,10 @@ import java.util.*;
  * objects in memory. The {@link #obtainFor} method in this
  * class assumes that object creation by the delegate {@link Factory} is fast. If it is not,
  * use {@link PatientSmartFactory PatientSmartFactory} instead of this class.
+ * 
+ * @param K the type of key
+ * @param V the type of value
+ * @param A the type of argument
  */
 public class MSmartFactory<K,V,A>
         implements
@@ -161,7 +165,7 @@ public class MSmartFactory<K,V,A>
      * @param key the key for which we want to obtain a value
      * @param argument optional argument to pass through to the createFor method
      * @return the found or created value for this key
-     * @throws Exception catch-all Exception
+     * @throws FactoryException catch-all Exception
      */
     @SuppressWarnings(value={"unchecked"})
     public V obtainFor(

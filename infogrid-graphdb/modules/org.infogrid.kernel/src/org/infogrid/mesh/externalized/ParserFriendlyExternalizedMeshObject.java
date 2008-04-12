@@ -22,7 +22,7 @@ import org.infogrid.model.primitives.PropertyValue;
 import java.util.ArrayList;
 
 /**
- * This is a temporary buffer for a to-be-deserialized MeshObject.
+ * A temporary buffer for a to-be-deserialized MeshObject.
  */
 public class ParserFriendlyExternalizedMeshObject
         extends
@@ -31,7 +31,7 @@ public class ParserFriendlyExternalizedMeshObject
             ExternalizedMeshObject
 {
     /**
-     * Set the Identifier.
+     * Set the MeshObjectIdentifier of the MeshObject.
      * 
      * @param newValue the new value
      */
@@ -86,10 +86,9 @@ public class ParserFriendlyExternalizedMeshObject
     }
     
     /**
-     * Add a MeshType, using its HasTypes.
+     * Add a MeshTypeIdentifier for the MeshType that the MeshObject is blessed with.
      * 
-     * 
-     * @param identifier the MeshType's HasTypes
+     * @param identifier the MeshType
      */
     public void addMeshType(
             MeshTypeIdentifier identifier )
@@ -98,9 +97,9 @@ public class ParserFriendlyExternalizedMeshObject
     }
 
     /**
-     * Get the MeshTypes' Identifiers.
+     * Get the MeshTypeIdentifiers of the MeshTypes that the MeshObject is blessed with.
      *
-     * @return the MeshTypes' Identifiers.
+     * @return the MeshTypeIdentifiers
      */
     public MeshTypeIdentifier [] getExternalTypeIdentifiers()
     {
@@ -401,7 +400,6 @@ public class ParserFriendlyExternalizedMeshObject
     {
         /**
          * Constructor.
-         * 
          * 
          * @param identifier the HasTypes of the other side of the relationship
          */

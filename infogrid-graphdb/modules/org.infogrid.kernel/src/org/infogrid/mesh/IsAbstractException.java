@@ -14,39 +14,83 @@
 
 package org.infogrid.mesh;
 
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.model.primitives.AttributableMeshType;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
-
-import org.infogrid.util.AbstractLocalizedRuntimeException;
+import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
+import org.infogrid.util.StringHelper;
 
 /**
-  * This Exception is thrown if we try to instantiate an EntityType or RelationshipType
+  * This Exception is thrown if we try to bless a MeshObject with an EntityType or RelationshipType
   * that is declared as abstract.
   */
 public class IsAbstractException
         extends
-            AbstractLocalizedRuntimeException
+            IllegalOperationTypeException
 {
     /**
-      * Constructor.
-      *
-      * @param type the AttributableMeshType that is abstract
-      */
+     * Constructor.
+     *
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param obj the MeshObject that could not be blessed, if available
+     * @param identifier the MeshObjectIdentifier for the MeshObject that could not be blessed
+     * @param type the AttributableMeshType that is abstract, if available
+     * @param typeIdentifier the MeshTypeIdentifier for the AttributableMeshType that is abstract
+     */
     public IsAbstractException(
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           obj,
+            MeshObjectIdentifier identifier,
+            AttributableMeshType type,
+            MeshTypeIdentifier   typeIdentifier )
+    {
+        super( mb, originatingMeshBaseIdentifier, obj, identifier );
+        
+        if( typeIdentifier == null ) {
+            throw new IllegalArgumentException( "typeIdentifier must not be null" );
+        }
+        theType           = type;
+        theTypeIdentifier = typeIdentifier;
+    }
+    
+    /**
+     * More convenient simple constructor for the most common case.
+     *
+     * @param obj the MeshObject that could not be blessed, if available
+     * @param type the AttributableMeshType that is abstract, if available
+     */
+    public IsAbstractException(
+            MeshObject           obj,
             AttributableMeshType type )
     {
-        theTypeName = type.getIdentifier();
+        this(   obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                obj.getIdentifier(),
+                type,
+                type.getIdentifier() );
     }
 
     /**
-      * Constructor.
-      *
-      * @param typeName the Identifier of the AttributableMeshType that is abstract
-      */
-    public IsAbstractException(
-            MeshTypeIdentifier typeName )
+     * Obtain the AttributableMeshType that was abstract.
+     * 
+     * @return the AttributableMeshType
+     * @throws MeshTypeWithIdentifierNotFoundException thrown if the AttributableMeshType could not be found
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     * @throws ClassCastException thrown if the type identifier identified a MeshType which is not a AttributableMeshType
+     */
+    public synchronized AttributableMeshType getAttributableMeshType()
+        throws
+            MeshTypeWithIdentifierNotFoundException,
+            IllegalStateException
     {
-        theTypeName = typeName;
+        if( theType == null ) {
+            theType = (AttributableMeshType) resolve( theTypeIdentifier );
+        }
+        return theType;
     }
 
     /**
@@ -56,18 +100,33 @@ public class IsAbstractException
       */
     public MeshTypeIdentifier getMeshTypeIdentifier()
     {
-        return theTypeName;
+        return theTypeIdentifier;
     }
 
     /**
-     * Convert to string, for debugging only.
-     *
-     * @return string form of this object
-     */
+      * Obtain String representation, for debugging.
+      *
+      * @return String representation
+      */
     @Override
     public String toString()
     {
-        return super.toString() + ": " + theTypeName;
+        return StringHelper.objectLogString(
+                this,
+                new String[] {
+                    "resolvingMeshBase",
+                    "meshObject",
+                    "meshObjectIdentifier",
+                    "type",
+                    "typeIdentifier"
+                },
+                new Object[] {
+                    theResolvingMeshBase,
+                    theMeshObject,
+                    theMeshObjectIdentifier,
+                    theType,
+                    theTypeIdentifier
+                });
     }
 
     /**
@@ -77,11 +136,17 @@ public class IsAbstractException
      */
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theTypeName };
+        return new Object[] { theMeshObjectIdentifier, theTypeIdentifier };
     }
 
     /**
-      * The Identifier of the abstract AttributableMeshType.
-      */
-    protected MeshTypeIdentifier theTypeName;
+     * The AttributableMeshType that was abstract.
+     */
+    protected transient AttributableMeshType theType;
+    
+    /**
+     * The identifier of the AttributableMeshType that was abstract.
+     */
+    protected MeshTypeIdentifier theTypeIdentifier;
 }
+

@@ -14,7 +14,9 @@
 
 package org.infogrid.mesh;
 
-import org.infogrid.util.AbstractLocalizedRuntimeException;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.meshbase.MeshObjectAccessException;
 
 /**
   * This Exception is thrown when an operation is attempted
@@ -22,21 +24,56 @@ import org.infogrid.util.AbstractLocalizedRuntimeException;
   */
 public abstract class IllegalOperationTypeException
         extends
-            AbstractLocalizedRuntimeException
+            AbstractMeshException
 {
     /**
      * Constructor.
      *
-     * @param obj the MeshObject on which the illegal operation was attempted
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param identifier the MeshObjectIdentifier for the MeshObject on which the illegal operation was attempted
      */
     protected IllegalOperationTypeException(
-            MeshObject obj )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           obj,
+            MeshObjectIdentifier identifier )
     {
-        theMeshObject = obj;
+        super( mb, originatingMeshBaseIdentifier );
+
+        if( identifier == null ) {
+            throw new IllegalArgumentException( "identifier must not be null" );
+        }
+        theMeshObject           = obj;
+        theMeshObjectIdentifier = identifier;
+    }
+
+    /**
+     * Obtain the MeshObject on which the illegal operation was attempted.
+     * 
+     * @return the MeshObject
+     * @throws MeshObjectAccessException thrown if something went wrong accessing the MeshObject
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     */
+    public synchronized MeshObject getMeshObject()
+        throws
+            MeshObjectAccessException,
+            IllegalStateException
+    {
+        if( theMeshObject == null ) {
+            theMeshObject = resolve( theMeshObjectIdentifier );
+        }
+        return theMeshObject;
     }
 
     /**
      * The MeshObject on which the illegal operation was attempted.
      */
     protected transient MeshObject theMeshObject;
+    
+    /**
+     * The MeshObjectIdentifier of the MeshObject on which the illegal operation was attempted.
+     */
+    protected MeshObjectIdentifier theMeshObjectIdentifier;
 }

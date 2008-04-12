@@ -91,6 +91,8 @@ public class ModelModule
     /**
      * Obtain a ModuleActivator for the Module that this ModuleAdvertisement corresponds to,
      * corresponding to the activation parameters given in the ModuleAdvertisement.
+     * 
+     * @return the ModelModuleActivator
      */
     public ModelModuleActivator getDefaultModuleActivator()
     {

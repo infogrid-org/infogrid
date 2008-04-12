@@ -155,9 +155,9 @@ public abstract class AMeshBase
         int               currentLength = 0; // make compiler happy
 
         for( int i=0 ; i<all.length ; ++i ) {
-            AMeshObject       pivot          = (AMeshObject) all[i];
-            MeshObjectIdentifier [] pivotNeighbors = pivot.getNeighborNames();
-            RoleType [][]     pivotTypes     = pivot.getNeighborRoleTypes();
+            AMeshObject             pivot          = (AMeshObject) all[i];
+            MeshObjectIdentifier [] pivotNeighbors = pivot.getInternalNeighborList();
+            RoleType [][]           pivotTypes     = pivot.getInternalNeighborRoleTypes();
 
             if( currentSet == null ) {
                 currentSet    = ArrayHelper.copyIntoNewArray( pivotNeighbors, MeshObjectIdentifier.class );

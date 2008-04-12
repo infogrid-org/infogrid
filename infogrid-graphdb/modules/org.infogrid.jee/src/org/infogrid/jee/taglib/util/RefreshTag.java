@@ -14,14 +14,15 @@
 
 package org.infogrid.jee.taglib.util;
 
-import org.infogrid.jee.taglib.AbstractInfoGridTag;
-import org.infogrid.jee.taglib.IgnoreException;
-import org.infogrid.jee.taglib.InfoGridJspUtils;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 
 import java.io.IOException;
+
+import org.infogrid.jee.taglib.AbstractInfoGridTag;
+import org.infogrid.jee.taglib.IgnoreException;
+import org.infogrid.jee.taglib.InfoGridJspUtils;
+
 import org.infogrid.jee.rest.RestfulRequest;
 import org.infogrid.jee.viewlet.templates.JspStructuredResponseTemplate;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;

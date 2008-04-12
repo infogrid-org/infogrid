@@ -20,7 +20,9 @@ import java.util.Iterator;
  * This Iterator iterates over a subset of the Objects returned by a delegate Iterator.
  * The subset is determined by a {@link Filter}, which may or may not select an
  * Object to be returned This iterator always reads one object ahead to know whether
- * \we have more elements or not.
+ * we have more elements or not.
+ * 
+ * @param T the type of element to iterate over
  */
 public class FilteringIterator<T>
         implements
@@ -111,6 +113,8 @@ public class FilteringIterator<T>
     /**
      * This inner interface is implemented by users of FilteringIterator to determine whether
      * or not we should accept a certain Object.
+     * 
+     * @param T the type of element to iterate over
      */
     public static interface Filter<T>
     {

@@ -25,6 +25,8 @@ public class IsDeadException
     extends
         RuntimeException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

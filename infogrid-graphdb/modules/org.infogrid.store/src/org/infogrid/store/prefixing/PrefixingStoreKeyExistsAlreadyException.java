@@ -26,6 +26,8 @@ public class PrefixingStoreKeyExistsAlreadyException
         extends
             StoreKeyExistsAlreadyException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

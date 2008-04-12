@@ -16,6 +16,8 @@ package org.infogrid.util.text;
 
 /**
  * One alternative how to parse a String using a Stringifier.
+ * 
+ * @param T the type of the Objects to be stringified
  */
 public abstract class StringifierParsingChoice<T>
 {

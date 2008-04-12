@@ -25,6 +25,8 @@ public class ObjectStoreKeyDoesNotExistException
         extends
             ObjectStoreException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

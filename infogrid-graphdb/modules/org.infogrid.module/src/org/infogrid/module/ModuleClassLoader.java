@@ -115,7 +115,9 @@ public class ModuleClassLoader
     /**
      * Obtain an Enumeration of Resources.
      *
+     * @param name the name of the Resource
      * @return the Enumeration
+     * @throws IOException thrown if an I/O error occurred
      */
     @Override
     public Enumeration<URL> getResources(
@@ -302,6 +304,7 @@ public class ModuleClassLoader
      * @param initial the initial size of the buffer
      * @param maxBytes the maximum number of bytes we accept
      * @return the found byte array
+     * @throws IOException thrown if an I/O error occurred
      */
     protected static byte [] slurp(
             InputStream inStream,
@@ -455,6 +458,8 @@ public class ModuleClassLoader
 
     /**
      * Compound iterator helper class.
+     * 
+     * @param T the type of element to iterate over
      */
     static class CompoundIterator<T>
             implements

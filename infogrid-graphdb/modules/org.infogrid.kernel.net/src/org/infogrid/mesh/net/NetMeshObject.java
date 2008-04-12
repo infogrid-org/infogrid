@@ -14,12 +14,19 @@
 
 package org.infogrid.mesh.net;
 
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.EquivalentAlreadyException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.NotRelatedException;
 
+import org.infogrid.mesh.RelatedAlreadyException;
+import org.infogrid.mesh.RoleTypeNotBlessedException;
+import org.infogrid.mesh.RoleTypeRequiresEntityTypeException;
 import org.infogrid.mesh.net.externalized.SimpleExternalizedNetMeshObject;
 
 import org.infogrid.meshbase.net.NetMeshBase;
@@ -231,6 +238,7 @@ public interface NetMeshObject
     public abstract void rippleBless(
             EntityType [] types )
         throws
+            EntityBlessedAlreadyException,
             IsAbstractException,
             TransactionException,
             NotPermittedException;
@@ -243,6 +251,8 @@ public interface NetMeshObject
     public abstract void rippleUnbless(
             EntityType [] types )
         throws
+            RoleTypeRequiresEntityTypeException,
+            EntityNotBlessedException,
             TransactionException,
             NotPermittedException;
 
@@ -255,6 +265,7 @@ public interface NetMeshObject
             NetMeshObjectIdentifier identifierOfOtherSide,
             NetMeshBase             mb )
         throws
+            RelatedAlreadyException,
             TransactionException;
     
     /**
@@ -266,6 +277,7 @@ public interface NetMeshObject
             NetMeshObjectIdentifier identifierOfOtherSide,
             NetMeshBase             mb )
         throws
+            NotRelatedException,
             TransactionException,
             NotPermittedException;
 
@@ -281,6 +293,7 @@ public interface NetMeshObject
             RoleType []             theTypes,
             NetMeshObjectIdentifier identifierOfOtherSide )
         throws
+            EntityNotBlessedException,
             IsAbstractException,
             TransactionException,
             NotPermittedException;
@@ -297,6 +310,7 @@ public interface NetMeshObject
             RoleType []             theTypes,
             NetMeshObjectIdentifier identifierOfOtherSide )
         throws
+            RoleTypeNotBlessedException,
             NotRelatedException,
             TransactionException,
             NotPermittedException;
@@ -309,6 +323,7 @@ public interface NetMeshObject
     public abstract void rippleAddAsEquivalent(
             NetMeshObjectIdentifier identifierOfEquivalent )
         throws
+            EquivalentAlreadyException,
             TransactionException,
             NotPermittedException;
     
@@ -317,8 +332,7 @@ public interface NetMeshObject
      * 
      * @param identifierOfEquivalent the Identifier of the replica NetMeshObject
      */
-    public abstract void rippleRemoveAsEquivalent(
-            NetMeshObjectIdentifier identifierOfEquivalent )
+    public abstract void rippleRemoveAsEquivalent()
         throws
             TransactionException,
             NotPermittedException;
@@ -334,6 +348,7 @@ public interface NetMeshObject
             PropertyType []  types,
             PropertyValue [] values )
         throws
+            IllegalPropertyTypeException,
             NotPermittedException,
             IllegalPropertyValueException,
             TransactionException;

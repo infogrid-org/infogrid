@@ -14,20 +14,19 @@
 
 package org.infogrid.util;
 
-import org.infogrid.util.logging.Log;
-
-import java.lang.ref.*;
-import java.util.*;
+import java.lang.ref.Reference;
 
 /**
  * A {@link SwappingHashMap} that stores data in memory only.
+ * 
+ * @param K the type of key
+ * @param V the type of value
+ * @param A the type of argument
  */
 public abstract class MSwappingHashMap<K,V,A>
         extends
             SwappingHashMap<K,V>
 {
-    private static final Log log = Log.getLogInstance( MSwappingHashMap.class ); // our own, private logger
-
     /**
      * Create MSwappingHashMap that uses SoftReferences.
      * 

@@ -58,6 +58,10 @@ import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.logging.Log;
 
 import java.util.HashMap;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.RelatedAlreadyException;
 
 /**
  *
@@ -978,25 +982,51 @@ public class AnetMeshBaseLifecycleManager
         if( existing != null ) {
             // make type adjustments
             if( types != null ) {
-                existing.rippleBless( types ); // FIXME: what about unbless?
+                try {
+                    existing.rippleBless( types ); // FIXME: what about unbless?
+
+                } catch( EntityBlessedAlreadyException ex ) {
+                    log.error( ex );
+                } catch( IsAbstractException ex ) {
+                    log.error( ex );
+                }
             }
             
             // make property adjustments
-            if( localProperties != null ) {                
-                existing.rippleSetPropertyValues( localProperties );
+            if( localProperties != null ) {
+                try {
+                    existing.rippleSetPropertyValues( localProperties );
+                    
+                } catch( IllegalPropertyTypeException ex ) {
+                    log.error( ex );
+                } catch( IllegalPropertyValueException ex ) {
+                    log.error( ex );
+                }
             }
 
             // make neighbor adjustments
             if( otherSides != null ) {
                 // FIXME? remove neighbors?
                 for( int i=0 ; i<otherSides.length ; ++i ) {
-                    existing.rippleRelate( otherSides[i], (NetMeshBase) theMeshBase );
+                    try {
+                        existing.rippleRelate( otherSides[i], (NetMeshBase) theMeshBase );
+
+                    } catch( RelatedAlreadyException ex ) {
+                        log.error( ex );
+                    }
                 }
                 
                 if( roleTypes != null ) {
                     for( int i=0 ; i<roleTypes.length ; ++i ) {
                         if( roleTypes[i] != null ) {
-                            existing.rippleBless( roleTypes[i], otherSides[i] );
+                            try {
+                                existing.rippleBless( roleTypes[i], otherSides[i] );
+
+                            } catch( EntityNotBlessedException ex ) {
+                                log.error( ex );
+                            } catch( IsAbstractException ex ) {
+                                log.error( ex );
+                            }
                         }
                     }
                 }

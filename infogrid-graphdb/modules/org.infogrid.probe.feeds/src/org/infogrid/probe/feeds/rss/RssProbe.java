@@ -14,33 +14,35 @@
 
 package org.infogrid.probe.feeds.rss;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
-import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.mesh.RelatedAlreadyException;
+import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 import org.infogrid.mesh.net.NetMeshObject;
-
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.transaction.TransactionException;
-
-import org.infogrid.model.Feeds.FeedsSubjectArea;
 import org.infogrid.model.primitives.BlobValue;
-
-import org.infogrid.probe.feeds.AbstractFeedProbe;
+import org.infogrid.model.Feeds.FeedsSubjectArea;
+import org.infogrid.module.ModuleException;
 import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;
-
-import org.infogrid.module.ModuleException;
+import org.infogrid.probe.feeds.AbstractFeedProbe;
 import org.infogrid.util.logging.Log;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 /**
  * A Probe that parses RSS feeds.
@@ -85,8 +87,15 @@ public class RssProbe
             Document               theDocument,
             StagingMeshBase        mb )
         throws
-            MeshObjectIdentifierNotUniqueException,
+            IsAbstractException,
+            EntityBlessedAlreadyException,
+            EntityNotBlessedException,
             RelatedAlreadyException,
+            NotRelatedException,
+            RoleTypeBlessedAlreadyException,
+            MeshObjectIdentifierNotUniqueException,
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
             TransactionException,
             NotPermittedException,
             ProbeException,
@@ -168,7 +177,7 @@ public class RssProbe
                 }
                 try {
                     home.blessRelationship( FeedsSubjectArea.FEED_CONTAINS_FEEDITEM.getSource(), item );
-                } catch( RelatedAlreadyException ex ) {
+                } catch( RoleTypeBlessedAlreadyException ex ) {
                     // ignore
                     if( log.isDebugEnabled() ) {
                         log.info( ex );

@@ -53,6 +53,7 @@ public abstract class ModelModuleActivator
      * @param activationClassName name of the activation class
      * @param activationMethodName name of the activation method in the activation class
      * @param loader ClassLoader that knows where to find activationClass
+     * @return a Module-specific return Object, or null
      * @throws ModuleActivationException thrown if the Module could not be activated
      */
     protected Object activateModelUsingJavaInstantiator(
@@ -115,6 +116,7 @@ public abstract class ModelModuleActivator
      * @param dependentContextObjects the context objects obtained from activating the dependent Modules, in sequence
      * @param modelStream the InputStream from which to read the model
      * @param loader the ClassLoader to use
+     * @return a Module-specific return Object, or null
      * @throws ModuleActivationException thrown if the Module could not be activated
      */
     protected Object activateModelUsingXmlModel(
@@ -190,6 +192,7 @@ public abstract class ModelModuleActivator
      *
      * @param dependentModule the dependent Module to activate
      * @return the ModuleActivator for the dependent Module
+     * @throws ModuleActivationException thrown if the ModuleActivator could not be instantiated
      */
     public ModuleActivator dependentModuleActivator(
             Module dependentModule )

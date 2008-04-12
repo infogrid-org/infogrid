@@ -122,6 +122,7 @@ public class KeyStoreWrapper
      * Obtain a Key with a certain name.
      *
      * @param alias the name
+     * @return the Key
      * @throws GeneralSecurityException thrown if the client was not permitted to invoke this operation
      */
     public Key getKey(
@@ -137,6 +138,7 @@ public class KeyStoreWrapper
      *
      * @param alias the name
      * @param password the password on the Key
+     * @return the Key
      * @throws GeneralSecurityException thrown if the client was not permitted to invoke this operation
      */
     public Key getKey(

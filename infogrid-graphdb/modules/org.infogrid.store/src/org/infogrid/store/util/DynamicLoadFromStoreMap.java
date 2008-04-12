@@ -31,6 +31,9 @@ import java.util.Set;
 /**
  * A <code>org.infogrid.util.CachingMap} whose cache is either entirely empty or complete,
  * and if empty, is transparently reloaded from the specified {@link org.infogrid.store.Store}.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public abstract class DynamicLoadFromStoreMap<K,V>
         extends

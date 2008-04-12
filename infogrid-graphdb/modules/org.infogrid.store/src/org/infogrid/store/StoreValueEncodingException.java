@@ -21,6 +21,8 @@ public class StoreValueEncodingException
         extends
             Exception
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

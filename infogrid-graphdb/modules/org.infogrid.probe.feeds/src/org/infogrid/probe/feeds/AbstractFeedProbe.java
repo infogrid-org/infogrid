@@ -56,6 +56,14 @@ import org.w3c.dom.NodeList;
 
 import java.awt.Color;
 import java.net.URISyntaxException;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.mesh.RelatedAlreadyException;
+import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 
 /**
  * Factors out common functionality for Atom and RSS feeds.
@@ -87,7 +95,22 @@ public abstract class AbstractFeedProbe
             TransactionException,
             NotPermittedException,
             ProbeException,
-            URISyntaxException
+            URISyntaxException,
+            IsAbstractException,
+            EntityBlessedAlreadyException,
+            EntityNotBlessedException,
+            RelatedAlreadyException,
+            RoleTypeBlessedAlreadyException,
+            NotRelatedException,
+//            MeshObjectIdentifierNotUniqueException,
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException
+//            TransactionException,
+//            NotPermittedException,
+//            ProbeException,
+//            IOException,
+//            ModuleException,
+//            URISyntaxException;
     {
         if( here == null ) {
             return;
@@ -176,10 +199,18 @@ public abstract class AbstractFeedProbe
             StagingMeshBase   mb )
         throws
             TransactionException,
+            EntityNotBlessedException,
+            RelatedAlreadyException,
+            RoleTypeBlessedAlreadyException,
+            NotRelatedException,
             NotPermittedException,
             MeshObjectIdentifierNotUniqueException,
             ProbeException,
-            URISyntaxException
+            URISyntaxException,
+            IsAbstractException,
+            EntityBlessedAlreadyException,
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException
     {
         NetMeshObject ret = mb.getMeshBaseLifecycleManager().createMeshObject( identifier, type );
         
@@ -372,7 +403,13 @@ public abstract class AbstractFeedProbe
             Element       here )
         throws
             TransactionException,
-            URISyntaxException
+            URISyntaxException,
+            RelatedAlreadyException,
+            RoleTypeBlessedAlreadyException,
+            EntityNotBlessedException,
+            NotRelatedException,
+            IsAbstractException,
+            NotPermittedException
     {
         NetMeshBase base = current.getMeshBase();
         
@@ -415,8 +452,6 @@ public abstract class AbstractFeedProbe
 
                     } catch( MeshTypeWithIdentifierNotFoundException ex ) {
                         log.warn( ex );
-                    } catch( NotPermittedException ex ) {
-                        log.error( ex );
                     }
                 }
             } else {
