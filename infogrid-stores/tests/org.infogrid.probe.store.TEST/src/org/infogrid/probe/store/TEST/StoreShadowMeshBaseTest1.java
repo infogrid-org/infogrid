@@ -14,6 +14,7 @@
 
 package org.infogrid.probe.store.TEST;
 
+import java.io.IOException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
@@ -39,6 +40,16 @@ import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.mesh.RelatedAlreadyException;
+import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
+import org.infogrid.module.ModuleException;
+import org.infogrid.probe.ProbeException;
 
 /**
  * Tests ProbeManager restore of StoreShadowMeshBase with a One-Time-Only CoherenceSpecification.
@@ -240,9 +251,20 @@ public class StoreShadowMeshBaseTest1
                 CoherenceSpecification coherence,
                 StagingMeshBase        mb )
             throws
+                IsAbstractException,
+                EntityBlessedAlreadyException,
+                EntityNotBlessedException,
+                RelatedAlreadyException,
+                NotRelatedException,
+                RoleTypeBlessedAlreadyException,
                 MeshObjectIdentifierNotUniqueException,
+                IllegalPropertyTypeException,
+                IllegalPropertyValueException,
                 TransactionException,
                 NotPermittedException,
+                ProbeException,
+                IOException,
+                ModuleException,
                 URISyntaxException
         {
             ++probeRunCounter;

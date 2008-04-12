@@ -27,6 +27,9 @@ import org.infogrid.util.logging.Log;
  * We want to issue those queries in parallel, and only proceed
  * after all of them have produced results. These results can come
  * in in any order. Queries are identified by keys.</p>
+ * 
+ * @param K the type of key
+ * @param R the type of return value
  */
 public class ReturnSynchronizer<K,R>
 {
@@ -251,7 +254,7 @@ public class ReturnSynchronizer<K,R>
         CS monitor;
 
         synchronized( this ) {
-            monitor = (CS) threadToMonitorTable.get( t );
+            monitor = threadToMonitorTable.get( t );
 
             if( monitor == null ) {
                 return true; // no more open arguments for this tread (maybe there never were)
@@ -394,7 +397,9 @@ public class ReturnSynchronizer<K,R>
     public static class QueryIncompleteException
             extends
                 Exception
-    {}
+    {
+        private static final long serialVersionUID = 1L; // helps with serialization
+    }
 
     /**
      * Simple Exception thrown when an illegal key is used.
@@ -402,5 +407,7 @@ public class ReturnSynchronizer<K,R>
     public static class IllegalKeyException
             extends
                 RuntimeException
-    {}
+    {
+        private static final long serialVersionUID = 1L; // helps with serialization
+    }
 }

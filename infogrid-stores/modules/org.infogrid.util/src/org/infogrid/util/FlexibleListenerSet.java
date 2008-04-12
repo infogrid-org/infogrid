@@ -14,8 +14,6 @@
 
 package org.infogrid.util;
 
-import org.infogrid.util.logging.Log;
-
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -31,13 +29,15 @@ import java.util.Iterator;
  * sent only to some and not all of the listeners. Per default, this
  * class catches all RuntimeExceptions thrown by its listeners. This
  * behavior can be configured through a parameter in the constructor.</p>
+ * 
+ * @param T the type of listener
+ * @param E the type of event
+ * @param P the type of parameter
  */
 public abstract class FlexibleListenerSet<T,E,P>
         extends
             AbstractListenerSet<T,E,P>
 {
-    private static final Log log = Log.getLogInstance( FlexibleListenerSet.class ); // our own, private logger
-
     /**
      * Constructor with default initial size.
      */
@@ -315,6 +315,8 @@ public abstract class FlexibleListenerSet<T,E,P>
 
     /**
      * Iterator implementation for this set.
+     * 
+     * @param T the type of element to iterate over
      */
     class MyIterator<T>
         implements

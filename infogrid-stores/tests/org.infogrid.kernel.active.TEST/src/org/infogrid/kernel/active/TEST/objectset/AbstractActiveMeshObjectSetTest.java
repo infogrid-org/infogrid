@@ -18,6 +18,8 @@ import java.net.URISyntaxException;
 import org.infogrid.context.Context;
 import org.infogrid.context.SimpleContext;
 import org.infogrid.kernel.active.TEST.AllTests;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
@@ -81,6 +83,8 @@ public abstract class AbstractActiveMeshObjectSetTest
         throws
             TransactionException,
             MeshObjectIdentifierNotUniqueException,
+            EntityBlessedAlreadyException,
+            IsAbstractException,
             NotPermittedException
     {
         MeshObject ret = life.createMeshObject( identifier );

@@ -20,6 +20,8 @@ import java.util.Iterator;
 /**
  * An Iterator that returns the values obtained from an Iterator over references.
  * It also "clears up" expired references, but does not support remove().
+ * 
+ * @param E the type of element to iterate over
  */
 public class DereferencingIterator<E>
         implements

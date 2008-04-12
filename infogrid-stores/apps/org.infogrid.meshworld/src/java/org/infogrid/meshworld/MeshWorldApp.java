@@ -50,6 +50,8 @@ import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import org.infogrid.jee.security.FormTokenService;
+import org.infogrid.jee.security.StoreFormTokenService;
 import org.infogrid.jee.viewlet.templates.DefaultStructuredResponseTemplateFactory;
 
 /**
@@ -126,17 +128,22 @@ public class MeshWorldApp
 
         log = Log.getLogInstance( MeshWorldApp.class );
 
+        ResourceHelper theResourceHelper = ResourceHelper.getInstance( MeshWorldApp.class );
+
         // Context
         SimpleContext rootContext = SimpleContext.createRoot( ROOT_MODULE_NAME + " root context" );
         rootContext.addContextObject( theThisModule.getModuleRegistry() );
 
         // Database access via JNDI
-        
+
         InitialContext ctx           = new InitialContext();
         DataSource     theDataSource = (DataSource) ctx.lookup( "java:comp/env/jdbc/meshworldDB" );        
 
-        SqlStore store = SqlStore.create( theDataSource, ResourceHelper.getInstance( MeshWorldApp.class ).getResourceString( "MeshObjectTable" ) );
-        store.initializeIfNecessary();
+        SqlStore meshStore      = SqlStore.create( theDataSource, theResourceHelper.getResourceString( "MeshObjectTable" ) );
+        SqlStore formTokenStore = SqlStore.create( theDataSource, theResourceHelper.getResourceString( "FormTokenTable" ) );
+
+        meshStore.initializeIfNecessary();
+        formTokenStore.initializeIfNecessary();
 
         // ModelBase
         ModelBase modelBase = ModelBaseSingleton.getSingleton();
@@ -153,12 +160,16 @@ public class MeshWorldApp
         // AccessManager
         AccessManager accessMgr = null;
 
-        IterableStoreMeshBase meshBase = IterableStoreMeshBase.create( mbId, modelBase, accessMgr, store, rootContext );
+        IterableStoreMeshBase meshBase = IterableStoreMeshBase.create( mbId, modelBase, accessMgr, meshStore, rootContext    );
 
         // Name Server
         MNameServer<MeshBaseIdentifier,MeshBase> nameServer = MNameServer.create();
         nameServer.put( mbId, meshBase );
-        MeshWorldApp ret = new MeshWorldApp( meshBase, nameServer, rootContext );
+
+        // FormTokenService
+        StoreFormTokenService formTokenService = StoreFormTokenService.create( formTokenStore );
+
+        MeshWorldApp ret = new MeshWorldApp( meshBase, nameServer, formTokenService, rootContext );
         return ret;
     }
 
@@ -171,6 +182,7 @@ public class MeshWorldApp
     protected MeshWorldApp(
             IterableStoreMeshBase                   mainMeshBase,
             NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer,
+            FormTokenService                        formTokenService,
             SimpleContext                           applicationContext )
     {
         super(  mainMeshBase,
@@ -178,6 +190,7 @@ public class MeshWorldApp
                 new MeshWorldViewletFactory(),
                 null,
                 DefaultStructuredResponseTemplateFactory.create(),
+                formTokenService,
                 applicationContext );
     }
 

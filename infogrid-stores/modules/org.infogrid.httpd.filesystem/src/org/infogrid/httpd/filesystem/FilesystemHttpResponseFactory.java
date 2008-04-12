@@ -72,8 +72,9 @@ public class FilesystemHttpResponseFactory
     {
         HttpAccessManager accessMgr = theAccessManager; // this trick allows us to avoid a synchronized
 
-        if( accessMgr != null && !accessMgr.isAllowed( req ))
+        if( accessMgr != null && !accessMgr.isAllowed( req )) {
             return HttpErrorResponse.createWithChallenge( req, HttpStatusCodes.UNAUTHORIZED_CODE, accessMgr.getChallengeFor( req ), theErrorHandler );
+        }
 
         HttpEntity foundEntity = FileEntity.create( req, theDocumentRoot );
         if( foundEntity == null ) {

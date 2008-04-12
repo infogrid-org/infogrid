@@ -105,7 +105,7 @@ public class ServletSoftwareInstallation
         Iterator iter = props.keySet().iterator();
         while( iter.hasNext() ) {
             String key   = (String) iter.next();
-            String value = (String) props.getProperty( key );
+            String value = props.getProperty( key );
 
             if ( "rootmodule".equalsIgnoreCase( key )) {
                 rootModuleName = value;
@@ -276,8 +276,9 @@ public class ServletSoftwareInstallation
     {
         StringBuffer fullMsg = new StringBuffer( 256 );
 
-        if( msg != null )
+        if( msg != null ) {
             fullMsg.append( msg ).append( '\n' );
+        }
 
         fullMsg.append( "Usage: set properties with the following names:\n" );
         fullMsg.append( "    moduledebug=<stream>                      debug module loading to System.out or System.err\n" );

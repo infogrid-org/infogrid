@@ -24,6 +24,8 @@ public class ModuleRequirement
         implements
             Serializable
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
       * Factory method.
       *

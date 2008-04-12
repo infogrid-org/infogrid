@@ -152,7 +152,7 @@ public abstract class ModuleRegistry
         if( almostRet == null ) {
             return new StandardModuleAdvertisement[0];
         }
-        return (StandardModuleAdvertisement []) almostRet.toArray( new StandardModuleAdvertisement[ foundNumber ]);
+        return almostRet.toArray( new StandardModuleAdvertisement[ foundNumber ]);
     }
 
     /**
@@ -199,7 +199,7 @@ public abstract class ModuleRegistry
         if( almostRet == null ) {
             return new StandardModuleAdvertisement[0];
         }
-        return (StandardModuleAdvertisement []) almostRet.toArray( new StandardModuleAdvertisement[ foundNumber ]);
+        return almostRet.toArray( new StandardModuleAdvertisement[ foundNumber ]);
     }
 
     /**
@@ -595,6 +595,8 @@ public abstract class ModuleRegistry
 
     /**
      * Simple iterator over the elements in an array.
+     * 
+     * @param T the type of elements to iterate over
      */
     static class SimpleArrayIterator<T>
         implements
@@ -647,6 +649,8 @@ public abstract class ModuleRegistry
     
     /**
      * Helper iterator to filter out by type the results of a delegate Iterator.
+     * 
+     * @param T the type of elements to iterate over
      */
     static class FilteringIterator<T>
         implements

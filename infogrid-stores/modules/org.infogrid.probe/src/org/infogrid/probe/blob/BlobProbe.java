@@ -33,6 +33,13 @@ import org.infogrid.util.StreamUtils;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.RelatedAlreadyException;
+import org.infogrid.module.ModuleException;
 
 /**
  * This is a Probe for arbitrary Blob (Binary Large Objects) objects.
@@ -79,11 +86,18 @@ public class BlobProbe
             String                 contentType,
             StagingMeshBase        mb )
         throws
+            IsAbstractException,
+            EntityBlessedAlreadyException,
+            RelatedAlreadyException,
             MeshObjectIdentifierNotUniqueException,
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
             TransactionException,
             NotPermittedException,
             ProbeException,
-            IOException
+            IOException,
+            ModuleException,
+            URISyntaxException
     {
         byte [] buf = StreamUtils.slurp( input );
 

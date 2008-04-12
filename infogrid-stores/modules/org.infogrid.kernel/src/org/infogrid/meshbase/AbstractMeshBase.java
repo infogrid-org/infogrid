@@ -17,7 +17,6 @@ package org.infogrid.meshbase;
 import org.infogrid.context.Context;
 
 import org.infogrid.mesh.AbstractMeshObject;
-import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
@@ -98,7 +97,6 @@ public abstract class AbstractMeshBase
      * This will use the current time for timeCreated and timeUpdated of the newly created home object.
      *
      * @return the Home Object
-     * @throws IsAbstractException if one of the EntityTypes is abstract
      */
     protected MeshObject initializeHomeObject()
     {
@@ -113,14 +111,11 @@ public abstract class AbstractMeshBase
      * @param timeCreated of the created Home Object
      * @param timeUpdated of the created Home Object
      * @return the Home Object
-     * @throws IsAbstractException if one of the EntityTypes is abstract
      */
     protected MeshObject initializeHomeObject(
             long          timeCreated,
             long          timeUpdated,
             long          timeRead )
-        throws
-            IsAbstractException
     {
         MeshObjectIdentifier homeObjectIdentifier = theMeshObjectIdentifierFactory.getHomeMeshObjectIdentifier();
 

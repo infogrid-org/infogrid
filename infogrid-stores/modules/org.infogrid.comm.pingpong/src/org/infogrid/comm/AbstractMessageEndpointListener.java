@@ -18,6 +18,8 @@ import java.util.List;
 
 /**
  * Makes implementing MessageEndpointListeners easier.
+ * 
+ * @param T the message type
  */
 public abstract class AbstractMessageEndpointListener<T>
         implements

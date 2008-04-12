@@ -229,10 +229,11 @@ public class StoreMeshBaseTest2
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception anything can go wrong in a test
+     */
     public StoreMeshBaseTest2(
             String [] args )
         throws

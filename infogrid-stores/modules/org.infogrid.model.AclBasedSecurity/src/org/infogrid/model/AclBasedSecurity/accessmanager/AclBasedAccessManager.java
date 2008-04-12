@@ -14,9 +14,12 @@
 
 package org.infogrid.model.AclBasedSecurity.accessmanager;
 
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotPermittedException;
 
+import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.meshbase.security.AbstractAccessManager;
 import org.infogrid.meshbase.transaction.TransactionException;
 
@@ -77,8 +80,18 @@ public class AclBasedAccessManager
             sudo();
             toBeOwned.relateAndBless( AclBasedSecuritySubjectArea.MESHOBJECT_HASOWNER_MESHOBJECT.getSource(), newOwner );
 
+        } catch( EntityNotBlessedException ex ) {
+            log.error( ex );
+
+        } catch( RelatedAlreadyException ex ) {
+            log.error( ex );
+
+        } catch( IsAbstractException ex ) {
+            log.error( ex );
+
         } catch( NotPermittedException ex ) {
             log.error( ex );
+
         } finally {
             sudone();
         }
@@ -92,7 +105,7 @@ public class AclBasedAccessManager
      * @param newValue the proposed new value for the auto-delete time
      * @throws NotPermittedException thrown if it is not permitted
      */
-    public void checkPermittedSetTimeAutoDeletes(
+    public void checkPermittedSetTimeExpires(
             MeshObject obj,
             long       newValue )
         throws
@@ -104,7 +117,7 @@ public class AclBasedAccessManager
             MeshObject caller = getCaller();
 
             for( Role current : obj.getRoles( false ) ) {
-                current.getRoleType().checkPermittedSetTimeAutoDeletes( obj, newValue, caller );
+                current.getRoleType().checkPermittedSetTimeExpires( obj, newValue, caller );
             }
         } finally {
             sudone();
@@ -334,7 +347,7 @@ public class AclBasedAccessManager
      * given MeshObject.
      * 
      * @param obj the MeshObject
-     * @param toTraverse the ByRoleType to traverse
+     * @param toTraverse the RoleType to traverse
      * @param otherObject the reached MeshObject in the traversal
      * @throws NotPermittedException thrown if it is not permitted
      */
@@ -419,6 +432,67 @@ public class AclBasedAccessManager
 
             for( RoleType current : roleTypesToAsk ) {
                 current.checkPermittedIncrementalUnbless( obj, roleTypesToAskUsed, thisEnds, otherObject, caller );
+            }
+        } finally {
+            sudone();
+        }        
+    }
+
+    /**
+     * Check whether it is permitted to make one MeshObject equivalent to another.
+     * 
+     * @param one the first MeshObject
+     * @param two the second MeshObject
+     * @param roleTypesOneToAsk the RoleTypes, of MeshObject one, to ask
+     * @param roleTypesTwoToAsk the RoleTypes, of MeshObject two, to ask
+     * @throws NotPermittedException thrown if it is not permitted
+     */
+    public void checkPermittedAddAsEquivalent(
+            MeshObject  one,
+            RoleType [] roleTypesOneToAsk,
+            MeshObject  two,
+            RoleType [] roleTypesTwoToAsk )
+        throws
+            NotPermittedException
+    {
+        try {
+            sudo();
+            
+            MeshObject caller = getCaller();
+
+            for( RoleType current : roleTypesOneToAsk ) {
+                current.checkPermittedAddAsEquivalent( one, two, caller );
+            }
+            for( RoleType current : roleTypesTwoToAsk ) {
+                current.checkPermittedAddAsEquivalent( two, one, caller );
+            }
+        } finally {
+            sudone();
+        }        
+    }
+
+    /**
+     * Check whether it is permitted to remove a MeshObject from the equivalence set
+     * it is currently a member of.
+     * Subclasses may override this.
+     * 
+     * @param obj the MeshObject to remove
+     * @param roleTypesToAsk the RoleTypes to ask
+     * @throws NotPermittedException thrown if it is not permitted
+     */
+    public void checkPermittedRemoveAsEquivalent(
+            MeshObject  obj,
+            RoleType [] roleTypesToAsk )
+        throws
+            NotPermittedException
+    {
+        try {
+            sudo();
+            
+            MeshObject caller = getCaller();
+
+            for( RoleType current : roleTypesToAsk ) {
+                current.checkPermittedRemoveAsEquivalent( obj, caller );
             }
         } finally {
             sudone();

@@ -19,6 +19,9 @@ import java.util.Map;
 /**
  * Extends the <code>Map</code> interface to add some methods suitable for <code>Maps</code> that have a local
  * cache.
+ *
+ * @param K the type of key
+ * @param V the type of value
  */
 public interface CachingMap<K,V>
     extends

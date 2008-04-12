@@ -15,12 +15,14 @@
 package org.infogrid.util;
 
 import java.beans.PropertyChangeEvent;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * This subclasses <code>java.beans.PropertyChangeEvent</code> to make it easier
  * to process PropertyChangeEvents that deal with Set values for the changed properties.
+ * 
+ * @param T the type of element in the Collection
  */
 public abstract class CollectionPropertyChangeEvent<T>
         extends
@@ -33,6 +35,7 @@ public abstract class CollectionPropertyChangeEvent<T>
      * @param propertyName The programmatic name of the property that was changed.
      * @param oldValue the old Set prior to addition
      * @param addition the T that was added to the Set
+     * @return the created CollectionPropertyChangeEvent
      */
     public static <T> CollectionPropertyChangeEvent<T> createAdded(
             Object        source,
@@ -50,6 +53,7 @@ public abstract class CollectionPropertyChangeEvent<T>
      * @param propertyName The programmatic name of the property that was changed.
      * @param addition the T that was added to the Set
      * @param newValue the new Set after addition
+     * @return the created CollectionPropertyChangeEvent
      */
     public static <T> CollectionPropertyChangeEvent<T> createAdded(
             Object        source,
@@ -67,6 +71,7 @@ public abstract class CollectionPropertyChangeEvent<T>
      * @param propertyName The programmatic name of the property that was changed.
      * @param oldValue the old Set prior to removal
      * @param removal the T that was removed from the Set
+     * @return the created CollectionPropertyChangeEvent
      */
     public static <T> CollectionPropertyChangeEvent<T> createRemoved(
             Object        source,
@@ -84,6 +89,7 @@ public abstract class CollectionPropertyChangeEvent<T>
      * @param propertyName The programmatic name of the property that was changed.
      * @param removal the T that was removed from the Set
      * @param newValue the new Set after removal
+     * @return the created CollectionPropertyChangeEvent
      */
     public static <T> CollectionPropertyChangeEvent<T> createRemoved(
             Object        source,
@@ -100,6 +106,7 @@ public abstract class CollectionPropertyChangeEvent<T>
      * @param source  The bean that fired the event.
      * @param propertyName  The programmatic name of the property that was changed.
      * @param oldValue  The old value of the property.
+     * @param delta     The difference between the old and new value of the property.
      * @param newValue  The new value of the property.
      */
     protected CollectionPropertyChangeEvent(
@@ -124,6 +131,8 @@ public abstract class CollectionPropertyChangeEvent<T>
     
     /**
      * Obtain the delta object, i.e. the object that has been added or removed.
+     * 
+     * @return the delta
      */
     public T getDelta()
     {
@@ -147,17 +156,22 @@ public abstract class CollectionPropertyChangeEvent<T>
 
     /**
      * Subclass that reflects an addition to the Set.
+     * 
+     * @param T the type of element in the Collection
      */
     public static class Added<T>
             extends
                 CollectionPropertyChangeEvent<T>
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
          * @param source  The bean that fired the event.
          * @param propertyName  The programmatic name of the property that was changed.
          * @param oldValue  The old value of the property.
+         * @param addition  The added element of the property.
          * @param newValue  The new value of the property.
          */
         protected Added(
@@ -207,17 +221,22 @@ public abstract class CollectionPropertyChangeEvent<T>
 
     /**
      * Subclass that reflects a removal from the Set.
+     * 
+     * @param T the type of element in the Collection
      */
     public static class Removed<T>
             extends
                 CollectionPropertyChangeEvent<T>
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
          * @param source  The bean that fired the event.
          * @param propertyName  The programmatic name of the property that was changed.
          * @param oldValue  The old value of the property.
+         * @param removal   The removed element of the property.
          * @param newValue  The new value of the property.
          */
         protected Removed(

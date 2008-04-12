@@ -271,10 +271,11 @@ public class ProxySerializationTest1
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception anything can go wrong in a test
+     */
     public ProxySerializationTest1(
             String [] args )
         throws
@@ -391,6 +392,8 @@ public class ProxySerializationTest1
             extends
                 SimpleXprisoMessage
     {
+        private static final long serialVersionUID = 1L; // helps to get rid of IDE compiler warnings
+        
         public TestXprisoMessage(
                 int                                  requestId,
                 int                                  responseId,

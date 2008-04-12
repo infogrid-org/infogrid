@@ -26,6 +26,9 @@ import org.infogrid.util.logging.Log;
  * A very simple, in-memory only implementation of {@link NameServer}. This NameServer
  * keeps mappings locally, and if not found, it will delegate to (optional) delegate
  * NameServers.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public class MNameServer<K,V>
         implements

@@ -14,23 +14,25 @@
 
 package org.infogrid.probe.xml;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.RelatedAlreadyException;
-
+import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.transaction.TransactionException;
-
+import org.infogrid.module.ModuleException;
 import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;
-
-import org.infogrid.module.ModuleException;
-
 import org.w3c.dom.Document;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 /**
   * <p>This interface is supported by all Probes that can
@@ -84,8 +86,15 @@ public interface XmlDOMProbe
             Document               theDocument,
             StagingMeshBase        mb )
         throws
-            MeshObjectIdentifierNotUniqueException,
+            IsAbstractException,
+            EntityBlessedAlreadyException,
+            EntityNotBlessedException,
             RelatedAlreadyException,
+            RoleTypeBlessedAlreadyException,
+            NotRelatedException,
+            MeshObjectIdentifierNotUniqueException,
+            IllegalPropertyTypeException,
+            IllegalPropertyValueException,
             TransactionException,
             NotPermittedException,
             ProbeException,

@@ -14,33 +14,91 @@
 
 package org.infogrid.mesh;
 
-import org.infogrid.util.AbstractLocalizedRuntimeException;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.util.StringHelper;
 
 /**
- * This Exception indicates that two MeshObjects are already equivalents, and thus
- * cannot be made equivalents.
+ * This Exception is thrown if two MeshObject are supposed to become equivalent, but
+ * are equivalent already.
  */
 public class EquivalentAlreadyException
         extends
-            AbstractLocalizedRuntimeException
+            IllegalOperationTypeException
 {
     /**
-     * Constructor.
+     * Construct one.
      *
-     * @param meshObject the MeshObject where we discovered the EquivalentAlreadyException
-     * @param potentialEquivalent theMeshObject that was supposed to become a new equivalent
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param meshObject the first MeshObject that was equivalent already, if available
+     * @param meshObjectIdentifier the MeshObjectIdentifier for the first MeshObject that was equivalent already
+     * @param other the second MeshObject that was equivalent already, if available
+     * @param otherIdentifier the MeshObjectIdentifier for the second MeshObject that was equivalent already
      */
     public EquivalentAlreadyException(
-            MeshObject meshObject,
-            MeshObject potentialEquivalent )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           meshObject,
+            MeshObjectIdentifier meshObjectIdentifier,
+            MeshObject           other,
+            MeshObjectIdentifier otherIdentifier )
     {
-        theMeshObject = meshObject;
-        theEquivalent = potentialEquivalent;
+        super( mb, originatingMeshBaseIdentifier, meshObject, meshObjectIdentifier );
+        
+        theOther                = other;
+        theOtherIdentifier      = otherIdentifier;
     }
 
     /**
-     * Return this object in string form.
+     * More convenient simple constructor for the most common case.
+     *
+     * @param meshObject the first MeshObject that was equivalent already, if available
+     * @param other the second MeshObject that was equivalent already, if available
+     */
+    public EquivalentAlreadyException(
+            MeshObject           meshObject,
+            MeshObject           other )
+    {
+        this(   meshObject.getMeshBase(),
+                meshObject.getMeshBase().getIdentifier(),
+                meshObject,
+                meshObject.getIdentifier(),
+                other,
+                other.getIdentifier() );
+    }
+
+    /**
+     * Obtain the MeshObject that was equivalent already.
+     * 
+     * @return the other MeshObject
+     * @throws MeshObjectAccessException thrown if the MeshObject could not be found
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     */
+    public synchronized MeshObject getOtherMeshObject()
+        throws
+            MeshObjectAccessException,
+            IllegalStateException
+    {
+        if( theOther == null ) {
+            theOther = resolve( theOtherIdentifier );
+        }
+        return theOther;
+    }
+
+    /**
+     * Obtain the MeshObjectIdentifier of the MeshObject that was equivalent already.
+     *
+     * @return the MeshObjectIdentifier
+     */
+    public MeshObjectIdentifier getOtherMeshObjectIdentifier()
+    {
+        return theOtherIdentifier;
+    }
+
+    /**
+     * Return this object in string form, for debugging.
      *
      * @return string form of this object
      */
@@ -51,11 +109,15 @@ public class EquivalentAlreadyException
                 this,
                 new String[] {
                     "theMeshObject",
-                    "theEquivalent"
+                    "theMeshObjectIdentifier",
+                    "theOther",
+                    "theOtherIdentifier",
                 },
                 new Object[] {
                     theMeshObject,
-                    theEquivalent
+                    theMeshObjectIdentifier,
+                    theOther,
+                    theOtherIdentifier
                 });
     }
 
@@ -66,16 +128,17 @@ public class EquivalentAlreadyException
      */
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theMeshObject, theEquivalent };
+        return new Object[] { theMeshObjectIdentifier, theOtherIdentifier };
     }
 
     /**
-     * The MeshObject for which we discovered a violation.
+     * The second MeshObject that was equivalent already.
      */
-    protected transient MeshObject theMeshObject;
+    protected transient MeshObject theOther;
 
     /**
-     * The MeshObject that was supposed to become an equivalent.
+     * The MeshObjectIdentifier of the second MeshObject that was equivalent already.
      */
-    protected transient MeshObject theEquivalent;
+    protected MeshObjectIdentifier theOtherIdentifier;
 }
+

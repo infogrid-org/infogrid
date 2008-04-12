@@ -82,15 +82,12 @@ public class BulkLoaderViewlet
      * @see #performAfter
      */
     @Override
-    public void performBefore(
+    public void performBeforeSafePost(
             RestfulRequest     request,
             StructuredResponse response )
         throws
             ServletException
     {
-        if( !"POST".equals( request.getDelegate().getMethod() )) {
-            return;
-        }
         SaneRequest theSaneRequest = (SaneRequest) request.getDelegate().getAttribute( SaneRequest.class.getName() );
         
         String bulkXml = theSaneRequest.getPostArgument( "bulkXml" );
