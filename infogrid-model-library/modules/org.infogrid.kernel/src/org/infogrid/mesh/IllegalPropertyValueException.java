@@ -14,9 +14,14 @@
 
 package org.infogrid.mesh;
 
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
+import org.infogrid.model.primitives.MeshTypeUtils;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
 
+import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 import org.infogrid.util.StringHelper;
 
 /**
@@ -31,19 +36,71 @@ public class IllegalPropertyValueException
     /**
      * Constructor.
      *
-     * @param obj the MeshObject whose property we were trying to set to a new value
-     * @param pt the PropertyType that we were trying to set on obj
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param obj the MeshObject on which the violation was discovered, if available
+     * @param identifier the MeshObjectIdentifier for the MeshObject on which the violation was discovered
+     * @param pt the PropertyType whose value was attempted to be set, if available
+     * @param typeIdentifier the MeshTypeIdentifier for the PropertyType whose value was attempted to be set
      * @param illegalValue the value for the PropertyType that was illegal
      */
     public IllegalPropertyValueException(
-            MeshObject    obj,
-            PropertyType  pt,
-            PropertyValue illegalValue )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           obj,
+            MeshObjectIdentifier identifier,
+            PropertyType         pt,
+            MeshTypeIdentifier   typeIdentifier,
+            PropertyValue        illegalValue )
     {
-        super( obj );
+        super( mb, originatingMeshBaseIdentifier, obj, identifier );
+        
+        if( typeIdentifier == null ) {
+            throw new IllegalArgumentException( "typeIdentifier must not be null" );
+        }
+        thePropertyType           = pt;
+        thePropertyTypeIdentifier = typeIdentifier;
+        theIllegalValue           = illegalValue;
+    }
 
-        thePropertyType = pt;
-        theIllegalValue = illegalValue;
+    /**
+     * More convenient simple constructor for the most common case.
+     *
+     * @param obj the MeshObject on which the violation was discovered, if available
+     * @param pt the PropertyType whose value was attempted to be set, if available
+     * @param illegalValue the value for the PropertyType that was illegal
+     */
+    public IllegalPropertyValueException(
+            MeshObject           obj,
+            PropertyType         pt,
+            PropertyValue        illegalValue )
+    {
+        this(   obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                obj.getIdentifier(),
+                pt,
+                pt.getIdentifier(),
+                illegalValue );
+    }
+
+    /**
+     * Obtain the PropertyType whose value was attempted to be set
+     * 
+     * @return the PropertyType
+     * @throws MeshTypeWithIdentifierNotFoundException thrown if the PropertyType could not be found
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     * @throws ClassCastException thrown if the type identifier identified a MeshType which is not a PropertyType
+     */
+    public synchronized PropertyType getPropertyType()
+        throws
+            MeshTypeWithIdentifierNotFoundException,
+            IllegalStateException
+    {
+        if( thePropertyType == null ) {
+            thePropertyType = (PropertyType) resolve( thePropertyTypeIdentifier );
+        }
+        return thePropertyType;
     }
 
     /**
@@ -57,36 +114,47 @@ public class IllegalPropertyValueException
         return StringHelper.objectLogString(
                 this,
                 new String[] {
+                    "resolvingMeshBase",
                     "meshObject",
+                    "meshObjectIdentifier",
                     "propertyType",
-                    "dataType",
-                    "value"
+                    "propertyTypeIdentifier",
+                    "illegalValue",
+                    "types"
                 },
                 new Object[] {
+                    theResolvingMeshBase,
                     theMeshObject,
-                    thePropertyType.getIdentifier().toExternalForm(),
-                    thePropertyType.getDataType(),
-                    theIllegalValue
+                    theMeshObjectIdentifier,
+                    thePropertyType,
+                    thePropertyTypeIdentifier,
+                    theIllegalValue,
+                    MeshTypeUtils.meshTypeIdentifiers( theMeshObject )
                 });
     }
 
     /**
-     * Obtain resource parameters for the internationalization.
+     * Obtain parameters for the internationalization.
      *
-     * @return the resource parameters
+     * @return the parameters
      */
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theMeshObject, thePropertyType, thePropertyType.getDataType(), theIllegalValue };
+        return new Object[] { theMeshObjectIdentifier, thePropertyTypeIdentifier, theIllegalValue };
     }
 
     /**
-     * The PropertyType we were trying to set.
+     * The PropertyType that was illegal on the MeshObject.
      */
     protected transient PropertyType thePropertyType;
-
+    
     /**
-     * The illegal value that caused this exception.
+     * The identifier of the PropertyType that was illegal on the MeshObject.
+     */
+    protected MeshTypeIdentifier thePropertyTypeIdentifier;
+    
+    /**
+     * The illegal PropertyValue.
      */
     protected PropertyValue theIllegalValue;
 }

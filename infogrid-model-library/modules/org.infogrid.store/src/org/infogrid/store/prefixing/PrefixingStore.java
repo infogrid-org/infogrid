@@ -190,7 +190,6 @@ public class PrefixingStore
      * Exception if a data element with this key does not exist already.
      *
      * @param toUpdate the StoreValue to update
-     * @param data the data element, expressed as a sequence of bytes
      * @throws StoreKeyDoesNotExistException thrown if no data element exists in the Store using this key
      * @throws IOException thrown if an I/O error occurred
      *
@@ -306,7 +305,7 @@ public class PrefixingStore
      *
      * @param key the key to the data element in the Store
      * @return the StoreValue stored in the Store for this key; this encapsulates data element and meta-data
-     * @throws StoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
+     * @throws PrefixingStoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
      * @throws IOException thrown if an I/O error occurred
      *
      * @see #put to initially store a data element
@@ -343,7 +342,7 @@ public class PrefixingStore
      * Delete the data element that is stored using this key.
      *
      * @param key the key to the data element in the Store
-     * @throws StoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
+     * @throws PrefixingStoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
      * @throws IOException thrown if an I/O error occurred
      */
     public void delete(

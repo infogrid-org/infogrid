@@ -27,44 +27,62 @@
               It expresses meta-data such as when the Probe was last run, when it should be run next etc.
               Subtypes may implement different algorithms to determine the respective data.</userdescription>
             <isabstract/>
-            <declaresMethod>
+            <declaresMethod><![CDATA[
     /**
      * A successful run was just performed, but the data source did not change and no update was necessary.
      *
      * @param consumedTime the time in milliseconds that the update took
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public abstract void performedSuccessfulRunNoChange(
             long consumedTime )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException;
-            </declaresMethod>
-            <declaresMethod>
+         ]]></declaresMethod>
+            <declaresMethod><![CDATA[
     /**
      * A successful run was just performed, the data source did change, and this is how long the run took.
      *
      * @param consumedTime the time in milliseconds that the update took
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public abstract void performedSuccessfulRunWithChange(
             long consumedTime )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException;
-            </declaresMethod>
-            <declaresMethod>
+         ]]></declaresMethod>
+            <declaresMethod><![CDATA[
     /**
      * An attempt to run the Probe was unsuccessful, and no new data could be obtained because a problem occurred.
      *
      * @param consumedTime the time in milliseconds that the update took
      * @param problem the Throwable that was thrown by the Probe, indicating the problem
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public abstract void performedUnsuccessfulRun(
             long      consumedTime,
             Throwable problem )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException;
-            </declaresMethod>
+         ]]></declaresMethod>
 
             <propertytype ID="org.infogrid.model.Probe#ProbeUpdateSpecification/NextProbeRun">
                 <name>NextProbeRun</name>
@@ -111,10 +129,16 @@
      * A successful run was just performed, but the data source did not change and no update was necessary.
      *
      * @param consumedTime the time in milliseconds that the update took
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public void performedSuccessfulRunNoChange(
             long consumedTime )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException
     {
@@ -133,10 +157,16 @@
      * A successful run was just performed, the data source did change, and this is how long the run took.
      *
      * @param consumedTime the time in milliseconds that the update took
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public void performedSuccessfulRunWithChange(
             long consumedTime )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException
     {
@@ -156,11 +186,17 @@
      *
      * @param consumedTime the time in milliseconds that the update took
      * @param problem the Throwable that was thrown by the Probe, indicating the problem
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public void performedUnsuccessfulRun(
             long      consumedTime,
             Throwable problem )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException
     {
@@ -186,10 +222,16 @@
      * A successful run was just performed, but the data source did not change and no update was necessary.
      *
      * @param consumedTime the time in milliseconds that the update took
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public void performedSuccessfulRunNoChange(
             long consumedTime )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException
     {
@@ -209,10 +251,16 @@
      * A successful run was just performed, the data source did change, and this is how long the run took.
      *
      * @param consumedTime the time in milliseconds that the update took
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public void performedSuccessfulRunWithChange(
             long consumedTime )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException
     {
@@ -233,11 +281,17 @@
      *
      * @param consumedTime the time in milliseconds that the update took
      * @param problem the Throwable that was thrown by the Probe, indicating the problem
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public void performedUnsuccessfulRun(
             long      consumedTime,
             Throwable problem )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException
     {
@@ -274,10 +328,16 @@
      * A successful run was just performed, but the data source did not change and no update was necessary.
      *
      * @param consumedTime the time in milliseconds that the update took
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public void performedSuccessfulRunNoChange(
             long consumedTime )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException
     {
@@ -307,10 +367,16 @@
      * A successful run was just performed, the data source did change, and this is how long the run took.
      *
      * @param consumedTime the time in milliseconds that the update took
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public void performedSuccessfulRunWithChange(
             long consumedTime )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException
     {
@@ -332,11 +398,17 @@
      *
      * @param consumedTime the time in milliseconds that the update took
      * @param problem the Throwable that was thrown by the Probe, indicating the problem
+     * @throws org.infogrid.mesh.IllegalPropertyTypeException thrown if the body of this method accessed an invalid PropertyType
+     * @throws org.infogrid.mesh.IllegalPropertyValueException, thrown if the body of this method provided an invalid PropertyValue
+     * @throws org.infogrid.mesh.NotPermittedException thrown if the caller was not permitted to invoke this operation
+     * @throws org.infogrid.meshbase.transaction.TransactionException should not be thrown -- codegenerator faulty
      */
     public void performedUnsuccessfulRun(
             long      consumedTime,
             Throwable problem )
         throws
+            org.infogrid.mesh.IllegalPropertyTypeException,
+            org.infogrid.mesh.IllegalPropertyValueException,
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.meshbase.transaction.TransactionException
     {

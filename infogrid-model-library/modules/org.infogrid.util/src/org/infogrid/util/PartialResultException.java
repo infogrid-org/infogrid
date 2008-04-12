@@ -18,6 +18,8 @@ package org.infogrid.util;
  * This interface is implemented by those Exceptions that, while obviously
  * indicating that something went wrong, still want to return at least
  * a partial result.
+ * 
+ * @param T the type of partial result
  */
 public interface PartialResultException<T>
 {

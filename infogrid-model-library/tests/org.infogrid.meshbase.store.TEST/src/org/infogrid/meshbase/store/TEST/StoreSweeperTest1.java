@@ -138,6 +138,7 @@ public class StoreSweeperTest1
       * Constructor.
       *
       * @param args command-line arguments
+     * @throws Exception anything can go wrong in a test
       */
     public StoreSweeperTest1(
             String [] args )

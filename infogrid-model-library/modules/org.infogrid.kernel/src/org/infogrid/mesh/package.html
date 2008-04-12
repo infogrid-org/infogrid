@@ -3,18 +3,9 @@
     <title>The org.infogrid.mesh package</title>
   </head>
   <body>
-    <p>Contains the core classes and interfaces to represent
-       {@link org.infogrid.mesh.MeshObject MeshObjects}.</p>
-    <p>MeshObjects have zero or more properties, and may be related to each
-       other.</p>
-    <p>MeshObjects may be blessed and unblessed with zero or more
-       {@link org.infogrid.model.primitives.EntityType EntityTypes}.
-       Similarly, each relationship between any two MeshObjects may be blessed
-       with zero or more
-       {@link org.infogrid.model.primitives.RoleType RoleTypes}.</p>
-    <p>For each type, a MeshObject may have an associated
-       {@link org.infogrid.mesh.TypedMeshObjectFacade TypedMeshObjectFacade},
-       which provides a type-safe way of interacting with the MeshObject.</p>
+    <p>Contains the core classes and interfaces to represent and manipulate
+       {@link org.infogrid.mesh.MeshObject MeshObjects}. Life cycle operations
+       can be found on {@link org.infogrid.meshbase.MeshBase}.</p>
     <p>The application programmer should almost never have to deal with
        subtypes or classes implementing the concepts defined in this package.</p>
   </body>

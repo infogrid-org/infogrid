@@ -25,6 +25,11 @@ package org.infogrid.util.event;
  *    respectively. These are identifiers for the source and the delta value,
  *    which enables a receiver of this event to re-create source and/or delta value
  *    if those could not be serialized directly.</p>
+ * 
+ * @param S the type of the event source
+ * @param SID the type of the identifier of the event source
+ * @param V the type of the value
+ * @param VID the type of the identifier of the value
  */
 public interface ExternalizableEvent<S,SID,V,VID>
 {
@@ -32,7 +37,7 @@ public interface ExternalizableEvent<S,SID,V,VID>
      * Obtain the source of the event.
      * 
      * @return the source of the event
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     * @throws UnresolvedException.Source thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     public S getSource()
@@ -50,7 +55,7 @@ public interface ExternalizableEvent<S,SID,V,VID>
      * Obtain the delta value of the data item whose change triggered the event.
      * 
      * @return the delta value
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     * @throws UnresolvedException.Value thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     public V getDeltaValue()

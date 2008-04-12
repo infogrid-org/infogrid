@@ -257,6 +257,7 @@ public final class ResourceHelper
      * @param resourceName the name of the resource we are looking for
      * @param toParse the String to parse
      * @return the obtained values
+     * @throws ParseException thrown if parsing failed
      */
     public Object [] parseArgumentsFromResourceString(
             String resourceName,

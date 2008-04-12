@@ -78,10 +78,10 @@ public class StandardModule
 
         try {
             if( configurationClassName == null ) {
-                configurationClassName = ((StandardModuleAdvertisement)theModuleAdvertisement).getConfigurationClassName();
+                configurationClassName = theModuleAdvertisement.getConfigurationClassName();
             }
             if( configurationMethodName == null ) {
-                configurationMethodName = ((StandardModuleAdvertisement)theModuleAdvertisement).getConfigurationMethodName();
+                configurationMethodName = theModuleAdvertisement.getConfigurationMethodName();
             }
             
             if( configurationClassName != null ) {
@@ -151,10 +151,10 @@ public class StandardModule
 
         try {
             if( runClassName == null ) {
-                runClassName = ((StandardModuleAdvertisement)theModuleAdvertisement).getRunClassName();
+                runClassName = theModuleAdvertisement.getRunClassName();
             }
             if( runMethodName == null ) {
-                runMethodName = ((StandardModuleAdvertisement)theModuleAdvertisement).getRunMethodName();
+                runMethodName = theModuleAdvertisement.getRunMethodName();
             }
 
             if( runClassName == null ) {

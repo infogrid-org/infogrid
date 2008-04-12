@@ -231,11 +231,11 @@ public class NetMeshObjectRoleAddedEvent
         } catch( TransactionException ex ) {
             throw ex;
 
-        } catch( RoleTypeBlessedAlreadyException ex ) {
-            // that's fine
-            if( log.isDebugEnabled() ) {
-                log.debug( this + " role type blessed already" );
-            }
+//        } catch( RoleTypeBlessedAlreadyException ex ) {
+//            // that's fine
+//            if( log.isDebugEnabled() ) {
+//                log.debug( this + " role type blessed already" );
+//            }
 
         } catch( Throwable ex ) {
             throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, ex );

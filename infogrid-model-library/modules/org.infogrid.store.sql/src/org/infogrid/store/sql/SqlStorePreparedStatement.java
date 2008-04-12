@@ -86,7 +86,9 @@ public class SqlStorePreparedStatement
     }
 
     /**
-     * Obtain the SQL for this statement. This is primarily for debugging and logging.
+     * Obtain the SQL code for this statement. This is primarily for debugging and logging.
+     * 
+     * @return the SQL code
      */
     public String getSql()
     {

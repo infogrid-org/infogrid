@@ -50,14 +50,17 @@ public class DirectoryEntity
     {
         File f = new File( rootDir, req.getRelativeBaseUri() );
 
-        if( !f.getAbsolutePath().startsWith( rootDir.getAbsolutePath() ) )
+        if( !f.getAbsolutePath().startsWith( rootDir.getAbsolutePath() ) ) {
             return null;
+        }
 
-        if( !f.exists() )
+        if( !f.exists() ) {
             return null;
+        }
 
-        if( !f.isDirectory() )
+        if( !f.isDirectory() ) {
             return null;
+        }
 
         return new DirectoryEntity( req.getRelativeBaseUri(), f );
     }

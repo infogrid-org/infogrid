@@ -26,33 +26,40 @@ public abstract class AbstractExternalizedMeshObject
             ExternalizedMeshObject
 {
     /**
-     * Constructor. Subclass sets all properties.
+     * Constructor for subclasses only. Subclass sets all properties.
      */
     protected AbstractExternalizedMeshObject()
     {
+        // noop
     }
 
     /**
-     * Constructor. Set all local properties
+     * Constructor for subclasses only. Set all local properties.
+     * 
+     * @param identifier the MeshObjectIdentifier of the MeshObject
+     * @param timeCreated the time the MeshObject was created
+     * @param timeUpdated the time the MeshObject was last updated
+     * @param timeRead the time the MeshObject was last read
+     * @param timeExpires the time the MeshObject will expire
      */
     protected AbstractExternalizedMeshObject(
             MeshObjectIdentifier identifier,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeExpires )
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
     {
-        theIdentifier = identifier;
-        theTimeCreated  = timeCreated;
-        theTimeUpdated  = timeUpdated;
-        theTimeRead     = timeRead;
-        theTimeExpires  = timeExpires;
+        theIdentifier  = identifier;
+        theTimeCreated = timeCreated;
+        theTimeUpdated = timeUpdated;
+        theTimeRead    = timeRead;
+        theTimeExpires = timeExpires;
     }
 
     /**
-     * Obtain the Identifier of the MeshObject.
+     * Obtain the MeshObjectIdentifier of the MeshObject.
      *
-     * @return the Identifier of the MeshObject
+     * @return the MeshObjectIdentifier of the MeshObject
      */
     public MeshObjectIdentifier getIdentifier()
     {
@@ -62,7 +69,7 @@ public abstract class AbstractExternalizedMeshObject
     /**
      * Obtain the time the MeshObject was created.
      *
-     * @return the time the MeshObject was created
+     * @return the time the MeshObject was created, in System.currentTimeMillis() format
      */
     public long getTimeCreated()
     {
@@ -72,7 +79,7 @@ public abstract class AbstractExternalizedMeshObject
     /**
      * Obtain the time the MeshObject was last updated.
      *
-     * @return the time the MeshObject was last updated
+     * @return the time the MeshObject was last updated, in System.currentTimeMillis() format
      */
     public long getTimeUpdated()
     {
@@ -82,7 +89,7 @@ public abstract class AbstractExternalizedMeshObject
     /**
      * Obtain the time the MeshObject was last read.
      *
-     * @return the time the MeshObject was last read
+     * @return the time the MeshObject was last read, in System.currentTimeMillis() format
      */
     public long getTimeRead()
     {
@@ -92,7 +99,7 @@ public abstract class AbstractExternalizedMeshObject
     /**
      * Obtain the time when the MeshObject will expire.
      *
-     * @return the time the MeshObject will expire, or -1 if never.
+     * @return the time the MeshObject will expire, in System.currentTimeMillis() format, or -1 if never.
      */
     public long getTimeExpires()
     {
@@ -166,7 +173,7 @@ public abstract class AbstractExternalizedMeshObject
     }
 
     /**
-     * The identity of this MeshObject.
+     * The MeshObjectIdentifier of this MeshObject.
      */
     protected MeshObjectIdentifier theIdentifier;
 

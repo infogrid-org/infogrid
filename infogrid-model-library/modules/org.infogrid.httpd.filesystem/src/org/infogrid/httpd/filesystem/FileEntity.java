@@ -44,14 +44,17 @@ public class FileEntity
     {
         File f = new File( rootDir, req.getRelativeBaseUri() );
 
-        if( !f.getAbsolutePath().startsWith( rootDir.getAbsolutePath() ) )
+        if( !f.getAbsolutePath().startsWith( rootDir.getAbsolutePath() ) ) {
             return null;
+        }
 
-        if( !f.exists() )
+        if( !f.exists() ) {
             return null;
+        }
 
-        if( !f.isFile() )
+        if( !f.isFile() ) {
             return null;
+        }
 
         return new FileEntity( null, f );
     }
@@ -77,8 +80,9 @@ public class FileEntity
      */
     public String getMime()
     {
-        if( theMime == null )
+        if( theMime == null ) {
             theMime = determineMime( theFile );
+        }
 
         return theMime;
     }

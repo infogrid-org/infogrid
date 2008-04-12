@@ -456,6 +456,8 @@ public class CommandlineSoftwareInstallation
     /**
      * Obtain the number of milliseconds to sleep before exiting the main method.
      * This can be very convenient for profiling, for example.
+     * 
+     * @return the time before exit, in milliseconds
      */
     public final long getSleepPeriodBeforeExit()
     {

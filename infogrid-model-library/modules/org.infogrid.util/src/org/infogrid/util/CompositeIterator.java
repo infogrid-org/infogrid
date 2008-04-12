@@ -20,6 +20,8 @@ import java.util.NoSuchElementException;
 
 /**
  * <p>Iterator that returns the content returned by N delegate Iterators, in sequence.</p>
+ * 
+ * @param E the type of element to iterate over
  */
 public class CompositeIterator<E>
         implements

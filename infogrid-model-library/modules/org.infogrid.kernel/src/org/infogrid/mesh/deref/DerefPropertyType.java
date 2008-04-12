@@ -28,7 +28,7 @@ import org.infogrid.util.StringHelper;
 import org.infogrid.util.logging.Log;
 
 /**
-  * This is a pair of a MeshObject and a PropertyType,
+  * A pair of a MeshObject and a PropertyType,
   * representing a property of this MeshObject.
   */
 public final class DerefPropertyType
@@ -38,7 +38,7 @@ public final class DerefPropertyType
     private static final Log log = Log.getLogInstance( DerefPropertyType.class); // our own, private logger
 
     /**
-      * Construct one. This constructor does not (and should not, due to possible blessing later)
+      * Constructor. This constructor does not (and should not, due to possible blessing later)
       * check whether this MeshObject actually carries the specified PropertyType.
       *
       * @param mo the MeshObject
@@ -72,15 +72,15 @@ public final class DerefPropertyType
       */
     public PropertyValue getValue()
        throws
-            NotPermittedException,
-            IllegalPropertyTypeException
+            IllegalPropertyTypeException,
+            NotPermittedException
     {
         return theMeshObject.getPropertyValue( thePropertyType );
     }
 
     /**
      * Set the value of the property for this MeshObject. This will
-     * log an error to the logger if the PropertyType is not carried by the
+     * throw an Exception if the PropertyType is not carried by the
      * MeshObject.
      * 
      * @param newValue the new property value on this MeshObject
@@ -95,9 +95,9 @@ public final class DerefPropertyType
     public void setValue(
             PropertyValue newValue )
         throws
-            NotPermittedException,
-            IllegalPropertyValueException,
             IllegalPropertyTypeException,
+            IllegalPropertyValueException,
+            NotPermittedException,
             TransactionException
     {
         theMeshObject.setPropertyValue( thePropertyType, newValue );
@@ -128,6 +128,9 @@ public final class DerefPropertyType
 
         } catch( IllegalPropertyValueException ex ) {
             log.error( ex );
+
+        } catch( IllegalPropertyTypeException ex ) {
+            log.error( ex );
         }
     }
 
@@ -148,6 +151,18 @@ public final class DerefPropertyType
                    && thePropertyType.equals( realOther.thePropertyType );
         }
         return false;
+    }
+
+    /**
+     * Hash code.
+     * 
+     * @return hash code
+     */
+    @Override
+    public int hashCode()
+    {
+        int hash = theMeshObject.hashCode() ^ thePropertyType.hashCode();
+        return hash;
     }
 
     /**

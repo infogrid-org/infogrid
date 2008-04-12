@@ -28,6 +28,10 @@ import java.util.*;
  *
  * <p>This currently blocks while objects are removed. This could potentially be made to
  *    be more friendly to Threads.</p>
+ * 
+ * @param K the type of key
+ * @param V the type of value
+ * @param A the type of argument
  */
 public class PatientSmartFactory<K,V,A>
         extends

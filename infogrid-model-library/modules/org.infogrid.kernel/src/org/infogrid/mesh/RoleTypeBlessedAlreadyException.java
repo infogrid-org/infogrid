@@ -14,13 +14,19 @@
 
 package org.infogrid.mesh;
 
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.model.primitives.EntityType;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MeshTypeUtils;
-import org.infogrid.model.primitives.RoleType;
 
+import org.infogrid.model.primitives.RoleType;
+import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 import org.infogrid.util.StringHelper;
 
 /**
- * A MeshObject's relationship to another MeshObject is already blessed with a particular RoleType.
+ * This Exception is thrown if an operation requires a relationship to
+ * be not blessed with a certain RoleType, but it is already.
  */
 public class RoleTypeBlessedAlreadyException
         extends
@@ -29,21 +35,70 @@ public class RoleTypeBlessedAlreadyException
     /**
      * Constructor.
      *
-     * @param obj the MeshObject that is blessed already
-     * @param type the RoleType with which this relationship is blessed already
-     * @param otherSide the MeshObject that is at the other side of the blessed relationship
+     * @param mb the MeshBase in which this Exception was created
+     * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param identifier the MeshObjectIdentifier for the MeshObject on which the illegal operation was attempted
+     * @param type the MeshType of the already-existing blessing
+     * @param typeIdentifier the MeshTypeIdentifier of the MeshType of the already-existing blessing
+     * @param other the MeshObject identifying the other end of the relationship, if available
+     * @param otherIdentifier the MeshObjectIdentifier for the MeshObject identifying the other end of the relationship
      */
     public RoleTypeBlessedAlreadyException(
-            MeshObject obj,
-            RoleType   type,
-            MeshObject otherSide )
+            MeshBase             mb,
+            MeshBaseIdentifier   originatingMeshBaseIdentifier,
+            MeshObject           obj,
+            MeshObjectIdentifier identifier,
+            RoleType             type,
+            MeshTypeIdentifier   typeIdentifier,
+            MeshObject           other,
+            MeshObjectIdentifier otherIdentifier )
     {
-        super( obj );
-
-        theRoleType  = type;
-        theOtherSide = otherSide;
+        super( mb, originatingMeshBaseIdentifier, obj, identifier, type, typeIdentifier );
+        
+        theOther           = other;
+        theOtherIdentifier = otherIdentifier;
     }
-    
+
+    /**
+     * More convenient simple constructor for the most common case.
+     *
+     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param type the MeshType of the already-existing blessing
+     * @param other the MeshObject identifying the other end of the relationship, if available
+     */
+    public RoleTypeBlessedAlreadyException(
+            MeshObject           obj,
+            RoleType             type,
+            MeshObject           other )
+    {
+        this(   obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                obj.getIdentifier(),
+                type,
+                type.getIdentifier(),
+                other,
+                other.getIdentifier() );
+    }
+
+    /**
+     * Obtain the RoleType of the already-existing blessing.
+     * 
+     * @return the RoleType
+     * @throws MeshTypeWithIdentifierNotFoundException thrown if the RoleType could not be found
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
+     * @throws ClassCastException thrown if the type identifier identified a MeshType that is not an RoleType
+     */
+    @Override
+    public synchronized RoleType getType()
+        throws
+            MeshTypeWithIdentifierNotFoundException,
+            IllegalStateException
+    {
+        return (RoleType) super.getType();
+    }
+
     /**
       * Obtain String representation, for debugging.
       *
@@ -54,17 +109,23 @@ public class RoleTypeBlessedAlreadyException
     {
         return StringHelper.objectLogString(
                 this,
-                new String[] {
+                new String[]{
                     "meshObject",
-                    "otherSide",
-                    "roleType",
+                    "meshObjectIdentifier",
+                    "meshType",
+                    "meshTypeIdentifier",
+                    "otherObject",
+                    "otherObjectIdentifier",
                     "types"
                 },
                 new Object[] {
                     theMeshObject,
-                    theOtherSide,
-                    theRoleType.getIdentifier().toExternalForm(),
-                    ( theOtherSide != null ) ? MeshTypeUtils.meshTypeIdentifiers( theMeshObject.getRoleTypes( theOtherSide ))  : null 
+                    theMeshObjectIdentifier,
+                    theType,
+                    theTypeIdentifier,
+                    theOther,
+                    theOtherIdentifier,
+                    MeshTypeUtils.meshTypeIdentifiers( theMeshObject )
                 });
     }
 
@@ -73,18 +134,19 @@ public class RoleTypeBlessedAlreadyException
      *
      * @return the parameters
      */
+    @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theMeshObject, theRoleType, theOtherSide };
+        return new Object[] { theMeshObjectIdentifier, theTypeIdentifier, theOtherIdentifier };
     }
 
     /**
      * The other end of the relationship.
      */
-    protected transient MeshObject theOtherSide;
+    protected transient MeshObject theOther;
 
     /**
-     * The RoleType with which this relationship is blessed already.
+     * The identifier of the other end of the relationship.
      */
-    protected transient RoleType theRoleType;
+    protected transient MeshObjectIdentifier theOtherIdentifier;
 }

@@ -155,12 +155,20 @@ public class DoubleStringifier
     {
         /**
          * Constructor.
+         * 
+         * @param stringifier the DoubleStringifier we belong to
+         * @param rawString the String to parse
+         * @param startIndex the start index
+         * @param currentEnd the current end index
+         * @param endIndex the final end index
+         * @param max the maximum number of iterations to return
+         * @param matchAll if true, match all chars between start and end
          */
         public MyIterator(
                 DoubleStringifier stringifier,
                 String            rawString,
                 int               startIndex,
-                int               startIndex2,
+                int               currentEnd,
                 int               endIndex,
                 int               max,
                 boolean           matchAll )
@@ -168,7 +176,7 @@ public class DoubleStringifier
             theStringifier = stringifier;
             theRawString   = rawString;
             theStartIndex  = startIndex;
-            theCurrentEnd  = startIndex2;
+            theCurrentEnd  = currentEnd;
             theEndIndex    = endIndex;
             theMax         = max;
             theMatchAll    = matchAll;

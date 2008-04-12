@@ -181,7 +181,7 @@ public interface MeshBaseLifecycleManager
      * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
      * @return the created MeshObject
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternaIdentifierNotUniqueException if a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws MeshObjectIdentifierNotUniqueException if a MeshObject exists already in this MeshBase with the specified MeshObjectIdentifier
      */
     public abstract MeshObject createMeshObject(
             MeshObjectIdentifier identifier,
@@ -209,7 +209,7 @@ public interface MeshBaseLifecycleManager
      * @return the created MeshObject
      * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalNIdentifierNotUniqueExceptionf a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified MeshObjectIdentifier
      * @throws NotPermittedException thrown if the blessing operation is not permitted
      */
     public abstract MeshObject createMeshObject(

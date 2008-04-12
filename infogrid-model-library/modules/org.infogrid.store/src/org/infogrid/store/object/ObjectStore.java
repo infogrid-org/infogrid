@@ -27,6 +27,9 @@ import java.io.IOException;
 /**
  * This class can store arbitrary Java objects, by delegating to an underlying,
  * configurable {@link Store} and a {@link StoreEntryMapper}.
+ * 
+ * @param K the type of key
+ * @param V the type of value
  */
 public class ObjectStore<K,V>
 {
@@ -49,7 +52,9 @@ public class ObjectStore<K,V>
      *
      * @param key the key under which the object will be stored
      * @param value the object to be stored
-     * @throws StoreKeyExistsAlreadyException thrown if a data element is already stored in the Store using this key
+     * @throws ObjectStoreKeyExistsAlreadyException thrown if a data element is already stored in the Store using this key
+     * @throws StoreValueEncodingException the value could not be encoded
+     * @throws IOException the encoded value could not be written
      *
      * @see #update if a data element with this key exists already
      * @see #putOrUpdate if a data element with this key may exist already
@@ -85,7 +90,9 @@ public class ObjectStore<K,V>
      *
      * @param key the key under which the object will be stored
      * @param value the object to be stored
-     * @throws StoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
+     * @throws ObjectStoreKeyDoesNotExistException thrown if a data element has not been stored in the Store using this key
+     * @throws StoreValueEncodingException the value could not be encoded
+     * @throws IOException the encoded value could not be written
      *
      * @see #put if a data element with this key does not exist already
      * @see #putOrUpdate if a data element with this key may exist already
@@ -122,6 +129,7 @@ public class ObjectStore<K,V>
      * @param key the key under which the data element may already, and will continue to be stored
      * @param value the object to be stored
      * @return true if the value was updated, false if it was put
+     * @throws StoreValueEncodingException the value could not be encoded
      * @throws IOException thrown if an I/O error occurred
      *
      * @see #put if a data element with this key does not exist already
@@ -154,7 +162,9 @@ public class ObjectStore<K,V>
      *
      * @param key the key to the object in the Store
      * @return the object
-     * @throws StoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
+     * @throws ObjectStoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
+     * @throws StoreValueDecodingException the value could not be decoded
+     * @throws IOException thrown if an I/O error occurred
      */
     public V get(
             K key )
@@ -180,7 +190,8 @@ public class ObjectStore<K,V>
      * Delete the object that is stored using this key.
      *
      * @param key the key to the object in the Store
-     * @throws StoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
+     * @throws ObjectStoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
+     * @throws IOException thrown if an I/O error occurred
      */
     public void delete(
             K key )
