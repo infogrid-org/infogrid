@@ -30,7 +30,7 @@ public class AnyMessageStringifier
      * 
      * @param formatString the format string, such as "Your {0,string} items cost {1,currency}."
      * @param childStringifiers the mapping between symbolic names (e.g. "string", "currency") to the actual Stringifier
-     * @returns the AnyMessageStringifier
+     * @return the AnyMessageStringifier
      * @throws CompoundStringifierCompileException thrown if the format string could not be compiled
      */
     public static AnyMessageStringifier create(
