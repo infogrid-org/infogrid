@@ -52,10 +52,10 @@ public class ViewletTag
         content.append( "<div class=\"viewlet" );
 
         if( vl != null ) {
-            // This should not happen (too often), just a defensive move for slightly abnormal Viewlets
-            String vlName = vl.getClass().getName();
+            // This should not happen
+            String vlHtmlClass = vl.getHtmlClass();
 
-            content.append( " " ).append( vlName.replace( '.', '-') );
+            content.append( " " ).append( vlHtmlClass.replace( '.', '-') );
         }        
         content.append( "\">" );
         InfoGridJspUtils.println( pageContext, false, content.toString() );

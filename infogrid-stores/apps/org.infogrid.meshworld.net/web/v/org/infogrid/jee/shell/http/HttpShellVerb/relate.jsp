@@ -1,5 +1,5 @@
 <candy:overlay id="org-infogrid-jee-shell-http-HttpShellVerb-relate">
- <form method="post" action="${Viewlet.postUrl}">
+ <u:safeForm method="post" action="${Viewlet.postUrl}">
   <h2>Relate two MeshObjects</h2>
   <table>
    <tr>
@@ -24,5 +24,5 @@
     </td>
    </tr>
   </table>
- </form>
+ </u:safeForm>
 </candy:overlay>

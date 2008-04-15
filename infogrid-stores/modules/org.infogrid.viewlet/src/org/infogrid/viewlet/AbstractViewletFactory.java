@@ -65,7 +65,6 @@ public abstract class AbstractViewletFactory
         throws
             FactoryException
     {
-        MeshObject              subject    = theObjectsToView.getSubject();
         ViewletFactoryChoice [] candidates = determineFactoryChoicesOrderedByMatchQuality( theObjectsToView );
 
         if( candidates.length == 0 ) {
