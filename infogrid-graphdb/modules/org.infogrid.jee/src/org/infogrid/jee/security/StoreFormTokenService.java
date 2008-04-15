@@ -60,9 +60,9 @@ public class StoreFormTokenService
     public String generateNewToken()
     {
         StoredFormToken token = StoredFormToken.createNew();
-        
+
         theMap.put( token.getKey(), token );
-        
+
         return token.getKey();
     }
     
@@ -76,12 +76,12 @@ public class StoreFormTokenService
     public boolean validateToken(
             String key )
     {
-        StoredFormToken token = theMap.get( key );
+        // regardless, we remove tokens passed into here
+        StoredFormToken token = theMap.remove( key );
         if( token == null ) {
             return false;
         }
         if( !token.isStillValid() ) {
-            // FIXME? Should we remove invalid tokens?
             return false;
         }
         return true;
