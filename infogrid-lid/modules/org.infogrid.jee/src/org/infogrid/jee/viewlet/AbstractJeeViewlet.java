@@ -45,6 +45,21 @@ public abstract class AbstractJeeViewlet
     }
     
     /**
+     * Obtain the Html class name for this Viewlet. By default, it is the Java class
+     * name, having replaced all periods with hyphens.
+     * 
+     * @return the HTML class name
+     */
+    public String getHtmlClass()
+    {
+        String ret = getClass().getName();
+
+        ret = ret.replaceAll( "\\.", "-" );
+        
+        return ret;
+    }
+
+    /**
      * <p>Invoked prior to the execution of the Servlet if the GET method has been requested.
      *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
      *    the GET execution of the servlet.</p>
@@ -203,20 +218,31 @@ public abstract class AbstractJeeViewlet
     }
 
     /**
-     * This method converts a Class (subclass of this one) into the default request URL
+     * This method converts the name of a Class (subclass of this one) into the default request URL
      * for the RequestDispatcher.
      * 
+     * @param viewletClassName the class name of the JeeViewlet
+     * @return the JSP URL.
+     */
+    protected String constructDefaultDispatcherUrl(
+            String viewletClassName )
+    {
+        StringBuilder almost = new StringBuilder();
+        almost.append( "/v/" ).append( viewletClassName.replace( '.', '/' )).append( ".jsp" );
+        return almost.toString();
+    }
+
+    /**
+     * This method converts a Class (subclass of this one) into the default request URL
+     * for the RequestDispatcher.
      * 
      * @param viewletClass the class of the JeeViewlet
      * @return the JSP URL.
      */
-    protected static String constructDefaultDispatcherUrl(
+    protected String constructDefaultDispatcherUrl(
             Class viewletClass )
     {
-        String viewletClassName = viewletClass.getName();
-        StringBuilder almost = new StringBuilder();
-        almost.append( "/v/" ).append( viewletClassName.replace( '.', '/' )).append( ".jsp" );
-        return almost.toString();
+        return constructDefaultDispatcherUrl( viewletClass.getName() );
     }
 
     /**

@@ -14,13 +14,12 @@
 
 package org.infogrid.jee.viewlet.modelbase;
 
+import java.util.Iterator;
 import org.infogrid.context.Context;
 import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.viewlet.AbstractJeeViewlet;
 import org.infogrid.model.primitives.SubjectArea;
 import org.infogrid.modelbase.ModelBase;
-
-import java.util.Iterator;
 import org.infogrid.viewlet.AbstractViewedMeshObjects;
 import org.infogrid.viewlet.DefaultViewedMeshObjects;
 

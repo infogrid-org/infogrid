@@ -142,6 +142,9 @@ public class ViewletDispatcherServlet
             try {
                 viewlet = (JeeViewlet) app.getViewletFactory().obtainFor( toView, c );
 
+            } catch( CannotViewException ex ) {
+                throw ex; // pass on
+
             } catch( FactoryException ex ) {
                 log.info( ex );
             }
