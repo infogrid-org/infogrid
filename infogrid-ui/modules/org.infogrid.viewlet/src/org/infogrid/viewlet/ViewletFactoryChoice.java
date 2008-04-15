@@ -87,6 +87,9 @@ public abstract class ViewletFactoryChoice
      * @param toView the MeshObjectsToView; only used for error reporting
      * @param c the Context to use
      * @return the instantiated Viewlet
+     * @throws CannotViewException if, against expectations, the Viewlet corresponding
+     *         to this ViewletFactoryChoice could not view the MeshObjectsToView after
+     *         all. This usually indicates a programming error.
      */
     public abstract Viewlet instantiateViewlet(
             MeshObjectsToView        toView,
@@ -99,12 +102,16 @@ public abstract class ViewletFactoryChoice
      * method is optional by implementations.
      * 
      * @param toView the MeshObjectsToView; only used for error reporting
+     * @param viewletClass the Viewlet Class to instantiate
      * @param c the Context to use
      * @return the instantiated Viewlet
+     * @throws CannotViewException if, against expectations, the Viewlet corresponding
+     *         to this ViewletFactoryChoice could not view the MeshObjectsToView after
+     *         all. This usually indicates a programming error.
      */
-    protected static Viewlet instantiateViewlet(
+    protected Viewlet instantiateViewlet(
             MeshObjectsToView        toView,
-            Class                    viewletClass,
+            Class<? extends Viewlet> viewletClass,
             Context                  c )
         throws
             CannotViewException

@@ -1,5 +1,5 @@
 <candy:overlay id="org-infogrid-jee-shell-http-HttpShellVerb-unbless">
- <form method="post" action="${Viewlet.postUrl}">
+ <u:safeForm method="post" action="${Viewlet.postUrl}">
   <h1>Do you really want to unbless this MeshObject?</h1>
   <table>
    <tr>
@@ -25,5 +25,5 @@
     </td>
    </tr>
   </table>
- </form>
+ </u:safeForm>
 </candy:overlay>
