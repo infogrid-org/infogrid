@@ -34,7 +34,6 @@ public class WikiObjectDisplayViewlet
     /**
      * Factory method.
      *
-     * @param path the path for the RequestDispatcher
      * @param c the application context
      * @return the created Viewlet
      */
@@ -66,6 +65,8 @@ public class WikiObjectDisplayViewlet
      * Obtain the current content of the WikiObject.
      *
      * @return the current content
+     * @throws IllegalPropertyTypeException thrown if the current subject does not have a WikiSubjectArea.WIKIOBJECT_CONTENT property
+     * @throws NotPermittedException thrown if the caller is not authorized to access the WikiSubjectArea.WIKIOBJECT_CONTENT property
      */
     public String getContent()
         throws

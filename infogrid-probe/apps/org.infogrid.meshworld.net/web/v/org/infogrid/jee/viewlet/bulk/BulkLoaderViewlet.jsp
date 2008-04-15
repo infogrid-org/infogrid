@@ -9,7 +9,7 @@
 <v:viewletAlternatives />
 <u:refresh>Reload page</u:refresh>
 <v:viewlet>
-    <form method="post" action="${Viewlet.postUrl}">
+    <u:safeForm method="post" action="${Viewlet.postUrl}">
         <table style="width: 100%">
             <tr>
                 <td>
@@ -31,5 +31,5 @@
                 </td>
             </tr>    
         </table>
-    </form>
+    </u:safeForm>
 </v:viewlet>
