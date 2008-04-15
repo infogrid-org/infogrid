@@ -24,10 +24,10 @@ import org.infogrid.viewlet.MeshObjectsToView;
 import org.infogrid.viewlet.ViewletFactoryChoice;
 
 import org.infogrid.jee.viewlet.JeeViewlet;
+import org.infogrid.jee.viewlet.PseudoJspViewletFactoryChoice;
 import org.infogrid.jee.viewlet.bulk.BulkLoaderViewlet;
 import org.infogrid.jee.viewlet.meshbase.AllMeshObjectsViewlet;
 import org.infogrid.jee.viewlet.modelbase.AllMeshTypesViewlet;
-import org.infogrid.jee.viewlet.propertysheet.PropertySheetViewlet;
 import org.infogrid.jee.viewlet.wikiobject.WikiObjectDisplayViewlet;
 import org.infogrid.jee.viewlet.wikiobject.WikiObjectEditViewlet;
 
@@ -72,7 +72,7 @@ public class MeshWorldViewletFactory
             ret.add( DefaultViewletFactoryChoice.create( WikiObjectDisplayViewlet.class, ViewletFactoryChoice.GOOD_MATCH_QUALITY ));
             ret.add( DefaultViewletFactoryChoice.create( WikiObjectEditViewlet.class, ViewletFactoryChoice.GOOD_MATCH_QUALITY+1.0f ));
         }
-        ret.add( DefaultViewletFactoryChoice.create( PropertySheetViewlet.class, ViewletFactoryChoice.BAD_MATCH_QUALITY ));
+        ret.add( PseudoJspViewletFactoryChoice.create( "org.infogrid.jee.viewlet.propertysheet.PropertySheetViewlet", ViewletFactoryChoice.BAD_MATCH_QUALITY ));
 
         return ArrayHelper.copyIntoNewArray( ret, ViewletFactoryChoice.class );
     }

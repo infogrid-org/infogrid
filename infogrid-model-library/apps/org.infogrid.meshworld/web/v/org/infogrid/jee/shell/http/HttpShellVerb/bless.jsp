@@ -1,5 +1,5 @@
 <candy:overlay id="org-infogrid-jee-shell-http-HttpShellVerb-bless">
- <form method="post" action="${Viewlet.postUrl}">
+ <u:safeForm method="post" action="${Viewlet.postUrl}">
   <h2>Bless a MeshObject</h2>
   <table>
    <tr>
@@ -26,5 +26,5 @@
     </td>
    </tr>
   </table>
- </form>
+ </u:safeForm>
 </candy:overlay>

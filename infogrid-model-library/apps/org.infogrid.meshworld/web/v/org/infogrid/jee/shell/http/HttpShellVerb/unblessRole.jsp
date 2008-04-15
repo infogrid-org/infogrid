@@ -1,5 +1,5 @@
 <candy:overlay id="org-infogrid-jee-shell-http-HttpShellVerb-unblessRole">
- <form method="post" action="${Viewlet.postUrl}">
+ <u:safeForm method="post" action="${Viewlet.postUrl}">
   <h2>Unbless relationship between two MeshObjects</h2>
   <table>
    <tr>
@@ -30,5 +30,5 @@
     </td>
    </tr>
   </table>
- </form>
+ </u:safeForm>
 </candy:overlay>

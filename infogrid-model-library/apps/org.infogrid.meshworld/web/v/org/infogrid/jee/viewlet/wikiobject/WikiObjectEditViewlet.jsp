@@ -10,8 +10,8 @@
 <v:viewletAlternatives />
 <u:refresh>Reload page</u:refresh>
 <v:viewlet>
-    <h1>Wiki Editor Viewlet for: <mesh:meshObjectId meshObjectName="Subject" stringRepresentation="Plain" filter="true" maxLength="30"/></h1>
- <form action="" method="post">
+ <h1>Wiki Editor Viewlet for: <mesh:meshObjectId meshObjectName="Subject" stringRepresentation="Plain" filter="true" maxLength="30"/></h1>
+ <u:safeForm action="" method="post">
 
   <c:if test="${mode eq 'edit'}">
    <div class="mode"><p>Edit mode (not saved yet)</p></div>
@@ -48,5 +48,5 @@
    </table>
   </c:if>
   
- </form>  
+ </u:safeForm>  
 </v:viewlet>

@@ -39,6 +39,13 @@ public interface JeeViewlet
             Viewlet
 {
     /**
+     * Obtain the Html class name for this Viewlet.
+     * 
+     * @return the HTML class name
+     */
+    public String getHtmlClass();
+
+    /**
      * <p>Invoked prior to the execution of the Servlet if the GET method has been requested.
      *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
      *    the GET execution of the servlet.</p>
