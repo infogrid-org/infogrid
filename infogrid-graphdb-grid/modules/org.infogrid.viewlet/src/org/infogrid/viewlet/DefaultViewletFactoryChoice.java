@@ -32,6 +32,7 @@ public class DefaultViewletFactoryChoice
      * Factory method. Assume default match quality.
      *
      * @param viewletClass the Viewlet's class
+     * @return the created DefaultViewletFactoryChoice
      */
     public static DefaultViewletFactoryChoice create(
             Class<? extends Viewlet> viewletClass )
@@ -44,6 +45,7 @@ public class DefaultViewletFactoryChoice
      *
      * @param viewletClass the Viewlet's class
      * @param matchQuality the match quality
+     * @return the created DefaultViewletFactoryChoice
      */
     public static DefaultViewletFactoryChoice create(
             Class<? extends Viewlet> viewletClass,
@@ -149,6 +151,9 @@ public class DefaultViewletFactoryChoice
      * @param toView the MeshObjectsToView; only used for error reporting
      * @param c the Context to use
      * @return the instantiated Viewlet
+     * @throws CannotViewException if, against expectations, the Viewlet corresponding
+     *         to this ViewletFactoryChoice could not view the MeshObjectsToView after
+     *         all. This usually indicates a programming error.
      */
     public Viewlet instantiateViewlet(
             MeshObjectsToView toView,

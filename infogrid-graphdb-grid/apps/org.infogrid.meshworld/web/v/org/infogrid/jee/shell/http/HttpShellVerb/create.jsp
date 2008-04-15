@@ -1,5 +1,5 @@
 <candy:overlay id="org-infogrid-jee-shell-http-HttpShellVerb-create" htmlClass="org-infogrid-jee-shell-http-HttpShellVerb">
- <form method="post" action="${Viewlet.postUrl}">
+ <u:safeForm method="post" action="${Viewlet.postUrl}">
   <h2>Create a MeshObject</h2>
   <table>
    <tr>
@@ -23,5 +23,5 @@
     </td>
    </tr>
   </table>
- </form>
+ </u:safeForm>
 </candy:overlay>
