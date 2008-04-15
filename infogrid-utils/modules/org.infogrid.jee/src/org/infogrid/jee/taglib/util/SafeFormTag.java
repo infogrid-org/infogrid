@@ -32,6 +32,8 @@ public class SafeFormTag
         extends
              AbstractInfoGridTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -518,6 +520,7 @@ public class SafeFormTag
      * 
      * @param att the attribute name
      * @param value the value
+     * @throws JspException catch-all exception for any error condition
      */
     protected void appendIfNeeded(
             String att,
@@ -580,7 +583,7 @@ public class SafeFormTag
 
             print( "<input name=\"" );
             print( INPUT_FIELD_NAME );
-            print( "\" value=\"" );
+            print( "\" type=\"hidden\" value=\"" );
             print( value );
             print( "\" />" );
         }
@@ -593,6 +596,8 @@ public class SafeFormTag
      *
      * @return evaluate or skip page
      * @see javax.servlet.jsp.tagext.Tag#doEndTag()
+     * @throws JspException thrown if an evaluation error occurred
+     * @throws IOException thrown if an I/O Exception occurred
      */
     @Override
     protected int realDoEndTag()

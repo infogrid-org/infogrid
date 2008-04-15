@@ -38,6 +38,7 @@ public class ModuleAwareViewletFactory
      * @param implementationMarkerInterfaceName name of an interface that indicates the right implementation
      *        technology for a given Viewlet, e.g. "org.infogrid.viewlet.swing.SwingViewlet".
      * @param moduleRegistry the ModuleRegistry in which to look for Viewlets.
+     * @return the created ModuleAwareViewletFactory
      */
     public static ModuleAwareViewletFactory create(
             String                 implementationMarkerInterfaceName,
@@ -59,7 +60,7 @@ public class ModuleAwareViewletFactory
     {
         super( implementationMarkerInterfaceName );
 
-        theModuleRegistry  = moduleRegistry;
+        theModuleRegistry = moduleRegistry;
     }
 
     /**
