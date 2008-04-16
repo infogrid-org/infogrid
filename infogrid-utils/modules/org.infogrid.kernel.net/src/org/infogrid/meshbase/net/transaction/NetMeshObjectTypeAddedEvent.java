@@ -28,10 +28,8 @@ import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 
-import org.infogrid.util.logging.Log;
-
 /**
- *
+ * Event that indicates a NetMeshObject was blessed with one or more EntityTypes.
  */
 public class NetMeshObjectTypeAddedEvent
         extends
@@ -39,67 +37,83 @@ public class NetMeshObjectTypeAddedEvent
         implements
             NetMeshObjectTypeChangeEvent
 {
-    private static final Log log = Log.getLogInstance( NetMeshObjectTypeAddedEvent.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Constructor.
+     * 
+     * @param source the NetMeshObject whose type changed
+     * @param oldValues the old EntityTypes, prior to the event
+     * @param deltaValues the EntityTypes that were added
+     * @param newValues the new EntityTypes, after the event
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectTypeAddedEvent(
-            NetMeshObject     meshObject,
-            EntityType []     oldTypes,
-            EntityType []     addedTypes,
-            EntityType []     newTypes,
-            NetMeshBaseIdentifier incomingProxy,
-            long              updateTime )
+            NetMeshObject         source,
+            EntityType []         oldValues,
+            EntityType []         deltaValues,
+            EntityType []         newValues,
+            NetMeshBaseIdentifier originIdentifier,
+            long                  timeEventOccurred )
     {
-        super(  meshObject,
-                oldTypes,
-                addedTypes,
-                newTypes,
-                updateTime );
+        super(  source,
+                oldValues,
+                deltaValues,
+                newValues,
+                timeEventOccurred );
         
-        theIncomingProxy = incomingProxy;
+        theOriginNetworkIdentifier = originIdentifier;
     }
 
     /**
      * Constructor for the case where we don't have old and new values, only the delta.
      * This perhaps should trigger some exception if it is attempted to read old or
      * new values later. (FIXME?)
-     */
-    /**
-     * Constructor.
+     * 
+     * @param sourceIdentifier the identifier of the MeshObject whose type changed
+     * @param deltaValueIdentifiers the identifiers of the EntityTypes that were added
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectTypeAddedEvent(
-            NetMeshObjectIdentifier meshObjectIdentifier,
-            MeshTypeIdentifier []   addedTypeIdentifiers,
-            NetMeshBaseIdentifier       incomingProxy,
-            long                    updateTime )
+            NetMeshObjectIdentifier sourceIdentifier,
+            MeshTypeIdentifier []   deltaValueIdentifiers,
+            NetMeshBaseIdentifier   originIdentifier,
+            long                    timeEventOccurred )
     {
-        super(  meshObjectIdentifier,
-                addedTypeIdentifiers,
-                updateTime );
+        super(  sourceIdentifier,
+                deltaValueIdentifiers,
+                timeEventOccurred );
         
-        theIncomingProxy = incomingProxy;
+        theOriginNetworkIdentifier = originIdentifier;
     }
 
     /**
      * Constructor.
+     *
+     * @param sourceIdentifier the identifier of the MeshObject whose type changed
+     * @param oldValueIdentifiers the identifiers of the old set of EntityTypes, prior to the event
+     * @param deltaValueIdentifiers the identifiers of the EntityTypes that were added
+     * @param newValueIdentifiers the identifiers of the new set of EntityTypes, after the event
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectTypeAddedEvent(
-            NetMeshObjectIdentifier meshObjectIdentifier,
-            MeshTypeIdentifier []   oldTypeIdentifiers,
-            MeshTypeIdentifier []   addedTypeIdentifiers,
-            MeshTypeIdentifier []   newTypeIdentifiers,
-            NetMeshBaseIdentifier       incomingProxy,
-            long                    updateTime )
+            NetMeshObjectIdentifier sourceIdentifier,
+            MeshTypeIdentifier []   oldValueIdentifiers,
+            MeshTypeIdentifier []   deltaValueIdentifiers,
+            MeshTypeIdentifier []   newValueIdentifiers,
+            NetMeshBaseIdentifier   originIdentifier,
+            long                    timeEventOccurred )
     {
-        super(  meshObjectIdentifier,
-                oldTypeIdentifiers,
-                addedTypeIdentifiers,
-                newTypeIdentifiers,
-                updateTime );
+        super(  sourceIdentifier,
+                oldValueIdentifiers,
+                deltaValueIdentifiers,
+                newValueIdentifiers,
+                timeEventOccurred );
         
-        theIncomingProxy = incomingProxy;
+        theOriginNetworkIdentifier = originIdentifier;
     }
 
     /**
@@ -114,32 +128,45 @@ public class NetMeshObjectTypeAddedEvent
     }
 
     /**
-     * Apply this NetChange to a MeshObject in this MeshBase that is a replica
-     * of the NetMeshObject which caused the NetChange. This method
-     * is intended to make it easy to replicate Changes that were made to a
-     * replica of one NetMeshObject in one NetMeshBase to another replica
-     * of the NetMeshObject in another NetMeshBase.
+     * Obtain the MeshObjectIdentifier of the MeshObject affected by this Change.
+     *
+     * @return the MeshObjectIdentifier of the NetMeshObject affected by this Change
+     */
+    @Override
+    public NetMeshObjectIdentifier getAffectedMeshObjectIdentifier()
+    {
+        return (NetMeshObjectIdentifier) super.getAffectedMeshObjectIdentifier();
+    }
+
+    /**
+     * <p>Apply this NetChange to a NetMeshObject in this MeshBase. This method
+     *    is intended to make it easy to replicate NetChanges that were made to a
+     *    replica of one NetMeshObject in one NetMeshBase to another replica
+     *    of the NetMeshObject in another NetMeshBase.</p>
      *
      * <p>This method will attempt to create a Transaction if none is present on the
      * current Thread.</p>
      *
-     * @param otherMeshBase the other MeshBase in which to apply the change
-     * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
+     * @param base the NetMeshBase in which to apply the NetChange
+     * @return the NetMeshObject to which the NetChange was applied
+     * @throws CannotApplyChangeException thrown if the NetChange could not be applied, e.g because
+     *         the affected NetMeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public NetMeshObject applyToReplicaIn(
-            NetMeshBase otherMeshBase )
+            NetMeshBase base )
         throws
             CannotApplyChangeException,
             TransactionException
     {
-        setResolver( otherMeshBase );
+        setResolver( base );
 
         Transaction tx = null; 
         Throwable   t  = null;
 
         try {
-            tx = otherMeshBase.createTransactionNowIfNeeded();
+            tx = base.createTransactionNowIfNeeded();
 
             NetMeshObject otherObject = (NetMeshObject) getSource();
 
@@ -152,7 +179,7 @@ public class NetMeshObjectTypeAddedEvent
             throw ex;
 
         } catch( Throwable ex ) {
-            throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, ex );
+            throw new CannotApplyChangeException.ExceptionOccurred( base, ex );
 
         } finally {
             if( tx != null ) {
@@ -162,31 +189,36 @@ public class NetMeshObjectTypeAddedEvent
     }
 
     /**
-     * Obtain the Proxy, if any, from where this NetChange originated.
+     * Determine whether this NetChange should be forwarded through the given, outgoing Proxy.
+     * If specified, {@link #getOriginNetworkIdentifier} specifies where the NetChange came from.
      *
-     * @return the Proxy, if any
-     */
-    public final NetMeshBaseIdentifier getOriginNetworkIdentifier()
-    {
-        return theIncomingProxy;
-    }
-
-    /**
-     * Determine whether this NetChange should be forwarded through the outgoing Proxy.
-     * If specified, the incomingProxy parameter specifies where the NetChange came from.
-     *
-     * @param incomingProxy the incoming Proxy
-     * @param outgoingProxy the outgoing Proxy
-     * @return true if the NetChange should be forwarded.
+     * @param outgoingProxy the potential outgoing Proxy
+     * @return true if the NetChange should be forwarded torwards the outgoingProxy
      */
     public boolean shouldBeSent(
             Proxy outgoingProxy )
     {
         return Utils.awayFromLock( this, outgoingProxy );
     }
-    
+
     /**
-     * The incoming Proxy, if any.
+     * Obtain the NetMeshBaseIdentifier of the NetMeshBase from where this NetChange arrived.
+     * This may or may not be the NetMeshBase where the Change originated, as it might be
+     * passed through several NetMeshBases until it arrived here. This may be null if
+     * the Change originated locally.
+     *
+     * @return the NetMeshBaseIdentifier, if any
      */
-    protected NetMeshBaseIdentifier theIncomingProxy;
+    public final NetMeshBaseIdentifier getOriginNetworkIdentifier()
+    {
+        return theOriginNetworkIdentifier;
+    }
+
+    /**
+     * The NetMeshBaseIdentifier of the NetMeshBase from where this NetChange arrived.
+     * This may or may not be the NetMeshBase where the Change originated, as it might be
+     * passed through several NetMeshBases until it arrived here. This may be null if
+     * the Change originated locally.
+     */
+    protected NetMeshBaseIdentifier theOriginNetworkIdentifier;
 }

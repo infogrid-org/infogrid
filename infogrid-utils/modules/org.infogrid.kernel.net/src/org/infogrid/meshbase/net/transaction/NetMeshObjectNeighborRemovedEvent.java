@@ -27,10 +27,10 @@ import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 
-import org.infogrid.util.logging.Log;
 
 /**
- *
+ * This event indicates that a NetMeshObject was removed from the set of neighbors of a NetMeshObject.
+ * In other words, the NetMeshObject now participates in one relationship less.
  */
 public class NetMeshObjectNeighborRemovedEvent
         extends
@@ -38,18 +38,25 @@ public class NetMeshObjectNeighborRemovedEvent
         implements
             NetMeshObjectNeighborChangeEvent
 {
-    private static final Log log = Log.getLogInstance( NetMeshObjectNeighborRemovedEvent.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Constructor.
+     * 
+     * @param meshObject the MeshObject that is the source of the event
+     * @param oldNeighbors the set of neighbor MeshObjects prior to the event
+     * @param deltaNeighbor the neighbor MeshObject affected by this event
+     * @param newNeighbors the set of neighbor MeshObjects after the event
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectNeighborRemovedEvent(
             NetMeshObject         meshObject,
             NetMeshObject []      oldNeighbors,
             NetMeshObject         deltaNeighbor,
             NetMeshObject []      newNeighbors,
-            NetMeshBaseIdentifier incomingProxy,
-            long                  updateTime )
+            NetMeshBaseIdentifier originIdentifier,
+            long                  timeEventOccurred )
     {
         this(   meshObject,
                 meshObject.getIdentifier(),
@@ -59,20 +66,27 @@ public class NetMeshObjectNeighborRemovedEvent
                 new NetMeshObjectIdentifier[] { deltaNeighbor.getIdentifier() },
                 newNeighbors,
                 NetMeshObjectUtils.netMeshObjectIdentifiers( newNeighbors ),
-                incomingProxy,
-                updateTime );
+                originIdentifier,
+                timeEventOccurred );
     }
 
     /**
      * Convenience constructor.
+     * 
+     * @param meshObject the MeshObject that is the source of the event
+     * @param oldNeighborIdentifiers the identifiers of the neighbor MeshObjects prior to the event
+     * @param deltaNeighborIdentifier the identifier of the neighbor MeshObject affected by this event
+     * @param newNeighborIdentifiers the identifiers of the neighbor MeshObjects after the event
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectNeighborRemovedEvent(
             NetMeshObject              meshObject,
             NetMeshObjectIdentifier [] oldNeighborIdentifiers,
             NetMeshObjectIdentifier    deltaNeighborIdentifier,
             NetMeshObjectIdentifier [] newNeighborIdentifiers,
-            NetMeshBaseIdentifier      incomingProxy,
-            long                       updateTime )
+            NetMeshBaseIdentifier      originIdentifier,
+            long                       timeEventOccurred )
     {
         this(   meshObject,
                 meshObject.getIdentifier(),
@@ -82,68 +96,81 @@ public class NetMeshObjectNeighborRemovedEvent
                 new NetMeshObjectIdentifier[] { deltaNeighborIdentifier },
                 null,
                 newNeighborIdentifiers,
-                incomingProxy,
-                updateTime );
+                originIdentifier,
+                timeEventOccurred );
     }
 
     /**
      * Constructor.
+     * 
+     * @param meshObjectIdentifier identifier of the MeshObject that is the source of the event
+     * @param oldNeighborIdentifiers the Identifiers of the neighbor MeshObjects prior to the event
+     * @param deltaNeighborIdentifier the identifier of the neighbor MeshObject affected by this event
+     * @param newNeighborIdentifiers the identifiers of the neighbor MeshObjects after the event
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectNeighborRemovedEvent(
             NetMeshObjectIdentifier    meshObjectIdentifier,
-            NetMeshObjectIdentifier [] oldNeighbors,
-            NetMeshObjectIdentifier    deltaNeighbor,
-            NetMeshObjectIdentifier [] newNeighbors,
-            NetMeshBaseIdentifier      incomingProxy,
-            long                       updateTime )
+            NetMeshObjectIdentifier [] oldNeighborIdentifiers,
+            NetMeshObjectIdentifier    deltaNeighborIdentifier,
+            NetMeshObjectIdentifier [] newNeighborIdentifiers,
+            NetMeshBaseIdentifier      originIdentifier,
+            long                       timeEventOccurred )
     {
         this(   null,
                 meshObjectIdentifier,
                 null,
-                oldNeighbors,
+                oldNeighborIdentifiers,
                 null,
-                new NetMeshObjectIdentifier[] { deltaNeighbor },
+                new NetMeshObjectIdentifier[] { deltaNeighborIdentifier },
                 null,
-                newNeighbors,
-                incomingProxy,
-                updateTime );
+                newNeighborIdentifiers,
+                originIdentifier,
+                timeEventOccurred );
     }
 
     /**
      * Constructor for the case where we don't have old and new values, only the delta.
      * This perhaps should trigger some exception if it is attempted to read old or
      * new values later. (FIXME?)
+     * 
+     * @param meshObjectIdentifier identifier of the MeshObject that is the source of the event
+     * @param deltaNeighborIdentifier the identifier of the neighbor MeshObject affected by this event
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectNeighborRemovedEvent(
             NetMeshObjectIdentifier meshObjectIdentifier,
-            NetMeshObjectIdentifier deltaNeighbor,
-            NetMeshBaseIdentifier   incomingProxy,
-            long                    updateTime )
+            NetMeshObjectIdentifier deltaNeighborIdentifier,
+            NetMeshBaseIdentifier   originIdentifier,
+            long                    timeEventOccurred )
     {
         this(   null,
                 meshObjectIdentifier,
                 null,
                 null,
                 null,
-                new NetMeshObjectIdentifier[] { deltaNeighbor },
+                new NetMeshObjectIdentifier[] { deltaNeighborIdentifier },
                 null,
                 null,
-                incomingProxy,
-                updateTime );
+                originIdentifier,
+                timeEventOccurred );
     }
 
     /**
      * Main constructor.
      *
      * @param meshObject the MeshObject that is the source of the event (optional)
-     * @param meshObjectIdentifier Identifier of the MeshObject that is the source of the event (required)
+     * @param meshObjectIdentifier identifier of the MeshObject that is the source of the event (required)
      * @param oldNeighbors the set of neighbor MeshObjects prior to the event (optional)
-     * @param oldNeighborIdentifiers the Identifiers of the neighbor MeshObjects prior to the event (required)
+     * @param oldNeighborIdentifiers the identifiers of the neighbor MeshObjects prior to the event (required)
      * @param deltaNeighbors the set of neighbor MeshObjects affected by this event (optional)
-     * @param deltaNeighborIdentifiers the Identifiers of the neighbor MeshObjects affected by this event (required)
+     * @param deltaNeighborIdentifiers the identifiers of the neighbor MeshObjects affected by this event (required)
      * @param newNeighbors the set of neighbor MeshObjects after the event (optional)
-     * @param newNeighborIdentifiers the Identifiers of the neighbor MeshObjects after the event (required)
-     * @param updateTime the time at which the change was made, in System.currentTimeMillis() format
+     * @param newNeighborIdentifiers the identifiers of the neighbor MeshObjects after the event (required)
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     protected NetMeshObjectNeighborRemovedEvent(
             NetMeshObject              meshObject,
@@ -154,8 +181,8 @@ public class NetMeshObjectNeighborRemovedEvent
             NetMeshObjectIdentifier [] deltaNeighborIdentifiers,
             NetMeshObject []           newNeighbors,
             NetMeshObjectIdentifier [] newNeighborIdentifiers,
-            NetMeshBaseIdentifier      incomingProxy,
-            long                       updateTime )
+            NetMeshBaseIdentifier      originIdentifier,
+            long                       timeEventOccurred )
     {
         super(  meshObject,
                 meshObjectIdentifier,
@@ -165,9 +192,9 @@ public class NetMeshObjectNeighborRemovedEvent
                 deltaNeighborIdentifiers,
                 newNeighbors,
                 newNeighborIdentifiers,
-                updateTime );
+                timeEventOccurred );
 
-        theIncomingProxy = incomingProxy;
+        theOriginNetworkIdentifier = originIdentifier;
     }
     
     /**
@@ -182,6 +209,17 @@ public class NetMeshObjectNeighborRemovedEvent
     }
 
     /**
+     * Obtain the MeshObjectIdentifier of the MeshObject affected by this Change.
+     *
+     * @return the MeshObjectIdentifier of the NetMeshObject affected by this Change
+     */
+    @Override
+    public NetMeshObjectIdentifier getAffectedMeshObjectIdentifier()
+    {
+        return (NetMeshObjectIdentifier) super.getAffectedMeshObjectIdentifier();
+    }
+
+    /**
      * Obtain the neighbor that changed.
      *
      * @return the neighbor MeshObject
@@ -193,26 +231,28 @@ public class NetMeshObjectNeighborRemovedEvent
     }
 
     /**
-     * Apply this NetChange to a MeshObject in this MeshBase that is a replica
-     * of the NetMeshObject which caused the NetChange. This method
-     * is intended to make it easy to replicate Changes that were made to a
-     * replica of one NetMeshObject in one NetMeshBase to another replica
-     * of the NetMeshObject in another NetMeshBase.
+     * <p>Apply this NetChange to a NetMeshObject in this MeshBase. This method
+     *    is intended to make it easy to replicate NetChanges that were made to a
+     *    replica of one NetMeshObject in one NetMeshBase to another replica
+     *    of the NetMeshObject in another NetMeshBase.</p>
      *
      * <p>This method will attempt to create a Transaction if none is present on the
      * current Thread.</p>
      *
-     * @param otherMeshBase the other MeshBase in which to apply the change
-     * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
+     * @param base the NetMeshBase in which to apply the NetChange
+     * @return the NetMeshObject to which the NetChange was applied
+     * @throws CannotApplyChangeException thrown if the NetChange could not be applied, e.g because
+     *         the affected NetMeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public NetMeshObject applyToReplicaIn(
-            NetMeshBase otherMeshBase )
+            NetMeshBase base )
         throws
             CannotApplyChangeException,
             TransactionException
     {
-        setResolver( otherMeshBase );
+        setResolver( base );
 
         Transaction tx = null;
 
@@ -220,13 +260,13 @@ public class NetMeshObjectNeighborRemovedEvent
         NetMeshObject [] relatedOtherObjects;
 
         try {
-            tx = otherMeshBase.createTransactionNowIfNeeded();
+            tx = base.createTransactionNowIfNeeded();
 
             otherObject         = (NetMeshObject) getSource();
             relatedOtherObjects = (NetMeshObject []) getDeltaValue();
 
             for( int i=0 ; i<relatedOtherObjects.length ; ++i ) {
-                otherObject.rippleUnrelate( relatedOtherObjects[i].getIdentifier(), otherMeshBase );
+                otherObject.rippleUnrelate( relatedOtherObjects[i].getIdentifier(), base );
             }
             
             return otherObject;
@@ -235,7 +275,7 @@ public class NetMeshObjectNeighborRemovedEvent
             throw ex;
 
         } catch( Throwable ex ) {
-            throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, ex );
+            throw new CannotApplyChangeException.ExceptionOccurred( base, ex );
 
         } finally {
             if( tx != null ) {
@@ -245,31 +285,36 @@ public class NetMeshObjectNeighborRemovedEvent
     }
 
     /**
-     * Obtain the Proxy, if any, from where this NetChange originated.
+     * Determine whether this NetChange should be forwarded through the given, outgoing Proxy.
+     * If specified, {@link #getOriginNetworkIdentifier} specifies where the NetChange came from.
      *
-     * @return the Proxy, if any
-     */
-    public final NetMeshBaseIdentifier getOriginNetworkIdentifier()
-    {
-        return theIncomingProxy;
-    }
-
-    /**
-     * Determine whether this NetChange should be forwarded through the outgoing Proxy.
-     * If specified, the incomingProxy parameter specifies where the NetChange came from.
-     *
-     * @param incomingProxy the incoming Proxy
-     * @param outgoingProxy the outgoing Proxy
-     * @return true if the NetChange should be forwarded.
+     * @param outgoingProxy the potential outgoing Proxy
+     * @return true if the NetChange should be forwarded torwards the outgoingProxy
      */
     public boolean shouldBeSent(
             Proxy outgoingProxy )
     {
-        return Utils.hasReplicaInDirection( this, outgoingProxy, theIncomingProxy );
+        return Utils.hasReplicaInDirection( this, outgoingProxy, theOriginNetworkIdentifier );
     }
-    
+
     /**
-     * The incoming Proxy, if any.
+     * Obtain the NetMeshBaseIdentifier of the NetMeshBase from where this NetChange arrived.
+     * This may or may not be the NetMeshBase where the Change originated, as it might be
+     * passed through several NetMeshBases until it arrived here. This may be null if
+     * the Change originated locally.
+     *
+     * @return the NetMeshBaseIdentifier, if any
      */
-    protected NetMeshBaseIdentifier theIncomingProxy;
+    public final NetMeshBaseIdentifier getOriginNetworkIdentifier()
+    {
+        return theOriginNetworkIdentifier;
+    }
+
+    /**
+     * The NetMeshBaseIdentifier of the NetMeshBase from where this NetChange arrived.
+     * This may or may not be the NetMeshBase where the Change originated, as it might be
+     * passed through several NetMeshBases until it arrived here. This may be null if
+     * the Change originated locally.
+     */
+    protected NetMeshBaseIdentifier theOriginNetworkIdentifier;
 }

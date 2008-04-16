@@ -30,104 +30,101 @@ import org.infogrid.util.event.UnresolvedException;
 
 
 /**
-  * This event indicates that one of a MeshObject's properties has changed its value.
-  *
-  * This extends PropertyChangeEvent so we can keep the well-known JavaBeans
-  * event generation model that programmers are used to.
-  *
-  * Because the JavaBeans model really does not work with object serialization, we
-  * have to do some tricks. FIXME: override serialization code to not serialize the
-  * source property in the superclass.
-  *
-  * If you change this, watch out for serialization.
+  * <p>This event indicates that one of a MeshObject's properties has changed its value.</p>
   */
 public class MeshObjectPropertyChangeEvent
         extends
             AbstractExternalizablePropertyChangeEvent<MeshObject, MeshObjectIdentifier, PropertyType, MeshTypeIdentifier, PropertyValue, PropertyValue>
         implements
             Change<MeshObject,MeshObjectIdentifier,PropertyValue,PropertyValue>
-{    /**
+{
+    private static final long serialVersionUID = 1L; // helps with serialization
+
+    /**
      * Constructor.
      * 
-     * 
-     * 
-     * @param meshObject the MeshObject whose Property changed
-     * @param propertyType the PropertyType whose value changed
-     * @param oldValue the old value of the property
-     * @param newValue the new value of the property
-     * @param updateTime the time at which the change occurred
+     * @param source the MeshObject that is the source of the event
+     * @param property an object representing the property of the event
+     * @param oldValue the old value of the property, prior to the event
+     * @param newValue the new value of the property, after the event
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectPropertyChangeEvent(
-            MeshObject     meshObject,
-            PropertyType   propertyType,
+            MeshObject     source,
+            PropertyType   property,
             PropertyValue  oldValue,
             PropertyValue  newValue,
-            long           updateTime )
+            long           timeEventOccurred )
     {
-        super(  meshObject,
-                meshObject.getIdentifier(),
-                propertyType,
-                propertyType.getIdentifier(),
+        super(  source,
+                source.getIdentifier(),
+                property,
+                property.getIdentifier(),
                 oldValue,
                 oldValue,
                 newValue, // delta = new
                 newValue,
                 newValue,
                 newValue,
-                updateTime );
+                timeEventOccurred );
     }
 
     /**
      * Constructor for the case where we don't have an old value, only the new value.
      * This perhaps should trigger some exception if it is attempted to read old 
      * values later. (FIXME?)
+     * 
+     * @param sourceIdentifier the identifier of the MeshObject that is the source of the event
+     * @param propertyIdentifier the identifier of an object representing the property of the event
+     * @param newValue the new value of the property, after the event
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectPropertyChangeEvent(
-            MeshObjectIdentifier meshObjectIdentifier,
-            MeshTypeIdentifier   propertyTypeIdentifier,
+            MeshObjectIdentifier sourceIdentifier,
+            MeshTypeIdentifier   propertyIdentifier,
             PropertyValue        newValue,
-            long                 updateTime )
+            long                 timeEventOccurred )
     {
         super(  null,
-                meshObjectIdentifier,
+                sourceIdentifier,
                 null,
-                propertyTypeIdentifier,
+                propertyIdentifier,
                 null,
                 null,
                 null,
                 null,
                 newValue,
                 newValue,
-                updateTime );
+                timeEventOccurred );
     }
     
     /**
       * Constructor.
       *
-      * @param meshObject the MeshObject whose Property changed
-      * @param thePropertyType the PropertyType whose value changed
-      * @param theOldValue the old value of the property
-      * @param theNewValue the new value of the property
-      * @param updateTime the time at which the change occurred
+     * @param sourceIdentifier the identifier of the MeshObject that is the source of the event
+     * @param propertyIdentifier the identifier of an object representing the property of the event
+     * @param oldValue the old value of the property, prior to the event
+     * @param newValue the new value of the property, after the event
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
       */
     public MeshObjectPropertyChangeEvent(
-            MeshObjectIdentifier meshObjectIdentifier,
-            MeshTypeIdentifier   propertyTypeIdentifier,
+            MeshObjectIdentifier sourceIdentifier,
+            MeshTypeIdentifier   propertyIdentifier,
             PropertyValue        oldValue,
             PropertyValue        newValue,
-            long                 updateTime )
+            long                 timeEventOccurred )
     {
         super(  (MeshObject) null,
-                meshObjectIdentifier,
+                sourceIdentifier,
                 (PropertyType) null,
-                propertyTypeIdentifier,
+                propertyIdentifier,
                 oldValue,
                 oldValue,
                 newValue, // delta = new
                 newValue,
                 newValue,
                 newValue,
-                updateTime );
+                timeEventOccurred );
     }
 
     /**
@@ -151,30 +148,32 @@ public class MeshObjectPropertyChangeEvent
     }
 
     /**
-     * Apply this Change to a MeshObject in this MeshBase. This method
-     * is intended to make it easy to reproduce Changes that were made in
-     * one MeshBase to MeshObjects in another MeshBase.
+     * <p>Apply this Change to a MeshObject in this MeshBase. This method
+     *    is intended to make it easy to reproduce Changes that were made in
+     *    one MeshBase to MeshObjects in another MeshBase.</p>
      *
-     * This method will attempt to create a Transaction if none is present on the
-     * current Thread.
+     * <p>This method will attempt to create a Transaction if none is present on the
+     * current Thread.</p>
      *
-     * @param otherMeshBase the other MeshBase in which to apply the change
+     * @param base the MeshBase in which to apply the Change
+     * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
-     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and could not be created
+     *         the affected MeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public MeshObject applyTo(
-            MeshBase otherMeshBase )
+            MeshBase base )
         throws
             CannotApplyChangeException,
             TransactionException
     {
-        setResolver( otherMeshBase );
+        setResolver( base );
 
         Transaction tx = null;
 
         try {
-            tx = otherMeshBase.createTransactionNowIfNeeded();
+            tx = base.createTransactionNowIfNeeded();
 
             MeshObject otherObject = getSource();
 
@@ -193,7 +192,7 @@ public class MeshObjectPropertyChangeEvent
             throw ex;
 
         } catch( Throwable ex ) {
-            throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, ex );
+            throw new CannotApplyChangeException.ExceptionOccurred( base, ex );
 
         } finally {
             if( tx != null ) {
@@ -290,7 +289,7 @@ public class MeshObjectPropertyChangeEvent
     }
 
     /**
-     *  Determine hash code.
+     * Determine hash code.
      * 
      * @return the hash code
      */

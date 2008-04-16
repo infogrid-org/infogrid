@@ -22,7 +22,8 @@ import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.RoleType;
 
 /**
- *
+ * Indicates that the participation of a MeshObject in a relationship with its neighbor has
+ * changed RoleTypes.
  */
 public interface NetMeshObjectRoleChangeEvent
         extends

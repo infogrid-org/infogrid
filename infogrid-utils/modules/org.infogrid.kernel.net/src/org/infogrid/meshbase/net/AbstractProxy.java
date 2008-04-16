@@ -66,6 +66,7 @@ import org.infogrid.util.text.StringRepresentation;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 
 /**
  * Factors out functionality common to a lot of Proxy implementations.
@@ -295,7 +296,7 @@ public abstract class AbstractProxy
         }
 
         // First, process the pushLock events on existing objects.
-        // Then, create transaction and process.
+        // Then, createCopy transaction and process.
         // Then, process the pushLock events on all other objects
         // Then, process requests.
 
@@ -315,7 +316,6 @@ public abstract class AbstractProxy
             }
         }
 
-        // this 
         theWaitForLockResponseEndpoint.messageReceived( endpoint, incoming );
         
         Transaction tx = null;
@@ -503,12 +503,12 @@ public abstract class AbstractProxy
             }
 
             // deal with deleted objects
-            if( incoming.getDeleteChanges() != null && incoming.getDeleteChanges().length > 0 ) {
+            if( incoming.getDeletions() != null && incoming.getDeletions().length > 0 ) {
                 if( tx == null ) {
                     tx = theMeshBase.createTransactionAsapIfNeeded();
                 }
 
-                NetMeshObjectDeletedEvent [] deletedEvents = incoming.getDeleteChanges();
+                NetMeshObjectDeletedEvent [] deletedEvents = incoming.getDeletions();
 
                 for( int i=0 ; i<deletedEvents.length ; ++i ) {
                     NetMeshObject deleted = life.rippleDelete(
@@ -673,8 +673,8 @@ public abstract class AbstractProxy
         
         // try to release the requested locks
         if( incoming.getRequestedLockObjects() != null ) {
-            MeshObjectIdentifier [] requestLock      = incoming.getRequestedLockObjects();
-            MeshObjectIdentifier [] pushLockExisting = new MeshObjectIdentifier[ requestLock.length ];
+            NetMeshObjectIdentifier [] requestLock      = incoming.getRequestedLockObjects();
+            NetMeshObjectIdentifier [] pushLockExisting = new NetMeshObjectIdentifier[ requestLock.length ];
 
             int iPushLock = 0;
             for( int i=0 ; i<requestLock.length ; ++i ) {
@@ -700,7 +700,7 @@ public abstract class AbstractProxy
             }
             if( iPushLock > 0 ) {
                 if( iPushLock < pushLockExisting.length ) {
-                    pushLockExisting = ArrayHelper.subarray( pushLockExisting, 0, iPushLock, MeshObjectIdentifier.class );
+                    pushLockExisting = ArrayHelper.subarray( pushLockExisting, 0, iPushLock, NetMeshObjectIdentifier.class );
                 }
 
                 if( outgoing == null ) {
@@ -857,7 +857,7 @@ public abstract class AbstractProxy
     {
         theEndpoint.startCommunicating(); // this is no-op on subsequent calls
 
-        MeshObjectIdentifier [] extNames = new MeshObjectIdentifier[ localReplicas.length ];
+        NetMeshObjectIdentifier [] extNames = new NetMeshObjectIdentifier[ localReplicas.length ];
         for( int i=0 ; i<extNames.length ; ++i ) {
             extNames[i] = localReplicas[i].getIdentifier();
         }
@@ -883,7 +883,7 @@ public abstract class AbstractProxy
     {
         theEndpoint.startCommunicating(); // this is no-op on subsequent calls
 
-        MeshObjectIdentifier [] extNames = new MeshObjectIdentifier[ localReplicas.length ];
+        NetMeshObjectIdentifier [] extNames = new NetMeshObjectIdentifier[ localReplicas.length ];
         for( int i=0 ; i<extNames.length ; ++i ) {
             extNames[i] = localReplicas[i].getIdentifier();
         }
@@ -898,7 +898,7 @@ public abstract class AbstractProxy
 //     * Ask this ModelObjectRepositoryProxy to query its PartnerModelObjectRepositoryProxy to determine
 //     * its view as to what the RolePlayerTable of this RootEntity is and to merge the result into the
 //     * local replica's current RolePlayerTable. Make sure that the PartnerModelObjectRepositoryProxy
-//     * does not query back to this ModelObjectRepositoryProxy, otherwise we'd create an endless recursion.
+//     * does not query back to this ModelObjectRepositoryProxy, otherwise we'd createCopy an endless recursion.
 //     *
 //     * @param localReplica the local replica of the RootEntity
 //     */
@@ -997,7 +997,7 @@ public abstract class AbstractProxy
      * @param localReplicas the Identifier of the local Replica
      */
     public void resynchronizeDependentReplicas(
-            MeshObjectIdentifier[] localReplicas )
+            NetMeshObjectIdentifier[] localReplicas )
     {
         theEndpoint.startCommunicating(); // this is no-op on subsequent calls
         
@@ -1157,7 +1157,7 @@ public abstract class AbstractProxy
             log.debug( this + ".transactionCommitted( " + theTransaction + " )" );
         }
         Change []                                    changes           = theTransaction.getChangeSet().getChanges();
-        ArrayList<MeshObjectIdentifier>              canceledObjects   = new ArrayList<MeshObjectIdentifier>( changes.length );
+        ArrayList<NetMeshObjectIdentifier>           canceledObjects   = new ArrayList<NetMeshObjectIdentifier>( changes.length );
         ArrayList<NetMeshObjectDeletedEvent>         deletedEvents     = new ArrayList<NetMeshObjectDeletedEvent>( changes.length );
         ArrayList<NetMeshObjectNeighborAddedEvent>   neighborAdditions = new ArrayList<NetMeshObjectNeighborAddedEvent>( changes.length );
         ArrayList<NetMeshObjectNeighborRemovedEvent> neighborRemovals  = new ArrayList<NetMeshObjectNeighborRemovedEvent>( changes.length );
@@ -1173,13 +1173,13 @@ public abstract class AbstractProxy
             
             current.setResolver( theMeshBase );
 
-            NetMeshObject affectedObject = current.getAffectedMeshObject();
+            // NetMeshObject affectedObject = current.getAffectedMeshObject();
 
             if( current.shouldBeSent( this )) {
                 
                 if( current instanceof ReplicaPurgedEvent ) {
                     // affectedObject is null
-                    MeshObjectIdentifier affectedObjectIdentifier = current.getAffectedMeshObjectIdentifier();
+                    NetMeshObjectIdentifier affectedObjectIdentifier = current.getAffectedMeshObjectIdentifier();
                     canceledObjects.add( affectedObjectIdentifier );
 
                 } else if( current instanceof NetMeshObjectBecameDeadStateEvent ) {
@@ -1256,7 +1256,7 @@ public abstract class AbstractProxy
         SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
      
         if( !canceledObjects.isEmpty() ) {
-            outgoing.setRequestedCanceledObjects( ArrayHelper.copyIntoNewArray( canceledObjects, MeshObjectIdentifier.class ));
+            outgoing.setRequestedCanceledObjects( ArrayHelper.copyIntoNewArray( canceledObjects, NetMeshObjectIdentifier.class ));
         }
         if( !deletedEvents.isEmpty() ) {
             outgoing.setDeleteChanges( ArrayHelper.copyIntoNewArray( deletedEvents, NetMeshObjectDeletedEvent.class ));

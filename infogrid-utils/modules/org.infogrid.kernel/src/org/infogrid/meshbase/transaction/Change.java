@@ -22,10 +22,15 @@ import org.infogrid.meshbase.MeshBase;
 import org.infogrid.util.event.ExternalizableEvent;
 
 /**
-  * This interface represents the concept of a change that is applied to
-  * a transactable object during a transaction. Any instance of Change
-  * represents an "elemental" change, there are no composites.
-  */
+ * This interface represents the concept of a Change that may occur to a
+ * {@link org.infogrid.mesh.MeshObject} during a {@link Transaction}. Any instance of Change
+ * represents an "elemental" change, there are no composites.
+ * 
+ * @param S the type of the event source
+ * @param SID the type of the identifier of the event source
+ * @param V the type of the value
+ * @param VID the type of the identifier of the value
+ */
 public interface Change<S,SID,V,VID>
         extends
             ExternalizableEvent<S,SID,V,VID>
@@ -39,9 +44,9 @@ public interface Change<S,SID,V,VID>
             MeshBase resolver );
 
     /**
-     * Obtain the Identifier of the MeshObject affected by this Change.
+     * Obtain the identifier of the MeshObject affected by this Change.
      *
-     * @return the Identifier of the MeshObject affected by this Change
+     * @return the identifier of the MeshObject affected by this Change
      */
     public abstract MeshObjectIdentifier getAffectedMeshObjectIdentifier();
 
@@ -63,8 +68,9 @@ public interface Change<S,SID,V,VID>
      * @param base the MeshBase in which to apply the Change
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
-     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and could not be created
+     *         the affected MeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public abstract MeshObject applyTo(
             MeshBase base )

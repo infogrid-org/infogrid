@@ -15,7 +15,7 @@
 package org.infogrid.meshbase.transaction;
 
 /**
-  * This is the abstract supertype for all events indicating
+  * This interface is implemented by all Objects that wish to listen for events indicating
   * a lifecycle event in the life of a MeshObject.
   */
 public interface MeshObjectLifecycleListener
@@ -24,7 +24,7 @@ public interface MeshObjectLifecycleListener
      * A MeshObject has been created.
      * This is a "semantic create".
      * 
-     * @param theEvent the MAbstractMeshObjectLifecycleEvent
+     * @param theEvent the AbstractMeshObjectLifecycleEvent
      */
     public void meshObjectCreated(
             AbstractMeshObjectLifecycleEvent theEvent );

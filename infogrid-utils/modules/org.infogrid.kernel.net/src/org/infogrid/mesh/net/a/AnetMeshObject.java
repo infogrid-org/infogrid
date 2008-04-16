@@ -1327,9 +1327,9 @@ public class AnetMeshObject
      * @param canonicalIdentifier the canonical Identifier that this MeshObject used to have
      */
     protected void firePurged(
-            MeshBase        oldMeshBase,
-            MeshObjectIdentifier canonicalIdentifier,
-            long            time )
+            NetMeshBase             oldMeshBase,
+            NetMeshObjectIdentifier canonicalIdentifier,
+            long                    time )
     {
         MeshObjectStateEvent theEvent = new NetMeshObjectBecamePurgedStateEvent(
                 this,
@@ -1631,14 +1631,14 @@ public class AnetMeshObject
      */
     @Override
     protected void fireDeleted(
-            MeshBase       oldMeshBase,
+            MeshBase             oldMeshBase,
             MeshObjectIdentifier canonicalMeshObjectName,
-            long           time )
+            long                 time )
     {
         NetMeshObjectBecameDeadStateEvent theEvent
                 = new NetMeshObjectBecameDeadStateEvent(
                         this,
-                        canonicalMeshObjectName,
+                        (NetMeshObjectIdentifier) canonicalMeshObjectName,
                         determineIncomingProxyIdentifier( oldMeshBase ),
                         time );
         
