@@ -1063,7 +1063,7 @@ public class AnetMeshBaseLifecycleManager
         
         if( proxy != proxyTowardsHome ) {
             // tell that replica we are here
-            proxyTowardsHome.resynchronizeDependentReplicas( new MeshObjectIdentifier[] { identifier } );
+            proxyTowardsHome.resynchronizeDependentReplicas( new NetMeshObjectIdentifier[] { identifier } );
         }
 
         MeshObjectIdentifier [] equivalents = original.getEquivalents();

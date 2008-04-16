@@ -26,28 +26,32 @@ public class MeshObjectBecameDeadStateEvent
         extends
             MeshObjectStateEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
-     * Constructor. This must be invoked with both the MeshObject and the canonical Identifier,
-     * because it is not possible to construct the canonical Identifier after the MeshObject is dead.
+     * Constructor. This must be invoked with both the MeshObject and the canonical MeshObjectIdentifier,
+     * because it is not possible to construct the canonical MeshObjectIdentifier after the MeshObject is dead.
      * 
-     * @param canonicalIdentifier the canonical Identifier of the MeshObject that became dead
      * @param theMeshObject the MeshObject whose state changed
+     * @param canonicalIdentifier the canonical MeshObjectIdentifier of the MeshObject that became dead
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectBecameDeadStateEvent(
             MeshObject           theMeshObject,
             MeshObjectIdentifier canonicalIdentifier,
-            long                 updateTime )
+            long                 timeEventOccurred )
     {
         super(  theMeshObject,
                 canonicalIdentifier,
                 Value.ALIVE,
                 Value.DEAD,
-                updateTime );
+                timeEventOccurred );
     }
 
     /**
      * Resolve a value of the event.
      *
+     * @param vid the valid identifier
      * @return a value of the event
      */
     protected MeshObjectState resolveValue(
@@ -74,33 +78,35 @@ public class MeshObjectBecameDeadStateEvent
     }
 
     /**
-     * Apply this Change to a MeshObject in this MeshBase. This method
-     * is intended to make it easy to reproduce Changes that were made in
-     * one MeshBase to MeshObjects in another MeshBase.
+     * <p>Apply this Change to a MeshObject in this MeshBase. This method
+     *    is intended to make it easy to reproduce Changes that were made in
+     *    one MeshBase to MeshObjects in another MeshBase.</p>
      *
-     * This method will attempt to create a Transaction if none is present on the
-     * current Thread.
+     * <p>This method will attempt to create a Transaction if none is present on the
+     * current Thread.</p>
      *
-     * @param otherMeshBase the other MeshBase in which to apply the change
+     * @param base the MeshBase in which to apply the Change
+     * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
-     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and could not be created
+     *         the affected MeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public MeshObject applyTo(
-            MeshBase otherMeshBase )
+            MeshBase base )
         throws
             CannotApplyChangeException,
             TransactionException
     {
-        setResolver( otherMeshBase );
+        setResolver( base );
 
         Transaction tx = null;
         try {
-            tx = otherMeshBase.createTransactionNowIfNeeded();
+            tx = base.createTransactionNowIfNeeded();
 
             MeshObject otherObject = getSource();
 
-            otherMeshBase.getMeshBaseLifecycleManager().deleteMeshObject( otherObject );
+            base.getMeshBaseLifecycleManager().deleteMeshObject( otherObject );
 
             return otherObject;
             
@@ -108,7 +114,7 @@ public class MeshObjectBecameDeadStateEvent
             throw ex;
 
         } catch( Throwable ex ) {
-            throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, ex );
+            throw new CannotApplyChangeException.ExceptionOccurred( base, ex );
             
         } finally {
             if( tx != null ) {

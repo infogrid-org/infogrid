@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.net.transaction;
 
 import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.Proxy;
@@ -23,36 +24,50 @@ import org.infogrid.meshbase.transaction.Change;
 import org.infogrid.meshbase.transaction.TransactionException;
 
 /**
- * Extends Change to cover the NetMeshBase use cases.
+ * Extends Change to cover the NetMeshBase use cases, and return the more specific
+ * subtypes.
+ * 
+ * @param S the type of the event source
+ * @param SID the type of the identifier of the event source
+ * @param V the type of the value
+ * @param VID the type of the identifier of the value
  */
 public interface NetChange<S,SID,V,VID>
         extends
             Change<S,SID,V,VID>
 {
     /**
-     * Obtain the MeshObject affected by this Change.
+     * Obtain the NetMeshObject affected by this Change.
      *
      * @return obtain the NetMeshObject affected by this Change
      */
     public abstract NetMeshObject getAffectedMeshObject();
 
     /**
-     * Apply this NetChange to a MeshObject in this MeshBase that is a replica
-     * of the NetMeshObject which caused the NetChange. This method
-     * is intended to make it easy to replicate Changes that were made to a
-     * replica of one NetMeshObject in one NetMeshBase to another replica
-     * of the NetMeshObject in another NetMeshBase.
+     * Obtain the identifier of the NetMeshObject affected by this Change.
+     *
+     * @return the identifier of the NetMeshObject affected by this Change
+     */
+    public NetMeshObjectIdentifier getAffectedMeshObjectIdentifier();
+
+    /**
+     * <p>Apply this NetChange to a NetMeshObject in this MeshBase. This method
+     *    is intended to make it easy to replicate NetChanges that were made to a
+     *    replica of one NetMeshObject in one NetMeshBase to another replica
+     *    of the NetMeshObject in another NetMeshBase.</p>
      *
      * <p>This method will attempt to create a Transaction if none is present on the
      * current Thread.</p>
      *
-     * @param otherMeshBase the other MeshBase in which to apply the change
-     * @return the replica to which the Change was applied
-     * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
+     * @param base the NetMeshBase in which to apply the NetChange
+     * @return the NetMeshObject to which the NetChange was applied
+     * @throws CannotApplyChangeException thrown if the NetChange could not be applied, e.g because
+     *         the affected NetMeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public NetMeshObject applyToReplicaIn(
-            NetMeshBase otherMeshBase )
+            NetMeshBase base )
         throws
             CannotApplyChangeException,
             TransactionException;
@@ -63,13 +78,13 @@ public interface NetChange<S,SID,V,VID>
      * @return the NetMeshBaseIdentifier, if any
      */
     public abstract NetMeshBaseIdentifier getOriginNetworkIdentifier();
-    
+
     /**
-     * Determine whether this NetChange should be forwarded through the outgoing Proxy.
-     * If specified, the incomingProxy property specifies where the NetChange came from.
+     * Determine whether this NetChange should be forwarded through the given, outgoing Proxy.
+     * If specified, {@link #getOriginNetworkIdentifier} specifies where the NetChange came from.
      *
-     * @param outgoingProxy the outgoing Proxy
-     * @return true if the NetChange should be forwarded.
+     * @param outgoingProxy the potential outgoing Proxy
+     * @return true if the NetChange should be forwarded torwards the outgoingProxy
      */
     public abstract boolean shouldBeSent(
             Proxy outgoingProxy );

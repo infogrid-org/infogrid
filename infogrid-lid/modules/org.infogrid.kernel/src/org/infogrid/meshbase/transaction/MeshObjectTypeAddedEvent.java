@@ -24,114 +24,123 @@ import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MeshTypeUtils;
 
 import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.logging.Log;
 
 /**
- * An EntityType was added to a MeshObject.
+ * Event that indicates a MeshObject was blessed with one or more EntityTypes.
  */
 public class MeshObjectTypeAddedEvent
         extends
             AbstractMeshObjectTypeChangeEvent
 {
-    private static final Log log = Log.getLogInstance( MeshObjectTypeAddedEvent.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Constructor.
      *
-     * @param theMeshObject the MeshObject whose type changed
-     * @param addedTypes the EntityType(s) that were added to the MeshObject
-     * @param updateTime the time at which the update was performed
+     * @param source the MeshObject whose type changed
+     * @param oldValues the old set of EntityTypes, prior to the event
+     * @param deltaValues the EntityTypes that were added
+     * @param newValues the new set of EntityTypes, after the event
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectTypeAddedEvent(
-            MeshObject        theMeshObject,
-            EntityType []     oldTypes,
-            EntityType []     addedTypes,
-            EntityType []     newTypes,
-            long              updateTime )
+            MeshObject        source,
+            EntityType []     oldValues,
+            EntityType []     deltaValues,
+            EntityType []     newValues,
+            long              timeEventOccurred )
     {
-        super(  theMeshObject,
-                theMeshObject.getIdentifier(),
-                oldTypes,
-                MeshTypeUtils.meshTypeIdentifiers( oldTypes ),
-                addedTypes,
-                MeshTypeUtils.meshTypeIdentifiers( addedTypes ),
-                newTypes,
-                MeshTypeUtils.meshTypeIdentifiers( newTypes ),
-                updateTime );
+        super(  source,
+                source.getIdentifier(),
+                oldValues,
+                MeshTypeUtils.meshTypeIdentifiers( oldValues ),
+                deltaValues,
+                MeshTypeUtils.meshTypeIdentifiers( deltaValues ),
+                newValues,
+                MeshTypeUtils.meshTypeIdentifiers( newValues ),
+                timeEventOccurred );
     }
 
     /**
      * Constructor for the case where we don't have old and new values, only the delta.
      * This perhaps should trigger some exception if it is attempted to read old or
      * new values later. (FIXME?)
+     * 
+     * @param sourceIdentifier the identifier for the MeshObject whose type changed
+     * @param deltaValues the EntityTypes that were added
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectTypeAddedEvent(
-            MeshObjectIdentifier  meshObjectIdentifier,
-            MeshTypeIdentifier [] addedTypeIdentifiers,
-            long                  updateTime )
+            MeshObjectIdentifier  sourceIdentifier,
+            MeshTypeIdentifier [] deltaValues,
+            long                  timeEventOccurred )
     {
         super(  null,
-                meshObjectIdentifier,
+                sourceIdentifier,
                 null,
                 null,
                 null,
-                addedTypeIdentifiers,
+                deltaValues,
                 null,
                 null,
-                updateTime );        
+                timeEventOccurred );        
     }
 
     /**
      * Constructor.
      *
-     * @param theMeshObject the MeshObject whose type changed
-     * @param addedTypes the EntityType(s) that were added to the MeshObject
-     * @param updateTime the time at which the update was performed
+     * @param sourceIdentifier the identifier of the MeshObject whose type changed
+     * @param oldValueIdentifiers the identifiers of the old set of EntityTypes, prior to the event
+     * @param deltaValueIdentifiers the identifiers of the EntityTypes that were added
+     * @param newValueIdentifiers the identifiers of the new set of EntityTypes, after the event
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectTypeAddedEvent(
-            MeshObjectIdentifier  identifier,
-            MeshTypeIdentifier [] oldTypeIdentifiers,
-            MeshTypeIdentifier [] addedTypeIdentifiers,
-            MeshTypeIdentifier [] newTypeIdentifiers,
-            long                  updateTime )
+            MeshObjectIdentifier  sourceIdentifier,
+            MeshTypeIdentifier [] oldValueIdentifiers,
+            MeshTypeIdentifier [] deltaValueIdentifiers,
+            MeshTypeIdentifier [] newValueIdentifiers,
+            long                  timeEventOccurred )
     {
         super(  null,
-                identifier,
+                sourceIdentifier,
                 null,
-                oldTypeIdentifiers,
+                oldValueIdentifiers,
                 null,
-                addedTypeIdentifiers,
+                deltaValueIdentifiers,
                 null,
-                newTypeIdentifiers,
-                updateTime );
+                newValueIdentifiers,
+                timeEventOccurred );
     }
 
     /**
-     * Apply this Change to a MeshObject in this MeshBase. This method
-     * is intended to make it easy to reproduce Changes that were made in
-     * one MeshBase to MeshObjects in another MeshBase.
+     * <p>Apply this Change to a MeshObject in this MeshBase. This method
+     *    is intended to make it easy to reproduce Changes that were made in
+     *    one MeshBase to MeshObjects in another MeshBase.</p>
      *
-     * This method will attempt to create a Transaction if none is present on the
-     * current Thread.
+     * <p>This method will attempt to create a Transaction if none is present on the
+     * current Thread.</p>
      *
-     * @param otherMeshBase the other MeshBase in which to apply the change
+     * @param base the MeshBase in which to apply the Change
+     * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
-     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and could not be created
+     *         the affected MeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public MeshObject applyTo(
-            MeshBase otherMeshBase )
+            MeshBase base )
         throws
             CannotApplyChangeException,
             TransactionException
     {
-        setResolver( otherMeshBase );
+        setResolver( base );
 
         Transaction tx = null; 
         Throwable   t  = null;
 
         try {
-            tx = otherMeshBase.createTransactionNowIfNeeded();
+            tx = base.createTransactionNowIfNeeded();
 
             MeshObject otherObject = getSource();
 
@@ -144,7 +153,7 @@ public class MeshObjectTypeAddedEvent
             throw ex;
 
         } catch( Throwable ex ) {
-            throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, ex );
+            throw new CannotApplyChangeException.ExceptionOccurred( base, ex );
 
         } finally {
             if( tx != null ) {

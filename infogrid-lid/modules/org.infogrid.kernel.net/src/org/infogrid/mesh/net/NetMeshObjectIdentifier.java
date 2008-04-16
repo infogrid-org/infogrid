@@ -38,4 +38,10 @@ public interface NetMeshObjectIdentifier
      * @return the local external form
      */
     public abstract String toLocalExternalForm();
+
+
+    /**
+     * To save memory, this constant is allocated here and used wherever appropriate.
+     */
+    public static final NetMeshObjectIdentifier [] NET_EMPTY_ARRAY = {};
 }

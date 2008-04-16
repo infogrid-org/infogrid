@@ -17,6 +17,8 @@ package org.infogrid.meshbase.transaction;
 import org.infogrid.mesh.MeshObjectIdentifier;
 
 import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.util.StringHelper;
 
 /**
  * This Exception is thrown if a Change could not be applied.
@@ -36,13 +38,38 @@ public abstract class CannotApplyChangeException
             Throwable cause )
     {
         super( cause );
-        theMeshBase = mb;
+        
+        theMeshBase           = mb;
+        theMeshBaseIdentifier = mb.getIdentifier();
+    }
+
+    /**
+     * Convert to String format, for debugging.
+     * 
+     * @return String format
+     */
+    @Override
+    public String toString()
+    {
+        return StringHelper.objectLogString(
+                this,
+                new String[] {
+                    "meshBaseIdentifier"
+                },
+                new Object[] {
+                    theMeshBaseIdentifier
+                } );
     }
 
     /**
      * The MeshBase to which the Change could not be applied.
      */
     protected transient MeshBase theMeshBase;
+    
+    /**
+     * The identifier of the MeshBase to which the Change could not be applied.
+     */
+    protected MeshBaseIdentifier theMeshBaseIdentifier;
     
     /**
      * This subclass indicates that an unexpected Exception occurred during the
@@ -52,6 +79,8 @@ public abstract class CannotApplyChangeException
             extends
                 CannotApplyChangeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -74,24 +103,46 @@ public abstract class CannotApplyChangeException
             extends
                 CannotApplyChangeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param identifier the Identifier of the MeshObject that could not be found.
+         * @param objectIdentifier the Identifier of the MeshObject that could not be found.
          * @param mb the MeshBase in which the MeshObject could not be found
          */
         public MeshObjectNotFound(
-                MeshObjectIdentifier identifier,
-                MeshBase        mb )
+                MeshObjectIdentifier objectIdentifier,
+                MeshBase             mb )
         {
             super( mb, null );
             
-            theIdentifier = identifier;
+            theObjectIdentifier = objectIdentifier;
         }
-        
+
+        /**
+         * Convert to String format, for debugging.
+         * 
+         * @return String format
+         */
+        @Override
+        public String toString()
+        {
+            return StringHelper.objectLogString(
+                    this,
+                    new String[] {
+                        "meshBaseIdentifier",
+                        "objectIdentifier"
+                    },
+                    new Object[] {
+                        theMeshBaseIdentifier,
+                        theObjectIdentifier
+                    } );
+        }
+
         /**
          * The Identifier of the MeshObject that could not be found.
          */
-        protected MeshObjectIdentifier theIdentifier;
+        protected MeshObjectIdentifier theObjectIdentifier;
     }
 }
