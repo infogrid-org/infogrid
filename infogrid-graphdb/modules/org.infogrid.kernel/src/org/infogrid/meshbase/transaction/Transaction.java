@@ -21,13 +21,11 @@ import org.infogrid.util.logging.Log;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
+import org.infogrid.util.FlexibleListenerSet;
 
 /**
-  * <p>This represents the concept of a Transaction. This is an abstract class;
+  * <p>The concept of a Transaction in InfoGrid. This is an abstract class;
   *    specific implementations of MeshBase provide concrete subclasses.</p>
-  *
   * <p>Transactions are the bracket for a unit of Changes (called a ChangeSet) on
   *    a MeshBase.</p>
   */
@@ -36,7 +34,7 @@ public abstract class Transaction
     private static final Log log = Log.getLogInstance(Transaction.class); // our own, private logger
 
     /**
-      * Transactions can only be created by the MeshBase that they guard.
+      * Private constructor, as Transactions can only be created by the MeshBase that they guard.
       * They can also only be created within the Thread by which they will be used.
       *
       * @param transactable the MeshBase that the Transaction guards
@@ -44,7 +42,7 @@ public abstract class Transaction
     protected Transaction(
             MeshBase transactable )
     {
-        this.theTransactable = transactable;
+        theTransactable = transactable;
 
         myThread  = Thread.currentThread();
         myInvoker = new TransactionConstructionMarker();
@@ -102,7 +100,7 @@ public abstract class Transaction
         throws
             TransactionException.IllegalTransactionThread
     {
-        // FIXME: this should be somewhat looser than this: Threads should be able to
+        // FIXME? This should perhaps be somewhat looser than this: Threads should be able to
         // "empower" other threads to do work within a transaction on their behalf
 
         if( myThread != Thread.currentThread() ) {
@@ -134,9 +132,9 @@ public abstract class Transaction
 
     /**
       * Add a Change to the ChangeSet. This shall not be invoked by the
-      * application programmer.
+      * application programmer; InfoGrid internals do.
       *
-      * We don't synchronize, it's unlikely that this is invoked from the wrong place.
+      * We don't synchronize, as it is unlikely that this method is invoked from the wrong Thread.
       *
       * @param newChange the Change to be added to this Transaction
       */
@@ -147,19 +145,73 @@ public abstract class Transaction
     }
 
     /**
-      * Add a TransactionListener to this Transaction.
-      *
-      * @param newListener the new listener to be added
-      * @see #removeTransactionListener
-      */
-    public synchronized void addTransactionListener(
+     * Add a new listener object to this set using a WeakReference.
+     *
+     * @param newListener the listener to be added to this set
+     */
+    public void addWeakTransactionListener(
             TransactionListener newListener )
     {
-        if( theListeners == null ) {
-            theListeners = new ArrayList<TransactionListener>();
-        }
+        theListeners.addWeak( newListener );
+    }
+    
+    /**
+     * Add a new listener object to this set using a SoftReference.
+     *
+     * @param newListener the listener to be added to this set
+     */
+    public void addSoftTransactionListener(
+            TransactionListener newListener )
+    {
+        theListeners.addSoft( newListener );
+    }
+    
+    /**
+     * Add a new listener object to this set directly, i.e. without using References.
+     *
+     * @param newListener the listener to be added to this set
+     */
+    public void addTransactionListener(
+            TransactionListener newListener )
+    {
+        theListeners.addDirect( newListener );
+    }
 
-        theListeners.add( newListener );
+    /**
+     * Internal helper to createCopy a listener set.
+     * 
+     * @return the created listener set
+     */
+    protected FlexibleListenerSet<TransactionListener,Transaction,Status> createListenerSet()
+    {
+        FlexibleListenerSet<TransactionListener,Transaction,Status> ret
+                = new FlexibleListenerSet<TransactionListener,Transaction,Status>() {
+                        /**
+                         * Fire the event to one contained object.
+                         *
+                         * @param listener the receiver of this event
+                         * @param event the sent event
+                         * @param parameter dispatch parameter
+                         */
+                        protected void fireEventToListener(
+                                TransactionListener listener,
+                                Transaction         event,
+                                Status              parameter )
+                        {
+                            if( status == Status.TRANSACTION_STARTED ) {
+                                listener.transactionStarted( Transaction.this );
+                            // } else if( status == TRANSACTION_VOTED ) {
+                            //     theListener.transactionVoted( this );
+                            } else if( status == Status.TRANSACTION_COMMITTED ) {
+                                listener.transactionCommitted( Transaction.this );
+                            // } else if( status == TRANSACTION_ROLLEDBACK ) {
+                            //     theListener.transactionRolledBack( this );
+                            } else {
+                                log.error( "unknown value for status in Transaction" );
+                            }
+                        }
+                };
+        return ret;
     }
 
     /**
@@ -182,29 +234,9 @@ public abstract class Transaction
       */
     protected void notifyStateChanged()
     {
-        Iterator<TransactionListener> theIter;
-        synchronized( this ) {
-            if( theListeners == null ) {
-                return;
-            }
-
-            theIter = new ArrayList<TransactionListener>( theListeners ).iterator();
-        }
-        while( theIter.hasNext() ) {
-            TransactionListener theListener = theIter.next();
-
-            if( status == Status.TRANSACTION_STARTED ) {
-                theListener.transactionStarted( this );
-            // } else if( status == TRANSACTION_VOTED ) {
-            //     theListener.transactionVoted( this );
-            } else if( status == Status.TRANSACTION_COMMITTED ) {
-                theListener.transactionCommitted( this );
-            // } else if( status == TRANSACTION_ROLLEDBACK ) {
-            //     theListener.transactionRolledBack( this );
-            } else {
-                log.error( "unknown value for status in Transaction" );
-                break;
-            }
+        FlexibleListenerSet<TransactionListener,Transaction,Status> listeners = theListeners;
+        if( listeners != null ) {
+            listeners.fireEvent( this, status );
         }
     }
 
@@ -276,16 +308,17 @@ public abstract class Transaction
     /**
       * The set of TransactionListeners. Allocated as needed.
       */
-    protected ArrayList<TransactionListener> theListeners = null;
+    protected FlexibleListenerSet<TransactionListener,Transaction,Status> theListeners = null;
 
     /**
      * The number of attempts of recalculations we do before we declare this a
-     * circular loop and give up. FIXME: see also bug 354.
+     * circular loop and give up.
      */
     protected static final int MAX_RECALCULATE_ATTEMPTS = 100;
 
     /**
-     * Defines the values for a transaction status.
+     * Defines the values for a transaction status. FIXME: Not all of these values
+     * have been implemented so far.
      */
     public static enum Status
     {

@@ -34,39 +34,44 @@ public abstract class AbstractMeshObjectEquivalentsChangeEvent
     /**
      * Constructor.
      * 
-     * @param meshObject the MeshObject whose equivalents changed
-     * @param deltaEquivalents the Identifiers of the equivalents that changed
-     * @param newValue the Identifiers of the new set of equivalents
-     * @param updateTime the time at which the change occurred
+     * @param source the MeshObject that is the source of the event
+     * @param sourceIdentifier the identifier representing the source MeshObject of the event
+     * @param oldValues the old values of the equivalents, prior to the event
+     * @param oldValueIdentifiers the identifiers representing the old values of the equivalents, prior to the event
+     * @param deltaValues the equivalents that changed
+     * @param deltaValueIdentifiers the identifiers of the equivalents that changed
+     * @param newValues the new value of the equivalents, after the event
+     * @param newValueIdentifiers the identifiers representing the new values of the equivalents, after the event
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     protected AbstractMeshObjectEquivalentsChangeEvent(
-            MeshObject              meshObject,
-            MeshObjectIdentifier    meshObjectIdentifier,
-            MeshObject []           oldEquivalents,
-            MeshObjectIdentifier [] oldEquivalentIdentifiers,
-            MeshObject []           deltaEquivalents,
-            MeshObjectIdentifier [] deltaEquivalentIdentifiers,
-            MeshObject []           newEquivalents,
-            MeshObjectIdentifier [] newEquivalentIdentifiers,
-            long                    updateTime )
+            MeshObject              source,
+            MeshObjectIdentifier    sourceIdentifier,
+            MeshObject []           oldValues,
+            MeshObjectIdentifier [] oldValueIdentifiers,
+            MeshObject []           deltaValues,
+            MeshObjectIdentifier [] deltaValueIdentifiers,
+            MeshObject []           newValues,
+            MeshObjectIdentifier [] newValueIdentifiers,
+            long                    timeEventOccurred )
     {
-        super(  meshObject,
-                meshObjectIdentifier,
+        super(  source,
+                sourceIdentifier,
                 MeshObject._MESH_OBJECT_EQUIVALENTS_PROPERTY,
                 MeshObject._MESH_OBJECT_EQUIVALENTS_PROPERTY,
-                oldEquivalents,
-                oldEquivalentIdentifiers,
-                deltaEquivalents,
-                deltaEquivalentIdentifiers,
-                newEquivalents,
-                newEquivalentIdentifiers,
-                updateTime );
+                oldValues,
+                oldValueIdentifiers,
+                deltaValues,
+                deltaValueIdentifiers,
+                newValues,
+                newValueIdentifiers,
+                timeEventOccurred );
     }
 
     /**
-     * Obtain the Identifier of the MeshObject affected by this Change.
+     * Obtain the identifier of the MeshObject affected by this Change.
      *
-     * @return the Identifier of the MeshObject affected by this Change
+     * @return the identifier of the MeshObject affected by this Change
      */
     public MeshObjectIdentifier getAffectedMeshObjectIdentifier()
     {
@@ -84,7 +89,7 @@ public abstract class AbstractMeshObjectEquivalentsChangeEvent
     }
 
     /**
-     * Determine whether this is an addition or a removal.
+     * Determine whether this is an addition or a removal of an equivalent.
      *
      * @return true if this is an addition
      */
@@ -172,5 +177,5 @@ public abstract class AbstractMeshObjectEquivalentsChangeEvent
     /**
      * The resolver of identifiers carried by this event.
      */
-    protected MeshBase theResolver;
+    protected transient MeshBase theResolver;
 }

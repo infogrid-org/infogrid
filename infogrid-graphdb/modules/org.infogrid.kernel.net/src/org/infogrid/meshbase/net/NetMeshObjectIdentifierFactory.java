@@ -42,10 +42,10 @@ public interface NetMeshObjectIdentifierFactory
     public abstract NetMeshObjectIdentifier createMeshObjectIdentifier();
 
     /**
-     * Create a MeshObjectIdentifier from an external form.
+     * Create an identifier for a MeshObject at held locally at this MeshBase.
      *
-     * @param raw the external form
-     * @return the created MeshObjectIdentifier
+     * @param raw the identifier String
+     * @return the created DefaultAnetMeshObjectIdentifier
      * @throws URISyntaxException a parsing error occurred
      */
     // @Override except that the compiler doesn't like it
@@ -53,7 +53,21 @@ public interface NetMeshObjectIdentifierFactory
             String raw )
         throws
             URISyntaxException;
-    
+
+    /**
+     * Create an identifier for a MeshObject held at a different MeshBase.
+     *
+     * @param meshBaseIdentifier MeshBaseIdentifier of the MeshBase where the object is held
+     * @param raw the identifier String
+     * @return the created DefaultAnetMeshObjectIdentifier
+     * @throws URISyntaxException a parsing error occurred
+     */
+    public NetMeshObjectIdentifier fromExternalForm(
+            NetMeshBaseIdentifier meshBaseIdentifier,
+            String                raw )
+        throws
+            URISyntaxException;
+
     /**
      * Create a NetMeshObjectAccessSpecifiation from an external form.
      *

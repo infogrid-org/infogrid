@@ -34,8 +34,10 @@ public class MultiplicityException
         extends
             AbstractMeshException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
-     * Construct one.
+     * Constructor.
      *
      * @param mb the MeshBase in which this Exception was created
      * @param originatingMeshBaseIdentifier the MeshBaseIdentifier of the MeshBase in which this Exception was created

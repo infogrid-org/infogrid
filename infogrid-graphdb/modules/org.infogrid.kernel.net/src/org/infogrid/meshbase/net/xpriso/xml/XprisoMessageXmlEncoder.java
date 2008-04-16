@@ -141,7 +141,7 @@ public class XprisoMessageXmlEncoder
                 buf.append( "\"/>\n" );
             }
         }
-        NetMeshObjectDeletedEvent [] deleteChanges = msg.getDeleteChanges();
+        NetMeshObjectDeletedEvent [] deleteChanges = msg.getDeletions();
         if( deleteChanges != null ) {
             for( NetMeshObjectDeletedEvent current : deleteChanges ) {
                 buf.append( "    <" ).append( MESH_OBJECT_DELETED_TAG );
@@ -423,7 +423,7 @@ public class XprisoMessageXmlEncoder
             
         } else if( REQUESTED_CANCELED_OBJECT_TAG.equals( qName )) {
             try {
-                MeshObjectIdentifier ref = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
+                NetMeshObjectIdentifier ref = ((NetMeshObjectIdentifierFactory)theMeshObjectIdentifierFactory).fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
                 theMessage.addRequestedCanceledObject( ref );
             } catch( URISyntaxException ex ) {
                 log.warn( ex );
@@ -491,8 +491,8 @@ public class XprisoMessageXmlEncoder
             
         } else if( PROPERTY_CHANGE_TAG.equals( qName )) {
             try {
-                MeshObjectIdentifier ref      = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
-                MeshTypeIdentifier   type     = theMeshTypeIdentifierFactory.fromExternalForm( attrs.getValue( TYPE_TAG ));
+                MeshObjectIdentifier ref  = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
+                MeshTypeIdentifier   type = theMeshTypeIdentifierFactory.fromExternalForm( attrs.getValue( TYPE_TAG ));
                 long           updated  = parseLong( attrs, TIME_UPDATED_TAG, -1L );
                 theHasPropertiesBeingParsed = new ParserFriendlyExternalizedMeshObject.HasProperties( ref, type, updated );
             } catch( URISyntaxException ex ) {
@@ -501,7 +501,7 @@ public class XprisoMessageXmlEncoder
 
         } else if( TYPE_ADDITION_TAG.equals( qName )) {
             try {
-                MeshObjectIdentifier ref      = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
+                MeshObjectIdentifier ref = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
                 long           updated = parseLong( attrs, TIME_UPDATED_TAG, -1L );
                 theHasTypesBeingParsed = new ParserFriendlyExternalizedMeshObject.HasTypes( ref, updated );
             } catch( URISyntaxException ex ) {
@@ -510,7 +510,7 @@ public class XprisoMessageXmlEncoder
             
         } else if( TYPE_REMOVAL_TAG.equals( qName )) {
             try {
-                MeshObjectIdentifier ref      = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
+                MeshObjectIdentifier ref = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
                 long           updated = parseLong( attrs, TIME_UPDATED_TAG, -1L );
                 theHasTypesBeingParsed = new ParserFriendlyExternalizedMeshObject.HasTypes( ref, updated );
             } catch( URISyntaxException ex ) {
@@ -519,7 +519,7 @@ public class XprisoMessageXmlEncoder
             
         } else if( REQUESTED_LOCK_OBJECT_TAG.equals( qName )) {
             try {
-                MeshObjectIdentifier ref      = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
+                NetMeshObjectIdentifier ref = ((NetMeshObjectIdentifierFactory)theMeshObjectIdentifierFactory).fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
                 theMessage.addRequestedLockObjects( ref );
             } catch( URISyntaxException ex ) {
                 log.warn( ex );
@@ -527,7 +527,7 @@ public class XprisoMessageXmlEncoder
             
         } else if( PUSH_LOCK_OBJECT_TAG.equals( qName )) {
             try {
-                MeshObjectIdentifier ref      = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
+                NetMeshObjectIdentifier ref = ((NetMeshObjectIdentifierFactory)theMeshObjectIdentifierFactory).fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
                 theMessage.addPushLockObject( ref );
             } catch( URISyntaxException ex ) {
                 log.warn( ex );
@@ -535,7 +535,7 @@ public class XprisoMessageXmlEncoder
             
         } else if( RECLAIMED_LOCK_OBJECT_TAG.equals( qName )) {
             try {
-                MeshObjectIdentifier ref      = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
+                NetMeshObjectIdentifier ref = ((NetMeshObjectIdentifierFactory)theMeshObjectIdentifierFactory).fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
                 theMessage.addReclaimedLockObject( ref );
             } catch( URISyntaxException ex ) {
                 log.warn( ex );
@@ -543,7 +543,7 @@ public class XprisoMessageXmlEncoder
             
         } else if( REQUESTED_RESYNCHRONIZE_DEPENDENT_REPLICA_TAG.equals( qName )) {
             try {
-                MeshObjectIdentifier ref      = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
+                NetMeshObjectIdentifier ref = ((NetMeshObjectIdentifierFactory)theMeshObjectIdentifierFactory).fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
                 theMessage.addRequestedResynchronizeDependentReplica( ref );
             } catch( URISyntaxException ex ) {
                 log.warn( ex );
@@ -675,7 +675,7 @@ public class XprisoMessageXmlEncoder
             
         } else if( TYPE_REMOVAL_TAG.equals( qName )) {
             theMessage.addTypeRemoval( new NetMeshObjectTypeRemovedEvent(
-                    theHasTypesBeingParsed.getIdentifier(),
+                    (NetMeshObjectIdentifier) theHasTypesBeingParsed.getIdentifier(),
                     theHasTypesBeingParsed.getTypes(),
                     theMessage.getSenderIdentifier(),
                     theHasTypesBeingParsed.getTimeUpdated() ));

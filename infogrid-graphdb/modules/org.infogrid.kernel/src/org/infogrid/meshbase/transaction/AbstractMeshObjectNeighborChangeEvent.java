@@ -36,7 +36,7 @@ import org.infogrid.util.logging.Log;
  * <p>This event indicates that the set of neighbor MeshObjects of a MeshObject has changed.</p>
  *
  * <p>This extends PropertyChangeEvent so we can keep the well-known JavaBeans
- * event generation model that programmers are used to.</p>
+ *    event generation model that programmers are used to.</p>
  */
 public abstract class AbstractMeshObjectNeighborChangeEvent
         extends
@@ -59,7 +59,7 @@ public abstract class AbstractMeshObjectNeighborChangeEvent
      * @param deltaNeighborIdentifiers the Identifiers of the neighbor MeshObjects affected by this event (required)
      * @param newNeighbors the set of neighbor MeshObjects after the event (optional)
      * @param newNeighborIdentifiers the Identifiers of the neighbor MeshObjects after the event (required)
-     * @param updateTime the time at which the change was made, in System.currentTimeMillis() format
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     protected AbstractMeshObjectNeighborChangeEvent(
             MeshObject              meshObject,
@@ -72,7 +72,7 @@ public abstract class AbstractMeshObjectNeighborChangeEvent
             MeshObjectIdentifier [] deltaNeighborIdentifiers,
             MeshObject []           newNeighbors,
             MeshObjectIdentifier [] newNeighborIdentifiers,
-            long                    updateTime )
+            long                    timeEventOccurred )
     {
         super(  meshObject,
                 meshObjectIdentifier,
@@ -84,7 +84,7 @@ public abstract class AbstractMeshObjectNeighborChangeEvent
                 deltaNeighborIdentifiers,
                 newNeighbors,
                 newNeighborIdentifiers,
-                updateTime );
+                timeEventOccurred );
     }
 
     /**

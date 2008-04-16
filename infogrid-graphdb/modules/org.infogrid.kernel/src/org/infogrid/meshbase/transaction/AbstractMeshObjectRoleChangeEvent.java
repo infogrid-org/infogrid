@@ -30,12 +30,13 @@ import org.infogrid.util.event.UnresolvedException;
 import org.infogrid.util.StringHelper;
 
 /**
-  * <p>This indicates a change in a MeshObject's participation in a role of
-  * a certain RoleType.</p>
-  *
-  * <p>This extends PropertyChangeEvent so we can keep the well-known JavaBeans
-  * event generation model that programmers are used to.</p>
-  */
+ * <p>This indicates a change in a MeshObject's participation in a role of
+ * a certain RoleType. In other words, a relationship between the MeshObject and
+ * another MeshObject was blessed or unblessed.</p>
+ *
+ * <p>This extends PropertyChangeEvent so we can keep the well-known JavaBeans
+ * event generation model that programmers are used to.</p>
+ */
 public abstract class AbstractMeshObjectRoleChangeEvent
         extends
             AbstractExternalizablePropertyChangeEvent<MeshObject, MeshObjectIdentifier, String, String, RoleType[], MeshTypeIdentifier[]>
@@ -44,40 +45,52 @@ public abstract class AbstractMeshObjectRoleChangeEvent
 {
     /**
      * Constructor.
+     * 
+     * @param source the MeshObject that is the source of the event
+     * @param sourceIdentifier the identifier representing the source MeshObject of the event
+     * @param oldValues the old values of the RoleType, prior to the event
+     * @param oldValueIdentifiers the identifier representing the old values of the RoleType, prior to the event
+     * @param deltaValues the RoleTypes that changed
+     * @param deltaValueIdentifiers the identifiers of the RoleTypes that changed
+     * @param newValues the new values of the RoleType, after the event
+     * @param newValueIdentifiers the identifier representing the new values of the RoleType, after the event
+     * @param neighbor the MeshObject that identifies the other end of the affected relationship
+     * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     protected AbstractMeshObjectRoleChangeEvent(
-            MeshObject            meshObject,
-            MeshObjectIdentifier  meshObjectIdentifier,
-            RoleType []           oldRoleTypes,
-            MeshTypeIdentifier [] oldRoleTypeIdentifiers,
-            RoleType []           deltaRoleTypes,
-            MeshTypeIdentifier [] deltaRoleTypeIdentifiers,
-            RoleType []           newRoleTypes,
-            MeshTypeIdentifier [] newRoleTypeIdentifiers,
+            MeshObject            source,
+            MeshObjectIdentifier  sourceIdentifier,
+            RoleType []           oldValues,
+            MeshTypeIdentifier [] oldValueIdentifiers,
+            RoleType []           deltaValues,
+            MeshTypeIdentifier [] deltaValueIdentifiers,
+            RoleType []           newValues,
+            MeshTypeIdentifier [] newValueIdentifiers,
             MeshObject            neighbor,
             MeshObjectIdentifier  neighborIdentifier,
-            long                  updateTime )
+            long                  timeEventOccurred )
     {
-        super(  meshObject,
-                meshObjectIdentifier,
+        super(  source,
+                sourceIdentifier,
                 MeshObject._MESH_OBJECT_ROLES_PROPERTY,
                 MeshObject._MESH_OBJECT_ROLES_PROPERTY,
-                oldRoleTypes,
-                oldRoleTypeIdentifiers,
-                deltaRoleTypes,
-                deltaRoleTypeIdentifiers,
-                newRoleTypes,
-                newRoleTypeIdentifiers,
-                updateTime );
+                oldValues,
+                oldValueIdentifiers,
+                deltaValues,
+                deltaValueIdentifiers,
+                newValues,
+                newValueIdentifiers,
+                timeEventOccurred );
 
         theNeighbor             = neighbor;
         theNeighborIdentifier = neighborIdentifier;
     }
 
    /**
-     * Obtain the Identifier of the MeshObject affected by this Change.
+     * Obtain the identifier of the MeshObject affected by this Change.
      *
-     * @return the Identifier of the MeshObject affected by this Change
+     * @return the identifier of the MeshObject affected by this Change
      */
     public MeshObjectIdentifier getAffectedMeshObjectIdentifier()
     {
@@ -95,9 +108,9 @@ public abstract class AbstractMeshObjectRoleChangeEvent
     }
 
    /**
-     * Obtain the Identifier of the neighbor MeshObject affected by this Change.
+     * Obtain the identifier of the neighbor MeshObject that identifies the relationship affected by this Change.
      *
-     * @return the Identifier of the neighbor MeshObject affected by this Change
+     * @return the identifier of the neighbor MeshObject that identifies the relationship affected by this Change
      */
     public MeshObjectIdentifier getNeighborMeshObjectIdentifier()
     {
@@ -105,9 +118,9 @@ public abstract class AbstractMeshObjectRoleChangeEvent
     }
 
     /**
-     * Obtain the neighbor MeshObject affected by this Change.
+     * Obtain the neighbor MeshObject that identifies the relationship affected by this Change.
      *
-     * @return obtain the neighbor MeshObject affected by this Change
+     * @return obtain the neighbor MeshObject that identifies the relationship affected by this Change
      */
     public synchronized MeshObject getNeighborMeshObject()
     {
@@ -118,9 +131,9 @@ public abstract class AbstractMeshObjectRoleChangeEvent
     }
 
     /**
-     * Obtain the affected RoleTypes.
+     * Obtain the identifiers of the affected RoleTypes.
      *
-     * @return the RoleTypes
+     * @return the identifiers of the affected RoleTypes
      */
     public MeshTypeIdentifier [] getAffectedRoleTypeIdentifiers()
     {

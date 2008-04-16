@@ -21,62 +21,68 @@ import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 
 /**
- * A MeshObject was semantically deleted.
+ * This event indicates that a MeshObject was semantically deleted.
  */
 public class MeshObjectDeletedEvent
         extends
             AbstractMeshObjectLifecycleEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Construct one.
      * 
-     * @param meshBase the MeshBase that sent out this event
-     * @param canonicalIdentifier the canonical Identifier of the MeshObject that experienced a lifecycle event
-     * @param deletedMeshObject the MeshObject that experienced a lifecycle event
+     * @param source the MeshBase that is the source of the event
+     * @param sourceIdentifier the MeshBaseIdentifier representing the source of the event
+     * @param deltaValue the MeshObject whose lifecycle changed
+     * @param deltaValueIdentifier the MeshObjectIdentifier whose lifecycle changed
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectDeletedEvent(
-            MeshBase             meshBase,
-            MeshBaseIdentifier   meshBaseIdentifier,
-            MeshObject           deletedMeshObject,
-            MeshObjectIdentifier deletedMeshObjectIdentifier,
-            long                 updateTime )
+            MeshBase             source,
+            MeshBaseIdentifier   sourceIdentifier,
+            MeshObject           deltaValue,
+            MeshObjectIdentifier deltaValueIdentifier,
+            long                 timeEventOccurred )
     {
-        super(  meshBase,
-                meshBaseIdentifier,
-                deletedMeshObject,
-                deletedMeshObjectIdentifier,
-                updateTime );
+        super(  source,
+                sourceIdentifier,
+                deltaValue,
+                deltaValueIdentifier,
+                timeEventOccurred );
     }
 
     /**
-     * Apply this Change to a MeshObject in this MeshBase. This method
-     * is intended to make it easy to reproduce Changes that were made in
-     * one MeshBase to MeshObjects in another MeshBase.
+     * <p>Apply this Change to a MeshObject in this MeshBase. This method
+     *    is intended to make it easy to reproduce Changes that were made in
+     *    one MeshBase to MeshObjects in another MeshBase.</p>
      *
-     * This method will attempt to create a Transaction if none is present on the
-     * current Thread.
+     * <p>This method will attempt to create a Transaction if none is present on the
+     * current Thread.</p>
      *
-     * @param otherMeshBase the other MeshBase in which to apply the change
+     * @param base the MeshBase in which to apply the Change
+     * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
-     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and could not be created
+     *         the affected MeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public MeshObject applyTo(
-            MeshBase otherMeshBase )
+            MeshBase base )
         throws
             CannotApplyChangeException,
             TransactionException
     {
-        setResolver( otherMeshBase );
+        setResolver( base );
 
         Transaction tx = null;
 
         try {
-            tx = otherMeshBase.createTransactionNowIfNeeded();
+            tx = base.createTransactionNowIfNeeded();
 
             MeshObject otherObject = getDeltaValue();
 
-            otherMeshBase.getMeshBaseLifecycleManager().deleteMeshObject( otherObject );
+            base.getMeshBaseLifecycleManager().deleteMeshObject( otherObject );
 
             return otherObject;
 
@@ -84,7 +90,7 @@ public class MeshObjectDeletedEvent
             throw ex;
 
         } catch( Throwable ex ) {
-            throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, ex );
+            throw new CannotApplyChangeException.ExceptionOccurred( base, ex );
             
         } finally {
             if( tx != null ) {
