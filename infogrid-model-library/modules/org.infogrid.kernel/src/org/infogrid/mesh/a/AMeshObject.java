@@ -316,7 +316,8 @@ public class AMeshObject
      * this method makes any sense, subclasses may appreciate it.
      *
      * @param otherObject the MeshObject to relate to
-     * @param isMaster true of this is the master
+     * @param isMaster true if this is the master
+     * @param forgiving true if the problems should be tolerated to the maximum extent possible
      * @throws RelatedAlreadyException thrown to indicate that this MeshObject is already related
      *         to the otherObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
@@ -640,6 +641,7 @@ public class AMeshObject
      * @param forgiving if true, attempt to ignore errors
      * @throws RoleTypeBlessedAlreadyException thrown if the relationship to the other MeshObject is blessed
      *         already with one ore more of the given RoleTypes
+     * @throws EntityNotBlessedException thrown if the source or destination MeshObject was not blessed with a required EntityType
      * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
      * @throws IsAbstractException thrown if one of the RoleTypes belong to an abstract RelationshipType
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
@@ -1335,7 +1337,6 @@ public class AMeshObject
      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
      *        if false, only this MeshObject will be used as the start
      * @return the RoleTypes that this MeshObject currently participates in.
-     * @throws NotRelatedException thrown if this MeshObject and otherObject are not related
      */
     public RoleType [] getRoleTypes(
             MeshObject otherObject,

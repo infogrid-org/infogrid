@@ -60,7 +60,6 @@ public abstract class MapCursorIterator<K,V>
             Class<K> keyArrayComponentType,
             Class<V> valueArrayComponentType )
     {
-        
         Entry<K,V> [] entries  = (Entry<K,V> []) ArrayHelper.createArray( Entry.class, map.size() );
         entries  = map.entrySet().toArray( entries );
 

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
-  * <p>A change set is the set of Changes (create, update, delete)
+  * <p>A ChangeSet is the set of {@link Change Changes} (createCopy, update, delete)
   * that are to be or have been performed during a Transaction.</p>
   *
   * <p>While the Transaction is open, Changes are automatically added to the
@@ -33,6 +33,8 @@ public class ChangeSet
             Serializable,
             Iterable<Change>
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Factory method.
      *
@@ -46,10 +48,10 @@ public class ChangeSet
     /**
      * Factory method creating a ChangeSet by copying the content of another ChangeSet.
      *
-     * @param first the first component ChangeSet from which to create the new ChangeSet.
+     * @param first the first component ChangeSet from which to createCopy the new ChangeSet.
      * @return the created ChangeSet.
      */
-    public static ChangeSet create(
+    public static ChangeSet createCopy(
             ChangeSet first )
     {
         ChangeSet ret = new ChangeSet();
@@ -62,11 +64,11 @@ public class ChangeSet
      * Factory method creating a ChangeSet by concatenating two other ChangeSets
      * in sequence.
      *
-     * @param first the first component ChangeSet from which to create the new ChangeSet.
-     * @param second the second component ChangeSet from which to create the new ChangeSet.
+     * @param first the first component ChangeSet from which to createCopy the new ChangeSet.
+     * @param second the second component ChangeSet from which to createCopy the new ChangeSet.
      * @return the created ChangeSet.
      */
-    public static ChangeSet create(
+    public static ChangeSet createCat(
             ChangeSet first,
             ChangeSet second )
     {
@@ -81,10 +83,10 @@ public class ChangeSet
      * Factory method creating a ChangeSet by concatenating several other ChangeSets
      * in sequence.
      *
-     * @param components the component ChangeSets from which to create the new ChangeSet.
+     * @param components the component ChangeSets from which to createCopy the new ChangeSet.
      * @return the created ChangeSet.
      */
-    public static ChangeSet create(
+    public static ChangeSet createCat(
             ChangeSet [] components )
     {
         ChangeSet ret = new ChangeSet();
@@ -104,7 +106,7 @@ public class ChangeSet
     }
 
     /**
-     * Allow us to iterate over the Changes in this ChangeSet.
+     * Obtain Iterator over the Changes in this ChangeSet.
      *
      * @return Iterator over the Changes in this ChangeSet
      */
@@ -202,9 +204,9 @@ public class ChangeSet
     }
 
     /**
-     * Obtain in string format, for debugging.
+     * Obtain in String format, for debugging.
      *
-     * @return this instance in string format
+     * @return this instance in String format
      */
     @Override
     public String toString()

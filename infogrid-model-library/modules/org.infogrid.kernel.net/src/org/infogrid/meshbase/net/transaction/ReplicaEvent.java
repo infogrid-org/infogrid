@@ -21,7 +21,8 @@ import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 
 /**
- *
+ * A NetChange that indicates a replication-specific event, not a semantic event.
+ * This is a marker interface as the public interface of ReplicaEvents is the same.
  */
 public interface ReplicaEvent
         extends

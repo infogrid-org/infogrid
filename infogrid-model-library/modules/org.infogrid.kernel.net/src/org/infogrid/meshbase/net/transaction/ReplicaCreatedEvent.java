@@ -19,24 +19,32 @@ import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 
 /**
- *
+ * Indicates that a replica of a NetMeshObject was created.
  */
 public class ReplicaCreatedEvent
         extends
-            NetMeshObjectCreatedEvent
+            AbstractNetMeshObjectCreatedEvent
         implements
             ReplicaEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
+     *
+     * @param source the NetMeshBase that is the source of the event
+     * @param sourceIdentifier the NetMeshBaseIdentifier representing the source of the event
+     * @param createdObject the NetMeshObject that was created
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public ReplicaCreatedEvent(
-            NetMeshBase           mb,
-            NetMeshBaseIdentifier mbIdentifier,
-            NetMeshObject         replica,
-            NetMeshBaseIdentifier incomingProxy,
-            long                  updateTime )
+            NetMeshBase           source,
+            NetMeshBaseIdentifier sourceIdentifier,
+            NetMeshObject         createdObject,
+            NetMeshBaseIdentifier originIdentifier,
+            long                  timeEventOccurred )
     {
-        super( mb, mbIdentifier, replica, incomingProxy, updateTime );
+        super( source, sourceIdentifier, createdObject, originIdentifier, timeEventOccurred );
     }
 }

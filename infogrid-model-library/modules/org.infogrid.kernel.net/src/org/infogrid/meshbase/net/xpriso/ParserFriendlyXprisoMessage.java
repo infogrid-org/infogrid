@@ -14,7 +14,7 @@
 
 package org.infogrid.meshbase.net.xpriso;
 
-import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 
 import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
@@ -37,7 +37,8 @@ import org.infogrid.util.StringHelper;
 import java.util.ArrayList;
 
 /**
- * An XprisoMessage that is suitable for parsers.
+ * An XprisoMessage that is suitable for parsers that pick up one item at a time, instead of
+ * all of them at the same time.
  */
 public class ParserFriendlyXprisoMessage
         extends
@@ -46,6 +47,10 @@ public class ParserFriendlyXprisoMessage
     /**
      * Factory method.
      *
+     * @param requestId the request id of the message
+     * @param responseId the response id of the message
+     * @param sender identifies the sender of this message
+     * @param receiver identifies the receiver of this message
      * @return the created ParserFriendlyXprisoMessage
      */
     public static ParserFriendlyXprisoMessage create(
@@ -60,6 +65,11 @@ public class ParserFriendlyXprisoMessage
 
     /**
      * Constructor.
+     * 
+     * @param requestId the request id of the message
+     * @param responseId the response id of the message
+     * @param sender identifies the sender of this message
+     * @param receiver identifies the receiver of this message
      */
     protected ParserFriendlyXprisoMessage(
             long                  requestId,
@@ -104,6 +114,9 @@ public class ParserFriendlyXprisoMessage
         if( thePropertyChanges.size() > 0 ) {
             return false;
         }
+        if( thePushHomeReplicas.size() > 0 ) {
+            return false;
+        }
         if( thePushLockObjects.size() > 0 ) {
             return false;
         }
@@ -116,6 +129,9 @@ public class ParserFriendlyXprisoMessage
             return false;
         }
         if( theRequestedFirstTimeObjects.size() > 0 ) {
+            return false;
+        }
+        if( theRequestedHomeReplicas.size() > 0 ) {
             return false;
         }
         if( theRequestedLockObjects.size() > 0 ) {
@@ -219,7 +235,7 @@ public class ParserFriendlyXprisoMessage
      * @param newValue the identifiers for the MeshObjects
      */
     public void addRequestedCanceledObject(
-            MeshObjectIdentifier newValue )
+            NetMeshObjectIdentifier newValue )
     {
         theRequestedCanceledObjects.add( newValue );
     }
@@ -228,11 +244,11 @@ public class ParserFriendlyXprisoMessage
      * Obtain the identifiers for the MeshObjects for which the sender requests
      * that a currently valid lease be chanceled.
      *
-     * @return the IdentifierValues for the MeshObjects
+     * @return the identifiers for the MeshObjects
      */
-    public MeshObjectIdentifier[] getRequestedCanceledObjects()
+    public NetMeshObjectIdentifier [] getRequestedCanceledObjects()
     {
-        MeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedCanceledObjects, MeshObjectIdentifier.class );
+        NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedCanceledObjects, NetMeshObjectIdentifier.class );
         return ret;
     }
 
@@ -278,7 +294,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the IdentifierValues for the MeshObjects
      */
-    public NetMeshObjectDeletedEvent [] getDeleteChanges()
+    public NetMeshObjectDeletedEvent [] getDeletions()
     {
         NetMeshObjectDeletedEvent [] ret = ArrayHelper.copyIntoNewArray( theDeleteChanges, NetMeshObjectDeletedEvent.class );
         return ret;
@@ -483,7 +499,7 @@ public class ParserFriendlyXprisoMessage
      * @param newValue the MeshObjectIdentifier for the MeshObject
      */
     public void addRequestedLockObjects(
-            MeshObjectIdentifier newValue )
+            NetMeshObjectIdentifier newValue )
     {
         theRequestedLockObjects.add( newValue );
     }
@@ -492,11 +508,11 @@ public class ParserFriendlyXprisoMessage
      * Obtain the identifiers for the MeshObjects for which the sender requests
      * the lock from the receiver (i.e. update rights).
      *
-     * @return the IdentifierValues for the MeshObjects
+     * @return the identifiers for the MeshObjects
      */
-    public MeshObjectIdentifier[] getRequestedLockObjects()
+    public NetMeshObjectIdentifier [] getRequestedLockObjects()
     {
-        MeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedLockObjects, MeshObjectIdentifier.class );
+        NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedLockObjects, NetMeshObjectIdentifier.class );
         return ret;
     }
 
@@ -507,7 +523,7 @@ public class ParserFriendlyXprisoMessage
      * @param newValue the MeshObjectIdentifier for the MeshObject
      */
     public void addPushLockObject(
-            MeshObjectIdentifier newValue )
+            NetMeshObjectIdentifier newValue )
     {
         thePushLockObjects.add( newValue );
     }
@@ -516,11 +532,11 @@ public class ParserFriendlyXprisoMessage
      * Obtain the identifiers for the MeshObjects for which the sender surrenders
      * the lock to the receiver (i.e. update rights).
      *
-     * @return the IdentifierValues for the MeshObjects
+     * @return the identifiers for the MeshObjects
      */
-    public MeshObjectIdentifier[] getPushLockObjects()
+    public NetMeshObjectIdentifier [] getPushLockObjects()
     {
-        MeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( thePushLockObjects, MeshObjectIdentifier.class );
+        NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( thePushLockObjects, NetMeshObjectIdentifier.class );
         return ret;
     }
     
@@ -531,7 +547,7 @@ public class ParserFriendlyXprisoMessage
      * @param newValue the MeshObjectIdentifier for the MeshObject
      */
     public void addReclaimedLockObject(
-            MeshObjectIdentifier newValue )
+            NetMeshObjectIdentifier newValue )
     {
         theReclaimedLockObjects.add( newValue );
     }
@@ -540,11 +556,59 @@ public class ParserFriendlyXprisoMessage
      * Obtain the identifiers for the MeshObjects for which the sender has forcefully
      * reclaimed the lock.
      *
-     * @return the IdentifierValues for the MeshObjects
+     * @return the identifiers for the MeshObjects
      */
-    public MeshObjectIdentifier[] getReclaimedLockObjects()
+    public NetMeshObjectIdentifier [] getReclaimedLockObjects()
     {
-        MeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theReclaimedLockObjects, MeshObjectIdentifier.class );
+        NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theReclaimedLockObjects, NetMeshObjectIdentifier.class );
+        return ret;
+    }
+    
+    /**
+     * Set the identifiers for the NetMeshObjects for which the sender requests
+     * home replica status.
+     * 
+     * @param newValue the NetMeshObjectIdentifiers for the NetMeshObjects
+     */
+    public void addRequestedHomeReplica(
+            NetMeshObjectIdentifier newValue )
+    {
+        theRequestedHomeReplicas.add( newValue );
+    }
+
+    /**
+     * Obtain the identifiers for the NetMeshObjects for which the sender requests
+     * home replica status.
+     * 
+     * @return the NetMeshObjectIdentifiers for the NetMeshObjects
+     */
+    public NetMeshObjectIdentifier [] getRequestedHomeReplicas()
+    {
+        NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedHomeReplicas, NetMeshObjectIdentifier.class );
+        return ret;
+    }
+
+    /**
+     * Set the identifiers for the NetMeshObjects for which the sender surrenders
+     * the home replica status to the receiver.
+     * 
+     * @param newValue the NetMeshObjectIdentifiers for the NetMeshObjects
+     */
+    public void addPushHomeReplica(
+            NetMeshObjectIdentifier newValue )
+    {
+        thePushHomeReplicas.add( newValue );
+    }
+
+    /**
+     * Obtain the identifiers for the NetMeshObjects for which the sender surrenders
+     * the home replica status to the receiver.
+     * 
+     * @return the NetMeshObjectIdentifiers for the NetMeshObjects
+     */
+    public NetMeshObjectIdentifier [] getPushHomeReplicas()
+    {
+        NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( thePushHomeReplicas, NetMeshObjectIdentifier.class );
         return ret;
     }
     
@@ -555,7 +619,7 @@ public class ParserFriendlyXprisoMessage
      * @param newValue the MeshObjectIdentifier for the MeshObject
      */
     public void addRequestedResynchronizeDependentReplica(
-            MeshObjectIdentifier newValue )
+            NetMeshObjectIdentifier newValue )
     {
         theRequestedResynchronizeDependentReplicas.add( newValue );
     }
@@ -564,11 +628,11 @@ public class ParserFriendlyXprisoMessage
      * Obtain the identifiers for the MeshObjects for which the sender has a replica
      * that it wishes to resynchronize as a dependent replica.
      *
-     * @return the Identifiers for the MeshObjects
+     * @return the identifiers for the MeshObjects
      */
-    public MeshObjectIdentifier[] getRequestedResynchronizeDependentReplicas()
+    public NetMeshObjectIdentifier [] getRequestedResynchronizeDependentReplicas()
     {
-        MeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedResynchronizeDependentReplicas, MeshObjectIdentifier.class );
+        NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedResynchronizeDependentReplicas, NetMeshObjectIdentifier.class );
         return ret;
     }
 
@@ -679,7 +743,7 @@ public class ParserFriendlyXprisoMessage
      * sender currently as a lease, but whose lease the sender would like to
      * cancel.
      */
-    protected ArrayList<MeshObjectIdentifier> theRequestedCanceledObjects = new ArrayList<MeshObjectIdentifier>();
+    protected ArrayList<NetMeshObjectIdentifier> theRequestedCanceledObjects = new ArrayList<NetMeshObjectIdentifier>();
     
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifier, that have been
@@ -738,25 +802,37 @@ public class ParserFriendlyXprisoMessage
      * The set of MeshObjects, identified by their IdentifierValues, for which the
      * sender requests the lock.
      */
-    protected ArrayList<MeshObjectIdentifier> theRequestedLockObjects = new ArrayList<MeshObjectIdentifier>();
+    protected ArrayList<NetMeshObjectIdentifier> theRequestedLockObjects = new ArrayList<NetMeshObjectIdentifier>();
     
     /**
      * The set of MeshObjects, identified by their IdentifierValues, whose lock
      * the sender surrenders to the receiver.
      */
-    protected ArrayList<MeshObjectIdentifier> thePushLockObjects = new ArrayList<MeshObjectIdentifier>();
+    protected ArrayList<NetMeshObjectIdentifier> thePushLockObjects = new ArrayList<NetMeshObjectIdentifier>();
     
     /**
      * The set of MeshObjects, identified by their IdentifierValues, whose lock
      * the sender has forcefully reclaimed.
      */
-    protected ArrayList<MeshObjectIdentifier> theReclaimedLockObjects = new ArrayList<MeshObjectIdentifier>();
+    protected ArrayList<NetMeshObjectIdentifier> theReclaimedLockObjects = new ArrayList<NetMeshObjectIdentifier>();
+    
+    /**
+     * The set of MeshObjects, identified by their MeshObjectIdentifier, whose which the
+     * sender requests the homeReplica status.
+     */
+    protected ArrayList<NetMeshObjectIdentifier> theRequestedHomeReplicas = new ArrayList<NetMeshObjectIdentifier>();
+
+    /**
+     * The set of MeshObjects, identified by the MeshObjectIdentifier, whose homeReplica status
+     * the sender surrenders to the receiver.
+     */
+    protected ArrayList<NetMeshObjectIdentifier> thePushHomeReplicas = new ArrayList<NetMeshObjectIdentifier>();
     
     /**
      * The set of MeshObjects, identified by their IdentifierValues, that the sender
      * wishes to resynchronize as dependent replicas.
      */
-    protected ArrayList<MeshObjectIdentifier> theRequestedResynchronizeDependentReplicas = new ArrayList<MeshObjectIdentifier>();
+    protected ArrayList<NetMeshObjectIdentifier> theRequestedResynchronizeDependentReplicas = new ArrayList<NetMeshObjectIdentifier>();
 
     /**
      * The set of MeshObjects that are being sent by the sender to the receiver in
