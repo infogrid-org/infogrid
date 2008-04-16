@@ -32,7 +32,7 @@ public abstract class Utils
     }
 
     /**
-     * Determine whether proxy points away from the source of the change.
+     * Determine whether a given Proxy points away from the source of the NetChange.
      *
      * @param change the NetChange
      * @param proxy the Proxy
@@ -64,12 +64,19 @@ public abstract class Utils
     }
     
     /**
-     * Determine whether there is a replica of a NetMeshObject in the direction of
-     * a given proxy, exluding another.
+     * Determine whether there is a replica of the affected NetMeshObject
+     * in a given NetChange, in the direction of a given Proxy, exluding another
+     * that is known by the NetMeshBaseIdentifier of the NetMeshBase it interacts
+     * with.
+     * 
+     * @param change the NetChange that carries the affected NetMeshObject
+     * @param direction the Proxy indicating the direction
+     * @param exclude the NetMeshBaseIdentifier of the NetMeshBase that the to-be-excluded Proxy interacts with
+     * @return true if there is a replica of the affected NetMeshObject in this direction
      */
     public static boolean hasReplicaInDirection(
-            NetChange         change,
-            Proxy             direction,
+            NetChange             change,
+            Proxy                 direction,
             NetMeshBaseIdentifier exclude )
     {
         if( direction.getPartnerMeshBaseIdentifier().equals( exclude )) {
@@ -83,6 +90,10 @@ public abstract class Utils
     
     /**
      * Determine whether a NetMeshObject has a replica in the direction of a given Proxy.
+     * 
+     * @param obj the NetMeshObject
+     * @param direction the Proxy indicating the direction
+     * @return true if there is a replica of the affected NetMeshObject in this direction
      */
     public static boolean hasReplicaInDirection(
             NetMeshObject obj,

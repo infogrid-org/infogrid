@@ -27,6 +27,8 @@ public class MeshObjectIdentifierNotUniqueException
     extends
         AbstractMeshException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

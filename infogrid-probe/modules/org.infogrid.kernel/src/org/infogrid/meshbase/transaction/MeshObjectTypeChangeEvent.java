@@ -21,11 +21,11 @@ import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 
 /**
- *
+ * Indicates a Change in the MeshTypes by which a MeshObject is blessed.
  */
 public interface MeshObjectTypeChangeEvent
         extends
             Change<MeshObject,MeshObjectIdentifier,EntityType[],MeshTypeIdentifier[]>
 {
-    
+    // nothing
 }

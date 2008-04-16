@@ -16,7 +16,6 @@ package org.infogrid.mesh;
 
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
-import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MeshTypeUtils;
 
@@ -32,6 +31,8 @@ public class RoleTypeBlessedAlreadyException
         extends
             BlessedAlreadyException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

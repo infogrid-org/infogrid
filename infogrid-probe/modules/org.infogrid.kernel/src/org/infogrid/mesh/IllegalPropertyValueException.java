@@ -33,6 +33,8 @@ public class IllegalPropertyValueException
         extends
             IllegalOperationTypeException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

@@ -19,43 +19,46 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
 
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.Proxy;
-
 import org.infogrid.meshbase.transaction.CannotApplyChangeException;
-import org.infogrid.meshbase.transaction.MeshObjectBecameDeadStateEvent;
-import org.infogrid.meshbase.transaction.MeshObjectStateEvent;
+import org.infogrid.meshbase.transaction.MeshObjectDeletedEvent;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
 
 /**
- * This indicates that a NetMeshObject became dead, such as by being deleted.
+ * Abstract superclass to hold the common behavior of NetMeshObjectDeletedEvent
+ * and ReplicaPurgedEvent.
  */
-public class NetMeshObjectBecameDeadStateEvent
+public abstract class AbstractNetMeshObjectDeletedEvent
         extends
-            MeshObjectBecameDeadStateEvent
+            MeshObjectDeletedEvent
         implements
-            NetChange<MeshObject,MeshObjectIdentifier,MeshObjectStateEvent.MeshObjectState,String>
+            NetChange<MeshBase,MeshBaseIdentifier,MeshObject,MeshObjectIdentifier>
 {
-    private static final long serialVersionUID = 1L; // helps with serialization
-
     /**
      * Constructor. This must be invoked with both the NetMeshObject and the canonical NetMeshObjectIdentifier,
      * because it is not possible to construct the canonical NetMeshObjectIdentifier after the NetMeshObject is dead.
-     * 
-     * @param theMeshObject the MeshObject whose state changed
-     * @param canonicalIdentifier the canonical NetMeshObjectIdentifier of the NetMeshObject that became dead
+     *
+     * @param source the NetMeshBase that is the source of the event
+     * @param sourceIdentifier the NetMeshBaseIdentifier representing the source of the event
+     * @param deletedObject the NetMeshObject that was deleted
+     * @param deletedObjectIdentifier the identifier of the NetMeshObject that was deleted
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
-    public NetMeshObjectBecameDeadStateEvent(
-            NetMeshObject           theMeshObject,
-            NetMeshObjectIdentifier canonicalIdentifier,
-            NetMeshBaseIdentifier   originIdentifier,
-            long                    timeEventOccurred )
+    public AbstractNetMeshObjectDeletedEvent(
+            NetMeshBase           source,
+            NetMeshBaseIdentifier sourceIdentifier,
+            NetMeshObject         deletedObject,
+            MeshObjectIdentifier  deletedObjectIdentifier,
+            NetMeshBaseIdentifier originIdentifier,
+            long                  timeEventOccurred )
     {
-        super( theMeshObject, canonicalIdentifier, timeEventOccurred );
+        super( source, sourceIdentifier, deletedObject, deletedObjectIdentifier, timeEventOccurred );
         
         theOriginNetworkIdentifier = originIdentifier;
     }
@@ -104,14 +107,16 @@ public class NetMeshObjectBecameDeadStateEvent
             CannotApplyChangeException,
             TransactionException
     {
+        setResolver( base );
+
         Transaction tx = null;
+
         try {
             tx = base.createTransactionNowIfNeeded();
 
-            MeshObjectIdentifier otherObjectIdentifier = getAffectedMeshObjectIdentifier();
+            MeshObjectIdentifier otherObjectIdentifier = getDeltaValueIdentifier();
 
             NetMeshObject ret = base.getMeshBaseLifecycleManager().rippleDelete( otherObjectIdentifier, theOriginNetworkIdentifier, getTimeEventOccurred() );
-
             return ret;
 
         } catch( TransactionException ex ) {
@@ -124,7 +129,7 @@ public class NetMeshObjectBecameDeadStateEvent
             if( tx != null ) {
                 tx.commitTransaction();
             }
-        }        
+        }
     }
 
     /**
