@@ -14,9 +14,9 @@
 
 package org.infogrid.meshbase.net;
 
-import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
 
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.transaction.Transaction;
 
@@ -110,7 +110,7 @@ public interface Proxy
      * @throws NetMeshObjectAccessException accessing the MeshBase and obtaining a replica failed
      */
     public abstract void obtainReplica(
-            NetMeshObjectAccessSpecification[] paths )
+            NetMeshObjectAccessSpecification [] paths )
         throws
             NetMeshObjectAccessException;
 
@@ -143,7 +143,7 @@ public interface Proxy
      * @param localReplicas the Identifiers of the local Replica
      */
     public abstract void resynchronizeDependentReplicas(
-            MeshObjectIdentifier[] localReplicas );
+            NetMeshObjectIdentifier [] localReplicas );
 
     /**
      * Invoked by the MeshBase that this Proxy belongs to,

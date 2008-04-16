@@ -34,33 +34,36 @@ import org.infogrid.util.logging.Log;
 import org.infogrid.util.StringHelper;
 
 /**
- * A new MeshObject was created. If the MeshObject was created and blessed at the
- * same time, only this event (and no PropertyChangeEvents reflecting the blessing)
+ * This event indicates that a new MeshObject was created. If the MeshObject was created
+ * and blessed at the same time, only this event (and no PropertyChangeEvents reflecting the blessing)
  * will be sent.
  */
 public class MeshObjectCreatedEvent
         extends
             AbstractMeshObjectLifecycleEvent
 {
-    private static final Log log = Log.getLogInstance( MeshObjectCreatedEvent.class ); // our own, private logger
+    private static final long serialVersionUID = 1l; // helps with serialization
+    private static final Log  log              = Log.getLogInstance( MeshObjectCreatedEvent.class ); // our own, private logger
 
     /**
      * Constructor.
      *
-     * @param meshBase the MeshBase that sent out this event
-     * @param createdObject the MeshObject that experienced a lifecycle event
+     * @param source the MeshBase that is the source of the event
+     * @param sourceIdentifier the MeshBaseIdentifier representing the source of the event
+     * @param createdObject the MeshObject that was created
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectCreatedEvent(
-            MeshBase           meshBase,
-            MeshBaseIdentifier meshBaseIdentifier,
+            MeshBase           source,
+            MeshBaseIdentifier sourceIdentifier,
             MeshObject         createdObject,
-            long               updateTime )
+            long               timeEventOccurred )
     {
-        super(  meshBase,
-                meshBaseIdentifier,
+        super(  source,
+                sourceIdentifier,
                 createdObject,
                 createdObject.getIdentifier(),
-                updateTime );
+                timeEventOccurred );
         
         theExternalizedMeshObject = createdObject.asExternalized();
     }
@@ -68,20 +71,22 @@ public class MeshObjectCreatedEvent
     /**
      * Constructor.
      *
-     * @param meshBase the MeshBase that sent out this event
-     * @param createdObject the MeshObject that experienced a lifecycle event
+     * @param source the MeshBase that is the source of the event
+     * @param sourceIdentifier the MeshBaseIdentifier representing the source of the event
+     * @param createdObject the MeshObject that was created
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectCreatedEvent(
-            MeshBase               meshBase,
-            MeshBaseIdentifier     meshBaseIdentifier,
+            MeshBase               source,
+            MeshBaseIdentifier     sourceIdentifier,
             ExternalizedMeshObject createdObject,
-            long                   updateTime )
+            long                   timeEventOccurred )
     {
-        super(  meshBase,
-                meshBaseIdentifier,
+        super(  source,
+                sourceIdentifier,
                 null,
                 createdObject.getIdentifier(),
-                updateTime );
+                timeEventOccurred );
         
         theExternalizedMeshObject = createdObject;
     }
@@ -138,17 +143,19 @@ public class MeshObjectCreatedEvent
     }
 
     /**
-     * Apply this Change to a MeshObject in this MeshBase. This method
-     * is intended to make it easy to reproduce Changes that were made in
-     * one MeshBase to MeshObjects in another MeshBase.
+     * <p>Apply this Change to a MeshObject in this MeshBase. This method
+     *    is intended to make it easy to reproduce Changes that were made in
+     *    one MeshBase to MeshObjects in another MeshBase.</p>
      *
-     * This method will attempt to create a Transaction if none is present on the
-     * current Thread.
+     * <p>This method will attempt to create a Transaction if none is present on the
+     * current Thread.</p>
      *
-     * @param otherMeshBase the other MeshBase in which to apply the change
+     * @param base the MeshBase in which to apply the Change
+     * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
-     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and could not be created
+     *         the affected MeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public MeshObject applyTo(
             MeshBase otherMeshBase )

@@ -16,13 +16,16 @@ package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
 
 /**
- * Indicates that the set of equivalents of a MeshObject changed.
- */
-public interface MeshObjectEquivalentsChangeEvent
+  * This interface is supported by all Changes that indicate
+  * a lifecycle event in the life of a MeshObject.
+  */
+public interface MeshObjectLifecycleEvent
         extends
-            Change<MeshObject,MeshObjectIdentifier,MeshObject[],MeshObjectIdentifier[]>
+            Change<MeshBase,MeshBaseIdentifier,MeshObject,MeshObjectIdentifier>
 {
     // nothing
 }

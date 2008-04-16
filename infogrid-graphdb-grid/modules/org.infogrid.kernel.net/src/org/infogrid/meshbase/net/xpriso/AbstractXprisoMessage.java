@@ -54,7 +54,7 @@ public abstract class AbstractXprisoMessage
     /**
      * Obtain the NetMeshBaseIdentifier of the sender.
      * 
-     * @return the sender's NNetMeshBaseIdentifier
+     * @return the sender's NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getSenderIdentifier()
     {
@@ -64,7 +64,7 @@ public abstract class AbstractXprisoMessage
     /**
      * Obtain the NetMeshBaseIdentifier of the receiver.
      * 
-     * @return the receiver's NNetMeshBaseIdentifier
+     * @return the receiver's NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getReceiverIdentifier()
     {
@@ -116,7 +116,7 @@ public abstract class AbstractXprisoMessage
         if( !arraysEquals( getCreations(), realOther.getCreations() )) {
             return false;
         }
-        if( !arraysEquals( getDeleteChanges(), realOther.getDeleteChanges() )) {
+        if( !arraysEquals( getDeletions(), realOther.getDeletions() )) {
             return false;
         }
         if( !arraysEquals( getConveyedMeshObjects(), realOther.getConveyedMeshObjects() )) {
@@ -152,6 +152,12 @@ public abstract class AbstractXprisoMessage
         if( !arraysEquals( getReclaimedLockObjects(), realOther.getReclaimedLockObjects() )) {
             return false;
         }
+        if( !arraysEquals( getRequestedHomeReplicas(), realOther.getRequestedHomeReplicas() )) {
+            return false;
+        }
+        if( !arraysEquals( getPushHomeReplicas(), realOther.getPushHomeReplicas() )) {
+            return false;
+        }
         if( !arraysEquals( getRequestedResynchronizeDependentReplicas(), realOther.getRequestedResynchronizeDependentReplicas() )) {
             return false;
         }
@@ -162,6 +168,27 @@ public abstract class AbstractXprisoMessage
             return false;
         }
         return true;
+    }
+
+    /**
+     * Default implementation for hash code.
+     * 
+     * @return hash code
+     */
+    @Override
+    public int hashCode()
+    {
+        // following the default NetBeans implementation here. We don't deal with a lot of content -- likely not necessary
+        // because of the uniqueness of request/response and sender/receiver
+        
+        int hash = 5;
+
+        hash = 79 * hash + ( int ) ( theRequestId  ^ ( theRequestId  >>> 32 ) );        
+        hash = 79 * hash + ( int ) ( theResponseId ^ ( theResponseId >>> 32 ) );
+        hash = 79 * hash + ( theSenderIdentifier != null ? theSenderIdentifier.hashCode() : 0 );
+        hash = 79 * hash + ( theReceiverIdentifier != null ? theReceiverIdentifier.hashCode() : 0 );
+
+        return hash;
     }
 
     /**
@@ -190,6 +217,7 @@ public abstract class AbstractXprisoMessage
      *
      * @param one first array
      * @param two second array
+     * @return true if the content of the arrays is equal
      */
     protected boolean arraysEquals(
             Object [] one,

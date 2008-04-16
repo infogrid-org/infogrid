@@ -29,31 +29,33 @@ public abstract class AbstractMeshObjectLifecycleEvent
         extends
             AbstractExternalizableEvent<MeshBase,MeshBaseIdentifier,MeshObject,MeshObjectIdentifier>
         implements
-            Change<MeshBase,MeshBaseIdentifier,MeshObject,MeshObjectIdentifier>
+            MeshObjectLifecycleEvent
 {
     /**
-      * Private constructor, use subclasses.
-      *
-      * @param meshBase the MeshBase that sent out this event
-      * @param canonicalMeshObjectName the canonical Identifier of the MeshObject that experienced a lifecycle event
-      * @param meshObject the MeshObject that experienced a lifecycle event
-      */
+     * Private constructor, use subclasses.
+     *
+     * @param source the MeshBase that is the source of the event
+     * @param sourceIdentifier the MeshBaseIdentifier representing the source of the event
+     * @param deltaValue the MeshObject whose lifecycle changed
+     * @param deltaValueIdentifier the MeshObjectIdentifier whose lifecycle changed
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     */
     protected AbstractMeshObjectLifecycleEvent(
-            MeshBase             meshBase,
-            MeshBaseIdentifier   meshBaseIdentifier,
-            MeshObject           meshObject,
-            MeshObjectIdentifier canonicalMeshObjectName,
-            long                 updateTime )
+            MeshBase             source,
+            MeshBaseIdentifier   sourceIdentifier,
+            MeshObject           deltaValue,
+            MeshObjectIdentifier deltaValueIdentifier,
+            long                 timeEventOccurred )
     {
-        super( meshBase, meshBaseIdentifier, meshObject, canonicalMeshObjectName, updateTime );
+        super( source, sourceIdentifier, deltaValue, deltaValueIdentifier, timeEventOccurred );
     }
 
     /**
-     * Obtain the Identifier of the MeshObject affected by this Change.
+     * Obtain the identifier of the MeshObject affected by this Change.
      *
-     * @return the Identifier of the MeshObject affected by this Change
+     * @return the identifier of the MeshObject affected by this Change
      */
-    public final MeshObjectIdentifier getAffectedMeshObjectIdentifier()
+    public MeshObjectIdentifier getAffectedMeshObjectIdentifier()
     {
         return getDeltaValueIdentifier();
     }
@@ -76,8 +78,10 @@ public abstract class AbstractMeshObjectLifecycleEvent
     public void setResolver(
             MeshBase mb )
     {
-        theResolver = mb;
-        clearCachedObjects();
+        if( theResolver != mb ) {
+            theResolver = mb;
+            clearCachedObjects();
+        }
     }
     
     /**

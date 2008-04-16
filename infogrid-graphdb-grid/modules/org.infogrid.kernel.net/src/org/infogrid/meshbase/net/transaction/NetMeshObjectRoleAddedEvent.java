@@ -14,7 +14,6 @@
 
 package org.infogrid.meshbase.net.transaction;
 
-import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
@@ -27,11 +26,10 @@ import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MeshTypeUtils;
 import org.infogrid.model.primitives.RoleType;
-import org.infogrid.util.logging.Log;
-
 
 /**
- *
+ * <p>This event indicates that a relationship between the NetMeshObject and
+ * another NetMeshObject was blessed.</p>
  */
 public class NetMeshObjectRoleAddedEvent
         extends
@@ -39,126 +37,151 @@ public class NetMeshObjectRoleAddedEvent
         implements
             NetMeshObjectRoleChangeEvent
 {
-    private static final Log log = Log.getLogInstance( NetMeshObjectRoleAddedEvent.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Constructor.
      * 
-     * @param meshObject the MeshObject whose role participation changed
-     * @param thisEnd the RoleTypes whose participation changed
-     * @param otherSide the NetMeshObject to which the RoleTypes were added
-     * @param updateTime the time when the update occurred
+     * @param source the NetMeshObject that is the source of the event
+     * @param oldValues the old values of the RoleType, prior to the event
+     * @param deltaValues the RoleTypes that changed
+     * @param newValues the new values of the RoleType, after the event
+     * @param neighbor the MeshObject that identifies the other end of the affected relationship
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectRoleAddedEvent(
-            NetMeshObject         meshObject,
-            RoleType []           oldRoleTypes,
-            RoleType []           addedRoleTypes,
-            RoleType []           newRoleTypes,
-            NetMeshObject         otherSide,
-            NetMeshBaseIdentifier incomingProxy,
-            long                  updateTime )
+            NetMeshObject         source,
+            RoleType []           oldValues,
+            RoleType []           deltaValues,
+            RoleType []           newValues,
+            NetMeshObject         neighbor,
+            NetMeshBaseIdentifier originIdentifier,
+            long                  timeEventOccurred )
     {
-        this(   meshObject,
-                meshObject.getIdentifier(),
-                oldRoleTypes,
-                MeshTypeUtils.meshTypeIdentifiers( oldRoleTypes ),
-                addedRoleTypes,
-                MeshTypeUtils.meshTypeIdentifiers( addedRoleTypes ),
-                newRoleTypes,
-                MeshTypeUtils.meshTypeIdentifiers( newRoleTypes ),
-                otherSide,
-                otherSide.getIdentifier(),
-                incomingProxy,
-                updateTime );
+        this(   source,
+                source.getIdentifier(),
+                oldValues,
+                MeshTypeUtils.meshTypeIdentifiers( oldValues ),
+                deltaValues,
+                MeshTypeUtils.meshTypeIdentifiers( deltaValues ),
+                newValues,
+                MeshTypeUtils.meshTypeIdentifiers( newValues ),
+                neighbor,
+                neighbor.getIdentifier(),
+                originIdentifier,
+                timeEventOccurred );
     }
 
     /**
      * Constructor.
      * 
-     * @param meshObject the MeshObject whose role participation changed
-     * @param thisEnd the RoleTypes whose participation changed
-     * @param otherSide the NetMeshObject to which the RoleTypes were added
-     * @param updateTime the time when the update occurred
+     * @param source the NetMeshObject that is the source of the event
+     * @param oldValues the old values of the RoleType, prior to the event
+     * @param deltaValues the RoleTypes that changed
+     * @param newValues the new values of the RoleType, after the event
+     * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectRoleAddedEvent(
-            NetMeshObject           meshObject,
-            RoleType []             oldRoleTypes,
-            RoleType []             addedRoleTypes,
-            RoleType []             newRoleTypes,
-            NetMeshObjectIdentifier otherSideIdentifier,
-            NetMeshBaseIdentifier       incomingProxy,
-            long                    updateTime )
+            NetMeshObject           source,
+            RoleType []             oldValues,
+            RoleType []             deltaValues,
+            RoleType []             newValues,
+            NetMeshObjectIdentifier neighborIdentifier,
+            NetMeshBaseIdentifier   originIdentifier,
+            long                    timeEventOccurred )
     {
-        this(   meshObject,
-                meshObject.getIdentifier(),
-                oldRoleTypes,
-                MeshTypeUtils.meshTypeIdentifiers( oldRoleTypes ),
-                addedRoleTypes,
-                MeshTypeUtils.meshTypeIdentifiers( addedRoleTypes ),
-                newRoleTypes,
-                MeshTypeUtils.meshTypeIdentifiers( newRoleTypes ),
+        this(   source,
+                source.getIdentifier(),
+                oldValues,
+                MeshTypeUtils.meshTypeIdentifiers( oldValues ),
+                deltaValues,
+                MeshTypeUtils.meshTypeIdentifiers( deltaValues ),
+                newValues,
+                MeshTypeUtils.meshTypeIdentifiers( newValues ),
                 null,
-                otherSideIdentifier,
-                incomingProxy,
-                updateTime );
+                neighborIdentifier,
+                originIdentifier,
+                timeEventOccurred );
     }
 
     /**
      * Constructor for the case where we don't have old and new values, only the delta.
      * This perhaps should trigger some exception if it is attempted to read old or
      * new values later. (FIXME?)
+     * 
+     * @param sourceIdentifier the identifier representing the source MeshObject of the event
+     * @param deltaValueIdentifiers the identifiers of the RoleTypes that changed
+     * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectRoleAddedEvent(
-            NetMeshObjectIdentifier meshObjectIdentifier,
-            MeshTypeIdentifier []   addedRoleTypes,
-            NetMeshObjectIdentifier otherSideIdentifier,
-            NetMeshBaseIdentifier   incomingProxy,
-            long                    updateTime )
+            NetMeshObjectIdentifier sourceIdentifier,
+            MeshTypeIdentifier []   deltaValueIdentifiers,
+            NetMeshObjectIdentifier neighborIdentifier,
+            NetMeshBaseIdentifier   originIdentifier,
+            long                    timeEventOccurred )
     {
         this(   null,
-                meshObjectIdentifier,
+                sourceIdentifier,
                 null,
                 null,
                 null,
-                addedRoleTypes,
+                deltaValueIdentifiers,
                 null,
                 null,
                 null,
-                otherSideIdentifier,
-                incomingProxy,
-                updateTime );
+                neighborIdentifier,
+                originIdentifier,
+                timeEventOccurred );
     }
 
     /**
      * Pass-through constructor for subclasses.
+     * 
+     * @param source the MeshObject that is the source of the event
+     * @param sourceIdentifier the identifier representing the source MeshObject of the event
+     * @param oldValues the old values of the RoleType, prior to the event
+     * @param oldValueIdentifiers the identifier representing the old values of the RoleType, prior to the event
+     * @param deltaValues the RoleTypes that changed
+     * @param deltaValueIdentifiers the identifiers of the RoleTypes that changed
+     * @param newValues the new values of the RoleType, after the event
+     * @param newValueIdentifiers the identifier representing the new values of the RoleType, after the event
+     * @param neighbor the MeshObject that identifies the other end of the affected relationship
+     * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     protected NetMeshObjectRoleAddedEvent(
-            NetMeshObject           meshObject,
-            NetMeshObjectIdentifier meshObjectIdentifier,
-            RoleType []             oldRoleTypes,
-            MeshTypeIdentifier []   oldRoleTypeIdentifiers,
-            RoleType []             addedRoleTypes,
-            MeshTypeIdentifier []   addedRoleTypeIdentifiers,
-            RoleType []             newRoleTypes,
-            MeshTypeIdentifier []   newRoleTypesIdentifiers,
-            NetMeshObject           otherSide,
-            NetMeshObjectIdentifier otherSideIdentifier,
-            NetMeshBaseIdentifier    incomingProxy,
-            long                    updateTime )
+            NetMeshObject           source,
+            NetMeshObjectIdentifier sourceIdentifier,
+            RoleType []             oldValues,
+            MeshTypeIdentifier []   oldValueIdentifiers,
+            RoleType []             deltaValues,
+            MeshTypeIdentifier []   deltaValueIdentifiers,
+            RoleType []             newValues,
+            MeshTypeIdentifier []   newValueIdentifiers,
+            NetMeshObject           neighbor,
+            NetMeshObjectIdentifier neighborIdentifier,
+            NetMeshBaseIdentifier   originIdentifier,
+            long                    timeEventOccurred )
     {
-        super(  meshObject,
-                meshObjectIdentifier,
-                oldRoleTypes,
-                oldRoleTypeIdentifiers,
-                addedRoleTypes,
-                addedRoleTypeIdentifiers,
-                newRoleTypes,
-                newRoleTypesIdentifiers,
-                otherSide,
-                otherSideIdentifier,
-                updateTime );
+        super(  source,
+                sourceIdentifier,
+                oldValues,
+                oldValueIdentifiers,
+                deltaValues,
+                deltaValueIdentifiers,
+                newValues,
+                newValueIdentifiers,
+                neighbor,
+                neighborIdentifier,
+                timeEventOccurred );
 
-        theIncomingProxy = incomingProxy;
+        theOriginNetworkIdentifier = originIdentifier;
     }
     
     /**
@@ -170,6 +193,17 @@ public class NetMeshObjectRoleAddedEvent
     public NetMeshObject getAffectedMeshObject()
     {
         return (NetMeshObject) super.getAffectedMeshObject();
+    }
+
+    /**
+     * Obtain the MeshObjectIdentifier of the MeshObject affected by this Change.
+     *
+     * @return the MeshObjectIdentifier of the NetMeshObject affected by this Change
+     */
+    @Override
+    public NetMeshObjectIdentifier getAffectedMeshObjectIdentifier()
+    {
+        return (NetMeshObjectIdentifier) super.getAffectedMeshObjectIdentifier();
     }
 
     /**
@@ -195,32 +229,34 @@ public class NetMeshObjectRoleAddedEvent
     }
 
     /**
-     * Apply this NetChange to a MeshObject in this MeshBase that is a replica
-     * of the NetMeshObject which caused the NetChange. This method
-     * is intended to make it easy to replicate Changes that were made to a
-     * replica of one NetMeshObject in one NetMeshBase to another replica
-     * of the NetMeshObject in another NetMeshBase.
+     * <p>Apply this NetChange to a NetMeshObject in this MeshBase. This method
+     *    is intended to make it easy to replicate NetChanges that were made to a
+     *    replica of one NetMeshObject in one NetMeshBase to another replica
+     *    of the NetMeshObject in another NetMeshBase.</p>
      *
      * <p>This method will attempt to create a Transaction if none is present on the
      * current Thread.</p>
      *
-     * @param otherMeshBase the other MeshBase in which to apply the change
-     * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
+     * @param base the NetMeshBase in which to apply the NetChange
+     * @return the NetMeshObject to which the NetChange was applied
+     * @throws CannotApplyChangeException thrown if the NetChange could not be applied, e.g because
+     *         the affected NetMeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public NetMeshObject applyToReplicaIn(
-            NetMeshBase otherMeshBase )
+            NetMeshBase base )
         throws
             CannotApplyChangeException,
             TransactionException
     {
-        setResolver( otherMeshBase );
+        setResolver( base );
 
         NetMeshObject otherObject = null; // make compiler happy
 
         Transaction tx = null;
         try {
-            tx = otherMeshBase.createTransactionNowIfNeeded();
+            tx = base.createTransactionNowIfNeeded();
 
                                     otherObject        = (NetMeshObject) getSource();
             NetMeshObjectIdentifier relatedOtherObject = getNeighborMeshObjectIdentifier();
@@ -238,7 +274,7 @@ public class NetMeshObjectRoleAddedEvent
 //            }
 
         } catch( Throwable ex ) {
-            throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, ex );
+            throw new CannotApplyChangeException.ExceptionOccurred( base, ex );
 
         } finally {
             if( tx != null ) {
@@ -249,31 +285,36 @@ public class NetMeshObjectRoleAddedEvent
     }
 
     /**
-     * Obtain the Proxy, if any, from where this NetChange originated.
+     * Determine whether this NetChange should be forwarded through the given, outgoing Proxy.
+     * If specified, {@link #getOriginNetworkIdentifier} specifies where the NetChange came from.
      *
-     * @return the Proxy, if any
-     */
-    public final NetMeshBaseIdentifier getOriginNetworkIdentifier()
-    {
-        return theIncomingProxy;
-    }
-
-    /**
-     * Determine whether this NetChange should be forwarded through the outgoing Proxy.
-     * If specified, the incomingProxy parameter specifies where the NetChange came from.
-     *
-     * @param incomingProxy the incoming Proxy
-     * @param outgoingProxy the outgoing Proxy
-     * @return true if the NetChange should be forwarded.
+     * @param outgoingProxy the potential outgoing Proxy
+     * @return true if the NetChange should be forwarded torwards the outgoingProxy
      */
     public boolean shouldBeSent(
             Proxy outgoingProxy )
     {
-        return Utils.hasReplicaInDirection( this, outgoingProxy, theIncomingProxy );
+        return Utils.hasReplicaInDirection( this, outgoingProxy, theOriginNetworkIdentifier );
     }
-    
+
     /**
-     * The incoming Proxy, if any.
+     * Obtain the NetMeshBaseIdentifier of the NetMeshBase from where this NetChange arrived.
+     * This may or may not be the NetMeshBase where the Change originated, as it might be
+     * passed through several NetMeshBases until it arrived here. This may be null if
+     * the Change originated locally.
+     *
+     * @return the NetMeshBaseIdentifier, if any
      */
-    protected NetMeshBaseIdentifier theIncomingProxy;
+    public final NetMeshBaseIdentifier getOriginNetworkIdentifier()
+    {
+        return theOriginNetworkIdentifier;
+    }
+
+    /**
+     * The NetMeshBaseIdentifier of the NetMeshBase from where this NetChange arrived.
+     * This may or may not be the NetMeshBase where the Change originated, as it might be
+     * passed through several NetMeshBases until it arrived here. This may be null if
+     * the Change originated locally.
+     */
+    protected NetMeshBaseIdentifier theOriginNetworkIdentifier;
 }

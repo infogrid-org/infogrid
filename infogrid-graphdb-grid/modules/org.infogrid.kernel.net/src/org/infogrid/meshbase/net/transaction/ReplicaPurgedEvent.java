@@ -15,42 +15,53 @@
 package org.infogrid.meshbase.net.transaction;
 
 import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.Proxy;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 
-import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-
 /**
- *
+ * Indicates that a replica has been purged. This is a subclass of MeshObjectDeletedEvent as
+ * from the perspective of a non-"net"-aware application, there is no difference between
+ * a replica having been purged and a semantic delete.
  */
 public class ReplicaPurgedEvent
         extends
-            NetMeshObjectDeletedEvent
+            AbstractNetMeshObjectDeletedEvent
         implements
             ReplicaEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
-     * Constructor.
+     * Constructor. This must be invoked with both the NetMeshObject and the canonical NetMeshObjectIdentifier,
+     * because it is not possible to construct the canonical NetMeshObjectIdentifier after the NetMeshObject is dead.
+     *
+     * @param source the NetMeshBase that is the source of the event
+     * @param sourceIdentifier the NetMeshBaseIdentifier representing the source of the event
+     * @param deletedObject the NetMeshObject that was deleted
+     * @param deletedObjectIdentifier the identifier of the NetMeshObject that was deleted
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public ReplicaPurgedEvent(
-            NetMeshBase             mb,
-            NetMeshBaseIdentifier   mbIdentifier,
-            NetMeshObject           replica,
-            NetMeshObjectIdentifier canonicalIdentifier,
-            NetMeshBaseIdentifier   incomingProxy,
-            long                    updateTime )
+            NetMeshBase             source,
+            NetMeshBaseIdentifier   sourceIdentifier,
+            NetMeshObject           deletedObject,
+            NetMeshObjectIdentifier deletedObjectIdentifier,
+            NetMeshBaseIdentifier   originIdentifier,
+            long                    timeEventOccurred )
     {
-        super( mb, mbIdentifier, replica, canonicalIdentifier, incomingProxy, updateTime );
+        super( source, sourceIdentifier, deletedObject, deletedObjectIdentifier, originIdentifier, timeEventOccurred );
     }
 
     /**
-     * Determine whether this NetChange should be forwarded through the outgoing Proxy.
-     * If specified, the incomingProxy parameter specifies where the NetChange came from.
+     * Determine whether this NetChange should be forwarded through the given, outgoing Proxy.
+     * If specified, {@link #getOriginNetworkIdentifier} specifies where the NetChange came from.
      *
-     * @param incomingProxy the incoming Proxy
-     * @param outgoingProxy the outgoing Proxy
-     * @return true if the NetChange should be forwarded.
+     * @param outgoingProxy the potential outgoing Proxy
+     * @return true if the NetChange should be forwarded torwards the outgoingProxy
      */
     @Override
     public boolean shouldBeSent(
