@@ -21,7 +21,6 @@ import org.infogrid.mesh.MeshObjectUtils;
 import org.infogrid.meshbase.MeshBase;
 
 import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.logging.Log;
 
 /**
   * <p>This event indicates that a MeshObject has lost one or more equivalent MeshObjects.</p>
@@ -30,66 +29,72 @@ public class MeshObjectEquivalentsRemovedEvent
         extends
             AbstractMeshObjectEquivalentsChangeEvent
 {
-    private static final Log log = Log.getLogInstance( MeshObjectEquivalentsRemovedEvent.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Constructor.
      * 
-     * @param meshObject the MeshObject whose set of equivalents changed
-     * @param removedEquivalents the MeshObjects that were removed as equivalents
-     * @param newValue set of other MeshObjects equivalent to this MeshObject after the event
-     * @param updateTime the time when the update occurred
+     * @param source the MeshObject that is the source of the event
+     * @param oldValues the old values of the equivalents, prior to the event
+     * @param deltaValues the equivalents that changed
+     * @param newValues the new value of the equivalents, after the event
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectEquivalentsRemovedEvent(
-            MeshObject    meshObject,
-            MeshObject [] oldEquivalents,
-            MeshObject [] removedEquivalents,
-            MeshObject [] newEquivalents,
-            long          updateTime )
+            MeshObject    source,
+            MeshObject [] oldValues,
+            MeshObject [] deltaValues,
+            MeshObject [] newValues,
+            long          timeEventOccurred )
     {
-        this(   meshObject,
-                meshObject.getIdentifier(),
-                oldEquivalents,
-                MeshObjectUtils.meshObjectIdentifiers( oldEquivalents ),
-                removedEquivalents,
-                MeshObjectUtils.meshObjectIdentifiers( removedEquivalents ),
-                newEquivalents,
-                MeshObjectUtils.meshObjectIdentifiers( newEquivalents ),
-                updateTime );
+        this(   source,
+                source.getIdentifier(),
+                oldValues,
+                MeshObjectUtils.meshObjectIdentifiers( oldValues ),
+                deltaValues,
+                MeshObjectUtils.meshObjectIdentifiers( deltaValues ),
+                newValues,
+                MeshObjectUtils.meshObjectIdentifiers( newValues ),
+                timeEventOccurred );
     }
 
     /**
      * Main constructor.
      * 
-     * @param meshObject the MeshObject whose equivalents changed
-     * @param deltaEquivalents the Identifiers of the equivalents that changed
-     * @param newValue the Identifiers of the new set of equivalents
-     * @param updateTime the time at which the change occurred
+     * @param source the MeshObject that is the source of the event
+     * @param sourceIdentifier the identifier representing the source MeshObject of the event
+     * @param oldValues the old values of the equivalents, prior to the event
+     * @param oldValueIdentifiers the identifiers representing the old values of the equivalents, prior to the event
+     * @param deltaValues the equivalents that changed
+     * @param deltaValueIdentifiers the identifiers of the equivalents that changed
+     * @param newValues the new value of the equivalents, after the event
+     * @param newValueIdentifiers the identifiers representing the new values of the equivalents, after the event
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     protected MeshObjectEquivalentsRemovedEvent(
-            MeshObject              meshObject,
-            MeshObjectIdentifier    meshObjectIdentifier,
-            MeshObject []           oldEquivalents,
-            MeshObjectIdentifier [] oldEquivalentIdentifiers,
-            MeshObject []           deltaEquivalents,
-            MeshObjectIdentifier [] deltaEquivalentIdentifiers,
-            MeshObject []           newEquivalents,
-            MeshObjectIdentifier [] newEquivalentIdentifiers,
-            long                    updateTime )
+            MeshObject              source,
+            MeshObjectIdentifier    sourceIdentifier,
+            MeshObject []           oldValues,
+            MeshObjectIdentifier [] oldValueIdentifiers,
+            MeshObject []           deltaValues,
+            MeshObjectIdentifier [] deltaValueIdentifiers,
+            MeshObject []           newValues,
+            MeshObjectIdentifier [] newValueIdentifiers,
+            long                    timeEventOccurred )
     {
-        super(  meshObject,
-                meshObjectIdentifier,
-                oldEquivalents,
-                oldEquivalentIdentifiers,
-                deltaEquivalents,
-                deltaEquivalentIdentifiers,
-                newEquivalents,
-                newEquivalentIdentifiers,
-                updateTime );
+        super(  source,
+                sourceIdentifier,
+                oldValues,
+                oldValueIdentifiers,
+                deltaValues,
+                deltaValueIdentifiers,
+                newValues,
+                newValueIdentifiers,
+                timeEventOccurred );
     }
     
     /**
-     * Determine whether this is an addition or a removal.
+     * Determine whether this is an addition or a removal of an equivalent.
      *
      * @return true if this is an addition
      */
@@ -99,42 +104,44 @@ public class MeshObjectEquivalentsRemovedEvent
     }
 
     /**
-     * Apply this Change to a MeshObject in this MeshBase. This method
-     * is intended to make it easy to reproduce Changes that were made in
-     * one MeshBase to MeshObjects in another MeshBase.
+     * <p>Apply this Change to a MeshObject in this MeshBase. This method
+     *    is intended to make it easy to reproduce Changes that were made in
+     *    one MeshBase to MeshObjects in another MeshBase.</p>
      *
-     * This method will attempt to create a Transaction if none is present on the
-     * current Thread.
+     * <p>This method will attempt to create a Transaction if none is present on the
+     * current Thread.</p>
      *
-     * @param otherMeshBase the other MeshBase in which to apply the change
+     * @param base the MeshBase in which to apply the Change
+     * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
-     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and could not be created
+     *         the affected MeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public MeshObject applyTo(
-            MeshBase otherMeshBase )
+            MeshBase base )
         throws
             CannotApplyChangeException,
             TransactionException
     {
-        setResolver( otherMeshBase );
+        setResolver( base );
 
         Transaction tx = null;
 
         try {
-            tx = otherMeshBase.createTransactionNowIfNeeded();
+            tx = base.createTransactionNowIfNeeded();
 
-            MeshObject source = getSource();
+            MeshObject s = getSource();
 
-            source.removeAsEquivalent();
+            s.removeAsEquivalent();
 
-            return source;
+            return s;
 
         } catch( TransactionException ex ) {
             throw ex;
 
         } catch( Throwable ex ) {
-            throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, ex );
+            throw new CannotApplyChangeException.ExceptionOccurred( base, ex );
 
         } finally {
             if( tx != null ) {

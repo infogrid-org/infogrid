@@ -17,6 +17,7 @@ package org.infogrid.meshbase.net.transaction;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.transaction.MeshObjectEquivalentsChangeEvent;
 
 /**
@@ -27,5 +28,10 @@ public interface NetMeshObjectEquivalentsChangeEvent
             MeshObjectEquivalentsChangeEvent,
             NetChange<MeshObject,MeshObjectIdentifier,MeshObject[],MeshObjectIdentifier[]>
 {
-    // nothing
+    /**
+     * Obtain the MeshObjectIdentifier of the MeshObject affected by this Change.
+     *
+     * @return the MeshObjectIdentifier of the NetMeshObject affected by this Change
+     */
+    public NetMeshObjectIdentifier getAffectedMeshObjectIdentifier();
 }

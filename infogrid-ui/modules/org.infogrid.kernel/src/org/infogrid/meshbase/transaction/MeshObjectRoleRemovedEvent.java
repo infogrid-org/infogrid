@@ -26,105 +26,122 @@ import org.infogrid.model.primitives.RoleType;
 import org.infogrid.util.ArrayHelper;
 
 /**
- * This indicates a AbstractMeshObjectRoleChangeEvent in which the MeshObject plays one or
- * more RoleTypes fewer.
+ * <p>This event indicates that a relationship between the MeshObject and
+ * another MeshObject was unblessed.</p>
  */
 public class MeshObjectRoleRemovedEvent
         extends
             AbstractMeshObjectRoleChangeEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      * 
-     * @param theMeshObject the MeshObject whose role participation changed
-     * @param thisEnd the RoleTypes whose participation changed
-     * @param otherSide the other side of the relationship whose role participation changed
-     * @param updateTime the time when the update occurred
+     * @param source the MeshObject that is the source of the event
+     * @param oldValues the old values of the RoleType, prior to the event
+     * @param deltaValues the RoleTypes that changed
+     * @param newValues the new values of the RoleType, after the event
+     * @param neighbor the MeshObject that identifies the other end of the affected relationship
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectRoleRemovedEvent(
-            MeshObject        theMeshObject,
-            RoleType []       oldRoleTypes,
-            RoleType []       removedRoleTypes,
-            RoleType []       newRoleTypes,
-            MeshObject        otherSide,
-            long              updateTime )
+            MeshObject        source,
+            RoleType []       oldValues,
+            RoleType []       deltaValues,
+            RoleType []       newValues,
+            MeshObject        neighbor,
+            long              timeEventOccurred )
     {
-        this(   theMeshObject,
-                theMeshObject.getIdentifier(),
-                oldRoleTypes,
-                MeshTypeUtils.meshTypeIdentifiers( oldRoleTypes ),
-                removedRoleTypes,
-                MeshTypeUtils.meshTypeIdentifiers( removedRoleTypes ),
-                newRoleTypes,
-                MeshTypeUtils.meshTypeIdentifiers( newRoleTypes ),
-                otherSide,
-                otherSide.getIdentifier(),
-                updateTime );
+        this(   source,
+                source.getIdentifier(),
+                oldValues,
+                MeshTypeUtils.meshTypeIdentifiers( oldValues ),
+                deltaValues,
+                MeshTypeUtils.meshTypeIdentifiers( deltaValues ),
+                newValues,
+                MeshTypeUtils.meshTypeIdentifiers( newValues ),
+                neighbor,
+                neighbor.getIdentifier(),
+                timeEventOccurred );
     }
 
     /**
      * Constructor.
      * 
-     * @param theMeshObject the MeshObject whose role participation changed
-     * @param thisEnd the RoleTypes whose participation changed
-     * @param otherSide the other side of the relationship whose role participation changed
-     * @param updateTime the time when the update occurred
+     * @param sourceIdentifier the identifier representing the source MeshObject of the event
+     * @param oldValueIdentifiers the identifier representing the old values of the RoleType, prior to the event
+     * @param deltaValueIdentifiers the identifiers of the RoleTypes that changed
+     * @param newValueIdentifiers the identifier representing the new values of the RoleType, after the event
+     * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectRoleRemovedEvent(
-            MeshObjectIdentifier  meshObjectIdentifier,
-            MeshTypeIdentifier [] oldRoleTypeIdentifiers,
-            MeshTypeIdentifier [] removedRoleTypeIdentifiers,
-            MeshTypeIdentifier [] newRoleTypesIdentifiers,
-            MeshObjectIdentifier  otherSideIdentifier,
-            long                  updateTime )
+            MeshObjectIdentifier  sourceIdentifier,
+            MeshTypeIdentifier [] oldValueIdentifiers,
+            MeshTypeIdentifier [] deltaValueIdentifiers,
+            MeshTypeIdentifier [] newValueIdentifiers,
+            MeshObjectIdentifier  neighborIdentifier,
+            long                  timeEventOccurred )
     {
         this(   null,
-                meshObjectIdentifier,
+                sourceIdentifier,
                 null,
-                oldRoleTypeIdentifiers,
+                oldValueIdentifiers,
                 null,
-                removedRoleTypeIdentifiers,
+                deltaValueIdentifiers,
                 null,
-                newRoleTypesIdentifiers,
+                newValueIdentifiers,
                 null,
-                otherSideIdentifier,
-                updateTime );
+                neighborIdentifier,
+                timeEventOccurred );
     }
 
     /**
-     * Main constructor.
+     * Pass-through constructor for subclasses.
+     * 
+     * @param source the MeshObject that is the source of the event
+     * @param sourceIdentifier the identifier representing the source MeshObject of the event
+     * @param oldValues the old values of the RoleType, prior to the event
+     * @param oldValueIdentifiers the identifier representing the old values of the RoleType, prior to the event
+     * @param deltaValues the RoleTypes that changed
+     * @param deltaValueIdentifiers the identifiers of the RoleTypes that changed
+     * @param newValues the new values of the RoleType, after the event
+     * @param newValueIdentifiers the identifier representing the new values of the RoleType, after the event
+     * @param neighbor the MeshObject that identifies the other end of the affected relationship
+     * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     protected MeshObjectRoleRemovedEvent(
-            MeshObject            meshObject,
-            MeshObjectIdentifier  meshObjectIdentifier,
-            RoleType []           oldRoleTypes,
-            MeshTypeIdentifier [] oldRoleTypeIdentifiers,
-            RoleType []           deltaRoleTypes,
-            MeshTypeIdentifier [] deltaRoleTypeIdentifiers,
-            RoleType []           newRoleTypes,
-            MeshTypeIdentifier [] newRoleTypeIdentifiers,
+            MeshObject            source,
+            MeshObjectIdentifier  sourceIdentifier,
+            RoleType []           oldValues,
+            MeshTypeIdentifier [] oldValueIdentifiers,
+            RoleType []           deltaValues,
+            MeshTypeIdentifier [] deltaValueIdentifiers,
+            RoleType []           newValues,
+            MeshTypeIdentifier [] newValueIdentifiers,
             MeshObject            neighbor,
             MeshObjectIdentifier  neighborIdentifier,
-            long                  updateTime )
+            long                  timeEventOccurred )
     {
-        super(  meshObject,
-                meshObjectIdentifier,
-                oldRoleTypes,
-                oldRoleTypeIdentifiers,
-                deltaRoleTypes,
-                deltaRoleTypeIdentifiers,
-                newRoleTypes,
-                newRoleTypeIdentifiers,
+        super(  source,
+                sourceIdentifier,
+                oldValues,
+                oldValueIdentifiers,
+                deltaValues,
+                deltaValueIdentifiers,
+                newValues,
+                newValueIdentifiers,
                 neighbor,
                 neighborIdentifier,
-                updateTime );        
+                timeEventOccurred );
     }
 
     /**
-     * }
-     * Determine whether this is an addition or a removal.
+     * Determine whether this is an addition or a removal of a RoleType.
      *
-     * @return always returns false
+     * @return true if this is an addition
      */
     public boolean isAdditionalRoleUpdate()
     {
@@ -132,28 +149,31 @@ public class MeshObjectRoleRemovedEvent
     }
 
     /**
-     * Apply this Change to a MeshObject in this MeshBase. This method
-     * is intended to make it easy to replicate Changes that were made in
-     * one MeshBase to MeshObjects in another MeshBase.
+     * <p>Apply this Change to a MeshObject in this MeshBase. This method
+     *    is intended to make it easy to reproduce Changes that were made in
+     *    one MeshBase to MeshObjects in another MeshBase.</p>
      *
-     * This method will attempt to create a Transaction if none is present on the
-     * current Thread.
+     * <p>This method will attempt to create a Transaction if none is present on the
+     * current Thread.</p>
      *
-     * @param otherMeshBase the other MeshBase in which to apply the change
+     * @param base the MeshBase in which to apply the Change
+     * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
-     *         the affected MeshObject did not exist in the other MeshBase
+     *         the affected MeshObject did not exist in MeshBase base
+     * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
+     *         could not be created
      */
     public MeshObject applyTo(
-            MeshBase otherMeshBase )
+            MeshBase base )
         throws
             CannotApplyChangeException,
             TransactionException
     {
-        setResolver( otherMeshBase );
+        setResolver( base );
 
         Transaction tx = null;
         try {
-            tx = otherMeshBase.createTransactionNowIfNeeded();
+            tx = base.createTransactionNowIfNeeded();
 
             MeshObject  otherObject        = getSource();
             MeshObject  relatedOtherObject = getNeighborMeshObject();
@@ -167,7 +187,7 @@ public class MeshObjectRoleRemovedEvent
             throw ex;
 
         } catch( Throwable ex ) {
-            throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, ex );
+            throw new CannotApplyChangeException.ExceptionOccurred( base, ex );
 
         } finally {
             if( tx != null ) {

@@ -17,7 +17,7 @@ package org.infogrid.meshbase.transaction;
 import org.infogrid.meshbase.MeshBase;
 
 /**
-  * This is a supertype for all transaction-related exceptions. Inner classes
+  * A supertype for all {@link Transaction}-related Exceptions. Inner classes
   * provide more concrete subclasses.
   */
 public abstract class TransactionException
@@ -25,16 +25,16 @@ public abstract class TransactionException
             Exception
 {
     /**
-     * Construct one.
+     * Constructor.
      *
-     * @param trans the MeshBase that raised this TransactionException
+     * @param mb the MeshBase that raised this TransactionException
      * @param tx the Transaction that raised this TransactionException
      */
     protected TransactionException(
-            MeshBase    trans,
+            MeshBase    mb,
             Transaction tx )
     {
-        theTransactable = trans;
+        theTransactable = mb;
         theTransaction  = tx;
     }
 
@@ -81,12 +81,14 @@ public abstract class TransactionException
 
     /**
       * This TransactionException is thrown if a (potentially) modifying operation
-      * is invoked by a thread that does not belong to the currently active Transaction.
+      * is invoked by a Thread that does not belong to the currently active Transaction.
       */
     public static class IllegalTransactionThread
             extends
                 TransactionException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -107,6 +109,8 @@ public abstract class TransactionException
             extends
                 TransactionException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -127,6 +131,8 @@ public abstract class TransactionException
             extends
                 TransactionException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -160,13 +166,15 @@ public abstract class TransactionException
       *    }
       * }
       * </pre>
-      * This code works with all Transaction factory methods, including the ones that do not actuall create
+      * This code works with all Transaction factory methods, including the ones that do not actually create
       * a Transaction because the current Thread has an open Transaction already.
       */
     public static class TransactionAsapTimeout
             extends
                 TransactionException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
