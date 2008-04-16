@@ -24,6 +24,8 @@ public class CannotRelateToItselfException
         extends
             RelatedAlreadyException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

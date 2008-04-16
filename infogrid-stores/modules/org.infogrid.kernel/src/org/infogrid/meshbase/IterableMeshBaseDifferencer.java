@@ -502,7 +502,7 @@ public class IterableMeshBaseDifferencer
             }
         }
 
-        ChangeSet changes = ChangeSet.create( new ChangeSet[] {
+        ChangeSet changes = ChangeSet.createCat( new ChangeSet[] {
                 entityChanges,
                 graphChanges,
                 roleAdditionChanges,

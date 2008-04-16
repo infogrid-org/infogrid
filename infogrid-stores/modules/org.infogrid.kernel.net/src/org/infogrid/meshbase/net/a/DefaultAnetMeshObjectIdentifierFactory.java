@@ -30,7 +30,7 @@ import org.infogrid.util.text.StringRepresentation;
 import java.net.URISyntaxException;
 
 /**
- *
+ * The default NetMeshObjectIdentifierFactory in the "A" implementation.
  */
 public class DefaultAnetMeshObjectIdentifierFactory
         extends
@@ -41,6 +41,7 @@ public class DefaultAnetMeshObjectIdentifierFactory
     /**
      * Factory method.
      *
+     * @param meshBaseIdentifier the NetMeshBaseIdentifier of the owning NetMeshBase
      * @return the created DefaultAMeshObjectIdentifierFactory
      */
     public static DefaultAnetMeshObjectIdentifierFactory create(
@@ -52,13 +53,15 @@ public class DefaultAnetMeshObjectIdentifierFactory
 
     /**
      * Constructor.
+     * 
+     * @param meshBaseIdentifier the NetMeshBaseIdentifier of the owning NetMeshBase
      */
     protected DefaultAnetMeshObjectIdentifierFactory(
             NetMeshBaseIdentifier meshBaseIdentifier )
     {
         theNetMeshBaseIdentifier = meshBaseIdentifier;
 
-        HOME_OBJECT = new DefaultAnetMeshObjectIdentifier( theNetMeshBaseIdentifier, null ) {} ; // subclass so we can avoid making it public
+        NET_HOME_OBJECT = new DefaultAnetMeshObjectIdentifier( theNetMeshBaseIdentifier, null ) {} ; // subclass so we can avoid making it public
     
     }
 
@@ -74,9 +77,11 @@ public class DefaultAnetMeshObjectIdentifierFactory
     }
 
     /**
-     * Create an identifier for a MeshObject at held locallt at this MeshBase.
+     * Create an identifier for a MeshObject at held locally at this MeshBase.
      *
      * @param raw the identifier String
+     * @return the created DefaultAnetMeshObjectIdentifier
+     * @throws URISyntaxException a parsing error occurred
      */
     @Override
     public DefaultAnetMeshObjectIdentifier fromExternalForm(
@@ -89,11 +94,30 @@ public class DefaultAnetMeshObjectIdentifierFactory
     }
 
     /**
+     * Create an identifier for a MeshObject held at a different MeshBase.
+     *
+     * @param meshBaseIdentifier MeshBaseIdentifier of the MeshBase where the object is held
+     * @param raw the identifier String
+     * @return the created DefaultAnetMeshObjectIdentifier
+     * @throws URISyntaxException a parsing error occurred
+     */
+    public DefaultAnetMeshObjectIdentifier fromExternalForm(
+            NetMeshBaseIdentifier meshBaseIdentifier,
+            String                raw )
+        throws
+            URISyntaxException
+    {
+        DefaultAnetMeshObjectIdentifier ret = DefaultAnetMeshObjectIdentifier.fromExternalForm( meshBaseIdentifier, raw );
+        return ret;
+    }
+
+    /**
      * Convert this StringRepresentation back to an Identifier.
      *
      * @param representation the StringRepresentation in which this String is represented
      * @param s the String to parse
      * @return the created MeshObjectIdentifier
+     * @throws URISyntaxException a parsing error occurred
      */
     @Override
     public DefaultAnetMeshObjectIdentifier fromStringRepresentation(
@@ -133,14 +157,14 @@ public class DefaultAnetMeshObjectIdentifierFactory
     }
     
     /**
-     * Determine the Identifier of the Home Object.
+     * Determine the MeshObjectIdentifier of the Home Object.
      *
-     * @return the Identifier
+     * @return the MeshObjectIdentifier
      */
     @Override
     public DefaultAnetMeshObjectIdentifier getHomeMeshObjectIdentifier()
     {
-        return HOME_OBJECT;
+        return NET_HOME_OBJECT;
     }
     
     /**
@@ -213,5 +237,5 @@ public class DefaultAnetMeshObjectIdentifierFactory
     /**
      * The home object identifier.
      */
-    public final DefaultAnetMeshObjectIdentifier HOME_OBJECT;
+    public final DefaultAnetMeshObjectIdentifier NET_HOME_OBJECT;
 }

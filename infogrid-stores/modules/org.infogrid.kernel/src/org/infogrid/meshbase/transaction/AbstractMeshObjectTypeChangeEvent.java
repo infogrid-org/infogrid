@@ -30,7 +30,7 @@ import org.infogrid.util.logging.Log;
 
 /**
  * This event indicates that a MeshObject has changed its type, i.e. by supporting
- * one more or one less MeshType.
+ * one more or one less EntityType.
  */
 public abstract class AbstractMeshObjectTypeChangeEvent
         extends
@@ -43,25 +43,29 @@ public abstract class AbstractMeshObjectTypeChangeEvent
     /**
      * Constructor.
      *
-     * @param meshObject the MeshObject whose type changed
-     * @param propertyName the name of the property that changed according to the API of the PropertyChangeEvent superclass
-     * @param oldValue the old set of types
-     * @param newValue the new set of types
-     * @param updateTime the time the MeshObject was updated
+     * @param source the MeshObject that is the source of the event
+     * @param sourceIdentifier the identifier representing the source MeshObject of the event
+     * @param oldValue the old set of EntityTypes, prior to the event
+     * @param oldValueIdentifiers the identifiers representing the old set of EntityTypes, prior to the event
+     * @param deltaValue the EntityTypes that changed
+     * @param deltaValueIdentifiers the identifiers of the EntityTypes that changed
+     * @param newValue the new set of EntityTypes, after the event
+     * @param newValueIdentifiers the identifiers representing the new set of EntityTypes, after the event
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     protected AbstractMeshObjectTypeChangeEvent(
-            MeshObject           meshObject,
-            MeshObjectIdentifier meshObjectIdentifier,
+            MeshObject           source,
+            MeshObjectIdentifier sourceIdentifier,
             EntityType []        oldValue,
             MeshTypeIdentifier[] oldValueIdentifiers,
             EntityType []        deltaValue,
             MeshTypeIdentifier[] deltaValueIdentifiers,
             EntityType []        newValue,
             MeshTypeIdentifier[] newValueIdentifiers,
-            long                 updateTime )
+            long                 timeEventOccurred )
     {
-        super(  meshObject,
-                meshObjectIdentifier,
+        super(  source,
+                sourceIdentifier,
                 MeshObject._MESH_OBJECT_TYPES_PROPERTY,
                 MeshObject._MESH_OBJECT_TYPES_PROPERTY,
                 oldValue,
@@ -70,7 +74,7 @@ public abstract class AbstractMeshObjectTypeChangeEvent
                 deltaValueIdentifiers,
                 newValue,
                 newValueIdentifiers,
-                updateTime );
+                timeEventOccurred );
 
         if( log.isDebugEnabled() ) {
             log.debug( "created " + this );
@@ -78,11 +82,11 @@ public abstract class AbstractMeshObjectTypeChangeEvent
     }
 
     /**
-     * Obtain the Identifier of the MeshObject affected by this Change.
+     * Obtain the identifier of the MeshObject affected by this Change.
      *
-     * @return the Identifier of the MeshObject affected by this Change
+     * @return the identifier of the MeshObject affected by this Change
      */
-    public final MeshObjectIdentifier getAffectedMeshObjectIdentifier()
+    public MeshObjectIdentifier getAffectedMeshObjectIdentifier()
     {
         return getSourceIdentifier();
     }
@@ -98,9 +102,9 @@ public abstract class AbstractMeshObjectTypeChangeEvent
     }
 
     /**
-     * Obtain the Identifiers of the EntityTypes involved in this Change.
+     * Obtain the identifiers of the EntityTypes involved in this Change.
      *
-     * @return the Identifiers of the EntityTypes involved in this Change.
+     * @return the identifiers of the EntityTypes involved in this Change.
      */
     public final MeshTypeIdentifier [] getEntityTypeIdentifiers()
     {
