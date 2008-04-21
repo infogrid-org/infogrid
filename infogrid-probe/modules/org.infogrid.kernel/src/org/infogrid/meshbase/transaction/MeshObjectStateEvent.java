@@ -20,7 +20,7 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 
 import org.infogrid.util.event.AbstractExternalizablePropertyChangeEvent;
-import org.infogrid.util.event.UnresolvedException;
+import org.infogrid.util.event.SourceUnresolvedException;
 
 /**
   * This indicates a change in the state of a MeshObject, such as
@@ -101,7 +101,7 @@ public abstract class MeshObjectStateEvent
     protected MeshObject resolveSource()
     {
         if( theResolver == null ) {
-            throw new UnresolvedException.Source( this );
+            throw new SourceUnresolvedException( this );
         }
         
         MeshObject ret = theResolver.findMeshObjectByIdentifier( getSourceIdentifier() );

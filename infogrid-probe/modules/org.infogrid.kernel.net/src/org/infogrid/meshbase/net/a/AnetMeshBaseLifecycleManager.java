@@ -14,12 +14,19 @@
 
 package org.infogrid.meshbase.net.a;
 
+import java.util.HashMap;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.mesh.RelatedAlreadyException;
+import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
@@ -28,7 +35,6 @@ import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObject;
 import org.infogrid.mesh.net.security.CannotObtainLockException;
 import org.infogrid.mesh.security.MustNotDeleteHomeObjectException;
-
 import org.infogrid.meshbase.a.AMeshBase;
 import org.infogrid.meshbase.a.AMeshBaseLifecycleManager;
 import org.infogrid.meshbase.a.AMeshObjectEquivalenceSetComparator;
@@ -36,35 +42,25 @@ import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.Proxy;
-import org.infogrid.meshbase.net.transaction.NetChange;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
 import org.infogrid.meshbase.net.transaction.ReplicaPurgedEvent;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
-
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.RoleType;
-
 import org.infogrid.modelbase.MeshTypeNotFoundException;
 import org.infogrid.modelbase.ModelBase;
-
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.logging.Log;
 
-import java.util.HashMap;
-import org.infogrid.mesh.EntityNotBlessedException;
-import org.infogrid.mesh.IllegalPropertyTypeException;
-import org.infogrid.mesh.IllegalPropertyValueException;
-import org.infogrid.mesh.RelatedAlreadyException;
-
 /**
- *
+ * A NetMeshBaseLifecycleManager for the Anet implementation.
  */
 public class AnetMeshBaseLifecycleManager
         extends
@@ -87,10 +83,10 @@ public class AnetMeshBaseLifecycleManager
     }
 
     /**
-     * <p>Obtain the MeshBase that this MeshBaseLifecycleManager works on.</p>
+     * <p>Obtain the NetMeshBase that this NetMeshBaseLifecycleManager works on.</p>
      * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
      * 
-     * @return the MeshBase that this MMeshBaseLifecycleManagerworks on
+     * @return the NetMeshBase that this NetMeshBaseLifecycleManager works on
      */
     @Override
     public NetMeshBase getMeshBase()
@@ -99,43 +95,45 @@ public class AnetMeshBaseLifecycleManager
     }
 
     /**
-     * <p>Create a new MeshObject without a type.
+     * <p>Create a new NetMeshObject without a type
+     * and an automatically created NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
-     * is to be created.</p>
+     * is created.</p>
      *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      *
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     *
-     * @return the created MeshObject
+     * @return the created NetMeshObject
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     @Override
     public AnetMeshObject createMeshObject()
         throws
-            TransactionException
+            TransactionException,
+            NotPermittedException
     {
         MeshObject ret = super.createMeshObject();
         return (AnetMeshObject) ret;
     }
 
     /**
-     * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
+     * <p>This is a convenience method to create a NetMeshObject with exactly one EntityType
+     * and an automatically created NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      *
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     *
-     * @param type the EntityType with which the MeshObject will be blessed
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @param type the EntityType with which the NetMeshObject will be blessed
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     @Override
-    public NetMeshObject createMeshObject(
+    public AnetMeshObject createMeshObject(
             EntityType type )
         throws
             IsAbstractException,
@@ -143,25 +141,26 @@ public class AnetMeshBaseLifecycleManager
             NotPermittedException
     {
         MeshObject ret = super.createMeshObject( type );
-        return (NetMeshObject) ret;
+        return (AnetMeshObject) ret;
     }
 
     /**
-     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes.</p>
+     * <p>This is a convenience method to create a NetMeshObject with zero or more EntityTypes
+     * and an automatically created NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      *
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     *
-     * @param types the EntityTypes with which the MeshObject will be blessed
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @param types the EntityTypes with which the NetMeshObject will be blessed
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     @Override
-    public NetMeshObject createMeshObject(
+    public AnetMeshObject createMeshObject(
             EntityType [] types )
         throws
             IsAbstractException,
@@ -169,54 +168,59 @@ public class AnetMeshBaseLifecycleManager
             NotPermittedException
     {
         MeshObject ret = super.createMeshObject( types );
-        return (NetMeshObject) ret;
+        return (AnetMeshObject) ret;
     }
 
     /**
-     * <p>Create a new MeshObject (aka EntityType instance) initially without a type.
+     * <p>Create a new NetMeshObject without a type
+     * and with a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
+     * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
+     *                        automatically create a suitable NetMeshObjectIdentifier.
+     * @return the created NetMeshObject
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExtIdentifierNotUniqueExceptionrown if a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     @Override
-    public NetMeshObject createMeshObject(
+    public AnetMeshObject createMeshObject(
             MeshObjectIdentifier identifier )
         throws
+            MeshObjectIdentifierNotUniqueException,
             TransactionException,
-            MeshObjectIdentifierNotUniqueException
+            NotPermittedException
     {
         MeshObject ret = super.createMeshObject( identifier );
-        return (NetMeshObject) ret;
+        return (AnetMeshObject) ret;
     }
 
     /**
-     * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
+     * <p>This is a convenience method to create a NetMeshObject with exactly one EntityType
+     * and a provided NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param type the EntityType with which the MeshObject will be blessed
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
+     *                        automatically create a suitable NetMeshObjectIdentifier.
+     * @param type the EntityType with which the NetMeshObject will be blessed
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     @Override
-    public NetMeshObject createMeshObject(
+    public AnetMeshObject createMeshObject(
             MeshObjectIdentifier identifier,
-            EntityType      type )
+            EntityType           type )
         throws
             IsAbstractException,
             TransactionException,
@@ -224,186 +228,197 @@ public class AnetMeshBaseLifecycleManager
             MeshObjectIdentifierNotUniqueException
     {
         MeshObject ret = super.createMeshObject( identifier, type );
-        return (NetMeshObject) ret;
+        return (AnetMeshObject) ret;
     }
 
     /**
-     * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
+     * <p>This is a convenience method to create a NetMeshObject with zero or more EntityTypes
+     * and a provided NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param types the EntityTypes with which the MeshObject will be blessed
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
+     *                        automatically create a suitable NetMeshObjectIdentifier.
+     * @param types the EntityTypes with which the NetMeshObject will be blessed
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     @Override
-    public NetMeshObject createMeshObject(
+    public AnetMeshObject createMeshObject(
             MeshObjectIdentifier identifier,
-            EntityType []   types )
+            EntityType []        types )
         throws
             IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
             TransactionException,
-            NotPermittedException,
-            MeshObjectIdentifierNotUniqueException
+            NotPermittedException
     {
         MeshObject ret = super.createMeshObject( identifier, types );
-        return (NetMeshObject) ret;
+        return (AnetMeshObject) ret;
     }
 
     /**
-     * <p>Create a new MeshObject (aka EntityType instance) initially without a type.
+     * <p>Create a new NetMeshObject without a type, but with provided time stamps
+     * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeAutoDeletes the time this MeshObject will auto-delete, in System.currentTimeMillis() format
-     * @return the created MeshObject
+     * @param identifier the identifier of the to-be-created NetMeshObject. This must not be null.
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @return the created NetMeshObject
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NEtMeshBase with the specified identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalIdentifierNotUniqueExceptionif a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     @Override
     public AnetMeshObject createMeshObject(
             MeshObjectIdentifier identifier,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeAutoDeletes )
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
         throws
+            MeshObjectIdentifierNotUniqueException,
             TransactionException,
-            MeshObjectIdentifierNotUniqueException
+            NotPermittedException
     {
-        MeshObject ret = super.createMeshObject( identifier, timeCreated, timeUpdated, timeRead, timeAutoDeletes );
+        MeshObject ret = super.createMeshObject( identifier, timeCreated, timeUpdated, timeRead, timeExpires );
         return (AnetMeshObject) ret;
     }
 
     /**
-     * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
+     * <p>This is a convenience method to create a NetMeshObject with exactly one EntityType,
+     * with provided time stamps
+     * and a provided NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param type the EntityType with which the MeshObject will be blessed
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeAutoDeletes the time this MeshObject will auto-delete, in System.currentTimeMillis() format
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
+     *                        automatically create a suitable NetMeshObjectIdentifier.
+     * @param type the EntityType with which the NetMeshObject will be blessed
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalNaIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     @Override
-    public NetMeshObject createMeshObject(
+    public AnetMeshObject createMeshObject(
             MeshObjectIdentifier identifier,
-            EntityType      type,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeAutoDeletes )
+            EntityType           type,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
         throws
             IsAbstractException,
-            TransactionException,
             MeshObjectIdentifierNotUniqueException,
+            TransactionException,
             NotPermittedException
     {
-        MeshObject ret = super.createMeshObject( identifier, type, timeCreated, timeUpdated, timeRead, timeAutoDeletes );
-        return (NetMeshObject) ret;
+        MeshObject ret = super.createMeshObject( identifier, type, timeCreated, timeUpdated, timeRead, timeExpires );
+        return (AnetMeshObject) ret;
     }
 
     /**
-     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes.</p>
+     * <p>This is a convenience method to create a NetMeshObject with zero or more EntityTypes,
+     * with provided time stamps
+     * and a provided NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param types the EntityTypes with which the MeshObject will be blessed
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeAutoDeletes the time this MeshObject will auto-delete, in System.currentTimeMillis() format
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
+     *                        automatically create a suitable NetMeshObjectIdentifier.
+     * @param types the EntityTypes with which the NetMeshObject will be blessed
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalNaIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     @Override
-    public NetMeshObject createMeshObject(
+    public AnetMeshObject createMeshObject(
             MeshObjectIdentifier identifier,
-            EntityType []   types,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeAutoDeletes )
+            EntityType []        types,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
         throws
             IsAbstractException,
-            TransactionException,
             MeshObjectIdentifierNotUniqueException,
+            TransactionException,
             NotPermittedException
     {
-        MeshObject ret = super.createMeshObject( identifier, types, timeCreated, timeUpdated, timeRead, timeAutoDeletes );
-        return (NetMeshObject) ret;
+        MeshObject ret = super.createMeshObject( identifier, types, timeCreated, timeUpdated, timeRead, timeExpires );
+        return (AnetMeshObject) ret;
     }
 
     /**
-     * Create a NetMeshObject that is a replica. Using this method, the created NetMeshObject initially
-     * does not have update rights, and its home replica resides in a different MeshBase. The
-     * different MeshBase is identified by the Proxy through which this MeshBase communicates with it.
+     * <p>Convenience method to create a new replica of an existing NetMeshObject with zero or more types,
+     * with the provided time stamps, the provided NetMeshObjectIdentifier, flags whether to give up the
+     * lock or home replica status should this replica ever acquire either, and the Proxy in which both
+     * homeReplica and lock are to be found. 
+     * This call creates a replica of an existing MeshObject, so it is not a "semantic create".</p>
      * 
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
      * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param types the EntityTypes with which the MeshObject will be blessed
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeAutoDeletes the time this MeshObject will auto-delete, in System.currentTimeMillis() format
+     * @param identifier the identifier of the to-be-created replica. This must not be null.
+     * @param types the EntityTypes with which the NetMeshObject will be blessed
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @param giveUpHomeReplica if true, this replica will give up home replica status when asked should it ever acquire it
+     * @param giveUpLock if true, this replica will give up the lock when asked should it ever acquire it
      * @param proxyTowardsHomeAndLock the Proxy in whose direction the home replica and the updateable replica can be found
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @return the created replica
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalNamIdentifierNotUniqueExceptiona MeshObject exists already in this MeshBase with the specified Identifier
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
-    public NetMeshObject createMeshObject(
-            MeshObjectIdentifier identifier,
-            EntityType []   types,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeAutoDeletes,
-            boolean         giveUpLock,
-            Proxy           proxyTowardsHomeAndLock )
+    public AnetMeshObject createMeshObject(
+            NetMeshObjectIdentifier identifier,
+            EntityType []           types,
+            long                    timeCreated,
+            long                    timeUpdated,
+            long                    timeRead,
+            long                    timeExpires,
+            boolean                 giveUpHomeReplica,
+            boolean                 giveUpLock,
+            Proxy                   proxyTowardsHomeAndLock )
         throws
             IsAbstractException,
-            TransactionException,
             MeshObjectIdentifierNotUniqueException,
+            TransactionException,
             NotPermittedException
     {
         return createMeshObject(
@@ -412,7 +427,8 @@ public class AnetMeshBaseLifecycleManager
                 timeCreated,
                 timeUpdated,
                 timeRead,
-                timeAutoDeletes,
+                timeExpires,
+                giveUpHomeReplica,
                 giveUpLock,
                 new Proxy[] { proxyTowardsHomeAndLock },
                 0,
@@ -420,39 +436,45 @@ public class AnetMeshBaseLifecycleManager
     }
     
     /**
-     * Create a NetMeshObject that is a replica. Using this method, the created NetMeshObject initially
-     * does not have update rights, and its home replica resides in a different MeshBase. It may also be
-     * linked to other MeshBases in the replication graph.
+     * <p>Create a new replica of an existing NetMeshObject with zero or more types,
+     * with the provided time stamps, the provided NetMeshObjectIdentifier, flags whether to give up the
+     * lock or home replica status should this replica ever acquire either, and all Proxies and their roles.
+     * This call creates a replica of an existing MeshObject, so it is not a "semantic create".</p>
      * 
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
      * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param types the EntityTypes with which the MeshObject will be blessed
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeAutoDeletes the time this MeshObject will auto-delete, in System.currentTimeMillis() format
-     * @param proxies the Proxies in whose direction the other related nodes of the replication graph may be found
-     * @param homeProxyIndex the index, into the proxies array, that identifies the Proxy in whose direction the home replica may be found
-     * @param proxyTowardsLockIndex the index, into the proxies array, that identifies the Proxy in whose direction the update rights may be found
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @param identifier the identifier of the to-be-created replica. This must not be null.
+     * @param types the EntityTypes with which the NetMeshObject will be blessed
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @param giveUpHomeReplica if true, this replica will give up home replica status when asked should it ever acquire it
+     * @param giveUpLock if true, this replica will give up the lock when asked should it ever acquire it
+     * @param proxies all Proxies that are affected by this replica
+     * @param homeProxyIndex the index, into proxies, of the Proxy in whose direction the home replica can be found. This
+     *            replica is the home replica if this value is -1.
+     * @param proxyTowardsLockIndex the index, into proxies, of the Proxy in whose direction the lock can be found. This
+     *            replica is the replica with the lock if this value is -1.
+     * @return the created replica
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws MeshObjectIdentifierNotUniqueException exists already in this MeshBase with the specified Identifier
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
-    public NetMeshObject createMeshObject(
-            MeshObjectIdentifier identifier,
-            EntityType []   types,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeAutoDeletes,
-            boolean         giveUpLock,
-            Proxy []        proxies,
-            int             homeProxyIndex,
-            int             proxyTowardsLockIndex )
+    public AnetMeshObject createMeshObject(
+            NetMeshObjectIdentifier identifier,
+            EntityType []           types,
+            long                    timeCreated,
+            long                    timeUpdated,
+            long                    timeRead,
+            long                    timeExpires,
+            boolean                 giveUpHomeReplica,
+            boolean                 giveUpLock,
+            Proxy []                proxies,
+            int                     homeProxyIndex,
+            int                     proxyTowardsLockIndex )
         throws
             IsAbstractException,
             TransactionException,
@@ -489,7 +511,8 @@ public class AnetMeshBaseLifecycleManager
                 timeCreated,
                 timeUpdated,
                 timeRead,
-                timeAutoDeletes,
+                timeExpires,
+                giveUpHomeReplica,
                 giveUpLock,
                 proxies,
                 homeProxyIndex,
@@ -506,7 +529,7 @@ public class AnetMeshBaseLifecycleManager
 
         putIntoStore( ret );
 
-        Proxy             incomingProxy           = realBase.determineIncomingProxy();
+        Proxy                 incomingProxy           = realBase.determineIncomingProxy();
         NetMeshBaseIdentifier incomingProxyIdentifier = incomingProxy != null ? incomingProxy.getPartnerMeshBaseIdentifier() : null;
 
         tx.addChange( new NetMeshObjectCreatedEvent(
@@ -521,10 +544,16 @@ public class AnetMeshBaseLifecycleManager
     }
 
     /**
-     * <p>Semantically delete a number of MeshObjects at the same time.</p>
+     * <p>Semantically delete several NetMeshObjects at the same time.</p>
      * 
-     * <p>This call either succeeds or fails in total: if one or more of the specified MeshObject cannot be
-     *    deleted for some reason, none of the other MeshObjects will be deleted either.</p>
+     * <p>This call is a "semantic delete", which means that an existing
+     * NetMeshObjects will go away in all its replicas. Due to time lag, the NetMeshObject
+     * may still exist in certain replicas in other places for a while, but
+     * the request to deleteMeshObjects all objects is in the queue and will get there
+     * eventually.</p>
+     * 
+     * <p>This call either succeeds or fails in total: if one or more of the specified NetMeshObjects cannot be
+     *    deleted for some reason, none of the other NetMeshObjects will be deleted either.</p>
      * 
      * @param theObjects the MeshObjects to be semantically deleted
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
@@ -578,23 +607,22 @@ public class AnetMeshBaseLifecycleManager
     }
 
     /**
-     * Helper method to instantiate the right subclass of MeshObject. This makes the creation
-     * of subclasses of MMeshBase and this class much easier.
+     * Helper method to instantiate the right subclass of MeshObject.
      * 
-     * @param identifier the Identifier of the to-be-created MeshObject. This must not be null.
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeAutoDeletes the time this MeshObject will auto-delete
-     * @return the created MeshObject
+     * @param identifier the identifier of the to-be-created NetMeshObject. This must not be null.
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @return the created NetMeshObject
      */
     @Override
     protected AnetMeshObject instantiateMeshObjectImplementation(
             MeshObjectIdentifier identifier,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeAutoDeletes )
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
     {
         AnetMeshObject ret = new AnetMeshObject(
                 (NetMeshObjectIdentifier) identifier,
@@ -602,7 +630,8 @@ public class AnetMeshBaseLifecycleManager
                 timeCreated,
                 timeUpdated,
                 timeRead,
-                timeAutoDeletes,
+                timeExpires,
+                ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpHomeReplica(),
                 ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpLock(),
                 null,
                 AnetMeshObject.HERE_CONSTANT,
@@ -612,34 +641,42 @@ public class AnetMeshBaseLifecycleManager
     }
     
     /**
-     * Helper method to instantiate the right subclass of MeshObject. This makes the creation
-     * of subclasses of MMeshBase and this class much easier.
+     * Helper method to instantiate the right subclass of MeshObject.
      * 
-     * @param identifier the Identifier of the to-be-created MeshObject. This must not be null.
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeAutoDeletes the time this MeshObject will auto-delete
-     * @return the created MeshObject
+     * @param identifier the identifier of the to-be-created NetMeshObject. This must not be null.
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @param giveUpHomeReplica if true, this replica will give up home replica status when asked should it ever acquire it
+     * @param giveUpLock if true, this replica will give up the lock when asked should it ever acquire it
+     * @param proxies all Proxies that are affected by this replica
+     * @param homeProxyIndex the index, into proxies, of the Proxy in whose direction the home replica can be found. This
+     *            replica is the home replica if this value is -1.
+     * @param proxyTowardsLockIndex the index, into proxies, of the Proxy in whose direction the lock can be found. This
+     *            replica is the replica with the lock if this value is -1.
+     * @return the created NetMeshObject
      */
     protected AnetMeshObject instantiateMeshObjectImplementation(
-            MeshObjectIdentifier identifier,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeAutoDeletes,
-            boolean         giveUpLock,
-            Proxy []        proxies,
-            int             homeProxyIndex,
-            int             proxyTowardsLockIndex )
+            NetMeshObjectIdentifier identifier,
+            long                    timeCreated,
+            long                    timeUpdated,
+            long                    timeRead,
+            long                    timeExpires,
+            boolean                 giveUpHomeReplica,
+            boolean                 giveUpLock,
+            Proxy []                proxies,
+            int                     homeProxyIndex,
+            int                     proxyTowardsLockIndex )
     {
         AnetMeshObject ret = new AnetMeshObject(
-                (NetMeshObjectIdentifier) identifier,
+                identifier,
                 (AnetMeshBase) theMeshBase,
                 timeCreated,
                 timeUpdated,
                 timeRead,
-                timeAutoDeletes,
+                timeExpires,
+                giveUpHomeReplica,
                 giveUpLock,
                 proxies,
                 homeProxyIndex,
@@ -649,18 +686,17 @@ public class AnetMeshBaseLifecycleManager
     }
 
     /**
-     * Factored out method to instantiate a recreated MeshObject. This exists to make
-     * it easy to override it in subclasses.
+     * Factored out method to instantiate a recreated NetMeshObject.
      * 
-     * @param identifier the Identifier of the MeshObject
+     * @param identifier the identifier of the MeshObject
      * @param timeCreated the time it was created
      * @param timeUpdated the time it was last udpated
      * @param timeRead the time it was last read
-     * @param timeAutoDeletes the time it will auto-delete
+     * @param timeExpires the time it will expire
      * @param properties the properties of the MeshObject
      * @param types the EntityTypes of the MeshObject
      * @param equivalents either an array of length 2, or null. If given, contains the left and right equivalence pointers.
-     * @param otherSides the Identifiers of the MeshObject's neighbors, if any
+     * @param otherSides the identifiers of the MeshObject's neighbors, if any
      * @param roleTypes the RoleTypes in which this MeshObject participates with its neighbors
      * @param theObjectBeingParsed the externalized representation of the MeshObject
      * @return the recreated AMeshObject
@@ -668,11 +704,10 @@ public class AnetMeshBaseLifecycleManager
     @Override
     protected AnetMeshObject instantiateRecreatedMeshObject(
             MeshObjectIdentifier                identifier,
-            AMeshBase                           meshBase,
             long                                timeCreated,
             long                                timeUpdated,
             long                                timeRead,
-            long                                timeAutoDeletes,
+            long                                timeExpires,
             HashMap<PropertyType,PropertyValue> properties,
             EntityType []                       types,
             MeshObjectIdentifier []             equivalents,
@@ -680,7 +715,7 @@ public class AnetMeshBaseLifecycleManager
             RoleType [][]                       roleTypes,
             ExternalizedMeshObject              theObjectBeingParsed )
     {
-        AnetMeshBase              realBase              = (AnetMeshBase)              meshBase;
+        AnetMeshBase              realBase              = (AnetMeshBase)              theMeshBase;
         ExternalizedNetMeshObject realObjectBeingParsed = (ExternalizedNetMeshObject) theObjectBeingParsed;
         
 //        if(    identifier instanceof NetMeshObjectIdentifier ) {
@@ -691,9 +726,10 @@ public class AnetMeshBaseLifecycleManager
 //            }
 //        }
         
-        boolean giveUpLock = realObjectBeingParsed.getGiveUpLock();
+        boolean giveUpHomeReplica = realObjectBeingParsed.getGiveUpHomeReplica();
+        boolean giveUpLock        = realObjectBeingParsed.getGiveUpLock();
 
-        NetMeshBaseIdentifier [] proxyNetworkIdentifiers = realObjectBeingParsed.getProxyNames();
+        NetMeshBaseIdentifier [] proxyNetworkIdentifiers = realObjectBeingParsed.getProxyIdentifiers();
 
         int proxyTowardsHomeIndex = -1;
         int proxyTowardsLockIndex = -1;
@@ -718,16 +754,17 @@ public class AnetMeshBaseLifecycleManager
         
         AnetMeshObject ret = new AnetMeshObject(
                 (NetMeshObjectIdentifier) identifier,
-                (AnetMeshBase) realBase,
+                realBase,
                 timeCreated,
                 timeUpdated,
                 timeRead,
-                timeAutoDeletes,
+                timeExpires,
                 properties,
                 types,
                 (NetMeshObjectIdentifier []) equivalents,
                 (NetMeshObjectIdentifier []) otherSides,
                 roleTypes,
+                giveUpHomeReplica,
                 giveUpLock,
                 proxies,
                 proxyTowardsHomeIndex,
@@ -737,9 +774,12 @@ public class AnetMeshBaseLifecycleManager
     }
 
     /**
-     * Purge a non-home replica.
+     * Purge a replica. This method can be applied on all NetMeshObjects in this NetMeshBase,
+     * except the home object of this NetMeshBase.
      *
      * @param replica the non-home replica
+     * @throws TransactionException thrown if invoked outside proper Transaction boundaries
+     * @throws MustNotDeleteHomeObjectException thrown if applied to the home object of this NetMeshBase
      */
     public void purgeReplica(
             NetMeshObject replica )
@@ -751,9 +791,12 @@ public class AnetMeshBaseLifecycleManager
     }
     
     /**
-     * Purge a non-home replicas.
+     * Purge several replicas. This method can be applied on all NetMeshObjects in this NetMeshBase,
+     * except the home object of this NetMeshBase.
      *
      * @param replicas the non-home replicas
+     * @throws TransactionException thrown if invoked outside proper Transaction boundaries
+     * @throws MustNotDeleteHomeObjectException thrown if applied to the home object of this NetMeshBase
      */
     public void purgeReplicas(
             NetMeshObject [] replicas )
@@ -796,39 +839,44 @@ public class AnetMeshBaseLifecycleManager
     }
 
     /**
-     * Instantiate a replica MeshObject in this MeshBase, thereby setting 
-     * up a branch in the replication graph.
+     * Instantiate a replica NetMeshObject in this NetMeshBase, thereby setting 
+     * up a branch in the replication graph. This may also be invoked if the replica exists
+     * already in more complex replication topologies.
      *
-     * @param original the original MeshObject that we copy
-     * @param proxy the Proxy that conveyed this command
-     * @return the created MeshObject
+     * @param original external form of the replica that is being replicated locally
+     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
+     * @return the created NetMeshObject
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
-    public NetMeshObject rippleCreate(
+    public AnetMeshObject rippleCreate(
             ExternalizedNetMeshObject original,
-            NetMeshBaseIdentifier         proxy )
+            NetMeshBaseIdentifier     proxyIdentifier )
         throws
             NotPermittedException,
             TransactionException
     {
-        return rippleCreateOrSynchronize( original, proxy, true );
+        return rippleCreateOrSynchronize( original, proxyIdentifier, true );
     }    
 
     /**
-     * Delete a replica MeshObject in this MeshBase, thereby removing a
+     * Delete a replica NetMeshObject in this NetMeshBase, thereby removing a
      * branch in the replication graph.
      * 
-     * @param identifier the Identifier of the MeshObject whose replica is to be deleted
-     * @param proxy the Proxy that conveyed this command
-     * @return the deleted MeshObject, now dead
+     * @param identifier the identifier of the NetMeshObject whose replica is to be deleted
+     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
+     * @return the deleted NetMeshObject
+     * @param timeEventOccurred the time at which the delete command occurred
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
-    public NetMeshObject rippleDelete(
-            MeshObjectIdentifier  identifier,
-            NetMeshBaseIdentifier proxy,
-            long                  time )
+    public AnetMeshObject rippleDelete(
+            NetMeshObjectIdentifier identifier,
+            NetMeshBaseIdentifier   proxyIdentifier,
+            long                    timeEventOccurred )
         throws
-            TransactionException
+            TransactionException,
+            NotPermittedException
     {
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
 
@@ -840,51 +888,55 @@ public class AnetMeshBaseLifecycleManager
         // we don't do that here because it's the slave replica
         // theObject.checkPermittedDelete(); // this may throw NotPermittedException
 
-        try {
-            theObject.delete();
-            removeFromStore( theObject.getIdentifier() );
+        theObject.delete();
+        removeFromStore( theObject.getIdentifier() );
 
-            Proxy             incomingProxy           = realBase.determineIncomingProxy();
-            NetMeshBaseIdentifier incomingProxyIdentifier = incomingProxy != null ? incomingProxy.getPartnerMeshBaseIdentifier() : null;
+        Proxy             incomingProxy           = realBase.determineIncomingProxy();
+        NetMeshBaseIdentifier incomingProxyIdentifier = incomingProxy != null ? incomingProxy.getPartnerMeshBaseIdentifier() : null;
 
-            tx.addChange( new NetMeshObjectDeletedEvent(
-                    realBase,
-                    realBase.getIdentifier(),
-                    theObject,
-                    realIdentifier,
-                    incomingProxyIdentifier,
-                    time ));
+        tx.addChange( new NetMeshObjectDeletedEvent(
+                realBase,
+                realBase.getIdentifier(),
+                theObject,
+                realIdentifier,
+                incomingProxyIdentifier,
+                timeEventOccurred ));
 
-        } catch( NotPermittedException ex ) {
-            log.error( ex );
-        }
         return theObject;
     }
     
     /**
-     * Resynchronize a local replica to the provided SimpleExternalizedNetMeshObject.
+     * Resynchronize a local replica to the provided ExternalizedNetMeshObject.
      * 
-     * @param original the original MeshObject that we copy
-     * @param proxy the Proxy that conveyed this command
-     * @return the created MeshObject
+     * @param original external form of the replica that is being resynchronized locally
+     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
+     * @return the resynchronized NetMeshObject
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
-    public NetMeshObject resynchronize(
+    public AnetMeshObject resynchronize(
             ExternalizedNetMeshObject original,
-            NetMeshBaseIdentifier     proxy )
+            NetMeshBaseIdentifier     proxyIdentifier )
         throws
-            NotPermittedException,
-            TransactionException
+            TransactionException,
+            NotPermittedException
     {
-        return rippleCreateOrSynchronize( original, proxy, false );
+        return rippleCreateOrSynchronize( original, proxyIdentifier, false );
     }
 
     /**
      * Common implementation method for rippleCreate and resynchronize.
+     * 
+     * @param original external form of the replica that is being created or resynchronized locally
+     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
+     * @param isCreate distinguishes between create and resynchronize
+     * @return the created or resynchronized NetMeshObject
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
-    protected NetMeshObject rippleCreateOrSynchronize(
+    protected AnetMeshObject rippleCreateOrSynchronize(
             ExternalizedNetMeshObject original,
-            NetMeshBaseIdentifier         proxyName,
+            NetMeshBaseIdentifier     proxyIdentifier,
             boolean                   isCreate )
         throws
             NotPermittedException,
@@ -895,7 +947,7 @@ public class AnetMeshBaseLifecycleManager
 
         Proxy proxy;
         try {
-            proxy = realBase.obtainProxyFor( proxyName, null );
+            proxy = realBase.obtainProxyFor( proxyIdentifier, null );
 
         } catch( FactoryException ex ) {
             log.error( ex );
@@ -1009,7 +1061,7 @@ public class AnetMeshBaseLifecycleManager
                 // FIXME? remove neighbors?
                 for( int i=0 ; i<otherSides.length ; ++i ) {
                     try {
-                        existing.rippleRelate( otherSides[i], (NetMeshBase) theMeshBase );
+                        existing.rippleRelate( otherSides[i] );
 
                     } catch( RelatedAlreadyException ex ) {
                         log.error( ex );
@@ -1023,6 +1075,10 @@ public class AnetMeshBaseLifecycleManager
                                 existing.rippleBless( roleTypes[i], otherSides[i] );
 
                             } catch( EntityNotBlessedException ex ) {
+                                log.error( ex );
+                            } catch( NotRelatedException ex ) {
+                                log.error( ex );
+                            } catch( RoleTypeBlessedAlreadyException ex ) {
                                 log.error( ex );
                             } catch( IsAbstractException ex ) {
                                 log.error( ex );
@@ -1085,6 +1141,7 @@ public class AnetMeshBaseLifecycleManager
                     leftRight,
                     otherSides,
                     roleTypes,
+                    original.getGiveUpHomeReplica(),
                     original.getGiveUpLock(),
                     proxies,
                     proxyTowardsHomeIndex,
@@ -1107,12 +1164,13 @@ public class AnetMeshBaseLifecycleManager
     }
 
     /**
-     * Overridable helper to create a MeshObjectCreatedEvent.
+     * Overridable helper to create a NetMeshObjectCreatedEvent.
      *
+     * @param createdObject the created MeshObject
      * @return the created event
      */
     @Override
-    protected NetChange createCreatedEvent(
+    protected NetMeshObjectCreatedEvent createCreatedEvent(
             MeshObject createdObject )
     {
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
@@ -1120,7 +1178,7 @@ public class AnetMeshBaseLifecycleManager
         Proxy                 incomingProxy           = realBase.determineIncomingProxy();
         NetMeshBaseIdentifier incomingProxyIdentifier = incomingProxy != null ? incomingProxy.getPartnerMeshBaseIdentifier() : null;
 
-        NetChange ret = new NetMeshObjectCreatedEvent(
+        NetMeshObjectCreatedEvent ret = new NetMeshObjectCreatedEvent(
                 getMeshBase(),
                 getMeshBase().getIdentifier(),
                 (NetMeshObject) createdObject,
@@ -1129,28 +1187,32 @@ public class AnetMeshBaseLifecycleManager
     } 
 
     /**
-     * Overridable helper to create a MeshObjectDeletedEvent.
-     *
+     * Overridable helper to create a NetMeshObjectDeletedEvent.
+     * 
+     * @param deletedObject the deleted MeshObject
+     * @param canonicalIdentifier the canonical MeshObjectIdentifier of the deleted MeshObject.
+     *        Once a MeshObject has been deleted, its canonical MeshObjectIdentifier can no longer be determined
+     * @param timeEventOccurred the time when the event occurred
      * @return the created event
      */
     @Override
-    protected NetChange createDeletedEvent(
-            MeshObject      deletedObject,
+    protected NetMeshObjectDeletedEvent createDeletedEvent(
+            MeshObject           deletedObject,
             MeshObjectIdentifier canonicalIdentifier,
-            long            time )
+            long                 timeEventOccurred )
     {
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
 
         Proxy                 incomingProxy           = realBase.determineIncomingProxy();
         NetMeshBaseIdentifier incomingProxyIdentifier = incomingProxy != null ? incomingProxy.getPartnerMeshBaseIdentifier() : null;
 
-        NetChange ret = new NetMeshObjectDeletedEvent(
+        NetMeshObjectDeletedEvent ret = new NetMeshObjectDeletedEvent(
                 getMeshBase(),
                 getMeshBase().getIdentifier(),
                 (NetMeshObject) deletedObject,
                 canonicalIdentifier,
                 incomingProxyIdentifier,
-                time );
+                timeEventOccurred );
         return ret;
     }
     

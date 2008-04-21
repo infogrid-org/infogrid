@@ -84,7 +84,7 @@ public class StoreShadowMeshBaseLifecycleManager
         StoreShadowMeshBase realBase  = (StoreShadowMeshBase) theMeshBase;
         ModelBase           modelBase = theMeshBase.getModelBase();
 
-        NetMeshBaseIdentifier [] proxyNames = externalized.getProxyNames();
+        NetMeshBaseIdentifier [] proxyNames = externalized.getProxyIdentifiers();
         Proxy []             proxies    = new Proxy[ proxyNames.length ];
 
         int proxyTowardsHomeIndex = -1;

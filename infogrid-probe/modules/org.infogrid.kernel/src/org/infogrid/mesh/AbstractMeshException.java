@@ -139,12 +139,14 @@ public abstract class AbstractMeshException
      * @param identifier the MeshObjectIdentifier to resolve
      * @return the resolved MeshObject
      * @throws MeshObjectAccessException thrown if something went wrong accessing the MeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      * @throws IllegalStateException thrown if no resolving MeshBase is available
      */
     protected MeshObject resolve(
             MeshObjectIdentifier identifier )
         throws
             MeshObjectAccessException,
+            NotPermittedException,
             IllegalStateException
     {
         if( theResolvingMeshBase == null ) {

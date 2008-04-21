@@ -94,8 +94,8 @@ public class XprisoTest9
         
         tx.commitTransaction();
 
-        checkCondition(  obj1_mb2.doWeHaveLock(), "does not have lock" );
-        checkCondition( !obj1_mb1.doWeHaveLock(), "has lock" );
+        checkCondition(  obj1_mb2.hasLock(), "does not have lock" );
+        checkCondition( !obj1_mb1.hasLock(), "has lock" );
         
         //
 
@@ -112,7 +112,7 @@ public class XprisoTest9
         checkEquals( mb2.size(), 1, "wrong number of objects after sweeping" );
 
         checkEquals(    obj1_mb1.getAllProxies(), null, "Wrong number of Proxies on obj1_mb1" );
-        checkCondition( obj1_mb1.doWeHaveLock(), "does not have lock" );
+        checkCondition( obj1_mb1.hasLock(), "does not have lock" );
         checkCondition( obj1_mb2.getIsDead(), "obj1_mb2 not dead" );
     }
 

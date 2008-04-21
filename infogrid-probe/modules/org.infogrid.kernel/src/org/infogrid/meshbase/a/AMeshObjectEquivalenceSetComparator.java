@@ -24,7 +24,7 @@ import java.util.Comparator;
 
 /**
  * The representation of equivalence sets in the "A" implementation requires the consistent
- * ordering of MeshObjects by their Identifiers. This objects defines the order.
+ * ordering of MeshObjects by their identifiers. This objects defines the order.
  */
 public class AMeshObjectEquivalenceSetComparator
         implements

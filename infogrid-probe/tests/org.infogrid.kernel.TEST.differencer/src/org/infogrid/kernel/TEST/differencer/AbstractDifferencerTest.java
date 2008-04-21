@@ -76,7 +76,7 @@ public abstract class AbstractDifferencerTest
     }
     
     /**
-     * Helper method to create a MeshObject
+     * Helper method to createCopy a MeshObject
      */
     protected MeshObject createMeshObject(
             MeshBaseLifecycleManager   life,
@@ -94,15 +94,16 @@ public abstract class AbstractDifferencerTest
     }
 
     /**
-     * Helper method to create a MeshObject
+     * Helper method to createCopy a MeshObject
      */
     protected MeshObject createMeshObject(
             MeshBaseLifecycleManager life,
             MeshObjectIdentifier          identifier,
             long                     now )
         throws
+            MeshObjectIdentifierNotUniqueException,
             TransactionException,
-            MeshObjectIdentifierNotUniqueException
+            NotPermittedException
     {
         MeshObject ret = life.createMeshObject( identifier, now, now, now, -1L );
         return ret;

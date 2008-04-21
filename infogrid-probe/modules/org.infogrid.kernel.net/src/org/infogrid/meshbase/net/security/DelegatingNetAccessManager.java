@@ -15,11 +15,11 @@
 package org.infogrid.meshbase.net.security;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
-import org.infogrid.mesh.net.NetMeshObject;
 
+import org.infogrid.mesh.net.security.AccessLocallyNotPermittedException;
 import org.infogrid.meshbase.net.NetMeshBase;
-import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.security.IdentityChangeException;
@@ -159,6 +159,21 @@ public class DelegatingNetAccessManager
             TransactionException
     {
         theDelegate.assignOwner( toBeOwned, newOwner );
+    }
+    
+    /**
+     * Check whether it is permitted to semantically create a MeshObject with the provided
+     * MeshObjectIdentifier.
+     * 
+     * @param identifier the MeshObjectIdentifier
+     * @throws NotPermittedException thrown if it is not permitted
+     */
+    public void checkPermittedCreate(
+            MeshObjectIdentifier identifier )
+        throws
+            NotPermittedException
+    {
+        theDelegate.checkPermittedCreate( identifier );
     }
     
     /**
@@ -424,17 +439,16 @@ public class DelegatingNetAccessManager
      * provided NetMeshObjectAccessSpecification.
      *
      * @param mb the MeshBase in which the Exception occurred
-     * @param partialResult a partial result, if any, available at the time the Exception occurred
      * @param failedPaths the access path that was used
+     * @throws NotPermittedException thrown if it is not permitted
      */
     public void checkPermittedAccessLocally(
             NetMeshBase                         mb,
-            NetMeshObject []                    partialResults,
             NetMeshObjectAccessSpecification [] failedPaths )
         throws
-            NetMeshObjectAccessException
+            NotPermittedException
     {
-        throw new NetMeshObjectAccessException( mb, partialResults, failedPaths, null ); // has no cause
+        throw new AccessLocallyNotPermittedException( mb, mb.getIdentifier(), failedPaths );
     }
     
     /**

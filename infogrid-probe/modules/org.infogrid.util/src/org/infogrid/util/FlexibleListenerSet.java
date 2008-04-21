@@ -102,6 +102,9 @@ public abstract class FlexibleListenerSet<T,E,P>
      * Add a new listener object to this set using a WeakReference.
      *
      * @param newListener the listener to be added to this set
+     * @see #addSoft
+     * @see #addDirect
+     * @see remove
      */
     public void addWeak(
             T newListener )
@@ -113,6 +116,9 @@ public abstract class FlexibleListenerSet<T,E,P>
      * Add a new listener object to this set using a SoftReference.
      *
      * @param newListener the listener to be added to this set
+     * @see #addWeak
+     * @see #addDirect
+     * @see remove
      */
     public void addSoft(
             T newListener )
@@ -124,6 +130,9 @@ public abstract class FlexibleListenerSet<T,E,P>
      * Add a new listener object to this set directly, i.e. without using References.
      *
      * @param newListener the listener to be added to this set
+     * @see #addSoft
+     * @see #addWeak
+     * @see remove
      */
     public void addDirect(
             T newListener )
@@ -165,6 +174,9 @@ public abstract class FlexibleListenerSet<T,E,P>
      * Remove a listener object member of this set.
      *
      * @param oldListener the listener to be removed from this set
+     * @see #addSoft
+     * @see #addDirect
+     * @see #addWeak
      */
     @SuppressWarnings(value={"unchecked"})
     public synchronized void remove(

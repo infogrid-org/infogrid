@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import org.infogrid.meshbase.transaction.NotWithinTransactionBoundariesException;
 
 /**
  * This Collects functionality that is probably useful to all implementations
@@ -1892,7 +1893,7 @@ public abstract class AbstractMeshObject
     {
         Transaction tx = mb.getCurrentTransaction();
         if( tx == null ) {
-            throw new TransactionException.NotWithinTransactionBoundaries( mb );
+            throw new NotWithinTransactionBoundariesException( mb );
         }
 
         tx.checkThreadIsAllowed();

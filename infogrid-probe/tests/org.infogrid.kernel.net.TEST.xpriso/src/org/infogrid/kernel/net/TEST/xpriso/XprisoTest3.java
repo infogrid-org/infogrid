@@ -74,8 +74,8 @@ public class XprisoTest3
 
         log.info( "Checking where the lock is" );
         
-        checkCondition( obj_mb1.doWeHaveLock(),  "obj_mb1 does not have the lock" );
-        checkCondition( !obj_mb2.doWeHaveLock(), "obj_mb2 has the lock" );
+        checkCondition( obj_mb1.hasLock(),  "obj_mb1 does not have the lock" );
+        checkCondition( !obj_mb2.hasLock(), "obj_mb2 has the lock" );
 
         //
         
@@ -84,8 +84,8 @@ public class XprisoTest3
         boolean success = obj_mb2.tryToObtainLock();
         
         checkCondition( success, "Obtaining the lock failed" );
-        checkCondition( !obj_mb1.doWeHaveLock(),  "obj_mb1 has the lock" );
-        checkCondition( obj_mb2.doWeHaveLock(),  "obj_mb2 does not have the lock" );
+        checkCondition( !obj_mb1.hasLock(),  "obj_mb1 has the lock" );
+        checkCondition( obj_mb2.hasLock(),  "obj_mb2 does not have the lock" );
 
         checkProxies( obj_mb1, new NetMeshBase[] { mb2 }, null, mb2,  "obj_mb1 has wrong proxies" );
         checkProxies( obj_mb2, new NetMeshBase[] { mb1 }, mb1,  null, "obj_mb2 has wrong proxies" );
@@ -93,8 +93,8 @@ public class XprisoTest3
         success = obj_mb1.tryToObtainLock();
         
         checkCondition( success, "Obtaining the lock failed" );
-        checkCondition( obj_mb1.doWeHaveLock(),  "obj_mb1 does not have the lock" );
-        checkCondition( !obj_mb2.doWeHaveLock(), "obj_mb2 has the lock" );
+        checkCondition( obj_mb1.hasLock(),  "obj_mb1 does not have the lock" );
+        checkCondition( !obj_mb2.hasLock(), "obj_mb2 has the lock" );
         
         checkProxies( obj_mb1, new NetMeshBase[] { mb2 }, null, null, "obj_mb1 has wrong proxies" );
         checkProxies( obj_mb2, new NetMeshBase[] { mb1 }, mb1,  mb1,  "obj_mb2 has wrong proxies" );
@@ -107,8 +107,8 @@ public class XprisoTest3
         success = obj_mb2.tryToObtainLock();
         
         checkCondition( !success, "Obtaining the lock should have failed" );
-        checkCondition( obj_mb1.doWeHaveLock(),  "obj_mb1 does not have the lock" );
-        checkCondition( !obj_mb2.doWeHaveLock(), "obj_mb2 has the lock" );
+        checkCondition( obj_mb1.hasLock(),  "obj_mb1 does not have the lock" );
+        checkCondition( !obj_mb2.hasLock(), "obj_mb2 has the lock" );
 
         checkProxies( obj_mb1, new NetMeshBase[] { mb2 }, null, null, "obj_mb1 has wrong proxies" );
         checkProxies( obj_mb2, new NetMeshBase[] { mb1 }, mb1,  mb1,  "obj_mb2 has wrong proxies" );
