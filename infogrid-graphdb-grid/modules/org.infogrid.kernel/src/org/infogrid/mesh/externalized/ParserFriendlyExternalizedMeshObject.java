@@ -108,9 +108,9 @@ public class ParserFriendlyExternalizedMeshObject
     }
 
     /**
-     * Obtain the Identifiers of the neighbors of this MeshObject.
+     * Obtain the identifiers of the neighbors of this MeshObject.
      * 
-     * @return the Identifiers of the neighbors
+     * @return the dentifiers of the neighbors
      * @see #getTypes
      */
     public MeshObjectIdentifier[] getNeighbors()
@@ -126,6 +126,7 @@ public class ParserFriendlyExternalizedMeshObject
      * Obtain the RoleTypes played by this MeshObject with respect to
      * a given neighbor.
      *
+     * @param neighbor the neighbor
      * @return the RoleTypes
      */
     public MeshTypeIdentifier [] getRoleTypesFor(
@@ -144,7 +145,7 @@ public class ParserFriendlyExternalizedMeshObject
     /**
      * Add an equivalent, using its MeshObjectIdentifier.
      * 
-     * @param identifier the HasTypes of an equivalent
+     * @param identifier the MeshObjectIdentifier of an equivalent
      */
     public void addEquivalent(
             MeshObjectIdentifier identifier )
@@ -155,7 +156,7 @@ public class ParserFriendlyExternalizedMeshObject
     /**
      * Get the MeshObject's equivalents, if any.
      *
-     * @return the equivalents' Identifiers.
+     * @return the equivalents' MeshObjectIdentifiers.
      */
     public MeshObjectIdentifier[] getEquivalents()
     {
@@ -164,10 +165,9 @@ public class ParserFriendlyExternalizedMeshObject
     }
 
     /**
-     * Add a PropertyType, using its HasTypes.
+     * Add a PropertyType, using its MeshTypeIdentifier.
      * 
-     * 
-     * @param identifier the PropertyType's HasTypes
+     * @param identifier the PropertyType's identifier
      */
     public void addPropertyType(
             MeshTypeIdentifier identifier )
@@ -176,9 +176,9 @@ public class ParserFriendlyExternalizedMeshObject
     }
 
     /**
-     * Get the PropertyTypes' Identifiers.
+     * Get the PropertyTypes' MeshTypeIdentifiers.
      *
-     * @return the PropertyTypes' Identifiers.
+     * @return the PropertyTypes' identifiers.
      */
     public MeshTypeIdentifier [] getPropertyTypes()
     {
@@ -209,9 +209,9 @@ public class ParserFriendlyExternalizedMeshObject
     }
 
     /**
-     * Add a Relationship.
+     * Add a relationship.
      *
-     * @param rel the other Relationship
+     * @param rel the other relationship
      */
     public void addRelationship(
             HasRoleTypes rel )
@@ -220,9 +220,9 @@ public class ParserFriendlyExternalizedMeshObject
     }
 
     /**
-     * Get the Relationships.
+     * Get the relationships.
      *
-     * @return the Relationships
+     * @return the elationships
      */
     public HasRoleTypes [] getRelationships()
     {
@@ -252,17 +252,17 @@ public class ParserFriendlyExternalizedMeshObject
     }
 
     /**
-     * The Identifiers of the MeshTypes.
+     * The MeshTypeIdentifiers of the MeshTypes.
      */
     protected ArrayList<MeshTypeIdentifier> theMeshTypes = new ArrayList<MeshTypeIdentifier>();
     
     /**
-     * The Identifiers of the equivalents.
+     * The MeshObjectIdentifiers of the equivalents.
      */
     protected ArrayList<MeshObjectIdentifier> theEquivalents = new ArrayList<MeshObjectIdentifier>();
     
     /**
-     * The Identifiers of the PropertyTypes.
+     * The MeshTypeIdentifiers of the PropertyTypes.
      */
     protected ArrayList<MeshTypeIdentifier> thePropertyTypes = new ArrayList<MeshTypeIdentifier>();
     
@@ -272,7 +272,7 @@ public class ParserFriendlyExternalizedMeshObject
     protected ArrayList<PropertyValue> thePropertyValues = new ArrayList<PropertyValue>();
 
     /**
-     * The Relationships in which this ExternalizedMeshObject participates.
+     * The relationships in which this ExternalizedMeshObject participates.
      */
     protected ArrayList<HasRoleTypes> theRelationships = new ArrayList<HasRoleTypes>();
     
@@ -282,12 +282,15 @@ public class ParserFriendlyExternalizedMeshObject
     protected PropertyValue theCurrentPropertyValue;
 
     /**
-     * Represents something thas has types.
+     * Represents something thas has types, i.e. as a MeshType or a relationship.
      */
     public static class HasTypes
     {
         /**
          * Constructor.
+         * 
+         * @param identifier the MeshObjectIdentifier
+         * @param timeUpdated the time it was last updated
          */
         public HasTypes(
                 MeshObjectIdentifier identifier,
@@ -298,9 +301,9 @@ public class ParserFriendlyExternalizedMeshObject
         }
 
         /**
-         * Obtain the HasTypes of the MeshObject at this end.
+         * Obtain the MeshObjectIdentifier of the MeshObject at this end.
          * 
-         * @return the HasTypes of the MeshObject at this end
+         * @return the MeshObjectIdentifier of the MeshObject at this end
          */
         public MeshObjectIdentifier getIdentifier()
         {
@@ -308,9 +311,9 @@ public class ParserFriendlyExternalizedMeshObject
         }
         
         /**
-         * Get the Identifiers of the RoleTypes played by this relationship.
+         * Get the identifiers of the types at this end, i.e. EntityTypes or RoleTypes.
          *
-         * @return the Identifiers of the RoleTypes
+         * @return the identifiers of the types
          */
         public MeshTypeIdentifier [] getTypes()
         {
@@ -319,9 +322,9 @@ public class ParserFriendlyExternalizedMeshObject
         }
 
         /**
-         * Add the HasTypes of a RoleType.
+         * Add a type by identifier
          * 
-         * @param identifier the HasTypes
+         * @param identifier the identifier
          */
         public void addType(
                 MeshTypeIdentifier identifier )
@@ -330,9 +333,9 @@ public class ParserFriendlyExternalizedMeshObject
         }
 
         /**
-         * Obtain the time at which the update was performed.
+         * Obtain the time at which it was last updated.
          *
-         * @return the time at which the udpated was performed, in System.currentTimeMillis() format.
+         * @return the time at which it was last updated, in System.currentTimeMillis() format.
          */
         public long getTimeUpdated()
         {
@@ -340,23 +343,23 @@ public class ParserFriendlyExternalizedMeshObject
         }
 
         /**
-         * The HasTypes of the MeshObject on this side.
+         * The MeshObjectIdentifier of the MeshObject on this side.
          */
         protected MeshObjectIdentifier theIdentifier;
 
         /**
-         * The Identifiers of the RoleTypes.
+         * The identifiers of the types.
          */
         protected ArrayList<MeshTypeIdentifier> theTypes = new ArrayList<MeshTypeIdentifier>();
 
         /**
-         * The time at which this event occurred.
+         * The time at which it was last updated.
          */
         protected long theTimeUpdated;
     }
 
     /**
-     * Represents something that has RoleTypes.
+     * Represents something that has RoleTypes, i.e. a relationship.
      */
     public static class HasRoleTypes
             extends
@@ -365,7 +368,9 @@ public class ParserFriendlyExternalizedMeshObject
         /**
          * Constructor.
          * 
-         * @param identifier the HasTypes of the other side of the relationship
+         * @param identifier the MeshObjectIdentifier on this side of the relationship
+         * @param neighborIdentifier the MeshObjectIdentifier on the other side of the relationship
+         * @param timeUpdated the time it was last updated
          */
         public HasRoleTypes(
                 MeshObjectIdentifier identifier,
@@ -378,9 +383,9 @@ public class ParserFriendlyExternalizedMeshObject
         }
 
         /**
-         * Obtain the HasTypes of the MeshObject at the other end.
+         * Obtain the MeshObjectIdentifier of the MeshObject at the other end.
          * 
-         * @return the HasTypes of the MeshObject at the other end
+         * @return the HasMeshObjectIdentifierypes of the MeshObject at the other end
          */
         public MeshObjectIdentifier getNeighborIdentifier()
         {
@@ -388,35 +393,37 @@ public class ParserFriendlyExternalizedMeshObject
         }
         
         /**
-         * The HasTypes of the MeshObject on the other side.
+         * The MeshObjectIdentifier of the MeshObject on the other side.
          */
         protected MeshObjectIdentifier theNeighborIdentifier;
     }
     
     /**
-     * Represents something that has Properties.
+     * Represents something that has Properties, i.e. a MeshObject.
      */
     public static class HasProperties
     {
         /**
          * Constructor.
          * 
-         * @param identifier the HasTypes of the other side of the relationship
+         * @param identifier the MeshObjectIdentifier
+         * @param propertyTypeName the identifier of the PropertyType
+         * @param timeUpdated the time it was last updated
          */
         public HasProperties(
                 MeshObjectIdentifier identifier,
                 MeshTypeIdentifier   propertyTypeName,
                 long                 timeUpdated )
         {
-            theIdentifier     = identifier;
+            theIdentifier       = identifier;
             thePropertyTypeName = propertyTypeName;
             theTimeUpdated      = timeUpdated;
         }
         
         /**
-         * Obtain the HasTypes of the MeshObject at this end.
+         * Obtain the MeshObjectIdentifier.
          * 
-         * @return the HasTypes of the MeshObject at this end
+         * @return the MeshObjectIdentifier
          */
         public MeshObjectIdentifier getIdentifier()
         {
@@ -424,9 +431,9 @@ public class ParserFriendlyExternalizedMeshObject
         }
         
         /**
-         * Obtain the HasTypes of the PropertyType.
+         * Obtain the identifier of the PropertyType.
          * 
-         * @return the HasTypes of the PropertyType.
+         * @return the identifier of the PropertyType.
          */
         public MeshTypeIdentifier getPropertyTypeName()
         {
@@ -434,9 +441,9 @@ public class ParserFriendlyExternalizedMeshObject
         }
         
         /**
-         * Obtain the time at which the update was performed.
+         * Obtain the time at which it was last updated.
          *
-         * @return the time at which the udpated was performed, in System.currentTimeMillis() format.
+         * @return the time at which it was last updated, in System.currentTimeMillis() format.
          */
         public long getTimeUpdated()
         {
@@ -449,12 +456,12 @@ public class ParserFriendlyExternalizedMeshObject
         protected MeshObjectIdentifier theIdentifier;
 
         /**
-         * The Identifier PropertyType.
+         * The PropertyType's identifier.
          */
         protected MeshTypeIdentifier thePropertyTypeName;
 
         /**
-         * The time at which this event occurred.
+         * The time at which it was last updated.
          */
         protected long theTimeUpdated;
     }

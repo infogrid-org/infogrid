@@ -39,7 +39,7 @@ import org.infogrid.util.MCachingHashMap;
 import org.infogrid.util.logging.Log;
 
 /**
- * This networked MeshBase is held only in memory. It has no persistence whatsoever.
+ * This NetMeshBase is held only in memory. It has no persistence whatsoever.
  */
 public class NetMMeshBase
         extends
@@ -50,36 +50,51 @@ public class NetMMeshBase
     /**
       * Factory method.
       *
-      * @param modelBase the ModelBase with the type definitions we use
-      * @param c the Context in which this MeshBase will run
+     * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
+     * @param endpointFactory the factory for NetMessageEndpoints to communicate with other NetMeshBases
+     * @param modelBase the ModelBase containing type information
+     * @param accessMgr the AccessManager that controls access to this NetMeshBase
+     * @param context the Context in which this NetMeshBase runs.
+     * @return the created NetMMeshBase
       */
     public static NetMMeshBase create(
             NetMeshBaseIdentifier     identifier,
             NetMessageEndpointFactory endpointFactory,
             ModelBase                 modelBase,
             NetAccessManager          accessMgr,
-            Context                   c )
+            Context                   context )
     {
         ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create();
 
-        NetMMeshBase ret = NetMMeshBase.create( identifier, endpointFactory, setFactory, modelBase, accessMgr, c );
+        NetMMeshBase ret = create(
+                identifier,
+                endpointFactory,
+                setFactory,
+                modelBase,
+                accessMgr,
+                context );
 
         return ret;
     }
 
     /**
-      * Factory method.
-      *
-      * @param modelBase the ModelBase with the type definitions we use
-      * @param c the Context in which this MeshBase will run
-      */
+     * Factory method.
+     *
+     * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
+     * @param endpointFactory the factory for NetMessageEndpoints to communicate with other NetMeshBases
+     * @param setFactory the factory for MeshObjectSets appropriate for this NetMeshBase
+     * @param modelBase the ModelBase containing type information
+     * @param accessMgr the AccessManager that controls access to this NetMeshBase
+     * @param context the Context in which this NetMeshBase runs.
+     * @return the created NetMMeshBase
+     */
     public static NetMMeshBase create(
             NetMeshBaseIdentifier     identifier,
             NetMessageEndpointFactory endpointFactory,
             MeshObjectSetFactory      setFactory,
             ModelBase                 modelBase,
             NetAccessManager          accessMgr,
-            Context                   c )
+            Context                   context )
     {
         MCachingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = MCachingHashMap.create();
         MCachingHashMap<NetMeshBaseIdentifier,Proxy>     proxyStorage  = MCachingHashMap.create();
@@ -89,7 +104,15 @@ public class NetMMeshBase
         
         NetMeshObjectIdentifierFactory identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( identifier );
 
-        NetMMeshBase ret = new NetMMeshBase( identifier, identifierFactory, setFactory, modelBase, accessMgr, objectStorage, proxyManager, c );
+        NetMMeshBase ret = new NetMMeshBase(
+                identifier,
+                identifierFactory,
+                setFactory,
+                modelBase,
+                accessMgr,
+                objectStorage,
+                proxyManager,
+                context );
 
         setFactory.setMeshBase( ret );
         proxyFactory.setNetMeshBase( ret );
@@ -104,9 +127,14 @@ public class NetMMeshBase
     /**
      * Constructor.
      * 
-     * @param identifier the NetMeshBaseIdentifier through which this NetworkedMeshBase can be reached
-     * @param modelBase the ModelBase with the type definitions we use
-     * @param c the Context in which this MeshBase will run
+     * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
+     * @param identifierFactory the factory for NetMeshObjectIdentifiers appropriate for this NetMeshBase
+     * @param setFactory the factory for MeshObjectSets appropriate for this NetMeshBase
+     * @param modelBase the ModelBase containing type information
+     * @param accessMgr the AccessManager that controls access to this NetMeshBase
+     * @param cache the CachingMap that holds the NetMeshObjects in this NetMeshBase
+     * @param proxyManager the ProxyManager used by this NetMeshBase
+     * @param context the Context in which this NetMeshBase runs.
      */
     protected NetMMeshBase(
             NetMeshBaseIdentifier                       identifier,
@@ -116,8 +144,15 @@ public class NetMMeshBase
             NetAccessManager                            accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             ProxyManager                                proxyManager,
-            Context                                     c )
+            Context                                     context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, proxyManager, c );
+        super(  identifier,
+                identifierFactory,
+                setFactory,
+                modelBase,
+                accessMgr,
+                cache,
+                proxyManager,
+                context );
     }
 }

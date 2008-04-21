@@ -20,12 +20,14 @@ import org.infogrid.util.AbstractLocalizedException;
 
 /**
  * This Exception is thrown if a caller attempted to associate a different identity
- * (e.g. super-user identity) with the current Thread, and was not permitted to do so.
+ * (e.g. super-user identity) with the current Thread, and was not authorized to do so.
  */
 public class IdentityChangeException
         extends
             AbstractLocalizedException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

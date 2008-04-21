@@ -15,10 +15,10 @@
 package org.infogrid.meshbase.transaction;
 
 import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
 
 /**
-  * A supertype for all {@link Transaction}-related Exceptions. Inner classes
-  * provide more concrete subclasses.
+  * A superclass for all {@link Transaction}-related Exceptions.
   */
 public abstract class TransactionException
         extends
@@ -35,6 +35,7 @@ public abstract class TransactionException
             Transaction tx )
     {
         theTransactable = mb;
+        theIdentifier   = mb.getIdentifier();
         theTransaction  = tx;
     }
 
@@ -43,9 +44,19 @@ public abstract class TransactionException
      *
      * @return the MeshBase that raised this TransactionException
      */
-    public final MeshBase getTransactable()
+    public MeshBase getTransactable()
     {
         return theTransactable;
+    }
+
+    /**
+     * Obtain the MeshBaseIdentifier of the MeshBase that raised this TransactionException.
+     * 
+     * @return the MeshBaseIdentifier of the MeshBase that raised this TransactionException
+     */
+    public MeshBaseIdentifier getTransactableIdentifier()
+    {
+        return theIdentifier;
     }
 
     /**
@@ -53,7 +64,7 @@ public abstract class TransactionException
      *
      * @return the Transaction that raised this TransactionException
      */
-    public final Transaction getTransaction()
+    public Transaction getTransaction()
     {
         return theTransaction;
     }
@@ -66,7 +77,7 @@ public abstract class TransactionException
     @Override
     public String toString()
     {
-        return super.toString() + " -- MB: " + theTransactable + ", TX: " + theTransaction;
+        return super.toString() + " -- MB: " + theIdentifier + ", TX: " + theTransaction;
     }
 
     /**
@@ -75,117 +86,12 @@ public abstract class TransactionException
     protected transient MeshBase theTransactable;
 
     /**
+     * The identifier of the MeshBase that raised this TransactionException.
+     */
+    protected MeshBaseIdentifier theIdentifier;
+
+    /**
      * The Transaction that raised this TransactionException.
      */
     protected transient Transaction theTransaction;
-
-    /**
-      * This TransactionException is thrown if a (potentially) modifying operation
-      * is invoked by a Thread that does not belong to the currently active Transaction.
-      */
-    public static class IllegalTransactionThread
-            extends
-                TransactionException
-    {
-        private static final long serialVersionUID = 1L; // helps with serialization
-
-        /**
-         * Constructor.
-         *
-         * @param trans the MeshBase that was affected
-         */
-        public IllegalTransactionThread(
-                MeshBase trans )
-        {
-            super( trans, trans.getCurrentTransaction() );
-        }
-    }
-
-    /**
-      * This TransactionException is thrown if a (potentially) modifying operation
-      * is invoked outside of Transaction boundaries.
-      */
-    public static class NotWithinTransactionBoundaries
-            extends
-                TransactionException
-    {
-        private static final long serialVersionUID = 1L; // helps with serialization
-
-        /**
-         * Constructor.
-         *
-         * @param trans the MeshBase that was affected
-         */
-        public NotWithinTransactionBoundaries(
-                MeshBase trans )
-        {
-            super( trans, null );
-        }
-    }
-
-    /**
-      * This TransactionException is thrown to indicate that a Transaction is
-      * already active and thus the asked-for new Transaction cannot be created.
-      */
-    public static class TransactionActiveAlready
-            extends
-                TransactionException
-    {
-        private static final long serialVersionUID = 1L; // helps with serialization
-
-        /**
-         * Constructor.
-         *
-         * @param trans the MeshBase that was affected
-         * @param blockingTransaction the Transaction that blocked the new Transaction
-         */
-        public TransactionActiveAlready(
-                MeshBase    trans,
-                Transaction blockingTransaction )
-        {
-            super( trans, blockingTransaction );
-        }
-    }
-
-    /**
-      * This TransactionException is thrown to indicate that the current Thread reached a time out for
-      * trying to create a Transaction "asap". While there may be genuine congestion in an application,
-      * the most likely cause of this Exception is that the developer forgot to complete a previously
-      * opened Transaction, in which case the next Transaction cannot be started.
-      * <p>In our experience, the best pattern to use for Transactions is this:
-      * <pre>
-      * Transaction tx = null;
-      * try {
-      *    tx = meshBase.createTransactionXXX(); // use one of the factory methods, mor being the ModelObjectRepository for which the Transaction shall be created
-      *    // code that is subject to the Transaction
-      * } catch( ... ) {
-      *    // catch code for whatever Exceptions need to be handled her
-      * } finally {
-      *    if( tx != null ) {
-      *        tx.commit();
-      *    }
-      * }
-      * </pre>
-      * This code works with all Transaction factory methods, including the ones that do not actually create
-      * a Transaction because the current Thread has an open Transaction already.
-      */
-    public static class TransactionAsapTimeout
-            extends
-                TransactionException
-    {
-        private static final long serialVersionUID = 1L; // helps with serialization
-
-        /**
-         * Constructor.
-         *
-         * @param trans the MeshBase that was affected
-         * @param blockingTransaction the Transaction that blocked the new Transaction
-         */
-        public TransactionAsapTimeout(
-                MeshBase    trans,
-                Transaction blockingTransaction )
-        {
-            super( trans, blockingTransaction );
-        }
-    }
 }

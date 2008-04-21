@@ -69,13 +69,13 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
      * Obtain the source of the event.
      *
      * @return the source of the event
-     * @throws UnresolvedException if this ExternalizableEvent was serialized/deserialized,
+     * @throws SourceUnresolvedException if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the source failed
      */
     @Override
     public synchronized S getSource()
         throws
-            UnresolvedException.Source
+            SourceUnresolvedException
     {
         if( theSource == null ) {
             theSource = resolveSource();
@@ -122,25 +122,25 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
      * Enable subclass to resolve the source of the event.
      *
      * @return the source of the event
-     * @throws UnresolvedException.Source thrown if this ExternalizableEvent was serialized/deserialized,
+     * @throws SourceUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the source failed
      */
     protected abstract S resolveSource()
             throws
-                UnresolvedException.Source;
+                SourceUnresolvedException;
     
     /**
      * Enable subclass to resolve a value of the event.
      *
      * @param vid the identifier of the value of the event
      * @return a value of the event
-     * @throws UnresolvedException.Value thrown if this ExternalizableEvent was serialized/deserialized,
+     * @throws ValueUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     protected abstract V resolveValue(
             VID vid )
        throws
-           UnresolvedException.Value;
+           ValueUnresolvedException;
     
     /**
      * Obtain the time at which the event occurred.

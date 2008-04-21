@@ -38,9 +38,9 @@ public abstract class AbstractMeshObjectIdentifierFactory
     }
 
     /**
-     * Create a unique Identifier.
+     * Create a unique MeshObjectIdentifier.
      *
-     * @return the unique Identifier
+     * @return the unique MeshObjectIdentifier
      */
     public MeshObjectIdentifier createMeshObjectIdentifier()
     {

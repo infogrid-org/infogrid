@@ -34,7 +34,7 @@ public class DefaultProxy
      * Factory method.
      *
      * @param ep the communications endpoint
-     * @param mb the MeshBase this Proxy belongs to
+     * @param mb the NetMeshBase this Proxy belongs to
      * @return the created DefaultProxy
      */
     public static DefaultProxy create(
@@ -50,14 +50,15 @@ public class DefaultProxy
     }
 
     /**
-     * Factory method to restoreProxy from storage.
+     * Factory method to restore a Proxy from storage.
      *
      * @param ep the communications endpoint
-     * @param mb the MeshBase this Proxy belongs to
+     * @param mb the NetMeshBase this Proxy belongs to
      * @param timeCreated the timeCreated to use
      * @param timeUpdated the timeUpdated to use
      * @param timeRead the timeRead to use
      * @param timeExpires the timeExpires to use
+     * @return the restored DefaultProxy
      */
     public static DefaultProxy restoreProxy(
             NetMessageEndpoint ep,
@@ -79,7 +80,7 @@ public class DefaultProxy
      * Constructor.
      *
      * @param ep the communications endpoint
-     * @param mb the MeshBase this Proxy belongs to
+     * @param mb the NetMeshBase this Proxy belongs to
      */
     protected DefaultProxy(
             NetMessageEndpoint ep,
@@ -92,7 +93,7 @@ public class DefaultProxy
      * Constructor.
      *
      * @param ep the communications endpoint
-     * @param mb the MeshBase this Proxy belongs to
+     * @param mb the NetMeshBase this Proxy belongs to
      * @param timeCreated the timeCreated to use
      * @param timeUpdated the timeUpdated to use
      * @param timeRead the timeRead to use
@@ -116,7 +117,7 @@ public class DefaultProxy
 
     /**
      * Internal implementation method for messageReceived. Overriding this makes
-     * debugging easier.
+     * debugging easier as we only get breakpoints from instances of this class.
      *
      * @param endpoint the MessageEndpoint through which the message arrived
      * @param incoming the incoming message

@@ -68,29 +68,45 @@ public interface NonXmlStreamProbe
     /**
      * Read from the InputStream and instantiate corresponding MeshObjects.
      * 
-     * @param networkId the NetMeshBaseIdentifier that is being accessed
+     * @param dataSourceIdentifier identifies the data source that is being accessed
      * @param coherenceSpecification the type of data coherence that is requested by the application. Probe
      *         implementors may ignore this parameter, letting the Probe framework choose its own policy.
      *         If the Probe chooses to define its own policy (considering or ignoring this parameter), the
      *         Probe must bless the Probe's HomeObject with a subtype of ProbeUpdateSpecification (defined
-     *         in the <code>org.infogrid.model.Probe</code>) that reflects the policy.
+     *         in the <code>org.infogrid.model.Probe</code> Subject Area) that reflects the policy.
      * @param theInputStream the InputStream to read from
      * @param theContentType the content type (MIME) if known
-     * @param mb the StagingMeshBase in which the corresponding MeshObjects are instantiated by the Probe
-     * @throws IdentMeshObjectIdentifierNotUniqueExceptionhe Probe developer incorrectly
-     *         assigned duplicate Identifiers to created MeshObjects
-     * @throws RelatedAlreadyException thrown if the Probe developer incorrectly attempted to
-     *         relate two already-related MeshObjects
-     * @throws TransactionException this Exception is declared to make programming easier,
-     *         although actually throwing it would be a programming error
-     * @throws NotPermittedException thrown if an operation performed by the Probe was not permitted
-     * @throws ProbeException a Probe error occurred per the possible subclasses defined in ProbeException
+     * @param mb the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe
+     * @throws IsAbstractException thrown if an EntityType or a Relationship could not be instantiated because
+     *         it was abstract. Throwing this typically indicates a programming error.
+     * @throws EntityBlessedAlreadyException thrown if a MeshObject was incorrectly blessed twice with the same
+     *         EntityType. Throwing this typically indicates a programming error.
+     * @throws EntityNotBlessedException thrown if a MeshObject was not blessed with a required EntityType.
+     *         Throwing this typically indicates a programming error.
+     * @throws IllegalPropertyTypeException thrown if a MeshObject did not carry a PropertyType that it needed
+     *         to carry. Throwing this typically indicates a programming error.
+     * @throws IllegalPropertyValueException thrown if a PropertyValue was assigned to a property that was
+     *         outside of the allowed range. Throwing this typically indicates a programming error.
      * @throws IOException an input/output error occurred during execution of the Probe
+     * @throws MeshObjectIdentifierNotUniqueException thrown if the Probe developer incorrectly
+     *         assigned duplicate MeshObjectsIdentifiers to created MeshObjects.
+     *         Throwing this typically indicates a programming error.
      * @throws ModuleException thrown if a Module required by the Probe could not be loaded
+     * @throws NotPermittedException thrown if an operation performed by the Probe was not permitted
+     * @throws NotRelatedException thrown if a relationship was supposed to be blessed, but the relationship
+     *         did not exist. Throwing this typically indicates a programming error.
+     * @throws RelatedAlreadyException thrown if the Probe developer incorrectly attempted to
+     *         relate two already-related MeshObjects. Throwing this typically indicates a programming error.
+     * @throws RoleTypeBlessedAlreadyException thrown if a relationship was incorrectly blessed twice with the same
+     *         RelationshipType, in the same direction. Throwing this typically indicates a programming error.
+     * @throws TransactionException this Exception is declared to make programming easier,
+     *         although actually throwing it would be a programming error. Throwing this typically indicates a programming error.
+     * @throws ProbeException a Probe error occurred per the possible subclasses defined in ProbeException
+     * @throws URISyntaxException thrown if a URI was constructed in an invalid way
      */
     public void readFromStream(
-            NetMeshBaseIdentifier      networkId,
-            CoherenceSpecification coherence,
+            NetMeshBaseIdentifier  dataSourceIdentifier,
+            CoherenceSpecification coherenceSpecification,
             InputStream            theInputStream,
             String                 theContentType,
             StagingMeshBase        mb )

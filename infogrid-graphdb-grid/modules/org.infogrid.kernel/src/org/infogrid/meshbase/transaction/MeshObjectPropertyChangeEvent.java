@@ -26,7 +26,7 @@ import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 
 import org.infogrid.util.event.AbstractExternalizablePropertyChangeEvent;
-import org.infogrid.util.event.UnresolvedException;
+import org.infogrid.util.event.PropertyUnresolvedException;
 
 
 /**
@@ -221,7 +221,7 @@ public class MeshObjectPropertyChangeEvent
     protected MeshObject resolveSource()
     {
         if( theResolver == null ) {
-            throw new UnresolvedException.Property( this );
+            throw new PropertyUnresolvedException( this );
         }
         
         MeshObject ret = theResolver.findMeshObjectByIdentifier( getSourceIdentifier() );
@@ -236,7 +236,7 @@ public class MeshObjectPropertyChangeEvent
     protected PropertyType resolveProperty()
     {
         if( theResolver == null ) {
-            throw new UnresolvedException.Property( this );
+            throw new PropertyUnresolvedException( this );
         }
         
         try {
@@ -244,7 +244,7 @@ public class MeshObjectPropertyChangeEvent
             return ret;
 
         } catch( MeshTypeWithIdentifierNotFoundException ex ) {
-            throw new UnresolvedException.Property( this, ex );
+            throw new PropertyUnresolvedException( this, ex );
         }
     }
     

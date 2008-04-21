@@ -45,6 +45,7 @@ import org.infogrid.util.logging.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 
 /**
  * Tests the ProxyStoreEntryMapper's parsing functionality.
@@ -400,7 +401,7 @@ public class ProxySerializationTest1
                 String                               senderNetworkIdentifierString,
                 String                               receiverNetworkIdentifierString,
                 NetMeshObjectAccessSpecification []  requestedFirstTimeObjects,
-                MeshObjectIdentifier []              requestedCanceledObjects,
+                NetMeshObjectIdentifier []           requestedCanceledObjects,
                 NetMeshObjectDeletedEvent []         deleteChanges,
                 long   []                            deleteUpdateTimes,
                 NetMeshObjectCreatedEvent []         creations,
@@ -412,10 +413,10 @@ public class ProxySerializationTest1
                 NetMeshObjectRoleRemovedEvent []     roleRemovals,
                 NetMeshObjectTypeAddedEvent []       typeAdditions,
                 NetMeshObjectTypeRemovedEvent []     typeRemovals,
-                MeshObjectIdentifier []              requestedLockObjects,
-                MeshObjectIdentifier []              pushLockObjects,
-                MeshObjectIdentifier []              reclaimedLockObjects,
-                MeshObjectIdentifier []              requestedResynchronizeDependentReplicas,
+                NetMeshObjectIdentifier []           requestedLockObjects,
+                NetMeshObjectIdentifier []           pushLockObjects,
+                NetMeshObjectIdentifier []           reclaimedLockObjects,
+                NetMeshObjectIdentifier []           requestedResynchronizeDependentReplicas,
                 SimpleExternalizedNetMeshObject []   resynchronizedDependentReplicas,
                 boolean                              ceaseCommunications )
             throws
