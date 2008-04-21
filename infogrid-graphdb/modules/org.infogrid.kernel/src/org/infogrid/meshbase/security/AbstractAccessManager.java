@@ -35,6 +35,8 @@ public abstract class AbstractAccessManager
      * the caller is anonymous.
      *
      * @return the identity of the caller, or null.
+     * @see #setCaller
+     * @see #unsetCaller
      */
     public final MeshObject getCaller()
     {
@@ -70,23 +72,21 @@ public abstract class AbstractAccessManager
     }
 
     /**
-     * Set the identity of the caller on this Thread. This will unset any previous
-     * identity set on this Thread. Generally, the sequence of invocation should be:
-     * <pre>
-     * try {
-     *     identifyCallerOnThread( theCaller );
-     *     performWork();
-     * } finally {
-     *     callerDoneOnThread();
-     * }
-     * </pre>
+     * <p>Set the identity of the caller on this Thread. This will unset any previous
+     * identity set on this Thread.</p>
+     * <p>The implementation on this level allows anybody to change the identity associated
+     * with the current Thread; subclasses may implement this differently.</p>
      *
      * @param caller the caller, or null if anonymous
      * @return the previously set caller, if any
+     * @throws IdentityChangeException thrown if the current caller was not authorized to perform this operation
+     * @see #getCaller
      * @see #unsetCaller
      */
-    public final MeshObject setCaller(
+    public MeshObject setCaller(
             MeshObject caller )
+        throws
+            IdentityChangeException
     {
         if( log.isDebugEnabled() ) {
             log.debug( this + ".setCaller( " + caller + " )" );
@@ -98,14 +98,19 @@ public abstract class AbstractAccessManager
     }
 
     /**
-     * Unset the identity of the caller on this Thread. This is called when the caller
-     * is done.
+     * <p>Unset the identity of the caller on this Thread. This is called when the caller
+     * is done, for example.</p>
+     * <p>The implementation on this level allows anybody to change the identity associated
+     * with the current Thread; subclasses may implement this differently.</p>
      *
      * @return the previously set caller, if any
+     * @throws IdentityChangeException thrown if the current caller was not authorized to perform this operation
      * @see #getCaller
      * @see #setCaller
      */
-    public final MeshObject unsetCaller()
+    public MeshObject unsetCaller()
+        throws
+            IdentityChangeException
     {
         if( log.isDebugEnabled() ) {
             log.debug( this + ".callerDoneOnThread()" );
@@ -117,9 +122,16 @@ public abstract class AbstractAccessManager
     }
 
     /**
-     * Make the current Thread have super user rights.
+     * <p>Make the current Thread have super-user rights. This is very similar to common
+     * operating-systems calls.</p>
+     * <p>The implementation on this level allows anybody to change the identity associated
+     * with the current Thread; subclasses may implement this differently.</p>
+     * 
+     * @throws IdentityChangeException thrown if the current caller was not authorized to perform this operation
      */
-    public final void sudo()
+    public void sudo()
+        throws
+            IdentityChangeException
     {
         if( log.isDebugEnabled() ) {
             log.debug( this + ".sudo()" );
@@ -138,9 +150,10 @@ public abstract class AbstractAccessManager
     }
 
     /**
-     * Release super user rights from the current Thread.
+     * Release super-user rights from the current Thread. If the current Thread does not
+     * have super-user rights, nothing happens.
      */
-    public final void sudone()
+    public void sudone()
     {
         if( log.isDebugEnabled() ) {
             log.debug( this + ".sudone()" );
@@ -181,8 +194,6 @@ public abstract class AbstractAccessManager
 
     /**
      * The identities of the callers in the various threads.
-     *
-     * FIXME? It's not clear that this is the right place where to maintain this.
      */
     protected HashMap<Thread,MeshObject> theCallersOnThreads = new HashMap<Thread,MeshObject>();
     

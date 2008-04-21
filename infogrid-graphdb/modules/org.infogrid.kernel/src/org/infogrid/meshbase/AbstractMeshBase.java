@@ -44,7 +44,13 @@ import org.infogrid.util.logging.Log;
 import org.infogrid.util.text.StringRepresentation;
 
 import java.beans.PropertyChangeListener;
+import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
+import org.infogrid.meshbase.security.IdentityChangeException;
+import org.infogrid.meshbase.transaction.IllegalTransactionThreadException;
+import org.infogrid.meshbase.transaction.NotWithinTransactionBoundariesException;
+import org.infogrid.meshbase.transaction.TransactionActiveAlreadyException;
+import org.infogrid.meshbase.transaction.TransactionAsapTimeoutException;
 
 /**
  * This abstract, partial implementation of MeshBase provides
@@ -67,7 +73,7 @@ public abstract class AbstractMeshBase
      * @param modelBase the ModelBase containing type information
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param cache the CachingMap that holds the MeshObjects in this MeshBase
-     * @param context the Context in which this MeshBase runs.
+     * @param context the Context in which this MeshBase runs
      */
     protected AbstractMeshBase(
             MeshBaseIdentifier                          identifier,
@@ -86,15 +92,16 @@ public abstract class AbstractMeshBase
         this.theCache                       = cache;
         this.theContext                     = context;
 
-        QuitManager qm = (QuitManager) getContext().findContextObject( QuitManager.class );
+        QuitManager qm = getContext().findContextObject( QuitManager.class );
         if( qm != null ) {
             qm.addQuitListener( this );
         }
     }
 
     /**
-     * Enable subclasses to initialize the MeshBase's Home Object after the constructor has returned.
-     * This will use the current time for timeCreated and timeUpdated of the newly created home object.
+     * Enable subclasses to initialize the MeshBase's Home Object after the constructor has
+     * returned. This will use the current time for timeCreated and timeUpdated of the newly
+     * created home object.
      *
      * @return the Home Object
      */
@@ -102,14 +109,16 @@ public abstract class AbstractMeshBase
     {
         long now = System.currentTimeMillis();
 
-        return initializeHomeObject( now, now, now );
+        return initializeHomeObject( now, now, -1L );
     }
 
     /**
-     * Enable subclasses to initialize the MeshBase's Home Object after the constructor has returned.
+     * Enable subclasses to initialize the MeshBase's Home Object after the constructor has
+     * returned.
      *
-     * @param timeCreated of the created Home Object
-     * @param timeUpdated of the created Home Object
+     * @param timeCreated the time the created Home Object was (semantically) created
+     * @param timeUpdated the time the created Home Object was last updated
+     * @param timeRead    the time the created Home Object was last read
      * @return the Home Object
      */
     protected MeshObject initializeHomeObject(
@@ -122,8 +131,12 @@ public abstract class AbstractMeshBase
         MeshObject homeObject = this.findMeshObjectByIdentifier( homeObjectIdentifier );
         if( homeObject == null ) {
             Transaction tx = null;
+            
             try {
-                tx = this.createTransactionNowIfNeeded();
+                if( theAccessManager != null ) {
+                    theAccessManager.sudo();
+                }
+                tx = createTransactionNowIfNeeded();
 
                 homeObject = this.getMeshBaseLifecycleManager().createMeshObject(
                         homeObjectIdentifier,
@@ -138,11 +151,23 @@ public abstract class AbstractMeshBase
 
             } catch( MeshObjectIdentifierNotUniqueException ex ) {
                 log.error( ex ); // should not happen, the outside if should find HomeObject if it exists
+
             } catch( TransactionException ex ) {
                 log.error( ex );
+
+            } catch( NotPermittedException ex ) {
+                log.error( ex );
+
+            } catch( IdentityChangeException ex ) {
+                log.error( ex );
+
             } finally {
-                if( tx != null )
+                if( tx != null ) {
                     tx.commitTransaction();
+                }
+                if( theAccessManager != null ) {
+                    theAccessManager.sudone();
+                }
             }
         }
         return homeObject;
@@ -169,39 +194,162 @@ public abstract class AbstractMeshBase
     }
 
     /**
-      * Obtain a MeshObject whose unique identifier is known. This is the default implementation,
-      * it may be overridden by subclasses.
+      * Obtain the MeshBase's home object. The home object is
+      * the only well-known object in a MeshBase, but it is guaranteed to exist and cannot
+      * be deleted.
       *
-      * @param nameOfLocalObject the Identifier property of the MeshObject
-      * @return the locally found MeshObject, or null if not found locally
-      * @throws MeshObjectAccessException thrown if something went wrong accessing the MeshObject
+      * @return the MeshObject that is this MeshBase's home object
       */
+    public MeshObject getHomeObject()
+    {
+        // this is not subject to the sweeper
+
+        MeshObject theHomeObject = theCache.get( theMeshObjectIdentifierFactory.getHomeMeshObjectIdentifier()  );
+
+        return theHomeObject;
+    }
+    
+    /**
+     * <p>Find a MeshObject in this MeshBase by its identifier. Unlike
+     * the {@link #accessLocally accessLocally} methods, this method purely considers MeshObjects in the
+     * MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
+     * <p>If not found, returns <code>null</code>.</p>
+     * 
+     * @param identifier the identifier of the MeshObject that shall be found
+     * @return the found MeshObject, or null if not found
+     * @see #findMeshObjectByIdentifierOrThrow
+     */
+    public MeshObject findMeshObjectByIdentifier(
+            MeshObjectIdentifier identifier )
+    {
+        if( identifier == null ) {
+            throw new NullPointerException();
+        }
+        MeshObject ret = theCache.get( identifier );
+
+        Sweeper s = theSweeper;
+        if( ret != null && s != null ) {
+            ret = s.potentiallyFilter( ret );
+        }
+        return ret;
+    }
+
+    /**
+     * <p>Find a set of MeshObjects in this MeshBase by their identifiers. Unlike
+     *    the {@link #accessLocally accessLocally} methods, this method purely considers MeshObjects in the
+     *    MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
+     * <p>If one or more of the MeshObjects could not be found, returns <code>null</code> at
+     *    the respective index in the returned array.</p>
+     * 
+     * @param identifiers the identifiers of the MeshObjects that shall be found
+     * @return the found MeshObjects, which may contain null values for MeshObjects that were not found
+     */
+    public MeshObject [] findMeshObjectsByIdentifier(
+            MeshObjectIdentifier[] identifiers )
+    {
+        MeshObject [] ret = new MeshObject[ identifiers.length ];
+        for( int i=0 ; i<identifiers.length ; ++i ) {
+            ret[i] = findMeshObjectByIdentifier( identifiers[i] );
+        }
+        return ret;
+    }
+
+    /**
+     * <p>Find a MeshObject in this MeshBase by its identifier. Unlike
+     * the {@link #accessLocally accessLocally} methods, this method purely considers MeshObjects in the
+     * MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
+     * <p>If not found, throws {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
+     * 
+     * @param identifier the identifier of the MeshObject that shall be found
+     * @return the found MeshObject, or null if not found
+     * @throws MeshObjectsNotFoundException if the MeshObject was not found
+     */
+    public MeshObject findMeshObjectByIdentifierOrThrow(
+            MeshObjectIdentifier identifier )
+        throws
+            MeshObjectsNotFoundException
+    {
+        MeshObject ret = findMeshObjectByIdentifier( identifier );
+        if( ret == null ) {
+            throw new MeshObjectsNotFoundException( this, identifier );
+        }
+        return ret;
+    }
+
+    /**
+     * <p>Find a set of MeshObjects in this MeshBase by their identifiers. Unlike
+     *    the {@link #accessLocally accessLocally} method, this method purely considers MeshObjects in the
+     *    MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
+     * <p>If one or more of the MeshObjects could not be found, throws
+     *    {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
+     * 
+     * @param identifiers the identifiers of the MeshObjects that shall be found
+     * @return the found MeshObjects, which may contain null values for MeshObjects that were not found
+     * @throws MeshObjectsNotFoundException if one or more of the MeshObjects were not found. This Exception
+     *         inherits from PartialResultException, and carries the partial results that were available
+     */
+    public MeshObject [] findMeshObjectsByIdentifierOrThrow(
+            MeshObjectIdentifier[] identifiers )
+        throws
+            MeshObjectsNotFoundException
+    {
+        MeshObject [] ret   = new MeshObject[ identifiers.length ];
+        int           count = 0;
+        
+        for( int i=0 ; i<identifiers.length ; ++i ) {
+            ret[i] = findMeshObjectByIdentifier( identifiers[i] );
+            if( ret[i] == null ) {
+                ++count;
+            }
+        }
+        if( count == 0 ) {
+            return ret;
+        }
+        MeshObjectIdentifier [] notFound = new MeshObjectIdentifier[ count ];
+        for( int i=identifiers.length-1 ; i>=0 ; --i ) {
+            notFound[--count] = identifiers[i];
+        }
+        throw new MeshObjectsNotFoundException( this, ret, notFound );
+    }
+
+    /**
+     * Obtain a MeshObject whose unique identifier is known. This is the default implementation,
+     * it may be overridden by subclasses.
+     *
+     * @param nameOfLocalObject the identifier property of the MeshObject
+     * @return the locally found MeshObject, or null if not found locally
+     * @throws MeshObjectAccessException thrown if something went wrong accessing the MeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
     public MeshObject accessLocally(
             MeshObjectIdentifier nameOfLocalObject )
         throws
-            MeshObjectAccessException
+            MeshObjectAccessException,
+            NotPermittedException
     {
         return findMeshObjectByIdentifier( nameOfLocalObject );
     }
 
     /**
-     * Obtain N locally available MeshObjects whose unique AbstractMeshBase are known.
+     * Obtain N locally available MeshObjects whose unique identifiers are known.
      * This is the default implementation, it may be overridden by subclasses.
      * 
-     * @param nameOfLocalObjects the Identifier properties of the MeshObjects
-     * @return array of the same length as nameOfLocalObjects, with the locally found MeshObjects filled
-     *         in at the same positions. If one or more of the MeshObjects were not found, the location
-     *         in the array will be null.
-     * @throws MeshObjectAccessException thrown if something went wrong accessing the MeshObject
+     * @param identifiers the identifier properties of the MeshObjects
+     * @return array of the same length as identifiers, with the locally found MeshObjects filled
+     *         in at the same positions. If one or more of the MeshObjects were not found, the respective
+     *         location in the array will be null.
+     * @throws MeshObjectAccessException thrown if something went wrong accessing one or more MeshObjects
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public MeshObject [] accessLocally(
-            MeshObjectIdentifier[] nameOfLocalObjects )
+            MeshObjectIdentifier[] identifiers )
         throws
-            MeshObjectAccessException
+            MeshObjectAccessException,
+            NotPermittedException
     {
-        MeshObject [] ret = new MeshObject[ nameOfLocalObjects.length ];
-        for( int i=0 ; i<nameOfLocalObjects.length ; ++i ) {
-            ret[i] = findMeshObjectByIdentifier( nameOfLocalObjects[i] );
+        MeshObject [] ret = new MeshObject[ identifiers.length ];
+        for( int i=0 ; i<identifiers.length ; ++i ) {
+            ret[i] = findMeshObjectByIdentifier( identifiers[i] );
         }
         return ret;
     }
@@ -235,7 +383,8 @@ public abstract class AbstractMeshBase
     /**
       * Tell this MeshBase that we don't need it any more.
       *
-      * @param isPermanent if true, this MeshBase will go away permanmently; if false, it may come alive again some time later
+      * @param isPermanent if true, this MeshBase will go away permanmently; if false,
+     *         it may come alive again some time later
       * @throws IsDeadException thrown if this object is dead already
       */
     public void die(
@@ -256,7 +405,7 @@ public abstract class AbstractMeshBase
         theSweeper                 = null;
         // let's not set the cache to null, we want to know that it is collected at the same time
 
-        QuitManager qm = (QuitManager) getContext().findContextObject( QuitManager.class );
+        QuitManager qm = getContext().findContextObject( QuitManager.class );
 
         if( qm != null ) {
             qm.removeQuitListener( this ); // in case we are told to die by someone else than QuitManager
@@ -272,6 +421,7 @@ public abstract class AbstractMeshBase
      protected void internalDie(
              boolean isPermanent )
      {
+         // no op
      }
 
     /**
@@ -286,9 +436,22 @@ public abstract class AbstractMeshBase
     }
 
     /**
-     * Obtain the AccessManager that controls access to the MeshObjects in this MeshBase.
+      * Determine whether this is a persistent MeshBase.
+      * A MeshBase is persistent if the information stored in it last longer
+      * than the lifetime of the virtual machine running this MeshBase.
+      *
+      * @return true if this is a persistent MeshBase.
+      */
+    public boolean isPersistent()
+    {
+        return theCache.isPersistent();
+    }
+
+    /**
+     * Obtain the AccessManager associated with this MeshBase, if any.
+     * The AccessManager controls access to the MeshObjects in this MeshBase.
      *
-     * @return the AccessManager
+     * @return the AccessManager, if any
      */
     public AccessManager getAccessManager()
     {
@@ -319,7 +482,7 @@ public abstract class AbstractMeshBase
     /**
      * Obtain a factory for MeshObjectIdentifiers that is appropriate for this MeshBase.
      *
-     * @return the factory
+     * @return the factory for MeshObjectIdentifiers
      */
     public MeshObjectIdentifierFactory getMeshObjectIdentifierFactory()
     {
@@ -329,7 +492,7 @@ public abstract class AbstractMeshBase
     /**
      * Obtain a factory for MeshObjectSets.
      * 
-     * @return the factory
+     * @return the factory for MeshObjectSets
      */
     public MeshObjectSetFactory getMeshObjectSetFactory()
     {
@@ -337,15 +500,15 @@ public abstract class AbstractMeshBase
     }
 
     /**
-      * Create a new Transaction as soon as possible. This means the calling Thread may be suspended
-      * for some amount of time before it can start, or it may time out.
-      *
-      * @return the created and started Transaction
-      * @throws TransactionException.TransactionAsapTimeout a Transaction timeout has occurred
-      */
+     * Create a new Transaction as soon as possible. This means the calling Thread may be suspended
+     * for some amount of time before it can start, or it may time out.
+     *
+     * @return the created and started Transaction
+     * @throws TransactionAsapTimeoutException a Transaction timeout has occurred
+     */
     public final Transaction createTransactionAsap()
         throws
-            TransactionException.TransactionAsapTimeout
+            TransactionAsapTimeoutException
     {
         if( log.isDebugEnabled()) {
             log.debug( this + ".createTransactionAsap()" );
@@ -371,7 +534,7 @@ public abstract class AbstractMeshBase
             }
         }
         if( ret == null ) {
-            throw new TransactionException.TransactionAsapTimeout( this, existingTransaction );
+            throw new TransactionAsapTimeoutException( this, existingTransaction );
         }
 
         fireTransactionStartedEvent( ret );
@@ -380,15 +543,15 @@ public abstract class AbstractMeshBase
     }
 
     /**
-      * Create a new Transaction now, or throw an Exception if this is not possible at this very
-      * moment. The calling Thread will not be suspended.
-      *
-      * @return the created and started Transaction
-      * @throws TransactionException.TransactionActiveAlready a Transaction was active already
-      */
+     * Create a new Transaction now, or throw an Exception if this is not possible at this very
+     * moment. The calling Thread will not be suspended.
+     *
+     * @return the created and started Transaction
+     * @throws TransactionActiveAlreadyException a Transaction was active already
+     */
     public final Transaction createTransactionNow()
         throws
-            TransactionException.TransactionActiveAlready
+            TransactionActiveAlreadyException
     {
         if( log.isDebugEnabled()) {
             log.debug( this + ".createTransactionNow()" );
@@ -400,7 +563,7 @@ public abstract class AbstractMeshBase
                 theCurrentTransaction = createNewTransaction();
                 ret = theCurrentTransaction;
             } else {
-                throw new TransactionException.TransactionActiveAlready( this, theCurrentTransaction );
+                throw new TransactionActiveAlreadyException( this, theCurrentTransaction );
             }
         }
 
@@ -409,19 +572,18 @@ public abstract class AbstractMeshBase
         return ret;
     }
 
-
     /**
-      * Create a new Transaction as soon as possible, but only if we are not currently on a Thread
-      * that has already opened a Transaction. If we are on such a Thread, return null,
-      * indicating that the operation can go ahead and there is no need to commit a
-      * potential sub-Transaction. Otherwise behave like createTransactionAsap().
-      *
-      * @return the created and started Transaction, or null if one is already open on this Thread
-      * @throws TransactionException.TransactionAsapTimeout a Transaction timeout has occurred
-      */
+     * Create a new Transaction as soon as possible, but only if we are not currently on a Thread
+     * that has already opened a Transaction. If we are on such a Thread, return null,
+     * indicating that the operation can go ahead and there is no need to commit a
+     * potential sub-Transaction. Otherwise behave like createTransactionAsap().
+     *
+     * @return the created and started Transaction, or null if one is already open on this Thread
+     * @throws TransactionAsapTimeoutException a Transaction timeout has occurred
+     */
     public final Transaction createTransactionAsapIfNeeded()
         throws
-            TransactionException.TransactionAsapTimeout
+            TransactionAsapTimeoutException
     {
         if( log.isDebugEnabled()) {
             log.debug( this + ".createTransactionAsapIfNeeded()" );
@@ -443,7 +605,7 @@ public abstract class AbstractMeshBase
                         theCurrentTransaction.checkThreadIsAllowed();
                         return null;
 
-                    } catch( TransactionException.IllegalTransactionThread ex ) {
+                    } catch( IllegalTransactionThreadException ex ) {
                         // do nothing
                     }
                 }
@@ -456,7 +618,7 @@ public abstract class AbstractMeshBase
             }
         }
         if( ret == null ) {
-            throw new TransactionException.TransactionAsapTimeout( this, existingTransaction );
+            throw new TransactionAsapTimeoutException( this, existingTransaction );
         }
 
         fireTransactionStartedEvent( ret );
@@ -465,17 +627,17 @@ public abstract class AbstractMeshBase
     }
 
     /**
-      * Create a Transaction now, but only if we are not currently on a Thread
-      * that has already opened a Transaction. If we are on such a Thread, return null,
-      * indicating that the operation can go ahead and there is no need to commit a
-      * potential sub-Transaction. Otherwise behave like createTransactionNow().
-      *
-      * @return the created and started Transaction, or null if one is already open on this Thread
-      * @throws TransactionException.TransactionActiveAlready a Transaction was active already on a different Thread
-      */
+     * Create a Transaction now, but only if we are not currently on a Thread
+     * that has already opened a Transaction. If we are on such a Thread, return null,
+     * indicating that the operation can go ahead and there is no need to commit a
+     * potential sub-Transaction. Otherwise behave like createTransactionNow().
+     *
+     * @return the created and started Transaction, or null if one is already open on this Thread
+     * @throws TransactionActiveAlreadyException a Transaction was active already
+     */
     public final Transaction createTransactionNowIfNeeded()
         throws
-            TransactionException.TransactionActiveAlready
+            TransactionActiveAlreadyException
     {
         if( log.isDebugEnabled()) {
             log.debug( this + ".createTransactionNowIfNeeded()" );
@@ -492,8 +654,8 @@ public abstract class AbstractMeshBase
 
                     ret = null;
 
-                } catch( TransactionException.IllegalTransactionThread ex ) {
-                    throw new TransactionException.TransactionActiveAlready( this, theCurrentTransaction );
+                } catch( IllegalTransactionThreadException ex ) {
+                    throw new TransactionActiveAlreadyException( this, theCurrentTransaction );
                 }
             }
         }
@@ -518,161 +680,27 @@ public abstract class AbstractMeshBase
       *
       * @return the currently active Transaction, or null if there is none
       */
-     public final Transaction getCurrentTransaction()
-     {
-         return theCurrentTransaction;
-     }
-
-    /**
-     * Find a MeshObject in this MeshBase by its Identifier. Unlike
-     * the accessLocally method, this method does not attempt to contact other
-     * MeshBases.
-     * 
-     * @param identifier the Identifier of the MeshObject that shall be found
-     * @return the found MeshObject, or null if not found
-     */
-    public MeshObject findMeshObjectByIdentifier(
-            MeshObjectIdentifier identifier )
+    public final Transaction getCurrentTransaction()
     {
-        if( identifier == null ) {
-            throw new NullPointerException();
-        }
-        MeshObject ret = theCache.get( identifier );
-
-        Sweeper s = theSweeper;
-        if( ret != null && s != null ) {
-            ret = s.potentiallyFilter( ret );
-        }
-        return ret;
+        return theCurrentTransaction;
     }
 
     /**
-     * Find a set of MeshObjects in this MeshBase by their Identifiers. Unlike
-     * the accessLocally method, this method purely considers MeshObjects in the
-     * MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.
-     * 
-     * 
-     * 
-     * @param AbstractMeshBase the Identifiers of the MeshObjects that shall be found
-     * @return the found MeshObjects, which may contain null values for MeshObjects that were not found
-     */
-    public MeshObject [] findMeshObjectsByIdentifier(
-            MeshObjectIdentifier[] identifiers )
-    {
-        MeshObject [] ret = new MeshObject[ identifiers.length ];
-        for( int i=0 ; i<identifiers.length ; ++i ) {
-            ret[i] = findMeshObjectByIdentifier( identifiers[i] );
-        }
-        return ret;
-    }
-
-    /**
-     * <p>Find a MeshObject in this MeshBase by its Identifier. Unlike
-     * the accessLocally method, this method purely considers MeshObjects in the
-     * MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
-     * <p>If not found, throws {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
-     * 
-     * @param identifier the Identifier of the MeshObject that shall be found
-     * @return the found MeshObject, or null if not found
-     * @throws MeshObjectsNotFoundException if the MeshObject was not found
-     */
-    public MeshObject findMeshObjectByIdentifierOrThrow(
-            MeshObjectIdentifier identifier )
-        throws
-            MeshObjectsNotFoundException
-    {
-        MeshObject ret = findMeshObjectByIdentifier( identifier );
-        if( ret == null ) {
-            throw new MeshObjectsNotFoundException( this, identifier );
-        }
-        return ret;
-    }
-
-    /**
-     * <p>Find a set of MeshObjects in this MeshBase by their Identifiers. Unlike
-     *    the accessLocally method, this method purely considers MeshObjects in the
-     *    MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
-     * <p>If one or more of the MeshObjects could not be found, throws
-     *    {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
-     * 
-     * 
-     * 
-     * @param AbstractMeshBase the Identifiers of the MeshObjects that shall be found
-     * @return the found MeshObjects, which may contain null values for MeshObjects that were not found
-     */
-    public MeshObject [] findMeshObjectsByIdentifierOrThrow(
-            MeshObjectIdentifier[] identifiers )
-        throws
-            MeshObjectsNotFoundException
-    {
-        MeshObject [] ret   = new MeshObject[ identifiers.length ];
-        int           count = 0;
-        
-        for( int i=0 ; i<identifiers.length ; ++i ) {
-            ret[i] = findMeshObjectByIdentifier( identifiers[i] );
-            if( ret[i] == null ) {
-                ++count;
-            }
-        }
-        if( count == 0 ) {
-            return ret;
-        }
-        MeshObjectIdentifier [] notFound = new MeshObjectIdentifier[ count ];
-        for( int i=identifiers.length-1 ; i>=0 ; --i ) {
-            notFound[--count] = identifiers[i];
-        }
-        throw new MeshObjectsNotFoundException( this, ret, notFound );
-    }
-
-    /**
-      * Obtain the MeshBase's home object. The home object is
-      * the only well-known object in a MeshBase, but it is guaranteed to exist and cannot
-      * be deleted.
-      *
-      * @return the MeshObject that is this MeshBase's home object
-      */
-    public MeshObject getHomeObject()
-    {
-        // this is not subject to the sweeper
-
-        MeshObject theHomeObject = theCache.get( theMeshObjectIdentifierFactory.getHomeMeshObjectIdentifier()  );
-
-        return theHomeObject;
-    }
-
-    /**
-      * Determine whether this is a persistent MeshBase.
-      * A MeshBase is persistent if the information stored in it last longer
-      * than the lifetime of the virtual machine running this MeshBase.
-      *
-      * @return true if this is a persistent MeshBase.
-      */
-    public boolean isPersistent()
-    {
-        return theCache.isPersistent();
-    }
-
-    /**
-      * Determine whether this MeshBase is currently forwarding events.
-      * This shall not be called by the application programmer.
-      *
-      * @return true if this MeshBase is currently forwarding events
-      */
-    public final boolean getForwardEvents()
-    {
-        return forwardEvents;
-    }
-
-    /**
-     * Cause this MeshBase to start or stop generating events.
+     * Check whether a Transaction is active is on this Thread, and whether it is
+     * the right Transaction.
      *
-     * This may be invoked by subclasses, and is particularly useful for bulk read-from-disk
-     * operations of persistent MeshBases.
+     * @return the current Transaction
+     * @throws TransactionException thrown if there was no valid Transaction
      */
-    public final void setForwardEvents(
-            boolean newValue )
+    public synchronized Transaction checkTransaction()
+        throws
+            TransactionException
     {
-        forwardEvents = newValue;
+        if( theCurrentTransaction == null ) {
+            throw new NotWithinTransactionBoundariesException( this );
+        }
+        theCurrentTransaction.checkThreadIsAllowed();
+        return theCurrentTransaction;
     }
 
     /**
@@ -739,6 +767,8 @@ public abstract class AbstractMeshBase
     /**
      * Tell the MeshBase that this AMeshObject needs to be saved into persistent
      * storage (if applicable per AMeshBase implementation).
+     * 
+     * @param obj the AbstractMeshObject to be saved
      */
     public void flushMeshObject(
             AbstractMeshObject obj )
@@ -747,56 +777,61 @@ public abstract class AbstractMeshBase
     }
 
     /**
-      * Add a PropertyChangeListener.
-      *
-      * @param newListener the to-be-added PropertyChangeListener
-      * @see #removePropertyChangeListener
-      */
+     * Add a PropertyChangeListener to this MeshBase, without using a Reference.
+     *
+     * @param newListener the to-be-added PropertyChangeListener
+     * @see #addWeakPropertyChangeListener
+     * @see #addSoftPropertyChangeListener
+     * @see #removePropertyChangeListener
+     */
     public final synchronized void addDirectPropertyChangeListener(
             PropertyChangeListener newListener )
     {
-        if( thePropertyChangeListeners == null ) {
-            thePropertyChangeListeners = new FlexiblePropertyChangeListenerSet();
-        }
+        instantiatePropertyChangeListenersIfNeeded();
+
         thePropertyChangeListeners.addDirect( newListener );
     }
 
     /**
-      * Add a PropertyChangeListener.
-      *
-      * @param newListener the to-be-added PropertyChangeListener
-      * @see #removePropertyChangeListener
-      */
+     * Add a PropertyChangeListener to this MeshBase, using a WeakReference.
+     *
+     * @param newListener the to-be-added PropertyChangeListener
+     * @see #addDirectPropertyChangeListener
+     * @see #addSoftPropertyChangeListener
+     * @see #removePropertyChangeListener
+     */
     public final synchronized void addWeakPropertyChangeListener(
             PropertyChangeListener newListener )
     {
-        if( thePropertyChangeListeners == null ) {
-            thePropertyChangeListeners = new FlexiblePropertyChangeListenerSet();
-        }
+        instantiatePropertyChangeListenersIfNeeded();
+
         thePropertyChangeListeners.addWeak( newListener );
     }
 
     /**
-      * Add a PropertyChangeListener.
-      *
-      * @param newListener the to-be-added PropertyChangeListener
-      * @see #removePropertyChangeListener
-      */
+     * Add a PropertyChangeListener to this MeshBase, using a SoftReference.
+     *
+     * @param newListener the to-be-added PropertyChangeListener
+     * @see #addWeakPropertyChangeListener
+     * @see #addDirectPropertyChangeListener
+     * @see #removePropertyChangeListener
+     */
     public final synchronized void addSoftPropertyChangeListener(
             PropertyChangeListener newListener )
     {
-        if( thePropertyChangeListeners == null ) {
-            thePropertyChangeListeners = new FlexiblePropertyChangeListenerSet();
-        }
+        instantiatePropertyChangeListenersIfNeeded();
+
         thePropertyChangeListeners.addSoft( newListener );
     }
 
     /**
-      * Remove a PropertyChangeListener.
-      *
-      * @param oldListener the to-be-removed PropertyChangeListener
-      * @see #addPropertyChangeListener
-      */
+     * Remove a PropertyChangeListener from this MeshBase.
+     *
+     * @param oldListener the to-be-removed PropertyChangeListener
+     * @see #addWeakPropertyChangeListener
+     * @see #addSoftPropertyChangeListener
+     * @see #addDirectPropertyChangeListener
+     */
     public final synchronized void removePropertyChangeListener(
             PropertyChangeListener oldListener )
     {
@@ -807,9 +842,11 @@ public abstract class AbstractMeshBase
     }
 
     /**
-      * Add a TransactionListener.
+      * Add a TransactionListener to this MeshBase, without using a Reference.
       *
       * @param newListener the to-be-added TransactionListener
+      * @see #addWeakTransactionListener
+      * @see #addSoftTransactionListener
       * @see #removeTransactionListener
       */
     public final synchronized void addDirectTransactionListener(
@@ -821,9 +858,11 @@ public abstract class AbstractMeshBase
     }
 
     /**
-      * Add a TransactionListener.
+      * Add a TransactionListener to this MeshBase, using a WeakReference.
       *
       * @param newListener the to-be-added TransactionListener
+      * @see #addDirectTransactionListener
+      * @see #addSoftTransactionListener
       * @see #removeTransactionListener
       */
     public final synchronized void addWeakTransactionListener(
@@ -835,9 +874,11 @@ public abstract class AbstractMeshBase
     }
 
     /**
-      * Add a TransactionListener.
+      * Add a TransactionListener to this MeshBase, using a SoftReference.
       *
       * @param newListener the to-be-added TransactionListener
+      * @see #addWeakTransactionListener
+      * @see #addDirectTransactionListener
       * @see #removeTransactionListener
       */
     public final synchronized void addSoftTransactionListener(
@@ -849,10 +890,12 @@ public abstract class AbstractMeshBase
     }
 
     /**
-      * Remove a TransactionListener.
+      * Remove a TransactionListener from this MeshBase.
       *
       * @param oldListener the to-be-removed TransactionListener
-      * @see #addTransactionListener
+      * @see #addWeakTransactionListener
+      * @see #addSoftTransactionListener
+      * @see #addDirectTransactionListener
       */
     public final synchronized void removeTransactionListener(
             TransactionListener oldListener )
@@ -865,49 +908,63 @@ public abstract class AbstractMeshBase
 
     /**
      * Subscribe to events indicating the addition/removal/etc
-     * of MeshObjects to this MeshBase.
+     * of MeshObjects to/from this MeshBase, without using a Reference.
      * 
-     * @param newListener the to-be-added MeshObjectLifecycleListener
+     * @param newListener the to-be-added MMeshObjectLifecycleListener@see #removeMeshObjectLifecycleEventListener
+     * @see #addWeakMeshObjectLifecycleEventListener
+     * @see #addSoftMeshObjectLifecycleEventListener
      * @see #removeMeshObjectLifecycleEventListener
      */
     public final synchronized void addDirectMeshObjectLifecycleEventListener(
             MeshObjectLifecycleListener newListener )
     {
+        instantiateLifecycleEventListenersIfNeeded();
+
         theLifecycleEventListeners.addDirect( newListener );
     }
 
     /**
      * Subscribe to events indicating the addition/removal/etc
-     * of MeshObjects to this MeshBase.
+     * of MeshObjects to/from this MeshBase, using a WeakReference.
      * 
-     * @param newListener the to-be-added MeshObjectLifecycleListener
+     * @param newListener the to-be-added MMeshObjectLifecycleListener@see #removeMeshObjectLifecycleEventListener
+     * @see #addDirectMeshObjectLifecycleEventListener
+     * @see #addSoftMeshObjectLifecycleEventListener
      * @see #removeMeshObjectLifecycleEventListener
      */
     public final synchronized void addWeakMeshObjectLifecycleEventListener(
             MeshObjectLifecycleListener newListener )
     {
+        instantiateLifecycleEventListenersIfNeeded();
+
         theLifecycleEventListeners.addWeak( newListener );
     }
 
     /**
      * Subscribe to events indicating the addition/removal/etc
-     * of MeshObjects to this MeshBase.
+     * of MeshObjects to/from this MeshBase, using a SoftReference.
      * 
-     * @param newListener the to-be-added MeshObjectLifecycleListener
+     * @param newListener the to-be-added MMeshObjectLifecycleListener@see #removeMeshObjectLifecycleEventListener
+     * @see #addWeakMeshObjectLifecycleEventListener
+     * @see #addDirectMeshObjectLifecycleEventListener
      * @see #removeMeshObjectLifecycleEventListener
      */
     public final synchronized void addSoftMeshObjectLifecycleEventListener(
             MeshObjectLifecycleListener newListener )
     {
+        instantiateLifecycleEventListenersIfNeeded();
+
         theLifecycleEventListeners.addSoft( newListener );
     }
 
     /**
      * Unsubscribe from events indicating the addition/removal/etc
-     * of MeshObjects to this MeshBase.
+     * of MeshObjects to/from this MeshBase.
      * 
-     * @param oldListener the to-be-removed MeshObjectLifecycleListener
-     * @see #addMeshObjectLifecycleEventListener
+     * @param oldListener the to-be-removed MMeshObjectLifecycleListener@see #addMeshObjectLifecycleEventListener
+     * @see #addWeakMeshObjectLifecycleEventListener
+     * @see #addSoftMeshObjectLifecycleEventListener
+     * @see #addDirectMeshObjectLifecycleEventListener
      */
     public final synchronized void removeMeshObjectLifecycleEventListener(
             MeshObjectLifecycleListener oldListener )
@@ -915,6 +972,16 @@ public abstract class AbstractMeshBase
         theLifecycleEventListeners.remove( oldListener );
         if( theLifecycleEventListeners.isEmpty() ) {
             theLifecycleEventListeners = null;
+        }
+    }
+
+    /**
+     * Internal helper to instantiate thePropertyChangeListeners if needed.
+     */
+    protected void instantiatePropertyChangeListenersIfNeeded()
+    {
+        if( thePropertyChangeListeners == null ) {
+            thePropertyChangeListeners = new FlexiblePropertyChangeListenerSet();
         }
     }
 
@@ -998,24 +1065,6 @@ public abstract class AbstractMeshBase
             Transaction tx )
     {
         // noop
-    }
-
-    /**
-     * Check whether a Transaction is active is on this Thread, and whether it is
-     * the right Transaction.
-     *
-     * @return the current Transaction
-     * @throws TransactionException thrown if there was no valid Transaction
-     */
-    public synchronized Transaction checkTransaction()
-        throws
-            TransactionException
-    {
-        if( theCurrentTransaction == null ) {
-            throw new TransactionException.NotWithinTransactionBoundaries( this );
-        }
-        theCurrentTransaction.checkThreadIsAllowed();
-        return theCurrentTransaction;
     }
 
     /**
@@ -1262,13 +1311,6 @@ public abstract class AbstractMeshBase
       * The Context in which we run.
       */
     private Context theContext;
-
-    /**
-     * This flag is set to false briefly during restore from disk operations,
-     * to indicate that we don't want to forward the events generated by
-     * restore.
-     */
-    private boolean forwardEvents = true;
 
     /**
       * The number of tries before "asap" Transactions time out.
