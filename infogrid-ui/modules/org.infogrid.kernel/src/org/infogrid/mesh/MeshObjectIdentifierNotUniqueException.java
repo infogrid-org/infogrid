@@ -68,11 +68,13 @@ public class MeshObjectIdentifierNotUniqueException
      * 
      * @return the already-existing MeshObject
      * @throws MeshObjectAccessException thrown if the MeshObject could not be found
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      * @throws IllegalStateException thrown if no resolving MeshBase is available
      */
     public synchronized MeshObject getExistingMeshObject()
         throws
             MeshObjectAccessException,
+            NotPermittedException,
             IllegalStateException
     {
         if( theExisting == null ) {

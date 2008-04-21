@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.security;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.meshbase.transaction.TransactionException;
 
@@ -24,8 +25,8 @@ import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.RoleType;
 
 /**
- * An AccessManager that allows all operations under all circumstances and does nothing upon
- * owner etc assignments.
+ * A simplistic AccessManager implementation that allows all operations under all circumstances
+ * and does nothing to assign owners when asked.
  * This may not be very useful in production applications, but is useful for testing purposes.
  */
 public class PermitAllAccessManager
@@ -34,6 +35,8 @@ public class PermitAllAccessManager
 {
     /**
      * Factory method.
+     * 
+     * @return the created PermitAllAccessManager
      */
     public static PermitAllAccessManager create()
     {
@@ -47,7 +50,6 @@ public class PermitAllAccessManager
     {
         // no op
     }
-
 
     /**
      * Assign the second MeshObject to be the owner of the first MeshObject. This
@@ -67,10 +69,25 @@ public class PermitAllAccessManager
     }
     
     /**
-     * Check whether it is permitted to set a MeshObject's auto-delete time to the given value.
+     * Check whether it is permitted to semantically create a MeshObject with the provided
+     * MeshObjectIdentifier.
+     * 
+     * @param identifier the MeshObjectIdentifier
+     * @throws NotPermittedException thrown if it is not permitted
+     */
+    public void checkPermittedCreate(
+            MeshObjectIdentifier identifier )
+        throws
+            NotPermittedException
+    {
+        // no op
+    }
+    
+    /**
+     * Check whether it is permitted to set a MeshObject's timeExpires to the given value.
      *
      * @param obj the MeshObject
-     * @param newValue the proposed new value for the auto-delete time
+     * @param newValue the proposed new value for timeExpires
      * @throws NotPermittedException thrown if it is not permitted
      */
     public void checkPermittedSetTimeExpires(
@@ -167,18 +184,18 @@ public class PermitAllAccessManager
     }
 
     /**
-     * Check whether it is permitted to bless the relationship to the otherObject with the
+     * Check whether it is permitted to bless the relationship to the neighbor with the
      * provided RoleTypes.
      * 
      * @param obj the MeshObject
      * @param thisEnds the RoleTypes to bless the relationship with
-     * @param otherObject the neighbor to which this MeshObject is related
+     * @param neighbor the neighbor to which this MeshObject is related
      * @throws NotPermittedException thrown if it is not permitted
      */
     public void checkPermittedBless(
             MeshObject  obj,
             RoleType [] thisEnds,
-            MeshObject  otherObject )
+            MeshObject  neighbor )
         throws
             NotPermittedException
     {
@@ -186,18 +203,18 @@ public class PermitAllAccessManager
     }
 
     /**
-     * Check whether it is permitted to unbless the relationship to the otherObject from the
+     * Check whether it is permitted to unbless the relationship to the neighbor from the
      * provided RoleTypes.
      * 
      * @param obj the MeshObject
      * @param thisEnds the RoleTypes to unbless the relationship from
-     * @param otherObject the neighbor to which this MeshObject is related
+     * @param neighbor the neighbor to which this MeshObject is related
      * @throws NotPermittedException thrown if it is not permitted
      */
     public void checkPermittedUnbless(
             MeshObject  obj,
             RoleType [] thisEnds,
-            MeshObject  otherObject )
+            MeshObject  neighbor )
         throws
             NotPermittedException
     {
@@ -205,11 +222,11 @@ public class PermitAllAccessManager
     }
 
     /**
-     * Check whether it is permitted to traverse the given ByRoleType from this MeshObject to the
+     * Check whether it is permitted to traverse the given RoleType from this MeshObject to the
      * given MeshObject.
      * 
      * @param obj the MeshObject
-     * @param toTraverse the ByRoleType to traverse
+     * @param toTraverse the RoleType to traverse
      * @param otherObject the reached MeshObject in the traversal
      * @throws NotPermittedException thrown if it is not permitted
      */
@@ -224,12 +241,12 @@ public class PermitAllAccessManager
     }
 
     /**
-     * Check whether it is permitted to bless the relationship with the given otherObject with
+     * Check whether it is permitted to bless the relationship with the given neighbor with
      * the given thisEnds RoleTypes.
      * 
      * @param obj the MeshObject
      * @param thisEnds the RoleTypes to bless the relationship with
-     * @param otherObject the neighbor to which this MeshObject is related
+     * @param neighbor the neighbor to which this MeshObject is related
      * @param roleTypesToAsk the RoleTypes, of the relationship with RoleTypesToAskUsed, which to as
      * @param roleTypesToAskUsed the neighbor MeshObject whose rules may have an opinion on the blessing of the relationship with otherObject
      * @throws NotPermittedException thrown if it is not permitted
@@ -237,7 +254,7 @@ public class PermitAllAccessManager
     public void checkPermittedBless(
             MeshObject  obj,
             RoleType [] thisEnds,
-            MeshObject  otherObject,
+            MeshObject  neighbor,
             RoleType [] roleTypesToAsk,
             MeshObject  roleTypesToAskUsed )
         throws
@@ -247,13 +264,12 @@ public class PermitAllAccessManager
     }
 
     /**
-     * Check whether it is permitted to unbless the relationship from the given otherObject with
-     * the given thisEnds RoleTypes. Subclasses
-     * may override this.
+     * Check whether it is permitted to unbless the relationship from the given neighbor from
+     * the given thisEnds RoleTypes.
      * 
      * @param obj the MeshObject
      * @param thisEnds the RoleTypes to unbless the relationship from
-     * @param otherObject the neighbor to which this MeshObject is related
+     * @param neighbor the neighbor to which this MeshObject is related
      * @param roleTypesToAsk the RoleTypes, of the relationship with RoleTypesToAskUsed, which to as
      * @param roleTypesToAskUsed the neighbor MeshObject whose rules may have an opinion on the blessing of the relationship with otherObject
      * @throws NotPermittedException thrown if it is not permitted
@@ -261,7 +277,7 @@ public class PermitAllAccessManager
     public void checkPermittedUnbless(
             MeshObject  obj,
             RoleType [] thisEnds,
-            MeshObject  otherObject,
+            MeshObject  neighbor,
             RoleType [] roleTypesToAsk,
             MeshObject  roleTypesToAskUsed )
         throws
@@ -293,7 +309,6 @@ public class PermitAllAccessManager
     /**
      * Check whether it is permitted to remove a MeshObject from the equivalence set
      * it is currently a member of.
-     * Subclasses may override this.
      * 
      * @param obj the MeshObject to remove
      * @param roleTypesToAsk the RoleTypes to ask
@@ -307,8 +322,8 @@ public class PermitAllAccessManager
     {
         // no op
     }
-            
-    /**
+
+   /**
      * Check whether it is permitted to delete this MeshObject. This checks both whether the
      * MeshObject itself may be deleted, and whether the relationships it participates in may
      * be deleted (which in turn depends on whether the relationships may be unblessed).

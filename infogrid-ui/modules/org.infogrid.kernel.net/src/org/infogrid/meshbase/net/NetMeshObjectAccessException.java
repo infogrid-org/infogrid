@@ -24,6 +24,8 @@ public class NetMeshObjectAccessException
         extends
             MeshObjectAccessException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *
@@ -48,6 +50,7 @@ public class NetMeshObjectAccessException
      *
      * @return the MeshBase in which the Exception occurred
      */
+    @Override
     public NetMeshBase getMeshBase()
     {
         return (NetMeshBase) super.getMeshBase();
@@ -58,6 +61,7 @@ public class NetMeshObjectAccessException
      *
      * @return the partial result, if any
      */
+    @Override
     public NetMeshObject [] getBestEffortResult()
     {
         return (NetMeshObject []) super.getBestEffortResult();
@@ -79,6 +83,7 @@ public class NetMeshObjectAccessException
      *
      * @return the parameters with which the internationalized string will be parameterized
      */
+    @Override
     public Object [] getLocalizationParameters()
     {
         String [] ret = new String[ theFailedPaths.length ];

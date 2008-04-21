@@ -27,9 +27,13 @@ import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.text.StringRepresentation;
 
 /**
- * All communications between a NetMeshBase A and a NetMeshBase B is managed by
- * a pair of Proxies: one owned by NetMeshBase A, interacting with NetMeshBase B;
- * the other owned by NetMeshBase B, interacting with NetMeshBase A. 
+ * <p>All communications between a NetMeshBase A and a NetMeshBase B is managed by
+ * a pair of Proxies: one owned by and collocated with NetMeshBase A, interacting with
+ * NetMeshBase B on behalf of A; the other owned by and collocated with NetMeshBase B,
+ * interacting with NetMeshBase A on behalf of A.</p>
+ * 
+ * <p>The implementation class of NetMessageEndpoint determines how to perform
+ * the actual communication.</p>
  */
 public interface Proxy
         extends
@@ -43,21 +47,22 @@ public interface Proxy
     public abstract NetMeshBase getNetMeshBase();
 
     /**
-     * Determine the NetMeshBaseIdentifier of the partner MeshBase.
+     * Determine the NetMeshBaseIdentifier of the partner NetMeshBase. The partner
+     * NetMeshBase is the NetMeshBase with which this Proxy communicates.
      * 
-     * @return the NNetMeshBaseIdentifierof the partner MeshBase
+     * @return the NetMeshBaseIdentifier of the partner NetMeshBase
      */
     public abstract NetMeshBaseIdentifier getPartnerMeshBaseIdentifier();
 
     /**
-     * Obtain the MessageEndpoint associated with this Proxy.
+     * Obtain the NetMessageEndpoint associated with this Proxy.
      *
-     * @return the MessageEndpoint
+     * @return the NetMessageEndpoint
      */
     public abstract NetMessageEndpoint getMessageEndpoint();
 
     /**
-     * Set a different CoherenceSpecification.
+     * Set a new CoherenceSpecification.
      *
      * @param newValue the new value
      */
@@ -103,20 +108,22 @@ public interface Proxy
     public abstract long getTimeExpires();
 
     /**
-     * Ask this Proxy to obtain replicas with the enclosed specification. Do
-     * not acquire the lock -- that would be a separate operation.
+     * Ask this Proxy to obtain from its partner NetMeshBase replicas with the enclosed
+     * specification. Do not acquire the lock; that would be a separate operation. 
      * 
-     * @param paths the NNetMeshBasePathspecifying which replicas should be obtained
-     * @throws NetMeshObjectAccessException accessing the MeshBase and obtaining a replica failed
+     * @param paths the NetMeshObjectAccessSpecifications specifying which replicas should be obtained
+     * @param timeout the timeout, in milliseconds
+     * @throws NetMeshObjectAccessException accessing the NetMeshBase and obtaining a replica failed
      */
     public abstract void obtainReplica(
-            NetMeshObjectAccessSpecification [] paths )
+            NetMeshObjectAccessSpecification [] paths,
+            long                                timeout )
         throws
             NetMeshObjectAccessException;
 
     /**
      * Ask this Proxy to obtain the lock for one or more replicas from the
-     * Proxy. Unlike many of the other calls, this call is
+     * partner NetMeshBase. Unlike many of the other calls, this call is
      * synchronous over the network and either succeeds, fails, or times out.
      *
      * @param localReplicas the local replicas for which the lock should be obtained
@@ -130,7 +137,23 @@ public interface Proxy
             RemoteQueryTimeoutException;
 
     /**
-     * Send notification that this MeshBase has forcibly taken the lock back.
+     * Ask this Proxy to obtain the home replica status for one or more replicas from the
+     * partner NetMeshBase. Unlike many of the other calls, this call is
+     * synchronous over the network and either succeeds, fails, or times out.
+     *
+     * @param localReplicas the local replicas for which the home replica status should be obtained
+     * @param timeout the timeout, in milliseconds
+     * @throws RemoteQueryTimeoutException thrown if this call times out
+     */
+    public abstract void tryToObtainHomeReplicas(
+            NetMeshObject [] localReplicas,
+            long             timeout )
+        throws
+            RemoteQueryTimeoutException;
+
+    /**
+     * Send notification to the partner NetMeshBase that this MeshBase has forcibly taken the
+     * lock back for the given NetMeshObjects.
      *
      * @param localReplicas the local replicas for which the lock has been forced back
      */
@@ -138,17 +161,18 @@ public interface Proxy
             NetMeshObject [] localReplicas );
 
     /**
-     * Tell the receiver that a local Replica exists here that would like to be resynchronized.
+     * Tell the partner NetMeshBase that one or more local replicas exist here that
+     * would like to be resynchronized.
      *
-     * @param localReplicas the Identifiers of the local Replica
+     * @param localReplicas the NetMeshObjectIdentifiers of the local replicas
      */
     public abstract void resynchronizeDependentReplicas(
             NetMeshObjectIdentifier [] localReplicas );
 
     /**
-     * Invoked by the MeshBase that this Proxy belongs to,
-     * it causes this Proxy to initiate the "ceasing communication" sequence, and
-     * kill itself in its SmartFactory (if any).
+     * Invoked by the NetMeshBase that this Proxy belongs to,
+     * it causes this Proxy to initiate the "ceasing communication" sequence with
+     * the partner NetMeshBase, and then kill itself.
      *
      * @throws RemoteQueryTimeoutException thrown if communications timed out
      */
@@ -157,10 +181,12 @@ public interface Proxy
             RemoteQueryTimeoutException;
 
     /**
-     * Tell this Proxy that it is not needed any more. This will invoke initiateCaseCommunications if
+     * Tell this Proxy that it is not needed any more. This will invoke
+     * {@link #initiateCaseCommunications} if and only if
      * isPermanent is true.
      * 
-     * @param isPermanent if true, this Proxy will go away permanently; if false, it may come alive again some time later
+     * @param isPermanent if true, this Proxy will go away permanently; if false,
+     *        it may come alive again some time later, e.g. after a reboot
      */
     public abstract void die(
             boolean isPermanent );
@@ -173,35 +199,42 @@ public interface Proxy
     public abstract ExternalizedProxy asExternalized();
 
     /**
-      * Indicates that a Transaction has been committed. This is invoked by the NetMeshBase.
-      *
-      * @param theTransaction the Transaction that was committed
-      */
+     * Indicates that a Transaction has been committed. This is invoked by the NetMeshBase
+     * without needing a subscription.
+     *
+     * @param theTransaction the Transaction that was committed
+     */
     public void transactionCommitted(
             Transaction theTransaction );
 
     /**
-     * Subscribe to lease-related events.
+     * Subscribe to lease-related events, without using a Reference.
      *
      * @param newListener the to-be-added listener
+     * @see #addWeakLeaseManagementListener
+     * @see #addSoftLeaseManagementListener
      * @see #removeLeaseManagementListener
      */
     public abstract void addDirectLeaseManagementListener(
             LeaseManagementListener newListener );
 
     /**
-     * Subscribe to lease-related events.
+     * Subscribe to lease-related events, using a WeakReference.
      *
      * @param newListener the to-be-added listener
+     * @see #addDirectLeaseManagementListener
+     * @see #addSoftLeaseManagementListener
      * @see #removeLeaseManagementListener
      */
     public abstract void addWeakLeaseManagementListener(
             LeaseManagementListener newListener );
 
     /**
-     * Subscribe to lease-related events.
+     * Subscribe to lease-related events, using a SoftReference.
      *
      * @param newListener the to-be-added listener
+     * @see #addWeakLeaseManagementListener
+     * @see #addDirectLeaseManagementListener
      * @see #removeLeaseManagementListener
      */
     public abstract void addSoftLeaseManagementListener(
@@ -211,7 +244,9 @@ public interface Proxy
      * Unsubscribe from lease-related events.
      *
      * @param oldListener the to-be-removed listener
-     * @see #addLeaseManagementListener
+     * @see #addDirectLeaseManagementListener
+     * @see #addWeakLeaseManagementListener
+     * @see #addSoftLeaseManagementListener
      */
     public abstract void removeLeaseManagementListener(
             LeaseManagementListener oldListener );
@@ -254,5 +289,4 @@ public interface Proxy
             StringRepresentation rep,
             String               contextPath,
             boolean              isDefaultMeshBase );
-
 }

@@ -87,7 +87,7 @@ public class ParserFriendlyExternalizedNetMeshObject
     /**
      * Add an equivalent, using its MeshObjectIdentifier.
      * 
-     * @param identifier the HasTypes of an equivalent
+     * @param identifier the identifier of an equivalent
      */
     @Override
     public void addEquivalent(
@@ -98,15 +98,37 @@ public class ParserFriendlyExternalizedNetMeshObject
     }
 
     /**
-     * Get the MeshObject's equivalents, if any.
+     * Obtain the NetMeshObjectIdentifiers of the NetMeshObjects that participate in an equivalence
+     * set with this NetMeshObject.
      *
-     * @return the equivalents' Identifiers.
+     * @return the NetMeshObjectIdentifiers. May be null.
      */
     @Override
-    public NetMeshObjectIdentifier[] getEquivalents()
+    public NetMeshObjectIdentifier [] getEquivalents()
     {
         NetMeshObjectIdentifier [] ret = theEquivalents.toArray( new NetMeshObjectIdentifier[ theEquivalents.size() ]);
         return ret;
+    }
+
+    /**
+     * Set the GiveUpHomeReplica property.
+     *
+     * @param newValue the new value
+     */
+    public void setGiveUpHomeReplica(
+            boolean newValue )
+    {
+        theGiveUpHomeReplica = newValue;
+    }
+
+    /**
+     * Obtain the GiveUpHomeReplica property.
+     * 
+     * @return the GiveUpHomeReplica property
+     */
+    public boolean getGiveUpHomeReplica()
+    {
+        return theGiveUpHomeReplica;
     }
 
     /**
@@ -134,14 +156,16 @@ public class ParserFriendlyExternalizedNetMeshObject
      * Add a NetMeshBaseIdentifier of a Proxy.
      * 
      * @param toAdd to be added
+     * @param isProxyTowardsHome iof true, this identifies the Proxy in whose direction the home replica may be found
+     * @param isProxyTowardsLock iof true, this identifies the Proxy in whose direction the lock may be found
      */
     public void addProxyNetworkIdentifier(
             NetMeshBaseIdentifier toAdd,
-            boolean           isProxyTowardsHome,
-            boolean           isProxyTowardsLock )
+            boolean               isProxyTowardsHome,
+            boolean               isProxyTowardsLock )
     {
-        int last = theProxyNetworkIdentifiers.size();
-        theProxyNetworkIdentifiers.add( toAdd );
+        int last = theProxyIdentifiers.size();
+        theProxyIdentifiers.add( toAdd );
         
         if( isProxyTowardsHome ) {
             if( theProxyTowardsHomeIndex != -1 ) {
@@ -158,13 +182,13 @@ public class ParserFriendlyExternalizedNetMeshObject
     }
     
     /**
-     * Obtain the NetworkIdentifiers of all Proxies.
+     * Obtain the NetMeshBaseIdentifiers of all Proxies affected by this NetMeshObject.
      *
-     * @return the NetworkIdentifiers, if any
+     * @return the NetMeshBaseIdentifiers, if any
      */
-    public final NetMeshBaseIdentifier[] getProxyNames()
+    public final NetMeshBaseIdentifier[] getProxyIdentifiers()
     {
-        NetMeshBaseIdentifier [] ret = ArrayHelper.copyIntoNewArray( theProxyNetworkIdentifiers, NetMeshBaseIdentifier.class );
+        NetMeshBaseIdentifier [] ret = ArrayHelper.copyIntoNewArray( theProxyIdentifiers, NetMeshBaseIdentifier.class );
         return ret;
     }
 
@@ -175,10 +199,10 @@ public class ParserFriendlyExternalizedNetMeshObject
      */
     public final NetMeshBaseIdentifier getProxyTowardsHomeNetworkIdentifier()
     {
-        if( theProxyNetworkIdentifiers == null || theProxyTowardsHomeIndex == HERE_CONSTANT ) {
+        if( theProxyIdentifiers == null || theProxyTowardsHomeIndex == HERE_CONSTANT ) {
             return null;
         } else {
-            return theProxyNetworkIdentifiers.get( theProxyTowardsHomeIndex );
+            return theProxyIdentifiers.get( theProxyTowardsHomeIndex );
         }
     }
 
@@ -189,10 +213,10 @@ public class ParserFriendlyExternalizedNetMeshObject
      */
     public final NetMeshBaseIdentifier getProxyTowardsLockNetworkIdentifier()
     {
-        if( theProxyNetworkIdentifiers == null || theProxyTowardsLockIndex == HERE_CONSTANT ) {
+        if( theProxyIdentifiers == null || theProxyTowardsLockIndex == HERE_CONSTANT ) {
             return null;
         } else {
-            return theProxyNetworkIdentifiers.get( theProxyTowardsLockIndex );
+            return theProxyIdentifiers.get( theProxyTowardsLockIndex );
         }
     }
     
@@ -217,8 +241,9 @@ public class ParserFriendlyExternalizedNetMeshObject
                     "theTimeExpires",
                     "theRelationships",
                     "theEquivalents",
+                    "theGiveUpHomeReplica",
                     "theGiveUpLock",
-                    "theProxyNetworkIdentifiers",
+                    "theProxyIdentifiers",
                     "theProxyTowardsHomeIndex",
                     "theProxyTowardsLockIndex"
                 },
@@ -233,13 +258,19 @@ public class ParserFriendlyExternalizedNetMeshObject
                     theTimeExpires,
                     theRelationships,
                     theEquivalents,
+                    theGiveUpHomeReplica,
                     theGiveUpLock,
-                    theProxyNetworkIdentifiers,
+                    theProxyIdentifiers,
                     theProxyTowardsHomeIndex,
                     theProxyTowardsLockIndex
                 },
                 StringHelper.LOG_FLAGS.SHOW_NON_NULL | StringHelper.LOG_FLAGS.SHOW_NON_ZERO | StringHelper.LOG_FLAGS.SHOW_ZERO );
     }
+
+    /**
+     * The GiveUpHomeReplica property.
+     */
+    protected boolean theGiveUpHomeReplica;
     
     /**
      * The GiveUpLock property.
@@ -247,18 +278,19 @@ public class ParserFriendlyExternalizedNetMeshObject
     protected boolean theGiveUpLock;
     
     /**
-     * Instead of the Proxies, the NetworkIdentifiers, in String form, of the Proxies.
+     * NetMeshBaseIdentifier for the Proxies to other NetworkedMeshBases that contain the replicas that are
+     * closest in the replication graph.
      */
-    protected ArrayList<NetMeshBaseIdentifier> theProxyNetworkIdentifiers = new ArrayList<NetMeshBaseIdentifier>();
+    protected ArrayList<NetMeshBaseIdentifier> theProxyIdentifiers = new ArrayList<NetMeshBaseIdentifier>();
 
     /**
-     * The index into theProxies that represents our home Proxy. If this is HERE_CONSTANT, it
+     * The index into theProxyIdentifiers that represents our home Proxy. If this is HERE_CONSTANT, it
      * indicates that this is the home replica.
      */
     protected int theProxyTowardsHomeIndex = HERE_CONSTANT;
     
     /**
-     * The index into theProxies that represents the Proxy towards the lock. If this
+     * The index into theProxyIdentifiers that represents the Proxy towards the lock. If this
      * is HERE_CONSTANT, it indicates that this replica has the lock.
      */
     protected int theProxyTowardsLockIndex = HERE_CONSTANT;

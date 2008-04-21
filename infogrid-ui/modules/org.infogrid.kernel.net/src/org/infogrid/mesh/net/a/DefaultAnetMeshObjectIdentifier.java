@@ -26,7 +26,7 @@ import org.infogrid.util.ResourceHelper;
 import java.net.URISyntaxException;
 
 /**
- * Implements NetMeshObjectIdentifier for the in-memory NetMeshBase.
+ * Implements NetMeshObjectIdentifier for the Anet implementation.
  */
 public class DefaultAnetMeshObjectIdentifier
         extends
@@ -37,8 +37,9 @@ public class DefaultAnetMeshObjectIdentifier
     /**
      * Factory method.
      *
-     * @param localId the localId of the to-be-created ReferenceValue
-     * @return the created ReferenceValue
+     * @param baseIdentifier identifier of the NetMeshBase relative to which a localId is specified
+     * @param localId the localId of the to-be-created DefaultAnetMeshObjectIdentifier
+     * @return the created DefaultAnetMeshObjectIdentifier
      * @throws IllegalArgumentException thrown if a non-null localId contains a period.
      */
     public static DefaultAnetMeshObjectIdentifier create(
@@ -63,6 +64,7 @@ public class DefaultAnetMeshObjectIdentifier
     /**
      * Private constructor.
      * 
+     * @param baseIdentifier identifier of the NetMeshBase relative to which a localId is specified
      * @param localId the localId of the to-be-created MeshObjectIdentifier
      */
     protected DefaultAnetMeshObjectIdentifier(
@@ -75,9 +77,9 @@ public class DefaultAnetMeshObjectIdentifier
     }
 
     /**
-     * Obtain the Identifier of the MeshBase in which this NetMeshObjectIdentifier was allocated.
+     * Obtain the identifier of the NetMeshBase in which this NetMeshObjectIdentifier was allocated.
      *
-     * @return the Identifier of the MeshBase
+     * @return the dentifier of the NetMeshBase
      */
     public NetMeshBaseIdentifier getNetMeshBaseIdentifier()
     {
@@ -85,10 +87,10 @@ public class DefaultAnetMeshObjectIdentifier
     }
 
     /**
-     * Obtain an external form for this ReferenceValue, similar to
+     * Obtain an external form for this NetMeshObjectIdentifier, similar to
      * URL's getExternalForm(). This returns an empty String for local home objects.
      *
-     * @return external form of this ReferenceValue
+     * @return external form of this NetMeshObjectIdentifier
      */
     @Override
     public String toExternalForm()
@@ -105,10 +107,12 @@ public class DefaultAnetMeshObjectIdentifier
     }
     
     /**
-     * Re-construct a ReferenceValue from an external form.
+     * Re-construct a DefaultAnetMeshObjectIdentifier from an external form.
      *
-     * @param raw the external form of the ReferenceValue
-     * @return the created ReferenceValue
+     * @param contextIdentifier identifier of the NetMeshBase relative to which the external form is to be evaluated
+     * @param raw the external form of the DefaultAnetMeshObjectIdentifier
+     * @return the created DefaultAnetMeshObjectIdentifier
+     * @throws URISyntaxException thrown if a syntax error was encountered during parsing
      */
     public static DefaultAnetMeshObjectIdentifier fromExternalForm(
             NetMeshBaseIdentifier contextIdentifier,
@@ -179,7 +183,7 @@ public class DefaultAnetMeshObjectIdentifier
     protected NetMeshBaseIdentifier theNetMeshBaseIdentifier;
 
     /**
-     * Our ResourceHelper.
+     * Our ResourceHelper. This hides another field, intentionally.
      */
     public static final ResourceHelper RESOURCEHELPER = ResourceHelper.getInstance( DefaultAnetMeshObjectIdentifier.class );
     

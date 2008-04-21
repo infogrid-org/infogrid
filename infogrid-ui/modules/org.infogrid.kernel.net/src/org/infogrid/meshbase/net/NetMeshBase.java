@@ -16,11 +16,13 @@ package org.infogrid.meshbase.net;
 
 import org.infogrid.mesh.MeshObjectIdentifier;
 
+import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 
 import org.infogrid.meshbase.MeshBase;
 
+import org.infogrid.meshbase.MeshObjectsNotFoundException;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 
 import org.infogrid.util.CursorIterator;
@@ -44,238 +46,351 @@ public interface NetMeshBase
      */
     public abstract NetMeshBaseIdentifier getIdentifier();
 
-   /**
-     * Obtain a manager for MeshObject lifecycles.
-     * 
-     * @return a MeshBaseLifecycleManager that works on this MeshBase
-     */
-    public abstract NetMeshBaseLifecycleManager getMeshBaseLifecycleManager();
+    /**
+      * Obtain the NetMeshBase's home object. The home object is
+      * the only well-known object in a NetMeshBase. It is guaranteed to exist and
+      * cannot be deleted.
+      *
+      * @return the NetMeshObject that is this NetMeshBase's home object
+      */
+    public abstract NetMeshObject getHomeObject();
 
     /**
-     * Find a MeshObject in this MeshBase by its Identifier. Unlike
-     * the accessLocally method, this method does not attempt to contact other
-     * MeshBases.
+     * <p>Find a NetMeshObject in this NetMeshBase by its identifier. Unlike
+     * the {@link #accessLocally accessLocally} methods, this method purely considers NetMeshObjects in the
+     * NetMeshBase, and does not attempt to obtain them if they are not in the NetMeshBase yet.</p>
+     * <p>If not found, returns <code>null</code>.</p>
      * 
-     * @param identifier the Identifier of the MeshObject that shall be found
-     * @return the found MeshObject, or null if not found
+     * @param identifier the identifier of the NetMeshObject that shall be found
+     * @return the found NetMeshObject, or null if not found
+     * @see #findMeshObjectByIdentifierOrThrow
      */
     public abstract NetMeshObject findMeshObjectByIdentifier(
             MeshObjectIdentifier identifier );
 
     /**
-     * Find a set of MeshObjects in this MeshBase by their Identifiers. Unlike
-     * the accessLocally method, this method purely considers MeshObjects in the
-     * MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.
+     * <p>Find a set of NetMeshObjects in this NetMeshBase by their identifiers. Unlike
+     *    the {@link #accessLocally accessLocally} methods, this method purely considers NetMeshObjects in the
+     *    NetMeshBase, and does not attempt to obtain them if they are not in the NetMeshBase yet.</p>
+     * <p>If one or more of the NetMeshObjects could not be found, returns <code>null</code> at
+     *    the respective index in the returned array.</p>
      * 
-     * @param identifiers the Identifiers of the MeshObjects that shall be found
-     * @return the found MeshObjects, which may contain null values for MeshObjects that were not found
+     * @param identifiers the identifiers of the NetMeshObjects that shall be found
+     * @return the found NetMeshObjects, which may contain null values for NetMeshObjects that were not found
      */
     public abstract NetMeshObject [] findMeshObjectsByIdentifier(
-            MeshObjectIdentifier[] identifiers );
+            MeshObjectIdentifier [] identifiers );
 
     /**
-      * Obtain the MeshBase's home object. The home object is
-      * the only well-known object in a MeshBase, but it is guaranteed to exist and
-      * cannot be deleted.
-      *
-      * @return the MeshObject that is this MeshBase's home object
-      */
-    public abstract NetMeshObject getHomeObject();
-
-    /**
-      * Obtain a MeshObject whose unique identifier is known.
-      *
-      * @param nameOfLocalObject the Identifier property of the MeshObject
-      * @return the locally found MeshObject, or null if not found locally
-     * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
-      */
-    public abstract NetMeshObject accessLocally(
-            MeshObjectIdentifier nameOfLocalObject )
+     * <p>Find a NetMeshObject in this NetMeshBase by its identifier. Unlike
+     * the {@link #accessLocally accessLocally} methods, this method purely considers NetMeshObjects in the
+     * NetMeshBase, and does not attempt to obtain them if they are not in the NetMeshBase yet.</p>
+     * <p>If not found, throws {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
+     * 
+     * @param identifier the identifier of the NetMeshObject that shall be found
+     * @return the found NetMeshObject, or null if not found
+     * @throws MeshObjectsNotFoundException thrown if the NetMeshObject was not found
+     */
+    public abstract NetMeshObject findMeshObjectByIdentifierOrThrow(
+            MeshObjectIdentifier identifier )
         throws
-            NetMeshObjectAccessException;
+            MeshObjectsNotFoundException;
 
     /**
-      * Obtain N locally available MeshObjects whose unique identifiers are known.
-      *
-      * @param nameOfLocalObjects the Identifier properties of the MeshObjects
-      * @return array of the same length as nameOfLocalObjects, with the locally found MeshObjects filled
-      *         in at the same positions. If one or more of the MeshObjects were not found, the location
-      *         in the array will be null.
-     * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
-      */
+     * <p>Find a set of NetMeshObjects in this NetMeshBase by their identifiers. Unlike
+     *    the {@link #accessLocally accessLocally} method, this method purely considers NetMeshObjects in the
+     *    NetMeshBase, and does not attempt to obtain them if they are not in the NetMeshBase yet.</p>
+     * <p>If one or more of the NetMeshObjects could not be found, throws
+     *    {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
+     * 
+     * @param identifiers the identifiers of the NetMeshObjects that shall be found
+     * @return the found NetMeshObjects
+     * @throws MeshObjectsNotFoundException if one or more of the NetMeshObjects were not found. Note that this Exception
+     *         inherits from PartialResultException, and may carry any partial results that were available at the
+     *         time the Exception was thrown
+     */
+    public abstract NetMeshObject [] findMeshObjectsByIdentifierOrThrow(
+            MeshObjectIdentifier[] identifiers )
+        throws
+            MeshObjectsNotFoundException;
+
+    /**
+     * Obtain a MeshObject whose unique identifier is known.
+     * 
+     * @param identifier the identifier property of the MeshObject
+     * @return the locally found MeshObject, or null if not found locally
+     * @throws NetMeshObjectAccessException thrown if something went wrong accessing the MeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public abstract NetMeshObject accessLocally(
+            MeshObjectIdentifier identifier )
+        throws
+            NetMeshObjectAccessException,
+            NotPermittedException;
+
+    /**
+     * Obtain N locally available MeshObjects whose unique identifiers are known.
+     * 
+     * @param identifiers the identifier properties of the MeshObjects
+     * @return array of the same length as identifiers, with the locally found MeshObjects filled
+     *         in at the same positions. If one or more of the MeshObjects were not found, the respective
+     *         location in the array will be null.
+     * @throws NetMeshObjectAccessException thrown if something went wrong accessing one or more MeshObjects
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
     public abstract NetMeshObject [] accessLocally(
-            MeshObjectIdentifier [] nameOfLocalObjects )
+            MeshObjectIdentifier [] identifiers )
         throws
-            NetMeshObjectAccessException;
+            NetMeshObjectAccessException,
+            NotPermittedException;
 
     /**
-      * Obtain a MeshObject from a remote NetMeshBaseIdentifier.
-      *    This call does not obtain update rights for the obtained replica.</p>
-      * 
-      * @param networkLocation the NetMeshBaseIdentifier for the location from where we obtain the remote MeshObject
-      * @return the locally replicated MeshObject, or null if not found
-      * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
-      */
-    public abstract NetMeshObject accessLocally(
-            NetMeshBaseIdentifier networkLocation )
-        throws
-            NetMeshObjectAccessException;
-
-    /**
-     * <p>Obtain a non-standard MeshObject from a remote NetMeshBaseIdentifier.
-     *    This call does not obtain update rights for the obtained replica.</p>
+     * <p>Obtain a local replica of the home NetMeshObject held by a possibly remote NetMeshBase
+     * identified by its NetMeshBaseIdentifier.
+     * This call does not obtain update rights for the obtained replica.</p>
      * 
-     * @param remoteLocation the NetMeshBaseIdentifier for the location from where we obtain the remote MeshObject
-     * @param nameOfRemoteObject the Identifier of the non-standard remote MeshObject
-     * @return the locally replicated MeshObject, or null if not found
-     * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
+     *        a local replica of the remote NetMeshObject
+     * @return the locally replicated NetMeshObject, or null if not found
+     * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject accessLocally(
-            NetMeshBaseIdentifier   remoteLocation,
-            NetMeshObjectIdentifier nameOfRemoteObject )
+            NetMeshBaseIdentifier remoteLocation )
         throws
-            NetMeshObjectAccessException;
+            NetMeshObjectAccessException,
+            NotPermittedException;
 
     /**
-     * <p>Obtain a non-standard MeshObject from a remote NetMeshBaseIdentifier. Specify a non-default timeout.
-     *    This call does not obtain update rights for the obtained replica.</p>
+     * <p>Obtain a local replica of the home NetMeshObject held by a possibly remote NetMeshBase
+     * identified by its NetMeshBaseIdentifier.
+     * Specify a non-default timeout.
+     * This call does not obtain update rights for the obtained replica.</p>
      * 
-     * @param remoteLocation the NetMeshBaseIdentifier for the location from where we obtain the remote MeshObject
-     * @param nameOfRemoteObject the Identifier of the non-standard remote MeshObject
+     * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
+     *        a replica of the remote MeshObject
      * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
-     * @return the locally replicated MeshObject, or null if not found
-     * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @return the locally replicated NetMeshObject, or null if not found
+     * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject accessLocally(
             NetMeshBaseIdentifier   remoteLocation,
-            NetMeshObjectIdentifier nameOfRemoteObject,
             long                    timeoutInMillis )
         throws
-            NetMeshObjectAccessException;
+            NetMeshObjectAccessException,
+            NotPermittedException;
 
     /**
-     * <p>Obtain a non-standard MeshObject from a remote NetMeshBaseIdentifier.
-     *    This call does not obtain update rights for the obtained replica.</p>
+     * <p>Obtain a local replica of the home NetMeshObject held by a possibly remote NetMeshBase
+     * identified by its NetMeshBaseIdentifier.
+     * Request a non-default CoherenceSpecification.
+     * This call does not obtain update rights for the obtained replica.</p>
      * 
-     * @param remoteLocation the NetMeshBaseIdentifier for the location from where we obtain the remote MeshObject
-     * @param nameOfRemoteObject the Identifier of the non-standard remote MeshObject
-     * @param coherence the CoherenceSpecification desired by the caller
-     * @return the locally replicated MeshObject, or null if not found
-     * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
+     *        a replica of the remote MeshObject
+     * @param coherence the CoherenceSpecification requested by the caller
+     * @return the locally replicated NetMeshObject, or null if not found
+     * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject accessLocally(
             NetMeshBaseIdentifier   remoteLocation,
-            NetMeshObjectIdentifier nameOfRemoteObject,
             CoherenceSpecification  coherence )
         throws
-            NetMeshObjectAccessException;
+            NetMeshObjectAccessException,
+            NotPermittedException;
 
     /**
-     * Obtain a MeshObject from a remote NetMeshBaseIdentifier.
-     *    This call does not obtain update rights for the obtained replica.</p>
+     * <p>Obtain a local replica of a named NetMeshObject held by a possibly remote NetMeshBase
+     * identified by its NetMeshBaseIdentifier.
+     * This call does not obtain update rights for the obtained replica.</p>
      * 
-     * @param remoteLocation the NetMeshBaseIdentifier for the location from where we obtain the remote MeshObject
-     * @param coherence the CoherenceSpecification desired by the caller
-     * @return the locally replicated MeshObject, or null if not found
-     * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
-     */
-    public abstract NetMeshObject accessLocally(
-            NetMeshBaseIdentifier  remoteLocation,
-            CoherenceSpecification coherence )
-        throws
-            NetMeshObjectAccessException;
-
-    /**
-     * <p>Obtain a non-standard MeshObject from a remote NetMeshBaseIdentifier. Specify a non-default timeout.
-     *    This call does not obtain update rights for the obtained replica.</p>
-     * 
-     * @param remoteLocation the NetMeshBaseIdentifier for the location from where we obtain the remote MeshObject
-     * @param nameOfRemoteObject the Identifier of the non-standard remote MeshObject
-     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
-     * @param coherence the CoherenceSpecification desired by the caller
-     * @return the locally replicated MeshObject, or null if not found
-     * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
+     *        a replica of the remote MeshObject
+     * @param objectIdentifier the NetMeshObjectIdentifier of the remote NetMeshObject
+     * @return the locally replicated NetMeshObject, or null if not found
+     * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject accessLocally(
             NetMeshBaseIdentifier   remoteLocation,
-            NetMeshObjectIdentifier nameOfRemoteObject,
+            NetMeshObjectIdentifier objectIdentifier )
+        throws
+            NetMeshObjectAccessException,
+            NotPermittedException;
+
+    /**
+     * <p>Obtain a local replica of a named NetMeshObject held by a possibly remote NetMeshBase
+     * identified by its NetMeshBaseIdentifier.
+     * Specify a non-default timeout.
+     * This call does not obtain update rights for the obtained replica.</p>
+     * 
+     * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
+     *        a replica of the remote MeshObject
+     * @param objectIdentifier the NetMeshObjectIdentifier of the remote NetMeshObject
+     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
+     * @return the locally replicated NetMeshObject, or null if not found
+     * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public abstract NetMeshObject accessLocally(
+            NetMeshBaseIdentifier   remoteLocation,
+            NetMeshObjectIdentifier objectIdentifier,
+            long                    timeoutInMillis )
+        throws
+            NetMeshObjectAccessException,
+            NotPermittedException;
+
+    /**
+     * <p>Obtain a local replica of a named NetMeshObject held by a possibly remote NetMeshBase
+     * identified by its NetMeshBaseIdentifier.
+     * Request a non-default CoherenceSpecification.
+     * This call does not obtain update rights for the obtained replica.</p>
+     * 
+     * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
+     *        a replica of the remote MeshObject
+     * @param objectIdentifier the NetMeshObjectIdentifier of the remote NetMeshObject
+     * @param coherence the CoherenceSpecification requested by the caller
+     * @return the locally replicated NetMeshObject, or null if not found
+     * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public abstract NetMeshObject accessLocally(
+            NetMeshBaseIdentifier   remoteLocation,
+            NetMeshObjectIdentifier objectIdentifier,
+            CoherenceSpecification  coherence )
+        throws
+            NetMeshObjectAccessException,
+            NotPermittedException;
+
+    /**
+     * <p>Obtain a local replica of a named NetMeshObject held by a possibly remote NetMeshBase
+     * identified by its NetMeshBaseIdentifier.
+     * Request a non-default CoherenceSpecification.
+     * Specify a non-default timeout.
+     * This call does not obtain update rights for the obtained replica.</p>
+     * 
+     * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
+     *        a replica of the remote MeshObject
+     * @param objectIdentifier the NetMeshObjectIdentifier of the remote NetMeshObject
+     * @param coherence the CoherenceSpecification requested by the caller
+     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
+     * @return the locally replicated NetMeshObject, or null if not found
+     * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public abstract NetMeshObject accessLocally(
+            NetMeshBaseIdentifier   remoteLocation,
+            NetMeshObjectIdentifier objectIdentifier,
             CoherenceSpecification  coherence,
             long                    timeoutInMillis )
         throws
-            NetMeshObjectAccessException;
+            NetMeshObjectAccessException,
+            NotPermittedException;
 
     /**
-     * <p>Obtain a MeshObject from a remote NetMeshObjectAccessSpecification.
-     *    This call does not obtain update rights for the obtained replica.</p>
+     * <p>Obtain a local replica of a NetMeshObject using a NetMeshObjectAccessSpecification.
+     * This call does not obtain update rights for the obtained replica.</p>
      * 
-     * @param pathToObject the NetMeshObjectAccessSpecification indicating the location and path to use to access the remote MeshObject
-     * @return the locally replicated MeshObject, or null if not found
-     * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @param pathToObject the NetMeshObjectAccessSpecification indicating the location and path to use to access the remote NetMeshObject
+     * @return the locally replicated NetMeshObject, or null if not found
+     * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject accessLocally(
             NetMeshObjectAccessSpecification pathToObject )
         throws
-            NetMeshObjectAccessException;
+            NetMeshObjectAccessException,
+            NotPermittedException;
 
     /**
-     * <p>Obtain a MeshObject from a remote NetMeshObjectAccessSpecification.
-     *    This call does not obtain update rights for the obtained replica.</p>
+     * <p>Obtain a local replica of a NetMeshObject using a NetMeshObjectAccessSpecification.
+     * Specify a non-default timeout.
+     * This call does not obtain update rights for the obtained replica.</p>
      * 
-     * @param pathToObject the NetMeshObjectAccessSpecification indicating the location and path to use to access the remote MeshObject
+     * @param pathToObject the NetMeshObjectAccessSpecification indicating the location and path to use to access the remote NetMeshObject
      * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
-     * @return the locally replicated MeshObject, or null if not found
-     * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @return the locally replicated NetMeshObject, or null if not found
+     * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject accessLocally(
             NetMeshObjectAccessSpecification pathToObject,
             long                             timeoutInMillis )
         throws
-            NetMeshObjectAccessException;
+            NetMeshObjectAccessException,
+            NotPermittedException;
 
     /**
-     * <p>Obtain a number of MeshObjects from one ore more remote NetworkPaths.
+     * <p>Obtain N local replicas of N NetMeshObjects using N NetMeshObjectAccessSpecifications.
      * This call does not obtain update rights for the obtained replicas.</p>
+     * <p>There is no requirement that there is any similarity between the elements of pathToObjects;
+     * the requested NetMeshObjects may reside in very different NetMeshBases. However, by offering this
+     * single call, smart implementations may attempt group requests by shared paths, or execute them
+     * in parallel, and thus optimize communications. There is no requirement on implementations to do
+     * that, however.</p>
      * 
-     * @param pathsToObjects the NetworkPaths indicating the location and path to use to access the remote MeshObjects
-     * @return the locally replicated MeshObjects in the same sequence, or null if not found
-     * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @param pathsToObjects the NetMeshObjectAccessSpecifications indicating the location and paths to use to access the remote NetMeshObjects
+     * @return the locally replicated NetMeshObjects, or null if not found
+     * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject [] accessLocally(
             NetMeshObjectAccessSpecification [] pathsToObjects )
         throws
-            NetMeshObjectAccessException;
+            NetMeshObjectAccessException,
+            NotPermittedException;
 
     /**
-     * <p>Obtain a number of MeshObjects from one ore more remote NetworkPaths. Specify a non-default timeout.
+     * <p>Obtain N local replicas of N NetMeshObjects using N NetMeshObjectAccessSpecifications.
+     * Specify a non-default timeout.
      * This call does not obtain update rights for the obtained replicas.</p>
+     * <p>There is no requirement that there is any similarity between the elements of pathToObjects;
+     * the requested NetMeshObjects may reside in very different NetMeshBases. However, by offering this
+     * single call, smart implementations may attempt group requests by shared paths, or execute them
+     * in parallel, and thus optimize communications. There is no requirement on implementations to do
+     * that, however.</p>
      * 
-     * @param pathsToObjects the NetworkPaths indicating the location and path to use to access the remote MeshObjects
+     * @param pathsToObjects the NetMeshObjectAccessSpecifications indicating the location and paths to use to access the remote NetMeshObjects
      * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
-     * @return the locally replicated MeshObjects in the same sequence, or null if not found
-     * @exception NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @return the locally replicated NetMeshObjects, or null if not found
+     * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject [] accessLocally(
             NetMeshObjectAccessSpecification [] pathsToObjects,
             long                                timeoutInMillis )
         throws
-            NetMeshObjectAccessException;
+            NetMeshObjectAccessException,
+            NotPermittedException;
 
     /**
-     * Obtain a factory for MeshObjectIdentifiers that is appropriate for this MeshBase.
-     *
-     * @return the factory
+     * <p>Obtain a manager for NetMeshObject lifecycles.</p>
+     * 
+     * @return a NetMeshBaseLifecycleManager that works on this MeshBase
      */
-    public abstract NetMeshObjectIdentifierFactory getMeshObjectIdentifierFactory();
+    public abstract NetMeshBaseLifecycleManager getMeshBaseLifecycleManager();
 
     /**
-     * Obtain the NetAccessManager associated with this MeshBase, if any.
+     * Obtain the NetAccessManager associated with this NetMeshBase, if any.
+     * The NetAccessManager controls access to the NetMeshObjects in this NetMeshBase.
+     * A subtype of AccessManagerm NetAccessManager, is needed that also defines access rights related to
+     * operations that exist on NetMeshBase and NetMeshObject but not on their supertypes.
      *
-     * @return the NetAccessManager
+     * @return the NetAccessManager, if any
      */
     public abstract NetAccessManager getAccessManager();
 
     /**
-     * Set the default value for new NetMeshObject's giveUpLock property if not otherwise specified.
+     * Obtain a factory for NetMeshObjectIdentifiers that is appropriate for this NetMeshBase.
+     *
+     * @return the factory for NetMeshObjectIdentifiers
+     */
+    public abstract NetMeshObjectIdentifierFactory getMeshObjectIdentifierFactory();
+
+    /**
+     * Set the default value for a new NetMeshObject's willGiveUpLock property if not otherwise specified.
      *
      * @param newValue the new value
      * @see #getDefaultWillGiveUpLock
@@ -284,21 +399,46 @@ public interface NetMeshBase
             boolean newValue );
     
     /**
-     * Obtain the default value for new NetMeshObject's giveUpLock property if not otherwise specified.
+     * Obtain the default value for a new NetMeshObject's willGiveUpLock property if not otherwise specified.
      *
-     * @param return the default value
+     * @return the default value
      * @see #setDefaultWillGiveUpLock
      */
     public abstract boolean getDefaultWillGiveUpLock();
+
+    /**
+     * Set the default value for a new NetMeshObject's willGiveUpHomeReplica property if not otherwise specified.
+     *
+     * @param newValue the new value
+     * @see #getDefaultWillGiveUpHomeReplica
+     */
+    public abstract void setDefaultWillGiveUpHomeReplica(
+            boolean newValue );
     
     /**
-     * If true, the NetMeshBase will never give up locks, regardless what the individual MeshObjects
+     * Obtain the default value for a new NetMeshObject's willGiveUpHomeReplica property if not otherwise specified.
+     *
+     * @return the default value
+     * @see #setDefaultWillGiveUpHomeReplica
+     */
+    public abstract boolean getDefaultWillGiveUpHomeReplica();
+
+    /**
+     * If true, the NetMeshBase will never give up locks, regardless what the individual NetMeshObjects
      * would like.
      *
      * @return true never give up locks
      */
     public abstract boolean refuseToGiveUpLock();
     
+    /**
+     * If true, the NetMeshBase will never give up home replicas, regardless what the individual NetMeshObjects
+     * would like.
+     *
+     * @return true never give up home replicas
+     */
+    public abstract boolean refuseToGiveUpHomeReplica();
+
     /**
      * If is set to true, this NetMeshBase prefers that new Replicas create a branch from its own Replicas
      * in the replication graph. If this is set to false, this NetMeshBase prefers that new Replicas create a
@@ -346,31 +486,20 @@ public interface NetMeshBase
      * @see #obtainProxyFor
      */
     public abstract Proxy getProxyFor(
-            NetMeshBaseIdentifier  networkIdentifier );
+            NetMeshBaseIdentifier networkIdentifier );
 
     /**
      * <p>Obtain an Iterator over the set of currently active Proxies.</p>
      *
-     * @return the CursorIterator
+     * @return the CursorIterator over the Proxies
      */
     public abstract CursorIterator<Proxy> proxies();
     
-//    /**
-//     * Instruct this NetMeshBase to recreate a Proxy according to the provided specification.
-//     *
-//     * @param externalized the ExternalizedProxy containing the specification
-//     * @return the recreated Proxy
-//     */
-//    public Proxy recreateProxy(
-//            ExternalizedProxy externalized )
-//        throws
-//            FactoryException;
-//
     /**
      * Obtain this NetMeshBase as a NameServer for its Proxies, keyed by the NetMeshBaseIdentifiers
      * of the partner NetMeshBases.
      * 
-     *  @return the NameServer mapping NetMeshBaseIdentifiers to Proxies.
+     * @return the NameServer mapping NetMeshBaseIdentifiers to Proxies.
      */
     public NameServer<NetMeshBaseIdentifier,Proxy> getAsProxyNameServer();
 
@@ -382,7 +511,8 @@ public interface NetMeshBase
     public abstract Proxy determineIncomingProxy();
 
     /**
-     * Set the incoming Proxy for this Thread. To be called only by Proxies.
+     * Set the incoming Proxy for this Thread. To be called only by Proxies
+     * about themselves.
      *
      * @param incomingProxy the incoming Proxy for this Thread
      */
@@ -390,7 +520,8 @@ public interface NetMeshBase
             Proxy incomingProxy );
     
     /**
-     * Unregister the incoming Proxy for this Thread. To be called only be Proxies.
+     * Unregister the incoming Proxy for this Thread. To be called only be Proxies
+     * about themselves.
      */
     public abstract void unregisterIncomingProxy();
 

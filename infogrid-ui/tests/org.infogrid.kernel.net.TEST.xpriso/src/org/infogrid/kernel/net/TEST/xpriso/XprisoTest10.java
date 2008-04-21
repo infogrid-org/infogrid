@@ -107,7 +107,7 @@ public class XprisoTest10
         checkEquals( mb2.size(), 1, "wrong number of objects after sweeping" );
 
         checkEquals(    obj1_mb1.getAllProxies(), null, "Wrong number of Proxies on obj1_mb1" );
-        checkCondition( obj1_mb1.doWeHaveLock(), "obj1_mb1 did not re-acquire lock" );
+        checkCondition( obj1_mb1.hasLock(), "obj1_mb1 did not re-acquire lock" );
         checkCondition( obj1_mb2.getIsDead(), "obj1_mb2 not dead" );
 
         checkProxies( obj1_mb1, null, null, null, "obj1_mb1 has wrong proxies" );
@@ -195,7 +195,7 @@ public class XprisoTest10
 
             NetMeshObject replicaCurrent = mb2.findMeshObjectByIdentifier( current.getIdentifier() );
             if( replicaCurrent == null ) {
-                checkCondition( current.doWeHaveLock(), "object does not have lock: " + current );
+                checkCondition( current.hasLock(), "object does not have lock: " + current );
             }
         }
     }

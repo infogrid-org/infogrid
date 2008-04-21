@@ -114,9 +114,13 @@ public abstract class AbstractNetMeshObjectDeletedEvent
         try {
             tx = base.createTransactionNowIfNeeded();
 
-            MeshObjectIdentifier otherObjectIdentifier = getDeltaValueIdentifier();
+            NetMeshObjectIdentifier otherObjectIdentifier = getAffectedMeshObjectIdentifier();
 
-            NetMeshObject ret = base.getMeshBaseLifecycleManager().rippleDelete( otherObjectIdentifier, theOriginNetworkIdentifier, getTimeEventOccurred() );
+            NetMeshObject ret = base.getMeshBaseLifecycleManager().rippleDelete(
+                    otherObjectIdentifier,
+                    theOriginNetworkIdentifier,
+                    getTimeEventOccurred() );
+
             return ret;
 
         } catch( TransactionException ex ) {
