@@ -117,7 +117,7 @@ public abstract class AbstractIfHasLockTag
     {
         NetMeshObject obj = (NetMeshObject) lookupOrThrow( theMeshObjectName );
 
-        boolean ret = obj.doWeHaveLock();
+        boolean ret = obj.hasLock();
         
         return ret;
     }

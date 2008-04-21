@@ -182,6 +182,7 @@ public class XprisoMessageSerializationTest1
                         nmo_ref3,
                         nmo_ref5
                 }, // equivalents
+                false, // giveUpHomeReplica
                 true, // giveUpLock
                 new NetMeshBaseIdentifier[] {
                         id3,
@@ -223,6 +224,7 @@ public class XprisoMessageSerializationTest1
                         new NetMeshObjectIdentifier[] {
                                 nmo_ref5
                         }, // equivalents
+                        true, // giveUpHomeReplica
                         false, // giveUpLock
                         new NetMeshBaseIdentifier[] {
                                 id1
@@ -255,6 +257,7 @@ public class XprisoMessageSerializationTest1
                         new NetMeshObjectIdentifier[0], // neighbors
                         new MeshTypeIdentifier [0][], // roleTypes
                         new NetMeshObjectIdentifier[0], // equivalents
+                        true, // giveUpHomeReplica
                         true, // giveUpLock
                         new NetMeshBaseIdentifier[0], // proxyNames
                         -1, // proxyTowardsHomeIndex

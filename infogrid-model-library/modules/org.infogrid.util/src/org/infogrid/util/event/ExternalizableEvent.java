@@ -37,12 +37,12 @@ public interface ExternalizableEvent<S,SID,V,VID>
      * Obtain the source of the event.
      * 
      * @return the source of the event
-     * @throws UnresolvedException.Source thrown if this ExternalizableEvent was serialized/deserialized,
+     * @throws SourceUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     public S getSource()
         throws
-            UnresolvedException.Source;
+            SourceUnresolvedException;
     
     /**
      * Obtain the source identifier of the event.
@@ -55,12 +55,12 @@ public interface ExternalizableEvent<S,SID,V,VID>
      * Obtain the delta value of the data item whose change triggered the event.
      * 
      * @return the delta value
-     * @throws UnresolvedException.Value thrown if this ExternalizableEvent was serialized/deserialized,
+     * @throws ValueUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     public V getDeltaValue()
         throws
-            UnresolvedException.Value;
+            ValueUnresolvedException;
 
     /**
      * Obtain the delta-value identifier of the event.

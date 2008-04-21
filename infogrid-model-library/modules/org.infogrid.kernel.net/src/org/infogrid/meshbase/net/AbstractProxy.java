@@ -14,17 +14,19 @@
 
 package org.infogrid.meshbase.net;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import org.infogrid.comm.MessageEndpoint;
 import org.infogrid.comm.MessageEndpointIsDeadException;
 import org.infogrid.comm.WaitForResponseEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpointListener;
-
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
-
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.net.externalized.SimpleExternalizedProxy;
 import org.infogrid.meshbase.net.transaction.NetChange;
@@ -50,9 +52,7 @@ import org.infogrid.meshbase.transaction.CannotApplyChangeException;
 import org.infogrid.meshbase.transaction.Change;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
-
 import org.infogrid.net.NetMessageEndpoint;
-
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.Factory;
 import org.infogrid.util.FlexibleListenerSet;
@@ -63,17 +63,13 @@ import org.infogrid.util.StringHelper;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.text.StringRepresentation;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-
 /**
- * Factors out functionality common to a lot of Proxy implementations.
+ * <p>Factors out functionality common to many Proxy implementations.</>
  *
- * This does not listen to incoming messages itself; only the created WaitForResponseEndpoint does.
- * It is also not a TransactionListener any more: the NetMeshBase behaves as if it is, though.
- * This makes sure that the Proxy gets the updates even if temporarily on-disk.
+ * <p>Note that this class does not listen to incoming messages itself; only the created
+ * WaitForResponseEndpoint does. It is also not a TransactionListener any more: the
+ * NetMeshBase behaves as if it is, though. This makes sure that the Proxy gets the updates
+ * even if temporarily not in memory and swapped out.
  */
 public abstract class AbstractProxy
         implements
@@ -96,12 +92,14 @@ public abstract class AbstractProxy
         theMeshBase = mb;
 
         theEndpoint.addDirectMessageEndpointListener( this );
-            // this must be contained direct, otherwise the proxy may be swapped out and the endpoint "swallows" the incoming message
+            // this must be contained direct, otherwise the proxy may be swapped out and the endpoint "swallows"
+            // the incoming message that will never make it to the Proxy
 
         // Don't use the factory. We dispatch the incoming messages ourselves, so we can make
         // sure we process them in order.
-        theWaitForLockResponseEndpoint    = new MyWaitForLockResponseEndpoint( theEndpoint );
-        theWaitForReplicaResponseEndpoint = new MyWaitForReplicaResponseEndpoint( theEndpoint );
+        theWaitForLockResponseEndpoint        = new MyWaitForLockResponseEndpoint( theEndpoint );
+        theWaitForHomeReplicaResponseEndpoint = new MyWaitForHomeReplicaResponseEndpoint( theEndpoint );
+        theWaitForReplicaResponseEndpoint     = new MyWaitForReplicaResponseEndpoint( theEndpoint );
 
         // default, subclass constructors can reset
         theTimeCreated = theTimeUpdated = theTimeRead = System.currentTimeMillis();
@@ -122,17 +120,7 @@ public abstract class AbstractProxy
     }
 
     /**
-     * Obtain the MessageEndpoint associated with this Proxy.
-     *
-     * @return the MessageEndpoint
-     */
-    public final NetMessageEndpoint getMessageEndpoint()
-    {
-        return theEndpoint;
-    }
-
-    /**
-     * Obtain the key for Smart Factories.
+     * Obtain the key for smart factories.
      *
      * @return the key
      */
@@ -184,6 +172,27 @@ public abstract class AbstractProxy
     }
 
     /**
+     * Determine the NetMeshBaseIdentifier of the partner NetMeshBase. The partner
+     * NetMeshBase is the NetMeshBase with which this Proxy communicates.
+     * 
+     * @return the NetMeshBaseIdentifier of the partner NetMeshBase
+     */
+    public final NetMeshBaseIdentifier getPartnerMeshBaseIdentifier()
+    {
+        return theEndpoint.getNetworkIdentifierOfPartner();
+    }
+    
+    /**
+     * Obtain the MessageEndpoint associated with this Proxy.
+     *
+     * @return the MessageEndpoint
+     */
+    public final NetMessageEndpoint getMessageEndpoint()
+    {
+        return theEndpoint;
+    }
+
+    /**
      * Set a CoherenceSpecification.
      *
      * @param newValue the new value
@@ -195,7 +204,7 @@ public abstract class AbstractProxy
     }
 
     /**
-     * Obtain the CoherenceSpecification.
+     * Obtain the CoherenceSpecification currently in effect.
      *
      * @return the current CoherenceSpecification
      */
@@ -245,6 +254,335 @@ public abstract class AbstractProxy
     public final long getTimeExpires()
     {
         return theTimeExpires;
+    }
+
+    /**
+     * Ask this Proxy to obtain from its partner NetMeshBase replicas with the enclosed
+     * specification. Do not acquire the lock; that would be a separate operation. 
+     * 
+     * @param paths the NetMeshObjectAccessSpecifications specifying which replicas should be obtained
+     * @param timeout the timeout, in milliseconds
+     * @throws NetMeshObjectAccessException accessing the NetMeshBase and obtaining a replica failed
+     */
+    public final void obtainReplica(
+            NetMeshObjectAccessSpecification [] paths,
+            long                                timeout )
+        throws
+            NetMeshObjectAccessException
+    {
+        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
+        
+        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
+        outgoing.setRequestedFirstTimeObjects( paths );
+
+        XprisoMessage incoming; // this is only here to make debugging easier
+        try {
+            incoming = theWaitForReplicaResponseEndpoint.call( outgoing, timeout );
+            
+        } catch( RemoteQueryTimeoutException ex ) {
+            log.warn( ex );
+            throw new NetMeshObjectAccessException( theMeshBase, null, paths, ex );
+
+        } catch( InvocationTargetException ex ) {
+            log.warn( ex );
+        }
+    }
+
+    /**
+     * Ask this Proxy to obtain the lock for one or more replicas from the
+     * partner NetMeshBase. Unlike many of the other calls, this call is
+     * synchronous over the network and either succeeds, fails, or times out.
+     *
+     * @param localReplicas the local replicas for which the lock should be obtained
+     * @param timeout the timeout, in milliseconds
+     * @throws RemoteQueryTimeoutException thrown if this call times out
+     */
+    public final void tryToObtainLocks(
+            NetMeshObject [] localReplicas,
+            long             timeout )
+        throws
+            RemoteQueryTimeoutException
+    {
+        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
+
+        NetMeshObjectIdentifier [] extNames = new NetMeshObjectIdentifier[ localReplicas.length ];
+        for( int i=0 ; i<extNames.length ; ++i ) {
+            extNames[i] = localReplicas[i].getIdentifier();
+        }
+        
+        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
+        outgoing.setRequestedLockObjects( extNames );
+
+        XprisoMessage incoming; // this is only here to make debugging easier
+        try {
+            incoming = theWaitForLockResponseEndpoint.call( outgoing, timeout );
+
+        } catch( InvocationTargetException ex ) {
+            log.warn( ex );
+        }
+    }
+    
+    /**
+     * Ask this Proxy to obtain the home replica status for one or more replicas from the
+     * partner NetMeshBase. Unlike many of the other calls, this call is
+     * synchronous over the network and either succeeds, fails, or times out.
+     *
+     * @param localReplicas the local replicas for which the home replica status should be obtained
+     * @param timeout the timeout, in milliseconds
+     * @throws RemoteQueryTimeoutException thrown if this call times out
+     */
+    public void tryToObtainHomeReplicas(
+            NetMeshObject [] localReplicas,
+            long             timeout )
+        throws
+            RemoteQueryTimeoutException
+    {
+        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
+
+        NetMeshObjectIdentifier [] extNames = new NetMeshObjectIdentifier[ localReplicas.length ];
+        for( int i=0 ; i<extNames.length ; ++i ) {
+            extNames[i] = localReplicas[i].getIdentifier();
+        }
+        
+        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
+        outgoing.setRequestedHomeReplicas( extNames );
+
+        XprisoMessage incoming; // this is only here to make debugging easier
+        try {
+            incoming = theWaitForHomeReplicaResponseEndpoint.call( outgoing, timeout );
+
+        } catch( InvocationTargetException ex ) {
+            log.warn( ex );
+        }
+    }
+
+    /**
+     * Send notification to the partner NetMeshBase that this MeshBase has forcibly taken the
+     * lock back for the given NetMeshObjects.
+     *
+     * @param localReplicas the local replicas for which the lock has been forced back
+     */
+    public void forceObtainLocks(
+            NetMeshObject [] localReplicas )
+    {
+        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
+
+        NetMeshObjectIdentifier [] extNames = new NetMeshObjectIdentifier[ localReplicas.length ];
+        for( int i=0 ; i<extNames.length ; ++i ) {
+            extNames[i] = localReplicas[i].getIdentifier();
+        }
+        
+        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
+        outgoing.setReclaimedLockObjects( extNames );
+
+        theEndpoint.enqueueMessageForSend( outgoing );
+    }
+
+    /**
+     * Tell the partner NetMeshBase that one or more local replicas exist here that
+     * would like to be resynchronized.
+     *
+     * @param localReplicas the NetMeshObjectIdentifiers of the local replicas
+     */
+    public void resynchronizeDependentReplicas(
+            NetMeshObjectIdentifier [] localReplicas )
+    {
+        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
+        
+        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
+        outgoing.setRequestedResynchronizeDependentReplicas( localReplicas );
+
+        theEndpoint.enqueueMessageForSend( outgoing );
+    }
+
+    /**
+     * Invoked by the NetMeshBase that this Proxy belongs to,
+     * it causes this Proxy to initiate the "ceasing communication" sequence with
+     * the partner NetMeshBase, and then kill itself.
+     */
+    @SuppressWarnings(value={"unchecked"})
+    public void initiateCeaseCommunications()
+    {
+        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
+        
+        outgoing.setCeaseCommunications( true );
+        
+        theEndpoint.enqueueMessageForSend( outgoing );
+        
+        theFactory.remove( theEndpoint.getNetworkIdentifierOfPartner() );
+    }
+
+    /**
+     * Tell this Proxy that it is not needed any more. This will invoke
+     * {@link #initiateCaseCommunications} if and only if
+     * isPermanent is true.
+     * 
+     * @param isPermanent if true, this Proxy will go away permanently; if false,
+     *        it may come alive again some time later, e.g. after a reboot
+     */
+    public void die(
+            boolean isPermanent )
+    {
+        if( isPermanent ) {
+            initiateCeaseCommunications();
+        }
+        
+        theEndpoint.gracefulDie();
+    }
+
+    /**
+     * Obtain this Proxy in externalized form.
+     *
+     * @return the ExternalizedProxy capturing the information in this Proxy
+     */
+    public ExternalizedProxy asExternalized()
+    {
+        return SimpleExternalizedProxy.create( this );
+    }
+
+    /**
+     * Indicates that a Transaction has been committed. This is invoked by the NetMeshBase
+     * without needing a subscription.
+     *
+     * @param theTransaction the Transaction that was committed
+     */
+    public void transactionCommitted(
+            Transaction theTransaction )
+    {
+        if( log.isDebugEnabled() ) {
+            log.debug( this + ".transactionCommitted( " + theTransaction + " )" );
+        }
+        Change []                                    changes           = theTransaction.getChangeSet().getChanges();
+        ArrayList<NetMeshObjectIdentifier>           canceledObjects   = new ArrayList<NetMeshObjectIdentifier>( changes.length );
+        ArrayList<NetMeshObjectDeletedEvent>         deletedEvents     = new ArrayList<NetMeshObjectDeletedEvent>( changes.length );
+        ArrayList<NetMeshObjectNeighborAddedEvent>   neighborAdditions = new ArrayList<NetMeshObjectNeighborAddedEvent>( changes.length );
+        ArrayList<NetMeshObjectNeighborRemovedEvent> neighborRemovals  = new ArrayList<NetMeshObjectNeighborRemovedEvent>( changes.length );
+        ArrayList<NetMeshObjectPropertyChangeEvent>  propertyChanges   = new ArrayList<NetMeshObjectPropertyChangeEvent>( changes.length );
+        ArrayList<NetMeshObjectRoleAddedEvent>       roleAdditions     = new ArrayList<NetMeshObjectRoleAddedEvent>( changes.length );
+        ArrayList<NetMeshObjectRoleRemovedEvent>     roleRemovals      = new ArrayList<NetMeshObjectRoleRemovedEvent>( changes.length );
+        ArrayList<NetMeshObjectTypeAddedEvent>       typeAdditions     = new ArrayList<NetMeshObjectTypeAddedEvent>( changes.length );
+        ArrayList<NetMeshObjectTypeRemovedEvent>     typeRemovals      = new ArrayList<NetMeshObjectTypeRemovedEvent>( changes.length );
+        ArrayList<ExternalizedNetMeshObject>         replicatedObjects = new ArrayList<ExternalizedNetMeshObject>( changes.length );
+
+        for( int i=0 ; i<changes.length ; ++i ) {
+            NetChange current = (NetChange) changes[i];
+            
+            current.setResolver( theMeshBase );
+
+            // NetMeshObject affectedObject = current.getAffectedMeshObject();
+
+            if( current.shouldBeSent( this )) {
+                
+                if( current instanceof ReplicaPurgedEvent ) {
+                    // affectedObject is null
+                    NetMeshObjectIdentifier affectedObjectIdentifier = current.getAffectedMeshObjectIdentifier();
+                    canceledObjects.add( affectedObjectIdentifier );
+
+                } else if( current instanceof NetMeshObjectBecameDeadStateEvent ) {
+                    // ignore
+
+                } else if( current instanceof NetMeshObjectDeletedEvent ) {
+                    NetMeshObjectDeletedEvent realCurrent = (NetMeshObjectDeletedEvent) current;
+                    deletedEvents.add( realCurrent );
+
+                } else if( current instanceof NetMeshObjectEquivalentsAddedEvent ) {
+                    // FIXME
+
+                } else if( current instanceof NetMeshObjectEquivalentsRemovedEvent ) {
+                    // FIXME
+
+                } else if( current instanceof NetMeshObjectNeighborAddedEvent ) {
+                    NetMeshObjectNeighborAddedEvent realCurrent = (NetMeshObjectNeighborAddedEvent) current;
+                    neighborAdditions.add( realCurrent );
+                    
+                    NetMeshObject neighbor = realCurrent.getNeighborMeshObject();
+                    if( neighbor != null && !Utils.hasReplicaInDirection( neighbor, this )) {
+                        replicatedObjects.add( neighbor.asExternalized( ! theMeshBase.getPointsReplicasToItself() ) );
+                    }
+
+                } else if( current instanceof NetMeshObjectNeighborRemovedEvent ) {
+                    NetMeshObjectNeighborRemovedEvent realCurrent = (NetMeshObjectNeighborRemovedEvent) current;
+                    neighborRemovals.add( realCurrent );
+
+                } else if( current instanceof NetMeshObjectPropertyChangeEvent ) {
+                    NetMeshObjectPropertyChangeEvent realCurrent = (NetMeshObjectPropertyChangeEvent) current;
+                    propertyChanges.add( realCurrent );
+
+                } else if( current instanceof NetMeshObjectRoleAddedEvent ) {
+                    NetMeshObjectRoleAddedEvent realCurrent = (NetMeshObjectRoleAddedEvent) current;
+                    roleAdditions.add( realCurrent );
+
+                } else if( current instanceof NetMeshObjectRoleRemovedEvent ) {
+                    NetMeshObjectRoleRemovedEvent realCurrent = (NetMeshObjectRoleRemovedEvent) current;
+                    roleRemovals.add( realCurrent );
+
+                } else if( current instanceof NetMeshObjectTypeAddedEvent ) {
+                    NetMeshObjectTypeAddedEvent realCurrent = (NetMeshObjectTypeAddedEvent) current;
+                    typeAdditions.add( realCurrent );
+
+                } else if( current instanceof NetMeshObjectTypeRemovedEvent ) {
+                    NetMeshObjectTypeRemovedEvent realCurrent = (NetMeshObjectTypeRemovedEvent) current;
+                    typeRemovals.add( realCurrent );
+
+                } else if( current instanceof ReplicaCreatedEvent ) {
+                    // skip
+
+                } else {
+                    log.error( "What is this: " + current );
+                }
+            }
+        }
+        
+        if(    canceledObjects.isEmpty()
+            && deletedEvents.isEmpty()
+            && neighborAdditions.isEmpty()
+            && neighborRemovals.isEmpty()
+            && propertyChanges.isEmpty()
+            && roleAdditions.isEmpty()
+            && roleRemovals.isEmpty()
+            && typeAdditions.isEmpty()
+            && typeRemovals.isEmpty()
+            && replicatedObjects.isEmpty() )
+        {
+            return;
+        }
+
+        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
+        
+        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
+     
+        if( !canceledObjects.isEmpty() ) {
+            outgoing.setRequestedCanceledObjects( ArrayHelper.copyIntoNewArray( canceledObjects, NetMeshObjectIdentifier.class ));
+        }
+        if( !deletedEvents.isEmpty() ) {
+            outgoing.setDeleteChanges( ArrayHelper.copyIntoNewArray( deletedEvents, NetMeshObjectDeletedEvent.class ));
+        }
+        if( !neighborAdditions.isEmpty() ) {
+            outgoing.setNeighborAdditions( ArrayHelper.copyIntoNewArray( neighborAdditions, NetMeshObjectNeighborAddedEvent.class ));
+        }
+        if( !neighborRemovals.isEmpty() ) {
+            outgoing.setNeighborRemovals( ArrayHelper.copyIntoNewArray( neighborRemovals, NetMeshObjectNeighborRemovedEvent.class ));
+        }
+        if( !propertyChanges.isEmpty() ) {
+            outgoing.setPropertyChanges( ArrayHelper.copyIntoNewArray( propertyChanges, NetMeshObjectPropertyChangeEvent.class ));
+        }
+        if( !roleAdditions.isEmpty() ) {
+            outgoing.setRoleAdditions( ArrayHelper.copyIntoNewArray( roleAdditions, NetMeshObjectRoleAddedEvent.class ));
+        }
+        if( !roleRemovals.isEmpty() ) {
+            outgoing.setRoleRemovals( ArrayHelper.copyIntoNewArray( roleRemovals, NetMeshObjectRoleRemovedEvent.class ));
+        }
+        if( !typeAdditions.isEmpty() ) {
+            outgoing.setTypeAdditions( ArrayHelper.copyIntoNewArray( typeAdditions, NetMeshObjectTypeAddedEvent.class ));
+        }
+        if( !typeRemovals.isEmpty() ) {
+            outgoing.setTypeRemovals( ArrayHelper.copyIntoNewArray( typeRemovals, NetMeshObjectTypeRemovedEvent.class ));
+        }
+        if( !replicatedObjects.isEmpty() ) {
+            outgoing.setConveyedMeshObjects( ArrayHelper.copyIntoNewArray( replicatedObjects, ExternalizedNetMeshObject.class ));
+        }
+        
+        theEndpoint.enqueueMessageForSend( outgoing );
     }
 
     /**
@@ -317,6 +655,7 @@ public abstract class AbstractProxy
         }
 
         theWaitForLockResponseEndpoint.messageReceived( endpoint, incoming );
+        theWaitForHomeReplicaResponseEndpoint.messageReceived( endpoint, incoming );
         
         Transaction tx = null;
         try {
@@ -523,6 +862,9 @@ public abstract class AbstractProxy
         } catch( TransactionException ex ) {
             log.error( this + ": Could not create transaction for incoming message " + incoming, ex );
 
+        } catch( NotPermittedException ex ) {
+            log.error( this + ": Could not perform necessary actions for incoming message " + incoming, ex );
+
         } finally {
             if( tx != null ) {
                 tx.commitTransaction();
@@ -598,8 +940,10 @@ public abstract class AbstractProxy
 
             } catch( NetMeshObjectAccessException ex ) {
                 if( ex.isPartialResultAvailable() ) {
-                    firstTimeObjects = (NetMeshObject [] ) ex.getBestEffortResult();
+                    firstTimeObjects = ex.getBestEffortResult();
                 }
+            } catch( NotPermittedException ex ) {
+                log.warn( ex );
             }
             
             if( firstTimeObjects != null && firstTimeObjects.length > 0 ) {
@@ -684,7 +1028,7 @@ public abstract class AbstractProxy
                     log.warn( "cannot find MeshObject with Identifier " + requestLock[i].toExternalForm() );
                     continue;
                 }
-                if( !current.willGiveUpLock()) {
+                if( !current.getWillGiveUpLock()) {
                     continue;
                 }
                 try {
@@ -806,255 +1150,18 @@ public abstract class AbstractProxy
             log.error( this + ".disablingError( " + endpoint + ", " + msg + " )", t );
         }
         theWaitForLockResponseEndpoint.disablingError( endpoint, msg, t );
+        theWaitForHomeReplicaResponseEndpoint.disablingError( endpoint, msg, t );
         theWaitForReplicaResponseEndpoint.disablingError( endpoint, msg, t );
         
         proxyUpdated();
     }
     
     /**
-     * Ask this Proxy to obtain replicas with the enclosed specification. Do
-     * not acquire the lock -- that would be a separate operation.
-     * 
-     * 
-     * @param paths the NNetMeshBasePathspecifying which replicas should be obtained
-     * @throws RNetMeshObjectAccessExceptionaccessing the MeshBase failed
-     */
-    public final void obtainReplica(
-            NetMeshObjectAccessSpecification[] paths )
-        throws
-            NetMeshObjectAccessException
-    {
-        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
-        
-        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
-        outgoing.setRequestedFirstTimeObjects( paths );
-
-        try {
-            XprisoMessage incoming = theWaitForReplicaResponseEndpoint.call( outgoing );
-            
-        } catch( RemoteQueryTimeoutException ex ) {
-            log.warn( ex );
-            throw new NetMeshObjectAccessException( theMeshBase, null, paths, ex );
-
-        } catch( InvocationTargetException ex ) {
-            log.warn( ex );
-        }
-    }
-
-    /**
-     * Ask this Proxy to obtain the lock for this replica from the
-     * Proxy. Unlike many of the other calls, this call is
-     * synchronous over the network and either succeeds, fails, or times out.
-     *
-     * @param localReplicas the local replicas for which the lock should be obtained
-     * @param timeout the timeout, in milliseconds
-     */
-    public final void tryToObtainLocks(
-            NetMeshObject [] localReplicas,
-            long             timeout )
-        throws
-            RemoteQueryTimeoutException
-    {
-        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
-
-        NetMeshObjectIdentifier [] extNames = new NetMeshObjectIdentifier[ localReplicas.length ];
-        for( int i=0 ; i<extNames.length ; ++i ) {
-            extNames[i] = localReplicas[i].getIdentifier();
-        }
-        
-        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
-        outgoing.setRequestedLockObjects( extNames );
-
-        try {
-            XprisoMessage incoming = theWaitForLockResponseEndpoint.call( outgoing );
-
-        } catch( InvocationTargetException ex ) {
-            log.warn( ex );
-        }
-    }
-    
-    /**
-     * Send notification that this MeshBase has forcibly taken the lock back.
-     *
-     * @param localReplicas the local replicas for which the lock has been forced back
-     */
-    public void forceObtainLocks(
-            NetMeshObject [] localReplicas )
-    {
-        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
-
-        NetMeshObjectIdentifier [] extNames = new NetMeshObjectIdentifier[ localReplicas.length ];
-        for( int i=0 ; i<extNames.length ; ++i ) {
-            extNames[i] = localReplicas[i].getIdentifier();
-        }
-        
-        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
-        outgoing.setReclaimedLockObjects( extNames );
-
-        theEndpoint.enqueueMessageForSend( outgoing );
-    }
-    
-//    /**
-//     * Ask this ModelObjectRepositoryProxy to query its PartnerModelObjectRepositoryProxy to determine
-//     * its view as to what the RolePlayerTable of this RootEntity is and to merge the result into the
-//     * local replica's current RolePlayerTable. Make sure that the PartnerModelObjectRepositoryProxy
-//     * does not query back to this ModelObjectRepositoryProxy, otherwise we'd createCopy an endless recursion.
-//     *
-//     * @param localReplica the local replica of the RootEntity
-//     */
-//    public abstract void mergeRolePlayerTable(
-//            NetMeshObject localReplica );
-
-    /**
-     * Determine the NetMeshBaseIdentifier of the partner MeshBase.
-     * 
-     * @return the NNetMeshBaseIdentifierof the partner MeshBase
-     */
-    public final NetMeshBaseIdentifier getPartnerMeshBaseIdentifier()
-    {
-        return theEndpoint.getNetworkIdentifierOfPartner();
-    }
-    
-//    /**
-//     * Determine whether this Proxy can be safely removed (ie it does not
-//     * manage any open leases, and no communication is ongoing).
-//     *
-//     * @return true if this Proxy can be safely removed
-//     */
-//    public abstract boolean canBeSafelyRemoved();
-//
-//        /**
-//         * Obtain the RootObjects which this ModelObjectRepositoryProxy has been leased from our
-//         * PartnerModelObjectRepository and whose leases are still good. This
-//         * returns Iterator&lt;RootObject&gt;.
-//         *
-//         * @return Iterator over the leased RootObjects
-//         */
-//        public abstract Iterator obtainedReplicasIterator();
-//
-//        /**
-//         * Obtain the RootObjects which this ModelObjectRepositoryProxy has granted to our
-//         * PartnerModelObjectRepository and whose leases are still good. This
-//         * returns Iterator&lt;RootObject&gt;.
-//         *
-//         * @return Iterator over the leased RootObjects
-//         */
-//        public abstract Iterator grantedReplicasIterator();
-
-//    /**
-//     * Determine when our obtained lease expires. Returns 0L if we don't have
-//     * an obtained lease.
-//     *
-//     * @return the time when our obtained lease expires
-//     */
-//    public abstract long getObtainedLeaseExpires();
-//
-//    /**
-//     * Determine when our granted lease expires. Returns 0L if we don't have
-//     * a granted lease.
-//     *
-//     * @return the time when our granted lease expires
-//     */
-//    public abstract long getGrantedLeaseExpires();
-
-//    /**
-//     * Obtain an Iterator over the ReplicationMessages that we have sent but which have not
-//     * been acknowledged yet by our PartnerModelObjectRepository.
-//     *
-//     * @return Iterator over the unacknowledged sent ReplicationMessages
-//     */
-//    public abstract Iterator unacknowledgedSentMessagesIterator();
-//
-//    /**
-//     * Obtain an Iterator over the ReplicationMessages that we have received from our
-//     * PartnerModelObjectRepository but which we have not acknowledged yet.
-//     *
-//     * @return Iterator over the unacknowledged received ReplicationMessages
-//     */
-//    public abstract Iterator unacknowledgedReceivedMessagesIterator();
-
-//    /**
-//     * Determine whether this MeshObject has been granted to the Proxy
-//     * through this Proxy.
-//     *
-//     * @param candidate the MeshObject to test
-//     * @return true if this MeshObject has been granted via this Proxy
-//     */
-//    public abstract boolean hasGranted(
-//            NetMeshObject candidate );
-//
-//    /**
-//     * Determine whether the lease we obtained through this Proxy has expired
-//     * and all replicated MeshObject through this Proxy are now zombies.
-//     *
-//     * @return true if all obtained MeshObjects are zombies
-//     */
-//    public abstract boolean obtainedIsZombie();
-
-    /**
-     * Tell the receiver that a local Replica exists here that would like to be resynchronized.
-     *
-     * @param localReplicas the Identifier of the local Replica
-     */
-    public void resynchronizeDependentReplicas(
-            NetMeshObjectIdentifier[] localReplicas )
-    {
-        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
-        
-        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
-        outgoing.setRequestedResynchronizeDependentReplicas( localReplicas );
-
-        theEndpoint.enqueueMessageForSend( outgoing );
-    }
-
-    /**
-     * Invoked by the MeshBase that this Proxy belongs to,
-     * it causes this Proxy to initiate the "ceasing communication" sequence, and
-     * kill itself in its SmartFactory (if any).
-     */
-    @SuppressWarnings(value={"unchecked"})
-    public void initiateCeaseCommunications()
-    {
-        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
-        
-        outgoing.setCeaseCommunications( true );
-        
-        theEndpoint.enqueueMessageForSend( outgoing );
-        
-        if( theFactory instanceof SmartFactory ) {
-            ((SmartFactory)theFactory).remove( theEndpoint.getNetworkIdentifierOfPartner() );
-        }
-    }
-
-    /**
-      * Tell this Proxy that it is not needed any more. This will invoke initiateCaseCommunications as needed.
-      * 
-      * @param isPermanent if true, this MeshBase will go away permanmently; if false, it may come alive again some time later
-      */
-    public void die(
-            boolean isPermanent )
-    {
-        if( isPermanent ) {
-            initiateCeaseCommunications();
-        }
-        
-        theEndpoint.gracefulDie();
-    }
-
-    /**
-     * Obtain this Proxy in externalized form.
-     *
-     * @return the ExternalizedProxy capturing the information in this Proxy
-     */
-    public ExternalizedProxy asExternalized()
-    {
-        return SimpleExternalizedProxy.create( this );
-    }
-
-    /**
-     * Subscribe to lease-related events.
+     * Subscribe to lease-related events, without using a Reference.
      *
      * @param newListener the to-be-added listener
+     * @see #addWeakLeaseManagementListener
+     * @see #addSoftLeaseManagementListener
      * @see #removeLeaseManagementListener
      */
     public final void addDirectLeaseManagementListener(
@@ -1065,9 +1172,11 @@ public abstract class AbstractProxy
     }
 
     /**
-     * Subscribe to lease-related events.
+     * Subscribe to lease-related events, using a WeakReference.
      *
      * @param newListener the to-be-added listener
+     * @see #addDirectLeaseManagementListener
+     * @see #addSoftLeaseManagementListener
      * @see #removeLeaseManagementListener
      */
     public final void addWeakLeaseManagementListener(
@@ -1078,9 +1187,11 @@ public abstract class AbstractProxy
     }
 
     /**
-     * Subscribe to lease-related events.
+     * Subscribe to lease-related events, using a SoftReference.
      *
      * @param newListener the to-be-added listener
+     * @see #addWeakLeaseManagementListener
+     * @see #addDirectLeaseManagementListener
      * @see #removeLeaseManagementListener
      */
     public final void addSoftLeaseManagementListener(
@@ -1094,7 +1205,9 @@ public abstract class AbstractProxy
      * Unsubscribe from lease-related events.
      *
      * @param oldListener the to-be-removed listener
-     * @see #addLeaseManagementListener
+     * @see #addDirectLeaseManagementListener
+     * @see #addWeakLeaseManagementListener
+     * @see #addSoftLeaseManagementListener
      */
     public final void removeLeaseManagementListener(
             LeaseManagementListener oldListener )
@@ -1132,161 +1245,6 @@ public abstract class AbstractProxy
         if( listeners != null ) {
             listeners.fireEvent( new LeaseManagementEvent( this ));
         }
-    }
-
-    /**
-      * Indicates that a Transaction has been started.
-      *
-      * @param theTransaction the Transaction that was started
-      */
-    public void transactionStarted(
-            Transaction theTransaction )
-    {
-        // no op
-    }
-
-    /**
-      * Indicates that a Transaction has been committed.
-      *
-      * @param theTransaction the Transaction that was committed
-      */
-    public void transactionCommitted(
-            Transaction theTransaction )
-    {
-        if( log.isDebugEnabled() ) {
-            log.debug( this + ".transactionCommitted( " + theTransaction + " )" );
-        }
-        Change []                                    changes           = theTransaction.getChangeSet().getChanges();
-        ArrayList<NetMeshObjectIdentifier>           canceledObjects   = new ArrayList<NetMeshObjectIdentifier>( changes.length );
-        ArrayList<NetMeshObjectDeletedEvent>         deletedEvents     = new ArrayList<NetMeshObjectDeletedEvent>( changes.length );
-        ArrayList<NetMeshObjectNeighborAddedEvent>   neighborAdditions = new ArrayList<NetMeshObjectNeighborAddedEvent>( changes.length );
-        ArrayList<NetMeshObjectNeighborRemovedEvent> neighborRemovals  = new ArrayList<NetMeshObjectNeighborRemovedEvent>( changes.length );
-        ArrayList<NetMeshObjectPropertyChangeEvent>  propertyChanges   = new ArrayList<NetMeshObjectPropertyChangeEvent>( changes.length );
-        ArrayList<NetMeshObjectRoleAddedEvent>       roleAdditions     = new ArrayList<NetMeshObjectRoleAddedEvent>( changes.length );
-        ArrayList<NetMeshObjectRoleRemovedEvent>     roleRemovals      = new ArrayList<NetMeshObjectRoleRemovedEvent>( changes.length );
-        ArrayList<NetMeshObjectTypeAddedEvent>       typeAdditions     = new ArrayList<NetMeshObjectTypeAddedEvent>( changes.length );
-        ArrayList<NetMeshObjectTypeRemovedEvent>     typeRemovals      = new ArrayList<NetMeshObjectTypeRemovedEvent>( changes.length );
-        ArrayList<ExternalizedNetMeshObject>         replicatedObjects = new ArrayList<ExternalizedNetMeshObject>( changes.length );
-
-        for( int i=0 ; i<changes.length ; ++i ) {
-            NetChange current = (NetChange) changes[i];
-            
-            current.setResolver( theMeshBase );
-
-            // NetMeshObject affectedObject = current.getAffectedMeshObject();
-
-            if( current.shouldBeSent( this )) {
-                
-                if( current instanceof ReplicaPurgedEvent ) {
-                    // affectedObject is null
-                    NetMeshObjectIdentifier affectedObjectIdentifier = current.getAffectedMeshObjectIdentifier();
-                    canceledObjects.add( affectedObjectIdentifier );
-
-                } else if( current instanceof NetMeshObjectBecameDeadStateEvent ) {
-                    // ignore
-
-                } else if( current instanceof NetMeshObjectDeletedEvent ) {
-                    NetMeshObjectDeletedEvent realCurrent = (NetMeshObjectDeletedEvent) current;
-                    deletedEvents.add( realCurrent );
-
-                } else if( current instanceof NetMeshObjectEquivalentsAddedEvent ) {
-                    // FIXME
-
-                } else if( current instanceof NetMeshObjectEquivalentsRemovedEvent ) {
-                    // FIXME
-
-                } else if( current instanceof NetMeshObjectNeighborAddedEvent ) {
-                    NetMeshObjectNeighborAddedEvent realCurrent = (NetMeshObjectNeighborAddedEvent) current;
-                    neighborAdditions.add( realCurrent );
-                    
-                    NetMeshObject neighbor = realCurrent.getNeighborMeshObject();
-                    if( neighbor != null && !Utils.hasReplicaInDirection( neighbor, this )) {
-                        replicatedObjects.add( neighbor.asExternalized( ! theMeshBase.getPointsReplicasToItself() ) );
-                    }
-
-                } else if( current instanceof NetMeshObjectNeighborRemovedEvent ) {
-                    NetMeshObjectNeighborRemovedEvent realCurrent = (NetMeshObjectNeighborRemovedEvent) current;
-                    neighborRemovals.add( realCurrent );
-
-                } else if( current instanceof NetMeshObjectPropertyChangeEvent ) {
-                    NetMeshObjectPropertyChangeEvent realCurrent = (NetMeshObjectPropertyChangeEvent) current;
-                    propertyChanges.add( realCurrent );
-
-                } else if( current instanceof NetMeshObjectRoleAddedEvent ) {
-                    NetMeshObjectRoleAddedEvent realCurrent = (NetMeshObjectRoleAddedEvent) current;
-                    roleAdditions.add( realCurrent );
-
-                } else if( current instanceof NetMeshObjectRoleRemovedEvent ) {
-                    NetMeshObjectRoleRemovedEvent realCurrent = (NetMeshObjectRoleRemovedEvent) current;
-                    roleRemovals.add( realCurrent );
-
-                } else if( current instanceof NetMeshObjectTypeAddedEvent ) {
-                    NetMeshObjectTypeAddedEvent realCurrent = (NetMeshObjectTypeAddedEvent) current;
-                    typeAdditions.add( realCurrent );
-
-                } else if( current instanceof NetMeshObjectTypeRemovedEvent ) {
-                    NetMeshObjectTypeRemovedEvent realCurrent = (NetMeshObjectTypeRemovedEvent) current;
-                    typeRemovals.add( realCurrent );
-
-                } else if( current instanceof ReplicaCreatedEvent ) {
-                    // skip
-
-                } else {
-                    log.error( "What is this: " + current );
-                }
-            }
-        }
-        
-        if(    canceledObjects.isEmpty()
-            && deletedEvents.isEmpty()
-            && neighborAdditions.isEmpty()
-            && neighborRemovals.isEmpty()
-            && propertyChanges.isEmpty()
-            && roleAdditions.isEmpty()
-            && roleRemovals.isEmpty()
-            && typeAdditions.isEmpty()
-            && typeRemovals.isEmpty()
-            && replicatedObjects.isEmpty() )
-        {
-            return;
-        }
-
-        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
-        
-        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
-     
-        if( !canceledObjects.isEmpty() ) {
-            outgoing.setRequestedCanceledObjects( ArrayHelper.copyIntoNewArray( canceledObjects, NetMeshObjectIdentifier.class ));
-        }
-        if( !deletedEvents.isEmpty() ) {
-            outgoing.setDeleteChanges( ArrayHelper.copyIntoNewArray( deletedEvents, NetMeshObjectDeletedEvent.class ));
-        }
-        if( !neighborAdditions.isEmpty() ) {
-            outgoing.setNeighborAdditions( ArrayHelper.copyIntoNewArray( neighborAdditions, NetMeshObjectNeighborAddedEvent.class ));
-        }
-        if( !neighborRemovals.isEmpty() ) {
-            outgoing.setNeighborRemovals( ArrayHelper.copyIntoNewArray( neighborRemovals, NetMeshObjectNeighborRemovedEvent.class ));
-        }
-        if( !propertyChanges.isEmpty() ) {
-            outgoing.setPropertyChanges( ArrayHelper.copyIntoNewArray( propertyChanges, NetMeshObjectPropertyChangeEvent.class ));
-        }
-        if( !roleAdditions.isEmpty() ) {
-            outgoing.setRoleAdditions( ArrayHelper.copyIntoNewArray( roleAdditions, NetMeshObjectRoleAddedEvent.class ));
-        }
-        if( !roleRemovals.isEmpty() ) {
-            outgoing.setRoleRemovals( ArrayHelper.copyIntoNewArray( roleRemovals, NetMeshObjectRoleRemovedEvent.class ));
-        }
-        if( !typeAdditions.isEmpty() ) {
-            outgoing.setTypeAdditions( ArrayHelper.copyIntoNewArray( typeAdditions, NetMeshObjectTypeAddedEvent.class ));
-        }
-        if( !typeRemovals.isEmpty() ) {
-            outgoing.setTypeRemovals( ArrayHelper.copyIntoNewArray( typeRemovals, NetMeshObjectTypeRemovedEvent.class ));
-        }
-        if( !replicatedObjects.isEmpty() ) {
-            outgoing.setConveyedMeshObjects( ArrayHelper.copyIntoNewArray( replicatedObjects, ExternalizedNetMeshObject.class ));
-        }
-        
-        theEndpoint.enqueueMessageForSend( outgoing );
     }
 
     /**
@@ -1329,17 +1287,6 @@ public abstract class AbstractProxy
                     theMeshBase.getIdentifier()
                 } );
     }
-
-//    /**
-//     * Exists to allow a breakpoint.
-//     */
-//    public void finalize()
-//    {
-//        if( log.isDebugEnabled() ) {
-//            log.debug( this + ".finalized()" );
-//        }
-//    }
-
 
     /**
      * Obtain the right ResourceHelper for StringRepresentation.
@@ -1450,7 +1397,7 @@ public abstract class AbstractProxy
     }
 
     /**
-     * The MessageEndpoint to use to talk to our partner.
+     * The MessageEndpoint to use to talk to our partner NetMeshBase's Proxy.
      */
     protected NetMessageEndpoint theEndpoint;
 
@@ -1458,6 +1405,11 @@ public abstract class AbstractProxy
      * The WaitForResponseEndpoint that makes waiting for responses to lock requests much easier.
      */
     protected WaitForResponseEndpoint<XprisoMessage> theWaitForLockResponseEndpoint;
+
+    /**
+     * The WaitForResponseEndpoint that makes waiting for responses to homeReplica requests much easier.
+     */
+    protected WaitForResponseEndpoint<XprisoMessage> theWaitForHomeReplicaResponseEndpoint;
 
     /**
      * The WaitForResponseEndpoint that makes waiting for responses to replica requests much easier.
@@ -1475,7 +1427,8 @@ public abstract class AbstractProxy
     protected ProxyManager theFactory;
 
     /**
-     * The applicable CoherenceSpecification.
+     * The currently applicable CoherenceSpecification. FIXME: the information held here should
+     * impact the communications parameters of theEndpoint, but does not.
      */
     protected CoherenceSpecification theCoherenceSpecification;
 
@@ -1540,7 +1493,7 @@ public abstract class AbstractProxy
     public static final String NON_DEFAULT_MESH_BASE_LINK_END_ENTRY = "NonDefaultMeshBaseLinkEndString";
 
     /**
-     * Subclass for easier debugging, and to avoid automatic event subscription.
+     * Subclass WaitForResponseEndpoint for easier debugging, and to avoid automatic event subscription.
      */
     static class MyWaitForLockResponseEndpoint
             extends
@@ -1558,9 +1511,27 @@ public abstract class AbstractProxy
         }
     } 
 
+    /**
+     * Subclass WaitForResponseEndpoint for easier debugging, and to avoid automatic event subscription.
+     */
+    static class MyWaitForHomeReplicaResponseEndpoint
+            extends
+                WaitForResponseEndpoint<XprisoMessage>
+    {
+        /**
+         *  Constructor.
+         * 
+         * @param ep the MessageEndpoint to use
+         */
+        public MyWaitForHomeReplicaResponseEndpoint(
+                MessageEndpoint<XprisoMessage> ep )
+        {
+            super( ep );
+        }
+    } 
 
     /**
-     * Subclass for easier debugging, and to avoid automatic event subscription.
+     * Subclass WaitForResponseEndpoint for easier debugging, and to avoid automatic event subscription.
      */
     static class MyWaitForReplicaResponseEndpoint
             extends

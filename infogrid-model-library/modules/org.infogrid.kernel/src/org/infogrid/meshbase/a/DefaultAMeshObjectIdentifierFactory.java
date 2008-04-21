@@ -24,7 +24,7 @@ import org.infogrid.util.text.StringifierException;
 import java.net.URISyntaxException;
 
 /**
- * Default implementation of MeshObjectIdentifierFactory.
+ * Default implementation of MeshObjectIdentifierFactory for the A implementation.
  */
 public class DefaultAMeshObjectIdentifierFactory
         extends
@@ -53,6 +53,7 @@ public class DefaultAMeshObjectIdentifierFactory
      * Create an identifier for a MeshObject at held locally at this MeshBase.
      *
      * @param localId the local distinguishing String
+     * @throws URISyntaxException
      */
     public DefaultAMeshObjectIdentifier fromExternalForm(
             String localId )
@@ -68,6 +69,7 @@ public class DefaultAMeshObjectIdentifierFactory
      * @param representation the StringRepresentation in which this String is represented
      * @param s the String to parse
      * @return the created MeshObjectIdentifier
+     * @throws URISyntaxException thrown if a parsing error occurred
      */
     public DefaultAMeshObjectIdentifier fromStringRepresentation(
             StringRepresentation representation,

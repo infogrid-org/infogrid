@@ -47,6 +47,7 @@ import org.infogrid.util.logging.Log;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import org.infogrid.meshbase.security.AccessManager;
 
 /**
  * A MeshBaseLifecycleManager appropriate for the AMeshBase implementation of MeshBase. 
@@ -61,7 +62,7 @@ public class AMeshBaseLifecycleManager
      * Constructor. The application developer should not call this or a subclass constructor; use
      * MeshBase.getMeshObjectLifecycleManager() instead.
      * 
-     * @param base the MeshBase on which this MeshBaseLifecycleManager works
+     * @param base the AMeshBase on which this MeshBaseLifecycleManager works
      */
     protected AMeshBaseLifecycleManager(
             AMeshBase base )
@@ -70,19 +71,22 @@ public class AMeshBaseLifecycleManager
     }
 
     /**
-      * <p>Create a new MeshObject without a type.
-      * This call is a "semantic create" which means that a new, semantically distinct object
-      * is to be created.</p>
-      *
-      * <p>Before this operation can be successfully invoked, a Transaction must be active
-      * on this Thread.>/p>
-      *
-      * @return the created MeshObject
-      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-      */
+     * <p>Create a new MeshObject without a type
+     * and an automatically created MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @return the created MeshObject
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
     public AMeshObject createMeshObject()
         throws
-            TransactionException
+            TransactionException,
+            NotPermittedException
     {
         MeshObjectIdentifier identifier   = theMeshBase.getMeshObjectIdentifierFactory().createMeshObjectIdentifier();
         long                 time         = determineCreationTime();
@@ -95,6 +99,7 @@ public class AMeshBaseLifecycleManager
         }
         try {
             return createMeshObject( identifier, time, time, time, autoExpires );
+
         } catch( MeshObjectIdentifierNotUniqueException ex ) {
             log.error( ex );
             return null;
@@ -102,36 +107,42 @@ public class AMeshBaseLifecycleManager
     }
 
     /**
-     * <p>Create a new MeshObject without a type.
+     * <p>Create a new MeshObject without a type, but with provided time stamps
+     * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
+     * @param identifier the identifier of the to-be-created MeshObject. This must not be null.
      * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
      * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
      * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeAutoDeletes the time this MeshObject will auto-delete
+     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
      * @return the created MeshObject
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalIdentifierNotUniqueExceptionif a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public synchronized AMeshObject createMeshObject(
             MeshObjectIdentifier identifier,
             long                 timeCreated,
             long                 timeUpdated,
             long                 timeRead,
-            long                 timeAutoDeletes )
+            long                 timeExpires )
         throws
+            MeshObjectIdentifierNotUniqueException,
             TransactionException,
-            MeshObjectIdentifierNotUniqueException
+            NotPermittedException
     {
         if( identifier == null ) {
             throw new IllegalArgumentException( "null Identifier" );
+        }
+
+        AccessManager access = theMeshBase.getAccessManager();
+        if( access != null ) {
+            access.checkPermittedCreate( identifier );
         }
 
         long now = determineCreationTime();
@@ -144,7 +155,7 @@ public class AMeshBaseLifecycleManager
         if( timeRead < 0 ) {
             timeRead = now;
         }
-        // not timeAutoDeletes
+        // don't need to check timeExpires
 
         AMeshBase realBase = (AMeshBase) theMeshBase;
 
@@ -160,7 +171,7 @@ public class AMeshBaseLifecycleManager
                 timeCreated,
                 timeUpdated,
                 timeRead,
-                timeAutoDeletes );
+                timeExpires );
 
         putIntoStore( ret );
 
@@ -172,7 +183,13 @@ public class AMeshBaseLifecycleManager
     }
 
     /**
-     * <p>Semantically delete a number of MeshObjects at the same time.</p>
+     * <p>Semantically delete several MeshObjects at the same time.</p>
+     * 
+     * <p>This call is a "semantic delete", which means that an existing
+     * MeshObject will go away in all its replicas. Due to time lag, the MeshObject
+     * may still exist in certain replicas in other places for a while, but
+     * the request to deleteMeshObjects all objects is in the queue and will get there
+     * eventually.</p>
      * 
      * <p>This call either succeeds or fails in total: if one or more of the specified MeshObject cannot be
      *    deleted for some reason, none of the other MeshObjects will be deleted either.</p>
@@ -220,8 +237,9 @@ public class AMeshBaseLifecycleManager
     }
 
     /**
-     * Create a typed MeshObjectFacade for a MeshObject. This should generally not be invoked
-     * by the application programmer. Use MeshObject.getFacadeFor.
+     * Create a typed {@link TypedMeshObjectFacade} for a MeshObject. This should generally
+     * not be invoked by the application programmer. Use
+     * {@link MeshObject#getTypedFacadeFor MeshObject.getTypedFacadeFor}.
      *
      * @param object the MeshObject for which to create a TypedMeshObjectFacade
      * @param type the EntityType for the TypedMeshObjectFacade
@@ -231,8 +249,6 @@ public class AMeshBaseLifecycleManager
             MeshObject object,
             EntityType type )
     {
-        AMeshBase realBase = (AMeshBase) theMeshBase;
-
         if( object == null ) {
             throw new IllegalArgumentException( "null MeshObject" );
         }
@@ -284,13 +300,15 @@ public class AMeshBaseLifecycleManager
     }
     
     /**
-      * Determine the implementation class for an TypedMeshObjectFacade for a EntityType.
+      * Determine the implementation class for an TypedMeshObjectFacade for an EntityType.
+      * As an application developer, you should not usually have any reason to invoke this.
       *
       * @param theObjectType the type object
       * @return the Class
       * @throws ClassNotFoundException thrown if for some reason, this Class could not be found
       */
-    public Class getImplementationClass(
+    @SuppressWarnings( "unchecked" )
+    public Class<? extends TypedMeshObjectFacade> getImplementationClass(
             EntityType theObjectType )
         throws
             ClassNotFoundException
@@ -306,35 +324,44 @@ public class AMeshBaseLifecycleManager
         className.append( ".Impl" );
         className.append( theObjectType.getName().value() );
 
-        return Class.forName( className.toString(), true, theObjectType.getClassLoader() );
+        Class ret = Class.forName( className.toString(), true, theObjectType.getClassLoader() );
+        return (Class<? extends TypedMeshObjectFacade>) ret;
+        // this cast is correct by construction
     }
 
     /**
      * Helper method to instantiate the right subclass of MeshObject. This makes the creation
-     * of subclasses of MMeshBase and this class much easier.
+     * of subclasses of AMeshBase and this class much easier.
      * 
-     * @param identifier the Identifier of the to-be-created MeshObject. This must not be null.
+     * @param identifier the identifier of the to-be-created MeshObject. This must not be null.
      * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
      * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
      * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeAutoDeletes the time this MeshObject will auto-delete
+     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
      * @return the created MeshObject
      */
     protected AMeshObject instantiateMeshObjectImplementation(
             MeshObjectIdentifier identifier,
-            long           timeCreated,
-            long           timeUpdated,
-            long           timeRead,
-            long           timeAutoDeletes )
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
     {
-        AMeshObject ret = new AMeshObject( identifier, (AMeshBase) theMeshBase, timeCreated, timeUpdated, timeRead, timeAutoDeletes );
+        AMeshObject ret = new AMeshObject(
+                identifier,
+                (AMeshBase) theMeshBase,
+                timeCreated,
+                timeUpdated,
+                timeRead,
+                timeExpires );
         
         return ret;
     }
 
     /**
-     * Recreate a MeshObject that has been garbage-collected.
+     * Recreate a MeshObject that had been garbage-collected earlier
      * 
+     * @param theObjectBeingParsed external form of the to-be-recreated MeshObject
      * @return the recreated AMeshObject
      */
     public AMeshObject recreateMeshObject(
@@ -395,7 +422,7 @@ public class AMeshBaseLifecycleManager
 
             for( int j=0 ; j<currentRoleTypes.length ; ++j ) {
                 try {
-                    roleTypes[i][typeCounter] = (RoleType) mb.findRoleTypeByIdentifier( currentRoleTypes[j] );
+                    roleTypes[i][typeCounter] = mb.findRoleTypeByIdentifier( currentRoleTypes[j] );
                     typeCounter++; // make sure we do the increment after an exception might have been thrown
                 } catch( Exception ex ) {
                     log.warn( ex );
@@ -414,7 +441,6 @@ public class AMeshBaseLifecycleManager
         
         AMeshObject ret = instantiateRecreatedMeshObject(
                 theObjectBeingParsed.getIdentifier(),
-                realBase,
                 theObjectBeingParsed.getTimeCreated(),
                 theObjectBeingParsed.getTimeUpdated(),
                 theObjectBeingParsed.getTimeRead(),
@@ -426,50 +452,46 @@ public class AMeshBaseLifecycleManager
                 roleTypes,
                 theObjectBeingParsed );
 
-        // don't need to do this, is there by virtue of the SwappingHashMap
-        // realBase.theCache.put( identifier, ret );
-
-        return ret; // FIXME
+        return ret;
     }
 
     /**
      * Factored out method to instantiate a recreated MeshObject. This exists to make
      * it easy to override it in subclasses.
      * 
-     * @param identifier the Identifier of the MeshObject
+     * @param identifier the identifier of the MeshObject
      * @param timeCreated the time it was created
      * @param timeUpdated the time it was last udpated
      * @param timeRead the time it was last read
-     * @param timeAutoDeletes the time it will auto-delete
+     * @param timeExpires the time it will expire
      * @param properties the properties of the MeshObject
      * @param types the EntityTypes of the MeshObject
      * @param equivalents either an array of length 2, or null. If given, contains the left and right equivalence pointers.
-     * @param otherSides the Identifiers of the MeshObject's neighbors, if any
+     * @param otherSides the identifiers of the MeshObject's neighbors, if any
      * @param roleTypes the RoleTypes in which this MeshObject participates with its neighbors
      * @param theObjectBeingParsed the externalized representation of the MeshObject
      * @return the recreated AMeshObject
      */
     protected AMeshObject instantiateRecreatedMeshObject(
-            MeshObjectIdentifier                     identifier,
-            AMeshBase                           realBase,
+            MeshObjectIdentifier                identifier,
             long                                timeCreated,
             long                                timeUpdated,
             long                                timeRead,
-            long                                timeAutoDeletes,
+            long                                timeExpires,
             HashMap<PropertyType,PropertyValue> properties,
-            EntityType[]                        types,
-            MeshObjectIdentifier[]                   equivalents,
-            MeshObjectIdentifier[]                   otherSides,
+            EntityType []                       types,
+            MeshObjectIdentifier []             equivalents,
+            MeshObjectIdentifier []             otherSides,
             RoleType [][]                       roleTypes,
             ExternalizedMeshObject              theObjectBeingParsed )
     {
         AMeshObject ret = new AMeshObject(
                 identifier,
-                realBase,
+                (AMeshBase) theMeshBase,
                 timeCreated,
                 timeUpdated,
                 timeRead,
-                timeAutoDeletes,
+                timeExpires,
                 properties,
                 types,
                 equivalents,

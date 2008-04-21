@@ -19,7 +19,7 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.util.event.AbstractExternalizableEvent;
-import org.infogrid.util.event.UnresolvedException;
+import org.infogrid.util.event.ValueUnresolvedException;
 
 /**
   * This is the abstract supertype for all events indicating
@@ -104,7 +104,7 @@ public abstract class AbstractMeshObjectLifecycleEvent
             MeshObjectIdentifier vid )
     {
         if( theResolver == null ) {
-            throw new UnresolvedException.Value( this );
+            throw new ValueUnresolvedException( this );
         }
         MeshObject ret = theResolver.findMeshObjectByIdentifier( vid );
         return ret;

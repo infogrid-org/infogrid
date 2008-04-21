@@ -19,8 +19,9 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 
 import org.infogrid.util.event.AbstractExternalizablePropertyChangeEvent;
-import org.infogrid.util.event.UnresolvedException;
 import org.infogrid.util.StringHelper;
+import org.infogrid.util.event.SourceUnresolvedException;
+import org.infogrid.util.event.ValueUnresolvedException;
 
 /**
   * <p>This event indicates that a MeshObject's set of equivalent MeshObjects have changed.</p>
@@ -115,7 +116,7 @@ public abstract class AbstractMeshObjectEquivalentsChangeEvent
     protected MeshObject resolveSource()
     {
         if( theResolver == null ) {
-            throw new UnresolvedException.Source( this );
+            throw new SourceUnresolvedException( this );
         }
         
         MeshObject ret = theResolver.findMeshObjectByIdentifier( getSourceIdentifier() );
@@ -142,7 +143,7 @@ public abstract class AbstractMeshObjectEquivalentsChangeEvent
             MeshObjectIdentifier[] vid )
     {
         if( theResolver == null ) {
-            throw new UnresolvedException.Value( this );
+            throw new ValueUnresolvedException( this );
         }
         MeshObject [] ret = new MeshObject[ vid.length ];
 

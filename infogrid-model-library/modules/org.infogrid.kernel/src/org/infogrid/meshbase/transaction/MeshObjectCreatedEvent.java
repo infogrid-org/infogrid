@@ -29,9 +29,9 @@ import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 
-import org.infogrid.util.event.UnresolvedException;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.StringHelper;
+import org.infogrid.util.event.OtherUnresolvedException;
 
 /**
  * This event indicates that a new MeshObject was created. If the MeshObject was created
@@ -127,7 +127,7 @@ public class MeshObjectCreatedEvent
         }
         EntityType [] ret = new EntityType[ typeNames.length ];
         if( theResolver == null ) {
-            throw new UnresolvedException.Other( this );
+            throw new OtherUnresolvedException( this );
         }
 
         ModelBase modelBase = theResolver.getModelBase();
@@ -136,7 +136,7 @@ public class MeshObjectCreatedEvent
                 ret[i] = modelBase.findEntityTypeByIdentifier( typeNames[i] );
 
             } catch( MeshTypeWithIdentifierNotFoundException ex ) {
-                throw new UnresolvedException.Other( this, ex );
+                throw new OtherUnresolvedException( this, ex );
             }
         }
         return ret;
@@ -158,24 +158,24 @@ public class MeshObjectCreatedEvent
      *         could not be created
      */
     public MeshObject applyTo(
-            MeshBase otherMeshBase )
+            MeshBase base )
         throws
             CannotApplyChangeException,
             TransactionException
     {
-        setResolver( otherMeshBase );
+        setResolver( base );
 
         Transaction tx = null;
         Throwable   t = null;
 
-        ModelBase modelBase = otherMeshBase.getModelBase();
+        ModelBase modelBase = base.getModelBase();
 
         resolveEntityTypes();
 
         try {
-            tx = otherMeshBase.createTransactionNowIfNeeded();
+            tx = base.createTransactionNowIfNeeded();
 
-            MeshObject newObject = otherMeshBase.getMeshBaseLifecycleManager().createMeshObject(
+            MeshObject newObject = base.getMeshBaseLifecycleManager().createMeshObject(
                         getDeltaValueIdentifier(),
                         getEntityTypes(),
                         theExternalizedMeshObject.getTimeCreated(),
@@ -216,7 +216,7 @@ public class MeshObjectCreatedEvent
             }
         }
         if( t != null ) {
-            throw new CannotApplyChangeException.ExceptionOccurred( otherMeshBase, t );
+            throw new CannotApplyChangeException.ExceptionOccurred( base, t );
         }
         return null; // I don't think this can happen, but let's make the compiler happy.
     }

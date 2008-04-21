@@ -36,12 +36,12 @@ public interface ExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
      * Obtain the property of the event.
      *
      * @return the property of the event
-     * @throws UnresolvedException.Property thrown if this ExternalizableEvent was serialized/deserialized,
+     * @throws PropertyUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     public P getProperty()
         throws
-            UnresolvedException.Property;
+            PropertyUnresolvedException;
     
     /**
      * Obtain the property identifier of the event.
@@ -54,12 +54,12 @@ public interface ExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
      * Obtain the old value of the property prior to the event.
      *
      * @return the old value of the property
-     * @throws UnresolvedException.Value thrown if this ExternalizableEvent was serialized/deserialized,
+     * @throws ValueUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     public V getOldValue()
         throws
-            UnresolvedException.Value;
+            ValueUnresolvedException;
     
     /**
      * Obtain the old-value identifier of the event.
@@ -72,12 +72,12 @@ public interface ExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
      * Obtain the new value of the property after the event.
      *
      * @return the new value of the property
-     * @throws UnresolvedException.Value thrown if this ExternalizableEvent was serialized/deserialized,
+     * @throws ValueUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
      *         and re-resolving the value failed
      */
     public V getNewValue()
         throws
-            UnresolvedException.Value;
+            ValueUnresolvedException;
 
     /**
      * Obtain the new-value identifier of the event.

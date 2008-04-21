@@ -25,7 +25,8 @@ import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 import org.infogrid.modelbase.ModelBase;
 
 import org.infogrid.util.event.AbstractExternalizablePropertyChangeEvent;
-import org.infogrid.util.event.UnresolvedException;
+import org.infogrid.util.event.SourceUnresolvedException;
+import org.infogrid.util.event.ValueUnresolvedException;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -141,7 +142,7 @@ public abstract class AbstractMeshObjectTypeChangeEvent
     protected MeshObject resolveSource()
     {
         if( theResolver == null ) {
-            throw new UnresolvedException.Source( this );
+            throw new SourceUnresolvedException( this );
         }
         
         MeshObject ret = theResolver.findMeshObjectByIdentifier( getSourceIdentifier() );
@@ -168,7 +169,7 @@ public abstract class AbstractMeshObjectTypeChangeEvent
             MeshTypeIdentifier [] vid )
     {
         if( theResolver == null ) {
-            throw new UnresolvedException.Source( this );
+            throw new SourceUnresolvedException( this );
         }
         if( vid == null || vid.length == 0 ) {
             return new EntityType[0];
@@ -182,7 +183,7 @@ public abstract class AbstractMeshObjectTypeChangeEvent
                 ret[i] = modelBase.findEntityTypeByIdentifier( vid[i] );
 
             } catch( MeshTypeWithIdentifierNotFoundException ex ) {
-                throw new UnresolvedException.Value( this, ex );
+                throw new ValueUnresolvedException( this, ex );
             }
         }
         return ret;
