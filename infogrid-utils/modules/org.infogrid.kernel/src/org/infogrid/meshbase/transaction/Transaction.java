@@ -66,7 +66,7 @@ public abstract class Transaction
 
         try {
             checkThreadIsAllowed();
-        } catch( TransactionException.IllegalTransactionThread ex ) {
+        } catch( IllegalTransactionThreadException ex ) {
             throw new IllegalStateException( "trying to commit transaction from wrong thread" );
         }
 
@@ -93,18 +93,18 @@ public abstract class Transaction
     /**
      * Determine whether the calling Thread is compatible with this Transaction.
      *
-     * @throws TransactionException.IllegalTransactionThread if the calling Thread is not
+     * @throws IllegalTransactionThreadException if the calling Thread is not
      *         compatible with this Transaction
      */
     public void checkThreadIsAllowed()
         throws
-            TransactionException.IllegalTransactionThread
+            IllegalTransactionThreadException
     {
         // FIXME? This should perhaps be somewhat looser than this: Threads should be able to
         // "empower" other threads to do work within a transaction on their behalf
 
         if( myThread != Thread.currentThread() ) {
-            throw new TransactionException.IllegalTransactionThread( theTransactable );
+            throw new IllegalTransactionThreadException( theTransactable );
         }
     }
 

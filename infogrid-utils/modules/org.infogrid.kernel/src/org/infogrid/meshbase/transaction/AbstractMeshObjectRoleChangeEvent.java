@@ -26,8 +26,10 @@ import org.infogrid.modelbase.ModelBase;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 
 import org.infogrid.util.event.AbstractExternalizablePropertyChangeEvent;
-import org.infogrid.util.event.UnresolvedException;
 import org.infogrid.util.StringHelper;
+import org.infogrid.util.event.OtherUnresolvedException;
+import org.infogrid.util.event.SourceUnresolvedException;
+import org.infogrid.util.event.ValueUnresolvedException;
 
 /**
  * <p>This indicates a change in a MeshObject's participation in a role of
@@ -170,7 +172,7 @@ public abstract class AbstractMeshObjectRoleChangeEvent
     protected MeshObject resolveSource()
     {
         if( theResolver == null ) {
-            throw new UnresolvedException.Source( this );
+            throw new SourceUnresolvedException( this );
         }
         
         MeshObject ret = theResolver.findMeshObjectByIdentifier( getSourceIdentifier() );
@@ -195,7 +197,7 @@ public abstract class AbstractMeshObjectRoleChangeEvent
     protected MeshObject resolveNeighbor()
     {
         if( theResolver == null ) {
-            throw new UnresolvedException.Other( this );
+            throw new OtherUnresolvedException( this );
         }
         
         MeshObject ret = theResolver.findMeshObjectByIdentifier( getNeighborMeshObjectIdentifier() );
@@ -212,7 +214,7 @@ public abstract class AbstractMeshObjectRoleChangeEvent
             MeshTypeIdentifier [] vid )
     {
         if( theResolver == null ) {
-            throw new UnresolvedException.Value( this );
+            throw new ValueUnresolvedException( this );
         }
         if( vid == null || vid.length == 0 ) {
             return new RoleType[0];
@@ -226,7 +228,7 @@ public abstract class AbstractMeshObjectRoleChangeEvent
                 ret[i] = modelBase.findRoleTypeByIdentifier( vid[i] );
 
             } catch( MeshTypeWithIdentifierNotFoundException ex ) {
-                throw new UnresolvedException.Value( this, ex );
+                throw new ValueUnresolvedException( this, ex );
             }
         }
         return ret;

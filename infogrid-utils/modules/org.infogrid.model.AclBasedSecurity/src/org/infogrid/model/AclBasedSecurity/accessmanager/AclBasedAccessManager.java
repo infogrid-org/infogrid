@@ -17,10 +17,12 @@ package org.infogrid.model.AclBasedSecurity.accessmanager;
 import org.infogrid.mesh.EntityNotBlessedException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
 
 import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.meshbase.security.AbstractAccessManager;
+import org.infogrid.meshbase.security.IdentityChangeException;
 import org.infogrid.meshbase.transaction.TransactionException;
 
 import org.infogrid.model.primitives.EntityType;
@@ -80,6 +82,9 @@ public class AclBasedAccessManager
             sudo();
             toBeOwned.relateAndBless( AclBasedSecuritySubjectArea.MESHOBJECT_HASOWNER_MESHOBJECT.getSource(), newOwner );
 
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } catch( EntityNotBlessedException ex ) {
             log.error( ex );
 
@@ -95,6 +100,21 @@ public class AclBasedAccessManager
         } finally {
             sudone();
         }
+    }
+    
+    /**
+     * Check whether it is permitted to semantically create a MeshObject with the provided
+     * MeshObjectIdentifier.
+     * 
+     * @param identifier the MeshObjectIdentifier
+     * @throws NotPermittedException thrown if it is not permitted
+     */
+    public void checkPermittedCreate(
+            MeshObjectIdentifier identifier )
+        throws
+            NotPermittedException
+    {
+        // always allowed -- FIXME?
     }
     
     /**
@@ -119,6 +139,9 @@ public class AclBasedAccessManager
             for( Role current : obj.getRoles( false ) ) {
                 current.getRoleType().checkPermittedSetTimeExpires( obj, newValue, caller );
             }
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }
@@ -147,6 +170,9 @@ public class AclBasedAccessManager
 
             thePropertyType.checkPermittedSetProperty( obj, newValue, caller );
 
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }
@@ -173,6 +199,9 @@ public class AclBasedAccessManager
 
             thePropertyType.checkPermittedGetProperty( obj, caller );
         
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }
@@ -199,6 +228,9 @@ public class AclBasedAccessManager
 
             type.checkPermittedBlessedBy( obj, caller );
         
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }
@@ -232,6 +264,9 @@ public class AclBasedAccessManager
             for( Role current : roles ) {
                 current.getRoleType().checkPermittedIncrementalBless( obj, current.getOtherSide(), types, caller );
             }
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }        
@@ -263,6 +298,9 @@ public class AclBasedAccessManager
             for( Role current : roles ) {
                 current.getRoleType().checkPermittedIncrementalUnbless( obj, current.getOtherSide(), types, caller );
             }
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }                
@@ -300,6 +338,9 @@ public class AclBasedAccessManager
                 current.getRoleType().checkPermittedIncrementalBless( obj, current.getOtherSide(), thisEnds, otherObject, caller );
                 current.getRoleType().getOtherRoleType().checkPermittedIncrementalBless( current.getOtherSide(), obj, thisEnds, otherObject, caller );
             }
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }        
@@ -337,6 +378,9 @@ public class AclBasedAccessManager
                 current.getRoleType().checkPermittedIncrementalUnbless( obj, current.getOtherSide(), thisEnds, otherObject, caller );
                 current.getRoleType().getOtherRoleType().checkPermittedIncrementalUnbless( current.getOtherSide(), obj, thisEnds, otherObject, caller );
             }
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }        
@@ -364,6 +408,9 @@ public class AclBasedAccessManager
             MeshObject caller = getCaller();
 
             toTraverse.checkPermittedTraversal( obj, otherObject, caller );
+
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
 
         } finally {
             sudone();
@@ -399,6 +446,9 @@ public class AclBasedAccessManager
                 current.checkPermittedIncrementalBless( obj, roleTypesToAskUsed, thisEnds, otherObject, caller );
             }
         
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }        
@@ -433,6 +483,9 @@ public class AclBasedAccessManager
             for( RoleType current : roleTypesToAsk ) {
                 current.checkPermittedIncrementalUnbless( obj, roleTypesToAskUsed, thisEnds, otherObject, caller );
             }
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }        
@@ -466,6 +519,9 @@ public class AclBasedAccessManager
             for( RoleType current : roleTypesTwoToAsk ) {
                 current.checkPermittedAddAsEquivalent( two, one, caller );
             }
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }        
@@ -494,6 +550,9 @@ public class AclBasedAccessManager
             for( RoleType current : roleTypesToAsk ) {
                 current.checkPermittedRemoveAsEquivalent( obj, caller );
             }
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }        
@@ -525,6 +584,9 @@ public class AclBasedAccessManager
                 checkPermittedUnbless( obj,                    new RoleType[] { current.getRoleType() },                    current.getOtherSide() );
                 checkPermittedUnbless( current.getOtherSide(), new RoleType[] { current.getRoleType().getOtherRoleType() }, obj );
             }
+        } catch( IdentityChangeException ex ) {
+            log.error( ex );
+
         } finally {
             sudone();
         }        

@@ -108,9 +108,12 @@ public class NetMeshObjectBecameDeadStateEvent
         try {
             tx = base.createTransactionNowIfNeeded();
 
-            MeshObjectIdentifier otherObjectIdentifier = getAffectedMeshObjectIdentifier();
+            NetMeshObjectIdentifier otherObjectIdentifier = getAffectedMeshObjectIdentifier();
 
-            NetMeshObject ret = base.getMeshBaseLifecycleManager().rippleDelete( otherObjectIdentifier, theOriginNetworkIdentifier, getTimeEventOccurred() );
+            NetMeshObject ret = base.getMeshBaseLifecycleManager().rippleDelete(
+                    otherObjectIdentifier,
+                    theOriginNetworkIdentifier,
+                    getTimeEventOccurred() );
 
             return ret;
 

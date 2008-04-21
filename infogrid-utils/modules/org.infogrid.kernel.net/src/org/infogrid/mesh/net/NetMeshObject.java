@@ -25,6 +25,7 @@ import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.NotRelatedException;
 
 import org.infogrid.mesh.RelatedAlreadyException;
+import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 import org.infogrid.mesh.RoleTypeNotBlessedException;
 import org.infogrid.mesh.RoleTypeRequiresEntityTypeException;
 import org.infogrid.mesh.net.externalized.SimpleExternalizedNetMeshObject;
@@ -43,18 +44,17 @@ import org.infogrid.model.primitives.RoleType;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.RemoteQueryTimeoutException;
 
-
 /**
- * The subtype of MeshObject used in NetworkedMeshBases.
+ * The subtype of MeshObject used in NetMeshBases.
  */
 public interface NetMeshObject
         extends
             MeshObject
 {
     /**
-     * Obtain the globally unique identifier of this MeshObject.
+     * Obtain the globally unique identifier of this NetMeshObject.
      *
-     * @return the globally unique identifier of this MeshObject
+     * @return the globally unique identifier of this NetMeshObject
      */
     public abstract NetMeshObjectIdentifier getIdentifier();
 
@@ -67,33 +67,29 @@ public interface NetMeshObject
     public abstract NetMeshBase getMeshBase();
 
     /**
-     * Determine whether this the home replica.
-     *
-     * @return returns true if this is the home replica
-     */
-    public abstract boolean isHomeReplica();
-
-    /**
       * Determine whether this replica has update rights.
       *
       * @return returns true if this is replica has the update rights
       */
-    public abstract boolean doWeHaveLock();
+    public abstract boolean hasLock();
 
     /**
-      * Attempt to obtain update rights.
-      *
-      * @return returns true if we have update rights, or we were successful obtaining them.
-      */
+     * Attempt to obtain update rights.
+     *
+     * @return returns true if we have update rights, or we were successful obtaining them.
+     * @throws RemoteQueryTimeoutException thrown if the replica that has the lock could not be contacted or did not reply in the time alloted
+     */
     public abstract boolean tryToObtainLock()
         throws
             RemoteQueryTimeoutException;
 
     /**
-      * Attempt to obtain update rights. Specify a timeout in milliseconds.
-      *
-      * @return returns true if we have update rights, or we were successful obtaining them.
-      */
+     * Attempt to obtain update rights. Specify a timeout in milliseconds.
+     *
+     * @param timeout the timeout in milliseconds
+     * @return returns true if we have update rights, or we were successful obtaining them.
+     * @throws RemoteQueryTimeoutException thrown if the replica that has the lock could not be contacted or did not reply in the time alloted
+     */
     public abstract boolean tryToObtainLock(
             long timeout )
         throws
@@ -111,9 +107,9 @@ public interface NetMeshObject
       * currently does or does not have update rights.
       *
       * @return if true, this replica will give up update rights when asked
-      * @see #setWillGiveUpLock
+      * @see #getWillGiveUpLock
       */
-    public abstract boolean willGiveUpLock();
+    public abstract boolean getWillGiveUpLock();
 
     /**
       * Set whether this replica will allow update rights to be given up or not.
@@ -122,9 +118,66 @@ public interface NetMeshObject
       * prevent that.
       *
       * @param yesNo if true, this replica will give update rights when asked
-      * @see #willGiveUpLock
+      * @see #getWillGiveUpLock
       */
     public abstract void setWillGiveUpLock(
+            boolean yesNo );
+
+    /**
+     * Obtain the Proxy in the direction of the update rights for this replica.
+     * This may return null, indicating that this replica has the update rights.
+     *
+     * @return the Proxy in the direction of the update rights
+     */
+    public abstract Proxy getProxyTowardsLockReplica();
+    
+    /**
+     * Determine whether this the home replica.
+     *
+     * @return returns true if this is the home replica
+     */
+    public abstract boolean isHomeReplica();
+
+    /**
+     * Attempt to obtain the home replica status.
+     *
+     * @return returns true if we have home replica status, or we were successful obtaining it.
+     * @throws RemoteQueryTimeoutException thrown if the replica that has home replica status could not be contacted or did not reply in the time alloted
+     */
+    public abstract boolean tryToObtainHomeReplica()
+        throws
+            RemoteQueryTimeoutException;
+
+    /**
+     * Attempt to obtain the home replica status. Specify a timeout in milliseconds.
+     *
+     * @param timeout the timeout in milliseconds
+     * @return returns true if we have home replica status, or we were successful obtaining it.
+     * @throws RemoteQueryTimeoutException thrown if the replica that has home replica status could not be contacted or did not reply in the time alloted
+     */
+    public abstract boolean tryToObtainHomeReplica(
+            long timeout )
+        throws
+            RemoteQueryTimeoutException;
+
+    /**
+     * Determine whether this replica is going to give up home replica status if it has it,
+     * in case someone asks. This only says "if this replica is the home replica, it
+     * will give it up when asked". This call makes no statement about whether this replica
+     * currently does or does not have home replica status.
+     * 
+     * @return if true, this replica will give up home replica status when asked
+     * @see #setWillGiveUpHomeReplica
+     */
+    public abstract boolean getWillGiveUpHomeReplica();
+
+    /**
+     * Set whether this replica will allow home replica status to be given up or not.
+     * 
+     * @param yesNo if true, this replica will give up home replica status when asked
+     * @see #getWillGiveUpHomeReplica
+     */
+    public abstract void setWillGiveUpHomeReplica(
             boolean yesNo );
 
     /**
@@ -136,14 +189,6 @@ public interface NetMeshObject
     public abstract Proxy getProxyTowardsHomeReplica();
     
     /**
-     * Obtain the Proxy in the direction of the update rights for this replica.
-     * This may return null, indicating that this replica has the update rights.
-     *
-     * @return the Proxy in the direction of the update rights
-     */
-    public abstract Proxy getProxyTowardsLockReplica();
-    
-    /**
      * Obtain all Proxies applicable to this replica.
      *
      * @return all Proxies. This may return null for efficiency reasons
@@ -153,7 +198,7 @@ public interface NetMeshObject
     /**
      * Obtain an Iterator over all Proxies applicable to this replica.
      *
-     * @return the Iterator
+     * @return the CursorIterator
      */
     public abstract CursorIterator<Proxy> proxyIterator();
 
@@ -187,6 +232,25 @@ public interface NetMeshObject
             Proxy theProxy );
 
     /**
+     * Surrender home replica status when invoked.  This shall not be called by the application
+     * programmer. This is called only by Proxies that identify themselves to this call.
+     *
+     * @param theProxy the Proxy invoking this method
+     * @return true if successful, false otherwise.
+     */
+    public abstract boolean surrenderHomeReplica(
+            Proxy theProxy );
+    
+    /**
+     * Push home replica status to this replica. This shall not be called by the application
+     * programmer. This is called only by Proxies that identify themselves to this call.
+     * 
+     * @param theProxy the Proxy invoking this method
+     */
+    public abstract void pushHomeReplica(
+            Proxy theProxy );
+
+    /**
       * Tell the NetMeshObject to make a note of the fact that a new replica of the
       * NetMeshObject is being created in the direction of the provided Proxy.
       * This shall not be called by the application
@@ -211,9 +275,9 @@ public interface NetMeshObject
     /**
      * Obtain the same NetMeshObject as SimpleExternalizedNetMeshObject so it can be easily serialized.
      * 
-     * @param captureProxies if true, this SimpleExternalizedNetMeshObject contain entries for the
+     * @param captureProxies if true, the SimpleExternalizedNetMeshObject contain entries for the
      *        Proxies as held in this replica. If false, that information will be left out.
-     * @return this NetMeshObject as ExSimpleExternalizedNetMeshObject
+     * @return this NetMeshObject as SimpleExternalizedNetMeshObject
      */
     public abstract SimpleExternalizedNetMeshObject asExternalized(
             boolean captureProxies );
@@ -222,18 +286,23 @@ public interface NetMeshObject
      * Obtain the same NetMeshObject as SimpleExternalizedNetMeshObject so it can be easily serialized.
      * At the same time, add the provided Proxy to the list of Proxies of this replica.
      * 
-     * @param captureProxies if true, this ESimpleExternalizedNetMeshObjectwill contain entries for the
+     * @param captureProxies if true, the SimpleExternalizedNetMeshObject contain entries for the
      *        Proxies as held in this replica. If false, that information will be left out.
-     * @return this NetMeshObject as ExSimpleExternalizedNetMeshObject
+     * @param proxyTowardsNewReplica if given, add this Proxy to the list of Proxies of this replica as a side effect
+     * @return this NetMeshObject as SimpleExternalizedNetMeshObject
      */
     public abstract SimpleExternalizedNetMeshObject asExternalizedAndAddProxy(
             boolean captureProxies,
             Proxy   proxyTowardsNewReplica );
 
     /**
-     * Bless a replica MeshObject, as a consequence of the blessing of a master replica.
+     * Bless a replica NetMeshObject, as a consequence of the blessing of a master replica.
      *
      * @param types the to-be-blessed EntityTypes
+     * @throws EntityBlessedAlreadyException thrown if this MeshObject is already blessed with one or more of the EntityTypes
+     * @throws IsAbstractException thrown if one or more of the EntityTypes were abstract and could not be instantiated
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void rippleBless(
             EntityType [] types )
@@ -244,9 +313,13 @@ public interface NetMeshObject
             NotPermittedException;
 
     /**
-     * Unbless a replica MeshObject, as a consequence of the unblessing of a master replica.
+     * Unbless a replica NetMeshObject, as a consequence of the unblessing of a master replica.
      *
      * @param types the to-be-unblessed EntityTypes
+     * @throws RoleTypeRequiresEntityTypeException thrown if this MeshObject plays one or more roles that requires the MeshObject to remain being blessed with at least one of the EntityTypes
+     * @throws EntityNotBlessedException thrown if this MeshObject does not support at least one of the given EntityTypes
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void rippleUnbless(
             EntityType [] types )
@@ -257,24 +330,30 @@ public interface NetMeshObject
             NotPermittedException;
 
     /**
-     * Relate two replica MeshObjects, as a consequence of relating other replicas.
+     * Relate two replica NetMeshObjects, as a consequence of relating other replicas.
      * 
-     * @param identifierOfOtherSide the Identifier of the NetMeshObject to relate to
+     * @param newNeighborIdentifier the identifier of the NetMeshObject to relate to
+     * @throws RelatedAlreadyException thrown to indicate that this MeshObject is already related
+     *         to the newNeighbor
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      */
     public abstract void rippleRelate(
-            NetMeshObjectIdentifier identifierOfOtherSide,
-            NetMeshBase             mb )
+            NetMeshObjectIdentifier newNeighborIdentifier )
         throws
             RelatedAlreadyException,
             TransactionException;
     
     /**
-     * Unrelate two replica MeshObjects, as a consequence of unrelating other replicas.
+     * Unrelate two replica NetMeshObjects, as a consequence of unrelating other replicas.
      * 
-     * @param identifierOfOtherSide the Identifier of the NetMeshObject to unrelate from
+     * @param neighborIdentifier the identifier of the NetMeshObject to unrelate from
+     * @param mb the MeshBase that this MeshObject does or used to belong to
+     * @throws NotRelatedException thrown if this MeshObject is not related to the neighbor
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void rippleUnrelate(
-            NetMeshObjectIdentifier identifierOfOtherSide,
+            NetMeshObjectIdentifier neighborIdentifier,
             NetMeshBase             mb )
         throws
             NotRelatedException,
@@ -282,33 +361,46 @@ public interface NetMeshObject
             NotPermittedException;
 
     /**
-     * Bless the relationship of two replica MeshObjects, as a consequence of blessing the relationship
+     * Bless the relationship of two replica NetMeshObjects, as a consequence of blessing the relationship
      * of two other replicas.
      * 
      * @param theTypes the RoleTypes to use for blessing
-     * @param identifierOfOtherSide the Identifier of the NetMeshObject that
+     * @param neighborIdentifier the identifier of the NetMeshObject that
      *        identifies the relationship that shall be blessed
+     * @throws RoleTypeBlessedAlreadyException thrown if the relationship to the other MeshObject is blessed
+     *         already with one ore more of the given RoleTypes
+     * @throws EntityNotBlessedException thrown if this MeshObject is not blessed by a requisite EntityType
+     * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
+     * @throws IsAbstractException thrown if one of the RoleTypes belong to an abstract RelationshipType
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void rippleBless(
             RoleType []             theTypes,
-            NetMeshObjectIdentifier identifierOfOtherSide )
+            NetMeshObjectIdentifier neighborIdentifier )
         throws
+            RoleTypeBlessedAlreadyException,
             EntityNotBlessedException,
+            NotRelatedException,
             IsAbstractException,
             TransactionException,
             NotPermittedException;
 
     /**
-     * Unbless the relationship of two replica MeshObjects, as a consequence of unblessing the relationship
+     * Unbless the relationship of two replica NetMeshObjects, as a consequence of unblessing the relationship
      * of two other replicas.
      * 
      * @param theTypes the RoleTypes to use for unblessing
-     * @param identifierOfOtherSide the Identifier of the NetMeshObject that
+     * @param neighborIdentifier the identifier of the NetMeshObject that
      *        identifies the relationship that shall be unblessed
+     * @throws RoleTypeNotBlessedException thrown if the relationship to the other MeshObject does not support the RoleType
+     * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void rippleUnbless(
             RoleType []             theTypes,
-            NetMeshObjectIdentifier identifierOfOtherSide )
+            NetMeshObjectIdentifier neighborIdentifier )
         throws
             RoleTypeNotBlessedException,
             NotRelatedException,
@@ -316,9 +408,13 @@ public interface NetMeshObject
             NotPermittedException;
     
     /**
-     * Add a replica as an equivalent, as a consequence of adding a different replica as equivalent.
+     * Add a replica NetMeshObject as an equivalent, as a consequence of adding a different replica
+     * as equivalent.
      * 
      * @param identifierOfEquivalent the Identifier of the replica NetMeshObject
+     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void rippleAddAsEquivalent(
             NetMeshObjectIdentifier identifierOfEquivalent )
@@ -328,9 +424,11 @@ public interface NetMeshObject
             NotPermittedException;
     
     /**
-     * Remove a replica as an equivalent, as a consequence of removing a different replica as equivalent.
+     * Remove this replica NetMeshObject as an equivalent from the current set of equivalents, as a consequence of removing
+     * a different replica as equivalent.
      * 
-     * @param identifierOfEquivalent the Identifier of the replica NetMeshObject
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void rippleRemoveAsEquivalent()
         throws
@@ -338,23 +436,31 @@ public interface NetMeshObject
             NotPermittedException;
 
     /**
-     * Change the values of Properties on a replica, as a consequence of changing the values of the properties
+     * Change the values of Properties on a replica NetMeshObject, as a consequence of changing the values of the properties
      * in another replica.
      *
      * @param types the PropertyTypes
      * @param values the new values, in the same sequence as the PropertyTypes
+     * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
+     * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this Property
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void rippleSetPropertyValues(
             PropertyType []  types,
             PropertyValue [] values )
         throws
             IllegalPropertyTypeException,
-            NotPermittedException,
             IllegalPropertyValueException,
+            NotPermittedException,
             TransactionException;
 
     /**
-     * Delete a replica as a consequence of deleting another replica.
+     * Delete a replica NetMeshObject as a consequence of deleting another replica.
+     * 
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract void rippleDelete()
         throws
