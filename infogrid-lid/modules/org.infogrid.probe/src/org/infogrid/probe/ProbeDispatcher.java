@@ -357,7 +357,7 @@ public class ProbeDispatcher
 //        try {
 //            File dir = new File( theURL.toURL().getFile() );
 //
-//            // this will create directory object already
+//            // this will createCopy directory object already
 //            facade.getModelObjectRepository().initializeHomeObjectIfNeeded(
 //                    theDirectoryType,
 //                    facade.getDefaultCreatedTime(),
@@ -377,7 +377,7 @@ public class ProbeDispatcher
 //                RootEntity newDefinitionObject = facade.createForwardReferenceFromMetaObject( theDefinitionObjectType, path );
 //                RootEntity newComponentObject  = facade.createFromMetaObject( theFileType, shortFileName );
 //
-//                newComponentObject.setName( StringValue.create( shortFileName )); // FIXME: more
+//                newComponentObject.setName( StringValue.createCopy( shortFileName )); // FIXME: more
 //
 //                facade.createFromMetaObject( theContainsType,   "contains-"   + shortFileName, facade.getHomeObject(), newComponentObject );
 //                facade.createFromMetaObject( theReferencesType, "references-" + shortFileName, newComponentObject,     newDefinitionObject );
@@ -1456,7 +1456,7 @@ public class ProbeDispatcher
             ChangeSet newChangeSet )
     {
         if( theChangesToWriteBack == null ) {
-            theChangesToWriteBack = ChangeSet.create( newChangeSet );
+            theChangesToWriteBack = ChangeSet.createCopy( newChangeSet );
         } else {
             theChangesToWriteBack.append( newChangeSet );
         }

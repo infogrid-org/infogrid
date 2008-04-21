@@ -24,7 +24,6 @@ import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObject;
 import org.infogrid.meshbase.security.AccessManager;
 
-import org.infogrid.meshbase.transaction.Change;
 import org.infogrid.meshbase.transaction.MeshObjectCreatedEvent;
 import org.infogrid.meshbase.transaction.MeshObjectDeletedEvent;
 import org.infogrid.meshbase.transaction.TransactionException;
@@ -34,7 +33,8 @@ import org.infogrid.model.primitives.EntityType;
 import org.infogrid.util.logging.Log;
 
 /**
- * Collects implementation methods common to various implementations of MeshBaseLifecycleManager.
+ * Collects implementation methods common to various implementations of
+ * {@link MeshBaseLifecycleManager}.
  */
 public abstract class AbstractMeshBaseLifecycleManager
         implements
@@ -65,17 +65,20 @@ public abstract class AbstractMeshBaseLifecycleManager
     }
 
     /**
-      * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
-      *
-      * <p>Before this operation can be successfully invoked, a Transaction must be active
-      * on this Thread.>/p>
-      *
-      * @param type the EntityType with which the MeshObject will be blessed
-      * @return the created MeshObject
-      * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
-      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-      * @throws NotPermittedException thrown if the blessing operation is not permitted
-      */
+     * <p>This is a convenience method to create a MeshObject with exactly one EntityType
+     * and an automatically created MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @param type the EntityType with which the MeshObject will be blessed
+     * @return the created MeshObject
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
     public MeshObject createMeshObject(
             EntityType type )
         throws
@@ -96,17 +99,20 @@ public abstract class AbstractMeshBaseLifecycleManager
     }
 
     /**
-      * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes.</p>
-      *
-      * <p>Before this operation can be successfully invoked, a Transaction must be active
-      * on this Thread.>/p>
-      *
-      * @param types the EntityTypes with which the MeshObject will be blessed
-      * @return the created MeshObject
-      * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
-      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-      * @throws NotPermittedException thrown if the blessing operation is not permitted
-      */
+     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes
+     * and an automatically created MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @param types the EntityTypes with which the MeshObject will be blessed
+     * @return the created MeshObject
+     * @throws IsAbstractException thrown if one or more EntityTypes are abstract and cannot be instantiated
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
     public MeshObject createMeshObject(
             EntityType [] types )
         throws
@@ -128,24 +134,27 @@ public abstract class AbstractMeshBaseLifecycleManager
     }
 
     /**
-     * <p>Create a new MeshObject without a type.
+     * <p>Create a new MeshObject without a type
+     * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
+     * @return the created MeshObject
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExtIdentifierNotUniqueExceptionrown if a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public MeshObject createMeshObject(
             MeshObjectIdentifier identifier )
         throws
+            MeshObjectIdentifierNotUniqueException,
             TransactionException,
-            MeshObjectIdentifierNotUniqueException
+            NotPermittedException
     {
         long time = determineCreationTime();
         long autoExpires;
@@ -160,27 +169,31 @@ public abstract class AbstractMeshBaseLifecycleManager
     }
 
     /**
-     * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
+     * <p>This is a convenience method to create a MeshObject with exactly one EntityType
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
      * @param type the EntityType with which the MeshObject will be blessed
      * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public MeshObject createMeshObject(
             MeshObjectIdentifier identifier,
-            EntityType      type )
+            EntityType           type )
         throws
             IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
             TransactionException,
-            NotPermittedException,
-            MeshObjectIdentifierNotUniqueException
+            NotPermittedException
     {
         MeshObject ret = createMeshObject( identifier );
         if( type != null ) {
@@ -195,27 +208,31 @@ public abstract class AbstractMeshBaseLifecycleManager
     }
 
     /**
-     * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
+     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
      * @param types the EntityTypes with which the MeshObject will be blessed
      * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws IsAbstractException thrown if one or more EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public MeshObject createMeshObject(
             MeshObjectIdentifier identifier,
             EntityType []  types )
         throws
             IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
             TransactionException,
-            NotPermittedException,
-            MeshObjectIdentifierNotUniqueException
+            NotPermittedException
     {
         MeshObject ret = createMeshObject( identifier );
         if( types != null && types.length > 0 ) {
@@ -230,25 +247,27 @@ public abstract class AbstractMeshBaseLifecycleManager
     }
 
     /**
-     * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
+     * <p>This is a convenience method to create a MeshObject with exactly one EntityType,
+     * with provided time stamps
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
      * @param type the EntityType with which the MeshObject will be blessed
      * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
      * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
      * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeAutoDeletes the time this MeshObject will auto-deletedeleteMeshObjectystem.currentTimeMillis() format
+     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
      * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalNIdentifierNotUniqueExceptionf a MeshObject exists already in this MeshBase with the specified Identifier
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public MeshObject createMeshObject(
             MeshObjectIdentifier identifier,
@@ -256,14 +275,14 @@ public abstract class AbstractMeshBaseLifecycleManager
             long           timeCreated,
             long           timeUpdated,
             long           timeRead,
-            long           timeAutoDeletes )
+            long           timeExpires )
         throws
             IsAbstractException,
-            TransactionException,
             MeshObjectIdentifierNotUniqueException,
+            TransactionException,
             NotPermittedException
     {
-        MeshObject ret = createMeshObject( identifier, timeCreated, timeUpdated, timeRead, timeAutoDeletes );
+        MeshObject ret = createMeshObject( identifier, timeCreated, timeUpdated, timeRead, timeExpires );
         
         if( type != null ) {
             try {
@@ -277,23 +296,27 @@ public abstract class AbstractMeshBaseLifecycleManager
     }
 
     /**
-     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes.</p>
+     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes,
+     * with provided time stamps
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
      * @param types the EntityTypes with which the MeshObject will be blessed
      * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
      * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
      * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeAutoDeletes the time this MeshObject will auto-delete, in MeshObjectystem.currentTimeMillis() format
+     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
      * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalNIdentifierNotUniqueExceptionf a MeshObject exists already in this MeshBase with the specified Identifier
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public MeshObject createMeshObject(
             MeshObjectIdentifier identifier,
@@ -301,14 +324,14 @@ public abstract class AbstractMeshBaseLifecycleManager
             long           timeCreated,
             long           timeUpdated,
             long           timeRead,
-            long           timeAutoDeletes )
+            long           timeExpires )
         throws
             IsAbstractException,
-            TransactionException,
             MeshObjectIdentifierNotUniqueException,
+            TransactionException,
             NotPermittedException
     {
-        MeshObject ret = createMeshObject( identifier, timeCreated, timeUpdated, timeRead, timeAutoDeletes );
+        MeshObject ret = createMeshObject( identifier, timeCreated, timeUpdated, timeRead, timeExpires );
         
         if( types != null && types.length > 0 ) {
             try {
@@ -322,17 +345,15 @@ public abstract class AbstractMeshBaseLifecycleManager
     }
     
     /**
-     * <p>Semantically deleteMeshObjects a MeshObject.</p>
+     * <p>Semantically delete a MeshObject.</p>
      * 
-     * <p>This call is a "semantic deleteMeshObjects", which means that an existing
-     * object will go away in all its replicas. Due to time lag, the object
+     * <p>This call is a "semantic delete", which means that an existing
+     * MeshObject will go away in all its replicas. Due to time lag, the MeshObject
      * may still exist in certain replicas in other places for a while, but
      * the request to deleteMeshObjects all objects is in the queue and will get there
      * eventually.</p>
      * 
-     * 
      * @param theObject the MeshObject to be semantically deleted
-     * @throws DoReadOnlyException thrown if theObject does not have update rights, and cannot acquire them
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
@@ -399,10 +420,10 @@ public abstract class AbstractMeshBaseLifecycleManager
      * @param createdObject the created MeshObject
      * @return the created event
      */
-    protected Change createCreatedEvent(
+    protected MeshObjectCreatedEvent createCreatedEvent(
             MeshObject createdObject )
     {
-        Change ret = new MeshObjectCreatedEvent(
+        MeshObjectCreatedEvent ret = new MeshObjectCreatedEvent(
                 theMeshBase,
                 theMeshBase.getIdentifier(),
                 createdObject,
@@ -413,28 +434,30 @@ public abstract class AbstractMeshBaseLifecycleManager
     /**
      * Overridable helper to create a MeshObjectDeletedEvent.
      * 
-     * @param canonicalIdentifier the canonical Identifier of the deleted MeshObject
      * @param deletedObject the deleted MeshObject
+     * @param canonicalIdentifier the canonical MeshObjectIdentifier of the deleted MeshObject.
+     *        Once a MeshObject has been deleted, its canonical MeshObjectIdentifier can no longer be determined
+     * @param timeEventOccurred the time when the event occurred
      * @return the created event
      */
-    protected Change createDeletedEvent(
+    protected MeshObjectDeletedEvent createDeletedEvent(
             MeshObject           deletedObject,
             MeshObjectIdentifier canonicalIdentifier,
-            long                 time )
+            long                 timeEventOccurred )
     {
-        Change ret = new MeshObjectDeletedEvent(
+        MeshObjectDeletedEvent ret = new MeshObjectDeletedEvent(
                 theMeshBase,
                 theMeshBase.getIdentifier(),
                 deletedObject,
                 canonicalIdentifier,
-                time );
+                timeEventOccurred );
         return ret;
     }
 
     /**
-     * Helper method that allows our subclasses to access the Store without having to expose it publicly.
+     * Helper method that allows our subclasses to access the internal storage without having to expose it publicly.
      * 
-     * @param identifier the Identifier of the MeshObject
+     * @param identifier the identifier of the MeshObject to look for
      * @return the found MeshObject, or none.
      */
     protected MeshObject findInStore(
@@ -446,10 +469,10 @@ public abstract class AbstractMeshBaseLifecycleManager
     }
 
     /**
-     * Helper method that allows our subclasses to access the Store without having to expose it publicly.
+     * Helper method that allows our subclasses to access the internal storage without having to expose it publicly.
      *
-     * @param obj the MeshObject to put into the store
-     * @return the MeshObject in the store previously with the same Identifier
+     * @param obj the MeshObject to put into the storage
+     * @return the MeshObject in the store previously with the same identifier
      */
     protected MeshObject putIntoStore(
             AbstractMeshObject obj )
@@ -460,10 +483,10 @@ public abstract class AbstractMeshBaseLifecycleManager
     }
 
     /**
-     * Helper method that allows our subclasses to access the Store without having to expose it publicly.
+     * Helper method that allows our subclasses to access the internal storage without having to expose it publicly.
      * 
-     * @param identifier the Identifier of the MeshObject
-     * @return the found MeshObject, or none.
+     * @param identifier the identifier of the MeshObject
+     * @return the removed MeshObject, or null
      */
     protected MeshObject removeFromStore(
             MeshObjectIdentifier identifier )

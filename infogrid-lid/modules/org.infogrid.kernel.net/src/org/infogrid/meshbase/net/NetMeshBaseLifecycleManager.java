@@ -20,6 +20,7 @@ import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
 
 import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObjectFactory;
 import org.infogrid.mesh.security.MustNotDeleteHomeObjectException;
@@ -40,43 +41,45 @@ public interface NetMeshBaseLifecycleManager
 
 {
     /**
-     * <p>Obtain the MeshBase that this MeshBaseLifecycleManager works on.</p>
+     * <p>Obtain the NetMeshBase that this NetMeshBaseLifecycleManager works on.</p>
      * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
      * 
-     * @return the MeshBase that this MMeshBaseLifecycleManagerworks on
+     * @return the NetMeshBase that this NetMeshBaseLifecycleManager works on
      */
     public abstract NetMeshBase getMeshBase();
 
     /**
-     * <p>Create a new MeshObject without a type.
+     * <p>Create a new NetMeshObject without a type
+     * and an automatically created NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
-     * is to be created.</p>
+     * is created.</p>
      *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      *
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     *
-     * @return the created MeshObject
+     * @return the created NetMeshObject
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject createMeshObject()
         throws
-            TransactionException;
+            TransactionException,
+            NotPermittedException;
 
     /**
-     * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
+     * <p>This is a convenience method to create a NetMeshObject with exactly one EntityType
+     * and an automatically created NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      *
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     *
-     * @param type the EntityType with which the MeshObject will be blessed
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @param type the EntityType with which the NetMeshObject will be blessed
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject createMeshObject(
             EntityType type )
@@ -86,18 +89,19 @@ public interface NetMeshBaseLifecycleManager
             NotPermittedException;
 
     /**
-     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes.</p>
+     * <p>This is a convenience method to create a NetMeshObject with zero or more EntityTypes
+     * and an automatically created NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      *
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     *
-     * @param types the EntityTypes with which the MeshObject will be blessed
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @param types the EntityTypes with which the NetMeshObject will be blessed
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject createMeshObject(
             EntityType [] types )
@@ -107,243 +111,265 @@ public interface NetMeshBaseLifecycleManager
             NotPermittedException;
 
     /**
-     * <p>Create a new MeshObject (aka EntityType instance) initially without a type.
+     * <p>Create a new NetMeshObject without a type
+     * and with a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
+     * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
+     *                        automatically create a suitable NetMeshObjectIdentifier.
+     * @return the created NetMeshObject
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExtIdentifierNotUniqueExceptionrown if a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject createMeshObject(
             MeshObjectIdentifier identifier )
         throws
+            MeshObjectIdentifierNotUniqueException,
             TransactionException,
-            MeshObjectIdentifierNotUniqueException;
+            NotPermittedException;
 
     /**
-     * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
+     * <p>This is a convenience method to create a NetMeshObject with exactly one EntityType
+     * and a provided NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param type the EntityType with which the MeshObject will be blessed
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
+     *                        automatically create a suitable NetMeshObjectIdentifier.
+     * @param type the EntityType with which the NetMeshObject will be blessed
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject createMeshObject(
             MeshObjectIdentifier identifier,
-            EntityType      type )
+            EntityType           type )
         throws
             IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
             TransactionException,
-            NotPermittedException,
-            MeshObjectIdentifierNotUniqueException;
+            NotPermittedException;
 
     /**
-     * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
+     * <p>This is a convenience method to create a NetMeshObject with zero or more EntityTypes
+     * and a provided NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param types the EntityTypes with which the MeshObject will be blessed
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
+     *                        automatically create a suitable NetMeshObjectIdentifier.
+     * @param types the EntityTypes with which the NetMeshObject will be blessed
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject createMeshObject(
             MeshObjectIdentifier identifier,
-            EntityType []   types )
+            EntityType []        types )
         throws
             IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
             TransactionException,
-            NotPermittedException,
-            MeshObjectIdentifierNotUniqueException;
+            NotPermittedException;
 
     /**
-     * <p>Create a new MeshObject (aka EntityType instance) initially without a type.
+     * <p>Create a new NetMeshObject without a type, but with provided time stamps
+     * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
-     * @return the created MeshObject
+     * @param identifier the identifier of the to-be-created NetMeshObject. This must not be null.
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @return the created NetMeshObject
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NEtMeshBase with the specified identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalIdentifierNotUniqueExceptionif a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject createMeshObject(
             MeshObjectIdentifier identifier,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeExpires )
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
         throws
-            TransactionException,
-            MeshObjectIdentifierNotUniqueException;
-
-    /**
-     * <p>This is a convenience method to create a MeshObject with exactly one EntityType.</p>
-     * 
-     * <p>Before this operation can be successfully invoked, a Transaction must be active
-     * on this Thread.>/p>
-     * 
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param type the EntityType with which the MeshObject will be blessed
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
-     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalNaIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
-     */
-    public abstract NetMeshObject createMeshObject(
-            MeshObjectIdentifier identifier,
-            EntityType      type,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeExpires )
-        throws
-            IsAbstractException,
-            TransactionException,
             MeshObjectIdentifierNotUniqueException,
+            TransactionException,
             NotPermittedException;
 
     /**
-     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes.</p>
+     * <p>This is a convenience method to create a NetMeshObject with exactly one EntityType,
+     * with provided time stamps
+     * and a provided NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
      * 
-     * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param types the EntityTypes with which the MeshObject will be blessed
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
+     *                        automatically create a suitable NetMeshObjectIdentifier.
+     * @param type the EntityType with which the NetMeshObject will be blessed
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalNaIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject createMeshObject(
             MeshObjectIdentifier identifier,
-            EntityType []   types,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeExpires )
+            EntityType           type,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
         throws
             IsAbstractException,
-            TransactionException,
             MeshObjectIdentifierNotUniqueException,
-            NotPermittedException;    
+            TransactionException,
+            NotPermittedException;
 
     /**
-     * Create a NetMeshObject that is a replica. Using this method, the created NetMeshObject initially
-     * does not have update rights, and its home replica resides in a different MeshBase. The
-     * different MeshBase is identified by the Proxy through which this MeshBase communicates with it.
+     * <p>This is a convenience method to create a NetMeshObject with zero or more EntityTypes,
+     * with provided time stamps
+     * and a provided NetMeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
      * 
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
      * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param types the EntityTypes with which the MeshObject will be blessed
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
+     * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
+     *                        automatically create a suitable NetMeshObjectIdentifier.
+     * @param types the EntityTypes with which the NetMeshObject will be blessed
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @return the created NetMeshObject
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public abstract NetMeshObject createMeshObject(
+            MeshObjectIdentifier identifier,
+            EntityType []        types,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
+        throws
+            IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException;
+
+    /**
+     * <p>Convenience method to create a new replica of an existing NetMeshObject with zero or more types,
+     * with the provided time stamps, the provided NetMeshObjectIdentifier, flags whether to give up the
+     * lock or home replica status should this replica ever acquire either, and the Proxy in which both
+     * homeReplica and lock are to be found. 
+     * This call creates a replica of an existing MeshObject, so it is not a "semantic create".</p>
+     * 
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     * 
+     * @param identifier the identifier of the to-be-created replica. This must not be null.
+     * @param types the EntityTypes with which the NetMeshObject will be blessed
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @param giveUpHomeReplica if true, this replica will give up home replica status when asked should it ever acquire it
+     * @param giveUpLock if true, this replica will give up the lock when asked should it ever acquire it
      * @param proxyTowardsHomeAndLock the Proxy in whose direction the home replica and the updateable replica can be found
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @return the created replica
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws ExternalNamIdentifierNotUniqueExceptiona MeshObject exists already in this MeshBase with the specified Identifier
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject createMeshObject(
-            MeshObjectIdentifier identifier,
-            EntityType []   types,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeExpires,
-            boolean         giveUpLock,
-            Proxy           proxyTowardsHomeAndLock )
+            NetMeshObjectIdentifier identifier,
+            EntityType []           types,
+            long                    timeCreated,
+            long                    timeUpdated,
+            long                    timeRead,
+            long                    timeExpires,
+            boolean                 giveUpHomeReplica,
+            boolean                 giveUpLock,
+            Proxy                   proxyTowardsHomeAndLock )
         throws
             IsAbstractException,
-            TransactionException,
             MeshObjectIdentifierNotUniqueException,
-            NotPermittedException;    
-    
+            TransactionException,
+            NotPermittedException;
+
     /**
-     * Create a NetMeshObject that is a replica. Using this method, the created NetMeshObject initially
-     * does not have update rights, and its home replica resides in a different MeshBase. It may also be
-     * linked to other MeshBases in the replication graph.
+     * <p>Create a new replica of an existing NetMeshObject with zero or more types,
+     * with the provided time stamps, the provided NetMeshObjectIdentifier, flags whether to give up the
+     * lock or home replica status should this replica ever acquire either, and all Proxies and their roles.
+     * This call creates a replica of an existing MeshObject, so it is not a "semantic create".</p>
      * 
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
      * 
-     * 
-     * @param identifier the Identifier of the to-be-created MeshObject. If this is null,
-     *                        automatically create a suitable Identifier.
-     * @param types the EntityTypes with which the MeshObject will be blessed
-     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
-     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
-     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
-     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
-     * @param proxies the Proxies in whose direction the other related nodes of the replication graph may be found
-     * @param homeProxyIndex the index, into the proxies array, that identifies the Proxy in whose direction the home replica may be found
-     * @param proxyTowardsLockIndex the index, into the proxies array, that identifies the Proxy in whose direction the update rights may be found
-     * @return the created MeshObject
-     * @throws IsAbstractException thrown if the ENtityType is abstract and cannot be instantiated
+     * @param identifier the identifier of the to-be-created replica. This must not be null.
+     * @param types the EntityTypes with which the NetMeshObject will be blessed
+     * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this NetMeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this NetMeshObject will expire, in System.currentTimeMillis() format
+     * @param giveUpHomeReplica if true, this replica will give up home replica status when asked should it ever acquire it
+     * @param giveUpLock if true, this replica will give up the lock when asked should it ever acquire it
+     * @param proxies all Proxies that are affected by this replica
+     * @param homeProxyIndex the index, into proxies, of the Proxy in whose direction the home replica can be found. This
+     *            replica is the home replica if this value is -1.
+     * @param proxyTowardsLockIndex the index, into proxies, of the Proxy in whose direction the lock can be found. This
+     *            replica is the replica with the lock if this value is -1.
+     * @return the created replica
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a NetMeshObject exists already in this NetMeshBase with the specified identifier
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws IdentifierNoMeshObjectIdentifierNotUniqueExceptionady in this MeshBase with the specified Identifier
-     * @throws NotPermittedException thrown if the blessing operation is not permitted
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject createMeshObject(
-            MeshObjectIdentifier identifier,
-            EntityType []   types,
-            long            timeCreated,
-            long            timeUpdated,
-            long            timeRead,
-            long            timeExpires,
-            boolean         giveUpLock,
-            Proxy []        proxies,
-            int             homeProxyIndex,
-            int             proxyTowardsLockIndex )
+            NetMeshObjectIdentifier identifier,
+            EntityType []           types,
+            long                    timeCreated,
+            long                    timeUpdated,
+            long                    timeRead,
+            long                    timeExpires,
+            boolean                 giveUpHomeReplica,
+            boolean                 giveUpLock,
+            Proxy []                proxies,
+            int                     homeProxyIndex,
+            int                     proxyTowardsLockIndex )
         throws
             IsAbstractException,
             TransactionException,
@@ -351,11 +377,12 @@ public interface NetMeshBaseLifecycleManager
             NotPermittedException;
 
     /**
-     * Purge a non-home replica.
+     * Purge a replica. This method can be applied on all NetMeshObjects in this NetMeshBase,
+     * except the home object of this NetMeshBase.
      *
      * @param replica the non-home replica
      * @throws TransactionException thrown if invoked outside proper Transaction boundaries
-     * @throws MustNotDeleteHomeObjectException thrown if applied to the home object
+     * @throws MustNotDeleteHomeObjectException thrown if applied to the home object of this NetMeshBase
      */
     public abstract void purgeReplica(
             NetMeshObject replica )
@@ -364,11 +391,12 @@ public interface NetMeshBaseLifecycleManager
             MustNotDeleteHomeObjectException;
     
     /**
-     * Purge a non-home replicas.
+     * Purge several replicas. This method can be applied on all NetMeshObjects in this NetMeshBase,
+     * except the home object of this NetMeshBase.
      *
      * @param replicas the non-home replicas
      * @throws TransactionException thrown if invoked outside proper Transaction boundaries
-     * @throws MustNotDeleteHomeObjectException thrown if applied to the home object
+     * @throws MustNotDeleteHomeObjectException thrown if applied to the home object of this NetMeshBase
      */
     public abstract void purgeReplicas(
             NetMeshObject [] replicas )
@@ -377,49 +405,55 @@ public interface NetMeshBaseLifecycleManager
             MustNotDeleteHomeObjectException;
 
     /**
-     * Instantiate a replica MeshObject in this MeshBase, thereby setting 
+     * Instantiate a replica NetMeshObject in this NetMeshBase, thereby setting 
      * up a branch in the replication graph. This may also be invoked if the replica exists
      * already in more complex replication topologies.
      *
-     * @param original the original MeshObject that we copy
-     * @param proxy the Proxy that conveyed this command
-     * @return the created MeshObject
+     * @param original external form of the replica that is being replicated locally
+     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
+     * @return the created NetMeshObject
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject rippleCreate(
             ExternalizedNetMeshObject original,
-            NetMeshBaseIdentifier         proxy )
+            NetMeshBaseIdentifier     proxyIdentifier )
         throws
-            NotPermittedException,
-            TransactionException;
+            TransactionException,
+            NotPermittedException;
 
     /**
-     * Delete a replica MeshObject in this MeshBase, thereby removing a
+     * Delete a replica NetMeshObject in this NetMeshBase, thereby removing a
      * branch in the replication graph.
      * 
-     * @param identifier the Identifier of the MeshObject whose replica is to be deleted
-     * @param proxy the Proxy that conveyed this command
+     * @param identifier the identifier of the NetMeshObject whose replica is to be deleted
+     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
+     * @return the deleted NetMeshObject
+     * @param timeEventOccurred the time at which the delete command occurred
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject rippleDelete(
-            MeshObjectIdentifier   identifier,
-            NetMeshBaseIdentifier proxy,
-            long              time )
+            NetMeshObjectIdentifier identifier,
+            NetMeshBaseIdentifier   proxyIdentifier,
+            long                    timeEventOccurred )
         throws
-            TransactionException;
+            TransactionException,
+            NotPermittedException;
     
     /**
      * Resynchronize a local replica to the provided ExternalizedNetMeshObject.
      * 
-     * @param original the original MeshObject that we copy
-     * @param proxy the Proxy that conveyed this command
-     * @return the created MeshObject
+     * @param original external form of the replica that is being resynchronized locally
+     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
+     * @return the resynchronized NetMeshObject
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     public abstract NetMeshObject resynchronize(
             ExternalizedNetMeshObject original,
-            NetMeshBaseIdentifier         proxy )
+            NetMeshBaseIdentifier     proxyIdentifier )
         throws
-            NotPermittedException,
-            TransactionException;
+            TransactionException,
+            NotPermittedException;
 }

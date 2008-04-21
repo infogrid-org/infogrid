@@ -25,7 +25,7 @@ import java.io.Serializable;
 
 /**
  * This implementation of ExternalizedMeshObject is fully initialized in the
- * constructor.
+ * factory method.
  */
 public class SimpleExternalizedMeshObject
         extends

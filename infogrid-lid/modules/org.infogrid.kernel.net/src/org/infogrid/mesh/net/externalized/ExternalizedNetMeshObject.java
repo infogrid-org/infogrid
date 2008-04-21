@@ -28,28 +28,35 @@ public interface ExternalizedNetMeshObject
             ExternalizedMeshObject
 {
     /**
-     * Obtain the Identifier of the MeshObject.
+     * Obtain the NetMeshObjectIdentifier of the NetMeshObject.
      *
-     * @return the Identifier of the MeshObject
+     * @return the NetMeshObjectIdentifier of the NetMeshObject
      */
     public abstract NetMeshObjectIdentifier getIdentifier();
 
     /**
-     * Obtain the Identifiers of the neighbors of this MeshObject.
+     * Obtain the NetMeshObjectIdentifiers of the neighbors of this NetMeshObject.
      *
-     * @return the Identifiers of the neighbors
+     * @return the NetMeshObjectIdentifiers of the neighbors
      * @see #getRoleTypes
      */
     public abstract NetMeshObjectIdentifier [] getNeighbors();
 
     /**
-     * Obtain the Identifiers of the MeshObjects that participate in an equivalence
-     * set with this MeshObject.
+     * Obtain the NetMeshObjectIdentifiers of the NetMeshObjects that participate in an equivalence
+     * set with this NetMeshObject.
      *
-     * @return the Identifiers. May be null.
+     * @return the NetMeshObjectIdentifiers. May be null.
      */
     public abstract NetMeshObjectIdentifier [] getEquivalents();
     
+    /**
+     * Obtain the GiveUpHomeReplica property.
+     * 
+     * @return the GiveUpHomeReplica property
+     */
+    public abstract boolean getGiveUpHomeReplica();
+
     /**
      * Obtain the GiveUpLock property.
      *
@@ -58,11 +65,11 @@ public interface ExternalizedNetMeshObject
     public abstract boolean getGiveUpLock();
 
     /**
-     * Obtain the NetworkIdentifiers of all Proxies.
+     * Obtain the NetMeshBaseIdentifiers of all Proxies affected by this NetMeshObject.
      *
-     * @return the NetworkIdentifiers, if any
+     * @return the NetMeshBaseIdentifiers, if any
      */
-    public abstract NetMeshBaseIdentifier[] getProxyNames();
+    public abstract NetMeshBaseIdentifier[] getProxyIdentifiers();
 
     /**
      * Obtain the NetMeshBaseIdentifier of the Proxy towards the home replica.

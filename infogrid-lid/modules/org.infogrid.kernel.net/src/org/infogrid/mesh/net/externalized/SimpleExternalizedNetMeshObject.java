@@ -26,7 +26,8 @@ import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.util.StringHelper;
 
 /**
- *
+ * This implementation of ExternalizedNetMeshObject is fully initialized in the
+ * factory method.
  */
 public class SimpleExternalizedNetMeshObject
         extends
@@ -34,8 +35,30 @@ public class SimpleExternalizedNetMeshObject
         implements
             ExternalizedNetMeshObject
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Factory method.
+     * 
+     * @param identifier the NetMeshObjectIdentifier of the NetMeshObject
+     * @param typeNames the MeshTypeIdentifier identifying the EntityTypes with which the NetMeshObject is currently blessed
+     * @param timeCreated the time the NetMeshObject was created
+     * @param timeUpdated the time the NetMeshObject was last updated
+     * @param timeRead the time the NetMeshObject was last read
+     * @param timeExpires the time the NetMeshObject will expire
+     * @param propertyTypes the current PropertyTypes of the NetMeshObject, in the same sequence as propertyValues
+     * @param propertyValues the current values of the PropertyTypes, in the same sequence as propertyTypes
+     * @param neighbors the NetMeshObjectIdentifiers of the directly related NetMeshObjects
+     * @param roleTypes the MeshTypeIdentifiers of the RoleTypes applicable to the neighbors, in the same sequence
+     * @param equivalents the NetMeshObjectIdentifiers of the current left and right equivalent NetMeshObject, if any
+     * @param giveUpHomeReplica if true, this replica will give up home replica status when asked
+     * @param giveUpLock if true, this replica will give up the lock when asked
+     * @param proxyIdentifiers the partner NetMeshBaseIdentifiers of all Proxies affected by this NetMeshObject
+     * @param proxyTowardsHomeIndex index, into proxyIdentifiers, selecting the NetMeshBaseIdentifier of the Proxy in whose
+     *        direction the home replica may be found
+     * @param proxyTowardsLockIndex index, into proxyIdentifiers, selecting the NetMeshBaseIdentifier of the Proxy in whose
+     *        direction the lock may be found
+     * @return the created SimpleExternalizedNetMeshObject
      */
     public static SimpleExternalizedNetMeshObject create(
             NetMeshObjectIdentifier    identifier,
@@ -49,8 +72,9 @@ public class SimpleExternalizedNetMeshObject
             NetMeshObjectIdentifier [] neighbors,
             MeshTypeIdentifier [][]    roleTypes,
             NetMeshObjectIdentifier [] equivalents,
+            boolean                    giveUpHomeReplica,
             boolean                    giveUpLock,
-            NetMeshBaseIdentifier []   proxyNames,
+            NetMeshBaseIdentifier []   proxyIdentifiers,
             int                        proxyTowardsHomeIndex,
             int                        proxyTowardsLockIndex )
     {
@@ -112,8 +136,9 @@ public class SimpleExternalizedNetMeshObject
                 neighbors,
                 roleTypes,
                 equivalents,
+                giveUpHomeReplica,
                 giveUpLock,
-                proxyNames,
+                proxyIdentifiers,
                 proxyTowardsHomeIndex,
                 proxyTowardsLockIndex );
 
@@ -122,6 +147,25 @@ public class SimpleExternalizedNetMeshObject
     
     /**
      * Constructor.
+     * 
+     * @param identifier the NetMeshObjectIdentifier of the NetMeshObject
+     * @param typeNames the MeshTypeIdentifier identifying the EntityTypes with which the NetMeshObject is currently blessed
+     * @param timeCreated the time the NetMeshObject was created
+     * @param timeUpdated the time the NetMeshObject was last updated
+     * @param timeRead the time the NetMeshObject was last read
+     * @param timeExpires the time the NetMeshObject will expire
+     * @param propertyTypes the current PropertyTypes of the NetMeshObject, in the same sequence as propertyValues
+     * @param propertyValues the current values of the PropertyTypes, in the same sequence as propertyTypes
+     * @param neighbors the NetMeshObjectIdentifiers of the directly related NetMeshObjects
+     * @param roleTypes the MeshTypeIdentifiers of the RoleTypes applicable to the neighbors, in the same sequence
+     * @param equivalents the NetMeshObjectIdentifiers of the current left and right equivalent NetMeshObject, if any
+     * @param giveUpHomeReplica if true, this replica will give up home replica status when asked
+     * @param giveUpLock if true, this replica will give up the lock when asked
+     * @param proxyIdentifiers the partner NetMeshBaseIdentifiers of all Proxies affected by this NetMeshObject
+     * @param proxyTowardsHomeIndex index, into proxyIdentifiers, selecting the NetMeshBaseIdentifier of the Proxy in whose
+     *        direction the home replica may be found
+     * @param proxyTowardsLockIndex index, into proxyIdentifiers, selecting the NetMeshBaseIdentifier of the Proxy in whose
+     *        direction the lock may be found
      */
     protected SimpleExternalizedNetMeshObject(
             NetMeshObjectIdentifier    identifier,
@@ -135,8 +179,9 @@ public class SimpleExternalizedNetMeshObject
             NetMeshObjectIdentifier [] neighbors,
             MeshTypeIdentifier [][]    roleTypes,
             NetMeshObjectIdentifier [] equivalents,
+            boolean                    giveUpHomeReplica,
             boolean                    giveUpLock,
-            NetMeshBaseIdentifier[]    proxyNames,
+            NetMeshBaseIdentifier[]    proxyIdentifiers,
             int                        proxyTowardsHomeIndex,
             int                        proxyTowardsLockIndex )
 {
@@ -152,17 +197,19 @@ public class SimpleExternalizedNetMeshObject
                 roleTypes,
                 equivalents );
 
-        theGiveUpLock = giveUpLock;
-        theProxyNames = proxyNames != null ? proxyNames : new NetMeshBaseIdentifier[0];
+        theGiveUpHomeReplica = giveUpHomeReplica;
+        theGiveUpLock        = giveUpLock;
+
+        theProxyIdentifiers = proxyIdentifiers != null ? proxyIdentifiers : new NetMeshBaseIdentifier[0];
 
         theProxyTowardsHomeIndex = proxyTowardsHomeIndex;
         theProxyTowardsLockIndex = proxyTowardsLockIndex;
     }
     
     /**
-     * Obtain the Identifier of the MeshObject.
+     * Obtain the NetMeshObjectIdentifier of the NetMeshObject.
      *
-     * @return the Identifier of the MeshObject
+     * @return the NetMeshObjectIdentifier of the NetMeshObject
      */
     @Override
     public NetMeshObjectIdentifier getIdentifier()
@@ -171,10 +218,10 @@ public class SimpleExternalizedNetMeshObject
     }
     
     /**
-     * Obtain the Identifiers of the neighbors of this MeshObject.
-     * 
-     * @return the Identifiers of the neighbors
-     * @see #getTypes
+     * Obtain the NetMeshObjectIdentifiers of the neighbors of this NetMeshObject.
+     *
+     * @return the NetMeshObjectIdentifiers of the neighbors
+     * @see #getRoleTypes
      */
     @Override
     public NetMeshObjectIdentifier [] getNeighbors()
@@ -183,9 +230,10 @@ public class SimpleExternalizedNetMeshObject
     }
 
     /**
-     * Get the MeshObject's equivalents, if any.
+     * Obtain the NetMeshObjectIdentifiers of the NetMeshObjects that participate in an equivalence
+     * set with this NetMeshObject.
      *
-     * @return the equivalents' Identifiers.
+     * @return the NetMeshObjectIdentifiers. May be null.
      */
     @Override
     public NetMeshObjectIdentifier[] getEquivalents()
@@ -193,6 +241,16 @@ public class SimpleExternalizedNetMeshObject
         return (NetMeshObjectIdentifier []) super.getEquivalents();
     }
     
+    /**
+     * Obtain the GiveUpHomeReplica property.
+     * 
+     * @return the GiveUpHomeReplica property
+     */
+    public final boolean getGiveUpHomeReplica()
+    {
+        return theGiveUpHomeReplica;
+    }
+
     /**
      * Obtain the GiveUpLock property.
      *
@@ -204,13 +262,13 @@ public class SimpleExternalizedNetMeshObject
     }
 
     /**
-     * Obtain the NetworkIdentifiers of all Proxies.
+     * Obtain the NetMeshBaseIdentifiers of all Proxies affected by this NetMeshObject.
      *
-     * @return the NetworkIdentifiers, if any
+     * @return the NetMeshBaseIdentifiers, if any
      */
-    public final NetMeshBaseIdentifier[] getProxyNames()
+    public final NetMeshBaseIdentifier[] getProxyIdentifiers()
     {
-        return theProxyNames;
+        return theProxyIdentifiers;
     }
 
     /**
@@ -220,10 +278,10 @@ public class SimpleExternalizedNetMeshObject
      */
     public final NetMeshBaseIdentifier getProxyTowardsHomeNetworkIdentifier()
     {
-        if( theProxyNames == null || theProxyTowardsHomeIndex == HERE_CONSTANT ) {
+        if( theProxyIdentifiers == null || theProxyTowardsHomeIndex == HERE_CONSTANT ) {
             return null;
         } else {
-            return theProxyNames[ theProxyTowardsHomeIndex ];
+            return theProxyIdentifiers[ theProxyTowardsHomeIndex ];
         }
     }
 
@@ -234,10 +292,10 @@ public class SimpleExternalizedNetMeshObject
      */
     public final NetMeshBaseIdentifier getProxyTowardsLockNetworkIdentifier()
     {
-        if( theProxyNames == null || theProxyTowardsLockIndex == HERE_CONSTANT ) {
+        if( theProxyIdentifiers == null || theProxyTowardsLockIndex == HERE_CONSTANT ) {
             return null;
         } else {
-            return theProxyNames[ theProxyTowardsLockIndex ];
+            return theProxyIdentifiers[ theProxyTowardsLockIndex ];
         }
     }
     
@@ -264,7 +322,7 @@ public class SimpleExternalizedNetMeshObject
                     "theRoleTypes",
                     "theEquivalents",
                     "theGiveUpLock",
-                    "theProxyNames",
+                    "theProxyIdentifiers",
                     "theProxyTowardsHomeIndex",
                     "theProxyTowardsLockIndex"
                 },
@@ -281,7 +339,7 @@ public class SimpleExternalizedNetMeshObject
                     theRoleTypes,
                     theEquivalents,
                     theGiveUpLock,
-                    theProxyNames,
+                    theProxyIdentifiers,
                     theProxyTowardsHomeIndex,
                     theProxyTowardsLockIndex
                 },
@@ -289,24 +347,29 @@ public class SimpleExternalizedNetMeshObject
     }
     
     /**
+     * The GiveUpHomeReplica property.
+     */
+    protected boolean theGiveUpHomeReplica;
+    
+    /**
      * The GiveUpLock property.
      */
     protected boolean theGiveUpLock;
     
     /**
-     * NetworkIdentifiers for the Proxies to other NetworkedMeshBases that contain the replicas that are
+     * NetMeshBaseIdentifier for the Proxies to other NetworkedMeshBases that contain the replicas that are
      * closest in the replication graph. This may be null.
      */
-    protected NetMeshBaseIdentifier[] theProxyNames;
+    protected NetMeshBaseIdentifier [] theProxyIdentifiers;
 
     /**
-     * The index into theProxies that represents our home Proxy. If this is HERE_CONSTANT, it
+     * The index into theProxyIdentifiers that represents our home Proxy. If this is HERE_CONSTANT, it
      * indicates that this is the home replica.
      */
     protected int theProxyTowardsHomeIndex = HERE_CONSTANT;
     
     /**
-     * The index into theProxies that represents the Proxy towards the lock. If this
+     * The index into theProxyIdentifiers that represents the Proxy towards the lock. If this
      * is HERE_CONSTANT, it indicates that this replica has the lock.
      */
     protected int theProxyTowardsLockIndex = HERE_CONSTANT;

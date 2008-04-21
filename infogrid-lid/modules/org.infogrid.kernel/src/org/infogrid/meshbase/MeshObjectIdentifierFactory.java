@@ -48,7 +48,7 @@ public interface MeshObjectIdentifierFactory
      *
      * @param raw the external form
      * @return the created MeshObjectIdentifier
-     * @throws URISyntaxException a parsing error occurred
+     * @throws URISyntaxException thrown if a parsing error occurred
      */
     public MeshObjectIdentifier fromExternalForm(
             String raw )
@@ -61,6 +61,7 @@ public interface MeshObjectIdentifierFactory
      * @param representation the StringRepresentation in which this String is represented
      * @param s the String to parse
      * @return the created MeshObjectIdentifier
+     * @throws URISyntaxException thrown if a parsing error occurred
      */
     public MeshObjectIdentifier fromStringRepresentation(
             StringRepresentation representation,
