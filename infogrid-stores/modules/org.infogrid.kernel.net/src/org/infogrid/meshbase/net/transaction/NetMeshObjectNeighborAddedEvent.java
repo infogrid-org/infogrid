@@ -294,7 +294,7 @@ public class NetMeshObjectNeighborAddedEvent
             roleTypes           = getProperty();
 
             for( int i=0 ; i<relatedOtherObjects.length ; ++i ) {
-                otherObject.rippleRelate( relatedOtherObjects[i], base );
+                otherObject.rippleRelate( relatedOtherObjects[i] );
                 if( roleTypes != null && roleTypes.length > 0 ) {
                     otherObject.rippleBless( roleTypes, relatedOtherObjects[i] );
                 }

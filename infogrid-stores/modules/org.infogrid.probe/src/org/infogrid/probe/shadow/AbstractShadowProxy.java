@@ -16,6 +16,7 @@ package org.infogrid.probe.shadow;
 
 import org.infogrid.comm.MessageEndpoint;
 
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.AbstractProxy;
 import org.infogrid.meshbase.net.NetMeshBase;
 
@@ -87,20 +88,14 @@ public abstract class AbstractShadowProxy
 
         ChangeSet queued = ChangeSet.create();
         
-        // deal with conveyed objects
-        if( incoming.getConveyedMeshObjects() != null && incoming.getConveyedMeshObjects().length > 0 ) {
-            NetMeshObjectCreatedEvent [] creationChanges = incoming.getCreations();
-
-            for( NetMeshObjectCreatedEvent current : creationChanges ) {
-                queued.addChange( current );
-            }
-        }
+        // we skip conveyed objects -- only when the home has been pushed here, and that's currently not implemented
 
         // deal with type changes
         if( incoming.getTypeAdditions() != null ) {
             NetMeshObjectTypeAddedEvent [] typeChanges = incoming.getTypeAdditions();
 
             for( NetMeshObjectTypeAddedEvent current : typeChanges ) {
+                current.setResolver( theMeshBase );
                 queued.addChange( current );
             }
         }
@@ -108,6 +103,7 @@ public abstract class AbstractShadowProxy
             NetMeshObjectTypeRemovedEvent [] typeChanges = incoming.getTypeRemovals();
 
             for( NetMeshObjectTypeRemovedEvent current : typeChanges ) {
+                current.setResolver( theMeshBase );
                 queued.addChange( current );
             }
         }
@@ -117,6 +113,7 @@ public abstract class AbstractShadowProxy
             NetMeshObjectNeighborAddedEvent [] neighborAdditions = incoming.getNeighborAdditions();
 
             for( NetMeshObjectNeighborAddedEvent current : neighborAdditions ) {
+                current.setResolver( theMeshBase );
                 queued.addChange( current );
             }
         }
@@ -124,6 +121,7 @@ public abstract class AbstractShadowProxy
             NetMeshObjectNeighborRemovedEvent [] neighborRemovals = incoming.getNeighborRemovals();
 
             for( NetMeshObjectNeighborRemovedEvent current : neighborRemovals ) {
+                current.setResolver( theMeshBase );
                 queued.addChange( current );
             }
         }
@@ -131,6 +129,7 @@ public abstract class AbstractShadowProxy
             NetMeshObjectRoleAddedEvent [] roleChanges = incoming.getRoleAdditions();
 
             for( NetMeshObjectRoleAddedEvent current : roleChanges ) {
+                current.setResolver( theMeshBase );
                 queued.addChange( current );
             }
         }
@@ -138,6 +137,7 @@ public abstract class AbstractShadowProxy
             NetMeshObjectRoleRemovedEvent [] roleChanges = incoming.getRoleRemovals();
 
             for( NetMeshObjectRoleRemovedEvent current : roleChanges ) {
+                current.setResolver( theMeshBase );
                 queued.addChange( current );
             }
         }
@@ -147,15 +147,17 @@ public abstract class AbstractShadowProxy
             NetMeshObjectPropertyChangeEvent [] propertyChanges = incoming.getPropertyChanges();
 
             for( NetMeshObjectPropertyChangeEvent current : propertyChanges ) {
+                current.setResolver( theMeshBase );
                 queued.addChange( current );
             }
         }
 
         // deal with deleted objects
-        if( incoming.getDeleteChanges() != null ) {
-            NetMeshObjectDeletedEvent [] deletions = incoming.getDeleteChanges();
+        if( incoming.getDeletions() != null ) {
+            NetMeshObjectDeletedEvent [] deletions = incoming.getDeletions();
 
             for( NetMeshObjectDeletedEvent current : deletions ) {
+                current.setResolver( theMeshBase );
                 queued.addChange( current );
             }
         }

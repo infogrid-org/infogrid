@@ -19,7 +19,7 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 
 /**
- * An Identifier for NetMeshObjects.
+ * Extends MeshObjectIdentifier for NetMeshObjects.
  */
 public interface NetMeshObjectIdentifier
         extends

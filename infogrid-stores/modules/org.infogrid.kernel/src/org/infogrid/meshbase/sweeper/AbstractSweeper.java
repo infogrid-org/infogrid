@@ -127,13 +127,12 @@ public abstract class AbstractSweeper
             log.error( ex );
             
         } finally {
-            if( access != null ) {
-                access.sudone();
-            }
-            
             if( tx != null ) {
                 tx.commitTransaction();
             }
+            if( access != null ) {
+                access.sudone();
+            }            
         }
     }
 }

@@ -399,7 +399,7 @@ public interface MeshObject
      * Unrelate this MeshObject from another MeshObject. This will also remove all blessings from the relationship.
      *
      * @param otherObject the MeshObject to unrelate from
-     * @throws NotRelatedException thrown if this MeshObject is not already related to the otherObject
+     * @throws NotRelatedException thrown if this MeshObject is not related to the otherObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      * @see #relate

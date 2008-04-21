@@ -48,6 +48,7 @@ import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
 
 import java.util.ArrayList;
+import org.infogrid.mesh.NotPermittedException;
 
 /**
  * The subclass of MeshBase suitable for the AMeshObject implementation.
@@ -81,10 +82,10 @@ public abstract class AMeshBase
         super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, context );
     }
 
-    /**
-     * <p>Obtain a manager for object lifecycles.</p>
+   /**
+     * <p>Obtain a manager for MeshObject lifecycles.</p>
      * 
-     * @return a MeshBaseLifecycleManagerthat works on this MeshBase with the specified parameters
+     * @return a MeshBaseLifecycleManager that works on this MeshBase
      */
     public synchronized AMeshBaseLifecycleManager getMeshBaseLifecycleManager()
     {
@@ -95,52 +96,10 @@ public abstract class AMeshBase
     }
 
     /**
-     * Update the lastUpdated property. This is delegated to here so ShadowMeshBases
-     * and do this differently than regular NetMeshBases.
-     *
-     * @param timeUpdated the time to set to, or -1L to indicate the current time
-     * @param lastTimeUpdated the time this MeshObject was updated the last time
-     * @return the time to set to
-     */
-    public long calculateLastUpdated(
-            long timeUpdated,
-            long lastTimeUpdated )
-    {
-        long ret;
-        if( timeUpdated != -1L ) {
-            ret = timeUpdated;
-        } else {
-            ret = System.currentTimeMillis();
-        }
-        return ret;
-    }
-
-    /**
-     * Update the lastRead property. This does not trigger an event generation -- not necessary.
-     * This may be overridden.
-     *
-     * @param timeRead the time to set to, or -1L to indicate the current time
-     * @param lastTimeRead the time this MeshObject was read the last time
-     * @return the time to set to
-     */
-    public long calculateLastRead(
-            long timeRead,
-            long lastTimeRead )
-    {
-        long ret;
-        if( timeRead != -1L ) {
-            ret = timeRead;
-        } else {
-            ret = System.currentTimeMillis();
-        }
-        return ret;
-    }
-
-    /**
-     * <p>Determine the set of MeshObjects that are neighbors of all of the passed-in MeshObjects
-     * while playing particular RoleTypes.</p>
-     * <p>This is a convenience method that can have substantial performance benefits, depending on
-     * the underlying implementation of MeshObject.</p>
+     * Determine the set of MeshObjects that are neighbors of all of the passed-in MeshObjects
+     * while playing particular RoleTypes.
+     * This is a convenience method that can have substantial performance benefits, depending on
+     * the underlying implementation of MeshObject.
      *
      * @param all the MeshObjects whose common neighbors we seek.
      * @param allTypes the RoleTypes to be played by the MeshObject at the same position in the array
@@ -204,6 +163,10 @@ public abstract class AMeshBase
             } catch( MeshObjectAccessException ex ) {
                 log.error( ex );
                 ret = ex.getBestEffortResult();
+
+            } catch( NotPermittedException ex ) {
+                log.error( ex );
+                ret = new MeshObject[0];
             }
             return theMeshObjectSetFactory.createImmutableMeshObjectSet( ret );
         }
@@ -211,8 +174,7 @@ public abstract class AMeshBase
 
 
     /**
-     * This method may be overridden by subclasses to perform suitable actions when a
-     * Transaction was committed.
+     * Update the cache when Transactions are committed.
      *
      * @param tx Transaction the Transaction that was committed
      */
@@ -220,7 +182,6 @@ public abstract class AMeshBase
     protected void transactionCommittedHook(
             Transaction tx )
     {
-        // FIXME? Should this be done asynchronously?
         Change [] theChanges = tx.getChangeSet().getChanges();
 
         ArrayList<MeshObjectIdentifier> writtenAlready = new ArrayList<MeshObjectIdentifier>( theChanges.length );
@@ -277,21 +238,56 @@ public abstract class AMeshBase
     }
 
     /**
+     * Update the lastUpdated property. This is delegated to here so ShadowMeshBases
+     * can do this differently than regular MeshBases.
+     *
+     * @param timeUpdated the time to set to, or -1L to indicate the current time
+     * @param lastTimeUpdated the time this MeshObject was updated the last time
+     * @return the time to set to
+     */
+    public long calculateLastUpdated(
+            long timeUpdated,
+            long lastTimeUpdated )
+    {
+        long ret;
+        if( timeUpdated != -1L ) {
+            ret = timeUpdated;
+        } else {
+            ret = System.currentTimeMillis();
+        }
+        return ret;
+    }
+
+    /**
+     * Update the lastRead property. This is delegated to here so ShadowMeshBases
+     * can do this differently than regular MeshBases.
+     *
+     * @param timeRead the time to set to, or -1L to indicate the current time
+     * @param lastTimeRead the time this MeshObject was read the last time
+     * @return the time to set to
+     */
+    public long calculateLastRead(
+            long timeRead,
+            long lastTimeRead )
+    {
+        long ret;
+        if( timeRead != -1L ) {
+            ret = timeRead;
+        } else {
+            ret = System.currentTimeMillis();
+        }
+        return ret;
+    }
+
+    /**
      * Obtain the right ResourceHelper for StringRepresentation.
+     * This is factored out so it can be easily overridden in subclasses.
      * 
      * @return the ResourceHelper
      */
     protected ResourceHelper getResourceHelperForStringRepresentation()
     {
         return ResourceHelper.getInstance( AMeshBase.class );
-    }
-
-    /**
-     * Enable AMeshObject to access the MeshObjectSetFactory.
-     */
-    public MeshObjectSetFactory getDefaultMeshObjectSetFactory()
-    {
-        return theMeshObjectSetFactory;
     }
 
     /**

@@ -29,10 +29,13 @@ public class MeshObjectsNotFoundException
         extends
             MeshObjectAccessException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      * 
-     * @param identifier the Identifier of the MeshObject that was not found
+     * @param mb the MeshBase that threw this Exception
+     * @param identifier the identifier of the MeshObject that was not found
      */
     public MeshObjectsNotFoundException(
             MeshBase             mb,
@@ -44,7 +47,10 @@ public class MeshObjectsNotFoundException
     /**
      * Constructor.
      * 
-     * @param identifiers the Identifiers of the MeshObjects that were not found
+     * @param mb the MeshBase that threw this Exception
+     * @param identifiers the identifiers of the MeshObjects some of which were not found
+     * @param partialResult the subset of MeshObjects that were found, in the same sequence and position as identifiers.
+     *        MeshObjects that were not found are null in this array.
      */
     public MeshObjectsNotFoundException(
             MeshBase                mb,

@@ -114,7 +114,7 @@ public class ExternalizedNetMeshObjectXmlEncoder
     {
         ExternalizedNetMeshObject realObject = (ExternalizedNetMeshObject) theObject;
 
-        NetMeshBaseIdentifier [] proxyNames = realObject.getProxyNames();
+        NetMeshBaseIdentifier [] proxyNames = realObject.getProxyIdentifiers();
         NetMeshBaseIdentifier    homeProxy  = realObject.getProxyTowardsHomeNetworkIdentifier();
         NetMeshBaseIdentifier    lockProxy  = realObject.getProxyTowardsLockNetworkIdentifier();
         

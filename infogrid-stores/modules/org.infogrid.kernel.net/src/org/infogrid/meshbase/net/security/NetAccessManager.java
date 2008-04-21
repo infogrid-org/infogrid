@@ -14,9 +14,8 @@
 
 package org.infogrid.meshbase.net.security;
 
-import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.meshbase.net.NetMeshBase;
-import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 
@@ -32,13 +31,12 @@ public interface NetAccessManager
      * provided NetMeshObjectAccessSpecification.
      *
      * @param mb the MeshBase in which the Exception occurred
-     * @param partialResult a partial result, if any, available at the time the Exception occurred
      * @param failedPaths the access path that was used
+     * @throws NotPermittedException thrown if it is not permitted
      */
     public void checkPermittedAccessLocally(
             NetMeshBase                         mb,
-            NetMeshObject []                    partialResults,
             NetMeshObjectAccessSpecification [] failedPaths )
         throws
-            NetMeshObjectAccessException;
+            NotPermittedException;
 }

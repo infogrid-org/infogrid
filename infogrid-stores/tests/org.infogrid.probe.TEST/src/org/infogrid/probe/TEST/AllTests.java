@@ -125,6 +125,9 @@ public class AllTests
                         new String [] {
                                 AbstractTest.fileSystemFile( ShadowTest3.class, "ShadowTest3a.html" ) // ShadowTest3b.xml referenced from ShadowTest3a.html
                         } ),
+//                new TestSpec(
+//                        ShadowTest4.class,
+//                        noArgs ),
 
                 new TestSpec(
                         ProbeUpdateCalculatorTest1.class,

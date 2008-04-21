@@ -29,6 +29,8 @@ public class LeaseManagementEvent
         extends
             EventObject
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

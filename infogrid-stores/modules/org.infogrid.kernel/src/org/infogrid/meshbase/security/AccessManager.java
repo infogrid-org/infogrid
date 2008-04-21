@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.security;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.meshbase.transaction.TransactionException;
 
@@ -24,8 +25,18 @@ import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.RoleType;
 
 /**
- * Manages access control rights associated with Threads on behalf of a MeshBase.
- * This is an interface so different implementations are possible. 
+ * <p>Manages access control rights associated with Threads on behalf of a MeshBase.
+ * This is an interface so different implementations are possible.</p>
+ * <p>To change identities associated with a thread, the following coding pattern
+ * is recommended:</p>
+ * <pre>
+ * try {
+ *     setCaller( theCaller );
+ *     performWork();
+ * } finally {
+ *     unsetCaller();
+ * }
+ * </pre>
  */
 public interface AccessManager
 {
@@ -48,18 +59,11 @@ public interface AccessManager
 
     /**
      * Set the identity of the caller on this Thread. This will unset any previous
-     * identity set on this Thread. Generally, the sequence of invocation should be:
-     * <pre>
-     * try {
-     *     setCaller( theCaller );
-     *     performWork();
-     * } finally {
-     *     unsetCaller();
-     * }
-     * </pre>
+     * identity set on this Thread.
      *
      * @param caller the caller, or null if anonymous
      * @return the previously set caller, if any
+     * @throws IdentityChangeException thrown if the current caller was not authorized to perform this operation
      * @see #getCaller
      * @see #unsetCaller
      */
@@ -73,6 +77,7 @@ public interface AccessManager
      * is done, for example.
      *
      * @return the previously set caller, if any
+     * @throws IdentityChangeException thrown if the current caller was not authorized to perform this operation
      * @see #getCaller
      * @see #setCaller
      */
@@ -83,6 +88,8 @@ public interface AccessManager
     /**
      * Make the current Thread have super-user rights. This is very similar to common
      * operating-systems calls.
+     * 
+     * @throws IdentityChangeException thrown if the current caller was not authorized to perform this operation
      */
     public void sudo()
         throws
@@ -107,6 +114,18 @@ public interface AccessManager
             MeshObject newOwner )
         throws
             TransactionException;
+    
+    /**
+     * Check whether it is permitted to semantically create a MeshObject with the provided
+     * MeshObjectIdentifier.
+     * 
+     * @param identifier the MeshObjectIdentifier
+     * @throws NotPermittedException thrown if it is not permitted
+     */
+    public void checkPermittedCreate(
+            MeshObjectIdentifier identifier )
+        throws
+            NotPermittedException;
     
     /**
      * Check whether it is permitted to set a MeshObject's timeExpires to the given value.
@@ -191,43 +210,43 @@ public interface AccessManager
             NotPermittedException;
 
     /**
-     * Check whether it is permitted to bless the relationship to the otherObject with the
+     * Check whether it is permitted to bless the relationship to the neighbor with the
      * provided RoleTypes.
      * 
      * @param obj the MeshObject
      * @param thisEnds the RoleTypes to bless the relationship with
-     * @param otherObject the neighbor to which this MeshObject is related
+     * @param neighbor the neighbor to which this MeshObject is related
      * @throws NotPermittedException thrown if it is not permitted
      */
     public void checkPermittedBless(
             MeshObject  obj,
             RoleType [] thisEnds,
-            MeshObject  otherObject )
+            MeshObject  neighbor )
         throws
             NotPermittedException;
 
     /**
-     * Check whether it is permitted to unbless the relationship to the otherObject from the
+     * Check whether it is permitted to unbless the relationship to the neighbor from the
      * provided RoleTypes.
      * 
      * @param obj the MeshObject
      * @param thisEnds the RoleTypes to unbless the relationship from
-     * @param otherObject the neighbor to which this MeshObject is related
+     * @param neighbor the neighbor to which this MeshObject is related
      * @throws NotPermittedException thrown if it is not permitted
      */
     public void checkPermittedUnbless(
             MeshObject  obj,
             RoleType [] thisEnds,
-            MeshObject  otherObject )
+            MeshObject  neighbor )
         throws
             NotPermittedException;
 
     /**
-     * Check whether it is permitted to traverse the given ByRoleType from this MeshObject to the
+     * Check whether it is permitted to traverse the given RoleType from this MeshObject to the
      * given MeshObject.
      * 
      * @param obj the MeshObject
-     * @param toTraverse the ByRoleType to traverse
+     * @param toTraverse the RoleType to traverse
      * @param otherObject the reached MeshObject in the traversal
      * @throws NotPermittedException thrown if it is not permitted
      */
@@ -239,12 +258,12 @@ public interface AccessManager
             NotPermittedException;
 
     /**
-     * Check whether it is permitted to bless the relationship with the given otherObject with
+     * Check whether it is permitted to bless the relationship with the given neighbor with
      * the given thisEnds RoleTypes.
      * 
      * @param obj the MeshObject
      * @param thisEnds the RoleTypes to bless the relationship with
-     * @param otherObject the neighbor to which this MeshObject is related
+     * @param neighbor the neighbor to which this MeshObject is related
      * @param roleTypesToAsk the RoleTypes, of the relationship with RoleTypesToAskUsed, which to as
      * @param roleTypesToAskUsed the neighbor MeshObject whose rules may have an opinion on the blessing of the relationship with otherObject
      * @throws NotPermittedException thrown if it is not permitted
@@ -252,20 +271,19 @@ public interface AccessManager
     public void checkPermittedBless(
             MeshObject  obj,
             RoleType [] thisEnds,
-            MeshObject  otherObject,
+            MeshObject  neighbor,
             RoleType [] roleTypesToAsk,
             MeshObject  roleTypesToAskUsed )
         throws
             NotPermittedException;
 
     /**
-     * Check whether it is permitted to unbless the relationship from the given otherObject with
-     * the given thisEnds RoleTypes. Subclasses
-     * may override this.
+     * Check whether it is permitted to unbless the relationship from the given neighbor from
+     * the given thisEnds RoleTypes.
      * 
      * @param obj the MeshObject
      * @param thisEnds the RoleTypes to unbless the relationship from
-     * @param otherObject the neighbor to which this MeshObject is related
+     * @param neighbor the neighbor to which this MeshObject is related
      * @param roleTypesToAsk the RoleTypes, of the relationship with RoleTypesToAskUsed, which to as
      * @param roleTypesToAskUsed the neighbor MeshObject whose rules may have an opinion on the blessing of the relationship with otherObject
      * @throws NotPermittedException thrown if it is not permitted
@@ -273,7 +291,7 @@ public interface AccessManager
     public void checkPermittedUnbless(
             MeshObject  obj,
             RoleType [] thisEnds,
-            MeshObject  otherObject,
+            MeshObject  neighbor,
             RoleType [] roleTypesToAsk,
             MeshObject  roleTypesToAskUsed )
         throws
@@ -299,7 +317,6 @@ public interface AccessManager
     /**
      * Check whether it is permitted to remove a MeshObject from the equivalence set
      * it is currently a member of.
-     * Subclasses may override this.
      * 
      * @param obj the MeshObject to remove
      * @param roleTypesToAsk the RoleTypes to ask

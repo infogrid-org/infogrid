@@ -106,7 +106,7 @@ public class XprisoTest11
         checkEquals( mb2.size(), 1, "wrong number of objects after sweeping" );
 
         checkEquals(    obj1_mb1.getAllProxies(), null, "Wrong number of Proxies on obj1_mb1" );
-        checkCondition( obj1_mb1.doWeHaveLock(), "obj1_mb1 did not re-acquire lock" );
+        checkCondition( obj1_mb1.hasLock(), "obj1_mb1 did not re-acquire lock" );
         checkCondition( obj1_mb2.getIsDead(), "obj1_mb2 not dead" );
 
         //
