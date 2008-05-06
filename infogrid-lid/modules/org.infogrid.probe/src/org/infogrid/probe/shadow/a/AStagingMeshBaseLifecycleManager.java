@@ -97,6 +97,7 @@ public class AStagingMeshBaseLifecycleManager
                 -1L,
                 -1L,
                 -1L,
+                ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpHomeReplica(),                
                 ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpLock());                
     }
 
@@ -123,6 +124,7 @@ public class AStagingMeshBaseLifecycleManager
                 -1L,
                 -1L,
                 -1L,
+                ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpHomeReplica(),                
                 ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpLock());        
     }
 
@@ -151,6 +153,7 @@ public class AStagingMeshBaseLifecycleManager
                 -1L,
                 -1L,
                 -1L,
+                ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpHomeReplica(),                
                 ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpLock());        
     }
 
@@ -176,6 +179,7 @@ public class AStagingMeshBaseLifecycleManager
                 -1L,
                 -1L,
                 -1L,
+                ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpHomeReplica(),                
                 ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpLock());
     }
 
@@ -205,6 +209,7 @@ public class AStagingMeshBaseLifecycleManager
                 -1L,
                 -1L,
                 -1L,
+                ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpHomeReplica(),                
                 ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpLock());
     }
 
@@ -234,6 +239,7 @@ public class AStagingMeshBaseLifecycleManager
                 -1L,
                 -1L,
                 -1L,
+                ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpHomeReplica(),                
                 ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpLock());
     }
 
@@ -258,6 +264,7 @@ public class AStagingMeshBaseLifecycleManager
                 -1L,
                 -1L,
                 -1L,
+                ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpHomeReplica(),                
                 ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpLock());
     }
 
@@ -285,6 +292,7 @@ public class AStagingMeshBaseLifecycleManager
                 -1L,
                 -1L,
                 -1L,
+                ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpHomeReplica(),                
                 ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpLock());
     }
 
@@ -312,6 +320,7 @@ public class AStagingMeshBaseLifecycleManager
                 -1L,
                 -1L,
                 -1L,
+                ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpHomeReplica(),                
                 ((AnetMeshBase) theMeshBase).getDefaultWillGiveUpLock());
     }
     
@@ -333,7 +342,8 @@ public class AStagingMeshBaseLifecycleManager
             long                             timeCreated,
             long                             timeUpdated,
             long                             timeRead,
-            long                             timeAutoDeletes,
+            long                             timeExpires,
+            boolean                          giveUpHomeReplica,
             boolean                          giveUpLock )
         throws
             TransactionException,
@@ -381,7 +391,8 @@ public class AStagingMeshBaseLifecycleManager
                     timeCreated,
                     timeUpdated,
                     timeRead,
-                    timeAutoDeletes,
+                    timeExpires,
+                    giveUpHomeReplica,
                     giveUpLock,
                     new Proxy[] { placeholderProxy },
                     0,

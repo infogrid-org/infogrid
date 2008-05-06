@@ -20,6 +20,7 @@ import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.ResourceHelper;
 
 import java.util.ArrayList;
+import org.infogrid.util.logging.Log;
 
 /**
  * Default implementation for ViewletFactoryChoice.
@@ -28,6 +29,8 @@ public class DefaultViewletFactoryChoice
         extends
             ViewletFactoryChoice
 {
+    private static final Log log = Log.getLogInstance( DefaultViewletFactoryChoice.class ); // our own, private logger
+
     /**
      * Factory method. Assume default match quality.
      *
@@ -82,6 +85,16 @@ public class DefaultViewletFactoryChoice
     }
 
     /**
+     * Obtain the computable name of the Viewlet.
+     * 
+     * @return the Viewlet's name
+     */
+    public String getName()
+    {
+        return getImplementationName();
+    }
+
+    /**
       * Obtain the names of the interfaces provided by this ViewletFactoryChoice.
       *
       * @return the names of the interfaces provided by this ViewletFactoryChoice.
@@ -89,6 +102,7 @@ public class DefaultViewletFactoryChoice
     public String [] getInterfaceNames()
     {
         ArrayList<String> almost = new ArrayList<String>();
+        
         determineClassNames( theViewletClass, almost );
 
         String [] ret = ArrayHelper.copyIntoNewArray( almost, String.class );
