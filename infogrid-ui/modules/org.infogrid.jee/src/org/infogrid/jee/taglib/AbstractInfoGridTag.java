@@ -289,9 +289,9 @@ public abstract class AbstractInfoGridTag
 
         Object ret;
         if( InfoGridJspUtils.isTrue( theIgnore )) {
-            ret = InfoGridJspUtils.nestedLookupOrThrow( pageContext, name, theScope );
-        } else {
             ret = InfoGridJspUtils.nestedLookup( pageContext, name, theScope );
+        } else {
+            ret = InfoGridJspUtils.nestedLookupOrThrow( pageContext, name, theScope );
         }
         return ret;
     }
@@ -315,9 +315,9 @@ public abstract class AbstractInfoGridTag
         
         Object ret;
         if( InfoGridJspUtils.isTrue( theIgnore )) {
-            ret = InfoGridJspUtils.nestedLookupOrThrow( pageContext, name, propertyName, theScope );
-        } else {
             ret = InfoGridJspUtils.nestedLookup( pageContext, name, propertyName, theScope );
+        } else {
+            ret = InfoGridJspUtils.nestedLookupOrThrow( pageContext, name, propertyName, theScope );
         }
         return ret;
     }

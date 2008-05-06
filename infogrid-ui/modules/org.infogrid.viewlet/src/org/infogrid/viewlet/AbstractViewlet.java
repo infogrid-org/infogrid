@@ -17,6 +17,7 @@ package org.infogrid.viewlet;
 import org.infogrid.context.Context;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
+import org.infogrid.model.traversal.TraversalSpecification;
 
 /**
  * Factors out commonly used functionality for Viewlets.
@@ -46,6 +47,16 @@ public abstract class AbstractViewlet
      * @return a String
      */
     public String getUserVisibleName()
+    {
+        return getClass().getName();
+    }
+
+    /**
+     * Obtain the computable name of the Viewlet.
+     * 
+     * @return the Viewet's name
+     */
+    public String getName()
     {
         return getClass().getName();
     }
@@ -86,6 +97,16 @@ public abstract class AbstractViewlet
     public MeshObject getSubject()
     {
         return theViewedMeshObjects.getSubject();
+    }
+
+    /**
+     * Obtain the TraversalSpecification that the Viewlet currently uses.
+     * 
+     * @return the TraversalSpecification that the Viewlet currently uses
+     */
+    public TraversalSpecification getTraversalSpecification()
+    {
+        return theViewedMeshObjects.getTraversalSpecification();
     }
 
     /**

@@ -73,6 +73,7 @@ public class MeshWorldViewletFactory
             ret.add( DefaultViewletFactoryChoice.create( WikiObjectEditViewlet.class, ViewletFactoryChoice.GOOD_MATCH_QUALITY+1.0f ));
         }
         ret.add( PseudoJspViewletFactoryChoice.create( "org.infogrid.jee.viewlet.propertysheet.PropertySheetViewlet", ViewletFactoryChoice.BAD_MATCH_QUALITY ));
+        ret.add( PseudoJspViewletFactoryChoice.create( "org.infogrid.jee.viewlet.objectset.ObjectSetViewlet", ViewletFactoryChoice.BAD_MATCH_QUALITY ));
 
         return ArrayHelper.copyIntoNewArray( ret, ViewletFactoryChoice.class );
     }

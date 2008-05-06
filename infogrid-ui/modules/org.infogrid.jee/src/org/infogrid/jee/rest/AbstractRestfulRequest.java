@@ -14,26 +14,31 @@
 
 package org.infogrid.jee.rest;
 
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.MeshObjectIdentifier;
-import org.infogrid.meshbase.MeshBaseIdentifier;
-import org.infogrid.meshbase.MeshObjectAccessException;
-
-import org.infogrid.util.http.SaneRequest;
-
 import java.net.URISyntaxException;
 import javax.servlet.http.HttpServletRequest;
 import org.infogrid.jee.sane.SaneServletRequest;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.meshbase.MeshObjectAccessException;
+import org.infogrid.util.http.SaneRequest;
+import org.infogrid.util.logging.Log;
 
 /**
- *
+ * Collects common behaviors of implementations of RestfulRequest.
  */
 public abstract class AbstractRestfulRequest
         implements
             RestfulRequest
 {
+    private static final Log log = Log.getLogInstance( AbstractRestfulRequest.class ); // our own, private logger
+
     /**
      * Constructor.
+     * 
+     * @param lidRequest the underlying incoming SaneRequest
+     * @param contextPath the context path of the JEE application
      */
     protected AbstractRestfulRequest(
             SaneServletRequest lidRequest,
@@ -109,13 +114,7 @@ public abstract class AbstractRestfulRequest
     public String getRequestedViewletClassName()
     {
         if( theRequestedViewletClass == null ) {
-            String format = theSaneRequest.getArgument( LID_FORMAT_PARAMETER_NAME );
-
-            if( format != null && format.startsWith( VIEWLET_PREFIX )) {
-                theRequestedViewletClass = format.substring( VIEWLET_PREFIX.length() );
-            } else {
-                theRequestedViewletClass = NO_ANSWER_STRING;
-            }
+            theRequestedViewletClass = determineArgumentForMulti( LID_FORMAT_PARAMETER_NAME, VIEWLET_PREFIX );
         }
         if( (Object) theRequestedViewletClass != (Object) NO_ANSWER_STRING ) { // typecast to avoid warning
             return theRequestedViewletClass;
@@ -124,6 +123,47 @@ public abstract class AbstractRestfulRequest
         }
     }
     
+    /**
+     * Obtain the requested MIME type, if any.
+     * 
+     * @return the requuested MIME type, if any
+     */
+    public String getRequestedMimeType()
+    {
+        if( theRequestedMimeType == null ) {
+            theRequestedMimeType = determineArgumentForMulti( LID_FORMAT_PARAMETER_NAME, MIME_PREFIX );
+        }
+        if( (Object) theRequestedMimeType != (Object) NO_ANSWER_STRING ) { // typecast to avoid warning
+            return theRequestedMimeType;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Factors out functionality to determine the value of a URL argument with prefix.
+     *
+     * @param argName the name of the URL argument
+     * @param prefix the prefix
+     * @return the found value, or NO_ANSWER_STRING
+     */
+    protected String determineArgumentForMulti(
+            String argName,
+            String prefix )
+    {
+        String [] formats = theSaneRequest.getMultivaluedArgument( argName );
+        String    ret     = NO_ANSWER_STRING;
+
+        for( int i=0 ; i<formats.length ; ++i ) {
+            if( formats[i].startsWith( prefix )) {
+                ret = formats[i].substring( prefix.length() );
+                break;
+            }
+        }
+        
+        return ret;
+    }
+
     /**
      * Obtain the name of the requested layout, if any.
      * 
@@ -153,14 +193,21 @@ public abstract class AbstractRestfulRequest
      * Determine the identifier of the requested MeshBase.
      * 
      * @return the MeshBaseIdentifier
+     * @throws URISyntaxException thrown if the request URI could not be parsed
      */
     public MeshBaseIdentifier determineRequestedMeshBaseIdentifier()
             throws
-                MeshObjectAccessException,
                 URISyntaxException
     {
         if( theRequestedMeshBaseIdentifier == null ) {
-            calculate();
+            try {
+                calculate();
+
+            } catch( MeshObjectAccessException ex ) {
+                log.warn( ex ); // this is not critical here
+            } catch( NotPermittedException ex ) {
+                log.warn( ex ); // this is not critical here
+            }
         }
         return theRequestedMeshBaseIdentifier;
     }
@@ -169,34 +216,50 @@ public abstract class AbstractRestfulRequest
      * Determine the identifier of the requested MeshObject.
      * 
      * @return the MeshObjectIdentifier
+     * @throws URISyntaxException thrown if the request URI could not be parsed
      */
     public MeshObjectIdentifier determineRequestedMeshObjectIdentifier()
             throws
-                MeshObjectAccessException,
                 URISyntaxException
     {
         if( theRequestedMeshObjectIdentifier == null ) {
-            calculate();
+            try {
+                calculate();
+
+            } catch( MeshObjectAccessException ex ) {
+                log.warn( ex ); // this is not critical here
+            } catch( NotPermittedException ex ) {
+                log.warn( ex ); // this is not critical here
+            }
         }
         return theRequestedMeshObjectIdentifier;
     }
     
     /**
      * Internal method to calculate the data.
+     * 
+     * @throws MeshObjectAccessException thrown if the requested MeshObject could not be accessed
+     * @throws NotPermittedException thrown if the caller did not have the permission to perform this operation
+     * @throws URISyntaxException thrown if the request URI could not be parsed
      */
     protected abstract void calculate()
             throws
                 MeshObjectAccessException,
+                NotPermittedException,
                 URISyntaxException;
 
     /**
      * Determine the requested MeshObject.
      * 
      * @return the MeshObject, or null if not found
+     * @throws MeshObjectAccessException thrown if the requested MeshObject could not be accessed
+     * @throws NotPermittedException thrown if the caller did not have the permission to perform this operation
+     * @throws URISyntaxException thrown if the request URI could not be parsed
      */
     public MeshObject determineRequestedMeshObject()
             throws
                 MeshObjectAccessException,
+                NotPermittedException,
                 URISyntaxException
     {
         if( theRequestedMeshObject == null ) {
@@ -241,6 +304,11 @@ public abstract class AbstractRestfulRequest
     protected String theRequestedViewletClass = null;
 
     /**
+     * The requested MIME type, if any. (buffered)
+     */
+    protected String theRequestedMimeType = null;
+
+    /**
      * The requested formatting template, if any.
      */
     protected String theRequestedTemplate = null;
@@ -276,6 +344,11 @@ public abstract class AbstractRestfulRequest
      */
     public static final String VIEWLET_PREFIX = "viewlet:";
     
+    /**
+     * The prefix in the lid-format string that indicates the name of a MIME type.
+     */
+    public static final String MIME_PREFIX = "mime:";
+
     /**
      * Name of the LID traversal parameter.
      */

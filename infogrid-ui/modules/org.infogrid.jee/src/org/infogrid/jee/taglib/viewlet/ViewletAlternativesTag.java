@@ -47,7 +47,8 @@ public class ViewletAlternativesTag
     extends
         AbstractInfoGridTag
 {
-    private static final Log log = Log.getLogInstance( ViewletAlternativesTag.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
+    private static final Log  log              = Log.getLogInstance( ViewletAlternativesTag.class ); // our own, private logger
 
     /**
      * Constructor.
@@ -111,9 +112,9 @@ public class ViewletAlternativesTag
                 HashMap<String,String> map = new HashMap<String,String>();
                 
                 for( int i=0 ; i<candidates.length ; ++i ) {
-                    map.put( "lid-format", "viewlet:" + candidates[i].getImplementationName() );
+                    map.put( "lid-format", "viewlet:" + candidates[i].getName() );
                     print( "<li" );
-                    if( candidates[i].getImplementationName().equals( currentViewlet.getClass().getName() )) {
+                    if( candidates[i].getName().equals( currentViewlet.getName() )) {
                         print( " class=\"selected\"" );
                     }
                     print( ">" );

@@ -14,20 +14,17 @@
 
 package org.infogrid.jee.taglib.mesh;
 
-import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
-import org.infogrid.jee.taglib.InfoGridJspUtils;
-import org.infogrid.jee.taglib.IgnoreException;
-
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.model.primitives.RoleType;
-
-import org.infogrid.util.ArrayCursorIterator;
-
-import javax.servlet.jsp.JspException;
-
 import java.io.IOException;
 import java.util.Iterator;
+import javax.servlet.jsp.JspException;
+import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
+import org.infogrid.jee.taglib.IgnoreException;
+import org.infogrid.jee.taglib.InfoGridJspUtils;
+import org.infogrid.jee.taglib.util.InfoGridIterationTag;
+import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.model.primitives.RoleType;
+import org.infogrid.util.ArrayCursorIterator;
 
 /**
  * Tag that iterates over the <code>RoleTypes</code> in which a start <code>MeshObject</code>
@@ -36,6 +33,8 @@ import org.infogrid.mesh.NotRelatedException;
 public class MeshObjectRoleIterateTag
     extends
         AbstractInfoGridBodyTag
+    implements
+        InfoGridIterationTag
 {
     /**
      * Constructor.
@@ -209,6 +208,21 @@ public class MeshObjectRoleIterateTag
             pageContext.removeAttribute( theRoleTypeLoopVar );
         }
         return EVAL_PAGE;
+    }
+
+    /**
+     * Determine whether this iteration tag has a next element to be returned
+     * in the iteration.
+     * 
+     * @return true if there is a next element
+     */
+    public boolean hasNext()
+    {
+        if( theIterator.hasNext() ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

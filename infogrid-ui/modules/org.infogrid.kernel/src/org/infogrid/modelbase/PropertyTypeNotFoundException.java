@@ -18,6 +18,7 @@ import org.infogrid.model.primitives.AttributableMeshType;
 import org.infogrid.model.primitives.SubjectArea;
 
 import org.infogrid.model.primitives.MeshTypeIdentifier;
+import org.infogrid.util.StringHelper;
 
 /**
  * This Exception indicates that a PropertyType could not be found.
@@ -38,9 +39,15 @@ public class PropertyTypeNotFoundException
     {
         super();
 
-        theSubjectArea       = amt.getSubjectArea();
-        theSubjectAreaName   = amt.getSubjectArea().getIdentifier();
-        theAmtName           = amt.getIdentifier();
+        if( amt != null ) {
+            theSubjectArea       = amt.getSubjectArea();
+            theSubjectAreaName   = amt.getSubjectArea().getIdentifier();
+            theAmtName           = amt.getIdentifier();
+        } else {
+            theSubjectArea       = null;
+            theSubjectAreaName   = null;
+            theAmtName           = null;
+        }
         thePropertyTypeName  = propertyTypeName;
     }
 
@@ -58,9 +65,15 @@ public class PropertyTypeNotFoundException
     {
         super( cause );
 
-        theSubjectArea       = amt.getSubjectArea();
-        theSubjectAreaName   = amt.getSubjectArea().getIdentifier();
-        theAmtName           = amt.getIdentifier();
+        if( amt != null ) {
+            theSubjectArea       = amt.getSubjectArea();
+            theSubjectAreaName   = amt.getSubjectArea().getIdentifier();
+            theAmtName           = amt.getIdentifier();
+        } else {
+            theSubjectArea       = null;
+            theSubjectAreaName   = null;
+            theAmtName           = null;
+        }
         thePropertyTypeName  = propertyTypeName;
     }
 
@@ -72,13 +85,16 @@ public class PropertyTypeNotFoundException
     @Override
     public String toString()
     {
-        StringBuffer almostRet = new StringBuffer();
-        almostRet.append( super.toString() );
-        almostRet.append( "AttributableMeshType: " );
-        almostRet.append( theAmtName.toExternalForm() );
-        almostRet.append( ", PropertyType: " );
-        almostRet.append( thePropertyTypeName );
-        return almostRet.toString();
+        return StringHelper.objectLogString(
+                this,
+                new String [] {
+                    "AttributableMeshType",
+                    "PropertyType"
+                },
+                new Object[] {
+                    theAmtName,
+                    thePropertyTypeName
+                });
     }
 
     /**

@@ -102,7 +102,10 @@ public class DefaultStructuredResponseTemplateFactory
         jspPath.append( DEFAULT_JSP_NAME );
 
         InfoGridWebApp    app        = InfoGridWebApp.getSingleton();
-        RequestDispatcher dispatcher = app.findLocalizedRequestDispatcher( jspPath.toString(), restful.getSaneRequest().acceptLanguageIterator(), structured.getServletContext() );
+        RequestDispatcher dispatcher = app.findLocalizedRequestDispatcher(
+                jspPath.toString(),
+                restful.getSaneRequest().acceptLanguageIterator(),
+                structured.getServletContext() );
         
         return dispatcher;
     }
