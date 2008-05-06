@@ -23,6 +23,7 @@ import org.infogrid.util.http.SaneRequest;
 
 import java.net.URISyntaxException;
 import javax.servlet.http.HttpServletRequest;
+import org.infogrid.mesh.NotPermittedException;
 
 /**
  * Encapsulates parameter parsing according to InfoGrid REST conventions.
@@ -57,30 +58,34 @@ public interface RestfulRequest
      * Determine the identifier of the requested MeshBase.
      * 
      * @return the MeshBaseIdentifier
+     * @throws URISyntaxException thrown if the request URI could not be parsed
      */
     public MeshBaseIdentifier determineRequestedMeshBaseIdentifier()
             throws
-                MeshObjectAccessException,
                 URISyntaxException;
 
     /**
      * Determine the identifier of the requested MeshObject.
      * 
      * @return the MeshObjectIdentifier
+     * @throws URISyntaxException thrown if the request URI could not be parsed
      */
     public MeshObjectIdentifier determineRequestedMeshObjectIdentifier()
             throws
-                MeshObjectAccessException,
                 URISyntaxException;
 
     /**
      * Determine the requested MeshObject.
      * 
      * @return the MeshObject, or null if not found
+     * @throws MeshObjectAccessException thrown if the requested MeshObject could not be accessed
+     * @throws NotPermittedException thrown if the caller did not have the permission to perform this operation
+     * @throws URISyntaxException thrown if the request URI could not be parsed
      */
     public MeshObject determineRequestedMeshObject()
             throws
                 MeshObjectAccessException,
+                NotPermittedException,
                 URISyntaxException;
 
     /**
@@ -97,6 +102,13 @@ public interface RestfulRequest
      */
     public String getRequestedViewletClassName();
     
+    /**
+     * Obtain the requested MIME type, if any.
+     * 
+     * @return the requuested MIME type, if any
+     */
+    public String getRequestedMimeType();
+
     /**
      * Obtain the name of the requested layout, if any.
      * 

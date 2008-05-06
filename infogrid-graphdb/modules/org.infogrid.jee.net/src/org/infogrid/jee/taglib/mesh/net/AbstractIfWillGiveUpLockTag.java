@@ -118,7 +118,7 @@ public abstract class AbstractIfWillGiveUpLockTag
     {
         NetMeshObject obj = (NetMeshObject) lookupOrThrow( theMeshObjectName );
 
-        boolean ret = obj.setWillGiveUpLock();
+        boolean ret = obj.getWillGiveUpLock();
         
         return ret;
     }

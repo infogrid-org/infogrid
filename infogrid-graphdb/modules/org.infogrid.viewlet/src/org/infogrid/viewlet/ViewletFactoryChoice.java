@@ -14,12 +14,9 @@
 
 package org.infogrid.viewlet;
 
-import org.infogrid.context.Context;
-import org.infogrid.util.logging.Log;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
+import org.infogrid.context.Context;
 
 /**
  * <p>Represents a choice for instantiating a Viewlet by a ViewletFactory. See
@@ -38,8 +35,6 @@ import java.lang.reflect.Method;
  */
 public abstract class ViewletFactoryChoice
 {
-    private static final Log log = Log.getLogInstance( ViewletFactoryChoice.class ); // our own, private logger
-
     /**
      * No-op constructor, for subclasses only.
      */
@@ -54,6 +49,13 @@ public abstract class ViewletFactoryChoice
      * @return the user-visible String
      */
     public abstract String getUserVisibleName();
+
+    /**
+     * Obtain the computable name of the Viewlet.
+     * 
+     * @return the Viewlet's name
+     */
+    public abstract String getName();
 
     /**
       * Obtain the names of the interfaces provided by this ViewletFactoryChoice.

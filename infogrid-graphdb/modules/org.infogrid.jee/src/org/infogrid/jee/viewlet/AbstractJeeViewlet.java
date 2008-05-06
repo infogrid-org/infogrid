@@ -14,13 +14,19 @@
 
 package org.infogrid.jee.viewlet;
 
+import java.io.IOException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import org.infogrid.context.Context;
+import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.rest.RestfulRequest;
+import org.infogrid.jee.servlet.BufferedServletResponse;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;
 import org.infogrid.util.http.HTTP;
+import org.infogrid.util.logging.Log;
 import org.infogrid.viewlet.AbstractViewedMeshObjects;
 import org.infogrid.viewlet.AbstractViewlet;
+import org.infogrid.viewlet.CannotViewException;
 
 /**
  * Factors out commonly used functionality for JeeViewlets.
@@ -31,6 +37,8 @@ public abstract class AbstractJeeViewlet
         implements
             JeeViewlet
 {
+    private static final Log log = Log.getLogInstance( AbstractJeeViewlet.class ); // our own, private logger
+
     /**
      * Constructor, for subclasses only.
      * 
@@ -163,34 +171,109 @@ public abstract class AbstractJeeViewlet
         String ret = constructDefaultDispatcherUrl( getClass() );
         return ret;
     }
-    
+
     /**
-     * Set the current request.
-     *
-     * @param newRequest the new request
+     * Obtain the full URI of the incoming request.
      */
-    public void setCurrentRequest(
-            RestfulRequest newRequest )
+    public String getRequestURI()
     {
-        theCurrentRequest = newRequest;
+        RestfulRequest request = theCurrentRequest;
+        String         ret;
+
+        if( request != null ) {
+            ret = request.getSaneRequest().getAbsoluteFullUri();
+        } else {
+            ret = null;
+        }
+        return ret;
     }
 
-//    /**
-//     * Obtain the TraversalSpecification, if any
-//     *
-//     * @return the Xpath element
-//     */
-//    public String getLidXpath()
-//    {
-//        MeshObject             subject   = theViewedMeshObjects.getSubject();
-//        TraversalSpecification traversal = theViewedMeshObjects.getTraversalSpecification();
-//        InfoGridWebApp         app       = InfoGridWebApp.getSingleton();
-//        TraversalDictionary    dict      = app.getTraversalDictionary();
-//
-//        String ret = dict.translate( subject, traversal );
-//        return ret;
-//    }
-    
+    /**
+     * Process the incoming RestfulRequest.
+     * 
+     * @param restful the incoming RestfulRequest
+     * @param structured the StructuredResponse into which to write the result
+     */
+    public void processRequest(
+            RestfulRequest     restful,
+            StructuredResponse structured )
+        throws
+            ServletException,
+            IOException
+    {
+        synchronized( this ) {
+            if( theCurrentRequest != null ) {
+                throw new IllegalStateException( "Have current request already: " + theCurrentRequest );
+            }
+            theCurrentRequest = restful;
+        }
+        
+        try {
+            String servletPath = getServletPath();
+
+            if( servletPath != null ) {
+                InfoGridWebApp app = InfoGridWebApp.getSingleton();
+
+                RequestDispatcher dispatcher = app.findLocalizedRequestDispatcher(
+                        servletPath,
+                        restful.getSaneRequest().acceptLanguageIterator(),
+                        structured.getServletContext() );
+
+                if( dispatcher != null ) {
+                    runRequestDispatcher( dispatcher, restful, structured );
+                } // FIXME? Should there be an else here, throwing an Exception?
+            }
+
+        } finally {
+            synchronized( this ) {
+                theCurrentRequest = null;
+            }
+        }        
+    }
+
+    /**
+     * Invoke the RequestDispatcher, can catch the results in the default section of the StructuredResponse.
+     * 
+     * @param dispatcher the RequestDispatcher to invoke
+     * @param restful the incoming request
+     * @param structured the outgoing response
+     * @throws javax.servlet.ServletException processing failed
+     * @throws java.io.IOException I/O error
+     */
+    public static void runRequestDispatcher(
+            RequestDispatcher  dispatcher,
+            RestfulRequest     restful,
+            StructuredResponse structured )
+        throws
+            ServletException,
+            IOException
+    {
+        BufferedServletResponse bufferedResponse = new BufferedServletResponse( structured.getDelegate() );
+
+        dispatcher.include( restful.getDelegate(), bufferedResponse );
+
+        byte [] bufferedBytes  = bufferedResponse.getBufferedServletOutputStreamOutput();
+        String  bufferedString = bufferedResponse.getBufferedPrintWriterOutput();
+
+        if( bufferedBytes != null ) {
+            if( bufferedString != null ) {
+                // don't know what to do here -- defaults to "string gets processed, bytes ignore"
+                log.warn( "Have both String and byte content, don't know what to do: " + restful );
+                structured.setDefaultSectionContent( bufferedString ); // do something is better than nothing
+
+            } else {
+                structured.setDefaultSectionContent( bufferedBytes );
+            }
+
+        } else if( bufferedString != null ) {
+            structured.setDefaultSectionContent( bufferedString );
+        } else {
+            // do nothing
+        }
+        structured.setMimeType( bufferedResponse.getContentType() );
+    }
+                
+
     /**
      * Obtain the URL to which forms should be HTTP post'd. This
      * can be overridden by subclasses.
@@ -228,7 +311,24 @@ public abstract class AbstractJeeViewlet
             String viewletClassName )
     {
         StringBuilder almost = new StringBuilder();
-        almost.append( "/v/" ).append( viewletClassName.replace( '.', '/' )).append( ".jsp" );
+        almost.append( "/v/" );
+        almost.append( viewletClassName.replace( '.', '/' ));
+        
+        String mime = theCurrentRequest.getRequestedMimeType();
+        if( mime != null && mime.length() > 0 ) {
+            // FIXME: does not handle * parameters right now
+            almost.append( "/" );
+            almost.append( mime );
+            almost.append( "/" );
+            
+            int lastDot = viewletClassName.lastIndexOf( '.' );
+            if( lastDot > 0 ) {
+                almost.append( viewletClassName.substring( lastDot+1 ));
+            } else {
+                almost.append( viewletClassName );
+            }
+        }
+        almost.append( ".jsp" );
         return almost.toString();
     }
 

@@ -112,6 +112,17 @@ public abstract class RemoteQueryTimeoutException
     }
 
     /**
+     * All subclasses have a common ResourceHelper for all inner classes.
+     *
+     * @return the key
+     */
+    @Override
+    protected String findMessageParameter()
+    {
+        return findMessageParameterViaEnclosingClass();
+    }
+
+    /**
      * The local proxy object.
      */
     protected Object theLocalProxy;
