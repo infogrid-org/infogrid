@@ -33,6 +33,7 @@ import org.infogrid.util.logging.Log;
 import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.mesh.NotPermittedException;
 
 /**
  * Default implementation of Net RestfulRequest.
@@ -75,6 +76,7 @@ public class DefaultNetRestfulRequest
     protected void calculate()
             throws
                 MeshObjectAccessException,
+                NotPermittedException,
                 URISyntaxException
     {
         String relativeBaseUrl = theSaneRequest.getRelativeBaseUri();
@@ -138,6 +140,7 @@ public class DefaultNetRestfulRequest
     public NetMeshBaseIdentifier determineRequestedProxyIdentifier()
             throws
                 MeshObjectAccessException,
+                NotPermittedException,
                 URISyntaxException
     {
         if( theRequestedProxyIdentifier == null ) {
@@ -154,6 +157,7 @@ public class DefaultNetRestfulRequest
     public Proxy determineRequestedProxy()
             throws
                 MeshObjectAccessException,
+                NotPermittedException,
                 URISyntaxException
     {
         if( theRequestedProxy == null ) {

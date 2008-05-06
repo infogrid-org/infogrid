@@ -14,8 +14,7 @@
 
 package org.infogrid.jee.viewlet;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 import org.infogrid.context.Context;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.viewlet.CannotViewException;
@@ -92,6 +91,35 @@ public class PseudoJspViewletFactoryChoice
         String ret = rh.getResourceStringOrDefault( "UserVisibleName", theViewletClass.getName() );
 
         return ret;
+    }
+
+    /**
+     * Obtain the computable name of the Viewlet.
+     * 
+     * @return the Viewlet's name
+     */
+    @Override
+    public String getName()
+    {
+        return thePseudoClassName;
+    }
+
+    /**
+     * Internal helper method that recursively looks up the names of all interface
+     * and class names supported by a Class.
+     *
+     * @param clazz the Class
+     * @param found the set of names found
+     */
+    @Override
+    protected void determineClassNames(
+            Class             clazz,
+            ArrayList<String> found )
+    {
+        // We do what our superclass does, but add thePseudoClassName
+        
+        super.determineClassNames( clazz, found );
+        found.add( thePseudoClassName );
     }
 
     /**

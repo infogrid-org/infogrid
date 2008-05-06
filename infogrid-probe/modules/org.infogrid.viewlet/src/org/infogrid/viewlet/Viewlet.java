@@ -17,6 +17,7 @@ package org.infogrid.viewlet;
 import org.infogrid.context.ObjectInContext;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
+import org.infogrid.model.traversal.TraversalSpecification;
 
 /**
  * <p>A software component of an InfoGrid application's user interface.
@@ -39,6 +40,13 @@ public interface Viewlet
       * @return a String
       */
     public String getUserVisibleName();
+
+    /**
+     * Obtain the computable name of the Viewlet.
+     * 
+     * @return the Viewet's name
+     */
+    public abstract String getName();
 
     /**
       * The Viewlet is being instructed to view certain objects, which are packaged as
@@ -69,6 +77,13 @@ public interface Viewlet
      * @return the subject
      */
     public MeshObject getSubject();
+
+    /**
+     * Obtain the TraversalSpecification that the Viewlet currently uses.
+     * 
+     * @return the TraversalSpecification that the Viewlet currently uses
+     */
+    public TraversalSpecification getTraversalSpecification();
 
     /**
      * Obtain the Objects, i.e. the MeshObjects reached by traversing from the
