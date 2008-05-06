@@ -14,16 +14,15 @@
 
 package org.infogrid.jee.taglib.mesh.set;
 
+import java.io.IOException;
+import java.util.Iterator;
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.jee.taglib.InfoGridJspUtils;
+import org.infogrid.jee.taglib.util.InfoGridIterationTag;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
-
-import javax.servlet.jsp.JspException;
-
-import java.io.IOException;
-import java.util.Iterator;
 
 /**
  * Factors out common code for tags that iterate over the content of a <code>MeshObjectSet</code>.
@@ -31,6 +30,8 @@ import java.util.Iterator;
 public abstract class AbstractMeshObjectSetIterateTag
     extends
         AbstractInfoGridBodyTag
+    implements
+        InfoGridIterationTag
 {
     /**
      * Constructor.
@@ -186,6 +187,21 @@ public abstract class AbstractMeshObjectSetIterateTag
     public boolean displayHeader()
     {
         return isFirstIteration; // for now
+    }
+
+    /**
+     * Determine whether this iteration tag has a next element to be returned
+     * in the iteration.
+     * 
+     * @return true if there is a next element
+     */
+    public boolean hasNext()
+    {
+        if( theIterator.hasNext() ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

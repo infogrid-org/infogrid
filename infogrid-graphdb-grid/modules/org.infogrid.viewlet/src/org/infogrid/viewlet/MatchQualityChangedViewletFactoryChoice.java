@@ -49,6 +49,16 @@ public class MatchQualityChangedViewletFactoryChoice
     }
 
     /**
+     * Obtain the computable name of the Viewlet.
+     * 
+     * @return the Viewlet's name
+     */
+    public String getName()
+    {
+        return theDelegate.getName();
+    }
+
+    /**
       * Obtain the names of the interfaces provided by this ViewletFactoryChoice.
       *
       * @return the names of the interfaces provided by this ViewletFactoryChoice.

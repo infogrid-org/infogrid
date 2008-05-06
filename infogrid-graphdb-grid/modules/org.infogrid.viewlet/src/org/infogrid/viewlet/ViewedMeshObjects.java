@@ -59,7 +59,7 @@ public interface ViewedMeshObjects
     /**
      * Obtain the TraversalSpecification that the Viewlet currently uses.
      * 
-     * @eturn the TraversalSpecification that the Viewlet currently uses
+     * @return the TraversalSpecification that the Viewlet currently uses
      */
     public TraversalSpecification getTraversalSpecification();
 
