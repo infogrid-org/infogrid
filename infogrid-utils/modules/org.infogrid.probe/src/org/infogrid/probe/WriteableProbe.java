@@ -53,7 +53,7 @@ public interface WriteableProbe
      */
     public void write(
             NetMeshBaseIdentifier networkId,
-            ChangeSet         updateSet )
+            ChangeSet             updateSet )
         throws
             ProbeException,
             IOException,

@@ -148,7 +148,7 @@ public abstract class InfoGridWebApp
      * Find the a RequestDispatcher for the request with this ServletPath, localized
      * according to the user's language preferences. This uses a similar algorithm as for Java's
      * <code>ResourceBundle.getBundle</code>. It can be overridden by subclasses.
-     *
+     * 
      * @param servletName the generic servlet path
      * @param localeIterator Iterator over the user's Locale preferences, in sequence
      * @param context the ServletContext to use
@@ -166,7 +166,7 @@ public abstract class InfoGridWebApp
         int    period = servletName.lastIndexOf( "." );
         if( period >= 0 ) {
             servletBaseName  = servletName.substring( 0, period );
-            servletExtension = servletName.substring( period+1 );
+            servletExtension = servletName.substring( period ); // include the period
         } else {
             servletBaseName  = servletName;
             servletExtension = "";
@@ -180,7 +180,7 @@ public abstract class InfoGridWebApp
             while( localeIterator.hasNext() ) {
                 Locale current = localeIterator.next();
 
-                StringBuffer candidate = new StringBuffer();
+                StringBuilder candidate = new StringBuilder();
                 candidate.append( servletBaseName );
                 
                 String language = current.getLanguage();
@@ -201,6 +201,7 @@ public abstract class InfoGridWebApp
                         languagesStillToConsider.add( new Locale( language ));
                     }
                 }
+                candidate.append( servletExtension );
 
                 String candidateString = candidate.toString();
                 URL    resource        = null;
@@ -228,11 +229,12 @@ public abstract class InfoGridWebApp
                     if( consideredAlready.contains( current )) {
                         continue; // did this already
                     }
-                    StringBuffer candidate = new StringBuffer();
+                    StringBuilder candidate = new StringBuilder();
                     candidate.append( servletBaseName );
                 
                     candidate.append( '_' ).append( current.getLanguage() );
                     candidate.append( '_' ).append( current.getCountry() );
+                    candidate.append( servletExtension );
 
                     String candidateString = candidate.toString();
                     URL    resource        = null;
@@ -260,10 +262,11 @@ public abstract class InfoGridWebApp
                     if( consideredAlready.contains( current )) {
                         continue; // did this already
                     }
-                    StringBuffer candidate = new StringBuffer();
+                    StringBuilder candidate = new StringBuilder();
                     candidate.append( servletBaseName );
                 
                     candidate.append( '_' ).append( current.getLanguage() );
+                    candidate.append( servletExtension );
 
                     String candidateString = candidate.toString();
                     if( doesResourceExist( candidateString, context )) {

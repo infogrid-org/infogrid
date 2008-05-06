@@ -2,11 +2,11 @@
 <taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd">
     <tlib-version>1.0</tlib-version>
     <short-name>set</short-name>
-    <uri>/v/org/infogrid/jee/taglib/mesh/objectset/objectset.tld</uri>
+    <uri>/v/org/infogrid/jee/taglib/mesh/set/set.tld</uri>
     
     <tag>
         <name>ifSetEmpty</name>
-        <tag-class>org.infogrid.jee.taglib.mesh.objectset.IfSetEmptyTag</tag-class>
+        <tag-class>org.infogrid.jee.taglib.mesh.set.IfSetEmptyTag</tag-class>
         
         <attribute>
             <name>meshObjectSetName</name>
@@ -29,7 +29,7 @@
     
     <tag>
         <name>ifSetNotEmpty</name>
-        <tag-class>org.infogrid.jee.taglib.mesh.objectset.IfSetNotEmptyTag</tag-class>
+        <tag-class>org.infogrid.jee.taglib.mesh.set.IfSetNotEmptyTag</tag-class>
         
         <attribute>
             <name>meshObjectSetName</name>
@@ -52,7 +52,7 @@
 
     <tag>
         <name>iterate</name>
-        <tag-class>org.infogrid.jee.taglib.mesh.objectset.MeshObjectSetIterateTag</tag-class>
+        <tag-class>org.infogrid.jee.taglib.mesh.set.MeshObjectSetIterateTag</tag-class>
         <attribute>
             <name>meshObjectSetName</name>
             <required>true</required>
@@ -78,7 +78,7 @@
     
     <tag>
         <name>traverseIterate</name>
-        <tag-class>org.infogrid.jee.taglib.mesh.objectset.MeshObjectSetTraverseIterateTag</tag-class>
+        <tag-class>org.infogrid.jee.taglib.mesh.set.MeshObjectSetTraverseIterateTag</tag-class>
         <attribute>
             <name>startObjectName</name>
             <required>true</required>
@@ -110,16 +110,16 @@
     
     <tag>
         <name>iterateheader</name>
-        <tag-class>org.infogrid.jee.taglib.mesh.objectset.MeshObjectSetIterateHeaderTag</tag-class>
+        <tag-class>org.infogrid.jee.taglib.mesh.set.MeshObjectSetIterateHeaderTag</tag-class>
     </tag>
     
     <tag>
         <name>iteratecontentrow</name>
-        <tag-class>org.infogrid.jee.taglib.mesh.objectset.MeshObjectSetIterateContentRowTag</tag-class>
+        <tag-class>org.infogrid.jee.taglib.mesh.set.MeshObjectSetIterateContentRowTag</tag-class>
     </tag>
     
     <tag>
         <name>iteratenocontent</name>
-        <tag-class>org.infogrid.jee.taglib.mesh.objectset.MeshObjectSetIterateNoContentTag</tag-class>
+        <tag-class>org.infogrid.jee.taglib.mesh.set.MeshObjectSetIterateNoContentTag</tag-class>
     </tag>
 </taglib>

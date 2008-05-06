@@ -110,6 +110,11 @@
     </tag>
 
     <tag>
+        <name>ifIterationHasNext</name>
+        <tag-class>org.infogrid.jee.taglib.util.IfIterationHasNextTag</tag-class>
+    </tag>
+
+    <tag>
         <name>safeForm</name>
         <tag-class>org.infogrid.jee.taglib.util.SafeFormTag</tag-class>
         <attribute>

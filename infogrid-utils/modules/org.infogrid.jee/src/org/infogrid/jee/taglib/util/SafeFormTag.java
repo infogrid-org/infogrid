@@ -576,16 +576,18 @@ public class SafeFormTag
         appendIfNeeded( "accept-charset", theAcceptCharset );
         print( ">" );
 
-        FormTokenService service = InfoGridWebApp.getSingleton().getFormTokenService();
-        if( service != null ) {
-            // no service, no output
-            String value = service.generateNewToken();
+        if( "POST".equalsIgnoreCase( theMethod )) {
+            FormTokenService service = InfoGridWebApp.getSingleton().getFormTokenService();
+            if( service != null ) {
+                // no service, no output
+                String value = service.generateNewToken();
 
-            print( "<input name=\"" );
-            print( INPUT_FIELD_NAME );
-            print( "\" type=\"hidden\" value=\"" );
-            print( value );
-            print( "\" />" );
+                print( "<input name=\"" );
+                print( INPUT_FIELD_NAME );
+                print( "\" type=\"hidden\" value=\"" );
+                print( value );
+                print( "\" />" );
+            }
         }
         
         return EVAL_BODY_INCLUDE;

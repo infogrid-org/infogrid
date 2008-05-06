@@ -14,15 +14,13 @@
 
 package org.infogrid.jee.taglib.candy;
 
+import java.io.IOException;
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.jee.taglib.InfoGridJspUtils;
-
+import org.infogrid.jee.taglib.util.InfoGridIterationTag;
 import org.infogrid.util.CursorIterator;
-
-import javax.servlet.jsp.JspException;
-
-import java.io.IOException;
 
 /**
  * A Tag that can iterate over a very large set of objects by paging them, one tab per page.
@@ -30,6 +28,8 @@ import java.io.IOException;
 public class TabbedCursorIteratorTag
     extends
         AbstractInfoGridBodyTag
+    implements
+        InfoGridIterationTag
 {
     /**
      * Constructor.
@@ -219,6 +219,21 @@ public class TabbedCursorIteratorTag
             theCursorIterator = (CursorIterator<?>) lookupOrThrow( theCursorIteratorName );
         }
         return theCursorIterator;
+    }
+
+    /**
+     * Determine whether this iteration tag has a next element to be returned
+     * in the iteration.
+     * 
+     * @return true if there is a next element
+     */
+    public boolean hasNext()
+    {
+        if( theCursorIterator.hasNext() ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

@@ -14,19 +14,17 @@
 
 package org.infogrid.jee.taglib.mesh;
 
-import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
-import org.infogrid.jee.taglib.InfoGridJspUtils;
-import org.infogrid.jee.taglib.IgnoreException;
-
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.model.primitives.EntityType;
-
-import org.infogrid.util.ArrayCursorIterator;
-
-import javax.servlet.jsp.JspException;
-
 import java.io.IOException;
 import java.util.Iterator;
+import javax.servlet.jsp.JspException;
+import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
+import org.infogrid.jee.taglib.IgnoreException;
+import org.infogrid.jee.taglib.InfoGridJspUtils;
+import org.infogrid.jee.taglib.util.InfoGridIterationTag;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.model.primitives.EntityType;
+import org.infogrid.util.ArrayCursorIterator;
+
 
 /**
  * Tag that iterates over the <code>MeshTypes</code> with which a <code>MeshObject</code> is blessed.
@@ -34,6 +32,8 @@ import java.util.Iterator;
 public class MeshObjectBlessedByIterateTag
     extends
         AbstractInfoGridBodyTag
+    implements
+        InfoGridIterationTag
 {
     /**
      * Constructor.
@@ -174,6 +174,21 @@ public class MeshObjectBlessedByIterateTag
             pageContext.removeAttribute( theBlessedByLoopVar );
         }
         return EVAL_PAGE;
+    }
+
+    /**
+     * Determine whether this iteration tag has a next element to be returned
+     * in the iteration.
+     * 
+     * @return true if there is a next element
+     */
+    public boolean hasNext()
+    {
+        if( theIterator.hasNext() ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
