@@ -14,6 +14,7 @@
 
 package org.infogrid.jee.viewlet;
 
+import java.io.IOException;
 import org.infogrid.viewlet.Viewlet;
 
 import javax.servlet.ServletException;
@@ -122,24 +123,38 @@ public interface JeeViewlet
         throws
             ServletException;
 
-    /**
-     * Set the current request.
-     *
-     * @param newRequest the new request
-     */
-    public void setCurrentRequest(
-            RestfulRequest newRequest );
+//    /**
+//     * Set the current request.
+//     *
+//     * @param newRequest the new request
+//     */
+//    public void setCurrentRequest(
+//            RestfulRequest newRequest );
+//
+//    /**
+//     * Obtain the path to the Servlet for this JeeViewlet. JeeViewlet may implement this in different ways,
+//     * such as be returning a path to a JSP. This returns the generic path, not a localized version.
+//     * The localized version is constructed by the caller from its information about preferred Locales.
+//     * 
+//     * 
+//     * @return the Servlet path
+//     */
+//    public String getServletPath();
 
     /**
-     * Obtain the path to the Servlet for this JeeViewlet. JeeViewlet may implement this in different ways,
-     * such as be returning a path to a JSP. This returns the generic path, not a localized version.
-     * The localized version is constructed by the caller from its information about preferred Locales.
+     * Process the incoming RestfulRequest.
      * 
-     * 
-     * @return the Servlet path
+     * @param request the incoming RestfulRequest
+     * @param response the StructuredResponse into which to write the result
+     * @throws IOException thrown if writing the output failed
      */
-    public String getServletPath();
-    
+    public void processRequest(
+            RestfulRequest     request,
+            StructuredResponse response )
+        throws
+            ServletException,
+            IOException;
+            
     /**
      * Obtain the URL to which forms should be HTTP post'd. This
      * can be overridden by subclasses.

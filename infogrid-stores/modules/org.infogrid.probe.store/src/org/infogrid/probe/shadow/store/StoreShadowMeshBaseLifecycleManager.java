@@ -194,6 +194,7 @@ public class StoreShadowMeshBaseLifecycleManager
                 leftRight,
                 realOtherSides,
                 roleTypes,
+                externalized.getGiveUpHomeReplica(),
                 externalized.getGiveUpLock(),
                 proxies,
                 proxyTowardsHomeIndex,

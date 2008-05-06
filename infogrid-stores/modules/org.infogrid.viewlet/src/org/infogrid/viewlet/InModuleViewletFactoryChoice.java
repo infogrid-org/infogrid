@@ -82,6 +82,17 @@ public class InModuleViewletFactoryChoice
             return getImplementationName();
         }
     }
+    
+    /**
+     * Obtain the computable name of the Viewlet.
+     * 
+     * @return the Viewlet's name
+     */
+    public String getName()
+    {
+        return getImplementationName();
+    }
+
     /**
       * Obtain the names of the interfaces provided by this ViewletFactoryChoice.
       *
@@ -171,6 +182,7 @@ public class InModuleViewletFactoryChoice
      * @param c the Context to use
      * @return the instantiated Viewlet
      */
+    @SuppressWarnings( "unchecked" )
     public Viewlet instantiateViewlet(
             MeshObjectsToView toView,
             Context           c )
@@ -182,7 +194,7 @@ public class InModuleViewletFactoryChoice
             ClassLoader viewletClassLoader = viewletModule.getClassLoader();
             Class       viewletClass = Class.forName( theCapability.getImplementationName(), true, viewletClassLoader );
 
-            return instantiateViewlet( toView, viewletClass, c );
+            return instantiateViewlet( toView, (Class<? extends Viewlet>) viewletClass, c );
 
         } catch( ClassNotFoundException ex ) {
             throw new org.infogrid.viewlet.CannotViewException.InternalError( null, toView, ex );
