@@ -2,7 +2,7 @@
 <taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd">
     <tlib-version>1.0</tlib-version>
     <short-name>set</short-name>
-    <uri>/v/org/infogrid/jee/taglib/mesh/objectset/objectset.tld</uri>
+    <uri>/v/org/infogrid/jee/taglib/mesh/set/set.tld</uri>
     
     <tag>
         <name>ifSetEmpty</name>

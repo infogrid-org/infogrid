@@ -91,6 +91,17 @@ public class PseudoJspViewlet
     }
 
     /**
+     * Obtain the computable name of the Viewlet.
+     * 
+     * @return the Viewet's name
+     */
+    @Override
+    public String getName()
+    {
+        return thePseudoClassName;
+    }
+
+    /**
      * The name of the Viewlet class this would have been if it had been created as a separate
      * Viewlet class.
      */

@@ -14,20 +14,17 @@
 
 package org.infogrid.jee.rest;
 
-import org.infogrid.jee.app.InfoGridWebApp;
-
-import org.infogrid.meshbase.MeshBaseIdentifier;
-import org.infogrid.meshbase.MeshBase;
-import org.infogrid.meshbase.MeshObjectAccessException;
-
-import org.infogrid.util.NameServer;
-import org.infogrid.util.http.HTTP;
-import org.infogrid.util.logging.Log;
-
 import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.sane.SaneServletRequest;
+import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.meshbase.MeshObjectAccessException;
+import org.infogrid.util.NameServer;
+import org.infogrid.util.http.HTTP;
 
 /**
  * Default implementation of RestfulRequest.
@@ -36,10 +33,13 @@ public class DefaultRestfulRequest
         extends
             AbstractRestfulRequest
 {
-    private static final Log log = Log.getLogInstance( DefaultRestfulRequest.class ); // our own, private logger
-
     /**
      * Factory method.
+     * 
+     * @param lidRequest the underlying incoming SaneRequest
+     * @param contextPath the context path of the JEE application
+     * @param defaultMeshBaseIdentifier the identifier, in String form, of the default MeshBase
+     * @return the created DefaultRestfulRequest
      */
     public static DefaultRestfulRequest create(
             SaneServletRequest lidRequest,
@@ -51,6 +51,10 @@ public class DefaultRestfulRequest
 
     /**
      * Constructor.
+     * 
+     * @param lidRequest the underlying incoming SaneRequest
+     * @param contextPath the context path of the JEE application
+     * @param defaultMeshBaseIdentifier the identifier, in String form, of the default MeshBase
      */
     protected DefaultRestfulRequest(
             SaneServletRequest lidRequest,
@@ -64,10 +68,15 @@ public class DefaultRestfulRequest
 
     /**
      * Internal method to calculate the data.
+     * 
+     * @throws MeshObjectAccessException thrown if the requested MeshObject could not be accessed
+     * @throws NotPermittedException thrown if the caller did not have the permission to perform this operation
+     * @throws URISyntaxException thrown if the request URI could not be parsed
      */
     protected void calculate()
             throws
                 MeshObjectAccessException,
+                NotPermittedException,
                 URISyntaxException
     {
         String relativeBaseUrl = theSaneRequest.getRelativeBaseUri();

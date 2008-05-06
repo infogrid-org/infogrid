@@ -14,22 +14,8 @@
 
 package org.infogrid.jee.servlet;
 
-import org.infogrid.context.Context;
-
-import org.infogrid.jee.app.InfoGridWebApp;
-import org.infogrid.jee.rest.DefaultRestfulRequest;
-import org.infogrid.jee.rest.RestfulRequest;
-import org.infogrid.jee.sane.SaneServletRequest;
-import org.infogrid.jee.viewlet.JeeViewlet;
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.MeshObjectIdentifier;
-import org.infogrid.meshbase.MeshObjectAccessException;
-import org.infogrid.util.FactoryException;
-import org.infogrid.util.logging.Log;
-
-import org.infogrid.viewlet.CannotViewException;
-import org.infogrid.viewlet.MeshObjectsToView;
-
+import java.io.IOException;
+import java.net.URISyntaxException;
 import javax.servlet.GenericServlet;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -38,14 +24,27 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
+import org.infogrid.context.Context;
+import org.infogrid.jee.app.InfoGridWebApp;
+import org.infogrid.jee.rest.DefaultRestfulRequest;
+import org.infogrid.jee.rest.RestfulRequest;
+import org.infogrid.jee.sane.SaneServletRequest;
+import org.infogrid.jee.viewlet.JeeViewlet;
 import org.infogrid.jee.viewlet.templates.JspStructuredResponseTemplate;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;
 import org.infogrid.jee.viewlet.templates.StructuredResponseTemplate;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.model.traversal.TraversalDictionary;
 import org.infogrid.model.traversal.TraversalSpecification;
+import org.infogrid.util.FactoryException;
+import org.infogrid.util.logging.Log;
+import org.infogrid.viewlet.CannotViewException;
+import org.infogrid.viewlet.MeshObjectsToView;
+
+
 
 /**
  * <p>Main JeeViewlet dispatcher to determine the REST subject, the best JeeViewlet, and
@@ -115,6 +114,7 @@ public class ViewletDispatcherServlet
             MeshObjectAccessException,
             CannotViewException,
             URISyntaxException,
+            NotPermittedException,
             IllegalArgumentException,
             ServletException,
             IOException
@@ -150,22 +150,25 @@ public class ViewletDispatcherServlet
             }
         }
 
-        String            servletPath = null;
-        RequestDispatcher dispatcher  = null;
-
-        if( viewlet != null ) {
-            servletPath = viewlet.getServletPath();
-        }
-
-        if( servletPath != null ) {
-            dispatcher = app.findLocalizedRequestDispatcher( servletPath, restful.getSaneRequest().acceptLanguageIterator(), structured.getServletContext() );
-
-        } else if( viewlet != null ) {
-            log.error( "Viewlet " + viewlet + " returned null servletPath" );
-        }
-
-        if( dispatcher != null ) {
-
+//        String            servletPath = null;
+//        RequestDispatcher dispatcher  = null;
+//
+//        if( viewlet != null ) {
+//            servletPath = viewlet.getServletPath();
+//        }
+//
+//        if( servletPath != null ) {
+//            dispatcher = app.findLocalizedRequestDispatcher(
+//                    servletPath,
+//                    restful.getSaneRequest().acceptLanguageIterator(),
+//                    structured.getServletContext() );
+//
+//        } else if( viewlet != null ) {
+//            log.error( "Viewlet " + viewlet + " returned null servletPath" );
+//        }
+//
+//        if( dispatcher != null ) {
+if( viewlet != null ) {
             // create a stack of Viewlets
             JeeViewlet oldViewlet = (JeeViewlet) restful.getDelegate().getAttribute( JeeViewlet.VIEWLET_ATTRIBUTE_NAME );
             restful.getDelegate().setAttribute( JeeViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
@@ -196,10 +199,7 @@ public class ViewletDispatcherServlet
                         viewlet.performBeforeGet( restful, structured );
                     }
 
-                    viewlet.setCurrentRequest( restful );
-
-                    runRequestDispatcher( dispatcher, restful, structured );
-                    
+                    viewlet.processRequest( restful, structured );
 
                 } catch( RuntimeException t ) {
                     thrown = t;
@@ -233,48 +233,6 @@ public class ViewletDispatcherServlet
         }
     }
 
-    /**
-     * Invoke the RequestDispatcher, can catch the results in the default section of the StructuredResponse.
-     * 
-     * @param dispatcher the RequestDispatcher to invoke
-     * @param restful the incoming request
-     * @param structured the outgoing response
-     * @throws javax.servlet.ServletException processing failed
-     * @throws java.io.IOException I/O error
-     */
-    protected void runRequestDispatcher(
-            RequestDispatcher  dispatcher,
-            RestfulRequest     restful,
-            StructuredResponse structured )
-        throws
-            ServletException,
-            IOException
-    {
-        BufferedServletResponse bufferedResponse = new BufferedServletResponse( structured.getDelegate() );
-
-        dispatcher.include( restful.getDelegate(), bufferedResponse );
-
-        byte [] bufferedBytes  = bufferedResponse.getBufferedServletOutputStreamOutput();
-        String  bufferedString = bufferedResponse.getBufferedPrintWriterOutput();
-
-        if( bufferedBytes != null ) {
-            if( bufferedString != null ) {
-                // don't know what to do here -- defaults to "string gets processed, bytes ignore"
-                log.warn( "Have both String and byte content, don't know what to do: " + restful );
-                structured.setDefaultSectionContent( bufferedString ); // do something is better than nothing
-
-            } else {
-                structured.setDefaultSectionContent( bufferedBytes );
-            }
-
-        } else if( bufferedString != null ) {
-            structured.setDefaultSectionContent( bufferedString );
-        } else {
-            // do nothing
-        }
-        structured.setMimeType( bufferedResponse.getContentType() );
-    }
-                
     /**
      * Construct a RestfulRequest object that is suitable to the URL-to-MeshObject mapping
      * applied by this application.

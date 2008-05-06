@@ -24,9 +24,11 @@ import org.infogrid.jee.rest.net.DefaultNetRestfulRequest;
 import org.infogrid.jee.rest.net.NetRestfulRequest;
 import org.infogrid.jee.sane.SaneServletRequest;
 import org.infogrid.jee.servlet.ViewletDispatcherServlet;
+import org.infogrid.jee.viewlet.AbstractJeeViewlet;
 import org.infogrid.jee.viewlet.JeeViewlet;
 import org.infogrid.jee.viewlet.templates.JspStructuredResponseTemplate;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;
+import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.Proxy;
@@ -57,6 +59,7 @@ public class NetViewletDispatcherServlet
             StructuredResponse structured )
         throws
             MeshObjectAccessException,
+            NotPermittedException,
             CannotViewException,
             URISyntaxException,
             IllegalArgumentException,
@@ -84,13 +87,16 @@ public class NetViewletDispatcherServlet
         restful.getDelegate().setAttribute( JeeViewlet.SUBJECT_ATTRIBUTE_NAME, p );
 
         String            servletPath = "/v/org/infogrid/jee/viewlet/meshbase/net/Proxy.jsp";
-        RequestDispatcher dispatcher  = app.findLocalizedRequestDispatcher( servletPath, restful.getSaneRequest().acceptLanguageIterator(), getServletContext() );
+        RequestDispatcher dispatcher  = app.findLocalizedRequestDispatcher(
+                    servletPath,
+                    restful.getSaneRequest().acceptLanguageIterator(),
+                    getServletContext() );
 
         StructuredResponse oldStructuredResponse = (StructuredResponse) restful.getDelegate().getAttribute( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
         restful.getDelegate().setAttribute( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME, structured );
 
         try {
-            runRequestDispatcher( dispatcher, restful, structured );
+            AbstractJeeViewlet.runRequestDispatcher( dispatcher, restful, structured );
             
         } finally {
             restful.getDelegate().setAttribute( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME, oldStructuredResponse );            

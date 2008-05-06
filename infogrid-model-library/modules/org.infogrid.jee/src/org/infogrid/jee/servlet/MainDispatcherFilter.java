@@ -14,8 +14,6 @@
 
 package org.infogrid.jee.servlet;
 
-import org.infogrid.jee.app.InfoGridWebApp;
-import org.infogrid.jee.sane.SaneServletRequest;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -25,7 +23,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import javax.servlet.Filter;
 
@@ -101,9 +98,7 @@ public class MainDispatcherFilter
             ServletException
     {
         HttpServletRequest  realRequest  = (HttpServletRequest)  request;
-        HttpServletResponse realResponse = (HttpServletResponse) response;
 
-        SaneServletRequest  lidRequest   = (SaneServletRequest) realRequest.getAttribute( SaneServletRequest.class.getName() );
         String              relativePath = realRequest.getServletPath();
         ServletContext      context      = theFilterConfig.getServletContext();
 
@@ -111,19 +106,7 @@ public class MainDispatcherFilter
         if( restMatcher.matches() ) {
             // REST-ful
             
-            RequestDispatcher theRequestDispatcher = null;
-
-            if( theCanvasPath != null && theCanvasPath.length() > 0 ) {
-                // have canvas
-
-                InfoGridWebApp app = InfoGridWebApp.getSingleton();
-                
-                theRequestDispatcher = app.findLocalizedRequestDispatcher( theCanvasPath, lidRequest.acceptLanguageIterator(), context );
-            }
-            if( theRequestDispatcher == null ) {
-                // no canvas
-                theRequestDispatcher = context.getNamedDispatcher( theViewletDispatcherServletName );
-            }
+            RequestDispatcher theRequestDispatcher = context.getNamedDispatcher( theViewletDispatcherServletName );
             
             theRequestDispatcher.include( request, response );
 
@@ -168,11 +151,6 @@ public class MainDispatcherFilter
      * Regular expression that identifies REST-ful requests.
      */
     protected Pattern theRestPattern;
-
-    /**
-     * The path to the canvas, if any.
-     */
-    protected String theCanvasPath;
 
     /**
      * Name of the ViewletDispatcherServlet in the web.xml file, if any.

@@ -14,13 +14,12 @@
 
 package org.infogrid.jee.rest.net;
 
+import java.net.URISyntaxException;
 import org.infogrid.jee.rest.RestfulRequest;
-
+import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.Proxy;
-import org.infogrid.meshbase.MeshObjectAccessException;
-
-import java.net.URISyntaxException;
 
 /**
  * Encapsulates parameter parsing according to InfoGrid REST conventions.
@@ -38,6 +37,7 @@ public interface NetRestfulRequest
     public NetMeshBaseIdentifier determineRequestedProxyIdentifier()
         throws
             MeshObjectAccessException,
+            NotPermittedException,
             URISyntaxException;
     
     /**
@@ -48,5 +48,6 @@ public interface NetRestfulRequest
     public Proxy determineRequestedProxy()
         throws
             MeshObjectAccessException,
+            NotPermittedException,
             URISyntaxException;
 }
