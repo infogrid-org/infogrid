@@ -116,10 +116,11 @@ public class AllTests
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception many kinds of things might go wrong in a test
+     */
     public AllTests(
             String [] args )
         throws
