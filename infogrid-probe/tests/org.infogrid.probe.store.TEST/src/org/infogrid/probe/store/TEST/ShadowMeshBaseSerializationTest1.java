@@ -74,6 +74,7 @@ public class ShadowMeshBaseSerializationTest1
                                 null,
                                 null,
                                 false,
+                                false,
                                 null,
                                 -1,
                                 -1 )
