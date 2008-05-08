@@ -33,6 +33,7 @@ import org.infogrid.mesh.security.PropertyReadOnlyException;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
+import org.infogrid.meshbase.transaction.NotWithinTransactionBoundariesException;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.module.ModuleActivationException;
@@ -74,7 +75,7 @@ public class ProbeTest5
                 IsAbstractException.class,
                 MeshObjectIdentifierNotUniqueException.class,
                 RelatedAlreadyException.class,
-                TransactionException.NotWithinTransactionBoundaries.class,
+                NotWithinTransactionBoundariesException.class,
                 ProbeException.EmptyDataSource.class,
                 ProbeException.ErrorInProbe.class,
                 ProbeException.IncompleteData.class,
@@ -276,7 +277,7 @@ public class ProbeTest5
                 case 4:
                     throw new RelatedAlreadyException( placeholder, placeholder );
                 case 5:
-                    throw new TransactionException.NotWithinTransactionBoundaries( mb );
+                    throw new NotWithinTransactionBoundariesException( mb );
                 case 6:
                     throw new ProbeException.EmptyDataSource( networkId );
                 case 7:
