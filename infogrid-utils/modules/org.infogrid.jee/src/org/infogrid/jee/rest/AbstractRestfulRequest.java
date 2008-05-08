@@ -154,10 +154,12 @@ public abstract class AbstractRestfulRequest
         String [] formats = theSaneRequest.getMultivaluedArgument( argName );
         String    ret     = NO_ANSWER_STRING;
 
-        for( int i=0 ; i<formats.length ; ++i ) {
-            if( formats[i].startsWith( prefix )) {
-                ret = formats[i].substring( prefix.length() );
-                break;
+        if( formats != null ) {
+            for( int i=0 ; i<formats.length ; ++i ) {
+                if( formats[i].startsWith( prefix )) {
+                    ret = formats[i].substring( prefix.length() );
+                    break;
+                }
             }
         }
         
