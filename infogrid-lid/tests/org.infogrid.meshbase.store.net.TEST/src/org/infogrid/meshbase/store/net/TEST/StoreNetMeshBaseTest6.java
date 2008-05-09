@@ -53,8 +53,8 @@ public class StoreNetMeshBaseTest6
         MPingPongNetMessageEndpointFactory endpointFactoryA = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactoryA.setNameServer( theNameServerA );
 
-        NetStoreMeshBase mb1A = NetStoreMeshBase.create( net1, theModelBase, null, mb1MeshStore, mb1ProxyStore, endpointFactoryA, rootContext );
-        NetStoreMeshBase mb2A = NetStoreMeshBase.create( net2, theModelBase, null, mb2MeshStore, mb2ProxyStore, endpointFactoryA, rootContext );
+        mb1A = NetStoreMeshBase.create( net1, theModelBase, null, mb1MeshStore, mb1ProxyStore, endpointFactoryA, rootContext );
+        mb2A = NetStoreMeshBase.create( net2, theModelBase, null, mb2MeshStore, mb2ProxyStore, endpointFactoryA, rootContext );
         
         theNameServerA.put( mb1A.getIdentifier(), mb1A );
         theNameServerA.put( mb2A.getIdentifier(), mb2A );
@@ -111,8 +111,8 @@ public class StoreNetMeshBaseTest6
         MPingPongNetMessageEndpointFactory endpointFactoryB = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactoryB.setNameServer( theNameServerB );
 
-        NetStoreMeshBase mb1B = NetStoreMeshBase.create( net1, theModelBase, null, mb1MeshStore, mb1ProxyStore, endpointFactoryB, rootContext );
-        NetStoreMeshBase mb2B = NetStoreMeshBase.create( net2, theModelBase, null, mb2MeshStore, mb2ProxyStore, endpointFactoryB, rootContext );
+        mb1B = NetStoreMeshBase.create( net1, theModelBase, null, mb1MeshStore, mb1ProxyStore, endpointFactoryB, rootContext );
+        mb2B = NetStoreMeshBase.create( net2, theModelBase, null, mb2MeshStore, mb2ProxyStore, endpointFactoryB, rootContext );
         
         theNameServerB.put( mb1B.getIdentifier(), mb1B );
         theNameServerB.put( mb2B.getIdentifier(), mb2B );
@@ -208,6 +208,19 @@ public class StoreNetMeshBaseTest6
     @Override
     public void cleanup()
     {
+        if( mb1A != null ) {
+            mb1A.die();
+        }
+        if( mb2A != null ) {
+            mb2A.die();
+        }
+        if( mb1B != null ) {
+            mb1B.die();
+        }
+        if( mb2B != null ) {
+            mb2B.die();
+        }
+
         exec.shutdown();
     }
 
@@ -240,6 +253,14 @@ public class StoreNetMeshBaseTest6
      * The Store storing NetMeshBase mb2's Proxies.
      */
     protected IterablePrefixingStore mb2ProxyStore;
+
+    /**
+     * MeshBases to shut down at the end of the test.
+     */
+    protected NetStoreMeshBase mb1A;
+    protected NetStoreMeshBase mb2A;
+    protected NetStoreMeshBase mb1B;
+    protected NetStoreMeshBase mb2B;
 
     /**
      * Our ThreadPool.
