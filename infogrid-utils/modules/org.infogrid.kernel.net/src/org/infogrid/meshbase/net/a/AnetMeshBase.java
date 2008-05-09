@@ -1135,7 +1135,7 @@ public abstract class AnetMeshBase
      */
     private long theTryToObtainLockTimeout = theResourceHelper.getResourceLongOrDefault(
             "TryToObtainLockTimeout",
-            2000L ); // 2 sec
+            5000L ); // 2 sec
 
     /**
      * The duration, in milliseconds, that we are willing to suspend a Thread to wait for tryToObtainHomeReplica()
@@ -1143,7 +1143,7 @@ public abstract class AnetMeshBase
      */
     private long theTryToObtainHomeReplicaTimeout = theResourceHelper.getResourceLongOrDefault(
             "TryToObtainHomeReplicaTimeout",
-            2000L ); // 2 sec
+            5000L ); // 2 sec
 
     /**
      * The default value for the willGiveUpLock property of newly created NetMeshObjects.
