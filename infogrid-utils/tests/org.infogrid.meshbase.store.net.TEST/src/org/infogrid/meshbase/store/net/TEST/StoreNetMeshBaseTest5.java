@@ -195,7 +195,7 @@ public class StoreNetMeshBaseTest5
     {
         mb1.die();
         mb2.die();
-        
+
         exec.shutdown();
     }
 
