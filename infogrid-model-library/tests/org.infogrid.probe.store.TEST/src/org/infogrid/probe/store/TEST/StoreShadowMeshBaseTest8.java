@@ -114,7 +114,7 @@ public class StoreShadowMeshBaseTest8
         base.die();
         base          = null;
 
-        Thread.sleep( 2000L );
+        Thread.sleep( 4000L );
         collectGarbage();
         
         //
