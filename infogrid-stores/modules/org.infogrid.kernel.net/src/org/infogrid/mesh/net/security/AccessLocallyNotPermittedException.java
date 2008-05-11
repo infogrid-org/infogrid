@@ -44,16 +44,27 @@ public class AccessLocallyNotPermittedException
         theFailedPaths = failedPaths;
     }
     
-    /**
-     * Obtain the NetMeshObjectAccessSpecifications that could not be accessed.
-     * 
+     /**
+     * Obtain the failed NetMeshObjectAccessSpecifications.
+     *
      * @return the NetMeshObjectAccessSpecifications
      */
-    public NetMeshObjectAccessSpecification [] getFailedPaths()
+    public NetMeshObjectAccessSpecification [] getFailedAccessSpecifications()
     {
         return theFailedPaths;
     }
     
+    /**
+     * Obtain resource parameters for the internationalization.
+     *
+     * @return the resource parameters
+     */
+    @Override
+    public Object [] getLocalizationParameters()
+    {
+        return new Object[] { theOriginatingMeshBaseIdentifier, theFailedPaths };
+    }
+
     /**
      * The failed paths.
      */
