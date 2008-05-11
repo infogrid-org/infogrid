@@ -19,7 +19,6 @@ import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
-import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.m.NetMMeshBase;
 import org.infogrid.meshbase.net.security.DelegatingNetAccessManager;
@@ -31,6 +30,7 @@ import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.util.logging.Log;
 
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.net.security.AccessLocallyNotPermittedException;
 
 /**
  * Tests NetAccessManager protections for accessLocally.
@@ -82,9 +82,8 @@ public class XprisoTest13
             reportError( "Should have thrown exception" );
             checkObject( obja_mb3, "obja_mb3 unexpectedly found" );
 
-        } catch( NetMeshObjectAccessException ex ) {
+        } catch( AccessLocallyNotPermittedException ex ) {
             // correctly
-            checkEqualsInSequence( ex.getBestEffortResult(),           new NetMeshObjectIdentifier[1],                  "Unexpected best-effort result" );
             checkEqualsInSequence( ex.getFailedAccessSpecifications(), new NetMeshObjectAccessSpecification[] { spec }, "wrong NetMeshObjectAccessSpecification" );
         }
     }
