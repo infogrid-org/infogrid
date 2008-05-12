@@ -796,21 +796,30 @@ public abstract class AbstractTest
      * 
      * @param ref the Reference that needs to be cleared
      * @param max the maximum number of milliseconds
+     * @param msg the error message is the object is still around after max milliseconds
      * @throws InterruptedException thrown if the Thread was interrupted
      */
     protected void sleepUntilIsGone(
             Reference<?> ref,
-            long         max )
+            long         max,
+            String       msg )
         throws
             InterruptedException
     {
+        if( ref.get() == null ) {
+            return;
+        }
+
         long end = System.currentTimeMillis() + max;
-        
+
         System.gc();
 
         while( ref.get() != null && System.currentTimeMillis() < end ) {
-            Thread.sleep( 100L );
+            Thread.sleep( 50L );
             System.gc();
+        }
+        if( ref.get() != null ) {
+            reportError( msg );
         }
     }
 
