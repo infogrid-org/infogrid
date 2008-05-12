@@ -99,7 +99,7 @@ public class StoreShadowMeshBaseTest9
         base.die();
         base          = null;
 
-        sleepUntilIsGone( baseRef, 20000L );
+        sleepUntilIsGone( baseRef, 20000L, "base still here" );
         
         //
         
@@ -180,6 +180,7 @@ public class StoreShadowMeshBaseTest9
      * Constructor.
      *
      * @param args the command-line arguments
+     * @throws tests can throw all kinds of Exceptions
      */
     public StoreShadowMeshBaseTest9(
             String [] args )
