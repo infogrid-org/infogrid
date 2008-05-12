@@ -93,14 +93,10 @@ public class StoreNetMeshBaseTest6
         mb1A = null;
         mb2A = null;
         
-        Thread.sleep( 1000L );
-        
-        super.collectGarbage();
-        
-        checkCondition( mb1ARef.get() == null, "MB1 still here" );
-        checkCondition( mb2ARef.get() == null, "MB2 still here" );
-        checkCondition( obj1_1ARef.get() == null, "obj1_1 still here" );
-        checkCondition( obj1_2ARef.get() == null, "obj1_2 still here" );
+        sleepUntilIsGone( mb1ARef, 5000L, "MB1 still here" );
+        sleepUntilIsGone( mb2ARef, 50000L, "MB2 still here" );
+        sleepUntilIsGone( obj1_1ARef, 1000L, "obj1_1 still here" );
+        sleepUntilIsGone( obj1_2ARef, 1000L, "obj1_2 still here" );
         
         //
         
