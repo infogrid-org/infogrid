@@ -410,16 +410,16 @@ public abstract class AShadowMeshBase
     /**
      * Override finalize, so we get a debug message.
      */
-    @Override
-    protected void finalize()
-        throws
-            Throwable
-    {
-        if( log.isDebugEnabled() ) {
-            log.debug( this + ".finalize()" );
-        }
-        super.finalize();
-    }
+//    @Override
+//    protected void finalize()
+//        throws
+//            Throwable
+//    {
+//        if( log.isDebugEnabled() ) {
+//            log.debug( this + ".finalize()" );
+//        }
+//        super.finalize();
+//    }
 
     /**
      * Obtain the same MeshBase as ExternalizedMeshBase so it can be easily serialized.
