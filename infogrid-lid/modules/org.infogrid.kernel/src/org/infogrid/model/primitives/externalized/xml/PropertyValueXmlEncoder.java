@@ -14,6 +14,14 @@
 
 package org.infogrid.model.primitives.externalized.xml;
 
+import java.awt.Color;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.Stack;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.primitives.BooleanValue;
 import org.infogrid.model.primitives.ColorValue;
@@ -27,30 +35,17 @@ import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.model.primitives.TimePeriodValue;
 import org.infogrid.model.primitives.TimeStampValue;
-
 import org.infogrid.model.primitives.externalized.DecodingException;
 import org.infogrid.model.primitives.externalized.EncodingException;
 import org.infogrid.model.primitives.externalized.PropertyValueEncoder;
-
 import org.infogrid.util.Base64;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.logging.Log;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import java.awt.Color;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.Stack;
 
 /**
  * Utility methods to encode/decode a PropertyValue to/from XML. Implements the SAX interface.
@@ -230,7 +225,7 @@ public class PropertyValueXmlEncoder
     }
 
     /**
-     * Deserialize a PropertyValue from a byte stream.
+     * Deserialize a PropertyValue from a stream.
      * 
      * @param contentAsStream the byte [] stream in which the PropertyValue is encoded
      * @return return the just-instantiated PropertyValue
@@ -293,7 +288,7 @@ public class PropertyValueXmlEncoder
         try {
             if( length > 0 ) {
                 if( theCharacters == null ) {
-                    theCharacters = new StringBuffer();
+                    theCharacters = new StringBuilder();
                 }
                 theCharacters.append( ch, start, length );
             }
@@ -303,12 +298,13 @@ public class PropertyValueXmlEncoder
     }
 
     /**
-     * SAX says a new element starts.
+     * SAX found a new element.
      *
      * @param namespaceURI URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     public void startElement(
@@ -468,6 +464,7 @@ public class PropertyValueXmlEncoder
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void startElement1(
             String     namespaceURI,
@@ -486,6 +483,7 @@ public class PropertyValueXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     public void endElement(
@@ -579,6 +577,7 @@ public class PropertyValueXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void endElement1(
             String namespaceURI,
@@ -605,7 +604,7 @@ public class PropertyValueXmlEncoder
      * Throw exception in case of an Exception indicating an error.
      *
      * @param ex the Exception
-     * @throws SAXParseException the passed-in Exception
+     * @throws SAXParseException thrown if a parsing error occurs
      */
     public final void error(
             Exception ex )
@@ -778,6 +777,7 @@ public class PropertyValueXmlEncoder
      * @return the original String
      * @see #escape
      */
+    @SuppressWarnings( "fallthrough" )
     public static final String descape(
             String enc )
     {
@@ -912,7 +912,7 @@ public class PropertyValueXmlEncoder
     /**
      * The character String that is currently being parsed, if any.
      */
-    protected StringBuffer theCharacters = null;
+    protected StringBuilder theCharacters = null;
 
     /**
      * The PropertyValue that was successfully parsed.
@@ -926,6 +926,15 @@ public class PropertyValueXmlEncoder
             extends
                 SAXParseException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
+        /**
+         * Constructor.
+         * 
+         * @param message the error message
+         * @param locator indicates the location of the error in the stream
+         * @param cause the underlying cause
+         */
         public FixedSAXParseException(
                 String    message,
                 Locator   locator,

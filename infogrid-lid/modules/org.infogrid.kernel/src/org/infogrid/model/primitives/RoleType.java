@@ -298,10 +298,9 @@ public interface RoleType
     
     /**
      * Check whether the given caller is allowed to remove the MeshObject from its
-     * equivalence set
+     * equivalence set.
      * 
-     * @param one the first MeshObject
-     * @param two the second MeshObject
+     * @param obj the MeshObject to be removed from its equivalence set
      * @param caller the MeshObject representing the caller
      * @throws NotPermittedException thrown if this caller is not permitted to do this 
      */

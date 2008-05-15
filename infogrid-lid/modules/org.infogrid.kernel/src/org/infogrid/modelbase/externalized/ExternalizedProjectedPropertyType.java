@@ -42,7 +42,7 @@ public class ExternalizedProjectedPropertyType
      *
      * @return the value
      */
-    public ArrayList getTraversalToPropertySpecifications()
+    public ArrayList<ExternalizedTraversalToPropertySpecification> getTraversalToPropertySpecifications()
     {
         return inputTraversalToPropertySpecifications;
     }

@@ -15,7 +15,7 @@
 package org.infogrid.mesh.externalized.xml;
 
 /**
- *
+ * XML tags for the BulkLoader.
  */
 public interface BulkExternalizedMeshObjectXmlTags
         extends

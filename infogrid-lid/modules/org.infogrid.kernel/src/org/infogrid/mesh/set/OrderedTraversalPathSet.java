@@ -17,7 +17,7 @@ package org.infogrid.mesh.set;
 import org.infogrid.model.traversal.TraversalPath;
 
 /**
- * This is a TraversalPathSet whose content is ordered according to some criteria.
+ * A TraversalPathSet whose content is ordered according to some criteria.
  * Consequently, it provides methods that only are appropriate for OrderedTraversalPathSets.
  */
 public interface OrderedTraversalPathSet

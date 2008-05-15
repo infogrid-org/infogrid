@@ -19,7 +19,7 @@ import org.infogrid.mesh.MeshObject;
 import org.infogrid.modelbase.ModelBase;
 
 /**
- * Factors out functionality that is common to man types of TraversalDictionary.
+ * Factors out functionality that is common to many types of TraversalDictionary.
  */
 public abstract class AbstractTraversalDictionary
     implements
@@ -37,7 +37,7 @@ public abstract class AbstractTraversalDictionary
     }
     
     /**
-     * Translate the String form of a traversal path into an actual TraversalPath.
+     * Translate the String form of a TraversalSpecification into an actual TraversalSpecification.
      *
      * @param startObject the start MeshObject for the traversal
      * @param traversalTerm the term to be translated
@@ -52,10 +52,10 @@ public abstract class AbstractTraversalDictionary
     }
 
     /**
-     * Translate an actual TraversalPath into a String form;
+     * Translate an actual TraversalSpecification into String form.
      *
      * @param startObject the start MeshObject for the traversal
-     * @paran traversal the TraversalSpecification
+     * @param traversal the TraversalSpecification
      * @return the external form
      */
     public String translate(
@@ -69,15 +69,15 @@ public abstract class AbstractTraversalDictionary
     /**
      * Enable subclasses to insert a translation entry into our tables.
      * 
-     * @param String term 1
-     * @param TraversalSpecification term 2
+     * @param term the term to be added
+     * @param specification the TraversalSpecification to be added
      */
     protected void addTranslationEntry(
-            String                 term1,
-            TraversalSpecification term2 )
+            String                 term,
+            TraversalSpecification specification )
     {
-        theForwardTable.put( term1, term2 );
-        theBackwardTable.put( term2, term1 );
+        theForwardTable.put( term, specification );
+        theBackwardTable.put( specification, term );
     }
 
     /**

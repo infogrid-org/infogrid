@@ -18,7 +18,7 @@ import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
 
 /**
- * This is a degenerated ActiveMeshObjectSet which has constant content. While this may
+ * A degenerated ActiveMeshObjectSet which has constant content. While this may
  * sound a bit crazy, it does happen in practice that a constant set is created and
  * used where an ActiveMeshObjectSet is expected. This implementation fills this need.
  */
@@ -29,12 +29,8 @@ public class ConstantActiveMMeshObjectSet
     /**
      * Private constructor, use factory methods.
      *
-     * @param mb the MeshBase that this MeshObjectSet belongs to
+     * @param factory the MeshObjectSetFactory that created this MeshObjectSet
      * @param content the content of this set
-     * @param pts the set of PropertyTypes whose PropertyChangeEvents we forward to content
-     *        PropertyChangeListeners
-     * @param forwardRptEvents if true, we forward RolePlayerTableEvents to content
-     *        PropertyChangeListeners, otherwise not
      */
     protected ConstantActiveMMeshObjectSet(
             MeshObjectSetFactory factory,

@@ -74,6 +74,7 @@ public interface ActiveMeshObjectSetFactory
      * MeshObjectSets, as long as they are selected by the MeshObjectSelector.
      * 
      * @param operands the sets to unify
+     * @param selector determines which candidates are included
      * @return the created MeshObjectSet
      */
     public CompositeActiveMeshObjectSet createActiveMeshObjectSetUnification(
@@ -96,6 +97,7 @@ public interface ActiveMeshObjectSetFactory
      * selected by the MeshObjectSelector.
      * 
      * @param operands the sets to unify
+     * @param selector determines which candidates are included
      * @return the created MeshObjectSet
      */
     public CompositeActiveMeshObjectSet createActiveMeshObjectSetIntersection(
@@ -107,6 +109,7 @@ public interface ActiveMeshObjectSetFactory
      * 
      * @param content the content of the OrderedMeshObjectSet
      * @param sorter the MeshObjectSorter that determines the ordering within the OrderedMeshObjectSet
+     * @return the created MeshObjectSet
      */
     public OrderedActiveMeshObjectSet createActiveOrderedMeshObjectSet(
             MeshObjectSet    content,
@@ -119,6 +122,7 @@ public interface ActiveMeshObjectSetFactory
      * @param sorter the MeshObjectSorter that determines the ordering within the OrderedMeshObjectSet
      * @param max the maximum number of MeshObjects that will be contained by this set. If the underlying set contains more,
      *        this set will only contain the first max MeshObjects according to the sorter.
+     * @return the created MeshObjectSet
      */
     public OrderedActiveMeshObjectSet createActiveOrderedMeshObjectSet(
             MeshObjectSet    content,

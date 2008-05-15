@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 
 /**
  * Subclassable helper class to initialize a MeshObject when it is blessed with
- * a new type.
+ * a new type. This is not usually relevant to an application developer.
  */
 public class TypeInitializer
 {

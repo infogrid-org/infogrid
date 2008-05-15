@@ -72,10 +72,10 @@ public abstract class NotPermittedException
     /**
      * More convenient simple constructor for the most common case.
      *
-     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param obj the MeshObject on which the illegal operation was attempted
      */
     protected NotPermittedException(
-            MeshObject           obj )
+            MeshObject obj )
     {
         this(   obj.getMeshBase(),
                 obj.getMeshBase().getIdentifier(),
@@ -86,12 +86,12 @@ public abstract class NotPermittedException
     /**
      * More convenient simple constructor for the most common case.
      *
-     * @param obj the MeshObject on which the illegal operation was attempted, if available
+     * @param obj the MeshObject on which the illegal operation was attempted
      * @param cause the underlying cause
      */
     protected NotPermittedException(
-            MeshObject           obj,
-            Throwable            cause )
+            MeshObject obj,
+            Throwable  cause )
     {
         this(   obj.getMeshBase(),
                 obj.getMeshBase().getIdentifier(),

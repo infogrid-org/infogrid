@@ -24,6 +24,8 @@ public class WrongMeshTypeException
         extends
             MeshTypeWithIdentifierNotFoundException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      * 
@@ -42,6 +44,8 @@ public class WrongMeshTypeException
     /**
      * Obtain the type that was found. This will be an interface such as
      * <code>EntityType.class</code>, not a subclass such as <code>MEntityType.class</code>.
+     * 
+     * @return the found type
      */
     public Class<? extends MeshType> getFoundType()
     {
@@ -62,5 +66,5 @@ public class WrongMeshTypeException
     /**
      * The type that was actually found.
      */
-    protected Class<? extends MeshType> theFoundType;
+    protected transient Class<? extends MeshType> theFoundType;
 }

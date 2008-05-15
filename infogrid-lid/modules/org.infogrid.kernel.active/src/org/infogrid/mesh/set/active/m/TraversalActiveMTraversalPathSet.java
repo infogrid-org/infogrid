@@ -53,11 +53,12 @@ import org.infogrid.util.logging.Log;
 /**
   * <p>The TraversalPaths in this ActiveTraversalPathSet are obtained by traversing a
   * TraversalSpecification from a given MeshObject. But instead of being a "snapshot"
-  * of the result, this active set continues to expand and shrink as the MetaRelationship
-  * instances attached to the MeshObject change through actions by other parts of the program.
+  * of the result, this active set continues to expand and shrink as the relationships
+  * and their types in which this MeshObject participates change through actions by
+  * other parts of the program.
   * By listening to the appropriate events, one can monitor this set.</p>
   *
-  * <p>To instantiate, use static factory methods.</p>
+  * <p>To instantiate, use static factory methods on the respective subclasses.</p>
   */
 public abstract class TraversalActiveMTraversalPathSet
         extends
@@ -238,6 +239,7 @@ public abstract class TraversalActiveMTraversalPathSet
          *
          * @param factory the MeshObjectSetFactory that created this TraversalPathSet
          * @param start the MeshObject from which we start the traversal
+         * @param spec the TraversalSpecification to be used
          */
         protected MeshObjectEmpty(
                 MeshObjectSetFactory   factory,
@@ -268,7 +270,7 @@ public abstract class TraversalActiveMTraversalPathSet
     }
 
     /**
-     * This implements a single MetaRole step from a MeshObject.
+     * This implements a single RoleType step from a MeshObject.
      */
     protected static class OneStepFromMeshObject
             extends
@@ -281,6 +283,7 @@ public abstract class TraversalActiveMTraversalPathSet
          *
          * @param factory the MeshObjectSetFactory that created this TraversalPathSet
          * @param start the MeshObject from which we start the traversal
+         * @param spec the TraversalSpecification to be used
          */
         protected OneStepFromMeshObject(
                 MeshObjectSetFactory factory,
@@ -373,7 +376,7 @@ public abstract class TraversalActiveMTraversalPathSet
                         TraversalPath removedPath  = null;
                         int           removedIndex = -1;
                         for( int i=0 ; i<content.length ; ++i ) {
-                            if( content[i].getFirstMeshObject() == removed ) {
+                            if( content[i].getFirstMeshObjectIdentifier().equals( removed.getIdentifier() )) {
                                 removedPath  = content[i];
                                 removedIndex = i;
                                 break;
@@ -439,12 +442,13 @@ public abstract class TraversalActiveMTraversalPathSet
                 ActiveTraversalPathSetListener
     {
         /**
-         * Private constructor, use factory.
+         * Private constructor for subclasses only.
          * We don't do anything about the start selector, because if that one does not accept us,
          * the factory method will have prevented the creation of this instance and returned an empty set instead.
          *
          * @param factory the MeshObjectSetFactory that created this TraversalPathSet
          * @param start the MeshObject from which we start the traversal
+         * @param spec the TraversalSpecification to be used
          */
         protected SelectiveStepFromMeshObject(
                 MeshObjectSetFactory            factory,
@@ -514,7 +518,7 @@ public abstract class TraversalActiveMTraversalPathSet
                 return; // we are not initialized yet -- we can get callbacks as part of our children being constructed
             }
 
-            TraversalPath candidate = event.getAddedTraversalPath();
+            TraversalPath candidate = event.getDeltaValue();
 
             if( theEndSelector.accepts( candidate.getLastMeshObject() )) {
                 certainlyAdd( candidate );
@@ -543,7 +547,7 @@ public abstract class TraversalActiveMTraversalPathSet
 
             // find in currentContent and remove
             TraversalPath [] content = getTraversalPaths();
-            TraversalPath    removed = event.getRemovedTraversalPath();
+            TraversalPath    removed = event.getDeltaValue();
 
             for( int i=0 ; i<content.length ; ++i ) {
                 if( content[i] == removed ) {
@@ -599,6 +603,7 @@ public abstract class TraversalActiveMTraversalPathSet
          *
          * @param factory the MeshObjectSetFactory that created this TraversalPathSet
          * @param start the MeshObject from which we start the traversal
+         * @param spec the TraversalSpecification to be used
          */
         protected MultiStepFromMeshObject(
                 MeshObjectSetFactory                     factory,
@@ -788,7 +793,7 @@ public abstract class TraversalActiveMTraversalPathSet
             TraversalPath newMember = TraversalPath.create(
                     travPrefix,
                     meshObjectPrefix,
-                    event.getAddedTraversalPath() );
+                    event.getDeltaValue() );
             certainlyAdd( newMember );
         }
 
@@ -816,7 +821,7 @@ public abstract class TraversalActiveMTraversalPathSet
 
             // find in currentContent and remove
             for( int i=0 ; i<content.length ; ++i ) {
-                if( content[i].getNextSegment() == event.getRemovedTraversalPath() ) {
+                if( content[i].getNextSegment() == event.getDeltaValue() ) {
                     certainlyRemove( i );
                     break;
                 }
@@ -895,6 +900,7 @@ public abstract class TraversalActiveMTraversalPathSet
          *
          * @param factory the MeshObjectSetFactory that created this TraversalPathSet
          * @param start the MeshObject from which we start the traversal
+         * @param spec the TraversalSpecification to be used
          */
         protected ParallelStepFromMeshObject(
                 MeshObjectSetFactory                      factory,
@@ -968,7 +974,7 @@ public abstract class TraversalActiveMTraversalPathSet
                 return; // we are not initialized yet -- we can get callbacks as part of our children being constructed
             }
 
-            TraversalPath newMember = event.getAddedTraversalPath();
+            TraversalPath newMember = event.getDeltaValue();
             certainlyAdd( newMember );
         }
 
@@ -992,7 +998,7 @@ public abstract class TraversalActiveMTraversalPathSet
                 return; // we are not initialized yet -- we can get callbacks as part of our children being constructed
             }
 
-            TraversalPath removed = event.getRemovedTraversalPath();
+            TraversalPath removed = event.getDeltaValue();
 
             certainlyRemove( removed );
         }
@@ -1063,7 +1069,8 @@ public abstract class TraversalActiveMTraversalPathSet
          * the factory method will have prevented the creation of this instance and returned an empty set instead.
          *
          * @param factory the MeshObjectSetFactory that created this TraversalPathSet
-         * @param start the MeshObject from which we start the traversal
+         * @param startSet the MeshObjectSet from which we start the traversal
+         * @param spec the TraversalSpecification to be used
          */
         protected MeshObjectUnifier(
                 MeshObjectSetFactory   factory,
@@ -1125,7 +1132,7 @@ public abstract class TraversalActiveMTraversalPathSet
                 return;
             }
 
-            TraversalPath added = event.getAddedTraversalPath();
+            TraversalPath added = event.getDeltaValue();
 
             certainlyAdd( added );
         }
@@ -1142,7 +1149,7 @@ public abstract class TraversalActiveMTraversalPathSet
                 return;
             }
 
-            TraversalPath removed = event.getRemovedTraversalPath();
+            TraversalPath removed = event.getDeltaValue();
 
             certainlyRemove( removed );
         }
@@ -1171,7 +1178,7 @@ public abstract class TraversalActiveMTraversalPathSet
             }
 
             // new start object added
-            MeshObject added = event.getAddedMeshObject();
+            MeshObject added = event.getDeltaValue();
 
             TraversalActiveTraversalPathSet childSet = ((ActiveMeshObjectSetFactory)theFactory).createActiveTraversalPathSet(
                     added,
@@ -1199,7 +1206,7 @@ public abstract class TraversalActiveMTraversalPathSet
             }
 
             // start object removed
-            MeshObject removed = event.getRemovedMeshObject();
+            MeshObject removed = event.getDeltaValue();
 
             TraversalActiveTraversalPathSet childSet = theChildrenMap.remove( removed );
             childSet.removeActiveTraversalPathSetListener( this );
@@ -1250,7 +1257,8 @@ public abstract class TraversalActiveMTraversalPathSet
          * the factory method will have prevented the creation of this instance and returned an empty set instead.
          *
          * @param factory the MeshObjectSetFactory that created this TraversalPathSet
-         * @param start the MeshObject from which we start the traversal
+         * @param startSet the MeshObjectSet from which we start the traversal
+         * @param spec the TraversalSpecification to be used
          */
         protected PathUnifier(
                 MeshObjectSetFactory   factory,
@@ -1325,7 +1333,7 @@ public abstract class TraversalActiveMTraversalPathSet
             }
 
             ActiveTraversalPathSet source = (ActiveTraversalPathSet) event.getSource();
-            TraversalPath          added  = event.getAddedTraversalPath();
+            TraversalPath          added  = event.getDeltaValue();
 
             if( theUnderlyingSet == source ) {
                 MeshObject pivotMeshObject = added.getLastMeshObject();
@@ -1358,8 +1366,8 @@ public abstract class TraversalActiveMTraversalPathSet
                 return;
             }
 
-            ActiveTraversalPathSet source  = (ActiveTraversalPathSet) event.getSource();
-            TraversalPath          removed = event.getRemovedTraversalPath();
+            ActiveTraversalPathSet source  = event.getSource();
+            TraversalPath          removed = event.getDeltaValue();
 
             if( theUnderlyingSet == source ) {
                 TraversalPath basePath;

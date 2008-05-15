@@ -17,7 +17,7 @@ package org.infogrid.mesh.net.externalized.xml;
 import org.infogrid.mesh.externalized.xml.BulkExternalizedMeshObjectXmlTags;
 
 /**
- *
+ * XML tags for the BulkLoader loading NetMeshObjects.
  */
 public interface BulkExternalizedNetMeshObjectXmlTags
         extends
