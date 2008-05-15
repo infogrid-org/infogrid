@@ -37,9 +37,8 @@ import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.module.ModuleRequirement;
 
 /**
-  * This is a life cycle manager for MeshTypes created and stored in a ModelBase.
-  *
-  * At this point, we do not support the obsoletion of MeshTypes. Likely, we never will.
+  * <p>A life cycle manager for MeshTypes created and stored in a ModelBase.</p>
+  * <p>At this point, we do not support the obsoletion of MeshTypes. Likely, we never will.</p>
   */
 public interface MeshTypeLifecycleManager
 {
@@ -381,6 +380,8 @@ public interface MeshTypeLifecycleManager
      * @param doGenerateInterfaceCode if BooleanValue.TRUE, instructs code generator to generate interface code
      * @param doGenerateImplementationCode if BooleanValue.TRUE, instructs code generator to generate implementation code
      * @return the newly created ProjectedPropertyType
+     * @throws InheritanceConflictException thrown if the overriding ProjectedPropertyType cannot be created because the
+     *        consistency constraints in the model were not met
      */
     public ProjectedPropertyTypePatcher createOverridingProjectedPropertyType(
             PropertyType []                     toOverride,

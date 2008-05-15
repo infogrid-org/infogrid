@@ -14,20 +14,6 @@
 
 package org.infogrid.mesh.set.active.m;
 
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.set.MeshObjectSet;
-import org.infogrid.mesh.set.active.ActiveMeshObjectSetListener;
-import org.infogrid.mesh.set.active.MeshObjectAddedEvent;
-import org.infogrid.mesh.set.active.MeshObjectRemovedEvent;
-import org.infogrid.mesh.set.active.OrderedActiveMeshObjectSetReorderedEvent;
-
-import org.infogrid.meshbase.transaction.MeshObjectPropertyChangeEvent;
-import org.infogrid.meshbase.transaction.MeshObjectRoleChangeEvent;
-
-import org.infogrid.model.traversal.TraversalSpecification;
-
-import org.infogrid.util.logging.Log;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -35,9 +21,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.mesh.set.active.ActiveMeshObjectSetFactory;
+import org.infogrid.mesh.set.active.ActiveMeshObjectSetListener;
+import org.infogrid.mesh.set.active.MeshObjectAddedEvent;
+import org.infogrid.mesh.set.active.MeshObjectRemovedEvent;
+import org.infogrid.mesh.set.active.OrderedActiveMeshObjectSetReorderedEvent;
 import org.infogrid.mesh.set.active.TraversalActiveMeshObjectSet;
+import org.infogrid.meshbase.transaction.MeshObjectPropertyChangeEvent;
+import org.infogrid.meshbase.transaction.MeshObjectRoleChangeEvent;
+import org.infogrid.model.traversal.TraversalSpecification;
+import org.infogrid.util.logging.Log;
 
 /**
  * <p>This is an ActiveMeshObjectSet whose elements are obtained by repeatedly
@@ -76,7 +72,7 @@ public class TransitiveClosureTraversalActiveMMeshObjectSet
      *
      * @param factory the MeshObjectSetFactory that created this MeshObjectSet
      * @param root the root MeshObject from where we attempt to traverse
-     * @param filterPts the PropertyTypes for whose PropertyChangeEvents we are looking (all if null)
+     * @param spec the TraversalSpecification to use
      */
     protected TransitiveClosureTraversalActiveMMeshObjectSet(
             MeshObjectSetFactory   factory,
@@ -265,7 +261,7 @@ public class TransitiveClosureTraversalActiveMMeshObjectSet
                 = (TraversalActiveMMeshObjectSet.StartFromMeshObject) event.getSource();
         MeshObject from = sourceSet.getStartOfTraversalMeshObject();
 
-        MeshObject added       = event.getAddedMeshObject();
+        MeshObject added       = event.getDeltaValue();
         Memento    m           = theMap.get( added );
         Memento    fromMemento = theMap.get( from );
         if( m == null ) {
@@ -304,7 +300,7 @@ public class TransitiveClosureTraversalActiveMMeshObjectSet
                 = (TraversalActiveMMeshObjectSet.StartFromMeshObject) event.getSource();
         MeshObject from = sourceSet.getStartOfTraversalMeshObject();
 
-        MeshObject removed = event.getRemovedMeshObject();
+        MeshObject removed = event.getDeltaValue();
 
         ArrayList<MeshObject> removedMeshObjects = new ArrayList<MeshObject>();
 

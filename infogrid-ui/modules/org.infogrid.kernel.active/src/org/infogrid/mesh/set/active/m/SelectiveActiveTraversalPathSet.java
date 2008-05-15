@@ -131,7 +131,7 @@ public abstract class SelectiveActiveTraversalPathSet
                 return;
             }
 
-            TraversalPath path = event.getAddedTraversalPath();
+            TraversalPath path = event.getDeltaValue();
 
             if( theSelector.accepts( path )) {
                 certainlyAdd( path );
@@ -150,7 +150,7 @@ public abstract class SelectiveActiveTraversalPathSet
                 return;
             }
 
-            TraversalPath path = event.getRemovedTraversalPath();
+            TraversalPath path = event.getDeltaValue();
 
             if( contains( path )) {
                 certainlyRemove( path );
@@ -179,8 +179,8 @@ public abstract class SelectiveActiveTraversalPathSet
          * @param number the maximum number of TraversalPaths in this set
          */
         protected ComparatorCrit(
-                MeshObjectSetFactory   factory,
-                ActiveTraversalPathSet delegate,
+                MeshObjectSetFactory      factory,
+                ActiveTraversalPathSet    delegate,
                 Comparator<TraversalPath> comp,
                 int                       number )
         {
@@ -211,7 +211,7 @@ public abstract class SelectiveActiveTraversalPathSet
                 return;
             }
 
-            TraversalPath path = event.getAddedTraversalPath();
+            TraversalPath path = event.getDeltaValue();
 
             TraversalPath [] ourContent = getTraversalPaths();
             TraversalPath removed = null;
@@ -256,7 +256,7 @@ public abstract class SelectiveActiveTraversalPathSet
                 return;
             }
 
-            TraversalPath obj = event.getRemovedTraversalPath();
+            TraversalPath obj = event.getDeltaValue();
 
             if( theDelegate.size() < n ) {
                 certainlyRemove( obj );

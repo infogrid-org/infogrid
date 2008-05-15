@@ -15,7 +15,7 @@
 package org.infogrid.model.primitives.externalized.xml;
 
 /**
- * XML tags used for the default PropertyValue encoding.
+ * XML tags for the default PropertyValue encoding.
  */
 public interface PropertyValueXmlTags
 {

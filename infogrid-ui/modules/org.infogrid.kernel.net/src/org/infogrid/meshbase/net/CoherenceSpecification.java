@@ -20,16 +20,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Subclasses indicate the desired coherence between replicas of the same information
- * in different network locations.
+ * Captures the requirements for coherence between replicas. This is an abstract
+ * class; concrete subclasses are defined as inner classes.
  */
 public abstract class CoherenceSpecification
 {
     /**
-     * Parse a ScopeSpecification's external form and instantiate the right subclass.
+     * Parse a CoherenceSpecification's external form and instantiate the right subclass.
      *
      * @param ext the external form
-     * @return the created ScopeSpecification
+     * @return the created CoherenceSpecification
      */
     public static CoherenceSpecification fromExternalForm(
             String ext )
@@ -76,6 +76,7 @@ public abstract class CoherenceSpecification
      *
      * @return String representation
      */
+    @Override
     public String toString()
     {
         return toExternalForm();
@@ -116,7 +117,7 @@ public abstract class CoherenceSpecification
             theResourceHelper.getResourceDoubleOrDefault( "DefaultAdaptiveFactor", 1.1 ));
 
     /**
-     * CoherenceSpecification that asks for periodic updates.
+     * A CoherenceSpecification that asks for periodic updates.
      */
     public static class Periodic
             extends
@@ -125,7 +126,7 @@ public abstract class CoherenceSpecification
         /**
          * Constructor.
          *
-         * @param period the time period, in milliseconds
+         * @param period the requested maximum time period between updates, in milliseconds
          */
         public Periodic(
                 long period )
@@ -180,6 +181,7 @@ public abstract class CoherenceSpecification
          *
          * @param other the Object to compare with
          */
+        @Override
         public boolean equals(
                 Object other )
         {
@@ -188,6 +190,17 @@ public abstract class CoherenceSpecification
             }
             Periodic realOther = (Periodic) other;
             return thePeriod == realOther.thePeriod;
+        }
+
+        /**
+         * Determine hash code.
+         * 
+         * @return hash code
+         */
+        @Override
+        public int hashCode()
+        {
+            return (int) ( thePeriod >> 8 ); // more randomness that way
         }
 
         /**
@@ -204,7 +217,7 @@ public abstract class CoherenceSpecification
     }
 
     /**
-     * CoherenceSpecification that asks for periodic updates according to an adaptive schedule
+     * A CoherenceSpecification that asks for periodic updates according to an adaptive schedule.
      */
     public static class AdaptivePeriodic
             extends
@@ -214,7 +227,7 @@ public abstract class CoherenceSpecification
          * Constructor.
          *
          * @param fallbackDelay the time period, in milliseconds, for the next run after a change has been detected
-         * @paran maxDelay      the maximum time period between runs
+         * @param maxDelay      the maximum time period between runs
          * @param adaptiveFactor the multiplier by which the current delay is increased if no change has been detected
          */
         public AdaptivePeriodic(
@@ -300,6 +313,7 @@ public abstract class CoherenceSpecification
          *
          * @param other the Object to compare with
          */
+        @Override
         public boolean equals(
                 Object other )
         {
@@ -318,6 +332,17 @@ public abstract class CoherenceSpecification
                 return false;
             }
             return true;
+        }
+
+        /**
+         * Determine hash code.
+         * 
+         * @return hash code
+         */
+        @Override
+        public int hashCode()
+        {
+            return (int) ( theMaxDelay ^ theFallbackDelay ^ ((long) (theAdaptiveFactor*1024.f)) >> 8 ); // more randomness that way
         }
 
         /**

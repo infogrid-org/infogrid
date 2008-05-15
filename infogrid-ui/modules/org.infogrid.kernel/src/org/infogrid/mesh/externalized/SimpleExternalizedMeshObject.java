@@ -247,7 +247,6 @@ public class SimpleExternalizedMeshObject
      * Obtain the MeshObjectIdentifier of the neighbors of this MeshObject.
      *
      * @return the MeshObjectIdentifier of the neighbors
-     * @see #getRoleTypes
      */
     public MeshObjectIdentifier [] getNeighbors()
     {

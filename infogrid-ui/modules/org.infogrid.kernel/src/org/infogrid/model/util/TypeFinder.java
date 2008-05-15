@@ -35,9 +35,7 @@ public abstract class TypeFinder
      * ModelModules to resolve the request. This uses String instead of MeshObjectIdentifier to
      * simplify the API for the code generator purpose.
      * 
-     * 
-     * 
-     * @param identifierString Identifier of the to-be-found MeshType
+     * @param identifierString identifier of the to-be-found MeshType
      * @return the found MeshType, or null if not found
      */
     public static EntityType findEntityType(

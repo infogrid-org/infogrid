@@ -27,8 +27,6 @@ public abstract class AbstractMeshObjectSetFactory
 {
     /**
      * Constructor for subclasses only.
-     * 
-     * @param mb the MeshBase to which this MeshObjectSetFactory belongs
      */
     protected AbstractMeshObjectSetFactory()
     {
@@ -218,7 +216,7 @@ public abstract class AbstractMeshObjectSetFactory
      * content contained in all the sets and without duplicates.
      *
      * @param inputSets the set of input MeshObjectSets to be unified
-     * @param optional selector for the resulting MeshObjects
+     * @param selector selector for the resulting MeshObjects
      * @return the MeshObjects that are contained in the inputSets, but without duplicates
      */
     protected static MeshObject [] unify(
@@ -256,7 +254,7 @@ public abstract class AbstractMeshObjectSetFactory
      * contained in everyone of the sets and without duplicates.
      *
      * @param inputSets the set of input MeshObjectSets to be intersected
-     * @param optional selector for the resulting MeshObjects
+     * @param selector selector for the resulting MeshObjects
      * @return the MeshObjects that are contained in all of the inputSets
      */
     protected static MeshObject [] intersect(

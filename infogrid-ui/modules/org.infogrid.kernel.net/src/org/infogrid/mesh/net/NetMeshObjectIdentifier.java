@@ -26,9 +26,9 @@ public interface NetMeshObjectIdentifier
             MeshObjectIdentifier
 {
     /**
-     * Obtain the Identifier of the MeshBase in which this NetMeshObjectIdentifier was allocated.
+     * Obtain the identifier of the MeshBase in which this NetMeshObjectIdentifier was allocated.
      *
-     * @return the Identifier of the MeshBase
+     * @return the identifier of the MeshBase
      */
     public abstract NetMeshBaseIdentifier getNetMeshBaseIdentifier();
     
@@ -38,7 +38,6 @@ public interface NetMeshObjectIdentifier
      * @return the local external form
      */
     public abstract String toLocalExternalForm();
-
 
     /**
      * To save memory, this constant is allocated here and used wherever appropriate.

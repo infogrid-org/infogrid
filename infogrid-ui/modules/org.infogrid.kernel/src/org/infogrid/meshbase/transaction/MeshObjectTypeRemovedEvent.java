@@ -121,7 +121,7 @@ public class MeshObjectTypeRemovedEvent
      * <p>This method will attempt to create a Transaction if none is present on the
      * current Thread.</p>
      *
-     * @param base the MeshBase in which to apply the Change
+     * @param otherMeshBase the MeshBase in which to apply the Change
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in MeshBase base

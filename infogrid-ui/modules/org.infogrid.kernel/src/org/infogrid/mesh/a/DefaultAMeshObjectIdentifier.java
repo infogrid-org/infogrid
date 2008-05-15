@@ -187,9 +187,4 @@ public class DefaultAMeshObjectIdentifier
      * The home entry in the resouce files, prefixed by the StringRepresentation's prefix.
      */
     public static final String HOME_DEFAULT_ENTRY = "HomeString";
-
-    /**
-     * Our ResourceHelper.
-     */
-    public static final ResourceHelper RESOURCEHELPER = ResourceHelper.getInstance( DefaultAMeshObjectIdentifier.class );
 }

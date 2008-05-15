@@ -17,14 +17,16 @@ package org.infogrid.meshbase;
 import org.infogrid.model.primitives.externalized.DecodingException;
 
 /**
- * This Exception is thrown if something went wrong during bulk load.
+ * Thrown if something went wrong during bulk load.
  */
 public class BulkLoadException
         extends
             DecodingException
 {
+    private static final long serialVersionUID = 1l; // helps with serialization
+
     /**
-     * Constructor.
+     * Constructor for subclasses only.
      *
      * @param cause the underlying cause for the BulkLoadException
      */
@@ -63,6 +65,8 @@ public class BulkLoadException
     public static class NotSupported
             extends BulkLoadException
     {
+        private static final long serialVersionUID = 1l; // helps with serialization
+
         /**
          * Constructor.
          */

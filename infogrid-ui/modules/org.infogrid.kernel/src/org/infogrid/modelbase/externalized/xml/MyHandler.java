@@ -14,9 +14,14 @@
 
 package org.infogrid.modelbase.externalized.xml;
 
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import org.infogrid.mesh.set.ByTypeMeshObjectSelector;
 import org.infogrid.mesh.set.MeshObjectSelector;
-
 import org.infogrid.model.primitives.AttributableMeshType;
 import org.infogrid.model.primitives.BlobDataType;
 import org.infogrid.model.primitives.BlobValue;
@@ -35,12 +40,13 @@ import org.infogrid.model.primitives.IntegerDataType;
 import org.infogrid.model.primitives.IntegerValue;
 import org.infogrid.model.primitives.L10Map;
 import org.infogrid.model.primitives.L10MapImpl;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MultiplicityDataType;
 import org.infogrid.model.primitives.MultiplicityValue;
 import org.infogrid.model.primitives.PointDataType;
 import org.infogrid.model.primitives.PointValue;
-import org.infogrid.model.primitives.PropertyTypeGroup;
 import org.infogrid.model.primitives.PropertyType;
+import org.infogrid.model.primitives.PropertyTypeGroup;
 import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.RelationshipType;
 import org.infogrid.model.primitives.RoleType;
@@ -51,20 +57,15 @@ import org.infogrid.model.primitives.TimePeriodDataType;
 import org.infogrid.model.primitives.TimePeriodValue;
 import org.infogrid.model.primitives.TimeStampDataType;
 import org.infogrid.model.primitives.TimeStampValue;
-
+import org.infogrid.model.primitives.externalized.xml.PropertyValueXmlEncoder;
 import org.infogrid.model.traversal.SelectiveTraversalSpecification;
 import org.infogrid.model.traversal.SequentialCompoundTraversalSpecification;
 import org.infogrid.model.traversal.TraversalSpecification;
 import org.infogrid.model.traversal.TraversalToPropertySpecification;
-
-import org.infogrid.model.primitives.MeshTypeIdentifier;
-import org.infogrid.model.primitives.externalized.xml.PropertyValueXmlEncoder;
-
 import org.infogrid.modelbase.MeshTypeLifecycleManager;
 import org.infogrid.modelbase.MeshTypeNotFoundException;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ProjectedPropertyTypePatcher;
-
 import org.infogrid.modelbase.externalized.ExternalizedAttributableMeshType;
 import org.infogrid.modelbase.externalized.ExternalizedAttributes;
 import org.infogrid.modelbase.externalized.ExternalizedEntityType;
@@ -80,18 +81,11 @@ import org.infogrid.modelbase.externalized.ExternalizedSubjectArea;
 import org.infogrid.modelbase.externalized.ExternalizedSubjectAreaDependency;
 import org.infogrid.modelbase.externalized.ExternalizedTraversalSpecification;
 import org.infogrid.modelbase.externalized.ExternalizedTraversalToPropertySpecification;
-
 import org.infogrid.module.ModuleRequirement;
-
 import org.infogrid.util.logging.Log;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
 
 /**
  * This is the handler for the SAX callbacks during model XML parsing.
@@ -353,9 +347,6 @@ public class MyHandler
                     // noop
                     break;
                 case XmlModelTokens.REFINES_TOKEN:
-                    // noop
-                    break;
-                case XmlModelTokens.TOP_TOKEN:
                     // noop
                     break;
                 case XmlModelTokens.TO_OVERRIDE_TOKEN:
@@ -863,11 +854,6 @@ public class MyHandler
                     theRoleType        = (ExternalizedRoleType) theStack.peek();
                     theRoleType.addRefines( theCharacters.toString() );
                     break;
-                case XmlModelTokens.TOP_TOKEN:
- log.error( "unexpected TOP -- thought we got rid of it" );
-                    theRoleType        = (ExternalizedRoleType) theStack.peek();
-                    // theRoleType.top    = createTypeIdentifierFrom( theCharacters );
-                    break;
                 case XmlModelTokens.TO_OVERRIDE_TOKEN:
                     temp               = theStack.peek();
                     if( temp instanceof ExternalizedPropertyType ) {
@@ -986,7 +972,7 @@ public class MyHandler
                     break;
                 case XmlModelTokens.MULTIPLICITY_VALUE_TOKEN:
                     theRoleType      = (ExternalizedRoleType) theStack.peek();
-                    theRoleType.setMultiplicity( (MultiplicityValue) createMultiplicityValueFrom( theCharacters ));
+                    theRoleType.setMultiplicity( createMultiplicityValueFrom( theCharacters ));
                     break;
                 case XmlModelTokens.ENUM_TOKEN:
                     theEnum          = (ExternalizedEnum)  theStack.pop();
@@ -1079,13 +1065,13 @@ public class MyHandler
     }
 
     /**
-     * Create a StringValue from a StringBuffer.
+     * Create a StringValue from a StringBuilder.
      *
-     * @param raw the StringBuffer
+     * @param raw the StringBuilder
      * @return the created StringValue
      */
     protected StringValue createStringValueFrom(
-            StringBuffer raw )
+            StringBuilder raw )
     {
         return StringValue.create( raw.toString().trim() );
     }
@@ -1104,13 +1090,13 @@ public class MyHandler
     }
 
     /**
-     * Create a FloatValue from a StringBuffer.
+     * Create a FloatValue from a StringBuilder.
      *
-     * @param raw the StringBuffer
+     * @param raw the StringBuilder
      * @return the created FloatValue
      */
     protected FloatValue createFloatValueFrom(
-            StringBuffer raw )
+            StringBuilder raw )
     {
         return createFloatValueFrom( raw.toString() );
     }
@@ -1163,13 +1149,13 @@ public class MyHandler
     }
 
     /**
-     * Create a MultiplicityValue from a StringBuffer.
+     * Create a MultiplicityValue from a StringBuilder.
      *
-     * @param raw the StringBuffer
+     * @param raw the StringBuilder
      * @return the created MultiplicityValue
      */
     protected MultiplicityValue createMultiplicityValueFrom(
-            StringBuffer raw )
+            StringBuilder raw )
     {
         return createMultiplicityValueFrom( raw.toString() );
     }
@@ -1179,7 +1165,7 @@ public class MyHandler
       * representation and what we know about the PropertyType at this time.
       *
       * @param raw the String
-      * @param ma the ExternalizedPropertyType
+      * @param pt the ExternalizedPropertyType
       * @return the created PropertyValue
       */
     protected PropertyValue constructDefaultValue(
@@ -1353,7 +1339,7 @@ public class MyHandler
      * @param theExternalizedSubjectArea the to-be-instantiated SubjectArea in buffered form
      * @param theClassLoader the ClassLoader to use for this SubjectArea
      * @return the instantiated SubjectArea
-     * @throws ModuleException thrown if a required ModelModule could not be loaded
+     * @throws MeshTypeNotFoundException thrown if a required MeshType could not be found
      */
     protected SubjectArea instantiateSubjectArea(
             ExternalizedSubjectArea theExternalizedSubjectArea,
@@ -1424,7 +1410,8 @@ public class MyHandler
      * @param theExternalizedEntityType the to-be-instantiated object in buffered form
      * @param theExternalizedSubjectArea the ExternalizedSubjectArea in which the newly instantiated object lives
      * @param theSubjectArea the SubjectArea in which the newly instantiated object lives
-     * @throws ModuleException a required ModelModule could not be loaded
+     * @return the ProjectedPropertyTypePatchers to be invoked in the next pass, if any
+     * @throws MeshTypeNotFoundException a required MeshType could not be found
      */
     protected ProjectedPropertyTypePatcher [] instantiateEntityType(
             ExternalizedEntityType  theExternalizedEntityType,
@@ -1441,6 +1428,7 @@ public class MyHandler
             theSupertypes[i] = (AttributableMeshType) theModelBase.findMeshTypeByIdentifier( currentRef );
 
             if( theSupertypes[i] == null ) {
+                // FIXME? I don't think this can ever happen
                 throw new IllegalArgumentException( "Cannot find supertype with ID " + currentRef + " for EntityType with ID " + theExternalizedEntityType.getIdentifier() );
             }
         }
@@ -1520,9 +1508,10 @@ public class MyHandler
      * Internal helper that sets the TraversalToPropertySpecifications of one EntityType.
      *
      * @param theExternalizedEntityType the EntityType in buffered form
+     * @param patchers the ProjectedPropertyTypePatchers, if any, for the involved ProjectedProperties
      * @param theExternalizedSubjectArea the SubjectArea in buffered form to which the EntityType belongs
      * @param theSubjectArea the SubjectArea to which the EntityType belongs
-     * @throws ModuleException thrown if a required Module could not be loaded
+     * @throws MeshTypeNotFoundException a required MeshType could not be found
      */
     protected void setInputPropertyForEntityType(
             ExternalizedEntityType          theExternalizedEntityType,
@@ -1555,7 +1544,7 @@ public class MyHandler
      * @param theExternalizedRelationshipType the to-be-instantiated object in buffered form
      * @param theExternalizedSubjectArea the ExternalizedSubjectArea in which the newly instantiated object lives
      * @param theSubjectArea the SubjectArea in which the newly instantiated object lives
-     * @throws ModuleException thrown if a required ModelModule could not be loaded
+     * @throws MeshTypeNotFoundException a required MeshType could not be found
      */
     protected void instantiateRelationshipType(
             ExternalizedRelationshipType theExternalizedRelationshipType,
@@ -1572,7 +1561,7 @@ public class MyHandler
             RoleType [] theDestinationSupertypes = new RoleType[ theExternalizedRelationshipType.getDestination().getRefines().size() ];
 
             for( int i=0 ; i<theSourceSupertypes.length ; ++i ) {
-                String current         = (String) theExternalizedRelationshipType.getSource().getRefines().get( i );
+                String current         = theExternalizedRelationshipType.getSource().getRefines().get( i );
                 theSourceSupertypes[i] = deserializeRoleType( current, theModelBase );
 
                 if( theSourceSupertypes[i] == null ) {
@@ -1580,7 +1569,7 @@ public class MyHandler
                 }
             }
             for( int i=0 ; i<theDestinationSupertypes.length ; ++i ) {
-                String current              = (String) theExternalizedRelationshipType.getDestination().getRefines().get( i );
+                String current              = theExternalizedRelationshipType.getDestination().getRefines().get( i );
                 theDestinationSupertypes[i] = deserializeRoleType( current, theModelBase );
 
                 if( theDestinationSupertypes[i] == null ) {
@@ -1617,7 +1606,7 @@ public class MyHandler
             RoleType [] theSrcDestSupertypes = new RoleType[ theExternalizedRelationshipType.getSourceDestination().getRefines().size() ];
 
             for( int i=0 ; i<theSrcDestSupertypes.length ; ++i ) {
-                String current          = (String) theExternalizedRelationshipType.getSourceDestination().getRefines().get( i );
+                String current          = theExternalizedRelationshipType.getSourceDestination().getRefines().get( i );
                 theSrcDestSupertypes[i] = deserializeRoleType( current, theModelBase );
 
                 if( theSrcDestSupertypes[i] == null ) {
@@ -1687,7 +1676,7 @@ public class MyHandler
      * @param theAmo the AttributableMeshType to which the newly instantiated PropertyType belongs
      * @param theExternalizedSubjectArea the ExternalizedSubjectArea in which the newly instantiated object lives
      * @param theSubjectArea the SubjectArea in which the newly instantiated object lives
-     * @throws ModuleException thrown if a required ModelModule could not be loaded
+     * @throws MeshTypeNotFoundException a required MeshType could not be found
      */
     protected void instantiatePropertyType(
             ExternalizedPropertyType         theExternalizedPropertyType,
@@ -1725,7 +1714,7 @@ public class MyHandler
             PropertyType [] toOverride = new PropertyType[ theExternalizedPropertyType.getToOverrides().size() ];
             for( int i=0 ; i<toOverride.length ; ++i )
             {
-                String             current    = (String) theExternalizedPropertyType.getToOverrides().get( i );
+                String             current    = theExternalizedPropertyType.getToOverrides().get( i );
                 MeshTypeIdentifier currentRef = createTypeIdentifierFrom( current );
 
                 toOverride[i] = theModelBase.findPropertyTypeByIdentifier( currentRef );
@@ -1756,9 +1745,10 @@ public class MyHandler
      * @param theExternalizedProjectedPropertyType the ProjectedPropertyType in buffered form
      * @param theExternalizedAmo the ExternalizedAttributableMeshType to which the ProjectedPropertyType belongs
      * @param theAmo the AttributableMeshType to which the ProjectedPropertyType belongs
+     * @param thePatcher the ProjectedPropertyTypePatcher to use
      * @param theExternalizedSubjectArea the ExternalizedSubjectArea in which the object lives
      * @param theSubjectArea the SubjectArea in which the object lives
-     * @throws ModuleException thrown if a required ModelModule could not be loaded
+     * @throws MeshTypeNotFoundException a required MeshType could not be found
      */
     protected void setInputPropertyInProjectedPropertyType(
             ExternalizedProjectedPropertyType  theExternalizedProjectedPropertyType,
@@ -1774,7 +1764,7 @@ public class MyHandler
                 = new TraversalToPropertySpecification[ theExternalizedProjectedPropertyType.getTraversalToPropertySpecifications().size() ];
 
         for( int i=0 ; i<mais.length ; ++i ) {
-            ExternalizedTraversalToPropertySpecification current = (ExternalizedTraversalToPropertySpecification) theExternalizedProjectedPropertyType.getTraversalToPropertySpecifications().get( i );
+            ExternalizedTraversalToPropertySpecification current = theExternalizedProjectedPropertyType.getTraversalToPropertySpecifications().get( i );
             TraversalSpecification traversalSpec = deserializeTraversalSpecification( current.getTraversalSpecification() );
 
             PropertyType [] mas = new PropertyType[ current.getPropertyTypes().size() ];
@@ -1795,7 +1785,7 @@ public class MyHandler
      *
      * @param theExternalizedTraversalSpec the to-be-deserialized TraversalSpecification
      * @return the TraversalSpecification
-     * @throws ModuleException thrown if a required ModelModule could not be loaded
+     * @throws MeshTypeNotFoundException a required MeshType could not be found
      */
     protected TraversalSpecification deserializeTraversalSpecification(
             ExternalizedTraversalSpecification theExternalizedTraversalSpec )
@@ -1853,7 +1843,7 @@ public class MyHandler
      *
      * @param theExternalizedSelector the to-be-deserialized MeshObjectSelector
      * @return the MeshObjectSelector
-     * @throws ModuleException thrown if a required ModelModule could not be loaded
+     * @throws MeshTypeNotFoundException a required MeshType could not be found
      */
     protected MeshObjectSelector deserializeMeshObjectSelector(
             ExternalizedMeshObjectSelector theExternalizedSelector )
@@ -1876,7 +1866,11 @@ public class MyHandler
 
     /**
      * Internal helper to deserialize a RoleType.
-     *
+     * 
+     * @param rawString the String to deserialize
+     * @param mb the ModelBase to resolve against
+     * @return the resolved RoleType
+     * @throws MeshTypeNotFoundException a required MeshType could not be found
      */
     protected RoleType deserializeRoleType(
             String    rawString,
@@ -1929,7 +1923,8 @@ public class MyHandler
      * @param theAmo the AttributableMeshType to which the newly instantiated PropertyTypeGroup belongs
      * @param theExternalizedSubjectArea the ExternalizedSubjectArea in which the newly instantiated object lives
      * @param theSubjectArea the SubjectArea in which the newly instantiated object lives
-     * @throws ModuleException thrown if a required ModelModule could not be loaded
+     * @return the ProjectedPropertyTypePatcher that goes with the ProjectedProperty
+     * @throws MeshTypeNotFoundException a required MeshType could not be found
      */
     protected ProjectedPropertyTypePatcher instantiateProjectedPropertyType(
             ExternalizedProjectedPropertyType theExternalizedProjectedPropertyType,
@@ -1972,7 +1967,7 @@ public class MyHandler
             // override
             PropertyType [] toOverride = new PropertyType[ theExternalizedProjectedPropertyType.getToOverrides().size() ];
             for( int i=0 ; i<toOverride.length ; ++i ) {
-                String             current    = (String) theExternalizedProjectedPropertyType.getToOverrides().get( i );
+                String             current    = theExternalizedProjectedPropertyType.getToOverrides().get( i );
                 MeshTypeIdentifier currentRef = createTypeIdentifierFrom( current );
 
                 toOverride[i] = theModelBase.findPropertyTypeByIdentifier( currentRef );
@@ -2007,7 +2002,7 @@ public class MyHandler
      * @param theAmo the AttributableMeshType to which the newly instantiated PropertyTypeGroup belongs
      * @param theExternalizedSubjectArea the ExternalizedSubjectArea in which the newly instantiated object lives
      * @param theSubjectArea the SubjectArea in which the newly instantiated object lives
-     * @throws ModuleException thrown if a required ModelModule could not be loaded
+     * @throws MeshTypeNotFoundException a required MeshType could not be found
      */
     protected void instantiatePropertyTypeGroup(
             ExternalizedPropertyTypeGroup    theExternalizedPropertyTypeGroup,
@@ -2022,7 +2017,7 @@ public class MyHandler
 
         PropertyType [] mas = new PropertyType[ theExternalizedPropertyTypeGroup.getGroupMembers().size() ];
         for( int i=0 ; i<mas.length ; ++i ) {
-            String             current    = (String) theExternalizedPropertyTypeGroup.getGroupMembers().get( i );
+            String             current    = theExternalizedPropertyTypeGroup.getGroupMembers().get( i );
             MeshTypeIdentifier currentRef = createTypeIdentifierFrom( current );
 
             mas[i] = theModelBase.findPropertyTypeByIdentifier( currentRef );
@@ -2110,7 +2105,7 @@ public class MyHandler
     }
     
     /**
-     * Determine a MeshTypeIdentifier appropriate for an AttributableMeshObject
+     * Determine a MeshTypeIdentifier appropriate for an AttributableMeshObject.
      *
      * @param sa the SubjectArea in which this AttributableMeshType lives
      * @param amo the AttributableMeshObject

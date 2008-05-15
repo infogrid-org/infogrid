@@ -139,11 +139,14 @@ public class ExternalizedNetMeshObjectXmlEncoder
     }
     
     /**
-     * Append a NetMeshBaseIdentifier.
+     * Append a NetMeshBaseIdentifier encoded as a String to a StringBuilder.
+     * 
+     * @param id the NetMeshBaseIdentifier
+     * @param buf the StringBuilder
      */
     protected void appendNetworkIdentifier(
             NetMeshBaseIdentifier id,
-            StringBuilder     buf )
+            StringBuilder         buf )
     {
         if( id != null ) {
             String externalForm = id.getCanonicalForm();
@@ -152,11 +155,14 @@ public class ExternalizedNetMeshObjectXmlEncoder
     }
 
     /**
-     * Append a NetMeshObjectAccessSpecification.
+     * Append a NetMeshObjectAccessSpecification encoded as a String to a StringBuilder.
+     * 
+     * @param path the NetMeshObjectAccessSpecification
+     * @param buf the StringBuilder
      */
     protected void appendNetworkPath(
-            NetMeshObjectAccessSpecification   path,
-            StringBuilder buf )
+            NetMeshObjectAccessSpecification path,
+            StringBuilder                    buf )
     {
         if( path != null ) {
             String externalForm = path.toExternalForm();
@@ -168,9 +174,12 @@ public class ExternalizedNetMeshObjectXmlEncoder
      * Deserialize an ExternalizedMeshObject from a byte stream.
      *
      * @param s the InputStream from which to read
-     * @param life the MeshBaseLifecycleManager appropriate to create an appropriate ExternalizedMeshObject
-     * @return return the deserialized ExternalizedNetMeshObject
+     * @param externalizedMeshObjectFactory the factory for ParserFriendlyExternalizedMeshObjects
+     * @param meshObjectIdentifierFactory the factory for MeshObjectIdentifiers
+     * @param meshTypeIdentifierFactory the factory for MeshTypeIdentifiers
+     * @return return the just-instantiated ExternalizedMeshObject
      * @throws DecodingException thrown if a problem occurred during decoding
+     * @throws IOException thrown if a problem occurred during writing the output
      */
     public synchronized ExternalizedNetMeshObject decodeExternalizedMeshObject(
             InputStream                                    s,
@@ -197,6 +206,7 @@ public class ExternalizedNetMeshObjectXmlEncoder
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected final void startElement1(
@@ -226,6 +236,7 @@ public class ExternalizedNetMeshObjectXmlEncoder
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected final void startElement2(
@@ -264,6 +275,7 @@ public class ExternalizedNetMeshObjectXmlEncoder
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurs
      */
     protected void startElement3(
             String     namespaceURI,
@@ -282,6 +294,7 @@ public class ExternalizedNetMeshObjectXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurs
      */
     @Override
     protected final void endElement2(
@@ -305,6 +318,7 @@ public class ExternalizedNetMeshObjectXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurs
      */
     protected void endElement3(
             String namespaceURI,

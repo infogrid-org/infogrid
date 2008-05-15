@@ -24,6 +24,8 @@ public class MeshObjectAddedEvent
         extends
             ActiveMeshObjectSetEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
       * Constructor.
       *
@@ -34,17 +36,16 @@ public class MeshObjectAddedEvent
             ActiveMeshObjectSet _theSet,
             MeshObject          _theAddedMeshObject )
     {
-        super(_theSet);
+        super(_theSet, _theAddedMeshObject );
 
-        theAddedMeshObject = _theAddedMeshObject;
-        theIndexOfAdded    = -1;
+        theIndexOfAdded = -1;
     }
 
     /**
       * Constructor.
       *
       * @param _theSet the set that changed,
-      * @param _theAddedEntity the Entity that was added to the set
+      * @param _theAddedMeshObject the Entity that was added to the set
       * @param _indexOfAdded the index in the set at which it was added
       */
     public MeshObjectAddedEvent(
@@ -52,20 +53,9 @@ public class MeshObjectAddedEvent
             MeshObject          _theAddedMeshObject,
             int                 _indexOfAdded )
     {
-        super(_theSet);
+        super(_theSet, _theAddedMeshObject );
 
-        theAddedMeshObject = _theAddedMeshObject;
-        theIndexOfAdded    = _indexOfAdded;
-    }
-
-    /**
-      * Obtain the added MeshObject.
-      *
-      * @return the added MeshObject
-      */
-    public MeshObject getAddedMeshObject()
-    {
-        return theAddedMeshObject;
+        theIndexOfAdded = _indexOfAdded;
     }
 
     /**
@@ -94,17 +84,12 @@ public class MeshObjectAddedEvent
         return StringHelper.objectLogString(
                 this,
                 new String[] {
-                    "theAddedMeshObject"
+                    "indexOfAdded"
                 },
                 new Object[] {
-                    theAddedMeshObject
+                    theIndexOfAdded
                 });
     }
-
-    /**
-      * The added MeshObject.
-      */
-    protected MeshObject theAddedMeshObject;
 
     /**
      * The index at which the MeshObject was added, or -1.

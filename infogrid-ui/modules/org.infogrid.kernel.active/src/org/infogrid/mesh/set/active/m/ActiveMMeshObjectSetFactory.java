@@ -45,6 +45,8 @@ public class ActiveMMeshObjectSetFactory
 
     /**
      * Factory method for the factory itself.
+     * 
+     * @return created ActiveMMeshObjectSetFactory
      */
     public static ActiveMMeshObjectSetFactory create()
     {
@@ -52,7 +54,7 @@ public class ActiveMMeshObjectSetFactory
     }
 
     /**
-     * Constructor.
+     * Constructor, for factory method and subclasses only.
      */
     protected ActiveMMeshObjectSetFactory()
     {
@@ -136,6 +138,7 @@ public class ActiveMMeshObjectSetFactory
      * MeshObjectSets, as long as they are selected by the MeshObjectSelector.
      * 
      * @param operands the sets to unify
+     * @param selector determines which candidates are included
      * @return the created MeshObjectSet
      */
     public CompositeActiveMMeshObjectSet createActiveMeshObjectSetUnification(
@@ -185,6 +188,7 @@ public class ActiveMMeshObjectSetFactory
      * selected by the MeshObjectSelector.
      * 
      * @param operands the sets to unify
+     * @param selector determines which candidates are included
      * @return the created MeshObjectSet
      */
     public CompositeActiveMMeshObjectSet createActiveMeshObjectSetIntersection(

@@ -21,13 +21,13 @@ import org.infogrid.mesh.MeshObject;
  * a String (representing a TraversalSpecification) into the actual
  * TraversalSpecification. Many different implementations are possible.</p>
  *
- * <p>The same term may mean different things when applied to different
- * MeshObjects.</p>
+ * <p>The same term may translate into different TraversalSpecifications when
+ * applied to different MeshObjects.</p>
  */
 public interface TraversalDictionary
 {
     /**
-     * Translate the String form of a traversal path into an actual TraversalPath.
+     * Translate the String form of a TraversalSpecification into an actual TraversalSpecification.
      *
      * @param startObject the start MeshObject for the traversal
      * @param traversalTerm the term to be translated
@@ -38,10 +38,10 @@ public interface TraversalDictionary
             String     traversalTerm );
 
     /**
-     * Translate an actual TraversalPath into a String form;
+     * Translate an actual TraversalSpecification into String form.
      *
      * @param startObject the start MeshObject for the traversal
-     * @paran traversal the TraversalSpecification
+     * @param traversal the TraversalSpecification
      * @return the external form
      */
     public abstract String translate(

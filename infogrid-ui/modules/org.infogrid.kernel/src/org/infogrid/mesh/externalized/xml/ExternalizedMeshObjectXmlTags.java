@@ -17,7 +17,7 @@ package org.infogrid.mesh.externalized.xml;
 import org.infogrid.model.primitives.externalized.xml.PropertyValueXmlTags;
 
 /**
- * Tags used in the serialization of ExternalizedMeshObjects to XML.
+ * XML Tags for the serialization of ExternalizedMeshObjects.
  */
 public interface ExternalizedMeshObjectXmlTags
         extends

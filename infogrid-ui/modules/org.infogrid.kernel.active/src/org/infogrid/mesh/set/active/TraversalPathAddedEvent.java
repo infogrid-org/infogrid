@@ -25,6 +25,8 @@ public class TraversalPathAddedEvent
         extends
             ActiveTraversalPathSetEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
       * Construct one.
       *
@@ -35,10 +37,9 @@ public class TraversalPathAddedEvent
             ActiveTraversalPathSet _theSet,
             TraversalPath          _addedTraversalPath )
     {
-        super(_theSet);
+        super(_theSet, _addedTraversalPath );
 
         theAddedIndex = -1;
-        theAddedPath  = _addedTraversalPath;
     }
 
     /**
@@ -55,10 +56,9 @@ public class TraversalPathAddedEvent
             int                    _addedIndex,
             TraversalPath          _addedTraversalPath )
     {
-        super(_theSet);
+        super(_theSet, _addedTraversalPath );
 
         theAddedIndex = _addedIndex;
-        theAddedPath  = _addedTraversalPath;
     }
 
     /**
@@ -69,16 +69,6 @@ public class TraversalPathAddedEvent
     public int getAddedTraversalPathIndex()
     {
         return theAddedIndex;
-    }
-
-    /**
-      * Obtain the added TraversalPath.
-      *
-      * @return the added TraversalPath
-      */
-    public TraversalPath getAddedTraversalPath()
-    {
-        return theAddedPath;
     }
 
     /**
@@ -103,9 +93,4 @@ public class TraversalPathAddedEvent
       * The index of the added TraversalPath.
       */
     protected int theAddedIndex;
-
-    /**
-     * The TraversalPath that was added.
-     */
-    protected TraversalPath theAddedPath;
 }

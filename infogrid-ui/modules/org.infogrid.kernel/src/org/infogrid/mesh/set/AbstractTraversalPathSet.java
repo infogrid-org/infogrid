@@ -22,7 +22,6 @@ import org.infogrid.util.ArrayCursorIterator;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.FlexiblePropertyChangeListenerSet;
-import org.infogrid.util.logging.Log;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -36,13 +35,10 @@ public abstract class AbstractTraversalPathSet
             TraversalPathSet,
             PropertyChangeListener
 {
-    private static Log log = Log.getLogInstance( AbstractTraversalPathSet.class ); // our own, private logger
-
     /**
      * Constructor.
      *
-     * @param name a name for this TraversalPathSet, for debugging only
-     * @param mb the MeshBase to which this TraversalSet belongs
+     * @param factory the MeshObjectSetFactory that created this TraversalPathSet
      */
     protected AbstractTraversalPathSet(
              MeshObjectSetFactory factory )
@@ -227,6 +223,8 @@ public abstract class AbstractTraversalPathSet
      * TraversalPaths in this set.
      *
      * @param newListener the new listener
+     * @see #addWeakContentPropertyChangeListener
+     * @see #addSoftContentPropertyChangeListener
      * @see #removeContentPropertyChangeListener
      */
     public final synchronized void addDirectContentPropertyChangeListener(
@@ -245,6 +243,8 @@ public abstract class AbstractTraversalPathSet
      * TraversalPaths in this set.
      *
      * @param newListener the new listener
+     * @see #addDirectContentPropertyChangeListener
+     * @see #addSoftContentPropertyChangeListener
      * @see #removeContentPropertyChangeListener
      */
     public final synchronized void addWeakContentPropertyChangeListener(
@@ -263,6 +263,8 @@ public abstract class AbstractTraversalPathSet
      * TraversalPaths in this set.
      *
      * @param newListener the new listener
+     * @see #addDirectContentPropertyChangeListener
+     * @see #addSoftContentPropertyChangeListener
      * @see #removeContentPropertyChangeListener
      */
     public final synchronized void addSoftContentPropertyChangeListener(
@@ -281,7 +283,9 @@ public abstract class AbstractTraversalPathSet
      * TraversalPaths in this set.
      *
      * @param oldListener the to-be-removed listeners
-     * @see #addContentPropertyChangeListener
+     * @see #addDirectContentPropertyChangeListener
+     * @see #addSoftContentPropertyChangeListener
+     * @see #addWeakContentPropertyChangeListener
      */
     public final synchronized void removeContentPropertyChangeListener(
             PropertyChangeListener oldListener)
