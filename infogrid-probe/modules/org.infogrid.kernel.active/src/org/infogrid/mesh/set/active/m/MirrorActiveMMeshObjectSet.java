@@ -25,7 +25,7 @@ import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.logging.Log;
 
 /**
- * This is an ActiveMeshObjectSet that mirrors the content of another. This
+ * An ActiveMeshObjectSet that mirrors the content of another. This
  * is used primarily for debugging as it enables the developer to monitor
  * the content of an arbitrary ActiveMeshObjectSet by "inserting" this MirrorActiveMMeshObjectSet
  * between the original set and its listeners. Given its purpose, this class is not
@@ -44,7 +44,6 @@ public class MirrorActiveMMeshObjectSet
      * Public constructor, so it can be subclassed easily (such as using an inner class), enabling
      * the developer to set what amounts to instance-specific breakpoints in standard debuggers.
      * 
-     * @param name a name for this set. This only is meant to be a help for debugging, it has no further meaning.
      * @param mirroredSet the ActiveMeshObjectSet that this MirroredActiveMeshObjectSet mirrors
      */
     public MirrorActiveMMeshObjectSet(
@@ -84,7 +83,7 @@ public class MirrorActiveMMeshObjectSet
             return;
         }
 
-        MeshObject added = event.getAddedMeshObject();
+        MeshObject added = event.getDeltaValue();
 
         breakpointHook();
         certainlyAdd( added );
@@ -102,7 +101,7 @@ public class MirrorActiveMMeshObjectSet
             return;
         }
 
-        MeshObject removed = event.getRemovedMeshObject();
+        MeshObject removed = event.getDeltaValue();
 
         breakpointHook();
         certainlyRemove( removed );

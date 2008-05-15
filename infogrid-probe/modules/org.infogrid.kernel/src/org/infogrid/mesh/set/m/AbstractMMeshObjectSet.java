@@ -70,11 +70,16 @@ public abstract class AbstractMMeshObjectSet
      *
      * @param initialContent the initial content of the set
      * @param initialCounters the counts for the initial content, in the same sequence
+     * @throws IllegalStateException thrown if this MeshObjectSet already has an initial content
+     * @throws IllegalArgumentException thrown if the initial content is null, or the array lenghts did not match
+     * @throws WrongMeshBaseException thrown if the provided MeshObjects dot not all reside in the same MeshBase
      */
     protected void setInitialContent(
             MeshObject [] initialContent,
             int []        initialCounters )
         throws
+            IllegalStateException,
+            IllegalArgumentException,
             WrongMeshBaseException
     {
         if( currentContent != null ) {
@@ -114,9 +119,16 @@ public abstract class AbstractMMeshObjectSet
      * Set the initial content of the set, for subclasses only.
      *
      * @param initialContent the initial content of the set, with the counters to be calculated
+     * @throws IllegalStateException thrown if this MeshObjectSet already has an initial content
+     * @throws IllegalArgumentException thrown if the initial content is null
+     * @throws WrongMeshBaseException thrown if the provided MeshObjects dot not all reside in the same MeshBase
      */
     protected void setInitialContent(
             MeshObject [][] initialContent )
+        throws
+            IllegalStateException,
+            IllegalArgumentException,
+            WrongMeshBaseException
     {
         if( currentContent != null ) {
             throw new IllegalStateException( "initialized already" );

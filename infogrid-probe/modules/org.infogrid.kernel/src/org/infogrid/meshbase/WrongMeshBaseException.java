@@ -26,6 +26,8 @@ public class WrongMeshBaseException
         extends
             AbstractLocalizedRuntimeException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *
@@ -55,6 +57,9 @@ public class WrongMeshBaseException
 
         theOne = one;
         theTwo = two;
+        
+        theOneIdentifier = one.getIdentifier();
+        theTwoIdentifier = two.getIdentifier();
     }
     
     /**
@@ -68,13 +73,33 @@ public class WrongMeshBaseException
     }
     
     /**
+     * Obtain the identifier of the first MeshBase.
+     *
+     * @return the identifier of the first MeshBase
+     */
+    public MeshBaseIdentifier getFirstMeshBaseIdentifier()
+    {
+        return theOneIdentifier;
+    }
+    
+    /**
      * Obtain the second MeshBase.
      *
      * @return the second MeshBase
      */
     public MeshBase getSecondMeshBase()
     {
-        return theOne;
+        return theTwo;
+    }
+    
+    /**
+     * Obtain the identifier of the second MeshBase.
+     *
+     * @return the identifier of the second MeshBase
+     */
+    public MeshBaseIdentifier getSecondMeshBaseIdentifier()
+    {
+        return theTwoIdentifier;
     }
     
     /**
@@ -84,16 +109,26 @@ public class WrongMeshBaseException
      */
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theOne, theTwo };
+        return new Object[] { theOneIdentifier, theTwoIdentifier };
     }
     
     /**
      * The first MeshBase.
      */
-    protected MeshBase theOne;
+    protected transient MeshBase theOne;
+
+    /**
+     * Identifier of the first MeshBase.
+     */
+    protected MeshBaseIdentifier theOneIdentifier;
     
     /**
      * The second MeshBase.
      */
-    protected MeshBase theTwo;
+    protected transient MeshBase theTwo;
+    
+    /**
+     * Identifier of the second MeshBase.
+     */
+    protected MeshBaseIdentifier theTwoIdentifier;
 }

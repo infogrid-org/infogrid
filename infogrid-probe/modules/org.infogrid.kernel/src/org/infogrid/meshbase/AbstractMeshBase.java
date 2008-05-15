@@ -14,25 +14,29 @@
 
 package org.infogrid.meshbase;
 
+import java.beans.PropertyChangeListener;
 import org.infogrid.context.Context;
-
 import org.infogrid.mesh.AbstractMeshObject;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
+import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.set.MeshObjectSet;
-
+import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.meshbase.security.AccessManager;
+import org.infogrid.meshbase.security.IdentityChangeException;
 import org.infogrid.meshbase.transaction.AbstractMeshObjectLifecycleEvent;
 import org.infogrid.meshbase.transaction.DefaultTransaction;
+import org.infogrid.meshbase.transaction.IllegalTransactionThreadException;
 import org.infogrid.meshbase.transaction.MeshObjectLifecycleListener;
+import org.infogrid.meshbase.transaction.NotWithinTransactionBoundariesException;
 import org.infogrid.meshbase.transaction.Transaction;
+import org.infogrid.meshbase.transaction.TransactionActiveAlreadyException;
+import org.infogrid.meshbase.transaction.TransactionAsapTimeoutException;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.meshbase.transaction.TransactionListener;
-
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.modelbase.ModelBase;
-
 import org.infogrid.util.AbstractLiveDeadObject;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.FlexibleListenerSet;
@@ -42,15 +46,6 @@ import org.infogrid.util.QuitManager;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.text.StringRepresentation;
-
-import java.beans.PropertyChangeListener;
-import org.infogrid.mesh.NotPermittedException;
-import org.infogrid.mesh.set.MeshObjectSetFactory;
-import org.infogrid.meshbase.security.IdentityChangeException;
-import org.infogrid.meshbase.transaction.IllegalTransactionThreadException;
-import org.infogrid.meshbase.transaction.NotWithinTransactionBoundariesException;
-import org.infogrid.meshbase.transaction.TransactionActiveAlreadyException;
-import org.infogrid.meshbase.transaction.TransactionAsapTimeoutException;
 
 /**
  * This abstract, partial implementation of MeshBase provides

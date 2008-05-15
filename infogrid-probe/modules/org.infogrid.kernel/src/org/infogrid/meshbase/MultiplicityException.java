@@ -15,29 +15,49 @@
 package org.infogrid.meshbase;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.RoleType;
 
+import org.infogrid.util.AbstractLocalizedRuntimeException;
 import org.infogrid.util.StringHelper;
 
 /**
- * This Exception indicates a violation in the multiplicity of a RoleType.
+ * Indicates a violation in the multiplicity of a RoleType.
  */
 public class MultiplicityException
         extends
-            RuntimeException
+            AbstractLocalizedRuntimeException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Construct one.
      *
      * @param meshObject the MeshObject where we discovered the multiplicity violation
-     * @param role the RoleType for which it happened
+     * @param roleType the RoleType for which it happened
      */
     public MultiplicityException(
             MeshObject meshObject,
-            RoleType   role )
+            RoleType   roleType )
     {
-        theMeshObject = meshObject;
-        theRole       = role;
+        theMeshObject           = meshObject;
+        theMeshObjectIdentifier = meshObject.getIdentifier();
+        theRoleType             = roleType;
+        theRoleTypeIdentifier   = roleType.getIdentifier();
+    }
+
+    /**
+     * Obtain the parameters with which the internationalized string
+     * will be parameterized.
+     *
+     * @return the parameters with which the internationalized string will be parameterized
+     */
+    public Object [] getLocalizationParameters()
+    {
+        Object [] ret = { theMeshObjectIdentifier, theRoleTypeIdentifier };
+
+        return ret;
     }
 
     /**
@@ -51,22 +71,32 @@ public class MultiplicityException
         return StringHelper.objectLogString(
                 this,
                 new String[] {
-                    "theMeshObject",
-                    "theRole"
+                    "theMeshObjectIdentifier",
+                    "theRoleTypeIdentifier"
                 },
                 new Object[] {
-                    theMeshObject,
-                    theRole
+                    theMeshObjectIdentifier,
+                    theRoleTypeIdentifier
                 });
     }
 
     /**
      * The MeshObject for which we discovered a violation.
      */
-    protected MeshObject theMeshObject;
+    protected transient MeshObject theMeshObject;
+
+    /**
+     * The identifier of the MeshObject for which we discovered a violation.
+     */
+    protected MeshObjectIdentifier theMeshObjectIdentifier;
 
     /**
      * The RoleType for which we discovered a violation.
      */
-    protected RoleType theRole;
+    protected transient RoleType theRoleType;
+    
+    /**
+     * The identifier of the RoleType for which we discovered a violation.
+     */
+    protected MeshTypeIdentifier theRoleTypeIdentifier;
 }

@@ -37,6 +37,8 @@ public interface ActiveTraversalPathSet
       * Add a listener to tell us when TraversalPaths are added to or removed from this ActiveTraversalPathSet.
       *
       * @param newListener the new listener
+      * @see #addSoftActiveTraversalPathSetListener
+      * @see #addWeakActiveTraversalPathSetListener
       * @see #removeActiveTraversalPathSetListener
       */
     public abstract void addDirectActiveTraversalPathSetListener(
@@ -46,6 +48,8 @@ public interface ActiveTraversalPathSet
       * Add a listener to tell us when TraversalPaths are added to or removed from this ActiveTraversalPathSet.
       *
       * @param newListener the new listener
+      * @see #addDirectActiveTraversalPathSetListener
+      * @see #addWeakActiveTraversalPathSetListener
       * @see #removeActiveTraversalPathSetListener
       */
     public abstract void addSoftActiveTraversalPathSetListener(
@@ -55,6 +59,8 @@ public interface ActiveTraversalPathSet
       * Add a listener to tell us when TraversalPaths are added to or removed from this ActiveTraversalPathSet.
       *
       * @param newListener the new listener
+      * @see #addDirectActiveTraversalPathSetListener
+      * @see #addSoftActiveTraversalPathSetListener
       * @see #removeActiveTraversalPathSetListener
       */
     public abstract void addWeakActiveTraversalPathSetListener(
@@ -64,7 +70,9 @@ public interface ActiveTraversalPathSet
       * Remove a listener to tell us when TraversalPaths are added to or removed from this ActiveTraversalPathSet.
       *
       * @param oldListener the to-be-removed listener
-      * @see #addActiveTraversalPathSetListener
+      * @see #addDirectActiveTraversalPathSetListener
+      * @see #addSoftActiveTraversalPathSetListener
+      * @see #addWeakActiveTraversalPathSetListener
       */
     public abstract void removeActiveTraversalPathSetListener(
             ActiveTraversalPathSetListener oldListener );

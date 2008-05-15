@@ -34,6 +34,8 @@ public class PropertyReadOnlyException
         extends
             NotPermittedException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *
@@ -152,4 +154,4 @@ public class PropertyReadOnlyException
      * The identifier of the PropertyType that was illegal on the MeshObject.
      */
     protected MeshTypeIdentifier thePropertyTypeIdentifier;
-    }
+}

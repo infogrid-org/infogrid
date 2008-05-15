@@ -35,6 +35,8 @@ public class SelectiveTraversalSpecification
         extends
             AbstractTraversalSpecification
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Factory method to create one without the start selector.
      *

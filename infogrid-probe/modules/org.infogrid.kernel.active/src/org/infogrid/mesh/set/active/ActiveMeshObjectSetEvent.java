@@ -14,33 +14,101 @@
 
 package org.infogrid.mesh.set.active;
 
-import java.util.EventObject;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.util.event.AbstractExternalizableEvent;
+import org.infogrid.util.event.SourceUnresolvedException;
+import org.infogrid.util.event.ValueUnresolvedException;
 
 /**
  * Abstract superclass for events that are emitted by ActiveMeshObjectSets.
  */
 public abstract class ActiveMeshObjectSetEvent
         extends
-            EventObject
+            AbstractExternalizableEvent<ActiveMeshObjectSet,ActiveMeshObjectSet,MeshObject,MeshObjectIdentifier>
 {
     /**
      * Constructor.
      * 
      * @param source the source of the event
+     * @param delta the changing MeshObject
      */
     protected ActiveMeshObjectSetEvent(
-            ActiveMeshObjectSet source )
+            ActiveMeshObjectSet source,
+            MeshObject          delta )
     {
-        super( source );
+        super(  source,
+                source,
+                delta,
+                delta != null ? delta.getIdentifier() : null,
+                System.currentTimeMillis() );
+    }
+
+    /**
+     * Set the resolving MeshBase.
+     * 
+     * @param newValue the new value
+     */
+    public void setMeshBase(
+            MeshBase newValue )
+    {
+        theMeshBase = newValue;
+    }
+
+    /**
+     * Obtain the resolving MeshBase, if any.
+     * 
+     * @return the MeshBase
+     */
+    public MeshBase getMeshBase()
+    {
+        return theMeshBase;
+    }
+
+    /**
+     * Enable subclass to resolve the source of the event.
+     *
+     * @return the source of the event
+     * @throws SourceUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the source failed
+     */
+    protected ActiveMeshObjectSet resolveSource()
+            throws
+                SourceUnresolvedException
+    {
+        throw new UnsupportedOperationException(); // FIXME for now
     }
     
     /**
-     * Obtain the ActiveMeshObjectSet that emitted the event.
+     * Enable subclass to resolve a value of the event.
      *
-     * @return the ActiveMeshObjectSet
+     * @param vid the identifier of the value of the event
+     * @return a value of the event
+     * @throws ValueUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
      */
-    public ActiveMeshObjectSet getMeshObjectSet()
+    protected MeshObject resolveValue(
+            MeshObjectIdentifier vid )
+       throws
+           ValueUnresolvedException
     {
-        return (ActiveMeshObjectSet) getSource();
+        if( vid == null ) {
+            return null;
+        }
+        if( theMeshBase == null ) {
+            throw new ValueUnresolvedException( this );
+        }
+        
+        MeshObject ret = theMeshBase.findMeshObjectByIdentifier( vid );
+        if( ret == null ) {
+            throw new ValueUnresolvedException( this );
+        }
+        return ret;
     }
+    
+    /**
+     * The resolving MeshBase, if any.
+     */
+    protected transient MeshBase theMeshBase;
 }

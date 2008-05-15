@@ -14,9 +14,10 @@
 
 package org.infogrid.modelbase;
 
+import java.util.ArrayList;
 import org.infogrid.model.primitives.AttributableMeshType;
-import org.infogrid.model.primitives.BooleanValue;
 import org.infogrid.model.primitives.BlobValue;
+import org.infogrid.model.primitives.BooleanValue;
 import org.infogrid.model.primitives.DataType;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.FloatValue;
@@ -31,16 +32,12 @@ import org.infogrid.model.primitives.RelationshipType;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.model.primitives.SubjectArea;
-
 import org.infogrid.model.traversal.TraversalToPropertySpecification;
-
 import org.infogrid.module.ModuleRequirement;
 import org.infogrid.util.ArrayHelper;
 
-import java.util.ArrayList;
-
 /**
- * This is a delegating MeshTypeLifecycleManager, which also keeps track
+ * A MeshTypeLifecycleManager that delegates to another, but that also keeps track
  * of the MeshTypes that it has instantiated.
  */
 public class LoaderMeshTypeLifecycleManager

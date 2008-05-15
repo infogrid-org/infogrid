@@ -36,21 +36,24 @@ public class MeshObjectAccessException
      * Constructor.
      *
      * @param mb the MeshBase in which the Exception occurred
+     * @param mbIdentifier the MeshBaseIdentifier in which the Exception occurred
      * @param partialResult a partial result, if any, available at the time the Exception occurred
-     * @param failedPaths the access path that was used
+     * @param failedIdentifiers the MeshObjectIdentifiers 
      * @param cause the underlying cause for the Exception
      */
     public MeshObjectAccessException(
             MeshBase                mb,
+            MeshBaseIdentifier      mbIdentifier,
             MeshObject []           partialResult,
-            MeshObjectIdentifier [] failedPaths,
+            MeshObjectIdentifier [] failedIdentifiers,
             Throwable               cause )
     {
         super( cause );
 
-        theMeshBase          = mb;
-        thePartialResult     = partialResult;
-        theFailedIdentifiers = failedPaths;
+        theMeshBase           = mb;
+        theMeshBaseIdentifier = mbIdentifier;
+        thePartialResult      = partialResult;
+        theFailedIdentifiers  = failedIdentifiers;
     }
 
     /**
@@ -120,6 +123,11 @@ public class MeshObjectAccessException
      * The MeshBase in which this Exception occurred.
      */
     protected transient MeshBase theMeshBase;
+
+    /**
+     * The identifier of the MeshBase in which this Exception occurred.
+     */
+    protected MeshBaseIdentifier theMeshBaseIdentifier;
 
     /**
      * The partial result (if any).

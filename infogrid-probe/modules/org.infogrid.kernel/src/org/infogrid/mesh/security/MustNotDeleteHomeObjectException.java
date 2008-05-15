@@ -24,6 +24,8 @@ public class MustNotDeleteHomeObjectException
         extends
             NotPermittedException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *
@@ -43,6 +45,6 @@ public class MustNotDeleteHomeObjectException
     @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theMeshObject.getIdentifier().toExternalForm() };
+        return new Object[] { theMeshObjectIdentifier };
     }
 }
