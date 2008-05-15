@@ -60,7 +60,7 @@ import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.logging.Log;
 
 /**
- * A NetMeshBaseLifecycleManager for the Anet implementation.
+ * A NetMeshBaseLifecycleManager for the AnetMeshObject implementation.
  */
 public class AnetMeshBaseLifecycleManager
         extends

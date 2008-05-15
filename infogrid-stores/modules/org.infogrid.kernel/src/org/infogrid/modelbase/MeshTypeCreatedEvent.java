@@ -15,6 +15,8 @@
 package org.infogrid.modelbase;
 
 import org.infogrid.model.primitives.MeshType;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
+import org.infogrid.util.event.ValueUnresolvedException;
 
 /**
   * This event indicates the creation of a MeshType in a ModelBase.
@@ -23,6 +25,8 @@ public class MeshTypeCreatedEvent
         extends
             MeshTypeLifecycleEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
       * Construct one.
       *
@@ -34,5 +38,27 @@ public class MeshTypeCreatedEvent
             MeshType  theObject )
     {
         super( theSender, theObject );
+    }
+
+    /**
+     * Enable subclass to resolve a value of the event.
+     *
+     * @param vid the identifier of the value of the event
+     * @return a value of the event
+     * @throws ValueUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
+     */
+    protected MeshType resolveValue(
+            MeshTypeIdentifier vid )
+       throws
+           ValueUnresolvedException
+    {
+        try {
+            MeshType ret = ModelBaseSingleton.getSingleton().findAttributableMeshTypeByIdentifier( vid );
+            return ret;
+
+        } catch( MeshTypeWithIdentifierNotFoundException ex ) {
+            throw new ValueUnresolvedException( this );
+        }
     }
 }

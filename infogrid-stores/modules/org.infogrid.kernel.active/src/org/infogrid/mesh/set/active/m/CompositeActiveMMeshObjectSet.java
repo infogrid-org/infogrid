@@ -158,6 +158,7 @@ public abstract class CompositeActiveMMeshObjectSet
          *
          * @param factory the MeshObjectSetFactory that created this MeshObjectSet
          * @param operands the sets from which this set is constructed
+         * @param selector determines which candidates are included
          */
         protected Unification(
                 MeshObjectSetFactory factory,
@@ -171,7 +172,7 @@ public abstract class CompositeActiveMMeshObjectSet
             for( int i=0 ; i<theOperands.length ; ++i ) {
                 MeshObject [] childEntities = theOperands[i].getMeshObjects();
                 for( int j=0 ; j<childEntities.length ; ++j ) {
-                    if( !temp.contains( childEntities[j] )) {
+                    if( ( selector == null || selector.accepts( childEntities[j] )) && !temp.contains( childEntities[j] )) {
                         temp.add( childEntities[j] );
                     }
                 }
@@ -190,7 +191,7 @@ public abstract class CompositeActiveMMeshObjectSet
             if( haveReceivedEventBefore( event )) {
                 return;
             }
-            potentiallyAdd( event.getAddedMeshObject() );
+            potentiallyAdd( event.getDeltaValue() );
         }
 
         /**
@@ -204,7 +205,7 @@ public abstract class CompositeActiveMMeshObjectSet
             if( haveReceivedEventBefore( event )) {
                 return;
             }
-            potentiallyRemove( event.getRemovedMeshObject() );
+            potentiallyRemove( event.getDeltaValue() );
         }
     }
 
@@ -220,6 +221,7 @@ public abstract class CompositeActiveMMeshObjectSet
          *
          * @param factory the MeshObjectSetFactory that created this MeshObjectSet
          * @param operands the sets from which this set is constructed
+         * @param selector determines which candidates are included
          */
         protected Intersection(
                 MeshObjectSetFactory factory,
@@ -232,6 +234,14 @@ public abstract class CompositeActiveMMeshObjectSet
                     theOperands[0].getMeshObjects(),
                     MeshObject.class ); // shorten later, this is max
 
+            if( selector != null ) {
+                for( int i=0 ; i<initialContent.length ; ++i ) {
+                    if( !selector.accepts( initialContent[i] )) {
+                        initialContent[i] = null;
+                    }
+                }
+            }
+            
             int takenOut = 0;
             for( int i=1; i<theOperands.length ; ++i ) {
                 MeshObject [] thisContent = theOperands[i].getMeshObjects();
@@ -273,7 +283,7 @@ public abstract class CompositeActiveMMeshObjectSet
             }
 
             // check that it is contained everywhere, and if so, add
-            MeshObject added = event.getAddedMeshObject();
+            MeshObject added = event.getDeltaValue();
 
             for( int i=0 ; i<theOperands.length ; ++i ) {
                 if( !ArrayHelper.isIn( added, theOperands[i].getMeshObjects(), false )) {
@@ -296,7 +306,7 @@ public abstract class CompositeActiveMMeshObjectSet
             }
 
             // if we contain this already, remove
-            certainlyRemove( event.getRemovedMeshObject() );
+            certainlyRemove( event.getDeltaValue() );
         }
     }
 }

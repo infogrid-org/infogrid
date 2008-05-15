@@ -26,6 +26,8 @@ public class InheritanceConflictException
         extends
             RuntimeException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization -- FIXME, serialization needs to be supported better
+
     /**
      * Construct one.
      *
@@ -55,8 +57,9 @@ public class InheritanceConflictException
         ret.append( ", PropertyTypes: " );
         for( int i=0 ; i<thePts.length ; ++i )
         {
-            if( i>0 )
+            if( i>0 ) {
                 ret.append( ", " );
+            }
             ret.append( thePts[i].toExternalForm() );
         }
         return ret.toString();

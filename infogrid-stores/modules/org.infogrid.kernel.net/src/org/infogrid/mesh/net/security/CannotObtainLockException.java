@@ -26,6 +26,8 @@ public class CannotObtainLockException
         extends
             NotPermittedException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *
@@ -41,6 +43,7 @@ public class CannotObtainLockException
      * Constructor.
      *
      * @param obj the NetMeshObject whose update rights could not be obtained
+     * @param cause the underlying cause
      */
     public CannotObtainLockException(
             NetMeshObject obj,

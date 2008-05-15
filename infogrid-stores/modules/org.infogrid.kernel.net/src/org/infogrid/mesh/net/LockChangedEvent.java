@@ -154,6 +154,43 @@ public abstract class LockChangedEvent
         {
             super( affectedObject, BooleanValue.FALSE, BooleanValue.TRUE, timeEventOccurred );
         }
+
+        /**
+         * Determine equality.
+         * 
+         * @param other the Object to compare to
+         * @return true if the two Objects are equal
+         */
+        @Override
+        public boolean equals(
+                Object other )
+        {
+            if( !( other instanceof GainedLock )) {
+                return false;
+            }
+            
+            GainedLock realOther = (GainedLock) other;
+            
+            if( !getSourceIdentifier().equals( realOther.getSourceIdentifier() )) {
+                return false;
+            }
+            
+            if( getTimeEventOccurred() != realOther.getTimeEventOccurred() ) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Determine hash code.
+         * 
+         * @return hash code
+         */
+        @Override
+        public int hashCode()
+        {
+            return super.hashCode();
+        }
     }
 
     /**
@@ -176,6 +213,43 @@ public abstract class LockChangedEvent
                 long          timeEventOccurred )
         {
             super( affectedObject, BooleanValue.TRUE, BooleanValue.FALSE, timeEventOccurred );
+        }
+
+        /**
+         * Determine equality.
+         * 
+         * @param other the Object to compare to
+         * @return true if the two Objects are equal
+         */
+        @Override
+        public boolean equals(
+                Object other )
+        {
+            if( !( other instanceof LostLock )) {
+                return false;
+            }
+            
+            LostLock realOther = (LostLock) other;
+            
+            if( !getSourceIdentifier().equals( realOther.getSourceIdentifier() )) {
+                return false;
+            }
+            
+            if( getTimeEventOccurred() != realOther.getTimeEventOccurred() ) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Determine hash code.
+         * 
+         * @return hash code
+         */
+        @Override
+        public int hashCode()
+        {
+            return super.hashCode();
         }
     }
 }

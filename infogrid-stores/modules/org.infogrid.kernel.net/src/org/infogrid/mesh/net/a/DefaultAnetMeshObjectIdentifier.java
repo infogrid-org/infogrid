@@ -21,8 +21,6 @@ import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 
-import org.infogrid.util.ResourceHelper;
-
 import java.net.URISyntaxException;
 
 /**
@@ -182,11 +180,6 @@ public class DefaultAnetMeshObjectIdentifier
      */
     protected NetMeshBaseIdentifier theNetMeshBaseIdentifier;
 
-    /**
-     * Our ResourceHelper. This hides another field, intentionally.
-     */
-    public static final ResourceHelper RESOURCEHELPER = ResourceHelper.getInstance( DefaultAnetMeshObjectIdentifier.class );
-    
     /**
      * Separator between NetMeshBaseIdentifier and local id.
      */

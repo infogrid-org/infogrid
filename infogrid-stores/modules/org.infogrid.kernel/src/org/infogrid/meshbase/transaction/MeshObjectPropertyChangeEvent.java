@@ -28,7 +28,6 @@ import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 import org.infogrid.util.event.AbstractExternalizablePropertyChangeEvent;
 import org.infogrid.util.event.PropertyUnresolvedException;
 
-
 /**
   * <p>This event indicates that one of a MeshObject's properties has changed its value.</p>
   */
@@ -217,8 +216,11 @@ public class MeshObjectPropertyChangeEvent
      * Resolve the source of the event.
      *
      * @return the source of the event
+     * @throws PropertyUnresolvedException thrown if the property cannot be resolved
      */
     protected MeshObject resolveSource()
+        throws
+            PropertyUnresolvedException
     {
         if( theResolver == null ) {
             throw new PropertyUnresolvedException( this );
@@ -232,8 +234,11 @@ public class MeshObjectPropertyChangeEvent
      * Resolve the property of the event.
      *
      * @return the property of the event
+     * @throws PropertyUnresolvedException thrown if the property cannot be resolved
      */
     protected PropertyType resolveProperty()
+        throws
+            PropertyUnresolvedException
     {
         if( theResolver == null ) {
             throw new PropertyUnresolvedException( this );

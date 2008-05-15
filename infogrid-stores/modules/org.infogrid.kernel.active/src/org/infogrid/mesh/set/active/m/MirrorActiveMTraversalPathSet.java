@@ -41,7 +41,6 @@ public class MirrorActiveMTraversalPathSet
      * Public constructor, so we can instantiate it directly, or we
      * can easily subclass is using an inner class.
      *
-     * @param name a name for this instance, for debugging only
      * @param mirroredSet the ActiveTraversalPathSet that this set is going to mirror
      */
     public MirrorActiveMTraversalPathSet(
@@ -50,7 +49,7 @@ public class MirrorActiveMTraversalPathSet
         super(  mirroredSet.getFactory() ); // FIXME? different factory?
 
         TraversalPath [] mirroredContent = mirroredSet.getTraversalPaths();
-        TraversalPath [] copiedContent = (TraversalPath []) ArrayHelper.copyIntoNewArray( mirroredContent, TraversalPath.class );
+        TraversalPath [] copiedContent   = ArrayHelper.copyIntoNewArray( mirroredContent, TraversalPath.class );
 
         setInitialContent( copiedContent );
 
@@ -82,7 +81,7 @@ public class MirrorActiveMTraversalPathSet
             return;
         }
 
-        TraversalPath added = event.getAddedTraversalPath();
+        TraversalPath added = event.getDeltaValue();
 
         breakpointHook();
 
@@ -101,7 +100,7 @@ public class MirrorActiveMTraversalPathSet
             return;
         }
 
-        TraversalPath removed = event.getRemovedTraversalPath();
+        TraversalPath removed = event.getDeltaValue();
 
         breakpointHook();
 

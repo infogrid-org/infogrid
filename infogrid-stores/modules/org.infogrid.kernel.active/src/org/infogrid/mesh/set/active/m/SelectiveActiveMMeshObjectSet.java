@@ -52,7 +52,7 @@ public abstract class SelectiveActiveMMeshObjectSet
    /**
      * Private constructor, use factory method.
      *
-     * @param name a name for this instance, for debugging only
+     * @param factory the MeshObjectSetFactory that created this MeshObjectSet
      * @param delegate the underlying set from whose content we select
      */
     protected SelectiveActiveMMeshObjectSet(
@@ -114,7 +114,7 @@ public abstract class SelectiveActiveMMeshObjectSet
         /**
          * Private constructor, use factory method.
          *
-         * @param name a name for this instance, for debugging only
+         * @param factory the MeshObjectSetFactory that created this MeshObjectSet
          * @param delegate the underlying set from whose content we select
          * @param selector the selection criteria
          */
@@ -159,7 +159,7 @@ public abstract class SelectiveActiveMMeshObjectSet
                 return;
             }
 
-            MeshObject obj = event.getAddedMeshObject();
+            MeshObject obj = event.getDeltaValue();
 
             if( theSelector.accepts( obj )) {
                 certainlyAdd( obj );
@@ -178,7 +178,7 @@ public abstract class SelectiveActiveMMeshObjectSet
                 return;
             }
 
-            MeshObject obj = event.getRemovedMeshObject();
+            MeshObject obj = event.getDeltaValue();
 
             if( contains( obj )) {
                 certainlyRemove( obj );

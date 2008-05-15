@@ -267,6 +267,7 @@ public abstract class BlobValue
      * Helper method to create an array of BlobValues from byte arrays.
      *
      * @param raw the array of byte arrays, or null
+     * @param mimeType the MIME type of the byte arrays, in the same sequence
      * @return the corresponding array of raw, or null
      */
     public static BlobValue [] createMultiple(

@@ -14,19 +14,15 @@
 
 package org.infogrid.meshbase;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObjectFactory;
-
-import org.infogrid.meshbase.transaction.TransactionException;
-
 import org.infogrid.modelbase.MeshTypeIdentifierFactory;
 
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.Iterator;
-
 /**
- * Defines a type to load bulk information into a MeshBase.
+ * Interface implemented by those objects that know how to load bulk information into a MeshBase.
  */
 public interface BulkLoader
 {
@@ -34,8 +30,12 @@ public interface BulkLoader
      * Bulk-load data into this MeshBase.
      *
      * @param inStream the Stream from which to read the data
-     * @param bestEffort if true, the bulk tries to work around errors to the maximum extent possible
-     * @return the iterator over the ExternalizedMeshObjects
+     * @param externalizedMeshObjectFactory the ExternalizedMeshObjectFactory to use
+     * @param meshObjectIdentifierFactory the MeshObjectIdentifierFactory to use
+     * @param meshTypeIdentifierFactory the MeshTypeIdentifierFactory to use 
+     * @return the iterator over the loaded ExternalizedMeshObjects
+     * @throws IOException thrown if an I/O error occurred
+     * @throws BulkLoadException thrown if a loading exception occurred, for the details check the cause
      */
     public Iterator<? extends ExternalizedMeshObject> bulkLoad(
             InputStream                                 inStream,
@@ -44,6 +44,5 @@ public interface BulkLoader
             MeshTypeIdentifierFactory                   meshTypeIdentifierFactory )
         throws
             IOException,
-            BulkLoadException,
-            TransactionException;
+            BulkLoadException;
 }

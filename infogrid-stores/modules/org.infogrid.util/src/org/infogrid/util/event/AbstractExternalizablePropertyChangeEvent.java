@@ -297,6 +297,41 @@ public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VI
     }
     
     /**
+     * Equals method.
+     * 
+     * @param other the Object to compare with
+     * @return true if they are equal
+     */
+    @Override
+    public abstract boolean equals(
+            Object other );
+
+    /**
+     * Hash code.
+     * 
+     * @return hash code
+     */
+    @Override
+    public int hashCode()
+    {
+        int ret = theSourceIdentifier != null ? theSourceIdentifier.hashCode() : 0;
+        if( theOldValueIdentifier != null ) {
+            ret ^= theOldValueIdentifier.hashCode();
+        }
+        if( theDeltaValueIdentifier != null ) {
+            ret ^= theDeltaValueIdentifier.hashCode();
+        }
+        if( theNewValueIdentifier != null ) {
+            ret ^= theNewValueIdentifier.hashCode();
+        }
+        if( thePropertyIdentifier != null ) {
+            ret ^= thePropertyIdentifier.hashCode();
+        }
+        ret ^= theTimeEventOccurred;
+        return ret;
+    }
+
+    /**
      * The source of the event.
      */
     private transient S theSource;

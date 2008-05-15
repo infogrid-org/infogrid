@@ -14,12 +14,13 @@
 
 package org.infogrid.meshbase.net.a;
 
+import java.util.HashMap;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.context.Context;
-
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
-
+import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.meshbase.Sweeper;
 import org.infogrid.meshbase.net.IterableNetMeshBase;
 import org.infogrid.meshbase.net.IterableNetMeshBaseDifferencer;
@@ -29,19 +30,13 @@ import org.infogrid.meshbase.net.NetSweeper;
 import org.infogrid.meshbase.net.ProxyManager;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.sweeper.SweepStep;
-
 import org.infogrid.modelbase.ModelBase;
-
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.MapCursorIterator;
 
-import java.util.HashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import org.infogrid.mesh.set.MeshObjectSetFactory;
-
 /**
- *
+ * The subtype of IterableMeshBase suitable for the AnetMeshObject implementation.
  */
 public abstract class AIterableNetMeshBase
         extends
@@ -98,21 +93,6 @@ public abstract class AIterableNetMeshBase
                 MeshObject.class );
         return ret;
     }
-//    /**
-//     * Obtain an Iterator to iterate over all MeshObjects contained in this MeshBase.
-//     * This Iterator will never throw ConcurrentModificationExceptions, but it is not guaranteed
-//     * to return all MeshObjects, and may return dead MeshObjects.
-//     *
-//     * @return an Iterator to iterator over all MeshObjects contained in this MeshBase
-//     * @see #iterator
-//     */
-//    public synchronized Iterator<MeshObject> clonedIterator()
-//    {
-//        MeshObject [] objects = new MeshObject[ theStore.size() ];
-//        objects = theStore.values().toArray( objects );
-//
-//        return new SimpleArrayIterator<MeshObject>( objects );
-//    }
 
     /**
      * Determine the number of MeshObjects in this MeshBase.

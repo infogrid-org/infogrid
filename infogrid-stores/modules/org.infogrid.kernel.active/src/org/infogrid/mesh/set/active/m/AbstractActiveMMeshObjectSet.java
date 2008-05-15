@@ -37,7 +37,7 @@ import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.WrongMeshBaseException;
 
 /**
- * <p>This factors out common functionality in various ActiveMeshObjectSet implementations.</p>
+ * <p>Factors out common functionality in various ActiveMeshObjectSet implementations.</p>
  * 
  * <p>This implementation DOES NOT listen to PropertyChangeEvents from its content.
  * If a subclass needs to do that, it needs to do it itself.</p>
@@ -68,7 +68,7 @@ public abstract class AbstractActiveMMeshObjectSet
      * add it to the set (otherwise, it will not add it). This method will also
      * fire a MeshObjectAddedEvent in case that is necessary
      * 
-     * @param newEntity the new MeshObject to potentially add
+     * @param newMeshObject the new MeshObject to potentially add
      * @return true if it was indeed added
      */
     protected final synchronized boolean potentiallyAdd(
@@ -96,7 +96,7 @@ public abstract class AbstractActiveMMeshObjectSet
      * not to be there yet. This method exists in addition to potentiallyAdd()
      * for performance reasons.
      *
-     * @param newEntity the new MeshObject to add
+     * @param newMeshObject the new MeshObject to add
      */
     protected final synchronized void certainlyAdd(
             MeshObject newMeshObject )
@@ -245,6 +245,8 @@ public abstract class AbstractActiveMMeshObjectSet
       * Add a listener for events indicating additions or removals to/from the set.
       *
       * @param newListener the listener to be added
+      * @see #addSoftActiveMeshObjectSetListener 
+      * @see #addWeakActiveMeshObjectSetListener 
       * @see #removeActiveMeshObjectSetListener
       */
     public final synchronized void addDirectActiveMeshObjectSetListener(
@@ -261,6 +263,8 @@ public abstract class AbstractActiveMMeshObjectSet
       * Add a listener for events indicating additions or removals to/from the set.
       *
       * @param newListener the listener to be added
+      * @see #addDirectActiveMeshObjectSetListener 
+      * @see #addWeakActiveMeshObjectSetListener 
       * @see #removeActiveMeshObjectSetListener
       */
     public final synchronized void addSoftActiveMeshObjectSetListener(
@@ -276,7 +280,8 @@ public abstract class AbstractActiveMMeshObjectSet
     /**
       * Add a listener for events indicating additions or removals to/from the set.
       *
-      * @param newListener the listener to be added
+      * @see #addDirectActiveMeshObjectSetListener 
+      * @see #addWeakActiveMeshObjectSetListener 
       * @see #removeActiveMeshObjectSetListener
       */
     public final synchronized void addWeakActiveMeshObjectSetListener(
@@ -293,7 +298,9 @@ public abstract class AbstractActiveMMeshObjectSet
       * Remove a listener for events indicating additions or removals to/from the set.
       *
       * @param oldListener the listener to be removed
-      * @see #addActiveMeshObjectSetListener
+      * @see #addDirectActiveMeshObjectSetListener 
+      * @see #addSoftActiveMeshObjectSetListener 
+      * @see #addWeakActiveMeshObjectSetListener 
       */
     public final synchronized void removeActiveMeshObjectSetListener(
             ActiveMeshObjectSetListener oldListener)
@@ -387,7 +394,7 @@ public abstract class AbstractActiveMMeshObjectSet
             = new FlexibleListenerSet<ActiveMeshObjectSetListener,ActiveMeshObjectSetEvent,Object>() {
                     protected void fireEventToListener(
                             ActiveMeshObjectSetListener listener,
-                            ActiveMeshObjectSetEvent          event,
+                            ActiveMeshObjectSetEvent    event,
                             Object                      parameter )
                     {
                         if( event instanceof MeshObjectAddedEvent ) {

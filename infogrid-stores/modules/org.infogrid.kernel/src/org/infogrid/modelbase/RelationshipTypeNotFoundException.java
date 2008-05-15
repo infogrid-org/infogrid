@@ -23,6 +23,8 @@ public class RelationshipTypeNotFoundException
         extends
             AttributableMeshTypeNotFoundException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *
