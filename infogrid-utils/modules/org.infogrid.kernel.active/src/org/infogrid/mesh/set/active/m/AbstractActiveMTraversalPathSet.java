@@ -32,9 +32,8 @@ import org.infogrid.model.traversal.TraversalPath;
 import org.infogrid.util.FlexibleListenerSet;
 import org.infogrid.util.logging.Log;
 
-
 /**
- * This abstract class factors out some functionality common to most ActiveTraversalPathSets.
+ * Factors out functionality common to most ActiveTraversalPathSets.
  */
 public abstract class AbstractActiveMTraversalPathSet
         extends
@@ -224,6 +223,8 @@ public abstract class AbstractActiveMTraversalPathSet
       * Add a listener to tell us when TraversalPaths are added to or removed from this ActiveTraversalPathSet.
       *
       * @param newListener the new listener
+      * @see #addSoftActiveTraversalPathSetListener
+      * @see #addWeakActiveTraversalPathSetListener
       * @see #removeActiveTraversalPathSetListener
       */
     public void addDirectActiveTraversalPathSetListener(
@@ -239,6 +240,8 @@ public abstract class AbstractActiveMTraversalPathSet
       * Add a listener to tell us when TraversalPaths are added to or removed from this ActiveTraversalPathSet.
       *
       * @param newListener the new listener
+      * @see #addDirectActiveTraversalPathSetListener
+      * @see #addWeakActiveTraversalPathSetListener
       * @see #removeActiveTraversalPathSetListener
       */
     public void addSoftActiveTraversalPathSetListener(
@@ -254,6 +257,8 @@ public abstract class AbstractActiveMTraversalPathSet
       * Add a listener to tell us when TraversalPaths are added to or removed from this ActiveTraversalPathSet.
       *
       * @param newListener the new listener
+      * @see #addDirectActiveTraversalPathSetListener
+      * @see #addSoftActiveTraversalPathSetListener
       * @see #removeActiveTraversalPathSetListener
       */
     public void addWeakActiveTraversalPathSetListener(
@@ -269,7 +274,9 @@ public abstract class AbstractActiveMTraversalPathSet
       * Remove a listener to tell us when TraversalPaths are added to or removed from this ActiveTraversalPathSet.
       *
       * @param oldListener the to-be-removed listener
-      * @see #addActiveTraversalPathSetListener
+      * @see #addDirectActiveTraversalPathSetListener
+      * @see #addSoftActiveTraversalPathSetListener
+      * @see #addWeakActiveTraversalPathSetListener
       */
     public void removeActiveTraversalPathSetListener(
             ActiveTraversalPathSetListener oldListener)
@@ -367,7 +374,7 @@ public abstract class AbstractActiveMTraversalPathSet
             = new FlexibleListenerSet<ActiveTraversalPathSetListener,ActiveTraversalPathSetEvent,Object>() {
                     protected void fireEventToListener(
                             ActiveTraversalPathSetListener listener,
-                            ActiveTraversalPathSetEvent          event,
+                            ActiveTraversalPathSetEvent    event,
                             Object                         parameter )
                     {
                         if( event instanceof TraversalPathAddedEvent ) {
@@ -451,7 +458,7 @@ public abstract class AbstractActiveMTraversalPathSet
         public void added(
                 TraversalPathAddedEvent event )
         {
-            super.potentiallyAdd( event.getAddedTraversalPath().getLastMeshObject() );
+            super.potentiallyAdd( event.getDeltaValue().getLastMeshObject() );
         }
 
         /**
@@ -462,7 +469,7 @@ public abstract class AbstractActiveMTraversalPathSet
         public void removed(
                 TraversalPathRemovedEvent event )
         {
-            super.potentiallyRemove( event.getRemovedTraversalPath().getLastMeshObject() );
+            super.potentiallyRemove( event.getDeltaValue().getLastMeshObject() );
         }
 
         /**

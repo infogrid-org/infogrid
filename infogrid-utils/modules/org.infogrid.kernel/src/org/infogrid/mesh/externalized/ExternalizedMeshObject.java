@@ -87,7 +87,6 @@ public interface ExternalizedMeshObject
      * Obtain the MeshObjectIdentifiers of the neighbors of this MeshObject.
      *
      * @return the MeshObjectIdentifiers of the neighbors
-     * @see #getRoleTypes
      */
     public abstract MeshObjectIdentifier [] getNeighbors();
 

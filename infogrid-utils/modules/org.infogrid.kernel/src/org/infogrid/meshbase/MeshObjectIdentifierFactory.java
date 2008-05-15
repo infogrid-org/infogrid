@@ -29,14 +29,14 @@ public interface MeshObjectIdentifierFactory
              IdentifierFactory
 {
     /**
-     * Determine the Identifier of the Home Object.
+     * Determine the MeshObjectIdentifier of the Home MeshObject of this MeshBase.
      *
      * @return the Identifier
      */
     public abstract MeshObjectIdentifier getHomeMeshObjectIdentifier();
 
     /**
-     * Create a unique Identifier for a MeshObject that can be used to create a MeshObject
+     * Create a unique MeshObjectIdentifier for a MeshObject that can be used to create a MeshObject
      * with the associated MeshBaseLifecycleManager.
      *
      * @return the created Identifier
@@ -44,7 +44,7 @@ public interface MeshObjectIdentifierFactory
     public abstract MeshObjectIdentifier createMeshObjectIdentifier();
 
     /**
-     * Create a MeshObjectIdentifier from an external form.
+     * Recreate a MeshObjectIdentifier from an external form.
      *
      * @param raw the external form
      * @return the created MeshObjectIdentifier
@@ -56,7 +56,7 @@ public interface MeshObjectIdentifierFactory
             URISyntaxException;
 
     /**
-     * Convert this StringRepresentation back to an Identifier.
+     * Convert this StringRepresentation back to a MeshObjectIdentifier.
      *
      * @param representation the StringRepresentation in which this String is represented
      * @param s the String to parse

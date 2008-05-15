@@ -36,6 +36,8 @@ public interface ActiveMeshObjectSet
       * Add a listener for events indicating additions or removals to/from the set.
       *
       * @param newListener the listener to be added
+      * @see #addSoftActiveMeshObjectSetListener
+      * @see #addWeakActiveMeshObjectSetListener
       * @see #removeActiveMeshObjectSetListener
       */
     public void addDirectActiveMeshObjectSetListener(
@@ -45,6 +47,8 @@ public interface ActiveMeshObjectSet
       * Add a listener for events indicating additions or removals to/from the set.
       *
       * @param newListener the listener to be added
+      * @see #addDirectActiveMeshObjectSetListener
+      * @see #addWeakActiveMeshObjectSetListener
       * @see #removeActiveMeshObjectSetListener
       */
     public void addSoftActiveMeshObjectSetListener(
@@ -54,6 +58,8 @@ public interface ActiveMeshObjectSet
       * Add a listener for events indicating additions or removals to/from the set.
       *
       * @param newListener the listener to be added
+      * @see #addDirectActiveMeshObjectSetListener
+      * @see #addSoftActiveMeshObjectSetListener
       * @see #removeActiveMeshObjectSetListener
       */
     public void addWeakActiveMeshObjectSetListener(
@@ -63,7 +69,9 @@ public interface ActiveMeshObjectSet
       * Remove a listener for events indicating additions or removals to/from the set.
       *
       * @param oldListener the listener to be removed
-      * @see #addActiveMeshObjectSetListener
+      * @see #addDirectActiveMeshObjectSetListener
+      * @see #addSoftActiveMeshObjectSetListener
+      * @see #addWeakActiveMeshObjectSetListener
       */
     public void removeActiveMeshObjectSetListener(
             ActiveMeshObjectSetListener oldListener );

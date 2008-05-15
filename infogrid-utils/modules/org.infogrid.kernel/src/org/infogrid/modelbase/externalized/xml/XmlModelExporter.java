@@ -14,8 +14,16 @@
 
 package org.infogrid.modelbase.externalized.xml;
 
+import java.awt.Color;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Iterator;
+import java.util.Locale;
 import org.infogrid.mesh.set.MeshObjectSelector;
-
 import org.infogrid.model.primitives.AttributableMeshType;
 import org.infogrid.model.primitives.BlobDataType;
 import org.infogrid.model.primitives.BlobValue;
@@ -53,30 +61,16 @@ import org.infogrid.model.primitives.TimePeriodDataType;
 import org.infogrid.model.primitives.TimePeriodValue;
 import org.infogrid.model.primitives.TimeStampDataType;
 import org.infogrid.model.primitives.TimeStampValue;
-
 import org.infogrid.model.traversal.AlternativeCompoundTraversalSpecification;
 import org.infogrid.model.traversal.SelectiveTraversalSpecification;
 import org.infogrid.model.traversal.SequentialCompoundTraversalSpecification;
 import org.infogrid.model.traversal.TraversalSpecification;
 import org.infogrid.model.traversal.TraversalToPropertySpecification;
-
 import org.infogrid.modelbase.ModelBase;
-
 import org.infogrid.module.ModuleRequirement;
-
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.logging.Log;
-
-import java.awt.Color;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Iterator;
-import java.util.Locale;
 
 /**
  * This class knows how to export the current model in a ModelBase.
@@ -110,7 +104,7 @@ public class XmlModelExporter
             log.debug( this + ".exportToXML( " + modelBase + ", " + theStream + " )" );
         }
 
-        SubjectArea [] theSubjectAreas = (SubjectArea []) ArrayHelper.copyIntoNewArray( modelBase.subjectAreaIterator(), SubjectArea.class );
+        SubjectArea [] theSubjectAreas = ArrayHelper.copyIntoNewArray( modelBase.subjectAreaIterator(), SubjectArea.class );
 
         exportToXML( theSubjectAreas, theStream );
     }
@@ -132,7 +126,7 @@ public class XmlModelExporter
     }
 
     /**
-     * Export several SubjectAreas to an XML stream.
+     * Export an enumerated set of SubjectAreas to an XML stream.
      *
      * @param theSubjectAreas the SubjectAreas that are being exported
      * @param theStream the OutputStream to which the data is sent
@@ -490,7 +484,7 @@ public class XmlModelExporter
     }
 
     /**
-     * This internal helper writes a PropertyType to an XML export stream.
+     * Internal helper to write a PropertyType to an XML export stream.
      *
      * @param indent the indent level
      * @param theWriter the Writer we write to
@@ -654,7 +648,7 @@ public class XmlModelExporter
     }
 
     /**
-     * This internal helper writes a PropertyTypeGroup to an XML export stream.
+     * Internal helper to write a PropertyTypeGroup to an XML export stream.
      *
      * @param indent the indent level
      * @param theWriter the Writer we write to
@@ -726,7 +720,7 @@ public class XmlModelExporter
     }
 
     /**
-     * This internal helper writes a singleton RoleType to an XML export stream.
+     * Internal helper to write a singleton RoleType to an XML export stream.
      *
      * @param indent the indent level
      * @param theWriter the Writer we write to
@@ -756,17 +750,6 @@ public class XmlModelExporter
         theWriter.write( XmlModelTokens.getKeywordFromToken( XmlModelTokens.ENTITY_TOKEN ));
         theWriter.write( ">\n" );
 
-        // top keyword
-//        doIndent( indent+1, theWriter );
-//        theWriter.write( "<" );
-//        theWriter.write( XmlModelTokens.getKeywordFromToken( XmlModelTokens.TOP_TOKEN ));
-//        theWriter.write( ">" );
-//        serializer.writeValue( top.getMeshObject().getIdentifier(), theWriter );
-//        theWriter.write( "</" );
-//        theWriter.write( XmlModelTokens.getKeywordFromToken( XmlModelTokens.TOP_TOKEN ));
-//        theWriter.write( ">\n" );
-// FIXME
-
         // MultiplicityValue keyword
         doIndent( indent+1, theWriter );
         theWriter.write( "<" );
@@ -785,7 +768,7 @@ public class XmlModelExporter
     }
 
     /**
-     * This internal helper writes a normal RoleType to an XML export stream.
+     * Internal helper to write a normal RoleType to an XML export stream.
      *
      * @param indent the indent level
      * @param theWriter the Writer we write to
@@ -851,7 +834,7 @@ public class XmlModelExporter
     }
 
     /**
-     * This internal helper writes a DataType to an XML export stream.
+     * Internal helper to write a DataType to an XML export stream.
      *
      * @param indent the indent level
      * @param theWriter the Writer we write to
@@ -926,8 +909,9 @@ public class XmlModelExporter
 
             qualifier = determineDataTypeQualifier( FloatDataType.class, type );
 
-            if( qualifier != null )
+            if( qualifier != null ) {
                 theWriter.write( qualifier );
+            }
             theWriter.write( "/>\n" );
 
         } else if( type instanceof IntegerDataType ) {
@@ -937,8 +921,9 @@ public class XmlModelExporter
 
             qualifier = determineDataTypeQualifier( IntegerDataType.class, type );
 
-            if( qualifier != null )
+            if( qualifier != null ) {
                 theWriter.write( qualifier );
+            }
             theWriter.write( "/>\n" );
 
         } else if( type instanceof MultiplicityDataType ) {
@@ -948,8 +933,9 @@ public class XmlModelExporter
 
             qualifier = determineDataTypeQualifier( MultiplicityDataType.class, type );
 
-            if( qualifier != null )
+            if( qualifier != null ) {
                 theWriter.write( qualifier );
+            }
             theWriter.write( "/>\n" );
 
         } else if( type instanceof PointDataType ) {
@@ -982,7 +968,7 @@ public class XmlModelExporter
     }
 
     /**
-     * This internal helper writes a UserVisibleName map to an XML export stream.
+     * Internal helper to write a UserVisibleName map to an XML export stream.
      *
      * @param indent the indent level
      * @param theWriter the Writer we write to
@@ -1033,7 +1019,7 @@ public class XmlModelExporter
     }
 
     /**
-     * This internal helper writes a UserVisibleDescription map to an XML export stream.
+     * Internal helper to write a UserVisibleDescription map to an XML export stream.
      *
      * @param indent the indent level
      * @param theWriter the Writer we write to
@@ -1085,7 +1071,7 @@ public class XmlModelExporter
     }
 
     /**
-      * Serialize a TraversalSpecification.
+      * Internal helper to write a TraversalSpecification to an XML export stream.
       *
       * @param indent the indent level
       * @param spec the TraversalSpecification to serialize
@@ -1165,7 +1151,7 @@ public class XmlModelExporter
     }
 
     /**
-      * Serialize a TraversalToPropertySpecification.
+      * Internal helper to write a TraversalToPropertySpecification to an XML stream.
       *
       * @param indent the indent level
       * @param spec the TraversalToPropertySpecification to serialize
@@ -1184,7 +1170,7 @@ public class XmlModelExporter
 
 
     /**
-      * Serialize a MeshObjectSelector.
+      * Internal helper to write a MeshObjectSelector to an XML stream.
       *
       * @param indent the indent level
       * @param selector the MeshObjectSelector to serialize
@@ -1202,9 +1188,10 @@ public class XmlModelExporter
     }
 
     /**
-      * Serialize any PropertyValue.
+      * Internal helper to write any PropertyValue to an XML stream.
       *
       * @param value the PropertyValue to serialize
+      * @param writeTag if true, tag the value with the type
       * @param theWriter the Writer to serialize to
       * @throws IOException thrown if a write error occurred
       */
@@ -1389,7 +1376,7 @@ public class XmlModelExporter
     }
 
     /**
-     * Write out an Identifier.
+     * Write out an Identifier to a stream.
      * 
      * @param identifier the Identifier to write
      * @param theWriter the Writer we write to
@@ -1515,24 +1502,25 @@ public class XmlModelExporter
         }
         return new String( ret );
     }
+
     /**
      * Helper method to indent by n steps.
      *
-     * @param indent the indent level
+     * @param n the number of steps to indent
      * @param theWriter the Writer we write to
      * @throws IOException a write error occurred
      */
     protected static void doIndent(
-            int    indent,
+            int    n,
             Writer theWriter )
         throws
             IOException
     {
-        if( indent <= 0 ) {
+        if( n <= 0 ) {
             return;
         }
 
-        int nBlanks = 2*indent;
+        int nBlanks = 2*n;
         if( nBlanks <= spaces.length ) {
             theWriter.write( spaces, 0, nBlanks );
             return;

@@ -30,7 +30,7 @@ import org.infogrid.util.FactoryException;
 import org.infogrid.util.NameServer;
 
 /**
- * A MeshBase that is networked, i.e. that can map in data that resides in one
+ * A MeshBase that is networked, i.e. that can replicate data that resides in one
  * or more different locations on the network. A number of methods defined in the
  * supertype {@link org.infogrid.meshbase.MeshBase} are repeated
  * here as they are known to return more specific subtypes.

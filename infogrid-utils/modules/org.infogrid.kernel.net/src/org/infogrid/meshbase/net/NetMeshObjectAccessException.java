@@ -40,7 +40,7 @@ public class NetMeshObjectAccessException
             NetMeshObjectAccessSpecification [] failedPaths,
             Throwable                           cause )
     {
-        super( mb, partialResult, NetMeshObjectAccessSpecification.identifiersOf( failedPaths ), cause );
+        super( mb, mb.getIdentifier(), partialResult, NetMeshObjectAccessSpecification.identifiersOf( failedPaths ), cause );
         
         theFailedPaths = failedPaths;
     }

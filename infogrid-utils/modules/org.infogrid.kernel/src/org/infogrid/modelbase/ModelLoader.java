@@ -25,7 +25,7 @@ import org.infogrid.util.logging.Log;
 import java.io.IOException;
 
 /**
- * <p>This is an abstract supertype for classes that know how to load
+ * <p>An abstract supertype for classes that know how to load
  * a model, or part of a model.</p>
  *
  * <p>Note: subtypes of this class need to have the same constructor as this class

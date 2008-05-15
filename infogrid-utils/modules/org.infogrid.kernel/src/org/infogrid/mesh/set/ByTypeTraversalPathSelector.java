@@ -14,8 +14,10 @@
 
 package org.infogrid.mesh.set;
 
+import org.infogrid.meshbase.MeshObjectsNotFoundException;
 import org.infogrid.model.primitives.AttributableMeshType;
 import org.infogrid.model.traversal.TraversalPath;
+import org.infogrid.util.logging.Log;
 
 /**
  * A simple implementation of TraversalPathSelector that accepts all TraversalPaths
@@ -25,8 +27,16 @@ public class ByTypeTraversalPathSelector
         implements
             TraversalPathSelector
 {
+    private static final Log log = Log.getLogInstance( ByTypeTraversalPathSelector.class ); // our own, private logger
+
     /**
      * Factory method.
+     * 
+     * @param firstType the type we are looking for in the first MeshObject of the path -- null matches all
+     * @param firstSubtypeAllowed  if true, we could also be an instance of a subtype of firstType
+     * @param lastType the type we are looking for in the last MeshObject of the path -- null matches all
+     * @param lastSubtypeAllowed  if true, we could also be an instance of a subtype of lastType
+     * @return the created ByTypeTraversalPathSelector
      */
     public static ByTypeTraversalPathSelector create(
             AttributableMeshType firstType,
@@ -70,7 +80,14 @@ public class ByTypeTraversalPathSelector
             throw new IllegalArgumentException();
         }
 
-        AttributableMeshType [] candidateFirstTypes = candidate.getFirstMeshObject().getTypes();
+        AttributableMeshType [] candidateFirstTypes;
+        try {
+            candidateFirstTypes = candidate.getFirstMeshObject().getTypes();
+
+        } catch( MeshObjectsNotFoundException ex ) {
+            log.error( ex );
+            return false;
+        }
         if( theFirstType != null ) {
             boolean found = false;
             if( theFirstSubtypeAllowed ) {

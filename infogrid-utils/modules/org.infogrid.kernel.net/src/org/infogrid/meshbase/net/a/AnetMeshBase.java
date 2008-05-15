@@ -14,13 +14,16 @@
 
 package org.infogrid.meshbase.net.a;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import org.infogrid.context.Context;
-
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-
+import org.infogrid.mesh.set.MeshObjectSetFactory;
+import org.infogrid.meshbase.MeshObjectsNotFoundException;
 import org.infogrid.meshbase.a.AMeshBase;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBase;
@@ -33,9 +36,7 @@ import org.infogrid.meshbase.net.Proxy;
 import org.infogrid.meshbase.net.ProxyManager;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.transaction.Transaction;
-
 import org.infogrid.modelbase.ModelBase;
-
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CursorIterator;
@@ -45,12 +46,6 @@ import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.ReturnSynchronizer;
 import org.infogrid.util.logging.Log;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import org.infogrid.mesh.NotPermittedException;
-import org.infogrid.mesh.set.MeshObjectSetFactory;
-import org.infogrid.meshbase.MeshObjectsNotFoundException;
 
 /**
  * The subtype of MeshBase suitable for the AnetMeshObject implementation.

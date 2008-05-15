@@ -16,8 +16,6 @@ package org.infogrid.modelbase;
 
 import org.infogrid.util.AbstractLocalizedException;
 
-import java.io.Serializable;
-
 /**
  * This Exception is thrown if a type lookup was unsuccessful.
  * Sub-classes provide more detail.
@@ -25,8 +23,6 @@ import java.io.Serializable;
 public abstract class MeshTypeNotFoundException
         extends
             AbstractLocalizedException
-        implements
-            Serializable
 {
     /**
      * Protected constructor, use subclasses only.

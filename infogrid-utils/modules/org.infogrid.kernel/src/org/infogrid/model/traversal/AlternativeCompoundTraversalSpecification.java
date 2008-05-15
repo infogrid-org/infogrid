@@ -21,9 +21,8 @@ import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.transaction.MeshObjectRoleChangeEvent;
 import org.infogrid.util.ArrayHelper;
 
-
 /**
- * This is the implementation of a CompoundTraversalSpecification that traverses several
+ * Implementation of a CompoundTraversalSpecification that traverses several
  * other TraversalSpecifications in parallel. In other words, the result of a traversal,
  * using this AlternativeCompoundTraversalSpecification from a certain MeshObject, is
  * the unification of all results of traversing from the same MeshObject using the
@@ -33,6 +32,8 @@ public class AlternativeCompoundTraversalSpecification
         extends
             AbstractTraversalSpecification
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Factory method.
      *

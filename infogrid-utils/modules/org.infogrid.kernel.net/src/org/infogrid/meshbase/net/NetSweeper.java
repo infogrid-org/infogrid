@@ -18,14 +18,14 @@ import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.Sweeper;
 
 /**
- * Adds methods specific to NetMeshObjects and NetMeshBases.
+ * Adds, to the Sweeper, methods specific to NetMeshObjects and NetMeshBases.
  */
 public interface NetSweeper
         extends
             Sweeper
 {
     /**
-     * Determine whether this candidate MeshObject should be purged, according
+     * Determine whether this candidate NetMeshObject should be purged, according
      * to this Sweeper.
      *
      * @param candidate the NetMeshObject that is a candidate for purging
@@ -36,7 +36,7 @@ public interface NetSweeper
     
     /**
      * Invoked by a background sweep process, the Sweeper will purge the
-     * MeshObject if this MeshObject should be purged.
+     * NetMeshObject if this NetMeshObject should be purged.
      *
      * @param candidate the NetMeshObject that is a candidate for purged
      * @return true if the MeshObject was purged

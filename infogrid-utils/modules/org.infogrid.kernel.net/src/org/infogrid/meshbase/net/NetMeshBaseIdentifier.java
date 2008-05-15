@@ -29,7 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This is a network identifier, such as a URI, XRI or URL. It has two components
+ * A network identifier, such as a URI, XRI or URL. It has two components
  * (which may be the same): the identifier in its canonical form, and a URL-equivalent.
  * For our purposes, we always need to have an URL-equivalent, otherwise the
  * identifier cannot be used for anything useful in InfoGrid. This class performs
@@ -45,7 +45,9 @@ public class NetMeshBaseIdentifier
      * Factory method to create a NetMeshBaseIdentifier that is resolvable into a stream,
      * e.g. http URL.
      * 
-     * @param canonicalForm the canonical form of this NNetMeshBaseIdentifier@return the created NeNetMeshBaseIdentifier
+     * @param canonicalForm the canonical form of this NetMeshBaseIdentifier
+     * @return the created NetMeshBaseIdentifier
+     * @throws URISyntaxException thrown if the syntax could not be parsed
      */
     public static NetMeshBaseIdentifier create(
             String canonicalForm )
@@ -57,10 +59,11 @@ public class NetMeshBaseIdentifier
     
     /**
      * Factory method to create a NetMeshBaseIdentifier that cannot be resolved into a stream,
-     * e.g. jdbc
+     * e.g. jdbc.
      * 
-     * @param canonicalForm the canonical form of this NNetMeshBaseIdentifier
+     * @param canonicalForm the canonical form of this NetMeshBaseIdentifier
      * @return the created NetMeshBaseIdentifier
+     * @throws URISyntaxException thrown if the syntax could not be parsed
      */
     public static NetMeshBaseIdentifier createUnresolvable(
             String canonicalForm )
@@ -74,7 +77,9 @@ public class NetMeshBaseIdentifier
      * Factory method to create a NetMeshBaseIdentifier that is resolvable into a stream,
      * e.g. http URL. This method attempts to guess the protocol if none has been provided.
      * 
-     * @param string the (potentially incomplete) String form of this NNetMeshBaseIdentifier@return the created NeNetMeshBaseIdentifier
+     * @param string the (potentially incomplete) String form of this NetMeshBaseIdentifier
+     * @return the created NetMeshBaseIdentifier
+     * @throws URISyntaxException thrown if the syntax could not be parsed
      */
     public static NetMeshBaseIdentifier guessAndCreate(
             String string )
@@ -88,12 +93,14 @@ public class NetMeshBaseIdentifier
      * Factory method to create a NetMeshBaseIdentifier specified in relative form in the
      * context of another NetMeshBaseIdentifier.
      * 
-     * @param context the NNetMeshBaseIdentifierthat forms the context
-     * @param string the (potentially incomplete) String form of this NeNetMeshBaseIdentifierreturn the created NetNetMeshBaseIdentifier
+     * @param context the NetMeshBaseIdentifier that forms the context
+     * @param string the (potentially incomplete) String form of this NetMeshBaseIdentifier
+     * @return the created NetMeshBaseIdentifier
+     * @throws URISyntaxException thrown if the syntax could not be parsed
      */
     public static NetMeshBaseIdentifier guessAndCreate(
             NetMeshBaseIdentifier context,
-            String            string )
+            String                string )
         throws
             URISyntaxException
     {
@@ -101,48 +108,49 @@ public class NetMeshBaseIdentifier
     }
 
     /**
-     * Factory method.
+     * Fully-specified factory method.
      * 
-     * 
-     * @param s the canonical form of this NetMeshBaseIdentifier
+     * @param context the NetMeshBaseIdentifier that forms the context
+     * @param string the (potentially incomplete) String form of this NetMeshBaseIdentifier
      * @param checkForSupportedProtocol if true, check for supported protocols
      * @param guess if true, attempt to guess the protocol if none was given
-     * @return the created NetNetMeshBaseIdentifier
+     * @return the created NetMeshBaseIdentifier
+     * @throws URISyntaxException thrown if the syntax could not be parsed
      */
     protected static NetMeshBaseIdentifier create(
             NetMeshBaseIdentifier context,
-            String                s,
+            String                string,
             boolean               checkForSupportedProtocol,
             boolean               guess )
         throws
             URISyntaxException
     {
-        if( s == null ) {
+        if( string == null ) {
             throw new NullPointerException();
         }
-        s = s.trim();
-        if( s != null ) {
-            Matcher m = thePort80Pattern.matcher( s );
+        string = string.trim();
+        if( string != null ) {
+            Matcher m = thePort80Pattern.matcher( string );
             if( m.matches() ) {
                 String zapped = m.group( 1 ) + m.group( 2 );
 
-                s = zapped;
+                string = zapped;
             }
         }
 
-        if( s.length() == 0 ) {
-            throw new URISyntaxException( s, "identifier cannot be empty String" );
+        if( string.length() == 0 ) {
+            throw new URISyntaxException( string, "identifier cannot be empty String" );
         }
 
-        if( isXriGlobalContextSymbol( s.charAt( 0 ))) {
-            return new NetMeshBaseIdentifier( s, new URI( theXriResolverPrefix + s ), true );
+        if( isXriGlobalContextSymbol( string.charAt( 0 ))) {
+            return new NetMeshBaseIdentifier( string, new URI( theXriResolverPrefix + string ), true );
         }
-        if( s.startsWith( theXriResolverPrefix )) {
-            s = s.substring( theXriResolverPrefix.length() );
-            return new NetMeshBaseIdentifier( s, new URI( theXriResolverPrefix + s ), true );
+        if( string.startsWith( theXriResolverPrefix )) {
+            string = string.substring( theXriResolverPrefix.length() );
+            return new NetMeshBaseIdentifier( string, new URI( theXriResolverPrefix + string ), true );
         }
 
-        String lower = s.toLowerCase();
+        String lower = string.toLowerCase();
         
         if( guess ) {
             if( lower.indexOf( "://" ) < 0 ) {
@@ -155,11 +163,11 @@ public class NetMeshBaseIdentifier
                     }
                 }
                 if( prefix != null ) {
-                    s = prefix + "/" + s;
+                    string = prefix + "/" + string;
                 } else {
-                    s     = "http://" + s;
+                    string = "http://" + string;
                 }
-                lower = s.toLowerCase();
+                lower = string.toLowerCase();
             }
         }
         
@@ -171,54 +179,58 @@ public class NetMeshBaseIdentifier
             }
         }
         if( isResolvable ) {
-            s = stripDirectoryPaths( s );
-            lower = s.toLowerCase();
+            string = stripDirectoryPaths( string );
+            lower = string.toLowerCase();
         }
         
         if( checkForSupportedProtocol ) {
             for( String urlProtocol : theSupportedUrlProtocols ) {
                 if( lower.startsWith( urlProtocol + ":" )) {
-                    return new NetMeshBaseIdentifier( s, new URI( s ), isResolvable );
+                    return new NetMeshBaseIdentifier( string, new URI( string ), isResolvable );
                 }
             }
             throw new IllegalArgumentException(
                     "canonical identifier uses unknown protocol (need one of "
                     + StringHelper.join( theSupportedUrlProtocols )
                     + "), is "
-                    + s );
+                    + string );
         } else {
-            return new NetMeshBaseIdentifier( s, new URI( s ), isResolvable );
+            return new NetMeshBaseIdentifier( string, new URI( string ), isResolvable );
         }
     }
 
     /**
      * Factory method.
      * 
-     * @param file the local File whose NNetMeshBaseIdentifierwe create
+     * @param file the local File whose NetMeshBaseIdentifier we create
+     * @return the created NetMeshBaseIdentifier
      */
     public static NetMeshBaseIdentifier create(
             File file )
     {
-        return new NetMeshBaseIdentifier( file.toURI(), true );
+        return new NetMeshBaseIdentifier( "file:" + file.getAbsolutePath(), file.toURI(), true );
     }
 
     /**
      * Factory method.
      * 
-     * @param url the URL whose NNetMeshBaseIdentifierwe create
+     * @param url the URL whose NetMeshBaseIdentifier we create
+     * @return the created NetMeshBaseIdentifier
+     * @throws URISyntaxException thrown if the syntax could not be parsed
      */
     public static NetMeshBaseIdentifier create(
             URL url )
         throws
             URISyntaxException
     {
-        return new NetMeshBaseIdentifier( url.toURI(), true );
+        return new NetMeshBaseIdentifier( url.toString(), url.toURI(), true );
     }
 
     /**
      * Factory method.
      * 
-     * @param uri the URI whose NNetMeshBaseIdentifierwe create
+     * @param uri the URI whose NetMeshBaseIdentifier we create
+     * @return the created NetMeshBaseIdentifier
      */
     public static NetMeshBaseIdentifier create(
             URI uri )
@@ -232,13 +244,15 @@ public class NetMeshBaseIdentifier
                 break;
             }
         }
-        return new NetMeshBaseIdentifier( uri, isResolvable );
+        return new NetMeshBaseIdentifier( uri.toString(), uri, isResolvable );
     }
 
     /**
      * For consistency with the Java APIs, we provide this method.
      * 
-     * @param canonicalForm the canonical form of this NNetMeshBaseIdentifier@return the created NeNetMeshBaseIdentifier
+     * @param canonicalForm the canonical form of this NetMeshBaseIdentifier
+     * @return the created NetMeshBaseIdentifier
+     * @throws URISyntaxException thrown if the syntax could not be parsed
      */
     public static NetMeshBaseIdentifier fromExternalForm(
             String canonicalForm )
@@ -267,16 +281,6 @@ public class NetMeshBaseIdentifier
     }
 
     /**
-     * Constructor.
-     */
-    protected NetMeshBaseIdentifier(
-            URI     uri,
-            boolean isResolvable )
-    {
-        this( uri.toString(), uri, isResolvable );
-    }
-
-    /**
      * Determine whether this NetMeshBaseIdentifier is REST-fully resolvable.
      * 
      * @return true if it is
@@ -288,6 +292,8 @@ public class NetMeshBaseIdentifier
 
     /**
      * Obtain the URI form of this identifier as URI.
+     * 
+     * @return the URI form
      */
     public URI toUri()
     {
@@ -296,6 +302,9 @@ public class NetMeshBaseIdentifier
 
     /**
      * Obtain the URL form of this identifier as URL.
+     * 
+     * @return the URL form
+     * @throws MalformedURLException thrown if the URI could not be turned into a URL
      */
     public URL toUrl()
         throws
@@ -305,9 +314,9 @@ public class NetMeshBaseIdentifier
     }
 
     /**
-     * Obtain the URI form of this identifier.
+     * Obtain the URI String form of this identifier.
      *
-     * @return the URI form
+     * @return the URI String form
      */
     public String getUriString()
     {
@@ -321,6 +330,7 @@ public class NetMeshBaseIdentifier
      * Obtain the protocol of the URL form.
      *
      * @return the protocol.
+     * @throws MalformedURLException thrown if the URI could not be turned into a URL
      */
     public String getUrlProtocol()
         throws
@@ -370,6 +380,7 @@ public class NetMeshBaseIdentifier
      * Determine equality.
      *
      * @param other the Object to compare against
+     * @return true if the objects are equal
      */
     @Override
     public boolean equals(

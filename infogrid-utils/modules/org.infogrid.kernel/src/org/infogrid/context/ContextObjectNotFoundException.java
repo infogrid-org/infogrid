@@ -21,6 +21,8 @@ public class ContextObjectNotFoundException
         extends
             RuntimeException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

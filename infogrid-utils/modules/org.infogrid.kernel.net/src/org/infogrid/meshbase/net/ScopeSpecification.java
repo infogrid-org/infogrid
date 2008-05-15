@@ -22,8 +22,8 @@ import java.util.regex.Pattern;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
 
 /**
- * Subclasses indicate the desired scope for a replication operation.
- * Right now there is only one.
+ * Defines the requested scope for a replication operation. This is an abstract
+ * class; concrete subclasses are defined as inner classes.
  */
 public abstract class ScopeSpecification
 {
@@ -160,6 +160,17 @@ public abstract class ScopeSpecification
             }
             SimpleStep realOther = (SimpleStep) other;
             return theScope == realOther.theScope;
+        }
+
+        /**
+         * Determine hash code.
+         * 
+         * @return hash code
+         */
+        @Override
+        public int hashCode()
+        {
+            return theScope;
         }
 
         /**

@@ -20,7 +20,7 @@ import org.infogrid.meshbase.MeshObjectIdentifierFactory;
 import java.net.URISyntaxException;
 
 /**
- * Specializes MeshObjectIdentifierFactory.
+ * Specializes MeshObjectIdentifierFactory to create NetMeshObjectIdentifiers.
  */
 public interface NetMeshObjectIdentifierFactory
         extends
@@ -42,10 +42,10 @@ public interface NetMeshObjectIdentifierFactory
     public abstract NetMeshObjectIdentifier createMeshObjectIdentifier();
 
     /**
-     * Create an identifier for a MeshObject at held locally at this MeshBase.
+     * Create an identifier for a MeshObject held locally at this MeshBase.
      *
      * @param raw the identifier String
-     * @return the created DefaultAnetMeshObjectIdentifier
+     * @return the created NetMeshObjectIdentifier
      * @throws URISyntaxException a parsing error occurred
      */
     // @Override except that the compiler doesn't like it
@@ -59,7 +59,7 @@ public interface NetMeshObjectIdentifierFactory
      *
      * @param meshBaseIdentifier MeshBaseIdentifier of the MeshBase where the object is held
      * @param raw the identifier String
-     * @return the created DefaultAnetMeshObjectIdentifier
+     * @return the created NetMeshObjectIdentifier
      * @throws URISyntaxException a parsing error occurred
      */
     public NetMeshObjectIdentifier fromExternalForm(

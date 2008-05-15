@@ -29,6 +29,8 @@ public class SequentialCompoundTraversalSpecification
         extends
             AbstractTraversalSpecification
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Factory method to construct a SequentialCompoundTraversalSpecification
      * from a sequence of TraversalSpecifications.

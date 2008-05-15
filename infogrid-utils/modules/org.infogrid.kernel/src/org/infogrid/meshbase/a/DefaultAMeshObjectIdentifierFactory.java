@@ -22,6 +22,7 @@ import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringifierException;
 
 import java.net.URISyntaxException;
+import org.infogrid.util.ResourceHelper;
 
 /**
  * Default implementation of MeshObjectIdentifierFactory for the A implementation.
@@ -78,14 +79,14 @@ public class DefaultAMeshObjectIdentifierFactory
             URISyntaxException
     {
         try {
-            representation.parseEntry( DefaultAMeshObjectIdentifier.RESOURCEHELPER, DefaultAMeshObjectIdentifier.HOME_DEFAULT_ENTRY, s );
+            representation.parseEntry( RESOURCEHELPER, DefaultAMeshObjectIdentifier.HOME_DEFAULT_ENTRY, s );
             return fromExternalForm( "" );
 
         } catch( StringifierException ex ) {
             // that wasn't it ...
         }
         try {
-            Object [] found = representation.parseEntry( DefaultAMeshObjectIdentifier.RESOURCEHELPER, DefaultAMeshObjectIdentifier.DEFAULT_ENTRY, s );
+            Object [] found = representation.parseEntry( RESOURCEHELPER, DefaultAMeshObjectIdentifier.DEFAULT_ENTRY, s );
 
             DefaultAMeshObjectIdentifier ret;
             switch( found.length ) {
@@ -121,4 +122,10 @@ public class DefaultAMeshObjectIdentifierFactory
      * The Home Object's identifier. Subclass to avoid having to make the constructor public.
      */
     public static final DefaultAMeshObjectIdentifier HOME_OBJECT = new DefaultAMeshObjectIdentifier( null ) {};
+
+    /**
+     * Our ResourceHelper. Note that this is the ResourceHelper of the Identifier,
+     * not of the factory. This is private so no conflicts with subtypes occur.
+     */
+    private static final ResourceHelper RESOURCEHELPER = ResourceHelper.getInstance( DefaultAMeshObjectIdentifier.class );
 }
