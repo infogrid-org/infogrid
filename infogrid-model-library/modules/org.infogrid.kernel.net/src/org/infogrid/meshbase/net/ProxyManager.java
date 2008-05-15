@@ -35,6 +35,7 @@ public class ProxyManager
      * 
      * @param proxyFactory the underlying factory of Proxies
      * @param storage the storage for the Proxies managed by this ProxyManager
+     * @return the created ProxyManager
      */
     public static ProxyManager create(
             ProxyFactory                            proxyFactory,
@@ -95,6 +96,8 @@ public class ProxyManager
      * Method invoked by a Proxy created by this ProxyManager that the Proxy has been updated. This
      * allows the ProxyManager to write changes back to disk, for example. This is overridden here
      * to allow for easier debugging.
+     * 
+     * @param updatedProxy the Proxy that was updated
      */
     @Override
     public void factoryCreatedObjectUpdated(

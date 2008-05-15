@@ -14,12 +14,10 @@
 
 package org.infogrid.meshbase;
 
+import java.net.URISyntaxException;
 import org.infogrid.mesh.MeshObjectIdentifier;
-
 import org.infogrid.util.UniqueIdentifierCreator;
 import org.infogrid.util.logging.Log;
-
-import java.net.URISyntaxException;
 
 /**
  * Factors out common features of MeshObjectIdentifierFactories.

@@ -26,10 +26,14 @@ import org.infogrid.util.logging.Log;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.meshbase.MeshObjectsNotFoundException;
+import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.StringHelper;
 
 /**
- * <p>This represents a path of traversal from an (implied) start MeshObject,
+ * <p>Represents a path of traversal from an (implied) start MeshObject,
  * to another or the same MeshObject, via a sequence of zero or more steps. One
  * step is the combination of a TraversalSpecification, and the resulting
  * MeshObject.</p>
@@ -54,7 +58,7 @@ public class TraversalPath
     private static final Log log = Log.getLogInstance( TraversalPath.class ); // our own, private logger
 
     /**
-     * Factory method for only one step on the path.
+     * Factory method for only one step on the TraversalPath.
      *
      * @param traversedSpec the TraversalSpecification that we traversed
      * @param reachedMeshObject the MeshObject that was reached by doing the traversal
@@ -97,7 +101,8 @@ public class TraversalPath
                 traversedSpec,
                 reachedMeshObject,
                 remainder,
-                size );
+                size,
+                reachedMeshObject.getMeshBase() );
         
         return ret;
     }
@@ -107,6 +112,7 @@ public class TraversalPath
      *
      * @param one the first TraversalPath
      * @param two the second TraversalPath
+     * @return the created TraversalPath
      * @throws WrongMeshBaseException thrown if a TraversalPath is prepended to a TraversalPath with MeshObjects in different MeshBases
      */
     public static TraversalPath create(
@@ -128,7 +134,8 @@ public class TraversalPath
                 one.theTraversedSpec,
                 one.theReached,
                 remainder,
-                one.theSize + two.theSize );
+                one.theSize + two.theSize,
+                one.getMeshBase() );
 
         return ret;
     }
@@ -153,7 +160,8 @@ public class TraversalPath
                     here.theTraversedSpec,
                     here.theReached,
                     nextStep,
-                    size );
+                    size,
+                    here.getMeshBase() );
         }
     }
 
@@ -162,24 +170,29 @@ public class TraversalPath
      *
      * @param traversedSpec the TraversalSpecification that we traversed
      * @param reachedMeshObject the MeshObject that was reached by doing the traversal
+     * @param remainder the remaining TraversalPath (recursive structure)
      * @param size the number of steps in this TraversalPath
+     * @param mb the MeshBase against which to resolve the MeshObject
      */
     protected TraversalPath(
             TraversalSpecification traversedSpec,
             MeshObject             reachedMeshObject,
             TraversalPath          remainder,
-            int                    size )
+            int                    size,
+            MeshBase               mb )
     {
-        theTraversedSpec = traversedSpec;
-        theReached       = reachedMeshObject;
-        theRemainder     = remainder;
-        theSize          = size;
+        theTraversedSpec     = traversedSpec;
+        theReached           = reachedMeshObject;
+        theReachedIdentifier = reachedMeshObject.getIdentifier();
+        theRemainder         = remainder;
+        theSize              = size;
+        theMeshBase          = mb;
     }
 
     /**
      * Set the debug name. This is to be used for debugging only.
      *
-     * @param debugName the debug name
+     * @param newValue the new value
      */
     public void setDebugName(
             String newValue )
@@ -198,13 +211,29 @@ public class TraversalPath
     }
 
     /**
+     * Set the MeshBase against which this TraversalPath shall be resolved.
+     * 
+     * @param newValue the new value
+     */
+    public void setMeshBase(
+            MeshBase newValue )
+    {
+        if( newValue == null || newValue != theMeshBase ) {
+            theMeshBase = newValue;
+            
+            theReached = null;
+            theRemainder.setMeshBase( newValue );
+        }
+    }
+
+    /**
      * Obtain the MeshBase to which this TraversalPath belongs.
      *
      * @return the MeshBase
      */
     public MeshBase getMeshBase()
     {
-        return theReached.getMeshBase();
+        return theMeshBase;
     }
 
     /**
@@ -259,15 +288,33 @@ public class TraversalPath
      * This convenience method returns all MeshObjects in this TraversalPath in sequence.
      *
      * @return an array of size getSize(), which contains the MeshObject on the TraversalPath
+     * @throws MeshObjectsNotFoundException thrown if the MeshObject could not be resolved
      */
-    public MeshObject [] getEntitiesInSequence()
+    public MeshObject [] getMeshObjectsInSequence()
+        throws
+            MeshObjectsNotFoundException
     {
-        MeshObject [] ret = new MeshObject[ getSize() ];
+        MeshObject []                   ret = new MeshObject[ getSize() ];
+        ArrayList<MeshObjectIdentifier> notFound = null;
 
         TraversalPath current = this;
         for( int i=0 ; i<ret.length ; ++i ) {
-            ret[i] = current.theReached;
-            current = current.getNextSegment();
+            try {
+                ret[i] = current.getFirstMeshObject();
+                current = current.getNextSegment();
+
+            } catch( MeshObjectsNotFoundException ex ) {
+                if( notFound == null ) {
+                    notFound = new ArrayList<MeshObjectIdentifier>();
+                }
+                notFound.add( current.getFirstMeshObjectIdentifier() );
+            }
+        }
+        if( notFound != null ) {
+            throw new MeshObjectsNotFoundException(
+                    theMeshBase,
+                    ret, // partialResult
+                    ArrayHelper.copyIntoNewArray( notFound, MeshObjectIdentifier.class ));
         }
         return ret;
     }
@@ -276,10 +323,26 @@ public class TraversalPath
      * Obtain the first MeshObject on this TraversalPath.
      *
      * @return the first MeshObject on this TraversalPath
+     * @throws MeshObjectsNotFoundException thrown if the MeshObject could not be resolved
      */
-    public MeshObject getFirstMeshObject()
+    public synchronized MeshObject getFirstMeshObject()
+        throws
+            MeshObjectsNotFoundException
     {
+        if( theReached == null ) {
+            theReached = resolveMeshObject( theReachedIdentifier );
+        }
         return theReached;
+    }
+
+    /**
+     * Obtain the identifier of the first MeshObject on this TraversalPath.
+     *
+     * @return the identifier of the first MeshObject on this TraversalPath
+     */
+    public MeshObjectIdentifier getFirstMeshObjectIdentifier()
+    {
+        return theReachedIdentifier;
     }
 
     /**
@@ -304,6 +367,26 @@ public class TraversalPath
     public TraversalPath getNextSegment()
     {
         return theRemainder;
+    }
+
+    /**
+     * Resolve a MeshObject
+     *
+     * @param identifier the MeshObjectIdentifier to resolve
+     * @return the resolved MeshObject
+     * @throws MeshObjectsNotFoundException thrown if the MeshObject could not be resolved
+     */
+    protected MeshObject resolveMeshObject(
+            MeshObjectIdentifier identifier )
+        throws
+            MeshObjectsNotFoundException
+    {
+        if( theMeshBase == null ) {
+            throw new MeshObjectsNotFoundException( theMeshBase, identifier );
+        }
+        
+        MeshObject ret = theMeshBase.findMeshObjectByIdentifierOrThrow( identifier );
+        return ret;
     }
 
     /**
@@ -388,6 +471,8 @@ public class TraversalPath
      * on the TraversalPath.
      *
      * @param newListener the listener to add
+     * @see #addWeakTraversalPathPropertyChangeListener
+     * @see #addSoftTraversalPathPropertyChangeListener
      * @see #removeTraversalPathPropertyChangeListener
      */
     public synchronized void addDirectTraversalPathPropertyChangeListener(
@@ -402,8 +487,13 @@ public class TraversalPath
             // subscribe
             TraversalPath current = this;
             while( current != null ) {
-                current.getFirstMeshObject().addDirectPropertyChangeListener( this );
-                current = current.getNextSegment();
+                try {
+                    current.getFirstMeshObject().addDirectPropertyChangeListener( this );
+                    current = current.getNextSegment();
+
+                } catch( MeshObjectsNotFoundException ex ) {
+                    log.error( ex ); // this is probably the best we can do
+                }
             }
         }
     }
@@ -413,6 +503,8 @@ public class TraversalPath
      * on the TraversalPath.
      *
      * @param newListener the listener to add
+     * @see #addDirectTraversalPathPropertyChangeListener
+     * @see #addSoftTraversalPathPropertyChangeListener
      * @see #removeTraversalPathPropertyChangeListener
      */
     public synchronized void addWeakTraversalPathPropertyChangeListener(
@@ -421,14 +513,19 @@ public class TraversalPath
         if( theListeners == null ) {
             theListeners = new FlexiblePropertyChangeListenerSet();
         }
-        theListeners.addDirect( newListener );
+        theListeners.addWeak( newListener );
 
         if( theListeners.size() == 1 ) {
             // subscribe
             TraversalPath current = this;
             while( current != null ) {
-                current.getFirstMeshObject().addWeakPropertyChangeListener( this );
-                current = current.getNextSegment();
+                try {
+                    current.getFirstMeshObject().addWeakPropertyChangeListener( this );
+                    current = current.getNextSegment();
+                    
+                } catch( MeshObjectsNotFoundException ex ) {
+                    log.error( ex ); // this is probably the best we can do
+                }
             }
         }
     }
@@ -438,6 +535,8 @@ public class TraversalPath
      * on the TraversalPath.
      *
      * @param newListener the listener to add
+     * @see #addDirectTraversalPathPropertyChangeListener
+     * @see #addWeakTraversalPathPropertyChangeListener
      * @see #removeTraversalPathPropertyChangeListener
      */
     public synchronized void addSoftTraversalPathPropertyChangeListener(
@@ -446,14 +545,19 @@ public class TraversalPath
         if( theListeners == null ) {
             theListeners = new FlexiblePropertyChangeListenerSet();
         }
-        theListeners.addDirect( newListener );
+        theListeners.addSoft( newListener );
 
         if( theListeners.size() == 1 ) {
             // subscribe
             TraversalPath current = this;
             while( current != null ) {
-                current.getFirstMeshObject().addSoftPropertyChangeListener( this );
-                current = current.getNextSegment();
+                try {
+                    current.getFirstMeshObject().addSoftPropertyChangeListener( this );
+                    current = current.getNextSegment();
+
+                } catch( MeshObjectsNotFoundException ex ) {
+                    log.error( ex ); // this is probably the best we can do
+                }
             }
         }
     }
@@ -463,7 +567,9 @@ public class TraversalPath
      * on the TraversalPath.
      *
      * @param oldListener the listener to remove
-     * @see #addTraversalPathPropertyChangeListener
+     * @see #addDirectTraversalPathPropertyChangeListener
+     * @see #addWeakTraversalPathPropertyChangeListener
+     * @see #addSoftTraversalPathPropertyChangeListener
      */
     public synchronized void removeTraversalPathPropertyChangeListener(
             PropertyChangeListener oldListener )
@@ -480,8 +586,13 @@ public class TraversalPath
 
             TraversalPath current = this;
             while( current != null ) {
-                current.getFirstMeshObject().removePropertyChangeListener( this );
-                current = current.getNextSegment();
+                try {
+                    current.getFirstMeshObject().removePropertyChangeListener( this );
+                    current = current.getNextSegment();
+
+                } catch( MeshObjectsNotFoundException ex ) {
+                    log.error( ex ); // this is probably the best we can do
+                }
             }
         }
     }
@@ -500,16 +611,15 @@ public class TraversalPath
         if( theEvent instanceof MeshObjectPropertyChangeEvent ) {
             delegatedEvent = new TraversalPathDelegatedPropertyChangeEvent(
                     this,
-                    (MeshObjectPropertyChangeEvent) theEvent,
-                    theReached.getMeshBase() );
+                    (MeshObjectPropertyChangeEvent) theEvent );
 
         } else if( theEvent instanceof MeshObjectRoleAddedEvent ) {
             MeshObjectRoleAddedEvent realEvent = (MeshObjectRoleAddedEvent) theEvent;
-            delegatedEvent = new TraversalPathDelegatedRoleChangeEvent.Added( this, realEvent, theReached.getMeshBase() );
+            delegatedEvent = new TraversalPathDelegatedRoleChangeEvent.Added( this, realEvent );
 
         } else if( theEvent instanceof MeshObjectRoleRemovedEvent ) {
             MeshObjectRoleRemovedEvent realEvent = (MeshObjectRoleRemovedEvent) theEvent;
-            delegatedEvent = new TraversalPathDelegatedRoleChangeEvent.Removed( this, realEvent, theReached.getMeshBase() );
+            delegatedEvent = new TraversalPathDelegatedRoleChangeEvent.Removed( this, realEvent );
 
         } else if( theEvent instanceof MeshObjectStateEvent ) {
             return;
@@ -538,13 +648,13 @@ public class TraversalPath
                 new String[] {
                     "debugName",
                     "traversedSpec",
-                    "reached",
+                    "theReachedIdentifier",
                     "remainder"
                 },
                 new Object[] {
                     theDebugName,
                     theTraversedSpec,
-                    theReached,
+                    theReachedIdentifier,
                     theRemainder
                 });
     }
@@ -560,9 +670,19 @@ public class TraversalPath
     protected TraversalSpecification theTraversedSpec;
 
     /**
+     * The MeshBase against which to resolve the MeshObject.
+     */
+    protected transient MeshBase theMeshBase;
+
+    /**
      * The MeshObject that we reached after we traversed the TraversalSpecification.
      */
-    protected MeshObject theReached;
+    protected transient MeshObject theReached;
+
+    /**
+     * The identifier of the MeshObject that we reached after we traversed the TraversalSpecification.
+     */
+    protected MeshObjectIdentifier theReachedIdentifier;
 
     /**
      * The remainder (aka second part) of this TraversalPath.
@@ -578,5 +698,5 @@ public class TraversalPath
     /**
      * Our listeners, if any.
      */
-    protected FlexiblePropertyChangeListenerSet theListeners;
+    protected transient FlexiblePropertyChangeListenerSet theListeners;
 }

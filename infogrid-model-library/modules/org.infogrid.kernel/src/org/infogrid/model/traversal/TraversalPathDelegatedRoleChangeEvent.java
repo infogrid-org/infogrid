@@ -40,9 +40,8 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
      * @param org the original MeshObjectRolePlayerUpdateEvent
      */
     protected TraversalPathDelegatedRoleChangeEvent(
-            TraversalPath             path,
-            AbstractMeshObjectRoleChangeEvent org,
-            MeshBase                  base )
+            TraversalPath                     path,
+            AbstractMeshObjectRoleChangeEvent org )
     {
         super(  org.getSource(),
                 org.getSource().getIdentifier(),
@@ -81,6 +80,34 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
     }
 
     /**
+     * Determine equality.
+     * 
+     * @param other the Object to compare with
+     * @return true if the Objects are equal
+     */
+    @Override
+    public abstract boolean equals(
+            Object other );
+
+    /**
+     * Hash code.
+     * 
+     * @return hash code
+     */
+    @Override
+    public int hashCode()
+    {
+        int ret = 0;
+        if( thePath != null ) {
+            ret ^= thePath.hashCode();
+        }
+        if( theOriginalEvent != null ) {
+            ret ^= theOriginalEvent.hashCode();
+        }
+        return ret;
+    }
+
+    /**
      * The TraversalPath that forwarded this event.
      */
     protected TraversalPath thePath;
@@ -98,6 +125,8 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
             extends
                 TraversalPathDelegatedRoleChangeEvent
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
@@ -105,10 +134,9 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
          * @param org the original MeshObjectRolePlayerUpdateEvent
          */
         Added(  TraversalPath            path,
-                MeshObjectRoleAddedEvent org,
-                MeshBase                 base )
+                MeshObjectRoleAddedEvent org )
         {
-            super( path, org, base );
+            super( path, org );
         }
 
         /**
@@ -143,6 +171,50 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
             MeshObject ret = theOriginalEvent.applyTo( otherMeshBase );
             return ret;
         }
+
+        /**
+         * Determine equality.
+         * 
+         * @param other the Object to compare with
+         * @return true if the Objects are equal
+         */
+        @Override
+        public boolean equals(
+                Object other )
+        {
+            if( !( other instanceof Added )) {
+                return false;
+            }
+            Added realOther = (Added) other;
+            
+            if( thePath != null ) {
+                if( !thePath.equals( realOther.thePath )) {
+                    return false;
+                }
+            } else if( realOther.thePath != null ) {
+                return false;
+            }
+            
+            if( theOriginalEvent != null ) {
+                if( !theOriginalEvent.equals( realOther.theOriginalEvent )) {
+                    return false;
+                }
+            } else if( realOther.theOriginalEvent != null ) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Hash code.
+         * 
+         * @return hash code
+         */
+        @Override
+        public int hashCode()
+        {
+            return super.hashCode();
+        }
     }
     
     /**
@@ -153,6 +225,8 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
             extends
                 TraversalPathDelegatedRoleChangeEvent
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
@@ -161,10 +235,9 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
          */
         Removed(
                 TraversalPath              path,
-                MeshObjectRoleRemovedEvent org,
-                MeshBase                   base )
+                MeshObjectRoleRemovedEvent org )
         {
-            super( path, org, base );
+            super( path, org );
         }
 
         /**
@@ -198,6 +271,49 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
         {
             MeshObject ret = theOriginalEvent.applyTo( otherMeshBase );
             return ret;
+        }
+        /**
+         * Determine equality.
+         * 
+         * @param other the Object to compare with
+         * @return true if the Objects are equal
+         */
+        @Override
+        public boolean equals(
+                Object other )
+        {
+            if( !( other instanceof Removed )) {
+                return false;
+            }
+            Removed realOther = (Removed) other;
+            
+            if( thePath != null ) {
+                if( !thePath.equals( realOther.thePath )) {
+                    return false;
+                }
+            } else if( realOther.thePath != null ) {
+                return false;
+            }
+            
+            if( theOriginalEvent != null ) {
+                if( !theOriginalEvent.equals( realOther.theOriginalEvent )) {
+                    return false;
+                }
+            } else if( realOther.theOriginalEvent != null ) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Hash code.
+         * 
+         * @return hash code
+         */
+        @Override
+        public int hashCode()
+        {
+            return super.hashCode();
         }
     }
 }

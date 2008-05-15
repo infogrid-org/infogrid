@@ -46,6 +46,7 @@ public interface ProxyFactory
      *
      * @param externalized the ExternalizedProxy
      * @return the recreated Proxy
+     * @throws FactoryException thrown if the Proxy restore failed
      */
     public Proxy restoreProxy(
             ExternalizedProxy externalized )

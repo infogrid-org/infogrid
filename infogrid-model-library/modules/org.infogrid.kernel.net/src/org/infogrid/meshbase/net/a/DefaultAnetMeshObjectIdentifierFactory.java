@@ -28,6 +28,7 @@ import org.infogrid.util.text.StringifierException;
 import org.infogrid.util.text.StringRepresentation;
 
 import java.net.URISyntaxException;
+import org.infogrid.util.ResourceHelper;
 
 /**
  * The default NetMeshObjectIdentifierFactory in the "A" implementation.
@@ -66,9 +67,9 @@ public class DefaultAnetMeshObjectIdentifierFactory
     }
 
     /**
-     * Create a unique Identifier.
+     * Create a unique NetMeshObjectIdentifier.
      *
-     * @return the unique Identifier
+     * @return the unique NetMeshObjectIdentifier
      */
     @Override
     public NetMeshObjectIdentifier createMeshObjectIdentifier()
@@ -127,14 +128,14 @@ public class DefaultAnetMeshObjectIdentifierFactory
             URISyntaxException
     {
         try {
-            representation.parseEntry( DefaultAnetMeshObjectIdentifier.RESOURCEHELPER, DefaultAnetMeshObjectIdentifier.HOME_DEFAULT_ENTRY, s );
+            representation.parseEntry( RESOURCEHELPER, DefaultAnetMeshObjectIdentifier.HOME_DEFAULT_ENTRY, s );
             return fromExternalForm( "" );
 
         } catch( StringifierException ex ) {
             // that wasn't it ...
         }
         try {
-            Object [] found = representation.parseEntry( DefaultAnetMeshObjectIdentifier.RESOURCEHELPER, DefaultAnetMeshObjectIdentifier.DEFAULT_ENTRY, s );
+            Object [] found = representation.parseEntry( RESOURCEHELPER, DefaultAnetMeshObjectIdentifier.DEFAULT_ENTRY, s );
 
             DefaultAnetMeshObjectIdentifier ret;
             switch( found.length ) {
@@ -238,4 +239,10 @@ public class DefaultAnetMeshObjectIdentifierFactory
      * The home object identifier.
      */
     public final DefaultAnetMeshObjectIdentifier NET_HOME_OBJECT;
+
+    /**
+     * Our ResourceHelper. Note that this is the ResourceHelper of the Identifier,
+     * not of the factory. This is private so no conflicts with subtypes occur.
+     */
+    private static final ResourceHelper RESOURCEHELPER = ResourceHelper.getInstance( DefaultAnetMeshObjectIdentifier.class );
 }

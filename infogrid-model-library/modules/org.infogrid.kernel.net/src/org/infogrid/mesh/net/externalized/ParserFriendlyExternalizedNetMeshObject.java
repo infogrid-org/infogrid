@@ -27,7 +27,7 @@ import org.infogrid.util.logging.Log;
 import java.util.ArrayList;
 
 /**
- *
+ * A temporary buffer for a to-be-deserialized NetMeshObject.
  */
 public class ParserFriendlyExternalizedNetMeshObject
         extends

@@ -15,7 +15,9 @@
 package org.infogrid.mesh.security;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.meshbase.MeshObjectAccessException;
 
 /**
  * This Exception indicates that a caller had insufficient permissions to perform
@@ -25,6 +27,8 @@ public class CallerHasInsufficientPermissionsException
         extends
             NotPermittedException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *
@@ -38,16 +42,30 @@ public class CallerHasInsufficientPermissionsException
     {
         super( obj );
         
-        theCaller = caller;
+        theCaller           = caller;
+        theCallerIdentifier = caller != null ? caller.getIdentifier() : null;
     }
     
     /**
      * Obtain the caller who did not have sufficient permissions.
      *
      * @return the caller
+     * @throws MeshObjectAccessException thrown if something went wrong accessing the MeshObject
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     * @throws IllegalStateException thrown if no resolving MeshBase is available
      */
-    public final MeshObject getCaller()
+    public synchronized MeshObject getCaller()
+        throws
+            MeshObjectAccessException,
+            NotPermittedException,
+            IllegalStateException
     {
+        if( theCallerIdentifier == null ) {
+            return null;
+        }
+        if( theCaller == null ) {
+            theCaller = resolve( theCallerIdentifier );
+        }
         return theCaller;
     }
 
@@ -59,11 +77,16 @@ public class CallerHasInsufficientPermissionsException
     @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object [] { theMeshObject, theCaller };
+        return new Object [] { theMeshObjectIdentifier, theCallerIdentifier };
     }
 
     /**
      * The caller that did not have sufficient permissions and triggered this Exception.
      */
     protected transient MeshObject theCaller;
+    
+    /**
+     * Identifier of the caller that did not have sufficent permissions.
+     */
+    protected MeshObjectIdentifier theCallerIdentifier;
 }

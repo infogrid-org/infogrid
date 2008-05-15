@@ -23,6 +23,8 @@ public class OrderedTraversalPathSetReorderedEvent
         extends
             ActiveTraversalPathSetEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
       * Construct one.
       *
@@ -31,6 +33,6 @@ public class OrderedTraversalPathSetReorderedEvent
     public OrderedTraversalPathSetReorderedEvent(
             ActiveTraversalPathSet _theSet )
     {
-        super( _theSet );
+        super( _theSet, null );
     }
 }

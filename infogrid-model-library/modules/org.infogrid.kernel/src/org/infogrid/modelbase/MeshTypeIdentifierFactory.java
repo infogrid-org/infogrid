@@ -43,6 +43,7 @@ public interface MeshTypeIdentifierFactory
      * @param representation the StringRepresentation in which this String is represented
      * @param s the String to parse
      * @return the created MeshObjectIdentifier
+     * @throws URISyntaxException thrown 
      */
     public MeshTypeIdentifier fromStringRepresentation(
             StringRepresentation representation,

@@ -17,8 +17,6 @@ package org.infogrid.model.traversal;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.util.ArrayHelper;
 
-import java.io.Serializable;
-
 /**
  * <p>This specifies the value of one or more specific properties at a destination
  *    MeshObject that is obtained by traversing a TraversalSpecification. In spite of the
@@ -36,8 +34,6 @@ import java.io.Serializable;
  *    place from a certain start MeshObject.
  */
 public class TraversalToPropertySpecification
-        implements
-            Serializable
 {
     /**
      * Factory method. This will create a TraversalToPropertySpecification that

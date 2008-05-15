@@ -25,6 +25,8 @@ public class TraversalPathRemovedEvent
         extends
             ActiveTraversalPathSetEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
       * Construct one.
       *
@@ -35,10 +37,9 @@ public class TraversalPathRemovedEvent
             ActiveTraversalPathSet _theSet,
             TraversalPath          _theRemovedTraversalPath )
     {
-        super(_theSet);
+        super(_theSet, _theRemovedTraversalPath );
 
-        theRemovedIndex         = -1;
-        theRemovedTraversalPath = _theRemovedTraversalPath;
+        theRemovedIndex = -1;
     }
 
     /**
@@ -55,10 +56,9 @@ public class TraversalPathRemovedEvent
             int                    _removedIndex,
             TraversalPath          _theRemovedTraversalPath )
     {
-        super(_theSet);
+        super(_theSet, _theRemovedTraversalPath );
 
-        theRemovedIndex         = _removedIndex;
-        theRemovedTraversalPath = _theRemovedTraversalPath;
+        theRemovedIndex = _removedIndex;
     }
 
     /**
@@ -72,16 +72,6 @@ public class TraversalPathRemovedEvent
     }
 
     /**
-      * Obtain the removed TraversalPath.
-      *
-      * @return the removed TraversalPath
-      */
-    public TraversalPath getRemovedTraversalPath()
-    {
-        return theRemovedTraversalPath;
-    }
-
-    /**
      * Obtain string representation, for debugging.
      *
      * @return a string representation of this instance
@@ -92,11 +82,9 @@ public class TraversalPathRemovedEvent
         return StringHelper.objectLogString(
                 this,
                 new String[] {
-                    "removed",
-                    "index"
+                    "removedIndex"
                 },
                 new Object[] {
-                    theRemovedTraversalPath,
                     theRemovedIndex
                 });
     }
@@ -105,9 +93,4 @@ public class TraversalPathRemovedEvent
      * The index of the TraversalPath that was removed, before it was removed.
      */
     protected int theRemovedIndex;
-
-    /**
-      * The removed TraversalPath.
-      */
-    protected TraversalPath theRemovedTraversalPath;
 }

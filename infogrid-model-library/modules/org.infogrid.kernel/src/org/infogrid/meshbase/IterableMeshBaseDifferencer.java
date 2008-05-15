@@ -14,7 +14,9 @@
 
 package org.infogrid.meshbase;
 
+import java.util.ArrayList;
 import org.infogrid.mesh.BlessedAlreadyException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotBlessedException;
@@ -22,9 +24,7 @@ import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
-
 import org.infogrid.mesh.set.MeshObjectSet;
-
 import org.infogrid.meshbase.transaction.AbstractMeshObjectEquivalentsChangeEvent;
 import org.infogrid.meshbase.transaction.AbstractMeshObjectLifecycleEvent;
 import org.infogrid.meshbase.transaction.AbstractMeshObjectNeighborChangeEvent;
@@ -45,18 +45,13 @@ import org.infogrid.meshbase.transaction.MeshObjectRoleRemovedEvent;
 import org.infogrid.meshbase.transaction.MeshObjectTypeAddedEvent;
 import org.infogrid.meshbase.transaction.MeshObjectTypeRemovedEvent;
 import org.infogrid.meshbase.transaction.TransactionException;
-
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.RoleType;
-
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.StringHelper;
 import org.infogrid.util.logging.Log;
-
-import java.util.ArrayList;
-import org.infogrid.mesh.IllegalPropertyTypeException;
 
 /**
   * <p>Provides the functionality to perform a diff on any two IterableMeshBases.</p>

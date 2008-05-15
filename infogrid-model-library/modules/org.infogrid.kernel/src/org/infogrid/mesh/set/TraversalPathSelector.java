@@ -16,7 +16,6 @@ package org.infogrid.mesh.set;
 
 import org.infogrid.model.traversal.TraversalPath;
 
-
 /**
   * This interface allows us to indicate whether or not a certain TraversalPath
   * matches a selection criteria.

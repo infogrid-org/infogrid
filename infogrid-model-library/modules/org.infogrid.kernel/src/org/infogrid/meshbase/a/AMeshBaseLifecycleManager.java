@@ -14,6 +14,9 @@
 
 package org.infogrid.meshbase.a;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import org.infogrid.mesh.AbstractMeshObject;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
@@ -24,11 +27,10 @@ import org.infogrid.mesh.TypedMeshObjectFacade;
 import org.infogrid.mesh.a.AMeshObject;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.security.MustNotDeleteHomeObjectException;
-
 import org.infogrid.meshbase.AbstractMeshBaseLifecycleManager;
+import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
-
 import org.infogrid.model.primitives.DataType;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.EnumeratedDataType;
@@ -38,16 +40,9 @@ import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.model.primitives.SubjectArea;
-
 import org.infogrid.modelbase.ModelBase;
-
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.logging.Log;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import org.infogrid.meshbase.security.AccessManager;
 
 /**
  * A MeshBaseLifecycleManager appropriate for the AMeshBase implementation of MeshBase. 
@@ -506,6 +501,7 @@ public class AMeshBaseLifecycleManager
      * 
      * @param theExternalizedObject the externalized representation of the MeshObject
      * @return the created MeshObject
+     * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
      */
     public AbstractMeshObject loadExternalizedMeshObject(
             ExternalizedMeshObject theExternalizedObject )

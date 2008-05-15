@@ -50,7 +50,7 @@ public class IterableNetMeshBaseDifferencer
     /**
      * Constructor.
      *
-     * @param baseline the basline IterableNetMeshBase against which we compare.
+     * @param baseline the baseline IterableNetMeshBase against which we compare.
      */
     public IterableNetMeshBaseDifferencer(
             IterableNetMeshBase baseline )
@@ -293,7 +293,7 @@ public class IterableNetMeshBaseDifferencer
      * @param meshObjectInBase the MeshObject in the baseline
      * @param meshObjectInComparison the MeshObject in the comparison
      * @param added the MeshObjects that were added as neighbors
-     * @param resultingEquivalents the Identifiers of the resulting set of neighbors
+     * @param newEquivalents the Identifiers of the resulting set of equivalents
      * @return the MeshObjectDeletedEvent or subclass
      */
     @Override
@@ -321,7 +321,7 @@ public class IterableNetMeshBaseDifferencer
      * @param meshObjectInBase the MeshObject in the baseline
      * @param meshObjectInComparison the MeshObject in the comparison
      * @param removed the Identifiers of the MeshObjects that were removed as equivalents
-     * @param remainingEquivalents the remaining equivalents
+     * @param newEquivalents the Identifiers of the resulting set of equivalents
      * @return the MeshObjectEquivalentsRemovedEvent or subclass
      */
     @Override

@@ -31,6 +31,7 @@ public class DefaultProxyFactory
     /** 
      * Factory method.
      *
+     * @param endpointFactory the NetMessageEndpointFactory to use to communicate
      * @return the created DefaultProxyFactory.
      */
     public static DefaultProxyFactory create(
@@ -43,6 +44,8 @@ public class DefaultProxyFactory
 
     /**
      * Constructor.
+     * 
+     * @param endpointFactory the NetMessageEndpointFactory to use to communicate
      */
     protected DefaultProxyFactory(
             NetMessageEndpointFactory endpointFactory )
@@ -79,9 +82,9 @@ public class DefaultProxyFactory
     /**
      * Recreate a Proxy from an ExternalizedProxy.
      *
-     * @param identifier the NetMeshBaseIdentifier of the Proxy
      * @param externalized the ExternalizedProxy
      * @return the recreated Proxy
+     * @throws FactoryException thrown if the Proxy restore failed
      */
     public Proxy restoreProxy(
             ExternalizedProxy externalized )

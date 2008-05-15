@@ -17,10 +17,9 @@ package org.infogrid.modelbase;
 import org.infogrid.model.primitives.ProjectedPropertyType;
 import org.infogrid.model.traversal.TraversalToPropertySpecification;
 
-
 /**
  * <p>Instances of a subclass of this class are returned from the MeshTypeLifecycleManager's
- * createProjectedPropertyType method. They hold the created ProjectedProperty, but
+ * {@link MeshTypeLifecycleManager#createProjectedPropertyType} method. They hold the created ProjectedProperty, but
  * also allow the invoker of the createProjectedPropertyType method to, in a second step,
  * set the input Properties. This allows us to prevent others to update the input Properties
  * after the ProjectedProperty has been created. Unfortunately this two-step approach

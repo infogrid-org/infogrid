@@ -99,7 +99,7 @@ public class ActiveMeshObjectSetTestListener
                 + ": The meshObjectAdded method was called: "
 //                + event
 //                + ", added name: "
-                + event.getAddedMeshObject() );
+                + event.getDeltaValue() );
     }
 
     /**
@@ -115,7 +115,7 @@ public class ActiveMeshObjectSetTestListener
                 + ": the meshObjectRemoved method was called: "
 //                + event
 //                + ", removed name: "
-                + event.getRemovedMeshObject() );
+                + event.getDeltaValue() );
     }
 
     /**
