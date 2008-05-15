@@ -27,16 +27,17 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- *
+ * Known how to serialize and deserialize a Proxy.
  */
 public interface ExternalizedProxyEncoder
 {
     /**
      * Serialize an ExternalizedProxy to an OutputStream.
      * 
-     * @param obj the input ExternalizedProxy
+     * @param p the input ExternalizedProxy
      * @param out the OutputStream to which to append the ExternalizedProxy
      * @throws EncodingException thrown if a problem occurred during encoding
+     * @throws IOException thrown if an I/O error occurred
      */
     public void encodeExternalizedProxy(
             ExternalizedProxy p,
@@ -49,7 +50,9 @@ public interface ExternalizedProxyEncoder
      * Deserialize an ExternalizedProxy from a byte stream.
      *
      * @param s the InputStream from which to read
+     * @return the decoded ExternalizedProxy
      * @throws DecodingException thrown if a problem occurred during decoding
+     * @throws IOException thrown if an I/O error occurred
      */
     public abstract ExternalizedProxy decodeExternalizedProxy(
             InputStream                                    s,

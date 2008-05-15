@@ -14,14 +14,11 @@
 
 package org.infogrid.model.traversal;
 
-import org.infogrid.mesh.MeshObject;
-
-import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.transaction.MeshObjectPropertyChangeEvent;
 
 /**
- * This is a MeshObjectPropertyChangeEvent, forwarded by a TraversalPath and
- * annotated with the TraversalPath.
+ * A MeshObjectPropertyChangeEvent that has been forwarded by a TraversalPath and
+ * that is annotated with the TraversalPath.
  */
 public class TraversalPathDelegatedPropertyChangeEvent
         extends
@@ -29,18 +26,19 @@ public class TraversalPathDelegatedPropertyChangeEvent
         implements
             TraversalPathDelegatedEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
-     * Construct with the original event that we are forwarding.
+     * Constructor, specifying the original event that is being forwarded.
      *
      * @param path the TraversalPath that forwarded this event
      * @param org the original event
      */
     public TraversalPathDelegatedPropertyChangeEvent(
             TraversalPath                 path,
-            MeshObjectPropertyChangeEvent org,
-            MeshBase                      base )
+            MeshObjectPropertyChangeEvent org )
     {
-        super(  (MeshObject) org.getSource(),
+        super(  org.getSource(),
                 org.getProperty(),
                 org.getOldValue(),
                 org.getDeltaValue(),

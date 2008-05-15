@@ -27,6 +27,8 @@ public class PropertyTypeNotFoundException
         extends
             MeshTypeNotFoundException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

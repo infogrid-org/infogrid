@@ -18,7 +18,6 @@ import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.a.DefaultAnetMeshObjectIdentifier;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.StringHelper;
-import org.infogrid.util.logging.Log;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -27,23 +26,24 @@ import java.net.URI;
  * <p>A path to a remote MeshObject, comprised of zero or more NetworkIdentifiers.
  * It can be roughly compared to a UUCP path, or a server trace in a mail message.</p>
  * 
- * <p>A NetMeshObjectAccessSpecification always identifies a MeshObject. However, sometimes everal MeshObjects
- * reside at the same NetMeshBaseIdentifier, such as when the NetMeshBaseIdentifier refers to a file
- * that contains several MeshObjects. This class also provides capabilities to diambiguate
+ * <p>A NetMeshObjectAccessSpecification always identifies a MeshObject. However, sometimes
+ * several MeshObjects reside at the same NetMeshBaseIdentifier, such as when the
+ * NetMeshBaseIdentifier refers to a NetMeshBase or a file that contains several
+ * MeshObjects. This class also provides capabilities to diambiguate
  * MeshObjects at the same NetMeshBaseIdentifier.</p>
  */
 public class NetMeshObjectAccessSpecification
         implements
             Serializable
 {
-    private static final Log log = Log.getLogInstance( NetMeshObjectAccessSpecification.class ); // our own, private logger
-    
+    private final static long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Factory method to create a NetMeshObjectAccessSpecification to a locally available MeshObject. This
      * is a degenerate form of NetMeshObjectAccessSpecification, but useful for API consistency.
      * 
-     * @param extName Identifier of the local MeshObject
-     * @return created NeNetMeshBasePath
+     * @param extName Identifier of the local NetMeshObject
+     * @return created NetMeshObjectAccessSpecification
      */
     public static NetMeshObjectAccessSpecification createToLocalObject(
             NetMeshObjectIdentifier extName )
@@ -55,7 +55,8 @@ public class NetMeshObjectAccessSpecification
     }
 
     /**
-     * Factory method to create a single-element NetMeshObjectAccessSpecification from a NetMeshBaseIdentifier.
+     * Factory method to create a single-element NetMeshObjectAccessSpecification from a NetMeshBaseIdentifier,
+     * requesting the home object at the NetMeshBaseIdentifier.
      * 
      * @param oneElementName the NetMeshBaseIdentifier
      * @return created NetMeshObjectAccessSpecification
@@ -71,10 +72,10 @@ public class NetMeshObjectAccessSpecification
 
     /**
      * Factory method to create a single-element NetMeshObjectAccessSpecification from a NetMeshBaseIdentifier,
-     * specifying a non-default MeshObject.
+     * requesting a non-default NetMeshObject.
      * 
      * @param oneElementName the NetMeshBaseIdentifier
-     * @param extName Identifier of the remote non-default MeshObject
+     * @param extName Identifier of the remote non-default NetMeshObject
      * @return created NetMeshObjectAccessSpecification
      */
     public static NetMeshObjectAccessSpecification create(
@@ -89,10 +90,11 @@ public class NetMeshObjectAccessSpecification
 
     /**
      * Factory method to create a single-element NetMeshObjectAccessSpecification from a NetMeshBaseIdentifier,
-     * specifying a non-default scope.
+     * requesting the home object at the NetMeshBaseIdentifier,
+     * specifying a non-default ScopeSpecification.
      * 
-     * @param oneElementName the NNetMeshBaseIdentifier
-     * @param scope the scope
+     * @param oneElementName the NetMeshBaseIdentifier
+     * @param scope the ScopeSpecification
      * @return created NetMeshObjectAccessSpecification
      */
     public static NetMeshObjectAccessSpecification create(
@@ -107,6 +109,7 @@ public class NetMeshObjectAccessSpecification
 
     /**
      * Factory method to create a single-element NetMeshObjectAccessSpecification from a NetMeshBaseIdentifier,
+     * requesting the home object at the NetMeshBaseIdentifier.
      * specifying a non-default CoherenceSpecification.
      * 
      * @param oneElementName the NetMeshBaseIdentifier
@@ -125,11 +128,12 @@ public class NetMeshObjectAccessSpecification
 
     /**
      * Factory method to create a single-element NetMeshObjectAccessSpecification from a NetMeshBaseIdentifier,
-     * specifying a non-default MeshObject and a non-default scope.
+     * requesting a non-default NetMeshObject,
+     * specifying a non-default ScopeSpecification.
      * 
      * @param oneElementName the NetMeshBaseIdentifier
-     * @param extName Identifier of the remote non-default MeshObject
-     * @param scope the scope
+     * @param extName Identifier of the remote non-default NetMeshObject
+     * @param scope the ScopeSpecification
      * @return created NetMeshObjectAccessSpecification
      */
     public static NetMeshObjectAccessSpecification create(
@@ -145,7 +149,8 @@ public class NetMeshObjectAccessSpecification
 
     /**
      * Factory method to create a single-element NetMeshObjectAccessSpecification from a NetMeshBaseIdentifier,
-     * specifying a non-default MeshObject and a non-default CoherenceSpecification.
+     * requesting a non-default MeshObject,
+     * specifying a non-default CoherenceSpecification.
      * 
      * @param oneElementName the NetMeshBaseIdentifier
      * @param extName Identifier of the remote non-default MeshObject
@@ -165,10 +170,12 @@ public class NetMeshObjectAccessSpecification
 
     /**
      * Factory method to create a single-element NetMeshObjectAccessSpecification from a NetMeshBaseIdentifier,
-     * specifying a non-default scope and a non-default CoherenceSpecification.
+     * requesting the home object at the NetMeshBaseIdentifier,
+     * specifying a non-default ScopeSpecification and a non-default CoherenceSpecification.
      * 
      * @param oneElementName the NetMeshBaseIdentifier
-     * @param scope the scope
+     * @param scope the ScopeSpecification
+     * @param coherence the CoherenceSpecification
      * @return created NetMeshObjectAccessSpecification
      */
     public static NetMeshObjectAccessSpecification create(
@@ -184,11 +191,12 @@ public class NetMeshObjectAccessSpecification
 
     /**
      * Factory method to create a single-element NetMeshObjectAccessSpecification from a NetMeshBaseIdentifier,
-     * specifying a non-default MeshObject, a non-default scope and a non-default CoherenceSpecification.
+     * requesting a non-default MeshObject,
+     * specifying a non-default ScopeSpecification and a non-default CoherenceSpecification.
      * 
      * @param oneElementName the NetMeshBaseIdentifier
      * @param extName Identifier of the remote non-default MeshObject
-     * @param scope the scope
+     * @param scope the ScopeSpecification
      * @param coherence the CoherenceSpecification
      * @return created NetMeshObjectAccessSpecification
      */
@@ -205,9 +213,10 @@ public class NetMeshObjectAccessSpecification
     }
 
     /**
-     * Factory method to create a multi-element NetMeshObjectAccessSpecification from a series of NetMeshBaseIdentifier.
+     * Factory method to create a multi-element NetMeshObjectAccessSpecification from
+     * a sequence of NetMeshBaseAccessSpecification.
      * 
-     * @param elements the NetworkIdentifiers, in sequence
+     * @param elements the NetMeshBaseAccessSpecifications, in sequence
      * @return created NetMeshObjectAccessSpecification
      */
     public static NetMeshObjectAccessSpecification create(
@@ -219,10 +228,11 @@ public class NetMeshObjectAccessSpecification
     }
 
     /**
-     * Factory method to create a multi-element NetMeshObjectAccessSpecification from a series of NetMeshBaseIdentifier,
-     * specifying a non-default MeshObject.
+     * Factory method to create a multi-element NetMeshObjectAccessSpecification from
+     * a sequence of NetMeshBaseAccessSpecifications,
+     * requesting a non-default MeshObject.
      * 
-     * @param elements the NetMeshBaseIdentifier, in sequence
+     * @param elements the NetMeshBaseAccessSpecifications, in sequence
      * @param extName Identifier of the remote non-default MeshObject
      * @return created NetMeshObjectAccessSpecification
      */
@@ -236,9 +246,10 @@ public class NetMeshObjectAccessSpecification
     }
 
     /**
-     * Factory method to create a multi-element NetMeshObjectAccessSpecification from a series of NetMeshBaseIdentifier.
+     * Factory method to create a multi-element NetMeshObjectAccessSpecification
+     * from a series of NetMeshBaseIdentifiers.
      * 
-     * @param elements the NetworkIdentifiers, in sequence
+     * @param elements the NetMeshBaseIdentifier, in sequence
      * @return created NetMeshObjectAccessSpecification
      */
     public static NetMeshObjectAccessSpecification create(
@@ -250,10 +261,11 @@ public class NetMeshObjectAccessSpecification
     }
 
     /**
-     * Factory method to create a multi-element NetMeshObjectAccessSpecification from a series of NetMeshBaseIdentifier,
-     * specifying a non-default MeshObject.
+     * Factory method to create a multi-element NetMeshObjectAccessSpecification from
+     * a series of NetMeshBaseIdentifiers,
+     * requesting a non-default MeshObject.
      * 
-     * @param elements the NetMeshBaseIdentifier, in sequence
+     * @param elements the NetMeshBaseIdentifiers, in sequence
      * @param extName Identifier of the remote non-default MeshObject
      * @return created NetMeshObjectAccessSpecification
      */
@@ -267,11 +279,11 @@ public class NetMeshObjectAccessSpecification
     }
     
     /**
-     * Factory method to create a single-element NetMeshObjectAccessSpecification from a URL.
+     * Convenience factory method to create a single-element NetMeshObjectAccessSpecification
+     * by converting a URI into a NetMeshBaseIdentifier, requesting its home MeshObject.
      * 
-     * 
-     * @param remoteLocation the URI identifying the remote MeshObject
-     * @return created NeNetMeshBasePath
+     * @param remoteLocation the URI
+     * @return created NetMeshObjectAccessSpecification
      */
     public static NetMeshObjectAccessSpecification create(
             URI remoteLocation )
@@ -281,13 +293,13 @@ public class NetMeshObjectAccessSpecification
     }
 
     /**
-     * Factory method to create a single-element NetMeshObjectAccessSpecification from a URL with a non-default
-     * CoherenceSpecification.
+     * Convenience factory method to create a single-element NetMeshObjectAccessSpecification
+     * by converting a URI into a NetMeshBaseIdentifier, requesting its home MeshObject,
+     * specifying a non-default CoherenceSpecification.
      * 
-     * 
-     * @param remoteLocation the URI identifying the remote MeshObject
+     * @param remoteLocation the URI
      * @param coherence the CoherenceSpecification
-     * @return created NetNetMeshBasePath
+     * @return created NetMeshObjectAccessSpecification
      */
     public static NetMeshObjectAccessSpecification create(
             URI                    remoteLocation,
@@ -298,13 +310,13 @@ public class NetMeshObjectAccessSpecification
     }
 
     /**
-     * Factory method to create a single-element NetMeshObjectAccessSpecification from a URL with a non-default
-     * ScopeSpecification.
+     * Convenience factory method to create a single-element NetMeshObjectAccessSpecification
+     * by converting a URI into a NetMeshBaseIdentifier, requesting its home MeshObject,
+     * specifying a non-default ScopeSpecification.
      * 
-     * 
-     * @param remoteLocation the URI identifying the remote MeshObject
-     * @param scope the scope
-     * @return created NetNetMeshBasePath
+     * @param remoteLocation the URI
+     * @param scope the ScopeSpecification
+     * @return created NetMeshObjectAccessSpecification
      */
     public static NetMeshObjectAccessSpecification create(
             URI                remoteLocation,
@@ -315,14 +327,14 @@ public class NetMeshObjectAccessSpecification
     }
 
     /**
-     * Factory method to create a single-element NetMeshObjectAccessSpecification from a URL with a non-default
-     * ScopeSpecification and a non-default CoherenceSpecification.
+     * Convenience factory method to create a single-element NetMeshObjectAccessSpecification
+     * by converting a URI into a NetMeshBaseIdentifier, requesting its home MeshObject,
+     * specifying a non-default ScopeSpecification and a non-default CoherenceSpecification.
      * 
-     * 
-     * @param remoteLocation the URI identifying the remote MeshObject
-     * @param scope the scope
+     * @param remoteLocation the URI
+     * @param scope the ScopeSpecification
      * @param coherence the CoherenceSpecification
-     * @return created NetwNetMeshBasePath
+     * @return created NetMeshObjectAccessSpecification
      */
     public static NetMeshObjectAccessSpecification create(
             URI                    remoteLocation,
@@ -334,8 +346,8 @@ public class NetMeshObjectAccessSpecification
     }
     
     /**
-     * A convenience method to prefix an array of NetworkPaths with the same NetMeshBaseIdentifier.
-     * 
+     * A convenience method to prefix an array of NetMeshObjectAccessSpecifications with
+     * the same NetMeshBaseAccessSpecification.
      * 
      * @param prefix the prefix for the NetworkPaths
      * @param paths the array of NetworkPaths that needs to be prefixed
@@ -357,10 +369,8 @@ public class NetMeshObjectAccessSpecification
     /**
      * Constructor.
      *
-     * @param namePath  the sequence of network locations to traverse to find one where we can access the MeshObject
+     * @param accessPath the sequence of network locations to traverse to find one where we can access the MeshObject
      * @param extName   the identifier of the MeshObject there, if different from the default
-     * @param scope     the scope parameter indicating how many MeshObjects shall be replcated at the same time
-     * @param coherence the requirement for information coherence (e.g. how often updates shall be sent)
      */
     private NetMeshObjectAccessSpecification(
             NetMeshBaseAccessSpecification [] accessPath,
@@ -377,7 +387,7 @@ public class NetMeshObjectAccessSpecification
     }
 
     /**
-     * Obtain the NetMeshBaseIdentifier path.
+     * Obtain the NetMeshBaseAccessSpecification path.
      * 
      * @return the path we traverse to the MeshObject we want to access. May be of length 0.
      */
@@ -387,9 +397,10 @@ public class NetMeshObjectAccessSpecification
     }
 
     /**
-     * Obtain the Identifier of the MeshObject that we are looking for in the remote MeshBase, if different from the default.
+     * Obtain the Identifier of the NetMeshObject that we are looking for in the remote MeshBase,
+     * if different from the default.
      *
-     * @return the Identifier of the MeshObject that we are looking for, if different from the default
+     * @return the Identifier of the NetMeshObject that we are looking for, if different from the default
      */
     public NetMeshObjectIdentifier getNoneDefaultNetMeshObjectIdentifier()
     {
@@ -397,10 +408,10 @@ public class NetMeshObjectAccessSpecification
     }
 
     /**
-     * Obtain the Identifier of the MeshObject that we are looking for in the remote MeshBase.
+     * Obtain the Identifier of the NetMeshObject that we are looking for in the remote NetMeshBase.
      * Calculate it if it is the default.
      *
-     * @return the Identifier of the MeshObject that we are looking for
+     * @return the Identifier of the NetMeshObject that we are looking for
      */
     public NetMeshObjectIdentifier getNetMeshObjectIdentifier()
     {
@@ -522,6 +533,24 @@ public class NetMeshObjectAccessSpecification
             return false;
         }
         return true;
+    }
+
+    /**
+     * Determine hash code.
+     * 
+     * @return hash code
+     */
+    @Override
+    public int hashCode()
+    {
+        int ret = 0;
+        for( int i=0 ; i<theAccessPath.length ; ++i ) {
+            ret ^= theAccessPath[i].hashCode() >> i;
+        }
+        if( theRemoteIdentifier != null ) {
+            ret ^= theRemoteIdentifier.hashCode();
+        }        
+        return ret;
     }
 
     /**

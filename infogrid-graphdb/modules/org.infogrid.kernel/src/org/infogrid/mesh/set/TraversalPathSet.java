@@ -22,7 +22,7 @@ import org.infogrid.util.CursorIterator;
 import java.beans.PropertyChangeListener;
 
 /**
- * This is a set of TraversalPaths. It is similar to
+ * A set of TraversalPaths. It is similar to
  * MeshObjectSet, but it contains TraversalPaths, not MeshObjects.
  */
 public interface TraversalPathSet
@@ -138,6 +138,8 @@ public interface TraversalPathSet
      * TraversalPaths in this set.
      *
      * @param newListener the new listener
+     * @see #addSoftContentPropertyChangeListener
+     * @see #addWeakContentPropertyChangeListener
      * @see #removeContentPropertyChangeListener
      */
     public void addDirectContentPropertyChangeListener(
@@ -148,6 +150,8 @@ public interface TraversalPathSet
      * TraversalPaths in this set.
      *
      * @param newListener the new listener
+     * @see #addDirectContentPropertyChangeListener
+     * @see #addSoftContentPropertyChangeListener
      * @see #removeContentPropertyChangeListener
      */
     public void addWeakContentPropertyChangeListener(
@@ -158,6 +162,8 @@ public interface TraversalPathSet
      * TraversalPaths in this set.
      *
      * @param newListener the new listener
+     * @see #addDirectContentPropertyChangeListener
+     * @see #addWeakContentPropertyChangeListener
      * @see #removeContentPropertyChangeListener
      */
     public void addSoftContentPropertyChangeListener(
@@ -168,7 +174,9 @@ public interface TraversalPathSet
      * TraversalPaths in this set.
      *
      * @param oldListener the to-be-removed listeners
-     * @see #addContentPropertyChangeListener
+     * @see #addDirectContentPropertyChangeListener
+     * @see #addSoftContentPropertyChangeListener
+     * @see #addWeakContentPropertyChangeListener
      */
     public void removeContentPropertyChangeListener(
             PropertyChangeListener oldListener );

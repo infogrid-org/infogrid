@@ -24,27 +24,28 @@ public class MeshObjectRemovedEvent
         extends
             ActiveMeshObjectSetEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
       * Constructor.
       *
       * @param _theSet the set that changed
-      * @param _theRemovedEntity the MeshObject that was removed from the set
+      * @param _theRemovedMeshObject the MeshObject that was removed from the set
       */
     public MeshObjectRemovedEvent(
             ActiveMeshObjectSet _theSet,
             MeshObject          _theRemovedMeshObject )
     {
-        super(_theSet);
+        super(_theSet, _theRemovedMeshObject );
 
-        theRemovedMeshObject = _theRemovedMeshObject;
-        theIndexOfRemoved    = -1;
+        theIndexOfRemoved = -1;
     }
 
     /**
       * Constructor.
       *
       * @param _theSet the set that changed,
-      * @param _theRemovedEntity the Entity that was removed from the set
+      * @param _theRemovedMeshObject the Entity that was removed from the set
       * @param _indexOfRemoved the index in the set from which the Entity was removed
       */
     public MeshObjectRemovedEvent(
@@ -52,20 +53,9 @@ public class MeshObjectRemovedEvent
             MeshObject          _theRemovedMeshObject,
             int                 _indexOfRemoved )
     {
-        super(_theSet);
+        super(_theSet, _theRemovedMeshObject );
 
-        theRemovedMeshObject = _theRemovedMeshObject;
-        theIndexOfRemoved    = _indexOfRemoved;
-    }
-
-    /**
-      * Obtain the removed MeshObject.
-      *
-      * @return the removed MeshObject
-      */
-    public MeshObject getRemovedMeshObject()
-    {
-        return theRemovedMeshObject;
+        theIndexOfRemoved = _indexOfRemoved;
     }
 
     /**
@@ -94,17 +84,12 @@ public class MeshObjectRemovedEvent
         return StringHelper.objectLogString(
                 this,
                 new String[] {
-                    "theRemovedMeshObject"
+                    "indexOfRemoved"
                 },
                 new Object[] {
-                    theRemovedMeshObject
+                    theIndexOfRemoved
                 });
     }
-
-    /**
-      * The removed MeshObject.
-      */
-    protected MeshObject theRemovedMeshObject;
 
     /**
      * The index from which the MeshObject was removed.

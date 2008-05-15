@@ -150,7 +150,7 @@ public class OrderedActiveMTraversalPathSet
             return;
         }
 
-        TraversalPath added = event.getAddedTraversalPath();
+        TraversalPath added = event.getDeltaValue();
         added.addWeakTraversalPathPropertyChangeListener( this );
 
         TraversalPath [] newContent = theSorter.getOrderedInNew( theUnderlyingSet.getTraversalPaths() );
@@ -179,7 +179,7 @@ public class OrderedActiveMTraversalPathSet
             return;
         }
 
-        TraversalPath removed = event.getRemovedTraversalPath();
+        TraversalPath removed = event.getDeltaValue();
         removed.removeTraversalPathPropertyChangeListener( this );
 
         certainlyRemove( removed );

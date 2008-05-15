@@ -17,7 +17,7 @@ package org.infogrid.modelbase.externalized.xml;
 import java.util.HashMap;
 
 /**
- * This helper class collects the token definitions for the XmlModelLoader and XmlModelExporter.
+ * Collects the token definitions for the XmlModelLoader and XmlModelExporter.
  */
 abstract class XmlModelTokens
 {
@@ -52,7 +52,7 @@ abstract class XmlModelTokens
             key.append( namespaceUri ).append( ":" );
         }
         key.append( keyword );
-        Integer almostRet = (Integer) theTokenMap.get( key.toString() );
+        Integer almostRet = theTokenMap.get( key.toString() );
         if( almostRet != null ) {
             return almostRet.intValue();
         }
@@ -141,32 +141,30 @@ abstract class XmlModelTokens
     protected static final int SOURCE_DESTINATION_TOKEN                  = 38;
     protected static final int ENTITY_TOKEN                              = 39;
     protected static final int REFINES_TOKEN                             = 40;
-    protected static final int TOP_TOKEN                                 = 41;
-    protected static final int TO_OVERRIDE_TOKEN                         = 42;
-    protected static final int GUARD_TOKEN                               = 43;
-    protected static final int SEQUENCE_NUMBER_TOKEN                     = 44;
-    protected static final int ICON_TOKEN                                = 45;
+    protected static final int TO_OVERRIDE_TOKEN                         = 41;
+    protected static final int GUARD_TOKEN                               = 42;
+    protected static final int SEQUENCE_NUMBER_TOKEN                     = 43;
+    protected static final int ICON_TOKEN                                = 44;
 
-    protected static final int BLOB_DATATYPE_TOKEN                       = 46;
-    protected static final int BOOLEAN_DATATYPE_TOKEN                    = 47;
-    protected static final int COLOR_DATATYPE_TOKEN                      = 48;
-    protected static final int ENUMERATED_DATATYPE_TOKEN                 = 49;
-    protected static final int EXTENT_DATATYPE_TOKEN                     = 50;
-    protected static final int FLOAT_DATATYPE_TOKEN                      = 51;
-    protected static final int FLOAT_MATRIX_DATATYPE_TOKEN               = 52;
-    protected static final int INTEGER_DATATYPE_TOKEN                    = 53;
-    protected static final int MULTIPLICITY_DATATYPE_TOKEN               = 54;
-    protected static final int POINT_DATATYPE_TOKEN                      = 55;
-    // protected static final int REFERENCE_DATATYPE_TOKEN                  = 56;
-    protected static final int STRING_DATATYPE_TOKEN                     = 57;
-    protected static final int TIME_PERIOD_DATATYPE_TOKEN                = 58;
-    protected static final int TIME_STAMP_DATATYPE_TOKEN                 = 59;
+    protected static final int BLOB_DATATYPE_TOKEN                       = 45;
+    protected static final int BOOLEAN_DATATYPE_TOKEN                    = 46;
+    protected static final int COLOR_DATATYPE_TOKEN                      = 47;
+    protected static final int ENUMERATED_DATATYPE_TOKEN                 = 48;
+    protected static final int EXTENT_DATATYPE_TOKEN                     = 49;
+    protected static final int FLOAT_DATATYPE_TOKEN                      = 50;
+    protected static final int FLOAT_MATRIX_DATATYPE_TOKEN               = 51;
+    protected static final int INTEGER_DATATYPE_TOKEN                    = 52;
+    protected static final int MULTIPLICITY_DATATYPE_TOKEN               = 53;
+    protected static final int POINT_DATATYPE_TOKEN                      = 54;
+    protected static final int STRING_DATATYPE_TOKEN                     = 55;
+    protected static final int TIME_PERIOD_DATATYPE_TOKEN                = 56;
+    protected static final int TIME_STAMP_DATATYPE_TOKEN                 = 57;
 
-    protected static final int MULTIPLICITY_VALUE_TOKEN                  = 60;
-    protected static final int ENUM_TOKEN                                = 61;
+    protected static final int MULTIPLICITY_VALUE_TOKEN                  = 58;
+    protected static final int ENUM_TOKEN                                = 59;
 
-    protected static final int DECLARES_METHOD_TOKEN                     = 62;
-    protected static final int IMPLEMENTS_METHOD_TOKEN                   = 63;
+    protected static final int DECLARES_METHOD_TOKEN                     = 60;
+    protected static final int IMPLEMENTS_METHOD_TOKEN                   = 61;
 
     /**
      * The table to map integers into strings.
@@ -221,7 +219,6 @@ abstract class XmlModelTokens
         addToTable( "srcdest",                     SOURCE_DESTINATION_TOKEN );
         addToTable( "e",                           ENTITY_TOKEN );
         addToTable( "refines",                     REFINES_TOKEN );
-        addToTable( "top",                         TOP_TOKEN );
         addToTable( "tooverride",                  TO_OVERRIDE_TOKEN );
         addToTable( "guard",                       GUARD_TOKEN );
         addToTable( "sequencenumber",              SEQUENCE_NUMBER_TOKEN );

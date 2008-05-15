@@ -57,7 +57,7 @@ public class MeshObjectsNotFoundException
             MeshObject []           partialResult,
             MeshObjectIdentifier [] identifiers )
     {
-        super( mb, partialResult, identifiers, null );
+        super( mb, mb.getIdentifier(), partialResult, identifiers, null );
     }
     
     /**

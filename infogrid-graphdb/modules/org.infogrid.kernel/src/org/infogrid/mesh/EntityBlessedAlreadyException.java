@@ -21,7 +21,7 @@ import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 
 /**
- * This Exception is thrown if an operation requires a MeshObject to
+ * Thrown if an operation requires a MeshObject to
  * be not blessed with a certain EntityType, but it is already.
  */
 public class EntityBlessedAlreadyException

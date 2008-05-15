@@ -25,6 +25,8 @@ public class AttributableMeshTypeNotFoundException
         extends
             MeshTypeNotFoundException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      *

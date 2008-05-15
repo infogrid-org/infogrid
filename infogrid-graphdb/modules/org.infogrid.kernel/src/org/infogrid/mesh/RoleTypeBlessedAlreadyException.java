@@ -24,7 +24,7 @@ import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 import org.infogrid.util.StringHelper;
 
 /**
- * This Exception is thrown if an operation requires a relationship to
+ * Thrown if an operation requires a relationship to
  * be not blessed with a certain RoleType, but it is already.
  */
 public class RoleTypeBlessedAlreadyException

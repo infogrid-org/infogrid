@@ -14,19 +14,19 @@
 
 package org.infogrid.meshbase.a;
 
+import java.util.ArrayList;
 import org.infogrid.context.Context;
-
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.a.AMeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
-
 import org.infogrid.meshbase.AbstractMeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.MeshObjectAccessException;
+import org.infogrid.meshbase.MeshObjectIdentifierFactory;
 import org.infogrid.meshbase.security.AccessManager;
-
 import org.infogrid.meshbase.transaction.AbstractMeshObjectNeighborChangeEvent;
 import org.infogrid.meshbase.transaction.AbstractMeshObjectRoleChangeEvent;
 import org.infogrid.meshbase.transaction.AbstractMeshObjectTypeChangeEvent;
@@ -36,19 +36,12 @@ import org.infogrid.meshbase.transaction.MeshObjectCreatedEvent;
 import org.infogrid.meshbase.transaction.MeshObjectDeletedEvent;
 import org.infogrid.meshbase.transaction.MeshObjectPropertyChangeEvent;
 import org.infogrid.meshbase.transaction.Transaction;
-
-import org.infogrid.modelbase.ModelBase;
 import org.infogrid.model.primitives.RoleType;
-
-import org.infogrid.meshbase.MeshObjectIdentifierFactory;
-
+import org.infogrid.modelbase.ModelBase;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
-
-import java.util.ArrayList;
-import org.infogrid.mesh.NotPermittedException;
 
 /**
  * The subclass of MeshBase suitable for the AMeshObject implementation.
@@ -111,7 +104,7 @@ public abstract class AMeshBase
             RoleType []   allTypes )
     {
         MeshObjectIdentifier [] currentSet    = null;
-        int               currentLength = 0; // make compiler happy
+        int                     currentLength = 0; // make compiler happy
 
         for( int i=0 ; i<all.length ; ++i ) {
             AMeshObject             pivot          = (AMeshObject) all[i];

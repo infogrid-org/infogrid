@@ -23,6 +23,8 @@ public class OrderedActiveMeshObjectSetReorderedEvent
         extends
             ActiveMeshObjectSetEvent
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
       * Construct one.
       *
@@ -31,6 +33,6 @@ public class OrderedActiveMeshObjectSetReorderedEvent
     public OrderedActiveMeshObjectSetReorderedEvent(
             OrderedActiveMeshObjectSet _theSet )
     {
-        super( _theSet );
+        super( _theSet, null );
     }
 }

@@ -275,6 +275,7 @@ public abstract class TraversalActiveMMeshObjectSet
          *
          * @param factory the MeshObjectSetFactory that created this MeshObjectSet
          * @param start the MeshObject from which we started the traversal
+         * @param spec the one step in the traversal
          */
         protected OneStepFromMeshObject(
                 ActiveMeshObjectSetFactory factory,
@@ -408,6 +409,8 @@ public abstract class TraversalActiveMMeshObjectSet
          *
          * @param factory the MeshObjectSetFactory that created this MeshObjectSet
          * @param start the MeshObject from which we started the traversal
+         * @param spec the TraversalSpecification to use
+         * @param childSet the underlying MeshObjectSet from which we select
          */
         protected SelectiveStepFromMeshObject(
                 ActiveMeshObjectSetFactory      factory,
@@ -516,7 +519,7 @@ public abstract class TraversalActiveMMeshObjectSet
                 return;
             }
 
-            MeshObject obj = event.getAddedMeshObject();
+            MeshObject obj = event.getDeltaValue();
 
             if( theEndSelector.accepts( obj )) {
                 certainlyAdd( obj );
@@ -539,7 +542,7 @@ public abstract class TraversalActiveMMeshObjectSet
                 return;
             }
 
-            MeshObject obj = event.getRemovedMeshObject();
+            MeshObject obj = event.getDeltaValue();
 
             if( theEndSelector.accepts( obj )) {
                 certainlyRemove( obj );
@@ -576,7 +579,9 @@ public abstract class TraversalActiveMMeshObjectSet
          * Private constructor, use factory methods.
          *
          * @param factory the MeshObjectSetFactory that created this MeshObjectSet
-         * @param start the MeshObject from which we started the traversal
+         * @param start the MeshObjectSet from which we started the traversal
+         * @param spec the TraversalSpecification to use
+         * @param startSelector the MeshObjectSelector to be applied to MeshObjects in the start MeshObjectSet, if any
          */
         protected Unifier(
                 ActiveMeshObjectSetFactory factory,
@@ -650,7 +655,7 @@ public abstract class TraversalActiveMMeshObjectSet
                 return;
             }
 
-            MeshObject added = event.getAddedMeshObject();
+            MeshObject added = event.getDeltaValue();
             if( event.getSource() == startSet ) {
                 // new start object added
                 TraversalActiveMeshObjectSet childSet = ((ActiveMeshObjectSetFactory)theFactory).createActiveMeshObjectSet(
@@ -684,7 +689,7 @@ public abstract class TraversalActiveMMeshObjectSet
                 return;
             }
 
-            MeshObject removed = event.getRemovedMeshObject();
+            MeshObject removed = event.getDeltaValue();
             if( event.getSource() == startSet ) {
                 // start object removed
                 TraversalActiveMMeshObjectSet childSet = (TraversalActiveMMeshObjectSet) theChildrenMap.remove( removed );
@@ -736,12 +741,14 @@ public abstract class TraversalActiveMMeshObjectSet
          *
          * @param factory the MeshObjectSetFactory that created this MeshObjectSet
          * @param start the MeshObject from which we started the traversal
+         * @param spec the TraversalSpecification to use
+         * @param startSelector the MeshObjectSelector to be applied to MeshObjects in the start MeshObjectSet, if any
          */
         protected ParallelStepFromMeshObject(
                 ActiveMeshObjectSetFactory                 factory,
                 MeshObject                                 start,
                 AlternativeCompoundTraversalSpecification  spec,
-                MeshObjectSelector                         startSelector )
+                MeshObjectSelector                         startSelector ) // FIXME: is startSelector used?
         {
             super( factory, start );
 
@@ -835,7 +842,7 @@ public abstract class TraversalActiveMMeshObjectSet
                 return;
             }
 
-            potentiallyAdd( event.getAddedMeshObject() );
+            potentiallyAdd( event.getDeltaValue() );
         }
 
         /**
@@ -854,7 +861,7 @@ public abstract class TraversalActiveMMeshObjectSet
                 return;
             }
 
-            potentiallyRemove( event.getRemovedMeshObject());
+            potentiallyRemove( event.getDeltaValue());
         }
 
         /**
@@ -886,6 +893,7 @@ public abstract class TraversalActiveMMeshObjectSet
          *
          * @param factory the MeshObjectSetFactory that created this MeshObjectSet
          * @param start the MeshObject from which we started the traversal
+         * @param spec the TraversalSpecification to use
          */
         protected EmptyFromMeshObject(
                 ActiveMeshObjectSetFactory factory,

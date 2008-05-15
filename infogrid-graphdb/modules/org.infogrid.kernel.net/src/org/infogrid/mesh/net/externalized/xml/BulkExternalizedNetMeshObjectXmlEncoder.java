@@ -40,7 +40,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * Parses a stream of AMeshObjects.
+ * Parses a stream of AnetMeshObjects.
  */
 public class BulkExternalizedNetMeshObjectXmlEncoder
         extends
@@ -63,8 +63,12 @@ public class BulkExternalizedNetMeshObjectXmlEncoder
      * Bulk-load data into this MeshBase.
      *
      * @param inStream the Stream from which to read the data
-     * @param bestEffort if true, the bulk tries to work around errors to the maximum extent possible
-     * @return the iterator over the ExternalizedMeshObjects
+     * @param externalizedMeshObjectFactory the ExternalizedMeshObjectFactory to use
+     * @param meshObjectIdentifierFactory the MeshObjectIdentifierFactory to use
+     * @param meshTypeIdentifierFactory the MeshTypeIdentifierFactory to use 
+     * @return the iterator over the loaded ExternalizedMeshObjects
+     * @throws IOException thrown if an I/O error occurred
+     * @throws BulkLoadException thrown if a loading exception occurred, for the details check the cause
      */
     public Iterator<? extends ExternalizedMeshObject> bulkLoad(
             InputStream                                 inStream,
@@ -100,6 +104,7 @@ public class BulkExternalizedNetMeshObjectXmlEncoder
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurs
      */
     @Override
     protected void startElement3(
@@ -124,6 +129,7 @@ public class BulkExternalizedNetMeshObjectXmlEncoder
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurs
      */
     protected void startElement4(
             String     namespaceURI,
@@ -142,6 +148,7 @@ public class BulkExternalizedNetMeshObjectXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurs
      */
     @Override
     protected void endElement1(
@@ -166,6 +173,7 @@ public class BulkExternalizedNetMeshObjectXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurs
      */
     @Override
     protected void endElement3(
@@ -188,6 +196,7 @@ public class BulkExternalizedNetMeshObjectXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurs
      */
     protected void endElement4(
             String namespaceURI,
@@ -225,11 +234,12 @@ public class BulkExternalizedNetMeshObjectXmlEncoder
      *
      * @param iter the iterator over the MeshObjects
      * @param out the OutputStream to write to
+     * @throws IOException thrown if an I/O error occurred
+     * @throws EncodingException thrown if an Encoding problem occurred
      */
     public void bulkWrite(
             Iterator<MeshObject> iter,
-            OutputStream         out,
-            boolean              skipDefaultValues )
+            OutputStream         out )
         throws
             IOException,
             EncodingException

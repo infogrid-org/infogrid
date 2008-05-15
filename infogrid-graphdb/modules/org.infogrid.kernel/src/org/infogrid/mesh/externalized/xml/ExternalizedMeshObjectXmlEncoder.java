@@ -14,37 +14,30 @@
 
 package org.infogrid.mesh.externalized.xml;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.URISyntaxException;
 import org.infogrid.mesh.MeshObjectIdentifier;
-
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.externalized.ExternalizedMeshObjectEncoder;
 import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObject;
 import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObjectFactory;
-
 import org.infogrid.meshbase.MeshObjectIdentifierFactory;
-
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.externalized.DecodingException;
 import org.infogrid.model.primitives.externalized.EncodingException;
 import org.infogrid.model.primitives.externalized.xml.PropertyValueXmlEncoder;
-
 import org.infogrid.modelbase.MeshTypeIdentifierFactory;
-
 import org.infogrid.util.logging.Log;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-
-import java.net.URISyntaxException;
-
 /**
- * Utility methods to encode/decode an ExternalizedMeshObject to/from XML. Implements the SAX interface.
+ * Utility methods to encode/decode an ExternalizedMeshObject to/from XML. Implements the
+ * SAX interface.
  */
 public class ExternalizedMeshObjectXmlEncoder
         extends
@@ -68,6 +61,7 @@ public class ExternalizedMeshObjectXmlEncoder
      * @param obj the input ExternalizedMeshObject
      * @param out the OutputStream to which to append the ExternalizedMeshObject
      * @throws EncodingException thrown if a problem occurred during encoding
+     * @throws IOException thrown if an I/O error occurred
      */
     public void encodeExternalizedMeshObject(
             ExternalizedMeshObject obj,
@@ -90,6 +84,7 @@ public class ExternalizedMeshObjectXmlEncoder
      *
      * @param theObject the MeshObject to encode
      * @param buf the StringBuilder to append to
+     * @throws EncodingException thrown if a problem occurred during encoding
      */
     public void appendExternalizedMeshObject(
             ExternalizedMeshObject theObject,
@@ -104,7 +99,9 @@ public class ExternalizedMeshObjectXmlEncoder
      * Encode a MeshObject value.
      *
      * @param theObject the MeshObject to encode
+     * @param meshObjectTagName the XML tag name for this ExternalizedMeshObject
      * @param buf the StringBuilder to append to
+     * @throws EncodingException thrown if a problem occurred during encoding
      */
     public void appendExternalizedMeshObject(
             ExternalizedMeshObject theObject,
@@ -208,6 +205,7 @@ public class ExternalizedMeshObjectXmlEncoder
      * Factored out to make it easy for subclasses to add to the attributes list.
      *
      * @param theObject the AMeshObject to encode
+     * @param meshObjectTagName the XML tag name for this ExternalizedMeshObject
      * @param buf the StringBuffer to write to
      */
     protected void encodeOpeningTag(
@@ -244,7 +242,7 @@ public class ExternalizedMeshObjectXmlEncoder
      * Hook to enable subclasses to add to the encoding defined on this level.
      *
      * @param theObject the MeshObject to encode
-     * @param buf the StringBuffer to add to
+     * @param buf the StringBuilder to add to
      */
     protected void subclassEncodingHook(
             ExternalizedMeshObject theObject,
@@ -257,9 +255,9 @@ public class ExternalizedMeshObjectXmlEncoder
      * Deserialize an ExternalizedMeshObject from a byte stream.
      *
      * @param s the InputStream from which to read
-     * @param life the MeshBaseLifecycleManager appropriate to create an appropriate ExternalizedMeshObject
      * @return return the deserialized ExternalizedMeshObject
      * @throws DecodingException thrown if a problem occurred during decoding
+     * @throws IOException thrown if an I/O error occurred
      */
     public synchronized ExternalizedMeshObject decodeExternalizedMeshObject(
             InputStream                                 s,
@@ -293,6 +291,7 @@ public class ExternalizedMeshObjectXmlEncoder
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void startElement1(
@@ -373,6 +372,7 @@ public class ExternalizedMeshObjectXmlEncoder
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void startElement2(
             String     namespaceURI,
@@ -391,6 +391,7 @@ public class ExternalizedMeshObjectXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void endElement1(
@@ -405,7 +406,7 @@ public class ExternalizedMeshObjectXmlEncoder
         } else if( TYPE_TAG.equals( qName )) {
             // first the "inner" element if present
             if( theHasTypesBeingParsed != null ) {
-                ((ParserFriendlyExternalizedMeshObject.HasTypes)theHasTypesBeingParsed).addType(
+                theHasTypesBeingParsed.addType(
                         theMeshTypeIdentifierFactory.fromExternalForm( theCharacters.toString() ) );
             } else if( theMeshObjectBeingParsed != null ) {
                 theMeshObjectBeingParsed.addMeshType(
@@ -442,6 +443,7 @@ public class ExternalizedMeshObjectXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void endElement2(
             String namespaceURI,

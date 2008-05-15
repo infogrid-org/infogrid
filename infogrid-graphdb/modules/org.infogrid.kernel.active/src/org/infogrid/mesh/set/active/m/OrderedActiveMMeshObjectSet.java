@@ -49,8 +49,7 @@ public class OrderedActiveMMeshObjectSet
     /**
      * Private constructor, use factory methods.
      *
-     * @param name the name of this set, used for debugging only
-     * @param mb the MeshBase to which this MeshObjectSet belongs
+     * @param factory the MeshObjectSetFactory that created this MeshObjectSet
      * @param underlyingSet the set whose content we ordered
      * @param sorter the Sorter that we use to order the content of the set
      * @param max determines how many MeshObjects will be contained by this set. If the underlyingSet contains more,
@@ -138,7 +137,7 @@ public class OrderedActiveMMeshObjectSet
             return;
         }
 
-        MeshObject added    = event.getAddedMeshObject();
+        MeshObject added    = event.getDeltaValue();
         int        insertAt = theSorter.getIndexOfNew( added, fullContent );
 
         fullContent = ArrayHelper.insert( fullContent, added, insertAt, MeshObject.class );
@@ -165,7 +164,7 @@ public class OrderedActiveMMeshObjectSet
             return;
         }
 
-        MeshObject removed = event.getRemovedMeshObject();
+        MeshObject removed = event.getDeltaValue();
 
         int index = -1;
         for( int i=0 ; i<fullContent.length ; ++i ) {

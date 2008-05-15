@@ -26,4 +26,3 @@ public interface OrderedActiveTraversalPathSet
 {
     // nothing
 }
-

@@ -16,7 +16,9 @@ package org.infogrid.modelbase;
 
 import org.infogrid.model.primitives.MeshType;
 
-import java.util.EventObject;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
+import org.infogrid.util.event.AbstractExternalizableEvent;
+import org.infogrid.util.event.SourceUnresolvedException;
 
 /**
   * <p>This is the abstract supertype for all events affecting the life cycle of
@@ -27,7 +29,7 @@ import java.util.EventObject;
   */
 public abstract class MeshTypeLifecycleEvent
        extends
-           EventObject
+           AbstractExternalizableEvent<ModelBase,Void,MeshType,MeshTypeIdentifier>
 {
     /**
       * Construct one.
@@ -39,23 +41,21 @@ public abstract class MeshTypeLifecycleEvent
             ModelBase theSender,
             MeshType  theObject )
     {
-        super( theSender );
-
-        this.theObject = theObject;
+        super( theSender, null, theObject, theObject.getIdentifier(), System.currentTimeMillis() );
     }
 
     /**
-      * Obtain MeshType whose lifecycle was affected.
-      *
-      * @return the MeshType whose lifecycle was affected
-      */
-    public MeshType getObject()
+     * Enable subclass to resolve the source of the event.
+     *
+     * @return the source of the event
+     * @throws SourceUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the source failed
+     */
+    protected ModelBase resolveSource()
+            throws
+                SourceUnresolvedException
     {
-        return theObject;
+        return ModelBaseSingleton.getSingleton();
     }
-
-    /**
-      * The MeshType whose lifecycle was affected.
-      */
-    protected MeshType theObject;
+    
 }
