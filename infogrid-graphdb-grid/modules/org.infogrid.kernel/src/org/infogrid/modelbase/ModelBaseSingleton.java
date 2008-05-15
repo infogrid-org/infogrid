@@ -40,6 +40,7 @@ public abstract class ModelBaseSingleton
      * Set the singleton instance. This will throw an IllegalStateException if a singleton
      * instance was set previously.
      *
+     * @param candidate the singleton ModelBase
      * @throws IllegalStateException thrown if a singleton instance was set previously
      */
     public synchronized static void setSingleton(
@@ -69,6 +70,7 @@ public abstract class ModelBaseSingleton
      * @param xmlResource the name of the XML resource, for error messages
      * @param stream the InputStream from which to load
      * @param classLoader the ClassLoader to use
+     * @return the SubjectAreas that were loaded
      * @throws MeshTypeNotFoundException thrown if a required MeshType was not found (e.g. when a subtype was looking for its non-existing supertype)
      * @throws InheritanceConflictException thrown if the specified PropertyType overriding was inconsistent with the model
      * @throws IOException thrown if an I/O error occurred during reading

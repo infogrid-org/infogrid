@@ -37,14 +37,11 @@ public class ImmutableMMeshObjectSet
             ImmutableMeshObjectSet
 {
     /**
-      * Constructor to be used by subclasses only.
-      *
-      * @param factory the MeshObjectSetFactory that created this MeshObjectSet
-      * @param filter the set of PropertyTypes whose PropertyChangeEvents we forward to
-      *        our content PropertyChangeListeners
-      * @param forwardRptEvents if true, we forward RolePlayerTableEvents to our content 
-      *        PropertyChangeListeners, otherwise not
-      */
+     * Constructor to be used by subclasses only.
+     *
+     * @param factory the MeshObjectSetFactory that created this MeshObjectSet
+     * @param content the content of the MeshObjectSet
+     */
     protected ImmutableMMeshObjectSet(
             MeshObjectSetFactory factory,
             MeshObject []        content )
@@ -72,6 +69,7 @@ public class ImmutableMMeshObjectSet
      * contained in this ImmutableMMeshObjectSet for the given RoleType.
      * 
      * @param role the RoleType to traverse
+     * @param considerEquivalents if true, consider equivalents for the traversal
      * @return the set of reached MeshObjects
      */
     public MeshObjectSet traverse(

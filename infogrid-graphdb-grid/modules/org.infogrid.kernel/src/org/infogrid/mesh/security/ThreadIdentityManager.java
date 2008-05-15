@@ -21,8 +21,7 @@ import org.infogrid.util.logging.Log;
 import java.util.HashMap;
 
 /**
- * A ThreadIdentityManager is an AbstractMeshObject that checks permissions of
- * callers before performing any operations on the MeshObject.
+ * A ThreadIdentityManager manages caller identities associated with Threads.
  */
 public abstract class ThreadIdentityManager
 {
@@ -158,6 +157,8 @@ public abstract class ThreadIdentityManager
 
     /**
      * The equivalent of toString() for this set of static vars.
+     * 
+     * @return the String form
      */
     protected static String local()
     {
@@ -179,7 +180,8 @@ public abstract class ThreadIdentityManager
     protected static HashMap<Thread,MeshObject> theCallersOnThreads = new HashMap<Thread,MeshObject>();
     
     /**
-     * The threads that currently are su'd.
+     * The threads that currently are su'd. The value of the HashMap counts the number of
+     * su invocations on that Thread.
      */
     protected static HashMap<Thread,Integer> theSuThreads = new HashMap<Thread,Integer>();
 }

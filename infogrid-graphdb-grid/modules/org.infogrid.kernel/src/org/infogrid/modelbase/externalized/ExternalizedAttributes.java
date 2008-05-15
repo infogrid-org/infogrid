@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * This contains a list of XML node attributes. We can't store the xml Attributes object directly,
+ * This contains a list of XML node attributes. We can't store the XML Attributes object directly,
  * because it is mutable (apparently, after a lot of debugging).
  */
 public class ExternalizedAttributes

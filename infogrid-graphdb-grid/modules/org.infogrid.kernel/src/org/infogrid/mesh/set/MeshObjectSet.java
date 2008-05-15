@@ -29,8 +29,7 @@ import java.beans.PropertyChangeListener;
 import org.infogrid.meshbase.MeshBase;
 
 /**
-  * This represents an unordered collection of MeshObjects without
-  * duplicates (set semantics).
+  * An unordered collection of MeshObject without duplicates (set semantics).
   */
 public interface MeshObjectSet
         extends
@@ -76,8 +75,9 @@ public interface MeshObjectSet
      * Get the Nth MeshObject contained in this set.
      * While the order of MeshObjects in a MeshObjectSet typically does not change,
      * no assumptions should be made about this. Compare
-     * with {@link org.infogrid.mesh.oset.OrderedMeshObjectSet OrderedMeshObjectSet}.
+     * with {@link org.infogrid.mesh.set.OrderedMeshObjectSet OrderedMeshObjectSet}.
      *
+     * @param n the index of the MeshObject to be returned
      * @return the Nth MeshObject contained in this set.
      */
     public abstract MeshObject get(
@@ -267,6 +267,8 @@ public interface MeshObjectSet
      * set will only rebroadcast events that relate to certain PropertyTypes.
      *
      * @param newListener the to-be-added listener
+     * @see #addSoftContentPropertyChangeListener
+     * @see #addWeakContentPropertyChangeListener
      * @see #removeContentPropertyChangeListener
      */
     public abstract void addDirectContentPropertyChangeListener(
@@ -284,6 +286,8 @@ public interface MeshObjectSet
      * set will only rebroadcast events that relate to certain PropertyTypes.
      *
      * @param newListener the to-be-added listener
+     * @see #addDirectContentPropertyChangeListener
+     * @see #addSoftContentPropertyChangeListener
      * @see #removeContentPropertyChangeListener
      */
     public abstract void addWeakContentPropertyChangeListener(
@@ -301,6 +305,8 @@ public interface MeshObjectSet
      * set will only rebroadcast events that relate to certain PropertyTypes.
      *
      * @param newListener the to-be-added listener
+     * @see #addDirectContentPropertyChangeListener
+     * @see #addWeakContentPropertyChangeListener
      * @see #removeContentPropertyChangeListener
      */
     public abstract void addSoftContentPropertyChangeListener(
@@ -310,7 +316,9 @@ public interface MeshObjectSet
       * Remove a content PropertyChangeListener.
       *
       * @param oldListener the to-be-removed listener
-      * @see #addContentPropertyChangeListener
+      * @see #addDirectContentPropertyChangeListener
+      * @see #addSoftContentPropertyChangeListener
+      * @see #addWeakContentPropertyChangeListener
       */
     public abstract void removeContentPropertyChangeListener(
             PropertyChangeListener oldListener );

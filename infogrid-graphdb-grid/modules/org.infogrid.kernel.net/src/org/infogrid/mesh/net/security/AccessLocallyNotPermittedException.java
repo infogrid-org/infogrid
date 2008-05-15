@@ -25,7 +25,7 @@ public class AccessLocallyNotPermittedException
         extends
             NotPermittedException
 {
-    protected static final long serialVersionUID = 1L; // helps with serialization
+    private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Constructor.

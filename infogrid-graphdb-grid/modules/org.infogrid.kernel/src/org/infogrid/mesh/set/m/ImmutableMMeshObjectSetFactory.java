@@ -35,6 +35,8 @@ public class ImmutableMMeshObjectSetFactory
 {
     /**
      * Factory method for the factory itself.
+     * 
+     * @return the created ImmutableMMeshObjectSetFactory
      */
     public static ImmutableMMeshObjectSetFactory create()
     {
@@ -206,7 +208,6 @@ public class ImmutableMMeshObjectSetFactory
     /**
      * Factory method.
      *
-     * @param mb the MeshBase to which this TraversalSet belongs
      * @param content the content for the ImmutableMTraversalPathSet
      * @return the created ImmutableMTraversalPathSet
      */

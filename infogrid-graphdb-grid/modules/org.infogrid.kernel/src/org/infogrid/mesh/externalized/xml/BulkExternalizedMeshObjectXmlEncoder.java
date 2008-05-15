@@ -14,32 +14,25 @@
 
 package org.infogrid.mesh.externalized.xml;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObject;
 import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObjectFactory;
-
-import org.infogrid.meshbase.BulkLoader;
 import org.infogrid.meshbase.BulkLoadException;
+import org.infogrid.meshbase.BulkLoader;
 import org.infogrid.meshbase.MeshObjectIdentifierFactory;
-import org.infogrid.meshbase.transaction.TransactionException;
-
 import org.infogrid.model.primitives.externalized.EncodingException;
 import org.infogrid.modelbase.MeshTypeIdentifierFactory;
-
 import org.infogrid.util.logging.Log;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Parses a stream of AMeshObjects.
@@ -65,8 +58,12 @@ public class BulkExternalizedMeshObjectXmlEncoder
      * Bulk-load data into this MeshBase.
      *
      * @param inStream the Stream from which to read the data
-     * @param bestEffort if true, the bulk tries to work around errors to the maximum extent possible
-     * @return the iterator over the ExternalizedMeshObjects
+     * @param externalizedMeshObjectFactory the ExternalizedMeshObjectFactory to use
+     * @param meshObjectIdentifierFactory the MeshObjectIdentifierFactory to use
+     * @param meshTypeIdentifierFactory the MeshTypeIdentifierFactory to use 
+     * @return the iterator over the loaded ExternalizedMeshObjects
+     * @throws IOException thrown if an I/O error occurred
+     * @throws BulkLoadException thrown if a loading exception occurred, for the details check the cause
      */
     public Iterator<? extends ExternalizedMeshObject> bulkLoad(
             InputStream                                 inStream,
@@ -75,8 +72,7 @@ public class BulkExternalizedMeshObjectXmlEncoder
             MeshTypeIdentifierFactory                   meshTypeIdentifierFactory )
         throws
             IOException,
-            BulkLoadException,
-            TransactionException
+            BulkLoadException
     {
         theExternalizedMeshObjectFactory = externalizedMeshObjectFactory; // note the synchronized statement
         theMeshObjectIdentifierFactory   = meshObjectIdentifierFactory;
@@ -103,6 +99,7 @@ public class BulkExternalizedMeshObjectXmlEncoder
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void startElement2(
@@ -127,6 +124,7 @@ public class BulkExternalizedMeshObjectXmlEncoder
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void startElement3(
             String     namespaceURI,
@@ -145,6 +143,7 @@ public class BulkExternalizedMeshObjectXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void endElement1(
@@ -169,6 +168,7 @@ public class BulkExternalizedMeshObjectXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void endElement2(
@@ -191,6 +191,7 @@ public class BulkExternalizedMeshObjectXmlEncoder
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void endElement3(
             String namespaceURI,
@@ -228,11 +229,12 @@ public class BulkExternalizedMeshObjectXmlEncoder
      *
      * @param iter the iterator over the MeshObjects
      * @param out the OutputStream to write to
+     * @throws IOException thrown if an I/O error occurred
+     * @throws EncodingException thrown if an Encoding problem occurred
      */
     public void bulkWrite(
             Iterator<MeshObject> iter,
-            OutputStream         out,
-            boolean              skipDefaultValues )
+            OutputStream         out )
         throws
             IOException,
             EncodingException

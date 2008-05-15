@@ -26,7 +26,7 @@ import java.util.Comparator;
 import org.infogrid.mesh.IllegalPropertyTypeException;
 
 /**
- * This is a default TraversalPathSorter implementation leveraging the Java collections API.
+ * A default TraversalPathSorter implementation leveraging the Java collections API.
  */
 public class DefaultTraversalPathSorter
         implements

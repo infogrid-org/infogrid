@@ -27,82 +27,84 @@ public class NetMeshBaseAccessSpecification
     /**
      * Factory method.
      *
-     * @param netMeshBase identifies the NetMeshBase to access
+     * @param identifier identifies the NetMeshBase to access
      * @return the created NetMeshBaseAccessSpecification
      */
     public static NetMeshBaseAccessSpecification create(
-            NetMeshBaseIdentifier netMeshBase )
+            NetMeshBaseIdentifier identifier )
     {
-        return new NetMeshBaseAccessSpecification( netMeshBase, DEFAULT_SCOPE, DEFAULT_COHERENCE );
+        return new NetMeshBaseAccessSpecification( identifier, DEFAULT_SCOPE, DEFAULT_COHERENCE );
     }
 
     /**
      * Factory method.
      *
-     * @param netMeshBase identifies the NetMeshBase to access
+     * @param identifier identifies the NetMeshBase to access
      * @param scope the ScopeSpecification for the access
      * @return the created NetMeshBaseAccessSpecification
      */
     public static NetMeshBaseAccessSpecification create(
-            NetMeshBaseIdentifier  netMeshBase,
+            NetMeshBaseIdentifier  identifier,
             ScopeSpecification     scope )
     {
-        return new NetMeshBaseAccessSpecification( netMeshBase, scope, DEFAULT_COHERENCE );
+        return new NetMeshBaseAccessSpecification( identifier, scope, DEFAULT_COHERENCE );
     }
 
     /**
      * Factory method.
      *
-     * @param netMeshBase identifies the NetMeshBase to access
+     * @param identifier identifies the NetMeshBase to access
      * @param coherence the CoherenceSpecification for the access
      * @return the created NetMeshBaseAccessSpecification
      */
     public static NetMeshBaseAccessSpecification create(
-            NetMeshBaseIdentifier  netMeshBase,
+            NetMeshBaseIdentifier  identifier,
             CoherenceSpecification coherence )
     {
-        return new NetMeshBaseAccessSpecification( netMeshBase, DEFAULT_SCOPE, coherence );
+        return new NetMeshBaseAccessSpecification( identifier, DEFAULT_SCOPE, coherence );
     }
 
     /**
      * Factory method.
      *
-     * @param netMeshBase identifies the NetMeshBase to access
+     * @param identifier identifies the NetMeshBase to access
      * @param scope the ScopeSpecification for the access
      * @param coherence the CoherenceSpecification for the access
      * @return the created NetMeshBaseAccessSpecification
      */
     public static NetMeshBaseAccessSpecification create(
-            NetMeshBaseIdentifier  netMeshBase,
+            NetMeshBaseIdentifier  identifier,
             ScopeSpecification     scope,
             CoherenceSpecification coherence )
     {
-        return new NetMeshBaseAccessSpecification( netMeshBase, scope, coherence );
+        return new NetMeshBaseAccessSpecification( identifier, scope, coherence );
     }
 
     /**
      * Convenience factory method.
      *
-     * @param netMeshBase identifies the NetMeshBases to access
+     * @param identifiers identifies the NetMeshBases to access
      * @return the created NetMeshBaseAccessSpecifications, in sequence
      */
     public static NetMeshBaseAccessSpecification [] create(
-            NetMeshBaseIdentifier [] netMeshBases )
+            NetMeshBaseIdentifier [] identifiers )
     {
-        if( netMeshBases == null ) {
+        if( identifiers == null ) {
             return null;
         }
-        NetMeshBaseAccessSpecification [] ret = new NetMeshBaseAccessSpecification[ netMeshBases.length ];
+        NetMeshBaseAccessSpecification [] ret = new NetMeshBaseAccessSpecification[ identifiers.length ];
         for( int i=0 ; i<ret.length ; ++i ) {
-            ret[i] = new NetMeshBaseAccessSpecification( netMeshBases[i], DEFAULT_SCOPE, DEFAULT_COHERENCE );
+            ret[i] = new NetMeshBaseAccessSpecification( identifiers[i], DEFAULT_SCOPE, DEFAULT_COHERENCE );
         }
         return ret;
     }
 
     /**
-     * Factory method based on an external-form representation.
+     * Factory method based on an external form representation.
      *
+     * @param s the external form
      * @return the created NetMeshBaseAccessSpecification
+     * @throws URISyntaxException thrown if the external form could not be parsed
      */
     public static NetMeshBaseAccessSpecification fromExternalForm(
             String s )
@@ -163,7 +165,7 @@ public class NetMeshBaseAccessSpecification
     /**
      * Obtain the NetMeshBaseIdentifier.
      *
-     * @return the Identifier
+     * @return the NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getNetMeshBaseIdentifier()
     {
@@ -191,7 +193,7 @@ public class NetMeshBaseAccessSpecification
     }
 
     /**
-     * Convert this into an external form.
+     * Convert NetMeshBaseAccessSpecification into an external form.
      *
      * @return the external form
      */
@@ -249,6 +251,27 @@ public class NetMeshBaseAccessSpecification
             return false;
         }
         return true;
+    }
+
+    /**
+     * Determine hash code.
+     * 
+     * @return hash code
+     */
+    @Override
+    public int hashCode()
+    {
+        int ret = 0;
+        if( theNetMeshBaseIdentifier != null ) {
+            ret ^= theNetMeshBaseIdentifier.hashCode();
+        }
+        if( theScopeSpecification != null ) {
+            ret ^= theScopeSpecification.hashCode();
+        }
+        if( theCoherenceSpecification != null ) {
+            ret ^= theCoherenceSpecification.hashCode();
+        }
+        return ret;
     }
 
     /**

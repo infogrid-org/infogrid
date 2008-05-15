@@ -77,8 +77,7 @@ public class XmlModelLoader
      * @return the instantiated SubjectAreas
      * @throws MeshTypeNotFoundException thrown if a referenced MeshType could not be resolved
      * @throws InheritanceConflictException thrown if there is a conflict in the inheritance hierarchy
-     * @throws IOException thrown if there is an IO error
-     * @throws ModuleException thrown if a required Module could not be loaded
+     * @throws IOException thrown if an I/O error occurred
      */
     public SubjectArea [] loadModel(
             MeshTypeLifecycleManager theInstantiator )
@@ -171,8 +170,16 @@ public class XmlModelLoader
             extends
                 IOException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
+        /**
+         * Constructor.
+         * 
+         * @param message error message, if any
+         * @param cause underlying cause, if any
+         */
         public FixedIOException(
-                String message,
+                String    message,
                 Throwable cause )
         {
             super( message );

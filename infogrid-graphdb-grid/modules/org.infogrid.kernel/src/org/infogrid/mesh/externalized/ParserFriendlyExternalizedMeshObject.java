@@ -111,7 +111,6 @@ public class ParserFriendlyExternalizedMeshObject
      * Obtain the identifiers of the neighbors of this MeshObject.
      * 
      * @return the dentifiers of the neighbors
-     * @see #getTypes
      */
     public MeshObjectIdentifier[] getNeighbors()
     {

@@ -38,7 +38,6 @@ public interface NetMeshBaseLifecycleManager
         extends
             MeshBaseLifecycleManager,
             ParserFriendlyExternalizedNetMeshObjectFactory
-
 {
     /**
      * <p>Obtain the NetMeshBase that this NetMeshBaseLifecycleManager works on.</p>

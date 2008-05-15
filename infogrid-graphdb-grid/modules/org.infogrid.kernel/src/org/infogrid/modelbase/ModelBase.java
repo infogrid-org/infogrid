@@ -32,7 +32,7 @@ import java.util.Iterator;
 
 /**
   * <p>This interface is implemented by classes that act as a repository of model-level concepts.
-  * The concepts held in a ModelBase include EntityTypes, RelationshipTypes, PropertTypes,
+  * The concepts held in a ModelBase include EntityTypes, RelationshipTypes, PropertyTypes,
   * SubjectAreas and the like. A ModelBase is comparable to a database's data dictionary,
   * except that the ModelBase holds conceptual-level concepts, not data-base level ones.
   * For example, it holds EntityTypes and their inheritance relationships, rather than tables.</p>

@@ -21,7 +21,7 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import java.util.List;
 
 /**
- *
+ * Representation of Proxy that can be easily serialized and deserialized.
  */
 public interface ExternalizedProxy
 {
@@ -63,7 +63,7 @@ public interface ExternalizedProxy
     /**
      * Obtain the NetMeshBaseIdentifier of the NetMeshBase to which this Proxy talks to.
      * 
-     * @return the NNetMeshBaseIdentifier
+     * @return the NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getNetworkIdentifierOfPartner();
 

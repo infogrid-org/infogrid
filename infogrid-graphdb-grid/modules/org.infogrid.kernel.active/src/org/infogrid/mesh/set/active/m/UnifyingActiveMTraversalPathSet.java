@@ -73,7 +73,7 @@ public class UnifyingActiveMTraversalPathSet
     public void traversalPathAdded(
             TraversalPathAddedEvent event )
     {
-        certainlyAdd( event.getAddedTraversalPath() );
+        certainlyAdd( event.getDeltaValue() );
     }
 
     /**
@@ -84,7 +84,7 @@ public class UnifyingActiveMTraversalPathSet
     public void traversalPathRemoved(
             TraversalPathRemovedEvent event )
     {
-        certainlyRemove( event.getRemovedTraversalPath() );
+        certainlyRemove( event.getDeltaValue() );
     }
 
     /**
