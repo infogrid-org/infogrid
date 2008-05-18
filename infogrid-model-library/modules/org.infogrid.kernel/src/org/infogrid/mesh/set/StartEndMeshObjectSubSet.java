@@ -153,36 +153,6 @@ public class StartEndMeshObjectSubSet
     }
 
     /**
-     * Convenience method to return the content of this MeshObjectSet as an
-     * array of the canonical Identifiers of the member MeshObjects.
-     *
-     * @return the array of IdentifierValues representing the Identifiers of the members
-     *         of this MeshObjectSet
-     */
-    @Override
-    public MeshObjectIdentifier[] asIdentifiers()
-    {
-        return asIdentifiers( getMeshObjects() );
-    }
-    
-    /**
-     * Convenience method to return an array of MeshObjects as an
-     * array of the canonical Identifiers of the member MeshObjects.
-     *
-     * @param array the MeshObjects 
-     * @return the array of Identifiers representing the MeshObjects
-     */
-    public static MeshObjectIdentifier[] asIdentifiers(
-            MeshObject [] array )
-    {
-        MeshObjectIdentifier [] ret = new MeshObjectIdentifier[ array.length ];
-        for( int i=0 ; i<ret.length ; ++i ) {
-            ret[i] = array[i].getIdentifier();
-        }
-        return ret;
-    }
-    
-    /**
      * Obtain an Iterator iterating over the content of this set.
      *
      * @return an Iterator iterating over the content of this set

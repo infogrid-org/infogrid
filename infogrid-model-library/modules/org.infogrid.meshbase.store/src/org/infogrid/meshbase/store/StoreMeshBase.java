@@ -61,7 +61,7 @@ public class StoreMeshBase
             Store              meshObjectStore,
             Context            c )
     {
-        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create();
+        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create( MeshObject.class, MeshObjectIdentifier.class );
 
         StoreMeshBase ret = StoreMeshBase.create( identifier, setFactory, modelBase, accessMgr, meshObjectStore, c );
 

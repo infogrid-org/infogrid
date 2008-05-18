@@ -17,6 +17,8 @@ package org.infogrid.probe.shadow.m;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 
+import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.Proxy;
@@ -96,7 +98,7 @@ public class MStagingMeshBase
     {
         super(  shadow.getIdentifier(),
                 shadow.getMeshObjectIdentifierFactory(),
-                ImmutableMMeshObjectSetFactory.create(),
+                ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class ),
                 shadow.getModelBase(),
                 accessMgr,
                 cache,

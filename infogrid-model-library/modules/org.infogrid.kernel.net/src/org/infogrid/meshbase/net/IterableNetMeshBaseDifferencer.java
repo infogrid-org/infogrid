@@ -17,6 +17,7 @@ package org.infogrid.meshbase.net;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 
+import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.set.MeshObjectSet;
@@ -59,17 +60,37 @@ public class IterableNetMeshBaseDifferencer
     }
 
     /**
+     * Helper method to create an array of MeshObjectIdentifier from an array of
+     * MeshObjects.
+     * 
+     * @param objs the MeshObjects
+     * @return the MeshObjectIdentifiers
+     */
+    @Override
+    protected MeshObjectIdentifier [] asIdentifiers(
+            MeshObject [] objs )
+    {
+        NetMeshObjectIdentifier [] ret = new NetMeshObjectIdentifier[ objs.length ];
+        for( int i=0 ; i<objs.length ; ++i ) {
+            ret[i] = (NetMeshObjectIdentifier) objs[i].getIdentifier();
+        }
+        return ret;
+    }
+
+    /**
      * Allow subclasses to instantiate a more specific event.
      * 
      * @param canonicalIdentifier the canonical Identifier of the MeshObject that was deleted
      * @param obj the MeshObject that was deleted
+     * @param externalized external form of the deleted MeshObject
      * @return the MeshObjectDeletedEvent or subclass
      */
     @Override
     protected NetMeshObjectDeletedEvent createMeshObjectDeletedEvent(
-            MeshObject           obj,
-            MeshObjectIdentifier canonicalIdentifier,
-            long                 time )
+            MeshObject             obj,
+            MeshObjectIdentifier   canonicalIdentifier,
+            ExternalizedMeshObject externalized,
+            long                   time )
     {
         NetMeshObjectDeletedEvent ret = new NetMeshObjectDeletedEvent(
                 (NetMeshBase) obj.getMeshBase(),
@@ -77,6 +98,7 @@ public class IterableNetMeshBaseDifferencer
                 (NetMeshObject) obj,
                 canonicalIdentifier,
                 (NetMeshBaseIdentifier) null,
+                externalized,
                 time );
 
         return ret;
@@ -188,10 +210,10 @@ public class IterableNetMeshBaseDifferencer
         NetMeshObjectNeighborAddedEvent ret = new NetMeshObjectNeighborAddedEvent(
                 (NetMeshObject) meshObjectInBase,
                 addedRoleTypes,
-                copyIntoNetMeshObjectArray( otherSidesInBase.getMeshObjects()),
-                (NetMeshObject) addedNeighborInComparison,
-                copyIntoNetMeshObjectArray( otherSidesInComparison.getMeshObjects()),
-                (NetMeshBaseIdentifier) null,
+                (NetMeshObjectIdentifier []) otherSidesInBase.asIdentifiers(),
+                (NetMeshObjectIdentifier)    addedNeighborInComparison.getIdentifier(),
+                (NetMeshObjectIdentifier []) otherSidesInComparison.asIdentifiers(),
+                (NetMeshBaseIdentifier)      null,
                 meshObjectInComparison.getTimeUpdated() );
 
         return ret;
@@ -218,9 +240,9 @@ public class IterableNetMeshBaseDifferencer
         NetMeshObjectNeighborRemovedEvent ret = new NetMeshObjectNeighborRemovedEvent(
                 (NetMeshObject) meshObjectInBase,
                 (NetMeshObjectIdentifier []) otherSidesInBase.asIdentifiers(),
-                (NetMeshObjectIdentifier) removedNeighborInBase.getIdentifier(),
+                (NetMeshObjectIdentifier)    removedNeighborInBase.getIdentifier(),
                 (NetMeshObjectIdentifier []) otherSidesInComparison.asIdentifiers(),
-                (NetMeshBaseIdentifier) null,
+                (NetMeshBaseIdentifier)      null,
                 meshObjectInComparison.getTimeUpdated() );
 
         return ret;
@@ -232,7 +254,7 @@ public class IterableNetMeshBaseDifferencer
      * @param meshObjectInBase the MeshObject in the baseline
      * @param meshObjectInComparison the MeshObject in the comparison
      * @param addedRoleTypes the RoleTypes that were added
-     * @param otherSideInBase the "other side" MeshObject in the baseline
+     * @param otherSideInComparison the "other side" MeshObject in the comparison
      * @return the MeshObjectRoleAddedEvent or subclass
      */
     @Override
@@ -242,14 +264,14 @@ public class IterableNetMeshBaseDifferencer
             RoleType []   oldRoleTypes,
             RoleType []   addedRoleTypes,
             RoleType []   newRoleTypes,
-            MeshObject    otherSideInBase )
+            MeshObject    otherSideInComparison )
     {
         NetMeshObjectRoleAddedEvent ret = new NetMeshObjectRoleAddedEvent(
-                (NetMeshObject) meshObjectInBase,
+                (NetMeshObject) meshObjectInComparison,
                 oldRoleTypes,
                 addedRoleTypes,
                 newRoleTypes,
-                (NetMeshObject) otherSideInBase,
+                (NetMeshObject) otherSideInComparison,
                 (NetMeshBaseIdentifier) null,
                 meshObjectInComparison.getTimeUpdated() );
 
@@ -298,17 +320,17 @@ public class IterableNetMeshBaseDifferencer
      */
     @Override
     protected NetMeshObjectEquivalentsAddedEvent createMeshObjectEquivalentsAddedEvent(
-            MeshObject    meshObjectInBase,
-            MeshObject    meshObjectInComparison,
-            MeshObjectSet oldEquivalents,
-            MeshObject [] added,
-            MeshObjectSet newEquivalents )
+            MeshObject              meshObjectInBase,
+            MeshObject              meshObjectInComparison,
+            MeshObjectSet           oldEquivalents,
+            MeshObjectIdentifier [] added,
+            MeshObjectSet           newEquivalents )
     {
         NetMeshObjectEquivalentsAddedEvent ret = new NetMeshObjectEquivalentsAddedEvent(
                 (NetMeshObject) meshObjectInBase,
-                copyIntoNetMeshObjectArray( oldEquivalents.getMeshObjects()),
-                copyIntoNetMeshObjectArray( added ),
-                copyIntoNetMeshObjectArray( newEquivalents.getMeshObjects()),
+                (NetMeshObjectIdentifier []) oldEquivalents.asIdentifiers(),
+                (NetMeshObjectIdentifier []) added,
+                (NetMeshObjectIdentifier []) newEquivalents.asIdentifiers(),
                 (NetMeshBaseIdentifier) null,
                 meshObjectInComparison.getTimeUpdated() );
 
@@ -326,17 +348,17 @@ public class IterableNetMeshBaseDifferencer
      */
     @Override
     protected NetMeshObjectEquivalentsRemovedEvent createMeshObjectEquivalentsRemovedEvent(
-            MeshObject    meshObjectInBase,
-            MeshObject    meshObjectInComparison,
-            MeshObjectSet oldEquivalents,
-            MeshObject [] removed,
-            MeshObjectSet newEquivalents )
+            MeshObject              meshObjectInBase,
+            MeshObject              meshObjectInComparison,
+            MeshObjectSet           oldEquivalents,
+            MeshObjectIdentifier [] removed,
+            MeshObjectSet           newEquivalents )
     {
         NetMeshObjectEquivalentsRemovedEvent ret = new NetMeshObjectEquivalentsRemovedEvent(
                 (NetMeshObject) meshObjectInBase,
-                copyIntoNetMeshObjectArray( oldEquivalents.getMeshObjects()),
-                copyIntoNetMeshObjectArray( removed ),
-                copyIntoNetMeshObjectArray( newEquivalents.getMeshObjects()),
+                (NetMeshObjectIdentifier []) oldEquivalents.asIdentifiers(),
+                (NetMeshObjectIdentifier []) removed,
+                (NetMeshObjectIdentifier []) newEquivalents.asIdentifiers(),
                 (NetMeshBaseIdentifier) null,
                 meshObjectInComparison.getTimeUpdated() );
 

@@ -76,7 +76,8 @@ public interface NonXmlStreamProbe
      *         in the <code>org.infogrid.model.Probe</code> Subject Area) that reflects the policy.
      * @param theInputStream the InputStream to read from
      * @param theContentType the content type (MIME) if known
-     * @param mb the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe
+     * @param freshMeshBase the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe.
+     *         This MeshBase is empty when passed into this call, except for the home object.
      * @throws IsAbstractException thrown if an EntityType or a Relationship could not be instantiated because
      *         it was abstract. Throwing this typically indicates a programming error.
      * @throws EntityBlessedAlreadyException thrown if a MeshObject was incorrectly blessed twice with the same
@@ -109,7 +110,7 @@ public interface NonXmlStreamProbe
             CoherenceSpecification coherenceSpecification,
             InputStream            theInputStream,
             String                 theContentType,
-            StagingMeshBase        mb )
+            StagingMeshBase        freshMeshBase )
         throws
             IsAbstractException,
             EntityBlessedAlreadyException,

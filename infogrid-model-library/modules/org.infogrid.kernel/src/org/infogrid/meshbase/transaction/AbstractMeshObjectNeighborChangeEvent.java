@@ -62,6 +62,7 @@ public abstract class AbstractMeshObjectNeighborChangeEvent
      * @param newNeighbors the set of neighbor MeshObjects after the event (optional)
      * @param newNeighborIdentifiers the Identifiers of the neighbor MeshObjects after the event (required)
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected AbstractMeshObjectNeighborChangeEvent(
             MeshObject              meshObject,
@@ -74,7 +75,8 @@ public abstract class AbstractMeshObjectNeighborChangeEvent
             MeshObjectIdentifier [] deltaNeighborIdentifiers,
             MeshObject []           newNeighbors,
             MeshObjectIdentifier [] newNeighborIdentifiers,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            MeshBase                resolver )
     {
         super(  meshObject,
                 meshObjectIdentifier,
@@ -87,6 +89,8 @@ public abstract class AbstractMeshObjectNeighborChangeEvent
                 newNeighbors,
                 newNeighborIdentifiers,
                 timeEventOccurred );
+        
+        theResolver = resolver;
     }
 
     /**
@@ -169,8 +173,20 @@ public abstract class AbstractMeshObjectNeighborChangeEvent
     public void setResolver(
             MeshBase mb )
     {
-        theResolver = mb;
-        clearCachedObjects();
+        if( theResolver != mb ) {
+            theResolver = mb;
+            clearCachedObjects();
+        }
+    }
+
+    /**
+     * Obtain the MeshBase that is currently set as resolver for the identifiers carried by this event.
+     * 
+     * @return the MeshBase, if any
+     */
+    public MeshBase getResolver()
+    {
+        return theResolver;
     }
 
     /**

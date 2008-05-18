@@ -15,6 +15,7 @@
 package org.infogrid.mesh.set.m;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.set.AbstractMeshObjectSetFactory;
 import org.infogrid.mesh.set.CompositeImmutableMeshObjectSet;
 import org.infogrid.mesh.set.ImmutableMeshObjectSet;
@@ -36,19 +37,28 @@ public class ImmutableMMeshObjectSetFactory
     /**
      * Factory method for the factory itself.
      * 
+     * @param componentClass           the Class to use to allocate arrays of MeshObjects
+     * @param componentIdentifierClass the Class to use to allocate arrays of MeshObjectIdentifiers
      * @return the created ImmutableMMeshObjectSetFactory
      */
-    public static ImmutableMMeshObjectSetFactory create()
+    public static ImmutableMMeshObjectSetFactory create(
+            Class<? extends MeshObject>           componentClass,
+            Class<? extends MeshObjectIdentifier> componentIdentifierClass )
     {
-        return new ImmutableMMeshObjectSetFactory();
+        return new ImmutableMMeshObjectSetFactory( componentClass, componentIdentifierClass );
     }
 
     /**
      * Constructor.
+     * 
+     * @param componentClass           the Class to use to allocate arrays of MeshObjects
+     * @param componentIdentifierClass the Class to use to allocate arrays of MeshObjectIdentifiers
      */
-    protected ImmutableMMeshObjectSetFactory()
+    protected ImmutableMMeshObjectSetFactory(
+            Class<? extends MeshObject>           componentClass,
+            Class<? extends MeshObjectIdentifier> componentIdentifierClass )
     {
-        super();
+        super( componentClass, componentIdentifierClass );
     }
 
     /**
@@ -77,23 +87,26 @@ public class ImmutableMMeshObjectSetFactory
             MeshObject []      candidates,
             MeshObjectSelector selector )
     {
-        ImmutableMeshObjectSet ret;
+        MeshObject [] content;
+        
         if( selector != null ) {
-            MeshObject [] content = new MeshObject[ candidates.length ];
             int count = 0;
+            content = ArrayHelper.createArray( theComponentClass, candidates.length );
             for( int i=0 ; i<candidates.length ; ++i ) {
                 if( selector.accepts( candidates[i] )) {
                     content[count++] = candidates[i];
                 }
             }
             if( count < content.length ) {
-                content = ArrayHelper.copyIntoNewArray( content, 0, count, MeshObject.class );
+                content = ArrayHelper.copyIntoNewArray( content, 0, count, theComponentClass );
             }
-            ret = new ImmutableMMeshObjectSet( this, content );
-
+ 
         } else {
-            ret = new ImmutableMMeshObjectSet( this, candidates );
+            content = ArrayHelper.copyIntoNewArray( candidates, theComponentClass );
         }
+        
+        ImmutableMeshObjectSet ret = new ImmutableMMeshObjectSet( this, content );
+        
         return ret;
     }
     
@@ -169,7 +182,7 @@ public class ImmutableMMeshObjectSetFactory
         }
         
         MeshObject [] oneContent = one.getMeshObjects();
-        MeshObject [] result     = new MeshObject[ oneContent.length ];
+        MeshObject [] result     = ArrayHelper.createArray( theComponentClass, oneContent.length );
 
         int count = 0;
         for( int i=0 ; i<oneContent.length ; ++i ) {
@@ -180,7 +193,7 @@ public class ImmutableMMeshObjectSetFactory
             }
         }
         if( count < result.length ) {
-            result = ArrayHelper.copyIntoNewArray( result, 0, count, MeshObject.class );
+            result = ArrayHelper.copyIntoNewArray( result, 0, count, theComponentClass );
         }
         return new CompositeImmutableMMeshObjectSet.Minus( this, result, new MeshObjectSet[] { one, two } );        
     }

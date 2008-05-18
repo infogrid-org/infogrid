@@ -57,7 +57,36 @@ public class MeshObjectEquivalentsAddedEvent
                 MeshObjectUtils.meshObjectIdentifiers( deltaValues ),
                 newValues,
                 MeshObjectUtils.meshObjectIdentifiers( newValues ),
-                timeEventOccurred );
+                timeEventOccurred,
+                source.getMeshBase() );
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param source the MeshObject that is the source of the event
+     * @param oldValues the old values of the equivalents, prior to the event
+     * @param deltaValues the equivalents that changed
+     * @param newValues the new value of the equivalents, after the event
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     */
+    public MeshObjectEquivalentsAddedEvent(
+            MeshObject              source,
+            MeshObjectIdentifier [] oldValues,
+            MeshObjectIdentifier [] deltaValues,
+            MeshObjectIdentifier [] newValues,
+            long                    timeEventOccurred )
+    {
+        this(   source,
+                source.getIdentifier(),
+                null,
+                oldValues,
+                null,
+                deltaValues,
+                null,
+                newValues,
+                timeEventOccurred,
+                source.getMeshBase() );
     }
 
     /**
@@ -72,6 +101,7 @@ public class MeshObjectEquivalentsAddedEvent
      * @param newValues the new value of the equivalents, after the event
      * @param newValueIdentifiers the identifiers representing the new values of the equivalents, after the event
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected MeshObjectEquivalentsAddedEvent(
             MeshObject              source,
@@ -82,7 +112,8 @@ public class MeshObjectEquivalentsAddedEvent
             MeshObjectIdentifier [] deltaValueIdentifiers,
             MeshObject []           newValues,
             MeshObjectIdentifier [] newValueIdentifiers,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            MeshBase                resolver )
     {
         super(  source,
                 sourceIdentifier,
@@ -92,7 +123,8 @@ public class MeshObjectEquivalentsAddedEvent
                 deltaValueIdentifiers,
                 newValues,
                 newValueIdentifiers,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver);
     }
 
     /**

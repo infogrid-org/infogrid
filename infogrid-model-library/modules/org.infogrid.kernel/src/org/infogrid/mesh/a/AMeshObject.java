@@ -34,6 +34,7 @@ import org.infogrid.mesh.externalized.SimpleExternalizedMeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshObjectAccessException;
+import org.infogrid.meshbase.WrongMeshBaseException;
 import org.infogrid.meshbase.a.AMeshBase;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.primitives.AttributableMeshType;
@@ -340,7 +341,7 @@ public class AMeshObject
             throw new CannotRelateToItselfException( this );
         }
         if( getMeshBase() != otherObject.getMeshBase() ) {
-            throw new IllegalArgumentException( "cannot relate MeshObjects in different MeshBases" );
+            throw new WrongMeshBaseException( getMeshBase(), otherObject.getMeshBase() );
         }
         MeshObjectIdentifier here            = getIdentifier();
         MeshObjectIdentifier other           = otherObject.getIdentifier();
@@ -675,7 +676,7 @@ public class AMeshObject
         AMeshObject realOtherObject = (AMeshObject) otherObject;
 
         if( theMeshBase != realOtherObject.theMeshBase ) {
-            throw new IllegalArgumentException( "Cannot relate MeshObjects held in different MeshBases" );
+            throw new WrongMeshBaseException( theMeshBase, realOtherObject.theMeshBase );
         }
 
         synchronized( this ) {

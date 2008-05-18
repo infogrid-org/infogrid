@@ -14,28 +14,23 @@
 
 package org.infogrid.meshbase.m;
 
+import java.util.HashMap;
 import org.infogrid.context.Context;
-
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-
+import org.infogrid.mesh.set.MeshObjectSetFactory;
+import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.MeshObjectIdentifierFactory;
 import org.infogrid.meshbase.a.AIterableMeshBase;
 import org.infogrid.meshbase.a.DefaultAMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.security.AccessManager;
-
 import org.infogrid.modelbase.ModelBase;
-
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CursorIterator;
-import org.infogrid.util.MapCursorIterator;
 import org.infogrid.util.MCachingHashMap;
+import org.infogrid.util.MapCursorIterator;
 import org.infogrid.util.logging.Log;
-
-import java.util.HashMap;
-import org.infogrid.mesh.set.MeshObjectSetFactory;
-import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 
 /**
   * This MeshBase is only held in memory. It has no persistence whatsoever.
@@ -60,7 +55,7 @@ public class MMeshBase
             AccessManager      accessMgr,
             Context            c )
     {
-        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create();
+        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create( MeshObject.class, MeshObjectIdentifier.class );
         
         MMeshBase ret = MMeshBase.create( identifier, setFactory, modelBase, accessMgr, c );
 
