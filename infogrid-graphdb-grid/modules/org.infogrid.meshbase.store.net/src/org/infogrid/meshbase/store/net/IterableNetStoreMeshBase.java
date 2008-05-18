@@ -46,6 +46,7 @@ import org.infogrid.util.CursorIterator;
 import org.infogrid.util.logging.Log;
 
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 
 /**
  *
@@ -81,7 +82,7 @@ public class IterableNetStoreMeshBase
         throws
             IsAbstractException
     {
-        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create();
+        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
 
         IterableNetStoreMeshBase ret = IterableNetStoreMeshBase.create(
                 identifier,

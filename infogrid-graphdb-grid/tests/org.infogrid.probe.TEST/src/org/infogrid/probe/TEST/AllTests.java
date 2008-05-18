@@ -73,11 +73,11 @@ public class AllTests
                         ProbeTest7.class,
                         noArgs ),
 
-// FIXME: ProbeTest8 seems to work, but spits out way too many warnings. This needs more investigation
-//                new TestSpec(
-//                        ProbeTest8.class,
-//                        noArgs ),
-
+//// FIXME: ProbeTest8 seems to work, but spits out way too many warnings. This needs more investigation
+////                new TestSpec(
+////                        ProbeTest8.class,
+////                        noArgs ),
+//
                 new TestSpec(
                         YadisTest1.class,
                         noArgs ),
@@ -96,21 +96,41 @@ public class AllTests
                                 AbstractTest.fileSystemFile( YadisTest5.class, "YadisTest5.xml" )
                         } ),
 
-                new TestSpec(
+
+            
+            new TestSpec( // property updates
                         WritableProbeTest1.class,
                         noArgs ),
+            new TestSpec( // blessing
+                        WritableProbeTest2.class,
+                        noArgs ),
+            new TestSpec( // unblessing
+                        WritableProbeTest3.class,
+                        noArgs ),
+            new TestSpec( // deletion
+                        WritableProbeTest4.class,
+                        noArgs ),
+                        
+// FIXME: The remaining WritableProbeTests have not been written yet.
+//                new TestSpec( // relationship delete
+//                        WritableProbeTest5.class,
+//                        noArgs ),
+//                new TestSpec( // bless relationship
+//                        WritableProbeTest6.class,
+//                        noArgs ),
+//                new TestSpec( // unbless relationship
+//                        WritableProbeTest7.class,
+//                        noArgs ),
+//                new TestSpec( // create relationship between objects instantiated by probe but unrelated
+//                        WritableProbeTest8.class,
+//                        noArgs ),
+//                new TestSpec( // create object 
+//                        WritableProbeTest9.class,
+//                        noArgs ),
+//                new TestSpec( // create and relate object
+//                        WritableProbeTest10.class,
+//                        noArgs ),
 
-// FIXME: The remaining WritableProbeTests do not work. This may be because InfoGrid is
-//        broken or because the tests are broken, or both. It needs further investigation.
-//                new TestSpec(
-//                        WritableProbeTest2.class,
-//                        noArgs ),
-//                new TestSpec(
-//                        WritableProbeTest3.class,
-//                        noArgs ),
-//                new TestSpec(
-//                        WritableProbeTest4.class,
-//                        noArgs ),
 
                 new TestSpec(
                         ShadowTest1.class,

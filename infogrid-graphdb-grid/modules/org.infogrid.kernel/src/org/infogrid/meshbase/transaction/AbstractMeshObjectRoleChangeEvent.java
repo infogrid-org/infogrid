@@ -59,6 +59,7 @@ public abstract class AbstractMeshObjectRoleChangeEvent
      * @param neighbor the MeshObject that identifies the other end of the affected relationship
      * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected AbstractMeshObjectRoleChangeEvent(
             MeshObject            source,
@@ -71,7 +72,8 @@ public abstract class AbstractMeshObjectRoleChangeEvent
             MeshTypeIdentifier [] newValueIdentifiers,
             MeshObject            neighbor,
             MeshObjectIdentifier  neighborIdentifier,
-            long                  timeEventOccurred )
+            long                  timeEventOccurred,
+            MeshBase              resolver )
     {
         super(  source,
                 sourceIdentifier,
@@ -85,8 +87,10 @@ public abstract class AbstractMeshObjectRoleChangeEvent
                 newValueIdentifiers,
                 timeEventOccurred );
 
-        theNeighbor             = neighbor;
+        theNeighbor           = neighbor;
         theNeighborIdentifier = neighborIdentifier;
+        
+        theResolver           = resolver;
     }
 
    /**
@@ -160,8 +164,20 @@ public abstract class AbstractMeshObjectRoleChangeEvent
     public void setResolver(
             MeshBase mb )
     {
-        theResolver = mb;
-        clearCachedObjects();
+        if( theResolver != mb ) {
+            theResolver = mb;
+            clearCachedObjects();
+        }
+    }
+
+    /**
+     * Obtain the MeshBase that is currently set as resolver for the identifiers carried by this event.
+     * 
+     * @return the MeshBase, if any
+     */
+    public MeshBase getResolver()
+    {
+        return theResolver;
     }
 
     /**

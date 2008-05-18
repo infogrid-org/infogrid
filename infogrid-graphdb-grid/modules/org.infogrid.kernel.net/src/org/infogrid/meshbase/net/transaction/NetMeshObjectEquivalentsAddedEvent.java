@@ -69,7 +69,39 @@ public class NetMeshObjectEquivalentsAddedEvent
                 newValues,
                 NetMeshObjectUtils.netMeshObjectIdentifiers( newValues ),
                 originIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                source.getMeshBase() );
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param source the NetMeshObject that is the source of the event
+     * @param oldValues the old values of the equivalents, prior to the event
+     * @param deltaValues the equivalents that changed
+     * @param newValues the new value of the equivalents, after the event
+     * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     */
+    public NetMeshObjectEquivalentsAddedEvent(
+            NetMeshObject              source,
+            NetMeshObjectIdentifier [] oldValues,
+            NetMeshObjectIdentifier [] deltaValues,
+            NetMeshObjectIdentifier [] newValues,
+            NetMeshBaseIdentifier      originIdentifier,
+            long                       timeEventOccurred )
+    {
+        this(   source,
+                source.getIdentifier(),
+                null,
+                oldValues,
+                null,
+                deltaValues,
+                null,
+                newValues,
+                originIdentifier,
+                timeEventOccurred,
+                source.getMeshBase() );
     }
 
     /**
@@ -96,7 +128,8 @@ public class NetMeshObjectEquivalentsAddedEvent
             NetMeshObject []           newValues,
             NetMeshObjectIdentifier [] newValueIdentifiers,
             NetMeshBaseIdentifier      originIdentifier,
-            long                       timeEventOccurred )
+            long                       timeEventOccurred,
+            NetMeshBase                resolver )
     {
         super(  source,
                 sourceIdentifier,
@@ -106,7 +139,8 @@ public class NetMeshObjectEquivalentsAddedEvent
                 deltaValueIdentifiers,
                 newValues,
                 newValueIdentifiers,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
 
         theOriginNetworkIdentifier = originIdentifier;
     }

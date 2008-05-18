@@ -60,8 +60,7 @@ public class EntityNotBlessedException
     public EntityNotBlessedException(
             MeshObject           obj,
             EntityType           type )
-    {
-        super(  obj.getMeshBase(),
+    {        super(  obj.getMeshBase(),
                 obj.getMeshBase().getIdentifier(),
                 obj,
                 obj.getIdentifier(),

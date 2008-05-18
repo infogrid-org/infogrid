@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.net.transaction;
 
 import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
 
 import org.infogrid.meshbase.net.NetMeshBase;
@@ -38,16 +39,18 @@ public class NetMeshObjectDeletedEvent
      * @param deletedObject the NetMeshObject that was deleted
      * @param deletedObjectIdentifier the identifier of the NetMeshObject that was deleted
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param externalized the deleted MeshObject in externalized form as it was just prior to deletion
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectDeletedEvent(
-            NetMeshBase           source,
-            NetMeshBaseIdentifier sourceIdentifier,
-            NetMeshObject         deletedObject,
-            MeshObjectIdentifier  deletedObjectIdentifier,
-            NetMeshBaseIdentifier originIdentifier,
-            long                  timeEventOccurred )
+            NetMeshBase            source,
+            NetMeshBaseIdentifier  sourceIdentifier,
+            NetMeshObject          deletedObject,
+            MeshObjectIdentifier   deletedObjectIdentifier,
+            NetMeshBaseIdentifier  originIdentifier,
+            ExternalizedMeshObject externalized,
+            long                   timeEventOccurred )
     {
-        super( source, sourceIdentifier, deletedObject, deletedObjectIdentifier, originIdentifier, timeEventOccurred );
+        super( source, sourceIdentifier, deletedObject, deletedObjectIdentifier, originIdentifier, externalized, timeEventOccurred );
     }
 }
