@@ -75,7 +75,8 @@ public class NetMeshObjectNeighborAddedEvent
                 newNeighbors,
                 NetMeshObjectUtils.netMeshObjectIdentifiers( newNeighbors ),
                 originIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                meshObject.getMeshBase() );
     }
 
     /**
@@ -109,7 +110,8 @@ public class NetMeshObjectNeighborAddedEvent
                 null,
                 newNeighborIdentifiers,
                 originIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                meshObject.getMeshBase() );
     }
 
     /**
@@ -122,6 +124,7 @@ public class NetMeshObjectNeighborAddedEvent
      * @param newNeighborIdentifiers the identifiers of the neighbor MeshObjects after the event
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public NetMeshObjectNeighborAddedEvent(
             NetMeshObjectIdentifier    meshObjectIdentifier,
@@ -130,7 +133,8 @@ public class NetMeshObjectNeighborAddedEvent
             NetMeshObjectIdentifier    deltaNeighborIdentifier,
             NetMeshObjectIdentifier [] newNeighborIdentifiers,
             NetMeshBaseIdentifier      originIdentifier,
-            long                       timeEventOccurred )
+            long                       timeEventOccurred,
+            NetMeshBase                resolver )
     {
         this(   null,
                 meshObjectIdentifier,
@@ -143,7 +147,8 @@ public class NetMeshObjectNeighborAddedEvent
                 null,
                 newNeighborIdentifiers,
                 originIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
     }
 
     /**
@@ -156,13 +161,15 @@ public class NetMeshObjectNeighborAddedEvent
      * @param deltaNeighborIdentifier the identifier of the neighbor MeshObject affected by this event
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public NetMeshObjectNeighborAddedEvent(
             NetMeshObjectIdentifier meshObjectIdentifier,
             MeshTypeIdentifier []   roleTypeIdentifiers,
             NetMeshObjectIdentifier deltaNeighborIdentifier,
             NetMeshBaseIdentifier   originIdentifier,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            NetMeshBase             resolver )
     {
         this(   null,
                 meshObjectIdentifier,
@@ -175,7 +182,8 @@ public class NetMeshObjectNeighborAddedEvent
                 null,
                 null,
                 originIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
     }
     
     /**
@@ -193,6 +201,7 @@ public class NetMeshObjectNeighborAddedEvent
      * @param newNeighborIdentifiers the identifiers of the neighbor MeshObjects after the event (required)
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected NetMeshObjectNeighborAddedEvent(
             NetMeshObject              meshObject,
@@ -206,7 +215,8 @@ public class NetMeshObjectNeighborAddedEvent
             NetMeshObject []           newNeighbors,
             NetMeshObjectIdentifier [] newNeighborIdentifiers,
             NetMeshBaseIdentifier      originIdentifier,
-            long                       timeEventOccurred )
+            long                       timeEventOccurred,
+            NetMeshBase                resolver )
     {
         super(  meshObject,
                 meshObjectIdentifier,
@@ -218,7 +228,8 @@ public class NetMeshObjectNeighborAddedEvent
                 deltaNeighborIdentifiers,
                 newNeighbors,
                 newNeighborIdentifiers,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
 
         theOriginNetworkIdentifier = originIdentifier;
     }

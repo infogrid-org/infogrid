@@ -79,7 +79,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.SAXException;
 
-
 /**
  * Performs most of the work of ShadowMeshBases all the way to invoking the right Probes.
  * This is a separate class in order to make it easier to reuse behavior for multiple
@@ -91,6 +90,12 @@ public class ProbeDispatcher
 
     /**
      * Constructor.
+     * 
+     * @param meshBase the ShadowMeshBase on whose behalf the ProbeDispatcher works
+     * @param directory the ProbeDirectory to use
+     * @param timeCreated the time the home object is supposed to be created
+     * @param timeNotNeededTillExpires the time until the Probe gets removed after it was detected that the Probe was not needed
+     * @param registry the ModuleRegistry to use for Probe discovery
      */
     public ProbeDispatcher(
             ShadowMeshBase        meshBase,
@@ -109,7 +114,6 @@ public class ProbeDispatcher
     /**
      * Calling this will trigger the Probe to run.
      *
-     * @param startTime use this time as the start time, in System.currentTimeMillis() format
      * @param coherence the CoherenceSpecification specified by the client, if any
      * @return the computed result is the number of milliseconds until the next desired invocation, or -1 if never
      * @throws ProbeException thrown if unable to compute a result
@@ -125,7 +129,8 @@ public class ProbeDispatcher
 
         Throwable             problem          = null; // this helps us to know what happened in the finally clause
         boolean               updated          = true; // default is "we have been updated
-        StagingMeshBase       base             = null;
+        StagingMeshBase       oldBase          = null;
+        StagingMeshBase       newBase          = null;
         long                  ret              = -1L;
         boolean               isFirstRun       = theShadowMeshBase.size() == 0;
         NetMeshBaseIdentifier sourceIdentifier = theShadowMeshBase.getIdentifier();
@@ -155,9 +160,11 @@ public class ProbeDispatcher
             // Pick right MeshBase -- first run is different from all others
 
             if( isFirstRun ) {
-                base = theShadowMeshBase;
+                oldBase = null;
+                newBase = theShadowMeshBase;
             } else {
-                base = MStagingMeshBase.create( theShadowMeshBase );
+                oldBase = theShadowMeshBase;
+                newBase = MStagingMeshBase.create( theShadowMeshBase );
             }
             if( !isFirstRun && coherence == null ) {
                 // use the old coherence
@@ -167,20 +174,20 @@ public class ProbeDispatcher
             Transaction tx = null;
             try {
                 // Run the Probe
-                tx = base.createTransactionAsap();
+                tx = newBase.createTransactionAsap();
 
-                base.initializeHomeObject( theCurrentUpdate );
+                newBase.initializeHomeObject( theCurrentUpdate );
                 
                 if( isDirectory ) {
-                    updated = handleDirectory( base, coherence );
+                    updated = handleDirectory( oldBase, newBase, coherence );
                 } else if( isStream ) {
-                    updated = handleStream( base, coherence );
+                    updated = handleStream( oldBase, newBase, coherence );
                 } else {
-                    updated = handleApi( base, coherence );
+                    updated = handleApi( oldBase, newBase, coherence );
                 }
                 
-                if( base != theShadowMeshBase ) {
-                    copyProbeUpdateSpecification( theShadowMeshBase.getHomeObject(), base.getHomeObject() );
+                if( newBase != theShadowMeshBase ) {
+                    copyProbeUpdateSpecification( theShadowMeshBase.getHomeObject(), newBase.getHomeObject() );
                     // otherwise we lose what was there previously
                 }
 
@@ -223,7 +230,7 @@ public class ProbeDispatcher
                             tx2 = theShadowMeshBase.createTransactionAsap();
                         }
 
-                        ChangeSet changeSet = diff.determineChangeSet( base );
+                        ChangeSet changeSet = diff.determineChangeSet( newBase );
 
                         updated = !changeSet.isEmpty();
                         if( updated ) {
@@ -249,7 +256,7 @@ public class ProbeDispatcher
                     ProbeUpdateSpecification spec = (ProbeUpdateSpecification) home.getTypedFacadeFor( ProbeSubjectArea.PROBEUPDATESPECIFICATION );
                     if( spec != null ) {
                         try {
-                            if( base != theShadowMeshBase && tx2 == null ) {
+                            if( newBase != theShadowMeshBase && tx2 == null ) {
                                 tx2 = theShadowMeshBase.createTransactionAsap();
                             }
                             
@@ -339,10 +346,19 @@ public class ProbeDispatcher
     }
 
     /**
-     * The data source refers to a directory, we need to handle that.
+     * The data source refers to a directory in a fie system, probe the directory.
+     * 
+     * @param oldBase the StagingMeshBase after the most recent successful run, if any
+     * @param newBase the new StagingMeshBase into which to instantiate the data
+     * @param coherence the CoherenceSpecification specified by the client, if any
+     * @return true if the data source is known to have been updated
+     * @throws ProbeException thrown if unable to compute a result
+     * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
+     * @throws IOException thrown if an I/O error occurred
      */
     protected boolean handleDirectory(
-            StagingMeshBase        theStagingBase,
+            StagingMeshBase        oldBase,
+            StagingMeshBase        newBase,
             CoherenceSpecification coherence )
         throws
             ProbeException,
@@ -394,17 +410,20 @@ public class ProbeDispatcher
     }
 
     /**
-     * The data source refers to a stream, we need to handle that.
+     * The data source refers to a stream, parse the stream.
      *
-     * @param theShadow the ShadowMeshBase that we belong to. We pass this so we don't have to depend on the WeakReference that may change
-     * @param facade the ProbeMeshBaseFacade to use for instantiation
-     * @return true of the data at this data source may have been updated
-     * @throws ProbeException thrown if an error occurred
-     * @throws TransactionException should never be thrown, but indicates that this method can only be invoked inside a Transaction
-     * @throws IOException an I/O error occurred
+     * @param oldBase the StagingMeshBase after the most recent successful run, if any
+     * @param newBase the new StagingMeshBase into which to instantiate the data
+     * @param coherence the CoherenceSpecification specified by the client, if any
+     * @return true if the data source is known to have been updated
+     * @throws ProbeException thrown if unable to compute a result
+     * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
+     * @throws URISyntaxException thrown if a URI could not be parsed
+     * @throws IOException thrown if an I/O error occurred
      */
     protected boolean handleStream(
-            StagingMeshBase        base,
+            StagingMeshBase        oldBase,
+            StagingMeshBase        newBase,
             CoherenceSpecification coherence )
         throws
             ProbeException,
@@ -525,12 +544,14 @@ public class ProbeDispatcher
             try {
                 if( XML_MIME_TYPE.equals( contentType )) {
                     handleXml(
-                            base,
+                            oldBase,
+                            newBase,
                             coherence,
                             inStream );
                 } else {
                     handleNonXml(
-                            base,
+                            oldBase,
+                            newBase,
                             coherence,
                             contentType,
                             inStream );
@@ -545,9 +566,9 @@ public class ProbeDispatcher
                 theServiceFactory = new YadisServiceFactory( getDocumentBuilder() );
             }
             if( yadisServicesXml != null ) {
-                theServiceFactory.addYadisServicesFromXml( sourceIdentifier, yadisServicesXml, base );
+                theServiceFactory.addYadisServicesFromXml( sourceIdentifier, yadisServicesXml, newBase );
             } else if( yadisServicesHtml != null ) {
-                theServiceFactory.addYadisServicesFromHtml( sourceIdentifier, yadisServicesHtml, base );
+                theServiceFactory.addYadisServicesFromHtml( sourceIdentifier, yadisServicesHtml, newBase );
             }
             
         }
@@ -555,17 +576,20 @@ public class ProbeDispatcher
     }
 
     /**
-     * This data source refers to an API, we need to handle that.
+     * The data source refers to an API, parse the API.
      *
-     * @param theShadow the StagingMeshBase that we belong to. We pass this so we don't have to depend on the WeakReference that may change
-     * @param facade the ProbeRepositoryFacade to use for instantiation
-     * @return true of the data at this data source may have been updated
-     * @throws ProbeException thrown if an error occurred
-     * @throws TransactionException should never be thrown, but indicates that this method can only be invoked inside a Transaction
-     * @throws IOException an I/O error occurred
+     * @param oldBase the StagingMeshBase after the most recent successful run, if any
+     * @param newBase the new StagingMeshBase into which to instantiate the data
+     * @param coherence the CoherenceSpecification specified by the client, if any
+     * @return true if the data source is known to have been updated
+     * @throws ProbeException thrown if unable to compute a result
+     * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
+     * @throws IOException thrown if an I/O error occurred
      */
+    @SuppressWarnings( "unchecked" )
     protected boolean handleApi(
-            StagingMeshBase        base,
+            StagingMeshBase        oldBase,
+            StagingMeshBase        newBase,
             CoherenceSpecification coherence )
         throws
             ProbeException,
@@ -575,10 +599,10 @@ public class ProbeDispatcher
         NetMeshBaseIdentifier          sourceIdentifier = theShadowMeshBase.getIdentifier();
         ProbeDirectory.MatchDescriptor desc1            = theProbeDirectory.getApiProbeDescriptorByMatchedUrl( sourceIdentifier.getUriString() );
 
-        Class       foundClass       = null;
-        String      foundClassName   = null;
-        Map         foundParameters  = null;
-        ClassLoader foundClassLoader = null;
+        Class<? extends Probe> foundClass       = null;
+        String                 foundClassName   = null;
+        Map<String,Object>     foundParameters  = null; // FIXME: currently not used
+        ClassLoader            foundClassLoader = null;
 
         if( desc1 != null ) {
             foundClass      = desc1.getProbeClass();
@@ -634,7 +658,7 @@ public class ProbeDispatcher
             }
 
             try {
-                foundClass = Class.forName( foundClassName, true, foundClassLoader );
+                foundClass = (Class<? extends Probe>) Class.forName( foundClassName, true, foundClassLoader );
             } catch( ClassNotFoundException ex ) {
                 throw new ProbeException.DontHaveApiProbe( sourceIdentifier, ex );
             }
@@ -666,10 +690,10 @@ public class ProbeDispatcher
             
             try {
                 if( probe instanceof WriteableProbe && changesToWriteBack != null ) {
-                    ((WriteableProbe) probe).write( sourceIdentifier, changesToWriteBack );
+                    ((WriteableProbe) probe).write( sourceIdentifier, changesToWriteBack, oldBase );
                 }
 
-                probe.readFromApi( sourceIdentifier, coherence, base );
+                probe.readFromApi( sourceIdentifier, coherence, newBase );
 
             } catch( EntityNotBlessedException ex ) {
                 throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, foundClass );
@@ -720,19 +744,20 @@ public class ProbeDispatcher
     }
     
     /**
-     * Do the import for an XML file.
-     * 
-     * @param theShadow the ShadowMeshBase that we belong to. We pass this so we don't have to depend on the WeakReference that may change
-     * @param theURL the URL from which the XML file is taken
-     * @param theURLString the URL in String format, for optimization reasons
-     * @param inStream the stream through which we read the XML file
-     * @param facade the ProbeMeshBaseFacade through which we import
-     * @throws ProbeException thrown if an error occurred
-     * @throws TransactionException should never be thrown, but indicates that this method can only be invoked inside a Transaction
-     * @throws IOException an I/O error occurred
+     * The data source refers to an XML file or stream, parse the XML.
+     *
+     * @param oldBase the StagingMeshBase after the most recent successful run, if any
+     * @param newBase the new StagingMeshBase into which to instantiate the data
+     * @param coherence the CoherenceSpecification specified by the client, if any
+     * @param inStream the incoming data stream
+     * @throws ProbeException thrown if unable to compute a result
+     * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
+     * @throws IOException thrown if an I/O error occurred
      */
-    protected Class handleXml(
-            StagingMeshBase        base,
+    @SuppressWarnings( "unchecked" )
+    protected void handleXml(
+            StagingMeshBase        oldBase,
+            StagingMeshBase        newBase,
             CoherenceSpecification coherence,
             InputStream            inStream )
         throws
@@ -741,7 +766,7 @@ public class ProbeDispatcher
             IOException
     {
         if( log.isDebugEnabled() ) {
-            log.debug( this + ".handleXml( " + base + ", " + inStream + " )" );
+            log.debug( this + ".handleXml( " + oldBase + ", " + newBase + ", " + inStream + " )" );
         }
 
         NetMeshBaseIdentifier sourceIdentifier = theShadowMeshBase.getIdentifier();
@@ -778,16 +803,16 @@ public class ProbeDispatcher
             }
         }
 
-        XmlDOMProbe        probe            = null;
-        String             foundClassName   = null;
-        Class              foundClass       = null;
-        ClassLoader        foundClassLoader = null;
-        Map<String,Object> foundParameters  = null;
+        XmlDOMProbe            probe            = null;
+        String                 foundClassName   = null;
+        Class<? extends Probe> foundClass       = null;
+        ClassLoader            foundClassLoader = null;
+        Map<String,Object>     foundParameters  = null; // FIXME not used
 
         if( docType != null ) {
             if( SaxMeshObjectSetProbe.MESHOBJECT_SET_TAG.equalsIgnoreCase( docType.getName() )) {
-                Class ret = handleNativeFormat( doc, coherence, base );
-                return ret;
+                handleNativeFormat( newBase, coherence, doc );
+                return;
             }
 
             ProbeDirectory.XmlDomProbeDescriptor desc = theProbeDirectory.getXmlDomProbeDescriptorByDocumentType( docType.getName() );
@@ -849,7 +874,8 @@ public class ProbeDispatcher
             }
 
             try {
-                foundClass = Class.forName( foundClassName, true, foundClassLoader );
+                foundClass = (Class<? extends Probe>) Class.forName( foundClassName, true, foundClassLoader );
+
             } catch( ClassNotFoundException ex ) {
                 throw new ProbeException.DontHaveXmlStreamProbe( sourceIdentifier, docType != null ? docType.getName() : null, tagType, ex );
             }
@@ -879,10 +905,10 @@ public class ProbeDispatcher
 
             try {
                 if( probe instanceof WriteableProbe ) {
-                    ((WriteableProbe) probe).write( sourceIdentifier, changesToWriteBack );
+                    ((WriteableProbe) probe).write( sourceIdentifier, changesToWriteBack, oldBase );
                 }
 
-                probe.parseDocument( sourceIdentifier, coherence, doc, base );
+                probe.parseDocument( sourceIdentifier, coherence, doc, newBase );
 
             } catch( IsAbstractException ex ) {
                 throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, foundClass );
@@ -930,25 +956,24 @@ public class ProbeDispatcher
         } else {
             throw new ProbeException.DontHaveXmlStreamProbe( sourceIdentifier, docType != null ? docType.getName() : null, tagType, null );
         }
-        return foundClass;
     }
 
     /**
-     * Do the import for a non-XML file.
-     * 
-     * 
-     * @param theShadow the ShadowMeshBase that we belong to. We pass this so we don't have to depend on the WeakReference that may change
-     * @param theURL the URL from which the stream is taken
-     * @param theURLString the URL in String format, for optimization reasons
-     * @param contentType the MIME type of the stream
-     * @param inStream the stream through which we read the file
-     * @param facade the ProbeMeshBaseFacade through which we import
-     * @throws ProbeException thrown if an error occurred
-     * @throws TransactionException should never be thrown, but indicates that this method can only be invoked inside a Transaction
-     * @throws IOException an I/O error occurred
+     * The data source refers to a non-XML file or stream, parse it.
+     *
+     * @param oldBase the StagingMeshBase after the most recent successful run, if any
+     * @param newBase the new StagingMeshBase into which to instantiate the data
+     * @param coherence the CoherenceSpecification specified by the client, if any
+     * @param contentType the MIME type of the data source
+     * @param inStream the incoming data stream
+     * @throws ProbeException thrown if unable to compute a result
+     * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
+     * @throws IOException thrown if an I/O error occurred
      */
-    protected Class handleNonXml(
-            StagingMeshBase        base,
+    @SuppressWarnings( "unchecked" )
+    protected void handleNonXml(
+            StagingMeshBase        oldBase,
+            StagingMeshBase        newBase,
             CoherenceSpecification coherence,
             String                 contentType,
             InputStream            inStream )
@@ -961,12 +986,12 @@ public class ProbeDispatcher
             log.debug( this + ".handleNonXml( " + contentType + ", " + inStream + " )" );
         }
 
-        NonXmlStreamProbe     probe            = null;
-        Class                 foundClass       = null;
-        String                foundClassName   = null;
-        ClassLoader           foundClassLoader = null;
-        Map<String,Object>    foundParameters  = null; // FIXME what are they used for?
-        NetMeshBaseIdentifier sourceIdentifier = theShadowMeshBase.getIdentifier();
+        NonXmlStreamProbe      probe            = null;
+        Class<? extends Probe> foundClass       = null;
+        String                 foundClassName   = null;
+        ClassLoader            foundClassLoader = null;
+        Map<String,Object>     foundParameters  = null; // FIXME what are they used for?
+        NetMeshBaseIdentifier  sourceIdentifier = theShadowMeshBase.getIdentifier();
 
         ProbeDirectory.StreamProbeDescriptor desc = theProbeDirectory.getStreamProbeDescriptorByMimeType( contentType );
 
@@ -1011,7 +1036,7 @@ public class ProbeDispatcher
             }
 
             try {
-                foundClass = Class.forName( foundClassName, true, foundClassLoader );
+                foundClass = (Class<? extends Probe>) Class.forName( foundClassName, true, foundClassLoader );
             } catch( ClassNotFoundException ex ) {
                 throw new ProbeException.DontHaveNonXmlStreamProbe( sourceIdentifier, contentType, ex );
             }
@@ -1041,10 +1066,10 @@ public class ProbeDispatcher
 
             try {
                 if( probe instanceof WriteableProbe ) {
-                    ((WriteableProbe) probe).write( sourceIdentifier, changesToWriteBack );
+                    ((WriteableProbe) probe).write( sourceIdentifier, changesToWriteBack, oldBase );
                 }
 
-                probe.readFromStream( sourceIdentifier, coherence, inStream, contentType, base );
+                probe.readFromStream( sourceIdentifier, coherence, inStream, contentType, newBase );
 
             } catch( IsAbstractException ex ) {
                 throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, foundClass );
@@ -1091,23 +1116,22 @@ public class ProbeDispatcher
         } else {
             throw new ProbeException.DontHaveNonXmlStreamProbe( sourceIdentifier, contentType, null );
         }
-        return foundClass;
     }
 
     /**
-     * This handles the case of the native InfoGrid XML format.
-     * 
-     * @param theURL the URL from which the XML file is taken
-     * @param doc the DOM of the XML file
-     * @param theRepository the ModelObjectRepository into which we import. The native format does not use a facade.
-     * @throws ProbeException thrown if an error occurred
-     * @throws TransactionException should never be thrown, but indicates that this method can only be invoked inside a Transaction
-     * @throws IOException an I/O error occurred
+     * The data source refers to InfoGrid native format, parse the DOM.
+     *
+     * @param newBase the new StagingMeshBase into which to instantiate the data
+     * @param coherence the CoherenceSpecification specified by the client, if any
+     * @param doc the XML Document to parse
+     * @throws ProbeException thrown if unable to compute a result
+     * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
+     * @throws IOException thrown if an I/O error occurred
      */
-    protected Class handleNativeFormat(
-            Document               doc,
+    protected void handleNativeFormat(
+            StagingMeshBase        newBase,
             CoherenceSpecification coherence,
-            StagingMeshBase        base )
+            Document               doc )
         throws
             ProbeException,
             TransactionException,
@@ -1121,14 +1145,12 @@ public class ProbeDispatcher
         DomMeshObjectSetProbe theProbe         = new DomMeshObjectSetProbe();
 
         try {
-            theProbe.parseDocument( sourceIdentifier, coherence, doc, base );
-
-            return theProbe.getClass();
+            theProbe.parseDocument( sourceIdentifier, coherence, doc, newBase );
 
         } catch( NotPermittedException ex ) {
-            throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, ProbeDispatcher.class );
+            throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, DomMeshObjectSetProbe.class );
         } catch( MeshObjectIdentifierNotUniqueException ex ) {
-            throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, ProbeDispatcher.class );
+            throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, DomMeshObjectSetProbe.class );
         }
     }
     
@@ -1198,6 +1220,7 @@ public class ProbeDispatcher
      *
      * @param coherence the CoherenceSpecification
      * @param obj the MeshObject
+     * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
      */
     protected void blessMeshObjectWithCoherence(
             CoherenceSpecification coherence,
@@ -1253,6 +1276,7 @@ public class ProbeDispatcher
      *
      * @param source the source MeshObject
      * @param destination the destination MeshObject
+     * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
      */
     protected void copyProbeUpdateSpecification(
             MeshObject source,
@@ -1511,7 +1535,9 @@ public class ProbeDispatcher
     }
 
     /**
-     * Obtain a DocumentBuilder
+     * Obtain an XML DocumentBuilder.
+     * 
+     * @return the DocumentBuilder
      */
     protected synchronized DocumentBuilder getDocumentBuilder()
     {
@@ -1590,8 +1616,7 @@ public class ProbeDispatcher
     /**
      * Determine whether a given NetMeshBaseIdentifier refers to a directory or not.
      * 
-     * @param proto the protocol to test
-     * @param filePartOfUrl the file component of the URL (the file system path in case of a "file" URL)
+     * @param id the NetMeshBaseIdentifier
      * @return true if this references a directory that exists
      */
     protected static boolean isDirectory(
@@ -1623,7 +1648,7 @@ public class ProbeDispatcher
      * Determine whether a given protocol is a protocol that requires us to read a
      * stream, or it is a non-stream protocol.
      *
-     * @param proto the protocol candidate
+     * @param id the NetMeshBaseIdentifier
      * @return true if this protocol requires us to read a stream
      */
     protected static boolean isStreamProtocol(

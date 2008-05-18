@@ -33,8 +33,8 @@ public abstract class ProbeException
      * Constructor, for subclasses only.
      * 
      * @param id the NetMeshBaseIdentifier that we were trying to access
-     * @param msg a message
-     * @param org the original Throwable that caused this
+     * @param msg error message, if any
+     * @param org the original Throwable that caused this, if any
      */
     protected ProbeException(
             NetMeshBaseIdentifier id,
@@ -123,18 +123,19 @@ public abstract class ProbeException
     protected NetMeshBaseIdentifier theNetworkIdentifier;
 
     /**
-     * This is the abstract superclass for all ProbeExceptions that indicate
+     * This is the superclass for all ProbeExceptions that indicate
      * we were not able to find a matching Probe.
      */
     public static class DontHaveProbe
             extends
                 ProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
-         * @param org the original Throwable that caused this
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          */
         public DontHaveProbe(
                 NetMeshBaseIdentifier id )
@@ -145,13 +146,12 @@ public abstract class ProbeException
         /**
          * Constructor.
          *
-         * @param u the URL that we were trying to access. The URL is passed in string form as
-         *          java.net.URL does not support non-standard protocols very well.
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          * @param org the original Throwable that caused this
          */
         public DontHaveProbe(
                 NetMeshBaseIdentifier id,
-                Throwable         org )
+                Throwable             org )
         {
             super( id, null, org );
         }
@@ -165,17 +165,19 @@ public abstract class ProbeException
             extends
                 DontHaveProbe
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          * @param mimeType the MIME type that we don't support
          * @param org the original Throwable that caused this
          */
         public DontHaveNonXmlStreamProbe(
                 NetMeshBaseIdentifier id,
-                String            mimeType,
-                Throwable         org )
+                String                mimeType,
+                Throwable             org )
         {
             super( id, org );
             theMimeType = mimeType;
@@ -216,19 +218,21 @@ public abstract class ProbeException
             extends
                 DontHaveProbe
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          * @param dtd the document type that we don't support. If this is not given, tag is given.
          * @param tag the top-level tag that we don't support. If this is not given, dtd is given.
          * @param org the original Throwable that caused this
          */
         public DontHaveXmlStreamProbe(
                 NetMeshBaseIdentifier id,
-                String            dtd,
-                String            tag,
-                Throwable         org )
+                String                dtd,
+                String                tag,
+                Throwable             org )
         {
             super( id, org );
 
@@ -286,15 +290,17 @@ public abstract class ProbeException
             extends
                 DontHaveProbe
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          * @param org the original Throwable that caused this
          */
         public DontHaveApiProbe(
                 NetMeshBaseIdentifier id,
-                Throwable         org )
+                Throwable             org )
         {
             super( id, org );
         }
@@ -319,10 +325,12 @@ public abstract class ProbeException
             extends
                 ProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          */
         public EmptyDataSource(
                 NetMeshBaseIdentifier id )
@@ -339,11 +347,13 @@ public abstract class ProbeException
             extends
                 ProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
-         * @param org the original Throwable causing this one
+         * @param id the NetMeshBaseIdentifier that we were trying to access
+         * @param org the original Throwable that caused this
          */
         public CannotDetermineContentType(
                 NetMeshBaseIdentifier id,
@@ -355,7 +365,7 @@ public abstract class ProbeException
         /**
          * Constructor.
          *
-         * @param u the URL of the data source whose type we could not determine
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          */
         public CannotDetermineContentType(
                 NetMeshBaseIdentifier id )
@@ -372,10 +382,12 @@ public abstract class ProbeException
             extends
                 ProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          */
         public FileNotLocal(
                 NetMeshBaseIdentifier id )
@@ -391,17 +403,19 @@ public abstract class ProbeException
             extends
                 ProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          * @param org the original Throwable that caused this
          * @param buggyProbe the Probe class that was buggy
          */
         public ErrorInProbe(
-                NetMeshBaseIdentifier id,
-                Throwable         org,
-                Class             buggyProbe )
+                NetMeshBaseIdentifier  id,
+                Throwable              org,
+                Class<? extends Probe> buggyProbe )
         {
             super( id, buggyProbe != null ? buggyProbe.getName() : null, org );
 
@@ -411,16 +425,26 @@ public abstract class ProbeException
         /**
          * Constructor.
          *
-         * @param u the URL that we were trying to access. The URL is passed in string form as java.net.URL does not support non-standard protocols very well.
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          * @param buggyProbe the Probe class that was buggy
          */
         public ErrorInProbe(
-                NetMeshBaseIdentifier id,
-                Class             buggyProbe )
+                NetMeshBaseIdentifier  id,
+                Class<? extends Probe> buggyProbe )
         {
             super( id, buggyProbe != null ? buggyProbe.getName() : null, null );
 
             theBuggyProbe = buggyProbe;
+        }
+
+        /**
+         * Obtain the class of the Probe that was buggy.
+         * 
+         * @return the Probe class.
+         */
+        public Class<? extends Probe> getBuggyProbe()
+        {
+            return theBuggyProbe;
         }
 
         /**
@@ -441,7 +465,7 @@ public abstract class ProbeException
         /**
          * The Probe class that is buggy.
          */
-        protected Class theBuggyProbe;
+        protected Class<? extends Probe> theBuggyProbe;
     }
 
     /**
@@ -451,38 +475,40 @@ public abstract class ProbeException
             extends
                 ProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
-         * @param message error message
+         * @param id the NetMeshBaseIdentifier that we were trying to access
+         * @param msg error message, if any
          * @param org the original Throwable that caused this
          */
         public SyntaxError(
                 NetMeshBaseIdentifier id,
-                String                message,
+                String                msg,
                 Throwable             org )
         {
-            super( id, message, org );
+            super( id, msg, org );
         }
 
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
-         * @param message error message
+         * @param id the NetMeshBaseIdentifier that we were trying to access
+         * @param msg error message, if any
          */
         public SyntaxError(
                 NetMeshBaseIdentifier id,
-                String                message )
+                String                msg )
         {
-            super( id, message, null );
+            super( id, msg, null );
         }
 
         /**
          * Constructor.
          *
-         * @param u the URL that we were trying to access. The URL is passed in string form as java.net.URL does not support non-standard protocols very well.
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          * @param org the original Throwable that caused this
          */
         public SyntaxError(
@@ -500,15 +526,45 @@ public abstract class ProbeException
             extends
                 ProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
+         * @param id the NetMeshBaseIdentifier that we were trying to access
+         * @param msg error message, if any
          * @param org the original Throwable that caused this
          */
         public IncompleteData(
                 NetMeshBaseIdentifier id,
-                Throwable         org )
+                String                msg,
+                Throwable             org )
+        {
+            super( id, msg, org );
+        }
+
+        /**
+         * Constructor.
+         * 
+         * @param id the NetMeshBaseIdentifier that we were trying to access
+         * @param msg error message, if any
+         */
+        public IncompleteData(
+                NetMeshBaseIdentifier id,
+                String                msg )
+        {
+            super( id, msg, null );
+        }
+
+        /**
+         * Constructor.
+         * 
+         * @param id the NetMeshBaseIdentifier that we were trying to access
+         * @param org the original Throwable that caused this
+         */
+        public IncompleteData(
+                NetMeshBaseIdentifier id,
+                Throwable             org )
         {
             super( id, null, org );
         }
@@ -521,15 +577,17 @@ public abstract class ProbeException
             extends
                 ProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
-         * @param org the original IOException that caused this
+         * @param id the NetMeshBaseIdentifier that we were trying to access
+         * @param org the original Throwable that caused this
          */
         public IO(
                 NetMeshBaseIdentifier id,
-                IOException       org )
+                IOException           org )
         {
             super( id, null, org );
         }
@@ -543,15 +601,17 @@ public abstract class ProbeException
             extends
                 ProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
-         * @param u the URL that we were trying to access. The URL is passed in string form as java.net.URL does not support non-standard protocols very well.
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          * @param statusCode the HTTP code that we got back
          */
         public HttpErrorResponse(
                 NetMeshBaseIdentifier id,
-                String            statusCode )
+                String                statusCode )
         {
             super( id, null, null );
 
@@ -597,17 +657,19 @@ public abstract class ProbeException
             extends
                 ProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          * @param explanation the user-visible, localized explanation of what went wrong
-         * @param org the original Throwable that cause this Exception
+         * @param org the original Throwable that caused this
          */
         public DoNotRunAgain(
                 NetMeshBaseIdentifier id,
-                String            explanation,
-                Throwable         org )
+                String                explanation,
+                Throwable             org )
         {
             super( id, null, org );
 
@@ -617,12 +679,12 @@ public abstract class ProbeException
         /**
          * Constructor.
          *
-         * @param u the URL that we were trying to access. The URL is passed in string form as java.net.URL does not support non-standard protocols very well.
+         * @param id the NetMeshBaseIdentifier that we were trying to access
          * @param explanation the user-visible, localized explanation of what went wrong
          */
         public DoNotRunAgain(
                 NetMeshBaseIdentifier id,
-                String            explanation )
+                String                explanation )
         {
             super( id, null, null );
 
@@ -652,15 +714,17 @@ public abstract class ProbeException
             extends
                 ProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
-         * @param org the original Throwable that cause this Exception
+         * @param id the NetMeshBaseIdentifier that we were trying to access
+         * @param org the original Throwable that caused this, if any
          */
         public Other(
                 NetMeshBaseIdentifier id,
-                Throwable         org )
+                Throwable             org )
         {
             super( id, null, org );
         }
@@ -668,12 +732,29 @@ public abstract class ProbeException
         /**
          * Constructor.
          * 
-         * @param id the NNetMeshBaseIdentifierthat we were trying to access
+         * @param id the NetMeshBaseIdentifier that we were trying to access
+         * @param msg error message, if any
          */
         public Other(
-                NetMeshBaseIdentifier id )
+                NetMeshBaseIdentifier id,
+                String                msg )
         {
-            super( id, null, null );
+            super( id, msg, null );
+        }
+
+        /**
+         * Constructor.
+         * 
+         * @param id the NetMeshBaseIdentifier that we were trying to access
+         * @param msg error message, if any
+         * @param org the original Throwable that caused this, if any
+         */
+        public Other(
+                NetMeshBaseIdentifier id,
+                String                msg,
+                Throwable             org )
+        {
+            super( id, msg, org );
         }
     }
 }

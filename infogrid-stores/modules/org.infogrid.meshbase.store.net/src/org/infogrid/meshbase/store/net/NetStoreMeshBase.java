@@ -44,6 +44,7 @@ import org.infogrid.store.util.StoreBackedMap;
 import org.infogrid.util.logging.Log;
 
 import java.net.URISyntaxException;
+import org.infogrid.mesh.net.NetMeshObject;
 
 /**
  * A NetMeshBase that stores its content in two Stores: one for the NetMeshObjects in
@@ -79,7 +80,7 @@ public class NetStoreMeshBase
         throws
             IsAbstractException
     {
-        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create();
+        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
         
         NetStoreMeshBase ret = NetStoreMeshBase.create(
                 identifier,

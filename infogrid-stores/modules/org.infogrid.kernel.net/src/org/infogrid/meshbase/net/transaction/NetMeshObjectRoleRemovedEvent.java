@@ -72,7 +72,8 @@ public class NetMeshObjectRoleRemovedEvent
                 neighbor,
                 neighbor.getIdentifier(),
                 originIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                source.getMeshBase() );
     }
 
     /**
@@ -85,13 +86,15 @@ public class NetMeshObjectRoleRemovedEvent
      * @param deltaNeighborIdentifier the identifier of the neighbor MeshObject affected by this event
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public NetMeshObjectRoleRemovedEvent(
             NetMeshObjectIdentifier meshObjectIdentifier,
             MeshTypeIdentifier []   roleTypeIdentifiers,
             NetMeshObjectIdentifier deltaNeighborIdentifier,
             NetMeshBaseIdentifier   originIdentifier,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            NetMeshBase             resolver )
     {
         this(   null,
                 meshObjectIdentifier,
@@ -104,7 +107,8 @@ public class NetMeshObjectRoleRemovedEvent
                 null,
                 deltaNeighborIdentifier,
                 originIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
     }
 
     /**
@@ -122,6 +126,7 @@ public class NetMeshObjectRoleRemovedEvent
      * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected NetMeshObjectRoleRemovedEvent(            
             NetMeshObject           source,
@@ -135,7 +140,8 @@ public class NetMeshObjectRoleRemovedEvent
             NetMeshObject           neighbor,
             NetMeshObjectIdentifier neighborIdentifier,
             NetMeshBaseIdentifier   originIdentifier,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            NetMeshBase             resolver )
     {
         super(  source,
                 sourceIdentifier,
@@ -147,7 +153,8 @@ public class NetMeshObjectRoleRemovedEvent
                 newValueIdentifiers,
                 neighbor,
                 neighborIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
 
         theOriginNetworkIdentifier = originIdentifier;
     }

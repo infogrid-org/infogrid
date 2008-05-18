@@ -14,6 +14,11 @@
 
 package org.infogrid.meshbase.net.xpriso.xml;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.URISyntaxException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
@@ -21,7 +26,6 @@ import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObjectFactory;
 import org.infogrid.mesh.net.externalized.xml.ExternalizedNetMeshObjectXmlEncoder;
-
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
@@ -36,23 +40,13 @@ import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeRemovedEvent;
 import org.infogrid.meshbase.net.xpriso.ParserFriendlyXprisoMessage;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.externalized.DecodingException;
 import org.infogrid.model.primitives.externalized.EncodingException;
-
 import org.infogrid.modelbase.MeshTypeIdentifierFactory;
-
 import org.infogrid.util.logging.Log;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.URISyntaxException;
 
 /**
  * Encodes and decodes XprisoMessages in default XML format.
@@ -101,6 +95,7 @@ public class XprisoMessageXmlEncoder
      * 
      * @param msg the input XprisoMessage
      * @param buf the StringBuilder to append to
+     * @throws EncodingException thrown if a problem occurred during encoding
      */
     public void appendXprisoMessage(
             XprisoMessage msg,
@@ -433,7 +428,7 @@ public class XprisoMessageXmlEncoder
             try {
                 MeshObjectIdentifier ref  = theMeshObjectIdentifierFactory.fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
                 long                 time = parseLong( attrs, TIME_UPDATED_TAG, -1L );
-                theMessage.addDeleteChange( new NetMeshObjectDeletedEvent( null, theMessage.getSenderIdentifier(), null, ref, theMessage.getSenderIdentifier(), time ));
+                theMessage.addDeleteChange( new NetMeshObjectDeletedEvent( null, theMessage.getSenderIdentifier(), null, ref, theMessage.getSenderIdentifier(), null, time ));
             } catch( URISyntaxException ex ) {
                 log.warn( ex );
             }
@@ -623,7 +618,8 @@ public class XprisoMessageXmlEncoder
                     theHasTypesBeingParsed.getTypes(),
                     (NetMeshObjectIdentifier) ((ParserFriendlyExternalizedNetMeshObject.HasRoleTypes)theHasTypesBeingParsed).getNeighborIdentifier(),
                     theMessage.getSenderIdentifier(),
-                    theHasTypesBeingParsed.getTimeUpdated() ));
+                    theHasTypesBeingParsed.getTimeUpdated(),
+                    null ));
 
             theHasTypesBeingParsed = null;
             
@@ -632,7 +628,8 @@ public class XprisoMessageXmlEncoder
                     (NetMeshObjectIdentifier) theHasTypesBeingParsed.getIdentifier(),
                     (NetMeshObjectIdentifier) ((ParserFriendlyExternalizedNetMeshObject.HasRoleTypes)theHasTypesBeingParsed).getNeighborIdentifier(),
                     theMessage.getSenderIdentifier(),
-                    theHasTypesBeingParsed.getTimeUpdated() ));
+                    theHasTypesBeingParsed.getTimeUpdated(),
+                    null ));
             
             theHasTypesBeingParsed = null;
             
@@ -642,7 +639,8 @@ public class XprisoMessageXmlEncoder
                     theHasTypesBeingParsed.getTypes(),
                     (NetMeshObjectIdentifier) ((ParserFriendlyExternalizedNetMeshObject.HasRoleTypes)theHasTypesBeingParsed).getNeighborIdentifier(),
                     theMessage.getSenderIdentifier(),
-                    theHasTypesBeingParsed.getTimeUpdated() ));
+                    theHasTypesBeingParsed.getTimeUpdated(),
+                    null ));
 
             theHasTypesBeingParsed = null;
             
@@ -652,7 +650,8 @@ public class XprisoMessageXmlEncoder
                     theHasTypesBeingParsed.getTypes(),
                     (NetMeshObjectIdentifier) ((ParserFriendlyExternalizedNetMeshObject.HasRoleTypes)theHasTypesBeingParsed).getNeighborIdentifier(),
                     theMessage.getSenderIdentifier(),
-                    theHasTypesBeingParsed.getTimeUpdated() ));
+                    theHasTypesBeingParsed.getTimeUpdated(),
+                    null ));
 
             theHasTypesBeingParsed = null;
             
@@ -662,7 +661,8 @@ public class XprisoMessageXmlEncoder
                     theHasPropertiesBeingParsed.getPropertyTypeName(),
                     thePropertyValue,
                     theMessage.getSenderIdentifier(),
-                    theHasPropertiesBeingParsed.getTimeUpdated() ));
+                    theHasPropertiesBeingParsed.getTimeUpdated(),
+                    null ));
 
             theHasPropertiesBeingParsed = null;
             
@@ -671,14 +671,16 @@ public class XprisoMessageXmlEncoder
                     (NetMeshObjectIdentifier) theHasTypesBeingParsed.getIdentifier(),
                     theHasTypesBeingParsed.getTypes(),
                     theMessage.getSenderIdentifier(),
-                    theHasTypesBeingParsed.getTimeUpdated() ));
+                    theHasTypesBeingParsed.getTimeUpdated(),
+                    null ));
             
         } else if( TYPE_REMOVAL_TAG.equals( qName )) {
             theMessage.addTypeRemoval( new NetMeshObjectTypeRemovedEvent(
                     (NetMeshObjectIdentifier) theHasTypesBeingParsed.getIdentifier(),
                     theHasTypesBeingParsed.getTypes(),
                     theMessage.getSenderIdentifier(),
-                    theHasTypesBeingParsed.getTimeUpdated() ));
+                    theHasTypesBeingParsed.getTimeUpdated(),
+                    null ));
             
         } else if( REQUESTED_LOCK_OBJECT_TAG.equals( qName )) {
             // no op

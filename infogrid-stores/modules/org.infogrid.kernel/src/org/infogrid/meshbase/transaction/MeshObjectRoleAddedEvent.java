@@ -63,7 +63,8 @@ public class MeshObjectRoleAddedEvent
                 MeshTypeUtils.meshTypeIdentifiers( newValues ),
                 neighbor,
                 neighbor.getIdentifier(),
-                timeEventOccurred );
+                timeEventOccurred,
+                source.getMeshBase() );
     }
 
     /**
@@ -75,6 +76,7 @@ public class MeshObjectRoleAddedEvent
      * @param newValueIdentifiers the identifier representing the new values of the RoleType, after the event
      * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public MeshObjectRoleAddedEvent(
             MeshObjectIdentifier  sourceIdentifier,
@@ -82,7 +84,8 @@ public class MeshObjectRoleAddedEvent
             MeshTypeIdentifier [] deltaValueIdentifiers,
             MeshTypeIdentifier [] newValueIdentifiers,
             MeshObjectIdentifier  neighborIdentifier,
-            long                  timeEventOccurred )
+            long                  timeEventOccurred,
+            MeshBase              resolver )
     {
         this(   null,
                 sourceIdentifier,
@@ -94,7 +97,8 @@ public class MeshObjectRoleAddedEvent
                 newValueIdentifiers,
                 null,
                 neighborIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
     }
 
     /**
@@ -111,6 +115,7 @@ public class MeshObjectRoleAddedEvent
      * @param neighbor the MeshObject that identifies the other end of the affected relationship
      * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected MeshObjectRoleAddedEvent(
             MeshObject            source,
@@ -123,7 +128,8 @@ public class MeshObjectRoleAddedEvent
             MeshTypeIdentifier [] newValueIdentifiers,
             MeshObject            neighbor,
             MeshObjectIdentifier  neighborIdentifier,
-            long                  timeEventOccurred )
+            long                  timeEventOccurred,
+            MeshBase              resolver )
     {
         super(  source,
                 sourceIdentifier,
@@ -135,7 +141,8 @@ public class MeshObjectRoleAddedEvent
                 newValueIdentifiers,
                 neighbor,
                 neighborIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
     }
     
     /**

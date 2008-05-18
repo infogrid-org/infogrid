@@ -238,6 +238,7 @@ public class XprisoMessageSerializationTest1
                 null,
                 nmo_ref4,
                 id3,
+                null,
                 5834L ));
 
         // Message 4
@@ -271,7 +272,8 @@ public class XprisoMessageSerializationTest1
                 new MeshTypeIdentifier[] { mt_ref5, mt_ref1 },
                 nmo_ref5,
                 id3,
-                17L ) );
+                17L,
+                null ) );
 
         // Message 6
 
@@ -280,7 +282,8 @@ public class XprisoMessageSerializationTest1
                 nmo_ref2,
                 nmo_ref3,
                 id2,
-                92L ) );
+                92L,
+                null ) );
         
         // Message 7
 
@@ -290,13 +293,15 @@ public class XprisoMessageSerializationTest1
                 new MeshTypeIdentifier[] { mt_ref4, mt_ref3 },
                 nmo_ref1,
                 id1,
-                7777L ) );
+                7777L,
+                null ) );
         seven.addRoleRemoval( new NetMeshObjectRoleRemovedEvent(
                 nmo_ref2,
                 new MeshTypeIdentifier[] { mt_ref2, mt_ref5 },
                 nmo_ref1,
                 id2,
-                8888L ) );
+                8888L,
+                null ) );
         
         // Message 8
 
@@ -305,12 +310,14 @@ public class XprisoMessageSerializationTest1
                 nmo_ref3,
                 new MeshTypeIdentifier[] { mt_ref4, mt_ref1 },
                 id2,
-                1L ) );
+                1L,
+                null ) );
         eight.addTypeRemoval( new NetMeshObjectTypeRemovedEvent(
                 nmo_ref3,
                 new MeshTypeIdentifier[] { mt_ref1, mt_ref2 },
                 id3,
-                17L ) );
+                17L,
+                null ) );
 
         // Message 7
         
@@ -321,7 +328,8 @@ public class XprisoMessageSerializationTest1
                 TimePeriodValue.create( 12L ),
                 TimePeriodValue.create( (short) 2008, (short) 1, (short) 2, (short) 3, (short) 4, 56.789f ),
                 id1,
-                17L ) );
+                17L,
+                null ) );
         
         // Put response together
         return new XprisoMessage[] {
