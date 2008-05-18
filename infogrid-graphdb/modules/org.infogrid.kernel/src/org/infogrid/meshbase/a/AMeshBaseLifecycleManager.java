@@ -221,13 +221,15 @@ public class AMeshBaseLifecycleManager
             ((AMeshObject)theObjects[i]).checkPermittedDelete(); // this may throw NotPermittedException
         }
         for( int i=0 ; i<theObjects.length ; ++i ) {
-            AMeshObject     current           = (AMeshObject) theObjects[i];
+            AMeshObject          current           = (AMeshObject) theObjects[i];
             MeshObjectIdentifier currentIdentifier = current.getIdentifier();
+            
+            ExternalizedMeshObject currentExternalized = current.asExternalized();
             
             current.delete();
             removeFromStore( current.getIdentifier() );
 
-            tx.addChange( createDeletedEvent( current, currentIdentifier, now ));
+            tx.addChange( createDeletedEvent( current, currentIdentifier, currentExternalized, now ));
         }
     }
 

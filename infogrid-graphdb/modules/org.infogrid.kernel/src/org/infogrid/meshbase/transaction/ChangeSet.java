@@ -124,6 +124,21 @@ public class ChangeSet
     {
         return ArrayHelper.copyIntoNewArray( theChanges, Change.class );
     }
+    
+    /**
+     * Obtain a Change at a particular index.
+     * 
+     * @param index the index
+     * @return the Change at the index
+     * @throws IndexOutOfBoundsException thrown if index is out of bounds
+     */
+    public Change getChange(
+            int index )
+        throws
+            IndexOutOfBoundsException
+    {
+        return theChanges.get( index );
+    }
 
     /**
      * Obtain the number of Changes in the ChangeSet.

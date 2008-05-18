@@ -186,10 +186,11 @@ public class XprisoTest1
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception all kinds of things may be wrong in tests
+     */
     public XprisoTest1(
             String [] args )
         throws

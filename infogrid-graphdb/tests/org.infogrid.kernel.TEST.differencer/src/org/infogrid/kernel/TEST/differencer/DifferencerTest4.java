@@ -67,7 +67,7 @@ public class DifferencerTest4
 
         //
         
-        log.info( "Creating MeshObjects in MeshBase1" );
+        log.info( "Creating MeshObjects in MeshBase2" );
         
         MeshBaseLifecycleManager life2 = theMeshBase2.getMeshBaseLifecycleManager();
 
