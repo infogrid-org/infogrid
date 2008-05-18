@@ -48,6 +48,8 @@ public abstract class AbstractMeshObjectLifecycleEvent
             long                 timeEventOccurred )
     {
         super( source, sourceIdentifier, deltaValue, deltaValueIdentifier, timeEventOccurred );
+        
+        theResolver = source;
     }
 
     /**
@@ -84,6 +86,16 @@ public abstract class AbstractMeshObjectLifecycleEvent
         }
     }
     
+    /**
+     * Obtain the MeshBase that is currently set as resolver for the identifiers carried by this event.
+     * 
+     * @return the MeshBase, if any
+     */
+    public MeshBase getResolver()
+    {
+        return theResolver;
+    }
+
     /**
      * Resolve the source of the event.
      *

@@ -180,7 +180,7 @@ public interface ProbeDirectory
          *
          * @return the Probe class, if one was given
          */
-        public final Class getProbeClass()
+        public final Class<? extends Probe> getProbeClass()
         {
             return theClazz;
         }

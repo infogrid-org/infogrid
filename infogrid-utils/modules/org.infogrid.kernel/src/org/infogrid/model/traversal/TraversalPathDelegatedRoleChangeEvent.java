@@ -53,7 +53,8 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
                 org.getNewValueIdentifier(),
                 org.getNeighborMeshObject(),
                 org.getNeighborMeshObjectIdentifier(),
-                org.getTimeEventOccurred() );
+                org.getTimeEventOccurred(),
+                org.getResolver() );
         
         thePath          = path;
         theOriginalEvent = org;

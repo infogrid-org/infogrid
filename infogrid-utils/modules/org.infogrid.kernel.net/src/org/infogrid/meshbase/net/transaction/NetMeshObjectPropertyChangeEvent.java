@@ -81,18 +81,21 @@ public class NetMeshObjectPropertyChangeEvent
      * @param newValue the new value of the property, after the event
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public NetMeshObjectPropertyChangeEvent(
             NetMeshObjectIdentifier sourceIdentifier,
             MeshTypeIdentifier      propertyIdentifier,
             PropertyValue           newValue,
             NetMeshBaseIdentifier   originIdentifier,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            NetMeshBase             resolver )
     {
         super(  sourceIdentifier,
                 propertyIdentifier,
                 newValue,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
 
         theOriginNetworkIdentifier = originIdentifier;
     }
@@ -106,6 +109,7 @@ public class NetMeshObjectPropertyChangeEvent
      * @param newValue the new value of the property, after the event
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public NetMeshObjectPropertyChangeEvent(
             NetMeshObjectIdentifier sourceIdentifier,
@@ -113,13 +117,15 @@ public class NetMeshObjectPropertyChangeEvent
             PropertyValue           oldValue,
             PropertyValue           newValue,
             NetMeshBaseIdentifier   originIdentifier,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            NetMeshBase             resolver )
     {
         super(  sourceIdentifier,
                 propertyIdentifier,
                 oldValue,
                 newValue,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
 
         theOriginNetworkIdentifier = originIdentifier;
     }

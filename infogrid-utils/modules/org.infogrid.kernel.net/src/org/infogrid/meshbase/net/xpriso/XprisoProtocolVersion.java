@@ -25,6 +25,8 @@ public class XprisoProtocolVersion
         implements
             Serializable
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * The currently only defined protocol version.
      */
@@ -32,6 +34,8 @@ public class XprisoProtocolVersion
 
     /**
      * Private constructor to keep a closed list.
+     * 
+     * @param versionId the version id
      */
     private XprisoProtocolVersion(
             String versionId )

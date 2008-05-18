@@ -14,17 +14,28 @@
 
 package org.infogrid.probe.xml;
 
+import java.awt.Color;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.infogrid.mesh.BlessedAlreadyException;
+import org.infogrid.mesh.EntityBlessedAlreadyException;
+import org.infogrid.mesh.EntityNotBlessedException;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
+import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.a.DefaultAnetMeshObjectIdentifier;
-
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.primitives.BooleanValue;
@@ -38,48 +49,32 @@ import org.infogrid.model.primitives.MeshType;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MultiplicityValue;
 import org.infogrid.model.primitives.PointValue;
-import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.PropertyType;
+import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.model.primitives.TimePeriodValue;
 import org.infogrid.model.primitives.TimeStampValue;
-
 import org.infogrid.modelbase.MeshTypeNotFoundException;
 import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 import org.infogrid.modelbase.ModelBase;
-
+import org.infogrid.probe.Probe;
 import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.StagingMeshBaseLifecycleManager;
-
 import org.infogrid.util.Base64;
 import org.infogrid.util.logging.Log;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.awt.Color;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.infogrid.mesh.EntityBlessedAlreadyException;
-import org.infogrid.mesh.EntityNotBlessedException;
-import org.infogrid.mesh.IllegalPropertyTypeException;
-import org.infogrid.mesh.IllegalPropertyValueException;
-import org.infogrid.mesh.IsAbstractException;
-import org.infogrid.mesh.NotRelatedException;
 
 /**
  * The NetMesh Xml Probe.
  */
 public class DomMeshObjectSetProbe
         implements
+            Probe,
             MeshObjectSetProbeTags
 {
     private static final Log log = Log.getLogInstance( DomMeshObjectSetProbe.class ); // our own, private logger
@@ -102,7 +97,8 @@ public class DomMeshObjectSetProbe
      *         If the Probe chooses to define its own policy (considering or ignoring this parameter), the
      *         Probe must bless the Probe's HomeObject with a subtype of ProbeUpdateSpecification (defined
      *         in the <code>org.infogrid.model.ProbeModel</code>) that reflects the policy.
-     * @param pmbf the interface through which the Probe instantiates MeshObjects
+     * @param freshMeshBase the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe.
+     *         This MeshBase is empty when passed into this call, except for the home object.
      * @throws DoNotHaveLockException a Probe can declare to throw this Exception,
      *         which makes programming easier, but if it actually threw it, that would be a programming error
      * @throws MeshObjectIdentifierNotUniqueException Probe throws this Exception, it indicates that the
@@ -118,7 +114,7 @@ public class DomMeshObjectSetProbe
             NetMeshBaseIdentifier  theNetworkIdentifier,
             CoherenceSpecification coherence,
             Document               theDocument,
-            StagingMeshBase        mb )
+            StagingMeshBase        freshMeshBase )
         throws
             NotPermittedException,
             MeshObjectIdentifierNotUniqueException,
@@ -126,8 +122,8 @@ public class DomMeshObjectSetProbe
             TransactionException,
             IOException
     {
-        ModelBase                       theModelBase = mb.getModelBase();
-        StagingMeshBaseLifecycleManager life         = mb.getMeshBaseLifecycleManager();
+        ModelBase                       theModelBase = freshMeshBase.getModelBase();
+        StagingMeshBaseLifecycleManager life         = freshMeshBase.getMeshBaseLifecycleManager();
         
         ArrayList<ExternalizedMeshObject> theBufferedObjects = new ArrayList<ExternalizedMeshObject>();
         
@@ -417,7 +413,7 @@ public class DomMeshObjectSetProbe
     //                    && proxy == null )
 
                     if( currentIdentifier.indexOf( '#' ) < 0 && proxy == null ) {
-                        realCurrentObject = mb.getHomeObject();
+                        realCurrentObject = freshMeshBase.getHomeObject();
 
                         realCurrentObject.bless( lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ));
 
@@ -461,11 +457,11 @@ public class DomMeshObjectSetProbe
 
             for( ExternalizedMeshObject currentObject : theBufferedObjects ) {
                 NetMeshObjectIdentifier currentObjectName = constructIdentifier( theNetworkIdentifier, null, currentObject.getIdentifier() );
-                MeshObject              realCurrentObject = mb.findMeshObjectByIdentifier( currentObjectName );
+                MeshObject              realCurrentObject = freshMeshBase.findMeshObjectByIdentifier( currentObjectName );
 
                 for( ExternalizedMeshObject.ExternalizedRelationship currentRelationship : currentObject.theRelationships ) {
                     NetMeshObjectIdentifier otherSideName = constructIdentifier( theNetworkIdentifier, null, currentRelationship.getIdentifier() );
-                    MeshObject              otherSide     = mb.findMeshObjectByIdentifier( otherSideName );
+                    MeshObject              otherSide     = freshMeshBase.findMeshObjectByIdentifier( otherSideName );
 
                     if( otherSide == null ) {
                         throw new ProbeException.SyntaxError( theNetworkIdentifier, "Referenced MeshObject could not be found: " + otherSide, null );

@@ -162,6 +162,9 @@ public abstract class AbstractMeshObject
         throws
             NotPermittedException
     {
+        if( log.isDebugEnabled() ) {
+            log.debug( this + ".setTimeExpires( " + newValue + " )" );
+        }
         checkPermittedSetTimeExpires( newValue );
         
         theTimeExpires = newValue;
@@ -418,6 +421,20 @@ public abstract class AbstractMeshObject
             NotPermittedException,
             TransactionException
     {
+        if( log.isDebugEnabled() ) {
+            log.debug(
+                    this
+                    + ".internalSetPropertyValues( "
+                    + ArrayHelper.join( ", ", "[", "]", "null", thePropertyTypes )
+                    + ", "
+                    + ArrayHelper.join( ", ", "[", "]", "null", newValues )
+                    + ", "
+                    + timeUpdated
+                    + ", "
+                    + isMaster
+                    + " )" );
+        }
+
         checkAlive();
 
         if( thePropertyTypes.length != newValues.length ) {
@@ -767,6 +784,20 @@ public abstract class AbstractMeshObject
             TransactionException,
             NotPermittedException
     {
+        if( log.isDebugEnabled() ) {
+            log.debug(
+                    this
+                    + ".internalBless( "
+                    + ArrayHelper.join( ", ", "[", "]", "null", types )
+                    + ", "
+                    + isMaster
+                    + ", "
+                    + checkIsAbstract
+                    + ", "
+                    + forgiving
+                    + " )" );
+        }
+
         checkAlive();
 
         for( int i=0 ; i<types.length ; ++i ) {
@@ -921,6 +952,16 @@ public abstract class AbstractMeshObject
             TransactionException,
             NotPermittedException
     {
+        if( log.isDebugEnabled() ) {
+            log.debug(
+                    this
+                    + ".internalBless( "
+                    + ArrayHelper.join( ", ", "[", "]", "null", types )
+                    + ", "
+                    + isMaster
+                    + " )" );
+        }
+
         checkAlive();
 
         if( types == null || types.length == 0 ) {

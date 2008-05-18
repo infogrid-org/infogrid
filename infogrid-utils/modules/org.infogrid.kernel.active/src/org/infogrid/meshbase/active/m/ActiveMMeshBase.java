@@ -48,14 +48,14 @@ public class ActiveMMeshBase
      */
     public static ActiveMMeshBase create(
             MeshBaseIdentifier identifier,
-            ModelBase     modelBase,
-            AccessManager accessMgr,
-            Context       c )
+            ModelBase          modelBase,
+            AccessManager      accessMgr,
+            Context            c )
     {
         MCachingHashMap<MeshObjectIdentifier,MeshObject> cache = MCachingHashMap.create();
 
         DefaultAMeshObjectIdentifierFactory identifierFactory = DefaultAMeshObjectIdentifierFactory.create();
-        ActiveMMeshObjectSetFactory      setFactory        = ActiveMMeshObjectSetFactory.create();
+        ActiveMMeshObjectSetFactory         setFactory        = ActiveMMeshObjectSetFactory.create( MeshObject.class, MeshObjectIdentifier.class );
 
         ActiveMMeshBase ret = new ActiveMMeshBase( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, c );
         setFactory.setMeshBase( ret );

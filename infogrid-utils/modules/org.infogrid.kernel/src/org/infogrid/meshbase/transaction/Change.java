@@ -44,6 +44,13 @@ public interface Change<S,SID,V,VID>
             MeshBase resolver );
 
     /**
+     * Obtain the MeshBase that is currently set as resolver for the identifiers carried by this event.
+     * 
+     * @return the MeshBase, if any
+     */
+    public MeshBase getResolver();
+
+    /**
      * Obtain the identifier of the MeshObject affected by this Change.
      *
      * @return the identifier of the MeshObject affected by this Change

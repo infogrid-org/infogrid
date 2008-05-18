@@ -15,7 +15,6 @@
 package org.infogrid.meshbase.net.local.store;
 
 import org.infogrid.context.Context;
-import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 
@@ -56,6 +55,8 @@ import org.infogrid.util.logging.Log;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 
@@ -266,7 +267,7 @@ public class LocalNetStoreMeshBase
             NetMessageEndpointFactory endpointFactory,
             Context                   c )
     {
-        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create();
+        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
 
         LocalNetStoreMeshBase ret = LocalNetStoreMeshBase.create(
                 identifier,
