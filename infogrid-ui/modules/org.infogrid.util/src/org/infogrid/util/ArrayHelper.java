@@ -479,8 +479,8 @@ public abstract class ArrayHelper
       * @return a newly created array of arrayComponentType
       */
     public static <T> T [] copyIntoNewArray(
-            T []     theOldArray,
-            Class<T> arrayComponentType )
+            T []               theOldArray,
+            Class<? extends T> arrayComponentType )
     {
         return copyIntoNewArray( theOldArray, 0, theOldArray.length, arrayComponentType );
     }
@@ -496,10 +496,10 @@ public abstract class ArrayHelper
       * @return a newly created array of arrayComponentType
       */
     public static <T> T [] copyIntoNewArray(
-            T []     theOldArray,
-            int      startIndex,
-            int      endIndex,
-            Class<T> arrayComponentType )
+            T []               theOldArray,
+            int                startIndex,
+            int                endIndex,
+            Class<? extends T> arrayComponentType )
     {
         T [] ret = createArray(
                 arrayComponentType,
@@ -1440,14 +1440,39 @@ public abstract class ArrayHelper
             String    separator,
             Object [] data )
     {
+        return join( separator, "", "", "null", data );
+    }
+
+    /**
+     * Join Strings, like Perl.
+     *
+     * @param separator the separator between the data elements
+     * @param prefix the prefix, if the data is non-null
+     * @param postfix the prefix, if the data is non-null
+     * @param ifNull to be written if the data is null
+     * @param data the data elements
+     * @return the joined String
+     */
+    public static String join(
+            String    separator,
+            String    prefix,
+            String    postfix,
+            String    ifNull,
+            Object [] data )
+    {
+        if( data == null ) {
+            return ifNull;
+        }
         String       sep = "";
         StringBuffer ret = new StringBuffer();
 
+        ret.append( prefix );
         for( int i=0 ; i<data.length ; ++i ) {
             ret.append( sep );
             ret.append( data[i] );
             sep = separator;
         }
+        ret.append( postfix );
         return ret.toString();
     }
 

@@ -63,7 +63,8 @@ public class MeshObjectRoleRemovedEvent
                 MeshTypeUtils.meshTypeIdentifiers( newValues ),
                 neighbor,
                 neighbor.getIdentifier(),
-                timeEventOccurred );
+                timeEventOccurred,
+                source.getMeshBase() );
     }
 
     /**
@@ -75,6 +76,7 @@ public class MeshObjectRoleRemovedEvent
      * @param newValueIdentifiers the identifier representing the new values of the RoleType, after the event
      * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public MeshObjectRoleRemovedEvent(
             MeshObjectIdentifier  sourceIdentifier,
@@ -82,7 +84,8 @@ public class MeshObjectRoleRemovedEvent
             MeshTypeIdentifier [] deltaValueIdentifiers,
             MeshTypeIdentifier [] newValueIdentifiers,
             MeshObjectIdentifier  neighborIdentifier,
-            long                  timeEventOccurred )
+            long                  timeEventOccurred,
+            MeshBase              resolver )
     {
         this(   null,
                 sourceIdentifier,
@@ -94,7 +97,8 @@ public class MeshObjectRoleRemovedEvent
                 newValueIdentifiers,
                 null,
                 neighborIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
     }
 
     /**
@@ -111,6 +115,7 @@ public class MeshObjectRoleRemovedEvent
      * @param neighbor the MeshObject that identifies the other end of the affected relationship
      * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected MeshObjectRoleRemovedEvent(
             MeshObject            source,
@@ -123,7 +128,8 @@ public class MeshObjectRoleRemovedEvent
             MeshTypeIdentifier [] newValueIdentifiers,
             MeshObject            neighbor,
             MeshObjectIdentifier  neighborIdentifier,
-            long                  timeEventOccurred )
+            long                  timeEventOccurred,
+            MeshBase              resolver )
     {
         super(  source,
                 sourceIdentifier,
@@ -135,7 +141,8 @@ public class MeshObjectRoleRemovedEvent
                 newValueIdentifiers,
                 neighbor,
                 neighborIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
     }
 
     /**

@@ -146,6 +146,7 @@ public interface JeeViewlet
      * 
      * @param request the incoming RestfulRequest
      * @param response the StructuredResponse into which to write the result
+     * @throws ServletException thrown if an error occurred
      * @throws IOException thrown if writing the output failed
      */
     public void processRequest(

@@ -27,7 +27,6 @@ import org.infogrid.modelbase.ModelBase;
 import org.infogrid.util.event.AbstractExternalizablePropertyChangeEvent;
 import org.infogrid.util.event.SourceUnresolvedException;
 import org.infogrid.util.event.ValueUnresolvedException;
-import org.infogrid.util.logging.Log;
 
 /**
  * This event indicates that a MeshObject has changed its type, i.e. by supporting
@@ -39,8 +38,6 @@ public abstract class AbstractMeshObjectTypeChangeEvent
         implements
             MeshObjectTypeChangeEvent
 {
-    private static final Log log = Log.getLogInstance( AbstractMeshObjectTypeChangeEvent.class ); // our own, private logger
-
     /**
      * Constructor.
      *
@@ -53,6 +50,7 @@ public abstract class AbstractMeshObjectTypeChangeEvent
      * @param newValue the new set of EntityTypes, after the event
      * @param newValueIdentifiers the identifiers representing the new set of EntityTypes, after the event
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected AbstractMeshObjectTypeChangeEvent(
             MeshObject           source,
@@ -63,7 +61,8 @@ public abstract class AbstractMeshObjectTypeChangeEvent
             MeshTypeIdentifier[] deltaValueIdentifiers,
             EntityType []        newValue,
             MeshTypeIdentifier[] newValueIdentifiers,
-            long                 timeEventOccurred )
+            long                 timeEventOccurred,
+            MeshBase             resolver )
     {
         super(  source,
                 sourceIdentifier,
@@ -77,9 +76,7 @@ public abstract class AbstractMeshObjectTypeChangeEvent
                 newValueIdentifiers,
                 timeEventOccurred );
 
-        if( log.isDebugEnabled() ) {
-            log.debug( "created " + this );
-        }
+        theResolver = resolver;
     }
 
     /**
@@ -130,8 +127,20 @@ public abstract class AbstractMeshObjectTypeChangeEvent
     public void setResolver(
             MeshBase mb )
     {
-        theResolver = mb;
-        clearCachedObjects();
+        if( theResolver != mb ) {
+            theResolver = mb;
+            clearCachedObjects();
+        }
+    }
+
+    /**
+     * Obtain the MeshBase that is currently set as resolver for the identifiers carried by this event.
+     * 
+     * @return the MeshBase, if any
+     */
+    public MeshBase getResolver()
+    {
+        return theResolver;
     }
 
     /**

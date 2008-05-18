@@ -16,7 +16,7 @@ package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-
+import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 
@@ -30,26 +30,41 @@ public class MeshObjectDeletedEvent
     private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
-     * Construct one.
+     * Constructor.
      * 
      * @param source the MeshBase that is the source of the event
      * @param sourceIdentifier the MeshBaseIdentifier representing the source of the event
      * @param deltaValue the MeshObject whose lifecycle changed
      * @param deltaValueIdentifier the MeshObjectIdentifier whose lifecycle changed
+     * @param externalized the deleted MeshObject in externalized form as it was just prior to deletion
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public MeshObjectDeletedEvent(
-            MeshBase             source,
-            MeshBaseIdentifier   sourceIdentifier,
-            MeshObject           deltaValue,
-            MeshObjectIdentifier deltaValueIdentifier,
-            long                 timeEventOccurred )
+            MeshBase               source,
+            MeshBaseIdentifier     sourceIdentifier,
+            MeshObject             deltaValue,
+            MeshObjectIdentifier   deltaValueIdentifier,
+            ExternalizedMeshObject externalized,
+            long                   timeEventOccurred )
     {
         super(  source,
                 sourceIdentifier,
                 deltaValue,
                 deltaValueIdentifier,
                 timeEventOccurred );
+        
+        theExternalizedMeshObject = externalized;
+    }
+
+    /**
+     * Obtain an externalized representation of the MeshObject as it was just before it
+     * was deleted.
+     * 
+     * @return externalized form of the deleted MeshObject
+     */
+    public ExternalizedMeshObject getExternalizedMeshObject()
+    {
+        return theExternalizedMeshObject;
     }
 
     /**
@@ -58,7 +73,7 @@ public class MeshObjectDeletedEvent
      *    one MeshBase to MeshObjects in another MeshBase.</p>
      *
      * <p>This method will attempt to create a Transaction if none is present on the
-     * current Thread.</p>
+     *    current Thread.</p>
      *
      * @param base the MeshBase in which to apply the Change
      * @return the MeshObject to which the Change was applied
@@ -132,4 +147,9 @@ public class MeshObjectDeletedEvent
     {
         return getAffectedMeshObjectIdentifier().hashCode();
     }
+    
+    /**
+     * The deleted MeshObject in externalized form, as it was just before the deletion.
+     */
+    protected ExternalizedMeshObject theExternalizedMeshObject;
 }

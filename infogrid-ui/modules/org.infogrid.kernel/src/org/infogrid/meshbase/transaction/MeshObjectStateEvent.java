@@ -33,20 +33,22 @@ public abstract class MeshObjectStateEvent
             Change<MeshObject,MeshObjectIdentifier,MeshObjectStateEvent.MeshObjectState,String>
 {
     /**
-      * Constructor.
-      *
+     * Constructor.
+     *
      * @param source the MeshObject that is the source of the event
      * @param sourceIdentifier the identifier representing the source MeshObject of the event
      * @param oldValue the old value of the MeshObjectState, prior to the event
      * @param newValue the new value of the MeshObjectState, after the event
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
-      */
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
+     */
     protected MeshObjectStateEvent(
             MeshObject           source,
             MeshObjectIdentifier sourceIdentifier,
             MeshObjectState      oldValue,
             MeshObjectState      newValue,
-            long                 timeEventOccurred )
+            long                 timeEventOccurred,
+            MeshBase             resolver )
     {
         super(  source,
                 sourceIdentifier,
@@ -59,6 +61,8 @@ public abstract class MeshObjectStateEvent
                 newValue,
                 newValue.toString(),
                 timeEventOccurred );
+        
+        theResolver = resolver;
     }
     
     /**
@@ -89,8 +93,20 @@ public abstract class MeshObjectStateEvent
     public void setResolver(
             MeshBase mb )
     {
-        theResolver = mb;
-        clearCachedObjects();
+        if( theResolver != mb ) {
+            theResolver = mb;
+            clearCachedObjects();
+        }
+    }
+
+    /**
+     * Obtain the MeshBase that is currently set as resolver for the identifiers carried by this event.
+     * 
+     * @return the MeshBase, if any
+     */
+    public MeshBase getResolver()
+    {
+        return theResolver;
     }
 
     /**
@@ -121,7 +137,7 @@ public abstract class MeshObjectStateEvent
     /**
      * The resolver of identifiers carried by this event.
      */
-    protected MeshBase theResolver;
+    protected transient MeshBase theResolver;
 
     /**
      * Common super-interface for all MeshObjectStates.

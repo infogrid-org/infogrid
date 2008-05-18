@@ -15,6 +15,7 @@
 package org.infogrid.mesh.set;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.model.traversal.TraversalPath;
 
@@ -240,4 +241,14 @@ public interface MeshObjectSetFactory
      */
     public ImmutableTraversalPathSet createImmutableTraversalPathSet(
             MeshObjectSet set );
+
+    /**
+     * Convenience method to return an array of MeshObjects as an
+     * array of the canonical Identifiers of the member MeshObjects.
+     *
+     * @param array the MeshObjects 
+     * @return the array of IdentifierValues representing the Identifiers
+     */
+    public MeshObjectIdentifier[] asIdentifiers(
+            MeshObject [] array );
 }

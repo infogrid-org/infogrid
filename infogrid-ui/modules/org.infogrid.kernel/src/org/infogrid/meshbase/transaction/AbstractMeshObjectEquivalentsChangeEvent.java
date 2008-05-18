@@ -44,6 +44,7 @@ public abstract class AbstractMeshObjectEquivalentsChangeEvent
      * @param newValues the new value of the equivalents, after the event
      * @param newValueIdentifiers the identifiers representing the new values of the equivalents, after the event
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected AbstractMeshObjectEquivalentsChangeEvent(
             MeshObject              source,
@@ -54,7 +55,8 @@ public abstract class AbstractMeshObjectEquivalentsChangeEvent
             MeshObjectIdentifier [] deltaValueIdentifiers,
             MeshObject []           newValues,
             MeshObjectIdentifier [] newValueIdentifiers,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            MeshBase                resolver )
     {
         super(  source,
                 sourceIdentifier,
@@ -67,6 +69,8 @@ public abstract class AbstractMeshObjectEquivalentsChangeEvent
                 newValues,
                 newValueIdentifiers,
                 timeEventOccurred );
+        
+        theResolver = resolver;
     }
 
     /**
@@ -104,8 +108,20 @@ public abstract class AbstractMeshObjectEquivalentsChangeEvent
     public void setResolver(
             MeshBase mb )
     {
-        theResolver = mb;
-        clearCachedObjects();
+        if( theResolver != mb ) {
+            theResolver = mb;
+            clearCachedObjects();
+        }
+    }
+    
+    /**
+     * Obtain the MeshBase that is currently set as resolver for the identifiers carried by this event.
+     * 
+     * @return the MeshBase, if any
+     */
+    public MeshBase getResolver()
+    {
+        return theResolver;
     }
 
     /**
