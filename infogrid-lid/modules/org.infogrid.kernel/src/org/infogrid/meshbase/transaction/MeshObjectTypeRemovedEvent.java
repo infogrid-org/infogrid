@@ -58,7 +58,8 @@ public class MeshObjectTypeRemovedEvent
                 MeshTypeUtils.meshTypeIdentifiers( deltaValues ),
                 newValues,
                 MeshTypeUtils.meshTypeIdentifiers( newValues ),
-                timeEventOccurred );
+                timeEventOccurred,
+                source.getMeshBase() );
     }
 
     /**
@@ -69,11 +70,13 @@ public class MeshObjectTypeRemovedEvent
      * @param sourceIdentifier the identifier for the MeshObject whose type changed
      * @param deltaValues the EntityTypes that were removed
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public MeshObjectTypeRemovedEvent(
             MeshObjectIdentifier  sourceIdentifier,
             MeshTypeIdentifier [] deltaValues,
-            long                  timeEventOccurred )
+            long                  timeEventOccurred,
+            MeshBase              resolver )
     {
         super(  null,
                 sourceIdentifier,
@@ -83,7 +86,8 @@ public class MeshObjectTypeRemovedEvent
                 deltaValues,
                 null,
                 null,
-                timeEventOccurred );        
+                timeEventOccurred,
+                resolver );        
     }
     
     /**
@@ -94,13 +98,15 @@ public class MeshObjectTypeRemovedEvent
      * @param deltaValueIdentifiers the identifiers of the EntityTypes that were removed
      * @param newValueIdentifiers the identifiers of the new set of EntityTypes, after the event
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public MeshObjectTypeRemovedEvent(
             MeshObjectIdentifier  sourceIdentifier,
             MeshTypeIdentifier [] oldValueIdentifiers,
             MeshTypeIdentifier [] deltaValueIdentifiers,
             MeshTypeIdentifier [] newValueIdentifiers,
-            long                  timeEventOccurred )
+            long                  timeEventOccurred,
+            MeshBase              resolver )
     {
         super(  null,
                 sourceIdentifier,
@@ -110,7 +116,8 @@ public class MeshObjectTypeRemovedEvent
                 deltaValueIdentifiers,
                 null,
                 newValueIdentifiers,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
     }
 
     /**

@@ -154,26 +154,9 @@ public abstract class AbstractMeshObjectSet
      */
     public MeshObjectIdentifier[] asIdentifiers()
     {
-        return asIdentifiers( getMeshObjects() );
+        return theFactory.asIdentifiers( getMeshObjects() );
     }
 
-    /**
-     * Convenience method to return an array of MeshObjects as an
-     * array of the canonical Identifiers of the member MeshObjects.
-     *
-     * @param array the MeshObjects 
-     * @return the array of IdentifierValues representing the Identifiers
-     */
-    public static MeshObjectIdentifier[] asIdentifiers(
-            MeshObject [] array )
-    {
-        MeshObjectIdentifier [] ret = new MeshObjectIdentifier[ array.length ];
-        for( int i=0 ; i<ret.length ; ++i ) {
-            ret[i] = array[i].getIdentifier();
-        }
-        return ret;
-    }
-    
     /**
      * Obtain an Iterator over all members of this set.
      *

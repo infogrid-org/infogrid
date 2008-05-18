@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.net.transaction;
 
+import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 
@@ -43,6 +44,7 @@ public class ReplicaPurgedEvent
      * @param deletedObject the NetMeshObject that was deleted
      * @param deletedObjectIdentifier the identifier of the NetMeshObject that was deleted
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
+     * @param externalized the deleted MeshObject in externalized form as it was just prior to deletion
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public ReplicaPurgedEvent(
@@ -51,9 +53,10 @@ public class ReplicaPurgedEvent
             NetMeshObject           deletedObject,
             NetMeshObjectIdentifier deletedObjectIdentifier,
             NetMeshBaseIdentifier   originIdentifier,
+            ExternalizedMeshObject  externalized,
             long                    timeEventOccurred )
     {
-        super( source, sourceIdentifier, deletedObject, deletedObjectIdentifier, originIdentifier, timeEventOccurred );
+        super( source, sourceIdentifier, deletedObject, deletedObjectIdentifier, originIdentifier, externalized, timeEventOccurred );
     }
 
     /**

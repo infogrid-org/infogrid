@@ -31,16 +31,16 @@ import org.infogrid.util.logging.Log;
 import java.util.Iterator;
 
 /**
- *
+ * Provides functionality useful for ProbeTests.
  */
 public abstract class AbstractProbeTest
         extends
             AbstractTest
 {
-    private static final Log log = Log.getLogInstance( AbstractProbeTest.class );
-
     /**
      * Constructor.
+     * 
+     * @param testClass the Class to be tested
      */
     protected AbstractProbeTest(
             Class testClass )
@@ -60,7 +60,7 @@ public abstract class AbstractProbeTest
             IterableNetMeshBase base,
             Log                 mylog )
     {
-        int ret = countFromIterator( base.iterator(), mylog );
+        int    ret = countFromIterator( base.iterator(), mylog );
         return ret;
     }
 
@@ -91,11 +91,12 @@ public abstract class AbstractProbeTest
     }
 
     /**
-     * Dump the content of a MeshBase to log.debug().
+     * Dump the content of a MeshBase to the debug channel of a Log.
      *
      * @param mb the MeshBase whose content we want to dump
      * @param prefix a string to prepend
      * @param mylog the Log to dump to
+     * @throws Exception catch-all Exception
      */
     protected final void dumpMeshBase(
             IterableMeshBase mb,
@@ -139,7 +140,10 @@ public abstract class AbstractProbeTest
     }
 
     /**
-     * Dump a ChangeSet.
+     * Dump a ChangeSet to the debug channel of a Log.
+     * 
+     * @param changes the ChangeSet to dump
+     * @param mylog the Log
      */
     protected final void dumpChangeSet(
             ChangeSet changes,

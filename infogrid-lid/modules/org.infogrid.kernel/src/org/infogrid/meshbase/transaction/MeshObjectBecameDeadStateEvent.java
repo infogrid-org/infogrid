@@ -45,7 +45,8 @@ public class MeshObjectBecameDeadStateEvent
                 canonicalIdentifier,
                 Value.ALIVE,
                 Value.DEAD,
-                timeEventOccurred );
+                timeEventOccurred,
+                null ); // FIXME? Is null the right value here?
     }
 
     /**

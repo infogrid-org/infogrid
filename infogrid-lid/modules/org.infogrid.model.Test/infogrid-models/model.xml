@@ -123,6 +123,16 @@
             <supertype>org.infogrid.model.Test#C</supertype>
         </entitytype>
         
+        <entitytype ID="org.infogrid.model.Test#Simple1">
+            <name>Simple1</name>
+        </entitytype>
+        <entitytype ID="org.infogrid.model.Test#Simple2">
+            <name>Simple2</name>
+        </entitytype>
+        <entitytype ID="org.infogrid.model.Test#Simple3">
+            <name>Simple3</name>
+        </entitytype>
+
         <entitytype ID="org.infogrid.model.Test#PropertyTest">
             <name>PropertyTest</name>
             <userdescription>Holds properties of all InfoGrid PropertyTypes.</userdescription>

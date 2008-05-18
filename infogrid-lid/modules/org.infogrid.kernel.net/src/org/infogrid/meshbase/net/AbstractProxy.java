@@ -1015,6 +1015,28 @@ public abstract class AbstractProxy
             }
         }        
         
+        // surrender the forcefully reacquired locks -- FIXME? More checking might be needed to avoid mischief
+        if( incoming.getReclaimedLockObjects() != null ) {
+            NetMeshObjectIdentifier [] requestLock      = incoming.getReclaimedLockObjects();
+            NetMeshObjectIdentifier [] pushLockExisting = new NetMeshObjectIdentifier[ requestLock.length ];
+
+            int iPushLock = 0;
+            for( int i=0 ; i<requestLock.length ; ++i ) {
+                NetMeshObject current = theMeshBase.findMeshObjectByIdentifier( requestLock[i] );
+                // FIXME: also check access rights
+                if( current == null ) {
+                    log.warn( "cannot find MeshObject with Identifier " + requestLock[i].toExternalForm() );
+                    continue;
+                }
+                // don't check whether it will give up lock -- it must
+                current.forceObtainLock();
+                pushLockExisting[ iPushLock++ ] = requestLock[i];
+                current.surrenderLock( this );
+                meshObjectModifiedDuringMessageProcessing( current );
+            }
+            // currently we do not send pushed locks back -- FIXME?
+        }
+
         // try to release the requested locks
         if( incoming.getRequestedLockObjects() != null ) {
             NetMeshObjectIdentifier [] requestLock      = incoming.getRequestedLockObjects();

@@ -73,7 +73,8 @@ public interface ApiProbe
      *         If the Probe chooses to define its own policy (considering or ignoring this parameter), the
      *         Probe must bless the Probe's HomeObject with a subtype of ProbeUpdateSpecification (defined
      *         in the <code>org.infogrid.model.Probe</code> Subject Area) that reflects the policy.
-     * @param mb the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe
+     * @param freshMeshBase the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe.
+     *         This MeshBase is empty when passed into this call, except for the home object.
      * @throws IsAbstractException thrown if an EntityType or a Relationship could not be instantiated because
      *         it was abstract. Throwing this typically indicates a programming error.
      * @throws EntityBlessedAlreadyException thrown if a MeshObject was incorrectly blessed twice with the same
@@ -104,7 +105,7 @@ public interface ApiProbe
     public void readFromApi(
             NetMeshBaseIdentifier  dataSourceIdentifier,
             CoherenceSpecification coherenceSpecification,
-            StagingMeshBase        mb )
+            StagingMeshBase        freshMeshBase )
         throws
             IsAbstractException,
             EntityBlessedAlreadyException,

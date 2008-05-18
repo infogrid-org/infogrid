@@ -15,6 +15,7 @@
 package org.infogrid.mesh.set;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.util.ArrayHelper;
 
@@ -27,10 +28,17 @@ public abstract class AbstractMeshObjectSetFactory
 {
     /**
      * Constructor for subclasses only.
+     * 
+     * @param componentClass           the Class to use to allocate arrays of MeshObjects
+     * @param componentIdentifierClass the Class to use to allocate arrays of MeshObjectIdentifiers
      */
-    protected AbstractMeshObjectSetFactory()
+    protected AbstractMeshObjectSetFactory(
+            Class<? extends MeshObject>           componentClass,
+            Class<? extends MeshObjectIdentifier> componentIdentifierClass )
     {
-        theMeshBase = null; // not initialized
+        theComponentClass           = componentClass;
+        theComponentIdentifierClass = componentIdentifierClass;
+        theMeshBase                 = null; // not initialized
     }
     
     /**
@@ -86,7 +94,7 @@ public abstract class AbstractMeshObjectSetFactory
         MeshObject [] inputContent = input.getMeshObjects();
         MeshObject [] content;
         if( selector != null ) {
-            content = new MeshObject[ inputContent.length ];
+            content = ArrayHelper.createArray( theComponentClass, inputContent.length );
             int count = 0;
             for( int i=0 ; i<inputContent.length ; ++i ) {
                 if( selector.accepts( inputContent[i] )) {
@@ -94,7 +102,7 @@ public abstract class AbstractMeshObjectSetFactory
                 }
             }
             if( count < content.length ) {
-                content = ArrayHelper.copyIntoNewArray( content, 0, count, MeshObject.class );
+                content = ArrayHelper.copyIntoNewArray( content, 0, count, theComponentClass );
             }
         } else {
             content = inputContent;
@@ -219,7 +227,7 @@ public abstract class AbstractMeshObjectSetFactory
      * @param selector selector for the resulting MeshObjects
      * @return the MeshObjects that are contained in the inputSets, but without duplicates
      */
-    protected static MeshObject [] unify(
+    protected MeshObject [] unify(
             MeshObjectSet []   inputSets,
             MeshObjectSelector selector )
     {
@@ -228,7 +236,7 @@ public abstract class AbstractMeshObjectSetFactory
             count += inputSets[i].size();
         }
 
-        MeshObject [] objs = new MeshObject[ count ];
+        MeshObject [] objs = ArrayHelper.createArray( theComponentClass, count );
 
         count = 0;
         for( int i=0 ; i<inputSets.length ; ++i ) {
@@ -257,13 +265,13 @@ public abstract class AbstractMeshObjectSetFactory
      * @param selector selector for the resulting MeshObjects
      * @return the MeshObjects that are contained in all of the inputSets
      */
-    protected static MeshObject [] intersect(
+    protected MeshObject [] intersect(
             MeshObjectSet []   inputSets,
             MeshObjectSelector selector )
     {
         MeshObject [] ret = ArrayHelper.copyIntoNewArray(
                 inputSets[0].getMeshObjects(),
-                MeshObject.class ); // shorten later, this is max
+                theComponentClass ); // shorten later, this is max
 
         int takenOut = 0;
         for( int i=1; i<inputSets.length ; ++i ) {
@@ -284,7 +292,7 @@ public abstract class AbstractMeshObjectSetFactory
         if( takenOut > 0 ) {
             MeshObject [] old = ret;
 
-            ret = new MeshObject[ old.length - takenOut ];
+            ret = ArrayHelper.createArray( theComponentClass, old.length - takenOut );
 
             for( int i=0, j=0 ; i<old.length ; ++i ) {
                 if( old[i] != null ) {
@@ -296,7 +304,34 @@ public abstract class AbstractMeshObjectSetFactory
     }
 
     /**
+     * Convenience method to return an array of MeshObjects as an
+     * array of the canonical Identifiers of the member MeshObjects.
+     *
+     * @param array the MeshObjects 
+     * @return the array of IdentifierValues representing the Identifiers
+     */
+    public MeshObjectIdentifier[] asIdentifiers(
+            MeshObject [] array )
+    {
+        MeshObjectIdentifier [] ret = ArrayHelper.createArray( theComponentIdentifierClass, array.length );
+        for( int i=0 ; i<ret.length ; ++i ) {
+            ret[i] = array[i].getIdentifier();
+        }
+        return ret;
+    }
+    
+    /**
      * The MeshBase to which this MeshObjectSetFactory belongs.
      */
     protected MeshBase theMeshBase;
+    
+    /**
+     * The Class to use to allocate arrays of MeshObject.
+     */
+    protected Class<? extends MeshObject> theComponentClass;
+    
+    /**
+     * The Class to use to allocate arrays of MeshObjectIdentifier.
+     */
+    protected Class<? extends MeshObjectIdentifier> theComponentIdentifierClass;
 }

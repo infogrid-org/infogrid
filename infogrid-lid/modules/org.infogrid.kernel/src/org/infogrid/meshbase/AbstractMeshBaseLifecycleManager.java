@@ -21,6 +21,7 @@ import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObject;
 import org.infogrid.meshbase.security.AccessManager;
 
@@ -437,19 +438,22 @@ public abstract class AbstractMeshBaseLifecycleManager
      * @param deletedObject the deleted MeshObject
      * @param canonicalIdentifier the canonical MeshObjectIdentifier of the deleted MeshObject.
      *        Once a MeshObject has been deleted, its canonical MeshObjectIdentifier can no longer be determined
+     * @param externalizedDeletedObject external form of the deleted MeshObject
      * @param timeEventOccurred the time when the event occurred
      * @return the created event
      */
     protected MeshObjectDeletedEvent createDeletedEvent(
-            MeshObject           deletedObject,
-            MeshObjectIdentifier canonicalIdentifier,
-            long                 timeEventOccurred )
+            MeshObject             deletedObject,
+            MeshObjectIdentifier   canonicalIdentifier,
+            ExternalizedMeshObject externalizedDeletedObject,
+            long                   timeEventOccurred )
     {
         MeshObjectDeletedEvent ret = new MeshObjectDeletedEvent(
                 theMeshBase,
                 theMeshBase.getIdentifier(),
                 deletedObject,
                 canonicalIdentifier,
+                externalizedDeletedObject,
                 timeEventOccurred );
         return ret;
     }

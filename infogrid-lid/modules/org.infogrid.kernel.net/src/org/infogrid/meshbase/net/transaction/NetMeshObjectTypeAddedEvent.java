@@ -75,16 +75,19 @@ public class NetMeshObjectTypeAddedEvent
      * @param deltaValueIdentifiers the identifiers of the EntityTypes that were added
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public NetMeshObjectTypeAddedEvent(
             NetMeshObjectIdentifier sourceIdentifier,
             MeshTypeIdentifier []   deltaValueIdentifiers,
             NetMeshBaseIdentifier   originIdentifier,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            NetMeshBase             resolver )
     {
         super(  sourceIdentifier,
                 deltaValueIdentifiers,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
         
         theOriginNetworkIdentifier = originIdentifier;
     }
@@ -98,6 +101,7 @@ public class NetMeshObjectTypeAddedEvent
      * @param newValueIdentifiers the identifiers of the new set of EntityTypes, after the event
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public NetMeshObjectTypeAddedEvent(
             NetMeshObjectIdentifier sourceIdentifier,
@@ -105,13 +109,15 @@ public class NetMeshObjectTypeAddedEvent
             MeshTypeIdentifier []   deltaValueIdentifiers,
             MeshTypeIdentifier []   newValueIdentifiers,
             NetMeshBaseIdentifier   originIdentifier,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            NetMeshBase             resolver )
     {
         super(  sourceIdentifier,
                 oldValueIdentifiers,
                 deltaValueIdentifiers,
                 newValueIdentifiers,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
         
         theOriginNetworkIdentifier = originIdentifier;
     }

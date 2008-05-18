@@ -28,6 +28,8 @@ import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.RelatedAlreadyException;
+import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.mesh.set.active.ActiveMeshObjectSet;
 import org.infogrid.mesh.set.active.ActiveMeshObjectSetFactory;
@@ -75,7 +77,7 @@ public class ShadowEventTest1
                         TEST1_URL.toExternalForm(),
                         TestApiProbe.class ));
         
-        ActiveMeshObjectSetFactory setFactory = ActiveMMeshObjectSetFactory.create();
+        ActiveMeshObjectSetFactory setFactory = ActiveMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
 
         LocalNetMMeshBase base = LocalNetMMeshBase.create( here, setFactory, theModelBase, null, exec, probeDirectory, rootContext );
 

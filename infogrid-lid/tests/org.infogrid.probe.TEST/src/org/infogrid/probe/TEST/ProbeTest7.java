@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 import org.infogrid.probe.m.MProbeDirectory;
 
@@ -100,7 +102,7 @@ public class ProbeTest7
                 
         CachingMap<MeshObjectIdentifier,MeshObject> theCache          = MCachingHashMap.create();
         DefaultAnetMeshObjectIdentifierFactory      identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( here );
-        ImmutableMMeshObjectSetFactory              setFactory        = ImmutableMMeshObjectSetFactory.create();
+        ImmutableMMeshObjectSetFactory              setFactory        = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
         
         
         LocalNetMMeshBase base = new LocalNetMMeshBase(

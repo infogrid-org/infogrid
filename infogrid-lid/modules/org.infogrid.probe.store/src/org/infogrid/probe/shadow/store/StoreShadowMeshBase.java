@@ -18,6 +18,8 @@ import org.infogrid.context.Context;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 
 import org.infogrid.mesh.set.MeshObjectSetFactory;
@@ -94,7 +96,7 @@ public class StoreShadowMeshBase
         StoreProxyManager proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
 
         NetMeshObjectIdentifierFactory identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( identifier );
-        ImmutableMMeshObjectSetFactory setFactory        = ImmutableMMeshObjectSetFactory.create();
+        ImmutableMMeshObjectSetFactory setFactory        = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
 
         StoreShadowMeshBase ret = new StoreShadowMeshBase(
                 identifier,
@@ -145,7 +147,7 @@ public class StoreShadowMeshBase
         StoreProxyManager proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
 
         NetMeshObjectIdentifierFactory identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( identifier );
-        ImmutableMMeshObjectSetFactory setFactory        = ImmutableMMeshObjectSetFactory.create();
+        ImmutableMMeshObjectSetFactory setFactory        = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
 
         StoreShadowMeshBase ret = new StoreShadowMeshBase(
                 identifier,

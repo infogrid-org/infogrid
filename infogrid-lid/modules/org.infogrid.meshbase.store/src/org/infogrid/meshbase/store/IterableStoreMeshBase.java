@@ -69,7 +69,7 @@ public class IterableStoreMeshBase
             IterableStore      meshObjectStore,
             Context            c )
     {
-        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create();
+        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create( MeshObject.class, MeshObjectIdentifier.class );
 
         IterableStoreMeshBase ret = IterableStoreMeshBase.create( identifier, setFactory, modelBase, accessMgr, meshObjectStore, c );
 

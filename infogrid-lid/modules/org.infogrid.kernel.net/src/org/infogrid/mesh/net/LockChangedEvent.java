@@ -61,12 +61,15 @@ public abstract class LockChangedEvent
     /**
      * Set a NetMeshBase as a resolver.
      * 
-     * @param resolver the resolver
+     * @param mb the resolver
      */
     public void setResolver(
-            NetMeshBase resolver )
+            NetMeshBase mb )
     {
-        theResolver = resolver;
+        if( theResolver != mb ) {
+            theResolver = mb;
+            clearCachedObjects();
+        }
     }
 
     /**
