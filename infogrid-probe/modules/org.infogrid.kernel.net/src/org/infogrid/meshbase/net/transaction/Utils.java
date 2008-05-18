@@ -64,6 +64,33 @@ public abstract class Utils
     }
     
     /**
+     * Determine whether a given Proxy points away from the source of the NetChange.
+     *
+     * @param proxyIdentifiers the identifiers of the partner NetMeshBases that the NetMeshObject interacts with, if any
+     * @param lockIdentifier the identifier of the partner NetMeshBase in whose direction the lock may be found, if any
+     * @param proxy the Proxy
+     * @return true if the Proxy points away from the source of the change
+     */
+    public static boolean awayFromLock(
+            NetMeshBaseIdentifier [] proxyIdentifiers,
+            NetMeshBaseIdentifier    lockIdentifier,
+            Proxy                    proxy )
+    {
+        if( proxyIdentifiers == null ) {
+            return false;
+        }
+        if( lockIdentifier != null && lockIdentifier.equals( proxy.getPartnerMeshBaseIdentifier() )) {
+            return false;
+        }
+        for( NetMeshBaseIdentifier p : proxyIdentifiers ) {
+            if( p.equals( proxy.getPartnerMeshBaseIdentifier() )) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Determine whether there is a replica of the affected NetMeshObject
      * in a given NetChange, in the direction of a given Proxy, exluding another
      * that is known by the NetMeshBaseIdentifier of the NetMeshBase it interacts

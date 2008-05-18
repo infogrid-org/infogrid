@@ -70,7 +70,8 @@ public class NetMeshObjectRoleAddedEvent
                 neighbor,
                 neighbor.getIdentifier(),
                 originIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                source.getMeshBase() );
     }
 
     /**
@@ -104,7 +105,8 @@ public class NetMeshObjectRoleAddedEvent
                 null,
                 neighborIdentifier,
                 originIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                source.getMeshBase() );
     }
 
     /**
@@ -117,13 +119,15 @@ public class NetMeshObjectRoleAddedEvent
      * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public NetMeshObjectRoleAddedEvent(
             NetMeshObjectIdentifier sourceIdentifier,
             MeshTypeIdentifier []   deltaValueIdentifiers,
             NetMeshObjectIdentifier neighborIdentifier,
             NetMeshBaseIdentifier   originIdentifier,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            NetMeshBase             resolver )
     {
         this(   null,
                 sourceIdentifier,
@@ -136,7 +140,8 @@ public class NetMeshObjectRoleAddedEvent
                 null,
                 neighborIdentifier,
                 originIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
     }
 
     /**
@@ -154,6 +159,7 @@ public class NetMeshObjectRoleAddedEvent
      * @param neighborIdentifier the identifier representing the MeshObject that identifies the other end of the affected relationship
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected NetMeshObjectRoleAddedEvent(
             NetMeshObject           source,
@@ -167,7 +173,8 @@ public class NetMeshObjectRoleAddedEvent
             NetMeshObject           neighbor,
             NetMeshObjectIdentifier neighborIdentifier,
             NetMeshBaseIdentifier   originIdentifier,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            NetMeshBase             resolver )
     {
         super(  source,
                 sourceIdentifier,
@@ -179,7 +186,8 @@ public class NetMeshObjectRoleAddedEvent
                 newValueIdentifiers,
                 neighbor,
                 neighborIdentifier,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
 
         theOriginNetworkIdentifier = originIdentifier;
     }

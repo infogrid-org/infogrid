@@ -64,7 +64,8 @@ public class MeshObjectNeighborAddedEvent
                 new MeshObjectIdentifier[] { deltaNeighbor.getIdentifier() },
                 newNeighbors,
                 MeshObjectUtils.meshObjectIdentifiers( newNeighbors ),
-                timeEventOccurred );
+                timeEventOccurred,
+                meshObject.getMeshBase() );
     }
 
     /**
@@ -95,7 +96,8 @@ public class MeshObjectNeighborAddedEvent
                 new MeshObjectIdentifier[] { deltaNeighborIdentifier },
                 null,
                 newNeighborIdentifiers,
-                timeEventOccurred );
+                timeEventOccurred,
+                meshObject.getMeshBase() );
     }
 
     /**
@@ -107,6 +109,7 @@ public class MeshObjectNeighborAddedEvent
      * @param deltaNeighborIdentifier the identifier of the neighbor MeshObject affected by this event
      * @param newNeighborIdentifiers the identifiers of the neighbor MeshObjects after the event
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     public MeshObjectNeighborAddedEvent(
             MeshObjectIdentifier    meshObjectIdentifier,
@@ -114,7 +117,8 @@ public class MeshObjectNeighborAddedEvent
             MeshObjectIdentifier [] oldNeighborIdentifiers,
             MeshObjectIdentifier    deltaNeighborIdentifier,
             MeshObjectIdentifier [] newNeighborIdentifiers,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            MeshBase                resolver )
     {
         this(   null,
                 meshObjectIdentifier,
@@ -126,7 +130,8 @@ public class MeshObjectNeighborAddedEvent
                 new MeshObjectIdentifier[] { deltaNeighborIdentifier },
                 null,
                 newNeighborIdentifiers,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
     }
 
     /**
@@ -143,6 +148,7 @@ public class MeshObjectNeighborAddedEvent
      * @param newNeighbors the set of neighbor MeshObjects after the event (optional)
      * @param newNeighborIdentifiers the Identifiers of the neighbor MeshObjects after the event (required)
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected MeshObjectNeighborAddedEvent(
             MeshObject              meshObject,
@@ -155,7 +161,8 @@ public class MeshObjectNeighborAddedEvent
             MeshObjectIdentifier [] deltaNeighborIdentifiers,
             MeshObject []           newNeighbors,
             MeshObjectIdentifier [] newNeighborIdentifiers,
-            long                    timeEventOccurred )
+            long                    timeEventOccurred,
+            MeshBase                resolver )
     {
         super(  meshObject,
                 meshObjectIdentifier,
@@ -167,7 +174,8 @@ public class MeshObjectNeighborAddedEvent
                 deltaNeighborIdentifiers,
                 newNeighbors,
                 newNeighborIdentifiers,
-                timeEventOccurred );
+                timeEventOccurred,
+                resolver );
     }
 
     /**

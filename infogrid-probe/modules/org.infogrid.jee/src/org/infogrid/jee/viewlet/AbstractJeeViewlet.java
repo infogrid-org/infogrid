@@ -26,7 +26,6 @@ import org.infogrid.util.http.HTTP;
 import org.infogrid.util.logging.Log;
 import org.infogrid.viewlet.AbstractViewedMeshObjects;
 import org.infogrid.viewlet.AbstractViewlet;
-import org.infogrid.viewlet.CannotViewException;
 
 /**
  * Factors out commonly used functionality for JeeViewlets.
@@ -174,6 +173,8 @@ public abstract class AbstractJeeViewlet
 
     /**
      * Obtain the full URI of the incoming request.
+     * 
+     * @return the full URI, as String
      */
     public String getRequestURI()
     {
@@ -193,6 +194,8 @@ public abstract class AbstractJeeViewlet
      * 
      * @param restful the incoming RestfulRequest
      * @param structured the StructuredResponse into which to write the result
+     * @throws javax.servlet.ServletException processing failed
+     * @throws java.io.IOException I/O error
      */
     public void processRequest(
             RestfulRequest     restful,

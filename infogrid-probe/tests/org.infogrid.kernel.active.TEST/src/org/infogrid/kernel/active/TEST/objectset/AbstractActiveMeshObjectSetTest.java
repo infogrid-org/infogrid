@@ -69,7 +69,7 @@ public abstract class AbstractActiveMeshObjectSetTest
         
         theMeshBase = MMeshBase.create( MeshBaseIdentifier.create( "testMeshBase" ), theModelBase, null, rootContext );
 
-        theMeshObjectSetFactory = ActiveMMeshObjectSetFactory.create();
+        theMeshObjectSetFactory = ActiveMMeshObjectSetFactory.create( MeshObject.class, MeshObjectIdentifier.class );
         theMeshObjectSetFactory.setMeshBase( theMeshBase );        
     }
 

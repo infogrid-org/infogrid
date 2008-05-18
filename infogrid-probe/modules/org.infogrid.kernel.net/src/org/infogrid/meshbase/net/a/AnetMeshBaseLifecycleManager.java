@@ -596,13 +596,14 @@ public class AnetMeshBaseLifecycleManager
             ((AnetMeshObject)theObjects[i]).checkPermittedDelete(); // this may throw NotPermittedException
         }
         for( int i=0 ; i<theObjects.length ; ++i ) {
-            AnetMeshObject  current              = (AnetMeshObject) theObjects[i];
-            MeshObjectIdentifier currentCanonicalName = current.getIdentifier();
+            AnetMeshObject         current              = (AnetMeshObject) theObjects[i];
+            MeshObjectIdentifier   currentCanonicalName = current.getIdentifier();
+            ExternalizedMeshObject externalized         = current.asExternalized( true );
             
             current.delete();
             removeFromStore( current.getIdentifier() );
 
-            tx.addChange( createDeletedEvent( current, currentCanonicalName, now ));
+            tx.addChange( createDeletedEvent( current, currentCanonicalName, externalized, now ));
         }
     }
 
@@ -818,9 +819,10 @@ public class AnetMeshBaseLifecycleManager
 
         for( NetMeshObject current : replicas ) {
             try {
+                NetMeshObjectIdentifier identifier   = current.getIdentifier();
+                ExternalizedMeshObject  externalized = current.asExternalized( true );
+
                 ((AnetMeshObject) current).purge();
-                
-                NetMeshObjectIdentifier identifier = current.getIdentifier();
                 
                 removeFromStore( identifier );
                 
@@ -830,6 +832,7 @@ public class AnetMeshBaseLifecycleManager
                         current,
                         identifier,
                         incomingProxyIdentifier,
+                        externalized,
                         time ));
 
             } catch( NotPermittedException ex ) {
@@ -880,8 +883,9 @@ public class AnetMeshBaseLifecycleManager
     {
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
 
-        AnetMeshObject  theObject      = (AnetMeshObject) realBase.findMeshObjectByIdentifier( identifier );
-        MeshObjectIdentifier realIdentifier = theObject.getIdentifier();
+        AnetMeshObject         theObject      = (AnetMeshObject) realBase.findMeshObjectByIdentifier( identifier );
+        MeshObjectIdentifier   realIdentifier = theObject.getIdentifier();
+        ExternalizedMeshObject externalized   = theObject.asExternalized( true );
         
         Transaction tx = realBase.checkTransaction();
 
@@ -891,7 +895,7 @@ public class AnetMeshBaseLifecycleManager
         theObject.delete();
         removeFromStore( theObject.getIdentifier() );
 
-        Proxy             incomingProxy           = realBase.determineIncomingProxy();
+        Proxy                 incomingProxy           = realBase.determineIncomingProxy();
         NetMeshBaseIdentifier incomingProxyIdentifier = incomingProxy != null ? incomingProxy.getPartnerMeshBaseIdentifier() : null;
 
         tx.addChange( new NetMeshObjectDeletedEvent(
@@ -900,6 +904,7 @@ public class AnetMeshBaseLifecycleManager
                 theObject,
                 realIdentifier,
                 incomingProxyIdentifier,
+                externalized,
                 timeEventOccurred ));
 
         return theObject;
@@ -1192,14 +1197,16 @@ public class AnetMeshBaseLifecycleManager
      * @param deletedObject the deleted MeshObject
      * @param canonicalIdentifier the canonical MeshObjectIdentifier of the deleted MeshObject.
      *        Once a MeshObject has been deleted, its canonical MeshObjectIdentifier can no longer be determined
+     * @param externalized external form of the MeshObject just before it was deleted
      * @param timeEventOccurred the time when the event occurred
      * @return the created event
      */
     @Override
     protected NetMeshObjectDeletedEvent createDeletedEvent(
-            MeshObject           deletedObject,
-            MeshObjectIdentifier canonicalIdentifier,
-            long                 timeEventOccurred )
+            MeshObject             deletedObject,
+            MeshObjectIdentifier   canonicalIdentifier,
+            ExternalizedMeshObject externalized,
+            long                   timeEventOccurred )
     {
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
 
@@ -1212,6 +1219,7 @@ public class AnetMeshBaseLifecycleManager
                 (NetMeshObject) deletedObject,
                 canonicalIdentifier,
                 incomingProxyIdentifier,
+                externalized,
                 timeEventOccurred );
         return ret;
     }

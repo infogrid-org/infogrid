@@ -282,9 +282,9 @@ public class ProbeTest5
                 case 7:
                     throw new ProbeException.ErrorInProbe( networkId, null );
                 case 8:
-                    throw new ProbeException.IncompleteData( networkId, null );
+                    throw new ProbeException.IncompleteData( networkId, "nothing to say" );
                 case 9:
-                    throw new ProbeException.Other( networkId, null );
+                    throw new ProbeException.Other( networkId, "nothing to say" );
                 case 10:
                     throw new ProbeException.SyntaxError( networkId, message, null );
                 case 11:
