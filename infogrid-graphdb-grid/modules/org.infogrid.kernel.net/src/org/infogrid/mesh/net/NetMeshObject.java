@@ -96,7 +96,39 @@ public interface NetMeshObject
             RemoteQueryTimeoutException;
 
     /**
-     * Forced recovery of the lock by the home replica.
+     * Attempt to move update rights to the NetMeshBase that can be found through the
+     * specified Proxy. This requires this NetMeshObject to have the update rights.
+     * 
+     * @param outgoingProxy the Proxy
+     * @return returns true if the update rights were moved
+     * @throws DoNotHaveLockException thrown if this NetMeshObject does not have update rights
+     * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
+     */
+    public abstract boolean tryToPushLock(
+            Proxy outgoingProxy )
+        throws
+            DoNotHaveLockException,
+            RemoteQueryTimeoutException;
+            
+    /**
+     * Attempt to move update rights to the NetMeshBase that can be found through the
+     * specified Proxy. Specify a timeout in milliseconds. This requires this NetMeshObject to have the update rights.
+     * 
+     * @param outgoingProxy the Proxy
+     * @param timeout the timeout in milliseconds
+     * @return returns true if the update rights were moved
+     * @throws DoNotHaveLockException thrown if this NetMeshObject does not have update rights
+     * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
+     */
+    public abstract boolean tryToPushLock(
+            Proxy outgoingProxy,
+            long  timeout )
+        throws
+            DoNotHaveLockException,
+            RemoteQueryTimeoutException;
+
+    /**
+     * Forced recovery of the lock. This must only be invoked on the home replica.
      */
     public abstract void forceObtainLock();
     
@@ -161,6 +193,38 @@ public interface NetMeshObject
             RemoteQueryTimeoutException;
 
     /**
+     * Attempt to move the home replica status to the NetMeshBase that can be found through the
+     * specified Proxy. This requires this NetMeshObject to have home replica status.
+     * 
+     * @param outgoingProxy the Proxy
+     * @return returns true if the home replica status was moved
+     * @throws NotHomeReplicaException thrown if this NetMeshObject does not have home replica status
+     * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
+     */
+    public abstract boolean tryToPushHomeReplica(
+            Proxy outgoingProxy )
+        throws
+            NotHomeReplicaException,
+            RemoteQueryTimeoutException;
+            
+    /**
+     * Attempt to move the home replica status to the NetMeshBase that can be found through the
+     * specified Proxy. Specify a timeout in milliseconds. This requires this NetMeshObject to have home replica status.
+     * 
+     * @param outgoingProxy the Proxy
+     * @param timeout the timeout in milliseconds
+     * @return returns true if the home replica status was moved
+     * @throws NotHomeReplicaException thrown if this NetMeshObject does not have home replica status
+     * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
+     */
+    public abstract boolean tryToPushHomeReplica(
+            Proxy outgoingProxy,
+            long  timeout )
+        throws
+            NotHomeReplicaException,
+            RemoteQueryTimeoutException;
+    
+    /**
      * Determine whether this replica is going to give up home replica status if it has it,
      * in case someone asks. This only says "if this replica is the home replica, it
      * will give it up when asked". This call makes no statement about whether this replica
@@ -219,7 +283,7 @@ public interface NetMeshObject
       * @param theProxy the Proxy invoking this method
       * @return true if successful, false otherwise.
       */
-    public abstract boolean surrenderLock(
+    public abstract boolean proxyInternalSurrenderLock(
             Proxy theProxy );
 
     /**
@@ -228,7 +292,7 @@ public interface NetMeshObject
       *
       * @param theProxy the Proxy invoking this method
       */
-    public abstract void pushLock(
+    public abstract void proxyInternalPushLock(
             Proxy theProxy );
 
     /**
@@ -238,7 +302,7 @@ public interface NetMeshObject
      * @param theProxy the Proxy invoking this method
      * @return true if successful, false otherwise.
      */
-    public abstract boolean surrenderHomeReplica(
+    public abstract boolean proxyInternalSurrenderHomeReplica(
             Proxy theProxy );
     
     /**
@@ -247,7 +311,7 @@ public interface NetMeshObject
      * 
      * @param theProxy the Proxy invoking this method
      */
-    public abstract void pushHomeReplica(
+    public abstract void proxyInternalPushHomeReplica(
             Proxy theProxy );
 
     /**
@@ -258,7 +322,7 @@ public interface NetMeshObject
       *
       * @param theProxy the Proxy invoking this method
       */
-    public abstract void registerReplicationTowards(
+    public abstract void proxyInternalRegisterReplicationTowards(
             Proxy theProxy );
 
     /**
@@ -269,7 +333,7 @@ public interface NetMeshObject
       *
       * @param theProxy the Proxy invoking this method
       */
-    public abstract void unregisterReplicationTowards(
+    public abstract void proxyInternalUnregisterReplicationTowards(
             Proxy theProxy );
 
     /**
