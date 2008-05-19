@@ -137,6 +137,23 @@ public interface Proxy
             RemoteQueryTimeoutException;
 
     /**
+     * Ask this Proxy to push the locks for one or more replicas to the partner
+     * NetMeshBase. Unlike many of the other calls, this call is
+     * synchronous over the network and either succeeds, fails, or times out.
+     * 
+     * @param localReplicas the local replicas for which the lock should be pushed
+     * @param sendSerialized if true, send the serialized representation of the MeshObject
+     * @param timeout the timeout, in milliseconds
+     * @throws RemoteQueryTimeoutException thrown if this call times out
+     */
+    public abstract void tryToPushLocks(
+            NetMeshObject [] localReplicas,
+            boolean          sendSerialized,
+            long             timeout )
+        throws
+            RemoteQueryTimeoutException;
+
+    /**
      * Ask this Proxy to obtain the home replica status for one or more replicas from the
      * partner NetMeshBase. Unlike many of the other calls, this call is
      * synchronous over the network and either succeeds, fails, or times out.
@@ -147,6 +164,23 @@ public interface Proxy
      */
     public abstract void tryToObtainHomeReplicas(
             NetMeshObject [] localReplicas,
+            long             timeout )
+        throws
+            RemoteQueryTimeoutException;
+
+    /**
+     * Ask this Proxy to push the home replica status for one or more replicas to the partner
+     * NetMeshBase. Unlike many of the other calls, this call is
+     * synchronous over the network and either succeeds, fails, or times out.
+     * 
+     * @param localReplicas the local replicas for which the home replica status should be pushed
+     * @param sendSerialized if true, send the serialized representation of the MeshObject
+     * @param timeout the timeout, in milliseconds
+     * @throws RemoteQueryTimeoutException thrown if this call times out
+     */
+    public abstract void tryToPushHomeReplicas(
+            NetMeshObject [] localReplicas,
+            boolean          sendSerialized,
             long             timeout )
         throws
             RemoteQueryTimeoutException;
