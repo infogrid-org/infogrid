@@ -18,8 +18,7 @@ import org.infogrid.meshbase.net.IterableNetMeshBase;
 
 /**
  * The specific subtype of MeshBase that is used for Probes to stage the information
- * that they read. While an implemnentation will very likely inherit from NetMeshBase,
- * this is not necessarily the case. It also prevents programming errors.
+ * that they read.
  */
 public interface StagingMeshBase
         extends

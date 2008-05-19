@@ -1061,6 +1061,16 @@ public abstract class AnetMeshBase
     }
     
     /**
+     * Obtain the desired timeout, in milliseconds, for tryToPushLock requests.
+     *
+     * @return the timeout, in milliseconds
+     */
+    public final long getTryToPushLockTimesOutAfter()
+    {
+        return theTryToPushLockTimeout;
+    }
+    
+    /**
      * Obtain the desired timeout, in milliseconds, for tryToObtainHomeReplica requests.
      *
      * @return the timeout, in milliseconds
@@ -1068,6 +1078,16 @@ public abstract class AnetMeshBase
     public final long getTryToObtainHomeReplicaTimesOutAfter()
     {
         return theTryToObtainHomeReplicaTimeout;
+    }
+    
+    /**
+     * Obtain the desired timeout, in milliseconds, for tryToPushHomeReplica requests.
+     *
+     * @return the timeout, in milliseconds
+     */
+    public final long getTryToPushHomeReplicaTimesOutAfter()
+    {
+        return theTryToPushHomeReplicaTimeout;
     }
     
     /**
@@ -1130,7 +1150,15 @@ public abstract class AnetMeshBase
      */
     private long theTryToObtainLockTimeout = theResourceHelper.getResourceLongOrDefault(
             "TryToObtainLockTimeout",
-            5000L ); // 2 sec
+            5000L ); // 5 sec
+
+    /**
+     * The duration, in milliseconds, that we are willing to suspend a Thread to wait for tryToPushLock()
+     * results to come in.
+     */
+    private long theTryToPushLockTimeout = theResourceHelper.getResourceLongOrDefault(
+            "theTryToPushLockTimeout",
+            theTryToObtainLockTimeout ); // push same as pull
 
     /**
      * The duration, in milliseconds, that we are willing to suspend a Thread to wait for tryToObtainHomeReplica()
@@ -1138,7 +1166,15 @@ public abstract class AnetMeshBase
      */
     private long theTryToObtainHomeReplicaTimeout = theResourceHelper.getResourceLongOrDefault(
             "TryToObtainHomeReplicaTimeout",
-            5000L ); // 2 sec
+            5000L ); // 5 sec
+
+    /**
+     * The duration, in milliseconds, that we are willing to suspend a Thread to wait for tryToPushHomeReplica()
+     * results to come in.
+     */
+    private long theTryToPushHomeReplicaTimeout = theResourceHelper.getResourceLongOrDefault(
+            "TryToPushHomeReplicaTimeout",
+            theTryToObtainHomeReplicaTimeout ); // push same as pull
 
     /**
      * The default value for the willGiveUpLock property of newly created NetMeshObjects.
