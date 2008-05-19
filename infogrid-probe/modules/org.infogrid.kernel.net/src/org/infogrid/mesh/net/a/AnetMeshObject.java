@@ -32,6 +32,7 @@ import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 import org.infogrid.mesh.RoleTypeNotBlessedException;
 import org.infogrid.mesh.RoleTypeRequiresEntityTypeException;
 import org.infogrid.mesh.a.AMeshObject;
+import org.infogrid.mesh.net.DoNotHaveLockException;
 import org.infogrid.mesh.net.HomeReplicaChangedEvent;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
@@ -39,6 +40,7 @@ import org.infogrid.mesh.net.externalized.SimpleExternalizedNetMeshObject;
 import org.infogrid.mesh.net.security.CannotObtainLockException;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.mesh.net.LockChangedEvent;
+import org.infogrid.mesh.net.NotHomeReplicaException;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessException;
@@ -267,6 +269,93 @@ public class AnetMeshObject
     }
 
     /**
+     * Attempt to move update rights to the NetMeshBase that can be found through the
+     * specified Proxy. This requires this NetMeshObject to have the update rights.
+     * 
+     * @param outgoingProxy the Proxy
+     * @return returns true if the update rights were moved
+     * @throws DoNotHaveLockException thrown if this NetMeshObject does not have update rights
+     * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
+     */
+    public boolean tryToPushLock(
+            Proxy outgoingProxy )
+        throws
+            DoNotHaveLockException,
+            RemoteQueryTimeoutException
+    {
+        AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
+        return tryToPushLock( outgoingProxy, realBase.getTryToPushLockTimesOutAfter() );
+    }
+            
+    /**
+     * Attempt to move update rights to the NetMeshBase that can be found through the
+     * specified Proxy. Specify a timeout in milliseconds. This requires this NetMeshObject to have the update rights.
+     * 
+     * @param outgoingProxy the Proxy
+     * @param timeout the timeout in milliseconds
+     * @return returns true if the update rights were moved
+     * @throws DoNotHaveLockException thrown if this NetMeshObject does not have update rights
+     * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
+     */
+    public boolean tryToPushLock(
+            Proxy outgoingProxy,
+            long  timeout )
+        throws
+            DoNotHaveLockException,
+            RemoteQueryTimeoutException
+    {
+        if( log.isDebugEnabled() ) {
+            log.debug( this + ".tryToPushLock( " + outgoingProxy + " )" );
+        }
+
+        boolean sendSerialized = false;
+        synchronized( theIdentifier ) {
+            if( theProxyTowardsLockIndex != HERE_CONSTANT ) {
+                throw new DoNotHaveLockException( this );
+            }
+
+            if( ((NetMeshBase)theMeshBase).refuseToGiveUpLock() ) {
+                return false;
+            }
+
+            // find the right proxy
+            Proxy p = null;
+            if( theProxies != null ) {
+                for( int i=0 ; i<theProxies.length ; ++i ) {
+                    if( theProxies[i] == outgoingProxy ) {
+                        p = outgoingProxy;
+                        break;
+                    }
+                }
+            }
+            if( p == null ) {
+                // not currently going via this proxy
+                sendSerialized = true;
+                if( theProxies == null ) {
+                    theProxies = new Proxy[] { outgoingProxy };
+                } else {
+                    theProxies = ArrayHelper.append( theProxies, outgoingProxy, Proxy.class );
+                }
+                theProxyTowardsLockIndex = theProxies.length - 1;
+
+                AnetMeshBase realBase = (AnetMeshBase) theMeshBase;                
+                realBase.flushMeshObject( this );
+            }
+        }
+        
+        outgoingProxy.tryToPushLocks( new NetMeshObject[] { this }, sendSerialized, timeout );
+        
+        if( theProxyTowardsLockIndex != HERE_CONSTANT ) {
+            fireLockLostEvent();
+
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+    
+    /**
      * Forced recovery of the lock by the home replica.
      */
     public void forceObtainLock()
@@ -396,6 +485,80 @@ public class AnetMeshObject
     }
 
     /**
+     * Attempt to move the home replica status to the NetMeshBase that can be found through the
+     * specified Proxy. This requires this NetMeshObject to have home replica status.
+     * 
+     * @param outgoingProxy the Proxy
+     * @return returns true if the home replica status was moved
+     * @throws NotHomeReplicaException thrown if this NetMeshObject does not have home replica status
+     * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
+     */
+    public boolean tryToPushHomeReplica(
+            Proxy outgoingProxy )
+        throws
+            NotHomeReplicaException,
+            RemoteQueryTimeoutException
+    {
+        AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
+        return tryToPushHomeReplica( outgoingProxy, realBase.getTryToPushHomeReplicaTimesOutAfter() );        
+    }
+            
+    /**
+     * Attempt to move the home replica status to the NetMeshBase that can be found through the
+     * specified Proxy. Specify a timeout in milliseconds. This requires this NetMeshObject to have home replica status.
+     * 
+     * @param outgoingProxy the Proxy
+     * @param timeout the timeout in milliseconds
+     * @return returns true if the home replica status was moved
+     * @throws NotHomeReplicaException thrown if this NetMeshObject does not have home replica status
+     * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
+     */
+    public boolean tryToPushHomeReplica(
+            Proxy outgoingProxy,
+            long  timeout )
+        throws
+            NotHomeReplicaException,
+            RemoteQueryTimeoutException
+    {
+        if( log.isDebugEnabled() ) {
+            log.debug( this + ".tryToPushHomeReplica( " + outgoingProxy + " )" );
+        }
+
+        boolean sendSerialized = true;
+        synchronized( theIdentifier ) {
+            if( theHomeProxyIndex != HERE_CONSTANT ) {
+                throw new NotHomeReplicaException( this );
+            }
+
+            if( ((NetMeshBase)theMeshBase).refuseToGiveUpHomeReplica() ) {
+                return false;
+            }
+
+            // find the right proxy
+            Proxy p = null;
+            if( theProxies != null ) {
+                for( int i=0 ; i<theProxies.length ; ++i ) {
+                    if( theProxies[i] == outgoingProxy ) {
+                        sendSerialized = false;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        outgoingProxy.tryToPushHomeReplicas( new NetMeshObject[] { this }, sendSerialized, timeout );
+        
+        if( theHomeProxyIndex != HERE_CONSTANT ) {
+            fireHomeReplicaLostEvent();
+
+            return true;
+
+        } else {
+            return false;
+        }        
+    }
+    
+    /**
      * Determine whether this replica is going to give up home replica status if it has it,
      * in case someone asks. This only says "if this replica is the home replica, it
      * will give it up when asked". This call makes no statement about whether this replica
@@ -490,7 +653,7 @@ public class AnetMeshObject
       * @param theProxy the Proxy invoking this method
       * @return true if successful, false otherwise.
       */
-    public boolean surrenderLock(
+    public boolean proxyInternalSurrenderLock(
             Proxy theProxy )
     {
         if( log.isDebugEnabled() ) {
@@ -540,7 +703,7 @@ public class AnetMeshObject
       *
       * @param theProxy the Proxy invoking this method
       */
-    public void pushLock(
+    public void proxyInternalPushLock(
             Proxy theProxy )
     {
         if( log.isDebugEnabled() ) {
@@ -571,7 +734,7 @@ public class AnetMeshObject
      * @param theProxy the Proxy invoking this method
      * @return true if successful, false otherwise.
      */
-    public boolean surrenderHomeReplica(
+    public boolean proxyInternalSurrenderHomeReplica(
             Proxy theProxy )
     {
         if( log.isDebugEnabled() ) {
@@ -621,7 +784,7 @@ public class AnetMeshObject
      * 
      * @param theProxy the Proxy invoking this method
      */
-    public void pushHomeReplica(
+    public void proxyInternalPushHomeReplica(
             Proxy theProxy )
     {
         if( log.isDebugEnabled() ) {
@@ -653,7 +816,7 @@ public class AnetMeshObject
       *
       * @param theProxy the Proxy invoking this method
       */
-    public void registerReplicationTowards(
+    public void proxyInternalRegisterReplicationTowards(
             Proxy theProxy )
     {
         if( log.isDebugEnabled() ) {
@@ -688,7 +851,7 @@ public class AnetMeshObject
       *
       * @param theProxy the Proxy invoking this method
       */
-    public void unregisterReplicationTowards(
+    public void proxyInternalUnregisterReplicationTowards(
             Proxy theProxy )
     {
         if( log.isDebugEnabled() ) {
