@@ -17,6 +17,7 @@ package org.infogrid.probe.shadow;
 import org.infogrid.comm.MessageEndpoint;
 
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.AbstractProxy;
 import org.infogrid.meshbase.net.NetMeshBase;
 
@@ -88,7 +89,27 @@ public abstract class AbstractShadowProxy
 
         ChangeSet queued = ChangeSet.create();
         
-        // we skip conveyed objects -- only when the home has been pushed here, and that's currently not implemented
+        // deal with conveyed objects whose home replica has been pushed here
+        if( incoming.getConveyedMeshObjects() != null && incoming.getPushHomeReplicas() != null ) {
+            ExternalizedNetMeshObject [] conveyed = incoming.getConveyedMeshObjects();
+            NetMeshObjectIdentifier   [] pushed   = incoming.getPushHomeReplicas();
+            
+            for( ExternalizedNetMeshObject current : conveyed ) {
+                for( NetMeshObjectIdentifier id : pushed ) {
+                    if( id.equals( current.getIdentifier() )) {
+                        NetMeshObjectCreatedEvent event = new NetMeshObjectCreatedEvent(
+                                null,
+                                theEndpoint.getNetworkIdentifierOfPartner(),
+                                current,
+                                theEndpoint.getNetworkIdentifierOfPartner());
+                        
+                        event.setResolver( theMeshBase );
+                        queued.addChange( event );
+                        break;
+                    }
+                }
+            }
+        }
 
         // deal with type changes
         if( incoming.getTypeAdditions() != null ) {

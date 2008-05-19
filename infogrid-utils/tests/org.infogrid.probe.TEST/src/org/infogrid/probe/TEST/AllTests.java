@@ -73,11 +73,11 @@ public class AllTests
                         ProbeTest7.class,
                         noArgs ),
 
-//// FIXME: ProbeTest8 seems to work, but spits out way too many warnings. This needs more investigation
-////                new TestSpec(
-////                        ProbeTest8.class,
-////                        noArgs ),
-//
+// FIXME: ProbeTest8 seems to work, but spits out way too many warnings. This needs more investigation
+//                new TestSpec(
+//                        ProbeTest8.class,
+//                        noArgs ),
+
                 new TestSpec(
                         YadisTest1.class,
                         noArgs ),
@@ -124,9 +124,9 @@ public class AllTests
 //                new TestSpec( // create relationship between objects instantiated by probe but unrelated
 //                        WritableProbeTest8.class,
 //                        noArgs ),
-//                new TestSpec( // create object 
-//                        WritableProbeTest9.class,
-//                        noArgs ),
+                new TestSpec( // create object 
+                        WritableProbeTest9.class,
+                        noArgs ),
 //                new TestSpec( // create and relate object
 //                        WritableProbeTest10.class,
 //                        noArgs ),

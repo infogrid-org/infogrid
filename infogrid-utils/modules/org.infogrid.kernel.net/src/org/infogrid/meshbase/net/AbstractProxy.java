@@ -323,6 +323,57 @@ public abstract class AbstractProxy
     }
     
     /**
+     * Ask this Proxy to push the locks for one or more replicas to the partner
+     * NetMeshBase. Unlike many of the other calls, this call is
+     * synchronous over the network and either succeeds, fails, or times out.
+     * 
+     * @param localReplicas the local replicas for which the lock should be pushed
+     * @param sendSerialized if true, send the serialized representation of the MeshObject
+     * @param timeout the timeout, in milliseconds
+     * @throws RemoteQueryTimeoutException thrown if this call times out
+     */
+    public void tryToPushLocks(
+            NetMeshObject [] localReplicas,
+            boolean          sendSerialized,
+            long             timeout )
+        throws
+            RemoteQueryTimeoutException
+    {
+        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
+
+        NetMeshObjectIdentifier [] extNames = new NetMeshObjectIdentifier[ localReplicas.length ];
+        for( int i=0 ; i<extNames.length ; ++i ) {
+            extNames[i] = localReplicas[i].getIdentifier();
+        }
+        
+        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
+        outgoing.setPushLockObjects( extNames );
+        
+        if( sendSerialized ) {
+            boolean                      pointsReplicasToItself = theMeshBase.getPointsReplicasToItself();
+            ExternalizedNetMeshObject [] externalized           = new ExternalizedNetMeshObject[ localReplicas.length ];
+
+            for( int i=0 ; i<extNames.length ; ++i ) {
+                boolean replicateToHere = pointsReplicasToItself || localReplicas[i].getProxyTowardsHomeReplica() == null;
+
+                externalized[i] = localReplicas[i].asExternalizedAndAddProxy( !replicateToHere, this );
+            }
+            outgoing.setConveyedMeshObjects( externalized );
+        }
+        for( int i=0 ; i<localReplicas.length ; ++i ) {
+            localReplicas[i].proxyInternalSurrenderLock( this );
+        }
+
+        XprisoMessage incoming; // this is only here to make debugging easier
+        try {
+            incoming = theWaitForLockResponseEndpoint.call( outgoing, timeout );
+
+        } catch( InvocationTargetException ex ) {
+            log.warn( ex );
+        }
+    }
+
+    /**
      * Ask this Proxy to obtain the home replica status for one or more replicas from the
      * partner NetMeshBase. Unlike many of the other calls, this call is
      * synchronous over the network and either succeeds, fails, or times out.
@@ -346,6 +397,57 @@ public abstract class AbstractProxy
         
         SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
         outgoing.setRequestedHomeReplicas( extNames );
+
+        XprisoMessage incoming; // this is only here to make debugging easier
+        try {
+            incoming = theWaitForHomeReplicaResponseEndpoint.call( outgoing, timeout );
+
+        } catch( InvocationTargetException ex ) {
+            log.warn( ex );
+        }
+    }
+
+    /**
+     * Ask this Proxy to push the home replica status for one or more replicas to the partner
+     * NetMeshBase. Unlike many of the other calls, this call is
+     * synchronous over the network and either succeeds, fails, or times out.
+     * 
+     * @param localReplicas the local replicas for which the home replica status should be pushed
+     * @param sendSerialized if true, send the serialized representation of the MeshObject
+     * @param timeout the timeout, in milliseconds
+     * @throws RemoteQueryTimeoutException thrown if this call times out
+     */
+    public void tryToPushHomeReplicas(
+            NetMeshObject [] localReplicas,
+            boolean          sendSerialized,
+            long             timeout )
+        throws
+            RemoteQueryTimeoutException
+    {
+        theEndpoint.startCommunicating(); // this is no-op on subsequent calls
+
+        NetMeshObjectIdentifier [] extNames = new NetMeshObjectIdentifier[ localReplicas.length ];
+        for( int i=0 ; i<extNames.length ; ++i ) {
+            extNames[i] = localReplicas[i].getIdentifier();
+        }
+        
+        SimpleXprisoMessage outgoing = SimpleXprisoMessage.create();
+        outgoing.setPushHomeReplicas( extNames );
+
+        if( sendSerialized ) {
+            boolean                      pointsReplicasToItself = theMeshBase.getPointsReplicasToItself();
+            ExternalizedNetMeshObject [] externalized           = new ExternalizedNetMeshObject[ localReplicas.length ];
+
+            for( int i=0 ; i<extNames.length ; ++i ) {
+                boolean replicateToHere = true; // always: home replica is currently here
+
+                externalized[i] = localReplicas[i].asExternalizedAndAddProxy( !replicateToHere, this );
+            }
+            outgoing.setConveyedMeshObjects( externalized );
+        }
+        for( int i=0 ; i<localReplicas.length ; ++i ) {
+            localReplicas[i].proxyInternalSurrenderHomeReplica( this );
+        }
 
         XprisoMessage incoming; // this is only here to make debugging easier
         try {
@@ -633,23 +735,38 @@ public abstract class AbstractProxy
             outgoing.setResponseId( incoming.getRequestId()); // make this message as a response
         }
 
-        // First, process the pushLock events on existing objects.
+        // First, process the proxyInternalPushLock events on existing objects.
         // Then, createCopy transaction and process.
-        // Then, process the pushLock events on all other objects
+        // Then, process the proxyInternalPushLock events on all other objects
         // Then, process requests.
 
-        ArrayList<MeshObjectIdentifier> stillToPush = null;
+        ArrayList<MeshObjectIdentifier> stillToPushLocks = null;
         if( incoming.getPushLockObjects() != null ) {
             MeshObjectIdentifier [] pushLockNew = incoming.getPushLockObjects();
-            stillToPush = new ArrayList<MeshObjectIdentifier>();
+            stillToPushLocks = new ArrayList<MeshObjectIdentifier>();
 
             for( int i=0 ; i<pushLockNew.length ; ++i ) {
                 NetMeshObject current = theMeshBase.findMeshObjectByIdentifier( pushLockNew[i] );
                 if( current != null ) {
-                    current.pushLock( this );
+                    current.proxyInternalPushLock( this );
                     meshObjectModifiedDuringMessageProcessing( current );
                 } else {
-                    stillToPush.add( pushLockNew[i] );
+                    stillToPushLocks.add( pushLockNew[i] );
+                }
+            }
+        }
+        ArrayList<MeshObjectIdentifier> stillToPushHomes = null;
+        if( incoming.getPushHomeReplicas() != null ) {
+            MeshObjectIdentifier [] pushHomeNew = incoming.getPushHomeReplicas();
+            stillToPushHomes = new ArrayList<MeshObjectIdentifier>();
+
+            for( int i=0 ; i<pushHomeNew.length ; ++i ) {
+                NetMeshObject current = theMeshBase.findMeshObjectByIdentifier( pushHomeNew[i] );
+                if( current != null ) {
+                    current.proxyInternalPushHomeReplica( this );
+                    meshObjectModifiedDuringMessageProcessing( current );
+                } else {
+                    stillToPushHomes.add( pushHomeNew[i] );
                 }
             }
         }
@@ -875,10 +992,18 @@ public abstract class AbstractProxy
             tx = null;
         }
 
-        if( stillToPush != null ) {
-            for( int i=0 ; i<stillToPush.size() ; ++i ) {
-                NetMeshObject current = theMeshBase.findMeshObjectByIdentifier( stillToPush.get( i ));
-                current.pushLock( this );
+        if( stillToPushLocks != null ) {
+            for( int i=0 ; i<stillToPushLocks.size() ; ++i ) {
+                NetMeshObject current = theMeshBase.findMeshObjectByIdentifier( stillToPushLocks.get( i ));
+                current.proxyInternalPushLock( this );
+                
+                meshObjectModifiedDuringMessageProcessing( current ); // this may be redundant, but it does not hurt either
+            }
+        }
+        if( stillToPushHomes != null ) {
+            for( int i=0 ; i<stillToPushHomes.size() ; ++i ) {
+                NetMeshObject current = theMeshBase.findMeshObjectByIdentifier( stillToPushHomes.get( i ));
+                current.proxyInternalPushHomeReplica( this );
                 
                 meshObjectModifiedDuringMessageProcessing( current ); // this may be redundant, but it does not hurt either
             }
@@ -921,13 +1046,13 @@ public abstract class AbstractProxy
         }
         
         // cancel objects
-        if( incoming.getRequestedCanceledObjects() != null ) {
+        if( incoming.getRequestedCanceledObjects() != null && incoming.getRequestedCanceledObjects().length > 0 ) {
             MeshObjectIdentifier [] canceledObjects = incoming.getRequestedCanceledObjects();
 
             for( int i=0 ; i<canceledObjects.length ; ++i ) {
 
                 NetMeshObject current = theMeshBase.findMeshObjectByIdentifier( canceledObjects[i] );
-                current.unregisterReplicationTowards( this );
+                current.proxyInternalUnregisterReplicationTowards( this );
 
                 meshObjectModifiedDuringMessageProcessing( current );
             }
@@ -957,7 +1082,7 @@ public abstract class AbstractProxy
                         externalizedFirstTimeObjects[count++] = firstTimeObjects[i].asExternalized( !replicateToHere );
 
                         if( replicateToHere ) {
-                            firstTimeObjects[i].registerReplicationTowards( this );
+                            firstTimeObjects[i].proxyInternalRegisterReplicationTowards( this );
                             meshObjectModifiedDuringMessageProcessing( firstTimeObjects[i] );
                         }
                     }
@@ -992,7 +1117,7 @@ public abstract class AbstractProxy
 
                         if( replicateToHere && dependentResyncObjects[i].findProxyTowards( getPartnerMeshBaseIdentifier() ) == null ) {
                             // only need to do this if we don't have it yet
-                            dependentResyncObjects[i].registerReplicationTowards( this );                            
+                            dependentResyncObjects[i].proxyInternalRegisterReplicationTowards( this );                            
                             meshObjectModifiedDuringMessageProcessing( dependentResyncObjects[i] );
                         }
                     }
@@ -1016,7 +1141,7 @@ public abstract class AbstractProxy
         }        
         
         // surrender the forcefully reacquired locks -- FIXME? More checking might be needed to avoid mischief
-        if( incoming.getReclaimedLockObjects() != null ) {
+        if( incoming.getReclaimedLockObjects() != null && incoming.getReclaimedLockObjects().length > 0 ) {
             NetMeshObjectIdentifier [] requestLock      = incoming.getReclaimedLockObjects();
             NetMeshObjectIdentifier [] pushLockExisting = new NetMeshObjectIdentifier[ requestLock.length ];
 
@@ -1031,14 +1156,14 @@ public abstract class AbstractProxy
                 // don't check whether it will give up lock -- it must
                 current.forceObtainLock();
                 pushLockExisting[ iPushLock++ ] = requestLock[i];
-                current.surrenderLock( this );
+                current.proxyInternalSurrenderLock( this );
                 meshObjectModifiedDuringMessageProcessing( current );
             }
             // currently we do not send pushed locks back -- FIXME?
         }
 
         // try to release the requested locks
-        if( incoming.getRequestedLockObjects() != null ) {
+        if( incoming.getRequestedLockObjects() != null && incoming.getRequestedLockObjects().length > 0 ) {
             NetMeshObjectIdentifier [] requestLock      = incoming.getRequestedLockObjects();
             NetMeshObjectIdentifier [] pushLockExisting = new NetMeshObjectIdentifier[ requestLock.length ];
 
@@ -1057,7 +1182,7 @@ public abstract class AbstractProxy
                     boolean success = current.tryToObtainLock(); // FIXME: need to specify timing that does not delay things too much
                     if( success ) {
                         pushLockExisting[ iPushLock++ ] = requestLock[i];
-                        current.surrenderLock( this );
+                        current.proxyInternalSurrenderLock( this );
                         meshObjectModifiedDuringMessageProcessing( current );
                     }
                 } catch( RemoteQueryTimeoutException ex ) {
