@@ -61,6 +61,7 @@ public abstract class AbstractWritableProbeTest
 
             myLog.info( "About to run TestCase " + i + ": " + testCases[i].theProbeClass.getName() );
 
+            LocalNetMMeshBase base = null;
             try {
                 // set up ProbeDirectory
                 MProbeDirectory theProbeDirectory = MProbeDirectory.create();
@@ -71,7 +72,7 @@ public abstract class AbstractWritableProbeTest
                                 testCases[i].theProbeClass ));
 
                 // create MeshBase and run Probe
-                LocalNetMMeshBase base = LocalNetMMeshBase.create( here, theModelBase, null, exec, theProbeDirectory, rootContext );
+                base = LocalNetMMeshBase.create( here, theModelBase, null, exec, theProbeDirectory, rootContext );
 
                 NetMeshObject shadowHomeInMain = base.accessLocally( TEST1_URL );
                 checkObject( shadowHomeInMain, "could not find shadow's home object in main MeshBase" );
@@ -93,6 +94,11 @@ public abstract class AbstractWritableProbeTest
             } catch( Throwable ex ) {
                 reportError( "Test " + i + " failed", ex );
                 System.exit( 1 );
+
+            } finally {
+                if( base != null ) {
+                    base.die( true );
+                }
             }
         }
     }
