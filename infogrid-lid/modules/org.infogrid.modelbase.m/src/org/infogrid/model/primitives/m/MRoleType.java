@@ -49,8 +49,6 @@ public abstract class MRoleType
             RoleType
 {
     private static final Log log = Log.getLogInstance( MRoleType.class ); // our own, private logger
-    
-    // static final long serialVersionUID = -9217606387749482000L;
 
     /**
      * Constructor.
@@ -258,6 +256,7 @@ public abstract class MRoleType
      * Determine whether a given event, with a source of from where we traverse the
      * TraversalSpecification, may affect the result of the traversal.
      *
+     * @param toResolveAgainst the MeshBase to resolve the event against
      * @param theEvent the event that we consider
      * @return true if this event may affect the result of traversing from the Entity
      *         that sent this event
@@ -356,10 +355,11 @@ public abstract class MRoleType
     }
 
     /**
-      * Obtain transitive closure of RoleTypeGuards.
-      *
-      * @return an ArrayList containing a transitive closure of RoleTypeGuards
-      */
+     * Obtain transitive closure of RoleTypeGuards.
+     *
+     * @return an ArrayList containing a transitive closure of RoleTypeGuards
+     * @throws InheritanceConflictException thrown if an internal inheritance conflict was detected
+     */
     protected final ArrayList<RoleTypeGuard> internalGetAllRoleTypeGuards()
             throws
                 InheritanceConflictException
@@ -516,6 +516,13 @@ public abstract class MRoleType
      * Check whether the given caller is allowed to bless an existing relationship from a given start
      * MeshObject to a given destination MeshObject with a given new RoleType, in the opinion of
      * another Role (identified as this RoleType plus associated other-side MeshObject).
+     * 
+     * @param start the MeshObject to be blessed
+     * @param thisOtherSide the MeshObjecton the other side of this role
+     * @param newTypes the RoleType by which the start MeshObject's relationship to the newDestination should be blessed
+     * @param newDestination identifies the MeshObject on the other side of the new roles
+     * @param caller the MeshObject representing the caller
+     * @throws NotPermittedException thrown if this caller is not permitted to do this 
      */
     public void checkPermittedIncrementalBless(
             MeshObject    start,
@@ -535,6 +542,13 @@ public abstract class MRoleType
      * Check whether the given caller is allowed to bless an existing relationship from a given start
      * MeshObject to a given destination MeshObject with a given new RoleType, in the opinion of
      * another Role (identified as this RoleType plus associated other-side MeshObject).
+     * 
+     * @param start the MeshObject to be blessed
+     * @param thisOtherSide the MeshObjecton the other side of this role
+     * @param newTypes the RoleType by which the start MeshObject's relationship to the newDestination should be unblessed
+     * @param newDestination identifies the MeshObject on the other side of the new roles
+     * @param caller the MeshObject representing the caller
+     * @throws NotPermittedException thrown if this caller is not permitted to do this 
      */
     public void checkPermittedIncrementalUnbless(
             MeshObject    start,
@@ -681,7 +695,7 @@ public abstract class MRoleType
             extends
                 MRoleType
     {
-        // static final long serialVersionUID = -3758985235609211592L;
+        private static final long serialVersionUID = 1L; // helps with serialization
 
         /**
           * Constructor.
@@ -689,7 +703,7 @@ public abstract class MRoleType
           * @param relationship the RelationshipType to which this RoleType will belong
           * @param entity the EntityType related to this RoleType
           * @param multiplicity the multiplicity of this RoleType
-          * @param constraints the RoleConstraints to be enforced
+          * @param constraintClassNames Class names of the RoleConstraints to be enforced
           */
         Source(
                 MRelationshipType  relationship,
@@ -754,7 +768,7 @@ public abstract class MRoleType
             extends
                 MRoleType
     {
-        // static final long serialVersionUID = 8390537737588799544L;
+        private static final long serialVersionUID = 1L; // helps with serialization
 
         /**
           * Constructor.
@@ -762,7 +776,7 @@ public abstract class MRoleType
           * @param relationship the RelationshipType to which this RoleType will belong
           * @param entity the EntityType related to this RoleType
           * @param multiplicity the multiplicity of this RoleType
-          * @param constraints the RoleConstraints to be enforced
+          * @param constraintClassNames Class names of the RoleConstraints to be enforced
           */
         Destination(
                 MRelationshipType  relationship,
@@ -829,7 +843,7 @@ public abstract class MRoleType
             implements
                 RoleType.TopSingleton
     {
-        // static final long serialVersionUID = 9175211150935208805L;
+        private static final long serialVersionUID = 1L; // helps with serialization
 
         /**
           * Constructor.
@@ -837,7 +851,7 @@ public abstract class MRoleType
           * @param relationship the RelationshipType to which this RoleType will belong
           * @param entity the EntityType related to this RoleType
           * @param multiplicity the multiplicity of this RoleType
-          * @param constraints the RoleConstraints to be enforced
+          * @param constraintClassNames Class names of the RoleConstraints to be enforced
           */
         TopSingleton(
                 MRelationshipType  relationship,

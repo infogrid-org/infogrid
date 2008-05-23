@@ -19,9 +19,8 @@ import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.text.StringRepresentation;
 
-
 /**
- * MeshTypeIdentifier implementation for MMeshBase.
+ * MeshTypeIdentifier implementation for MModelBase.
  */
 public class MMeshTypeIdentifier
         implements
@@ -30,6 +29,7 @@ public class MMeshTypeIdentifier
     /**
      * Factory method.
      *
+     * @param s the String
      * @return the created MMeshTypeIdentifier
      */
     public static MMeshTypeIdentifier create(
@@ -63,6 +63,7 @@ public class MMeshTypeIdentifier
      * Create a derived MeshTypeIdentifier.
      *
      * @param suffix the suffix to append
+     * @return the created MeshTypeIdentifier
      */
     public MeshTypeIdentifier createDerivedMeshTypeIdentifier(
             String suffix )
