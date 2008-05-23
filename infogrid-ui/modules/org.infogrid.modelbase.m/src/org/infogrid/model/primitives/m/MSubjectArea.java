@@ -25,7 +25,6 @@ import org.infogrid.module.ModuleRequirement;
 
 import org.infogrid.util.ArrayHelper;
 
-
 /**
   * The packaging construct for Models.
   * In-memory implementation.
@@ -36,6 +35,8 @@ public final class MSubjectArea
         implements
             SubjectArea
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      * 
@@ -237,7 +238,7 @@ public final class MSubjectArea
             }
         }
 
-        theCollectableMeshTypes = (CollectableMeshType []) ArrayHelper.append(
+        theCollectableMeshTypes = ArrayHelper.append(
                 theCollectableMeshTypes,
                 cmo,
                 CollectableMeshType.class );
@@ -266,5 +267,5 @@ public final class MSubjectArea
     /**
      * The ClassLoader that we use in order to load the AttributableMeshTypes in this SubjectArea.
      */
-    private volatile ClassLoader theClassLoader;
+    private transient ClassLoader theClassLoader;
 }
