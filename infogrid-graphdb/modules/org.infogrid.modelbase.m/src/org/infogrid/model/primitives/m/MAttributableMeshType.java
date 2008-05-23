@@ -28,7 +28,6 @@ import org.infogrid.model.primitives.PropertyTypeOrGroup;
 import org.infogrid.modelbase.InheritanceConflictException;
 
 import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.logging.Log;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -44,8 +43,6 @@ public abstract class MAttributableMeshType
         implements
             AttributableMeshType
 {
-    private static final Log log = Log.getLogInstance( MAttributableMeshType.class ); // our own, private logger
-
     /**
      * Constructor.
      * 

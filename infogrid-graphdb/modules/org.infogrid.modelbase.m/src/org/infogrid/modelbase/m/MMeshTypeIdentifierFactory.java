@@ -21,7 +21,8 @@ import org.infogrid.util.text.StringifierException;
 import java.net.URISyntaxException;
 
 /**
- *
+ * Factory for creating MeshTypeIdentifiers appropriate for the MModelBase
+ * implementation of ModelBase.
  */
 public class MMeshTypeIdentifierFactory
         implements
@@ -42,6 +43,7 @@ public class MMeshTypeIdentifierFactory
      */
     protected MMeshTypeIdentifierFactory()
     {
+        // no op
     }
  
     /**
@@ -61,7 +63,8 @@ public class MMeshTypeIdentifierFactory
      *
      * @param representation the StringRepresentation in which this String is represented
      * @param s the String to parse
-     * @return the created MeshObjectIdentifier
+     * @return the created MMeshTypeIdentifier
+     * @throws URISyntaxException thrown if the String could not be successfully parsed
      */
     public MMeshTypeIdentifier fromStringRepresentation(
             StringRepresentation representation,

@@ -20,7 +20,7 @@ import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.module.Module;
 
 /**
- * This is the initializer for this Module. It creates a MModelBase and sets it
+ * Initializer for this Module. It creates a MModelBase and sets it
  * as the ModelBaseSingleton.
  */
 public abstract class Init
