@@ -45,7 +45,8 @@ public class MEntityType
         implements
             EntityType
 {
-    private static final Log log = Log.getLogInstance( MEntityType.class ); // our own, private logger
+    private static final Log  log              = Log.getLogInstance( MEntityType.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Constructor.
@@ -180,7 +181,7 @@ public class MEntityType
 
         Iterator theIter;
         for( int i=0 ; i<theRoles.length ; ++i ) {
-            RelationshipType current = (RelationshipType) theRoles[i].getRelationshipType();
+            RelationshipType current = theRoles[i].getRelationshipType();
             if( current.equalsOrIsSupertype( supertypeRelationshipType )) {
                 almostRet.add( (MRelationshipType) theRoles[i].getRelationshipType() );
             }
@@ -412,10 +413,11 @@ public class MEntityType
     }
 
     /**
-      * Obtain transitive closure of EntityTypeGuard.
-      *
-      * @return an ArrayList containing a transitive closure of EntityTypeGuard
-      */
+     * Obtain transitive closure of EntityTypeGuard.
+     *
+     * @return an ArrayList containing a transitive closure of EntityTypeGuard
+     * @throws InheritanceConflictException thrown if the an inheritance conflict was found
+     */
     protected final ArrayList<EntityTypeGuard> internalGetAllEntityTypeGuards()
             throws
                 InheritanceConflictException

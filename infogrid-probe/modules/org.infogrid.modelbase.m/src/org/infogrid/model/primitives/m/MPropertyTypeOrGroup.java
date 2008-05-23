@@ -30,6 +30,8 @@ public class MPropertyTypeOrGroup
         implements
             PropertyTypeOrGroup
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      * 
