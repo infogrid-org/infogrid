@@ -32,6 +32,8 @@ public final class MRelationshipType
         implements
             RelationshipType
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor to create a binary RelationshipType.
      * 
