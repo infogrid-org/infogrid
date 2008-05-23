@@ -66,7 +66,8 @@ public class MModelBase
             ModelBase,
             Serializable
 {
-    private static final Log log = Log.getLogInstance(MModelBase.class); // our own, private logger
+    private static final Log  log              = Log.getLogInstance(MModelBase.class); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Factory method.

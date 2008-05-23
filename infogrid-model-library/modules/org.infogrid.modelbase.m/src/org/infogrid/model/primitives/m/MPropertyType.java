@@ -45,7 +45,8 @@ public class MPropertyType
         implements
             PropertyType
 {
-    private static final Log log = Log.getLogInstance( MPropertyType.class ); // our own, private logger
+    private static final Log  log              = Log.getLogInstance( MPropertyType.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
     
     /**
      * Constructor.
