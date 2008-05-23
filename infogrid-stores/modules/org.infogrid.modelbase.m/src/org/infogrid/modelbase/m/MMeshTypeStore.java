@@ -37,14 +37,14 @@ import java.util.Iterator;
 
 /**
   * This stores a working model, in memory. A working model is the set of SubjectAreas currently needed
-  * by some application.
-  * In-memory implementation.
+  * by some application. In-memory implementation.
   */
 public class MMeshTypeStore
         implements
             Serializable
 {
-    private static final Log log = Log.getLogInstance( MMeshTypeStore.class ); // our own, private logger
+    private static final Log  log              = Log.getLogInstance( MMeshTypeStore.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
       * Construct one.
@@ -81,7 +81,7 @@ public class MMeshTypeStore
       * Subscribe to events indicating the addition/removal/etc of MeshTypes.
       *
       * @param newListener the listener to be added
-      * @see #removeObjectTypeLifecycleEventListener
+      * @see #removeMeshTypeLifecycleEventListener
       */
     public synchronized void addMeshTypeLifecycleEventListener(
             MeshTypeLifecycleEventListener newListener )
@@ -324,8 +324,9 @@ public class MMeshTypeStore
     {
         Iterator<MeshTypeLifecycleEventListener> iter;
         synchronized( this ) {
-            if( theLifecycleEventListeners == null || theLifecycleEventListeners.isEmpty() )
+            if( theLifecycleEventListeners == null || theLifecycleEventListeners.isEmpty() ) {
                 return;
+            }
 
             iter = ( new ArrayList<MeshTypeLifecycleEventListener>( theLifecycleEventListeners )).iterator();
         }
@@ -474,12 +475,17 @@ public class MMeshTypeStore
     }
 
     /**
-      * This represents a key in the hash tables.
-      */
+     * Helper class used as key in the hash tables.
+     * 
+     * @param T the first component of the key
+     * @param S the second component of the key
+     */
     public static class KeyInTable<T,S>
             implements
                 Serializable
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
           * Create one with the two components, such as SubjectArea and AttributableMeshType.
           *

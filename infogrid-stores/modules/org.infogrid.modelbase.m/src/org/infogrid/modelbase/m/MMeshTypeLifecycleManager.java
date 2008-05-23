@@ -55,20 +55,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-
 /**
- * This is an MeshTypeLifecycleManager implementation for the in-memory implementation
+ * The MeshTypeLifecycleManager implementation for the in-memory implementation
  * of ModelBase.
-  * In-memory implementation.
  */
 public class MMeshTypeLifecycleManager
         implements
             MeshTypeLifecycleManager
 {
     /**
-      * Constructor
+      * Constructor.
       *
-      * @param rep the ModelBase that this belongs to
+      * @param mb the ModelBase that this MeshTypeLifecycleManager belongs to
       */
     MMeshTypeLifecycleManager(
             MModelBase mb )

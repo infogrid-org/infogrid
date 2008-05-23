@@ -31,11 +31,12 @@ public abstract class MMeshType
         implements
             MeshType
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      * 
-     * 
-     * @param theIdentifier the Identifier of the to-be-created object
+     * @param identifier the Identifier of the to-be-created object
      */
     public MMeshType(
             MeshTypeIdentifier identifier )
@@ -122,8 +123,9 @@ public abstract class MMeshType
      */
     public final BlobValue getUserVisibleDescription()
     {
-        if( theUserDescription == null && theUserDescriptionMap != null )
+        if( theUserDescription == null && theUserDescriptionMap != null ) {
             theUserDescription = (BlobValue) theUserDescriptionMap.get( Locale.getDefault() );
+        }
 
         return theUserDescription;
     }

@@ -31,6 +31,8 @@ public final class MProjectedPropertyType
         implements
             ProjectedPropertyType
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      * 
