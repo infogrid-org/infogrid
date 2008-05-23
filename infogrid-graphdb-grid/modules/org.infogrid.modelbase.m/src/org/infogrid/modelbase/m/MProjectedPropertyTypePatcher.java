@@ -29,6 +29,8 @@ public class MProjectedPropertyTypePatcher
 {
     /**
      * Constructor.
+     * 
+     * @param projPropertyType the ProjectedPropertyType to patch
      */
     MProjectedPropertyTypePatcher(
             MProjectedPropertyType projPropertyType )
