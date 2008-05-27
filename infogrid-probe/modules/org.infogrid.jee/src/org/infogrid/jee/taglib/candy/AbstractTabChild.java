@@ -14,11 +14,9 @@
 
 package org.infogrid.jee.taglib.candy;
 
-import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
-import org.infogrid.jee.taglib.InfoGridJspUtils;
-
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.Tag;
+import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
 
 /**
  * Common functionality for {@link TabHeaderTag TabHeaderTag} and {@link TabContentTag TabContentTag}.
@@ -111,30 +109,6 @@ public abstract class AbstractTabChild
             current = current.getParent();
         }
         throw new JspException( "Cannot find enclosing TabbedTag, starting from " + startTag );
-    }
-
-    /**
-     * Determine whether, based on the values and the default, this TabChild is selected
-     */
-    protected boolean determineIsSelected(
-            Object actualValue,
-            Object comparisonValue,
-            String defaultControl )
-    {
-        boolean isSelected;
-
-        if( actualValue == null ) {
-            if( comparisonValue == null ) {
-                isSelected = true;
-            } else if( InfoGridJspUtils.isTrue( defaultControl )) {
-                isSelected = true;
-            } else {
-                isSelected = false;
-            }
-        } else {
-            isSelected = actualValue.equals( comparisonValue );
-        }
-        return isSelected;
     }
 
     /**

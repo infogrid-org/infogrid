@@ -14,13 +14,11 @@
 
 package org.infogrid.jee.taglib.util;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridTag;
 import org.infogrid.jee.taglib.IgnoreException;
-
-import javax.servlet.jsp.JspException;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * <p>Formats an Object with its <code>toExternalForm</code> method.
@@ -31,6 +29,8 @@ public class ToExternalFormTag
         extends
              AbstractInfoGridTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -74,11 +74,11 @@ public class ToExternalFormTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+     * @throws IgnoreException thrown to abort processing without an error
      */
     @Override
     protected int realDoStartTag()

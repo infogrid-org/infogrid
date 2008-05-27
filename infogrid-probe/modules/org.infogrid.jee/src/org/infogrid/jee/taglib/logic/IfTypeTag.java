@@ -14,9 +14,8 @@
 
 package org.infogrid.jee.taglib.logic;
 
-import org.infogrid.jee.taglib.IgnoreException;
-
 import javax.servlet.jsp.JspException;
+import org.infogrid.jee.taglib.IgnoreException;
 
 /**
  * <p>This tag tests whether a MeshObject has a certain type. See description in the
@@ -26,6 +25,8 @@ public class IfTypeTag
         extends
             AbstractTypeTestTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -35,7 +36,7 @@ public class IfTypeTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred

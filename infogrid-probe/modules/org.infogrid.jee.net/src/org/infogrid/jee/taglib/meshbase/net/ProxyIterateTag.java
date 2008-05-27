@@ -127,10 +127,11 @@ public class ProxyIterateTag
     }
 
     /**
-     * Process the start tag.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
-     * @throws JspException if a JSP exception has occurred
+     * @throws JspException thrown if an evaluation error occurred
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected int realDoStartTag()
         throws
@@ -194,13 +195,11 @@ public class ProxyIterateTag
 
     /**
      * Our implementation of doEndTag().
+     *
+     * @return evaluate or skip body
      */
     @Override
     protected int realDoEndTag()
-        throws
-            JspException,
-            IgnoreException,
-            IOException
     {
         if( theLoopVar != null ) {
             pageContext.removeAttribute( theLoopVar );

@@ -14,11 +14,10 @@
 
 package org.infogrid.jee.taglib.logic;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.model.primitives.BooleanValue;
 import org.infogrid.model.primitives.PropertyValue;
-
-import javax.servlet.jsp.JspException;
 
 /**
  * <p>This tag tests for a false boolean value. See description in the
@@ -28,6 +27,8 @@ public class NotIfTag
     extends
         AbstractPropertyTestTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */

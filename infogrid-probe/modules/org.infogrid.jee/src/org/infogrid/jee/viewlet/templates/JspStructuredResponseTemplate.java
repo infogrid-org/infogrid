@@ -21,7 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.infogrid.jee.rest.RestfulRequest;
 
 /**
- *
+ * A ResponseTemplate that processes a JSP page with placeholders, in which the named
+ * sections of the StructuredResponse are inserted.
  */
 public class JspStructuredResponseTemplate
         extends
@@ -30,6 +31,9 @@ public class JspStructuredResponseTemplate
     /**
      * Factory method.
      *
+     * @param dispatcher identifies the JSP file
+     * @param restful the incoming RESTful request
+     * @param structured the StructuredResponse that contains the response
      * @return the created JspStructuredResponseTemplate
      */
     public static JspStructuredResponseTemplate create(
@@ -43,6 +47,10 @@ public class JspStructuredResponseTemplate
 
     /**
      * Constructor for subclasses only, use factory method.
+     * 
+     * @param dispatcher identifies the JSP file
+     * @param restful the incoming RESTful request
+     * @param structured the StructuredResponse that contains the response
      */
     protected JspStructuredResponseTemplate(
             RequestDispatcher  dispatcher,
@@ -60,6 +68,8 @@ public class JspStructuredResponseTemplate
      * 
      * @param delegate the delegate to stream to
      * @param structured the StructuredResponse
+     * @throws ServletException exception passed on from underlying servlet output
+     * @throws IOException exception passed on from underlying servlet output
      */
     public void doOutput(
             HttpServletResponse delegate,
