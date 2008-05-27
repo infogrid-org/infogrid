@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 import org.infogrid.context.Context;
 
 /**
- * <p>Represents a choice for instantiating a Viewlet by a ViewletFactory. See
+ * <p>A choice for instantiating a Viewlet by a ViewletFactory. See
  *    description at {@link ViewletFactory ViewletFactory}.</p>
  * <p>Two implementations are provided in this package:</p>
  * <ul>

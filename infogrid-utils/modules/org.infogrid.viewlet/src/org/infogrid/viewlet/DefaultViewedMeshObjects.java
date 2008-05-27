@@ -42,8 +42,6 @@ public class DefaultViewedMeshObjects
 
     /**
       * Constructor. Initializes to empty content.
-      *
-      * @param v the Viewlet that we belong to.
       */
     public DefaultViewedMeshObjects()
     {
@@ -56,6 +54,7 @@ public class DefaultViewedMeshObjects
      * @param subject the new subject of the Viewlet
      * @param subjectParameters the parameters of the newly selected subject, if any
      * @param viewletParameters the parameters of the Viewlet, if any
+     * @param traversal the TraversalSpecification currently in effect on the Viewlet, if any
      */
     @Override
     public void update(
