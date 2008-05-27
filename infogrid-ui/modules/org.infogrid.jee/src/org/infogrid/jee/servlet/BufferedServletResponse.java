@@ -53,6 +53,7 @@ public class BufferedServletResponse
      * Obtain the buffered ServletOutputStream. This triggers the creation of a byte buffer.
      *
      * @return the buffered ServletOutputStream
+     * @throws IOException an I/O problem occurred
      */
     @Override
     public ServletOutputStream getOutputStream()
@@ -89,7 +90,7 @@ public class BufferedServletResponse
      * Obtain the entire buffered output that was written via the PrintWriter.
      *
      * @return the buffered output, or null
-     * @throws IOException 
+     * @throws IOException an I/O problem occurred
      */
     public String getBufferedPrintWriterOutput()
         throws
@@ -110,7 +111,7 @@ public class BufferedServletResponse
      * Obtain the entire buffered output that was written via the ServletOutputStream.
      *
      * @return the buffered output, or null
-     * @throws IOException 
+     * @throws IOException an I/O problem occurred
      */
     public byte [] getBufferedServletOutputStreamOutput()
         throws
@@ -130,7 +131,7 @@ public class BufferedServletResponse
     /**
      * Flush the buffer.
      *
-     * @throws IOException 
+     * @throws IOException an I/O problem occurred
      */
     @Override
     public void flushBuffer()

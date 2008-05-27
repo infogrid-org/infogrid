@@ -4,6 +4,9 @@
     <short-name>v</short-name>
     <uri>/v/org/infogrid/jee/taglib/viewlet/viewlet.tld</uri>
 
+    <!-- Tags are ordered alphabetically by Java Class name. Makes it easier
+         to find them in the IDE. -->
+
     <tag>
         <name>viewlet</name>
         <tag-class>org.infogrid.jee.taglib.viewlet.ViewletTag</tag-class>

@@ -25,6 +25,8 @@ public class IfNotEmptyTag
     extends
         AbstractSectionTestTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */

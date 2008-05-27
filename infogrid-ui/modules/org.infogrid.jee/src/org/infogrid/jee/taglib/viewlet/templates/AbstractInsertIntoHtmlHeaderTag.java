@@ -23,7 +23,8 @@ import org.infogrid.jee.viewlet.templates.StructuredResponse;
 import org.infogrid.jee.viewlet.templates.TextHtmlStructuredResponseSection;
 
 /**
- * <p>Abstract superclass for all tags that insert additional information into the HTML header.</p>
+ * <p>Abstract superclass for all tags that insert additional information into the HTML header
+ *    via a StructuredResponse object.</p>
  */
 public abstract class AbstractInsertIntoHtmlHeaderTag
     extends
@@ -47,7 +48,7 @@ public abstract class AbstractInsertIntoHtmlHeaderTag
     }
     
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
@@ -66,7 +67,7 @@ public abstract class AbstractInsertIntoHtmlHeaderTag
     }
 
     /**
-     * Do the end tag operation.
+     * Our implementation of doEndTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred

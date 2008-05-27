@@ -4,16 +4,9 @@
     <short-name>set</short-name>
     <uri>/v/org/infogrid/jee/taglib/viewlet/templates/templates.tld</uri>
 
-    <tag>
-        <name>inline</name>
-        <tag-class>org.infogrid.jee.taglib.viewlet.templates.InlineTag</tag-class>
-        <attribute>
-            <name>name</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-    </tag>
-
+    <!-- Tags are ordered alphabetically by Java Class name. Makes it easier
+         to find them in the IDE. -->
+         
     <tag>
         <name>ifEmpty</name>
         <tag-class>org.infogrid.jee.taglib.viewlet.templates.IfEmptyTag</tag-class>
@@ -35,10 +28,11 @@
     </tag>
 
     <tag>
-        <name>stylesheet</name>
-        <tag-class>org.infogrid.jee.taglib.viewlet.templates.StylesheetTag</tag-class>
+        <name>inline</name>
+        <tag-class>org.infogrid.jee.taglib.viewlet.templates.InlineTag</tag-class>
         <attribute>
-            <name>href</name>
+            <name>name</name>
+            <required>true</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
@@ -46,6 +40,15 @@
     <tag>
         <name>script</name>
         <tag-class>org.infogrid.jee.taglib.viewlet.templates.ScriptTag</tag-class>
+        <attribute>
+            <name>href</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>stylesheet</name>
+        <tag-class>org.infogrid.jee.taglib.viewlet.templates.StylesheetTag</tag-class>
         <attribute>
             <name>href</name>
             <rtexprvalue>true</rtexprvalue>

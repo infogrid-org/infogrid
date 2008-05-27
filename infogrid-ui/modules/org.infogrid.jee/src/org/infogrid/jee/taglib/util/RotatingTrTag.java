@@ -14,16 +14,14 @@
 
 package org.infogrid.jee.taglib.util;
 
-import org.infogrid.jee.taglib.AbstractInfoGridTag;
-import org.infogrid.jee.taglib.IgnoreException;
-import org.infogrid.util.ArrayHelper;
-
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.jstl.core.LoopTagStatus;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.jstl.core.LoopTagStatus;
+import org.infogrid.jee.taglib.AbstractInfoGridTag;
+import org.infogrid.jee.taglib.IgnoreException;
+import org.infogrid.util.ArrayHelper;
 
 /**
  * <p>Rotates through specified HTML class names for each row in a table.
@@ -34,6 +32,7 @@ public class RotatingTrTag
         extends
              AbstractInfoGridTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Constructor.
@@ -49,9 +48,9 @@ public class RotatingTrTag
     @Override
     protected void initializeToDefaults()
     {
-        theVarStatus   = null;
-        theHtmlClasses = null;
-        theSeparator   = ",";
+        theVarStatus         = null;
+        theHtmlClasses       = null;
+        theSeparator         = ",";
         theFirstRowHtmlClass = null;
         theLastRowHtmlClass  = null;
         
@@ -174,11 +173,11 @@ public class RotatingTrTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected int realDoStartTag()
         throws
@@ -241,10 +240,11 @@ public class RotatingTrTag
     }
 
     /**
-     * Do the end tag operation.
+     * Our implementation of doEndTag().
      *
-     * @return evaluate or skip page
-     * @see javax.servlet.jsp.tagext.Tag#doEndTag()
+     * @return evaluate or skip body
+     * @throws JspException thrown if an evaluation error occurred
+     * @throws IOException thrown if an I/O Exception occurred
      */
     @Override
     protected int realDoEndTag()

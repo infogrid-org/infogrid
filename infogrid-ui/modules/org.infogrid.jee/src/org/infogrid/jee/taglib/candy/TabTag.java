@@ -28,6 +28,8 @@ public class TabTag
     extends
         AbstractInfoGridBodyTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -71,11 +73,11 @@ public class TabTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected int realDoStartTag()
         throws
@@ -91,10 +93,10 @@ public class TabTag
     }
 
     /**
-     * Do the end tag operation.
+     * Our implementation of doEndTag().
      *
-     * @return evaluate or skip page
-     * @see javax.servlet.jsp.tagext.Tag#doEndTag()
+     * @return evaluate or skip body
+     * @throws JspException thrown if an evaluation error occurred
      */
     @Override
     protected int realDoEndTag()

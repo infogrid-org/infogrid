@@ -17,13 +17,12 @@ package org.infogrid.jee.viewlet.templates;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import org.infogrid.jee.rest.AbstractRestfulRequest;
 import org.infogrid.jee.rest.RestfulRequest;
 
 /**
- *
+ * A ResponseTemplate that returns the default sections in the StructuredResponse without
+ * any changes, one after each other.
  */
 public class VerbatimResponseTemplate
         extends
@@ -32,6 +31,8 @@ public class VerbatimResponseTemplate
     /**
      * Factory method.
      *
+     * @param restful the incoming RESTful request
+     * @param structured the StructuredResponse that contains the response
      * @return the created JspStructuredResponseTemplate
      */
     public static VerbatimResponseTemplate create(
@@ -44,6 +45,9 @@ public class VerbatimResponseTemplate
 
     /**
      * Constructor for subclasses only, use factory method.
+     * 
+     * @param restful the incoming RESTful request
+     * @param structured the StructuredResponse that contains the response
      */
     protected VerbatimResponseTemplate(
             RestfulRequest     restful,
@@ -55,8 +59,9 @@ public class VerbatimResponseTemplate
     /**
      * Stream a StructuredResponse to an HttpResponse employing this template.
      * 
-     * @param delegate the delegate to stream to
-     * @param structured the StructuredResponse
+     * @param delegate the underlying HttpServletResponse
+     * @param structured the StructuredResponse that contains the response
+     * @throws IOException thrown if an I/O error occurred
      */
     public void doOutput(
             HttpServletResponse delegate,

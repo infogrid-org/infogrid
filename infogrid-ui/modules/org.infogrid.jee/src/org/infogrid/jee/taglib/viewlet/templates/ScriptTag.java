@@ -21,6 +21,8 @@ public class ScriptTag
     extends
         AbstractHrefOrInlineTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -66,5 +68,4 @@ public class ScriptTag
     {
         return text;
     }
-    
 }
