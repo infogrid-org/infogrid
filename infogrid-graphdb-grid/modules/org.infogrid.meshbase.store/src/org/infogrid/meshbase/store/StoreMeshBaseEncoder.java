@@ -14,18 +14,15 @@
 
 package org.infogrid.meshbase.store;
 
+import java.io.InputStream;
 import org.infogrid.mesh.a.AMeshObject;
-
 import org.infogrid.meshbase.a.AMeshBaseLifecycleManager;
-
 import org.infogrid.model.primitives.externalized.DecodingException;
 import org.infogrid.model.primitives.externalized.EncodingException;
 
-import java.io.InputStream;
-
 /**
  * This interface is supported by classes that know how to serialize and deserialize
- * MeshObjects
+ * MeshObjects.
  */
 public interface StoreMeshBaseEncoder
 {
@@ -34,6 +31,7 @@ public interface StoreMeshBaseEncoder
      *
      * @param obj the input MeshObject
      * @return the byte stream
+     * @throws EncodingException thrown if an encoding problem occurred
      */
     public byte [] encode(
             AMeshObject obj )
@@ -47,6 +45,7 @@ public interface StoreMeshBaseEncoder
      * @param contentAsStream the byte [] stream in which the MeshObject is encoded
      * @param life the StoreMeshObjectLifecycleManager to instantiate the MeshObject
      * @return return the just-instantiated MeshObject, as convenience
+     * @throws DecodingException thrown if a decoding problem occurred
      */
     public AMeshObject decode(
             InputStream               contentAsStream,

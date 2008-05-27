@@ -59,14 +59,14 @@ public class NetStoreMeshBase
     /**
      * Factory method.
      * 
-     * @param identifier the NNetMeshBaseIdentifierof the to-be-created NetMeshBase
+     * @param identifier the NetMeshBaseIdentifierof the to-be-created NetMeshBase
      * @param modelBase the ModelBase with the type definitions we use
      * @param accessMgr the AccessManager that controls access to this MeshBase
-     * @param theHomeObjectTypes the EntityTypes with which to bless the home object, if not initialized yet
      * @param meshObjectStore the Store in which to store the MeshObjects
      * @param proxyStore the Store in which to store the Proxies
      * @param endpointFactory the MessageEndpointFactory to use for proxy communication
      * @param c the Context in which this MeshBase will run
+     * @return the created NetStoreMeshBase
      * @throws IsAbstractException thrown if the given EntityTypes for the home object are abstract and cannot be instantiated
      */
     public static NetStoreMeshBase create(
@@ -98,14 +98,14 @@ public class NetStoreMeshBase
     /**
      * Factory method.
      * 
-     * @param identifier the NNetMeshBaseIdentifierof the to-be-created NetMeshBase
+     * @param identifier the NetMeshBaseIdentifier of the to-be-created NetMeshBase
      * @param modelBase the ModelBase with the type definitions we use
      * @param accessMgr the AccessManager that controls access to this MeshBase
-     * @param theHomeObjectTypes the EntityTypes with which to bless the home object, if not initialized yet
      * @param meshObjectStore the Store in which to store the MeshObjects
      * @param proxyStore the Store in which to store the Proxies
      * @param endpointFactory the MessageEndpointFactory to use for proxy communication
      * @param c the Context in which this MeshBase will run
+     * @return the created NetStoreMeshBase
      * @throws IsAbstractException thrown if the given EntityTypes for the home object are abstract and cannot be instantiated
      */
     public static NetStoreMeshBase create(
