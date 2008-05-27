@@ -14,17 +14,13 @@
 
 package org.infogrid.jee.viewlet.meshbase;
 
+import java.util.Iterator;
 import org.infogrid.context.Context;
-
 import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.viewlet.AbstractJeeViewlet;
-
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
-
 import org.infogrid.util.NameServer;
-
-import java.util.Iterator;
 import org.infogrid.viewlet.AbstractViewedMeshObjects;
 import org.infogrid.viewlet.DefaultViewedMeshObjects;
 

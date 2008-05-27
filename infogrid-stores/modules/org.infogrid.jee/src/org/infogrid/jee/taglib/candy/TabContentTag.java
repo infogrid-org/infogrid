@@ -14,10 +14,9 @@
 
 package org.infogrid.jee.taglib.candy;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.jee.taglib.InfoGridJspUtils;
-
-import javax.servlet.jsp.JspException;
 
 /**
  * Tag identifying the content portion of a tab.
@@ -26,6 +25,8 @@ public class TabContentTag
     extends
         AbstractTabChild
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -44,11 +45,11 @@ public class TabContentTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected int realDoStartTag()
         throws

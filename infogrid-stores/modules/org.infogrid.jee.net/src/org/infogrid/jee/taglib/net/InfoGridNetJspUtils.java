@@ -51,7 +51,7 @@ public abstract class InfoGridNetJspUtils
     {
         StringRepresentation rep = determineStringRepresentation( stringRepresentation );
 
-        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, p.getNetMeshBase() );
+        boolean isDefaultMeshBase = isDefaultMeshBase( p.getNetMeshBase() );
 
         String ret = p.toStringRepresentation( rep, isDefaultMeshBase );
         return ret;
@@ -97,7 +97,7 @@ public abstract class InfoGridNetJspUtils
             contextPath = ((HttpServletRequest)pageContext.getRequest()).getContextPath() + "/";
         }
 
-        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, p.getNetMeshBase() );
+        boolean isDefaultMeshBase = isDefaultMeshBase( p.getNetMeshBase() );
 
         String ret = p.toStringRepresentationLinkStart( rep, contextPath, isDefaultMeshBase );
         return ret;
@@ -127,7 +127,7 @@ public abstract class InfoGridNetJspUtils
             contextPath = ((HttpServletRequest)pageContext.getRequest()).getContextPath() + "/";
         }
 
-        boolean contextImpliesThisMeshBase = isDefaultMeshBase( pageContext, p.getNetMeshBase() );
+        boolean contextImpliesThisMeshBase = isDefaultMeshBase( p.getNetMeshBase() );
 
         String ret = p.toStringRepresentationLinkEnd( rep, contextPath, contextImpliesThisMeshBase );
         return ret;

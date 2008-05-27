@@ -33,7 +33,7 @@ import org.infogrid.util.FlexibleListenerSet;
 import org.infogrid.util.logging.Log;
 
 /**
- * Factors out functionality common to most ActiveTraversalPathSets.
+ * Factors out functionality common to most in-memory ActiveTraversalPathSets.
  */
 public abstract class AbstractActiveMTraversalPathSet
         extends

@@ -14,10 +14,8 @@
 
 package org.infogrid.jee.taglib.util;
 
-import org.infogrid.jee.taglib.AbstractInfoGridTag;
-import org.infogrid.jee.taglib.IgnoreException;
-import org.infogrid.jee.taglib.InfoGridJspUtils;
-
+import java.io.IOException;
+import java.io.PrintWriter;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -26,9 +24,9 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.BodyContent;
-
-import java.io.IOException;
-import java.io.PrintWriter;
+import org.infogrid.jee.taglib.AbstractInfoGridTag;
+import org.infogrid.jee.taglib.IgnoreException;
+import org.infogrid.jee.taglib.InfoGridJspUtils;
 
 /**
  * <p>Allows the inclusion of named servlets. This should be a standard feature
@@ -41,6 +39,8 @@ public class NamedServletIncludeTag
         AbstractInfoGridTag
     
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -108,12 +108,12 @@ public class NamedServletIncludeTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @throws IOException thrown if an I/O error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+     * @throws IgnoreException thrown to abort processing without an error
+     * @throws IOException thrown if an I/O Exception occurred
      */
     protected int realDoStartTag()
         throws
@@ -178,8 +178,6 @@ public class NamedServletIncludeTag
          */
         @Override
         public PrintWriter getWriter()
-            throws
-                IOException
         {
             return printWriter;
         }
@@ -192,8 +190,6 @@ public class NamedServletIncludeTag
          */
         @Override
         public ServletOutputStream getOutputStream()
-            throws
-                IOException
         {
             throw new IllegalStateException();
         }

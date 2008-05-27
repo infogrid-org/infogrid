@@ -100,6 +100,7 @@ public abstract class AbstractPropertyCompareTag
      * @return -1, 0 or +1 depending on the result of the comparison;
      *         2 in case of non-comparable values.
      * @throws JspException thrown if an evaluation error occurred
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected int compare()
         throws

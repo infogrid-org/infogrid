@@ -14,9 +14,8 @@
 
 package org.infogrid.jee.taglib.logic;
 
-import org.infogrid.jee.taglib.IgnoreException;
-
 import javax.servlet.jsp.JspException;
+import org.infogrid.jee.taglib.IgnoreException;
 
 /**
  * <p>This tag tests for a match of the String representation of a PropertyValue
@@ -27,6 +26,8 @@ public class MatchTag
         extends
             AbstractPropertyMatchTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */

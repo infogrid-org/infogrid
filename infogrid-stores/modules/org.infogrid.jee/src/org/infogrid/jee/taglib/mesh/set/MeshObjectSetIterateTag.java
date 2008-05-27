@@ -28,6 +28,8 @@ public class MeshObjectSetIterateTag
     extends
         AbstractMeshObjectSetIterateTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -75,6 +77,7 @@ public class MeshObjectSetIterateTag
      *
      * @return the set to iterate over
      * @throws JspException if a JSP exception has occurred
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected MeshObjectSet determineMeshObjectSet()
         throws

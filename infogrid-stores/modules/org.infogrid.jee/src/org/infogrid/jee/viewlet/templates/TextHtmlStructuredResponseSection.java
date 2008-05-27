@@ -15,16 +15,18 @@
 package org.infogrid.jee.viewlet.templates;
 
 /**
+ * A section in a StructuredResponse that contains HTML text.
  */
 public class TextHtmlStructuredResponseSection
         extends
             TextStructuredResponseSection
 {
     /**
-      * Factory method.
-      *
-      * @return the created StructuredResponseSection
-      */
+     * Factory method.
+     *
+     * @param name the name of the section
+     * @return the created StructuredResponseSection
+     */
     public static TextHtmlStructuredResponseSection create(
             String name )
     {
@@ -33,8 +35,10 @@ public class TextHtmlStructuredResponseSection
     }
 
     /**
-      * Constructor for subclasses only, use factory method.
-      */
+     * Constructor for subclasses only, use factory method.
+     * 
+     * @param name the name of the section
+     */
     protected TextHtmlStructuredResponseSection(
             String name )
     {
@@ -42,7 +46,8 @@ public class TextHtmlStructuredResponseSection
     }
 
     /**
-     * The single section identifying the default.
+     * The single default section for HTML text content. Output will be written into this section
+     * unless otherwise specified.
      */
     public static final TextHtmlStructuredResponseSection HTML_HEAD_SECTION
             = TextHtmlStructuredResponseSection.create( "html-head" );

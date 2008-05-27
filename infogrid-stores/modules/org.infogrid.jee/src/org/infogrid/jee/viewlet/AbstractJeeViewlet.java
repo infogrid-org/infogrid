@@ -52,8 +52,8 @@ public abstract class AbstractJeeViewlet
     }
     
     /**
-     * Obtain the Html class name for this Viewlet. By default, it is the Java class
-     * name, having replaced all periods with hyphens.
+     * Obtain the Html class name for this Viewlet that will be used for the enclosing <tt>div</tt> tag.
+     * By default, it is the Java class name, having replaced all periods with hyphens.
      * 
      * @return the HTML class name
      */
@@ -115,10 +115,9 @@ public abstract class AbstractJeeViewlet
      * <p>Invoked prior to the execution of the Servlet if the POST method has been requested
      *    and the FormTokenService determined that the incoming POST was <b>not</b> safe.
      *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
-     *    the GET execution of the servlet.</p>
+     *    the POST execution of the servlet.</p>
      * <p>It is strongly recommended that JeeViewlets do not regularly process the incoming
      *    POST data, as the request is likely unsafe (e.g. a Cross-Site Request Forgery).</p>
-     * <p>Subclasses will often override this.</p>
      * 
      * @param request the incoming request
      * @param response the response to be assembled
@@ -146,7 +145,9 @@ public abstract class AbstractJeeViewlet
      * @param thrown if this is non-null, it is the Throwable indicating a problem that occurred
      *        either during execution of performBefore or of the servlet.
      * @throws ServletException thrown if an error occurred
-     * @see #performBefore
+     * @see #performBeforeGet
+     * @see #performBeforeSafePost
+     * @see #performBeforeUnsafePost
      */
     public void performAfter(
             RestfulRequest     request,
@@ -161,7 +162,6 @@ public abstract class AbstractJeeViewlet
     /**
      * Obtain the path to the Servlet for this JeeViewlet. JeeViewlet may implement this in different ways,
      * such as be returning a path to a JSP. This returns the generic path, not a localized version.
-     * The localized version is constructed by the caller from its information about preferred Locales.
      * 
      * @return the Servlet path
      */
@@ -190,7 +190,8 @@ public abstract class AbstractJeeViewlet
     }
 
     /**
-     * Process the incoming RestfulRequest.
+     * Process the incoming RestfulRequest. Default implementation that can be
+     * overridden by subclasses.
      * 
      * @param restful the incoming RestfulRequest
      * @param structured the StructuredResponse into which to write the result
@@ -235,7 +236,7 @@ public abstract class AbstractJeeViewlet
     }
 
     /**
-     * Invoke the RequestDispatcher, can catch the results in the default section of the StructuredResponse.
+     * Invoke the RequestDispatcher and put the results in the default section of the StructuredResponse.
      * 
      * @param dispatcher the RequestDispatcher to invoke
      * @param restful the incoming request
@@ -243,7 +244,7 @@ public abstract class AbstractJeeViewlet
      * @throws javax.servlet.ServletException processing failed
      * @throws java.io.IOException I/O error
      */
-    public static void runRequestDispatcher(
+    public void runRequestDispatcher(
             RequestDispatcher  dispatcher,
             RestfulRequest     restful,
             StructuredResponse structured )
@@ -278,7 +279,7 @@ public abstract class AbstractJeeViewlet
                 
 
     /**
-     * Obtain the URL to which forms should be HTTP post'd. This
+     * Obtain the URL to which forms should be HTTP POSTed. This
      * can be overridden by subclasses.
      *
      * @return the URL

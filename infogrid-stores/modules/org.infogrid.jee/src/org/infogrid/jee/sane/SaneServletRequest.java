@@ -14,16 +14,6 @@
 
 package org.infogrid.jee.sane;
 
-import org.infogrid.util.ArrayCursorIterator;
-import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.CompositeIterator;
-import org.infogrid.util.OneElementIterator;
-import org.infogrid.util.StreamUtils;
-import org.infogrid.util.http.HTTP;
-import org.infogrid.util.http.SaneCookie;
-import org.infogrid.util.http.SaneRequest;
-import org.infogrid.util.logging.Log;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -34,9 +24,17 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import org.infogrid.util.ArrayCursorIterator;
+import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.CompositeIterator;
+import org.infogrid.util.OneElementIterator;
+import org.infogrid.util.StreamUtils;
+import org.infogrid.util.http.HTTP;
+import org.infogrid.util.http.SaneCookie;
+import org.infogrid.util.http.SaneRequest;
+import org.infogrid.util.logging.Log;
 
 /**
  * A ServletRequest following the <code>SaneRequest</code> API.

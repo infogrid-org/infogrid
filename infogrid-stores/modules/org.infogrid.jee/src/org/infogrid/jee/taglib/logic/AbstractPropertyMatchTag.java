@@ -14,14 +14,12 @@
 
 package org.infogrid.jee.taglib.logic;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.model.primitives.ModelPrimitivesStringRepresentation;
 import org.infogrid.model.primitives.PropertyValue;
-
-import javax.servlet.jsp.JspException;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * <p>Abstract superclass for all tags performing a match between a <code>PropertyValue</code>
@@ -80,6 +78,7 @@ public abstract class AbstractPropertyMatchTag
      * @return -1, 0 or +1 depending on the result of the comparison.
      *         2 in case of non-comparable values.
      * @throws JspException thrown if an evaluation error occurred
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected boolean matches()
         throws

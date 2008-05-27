@@ -30,7 +30,7 @@ import org.infogrid.meshbase.transaction.Change;
 import org.infogrid.util.ArrayHelper;
 
 /**
- * <p>This ActiveMeshObjectSet is calculated as a composition of other
+ * <p>This in-memory ActiveMeshObjectSet is calculated as a composition of other
  * MeshObjectSets. The type of composition can be specified by
  * choosing an appropriate factory method.</p>
  *

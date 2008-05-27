@@ -24,7 +24,7 @@ import org.infogrid.viewlet.AbstractViewedMeshObjects;
 import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
 /**
- * Displays all MeshTypes in the ModelBase.
+ * Viewlet that displays all MeshTypes currently held in the ModelBase.
  */
 public class AllMeshTypesViewlet
         extends

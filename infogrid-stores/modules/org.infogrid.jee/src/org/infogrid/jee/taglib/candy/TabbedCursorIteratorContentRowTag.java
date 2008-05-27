@@ -28,6 +28,8 @@ public class TabbedCursorIteratorContentRowTag
     extends
         AbstractInfoGridBodyTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -37,11 +39,10 @@ public class TabbedCursorIteratorContentRowTag
     }
     
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
      */
     protected int realDoStartTag()
         throws
@@ -61,11 +62,10 @@ public class TabbedCursorIteratorContentRowTag
     }
 
     /**
-     * Do the end tag operation.
+     * Our implementation of doEndTag().
      *
-     * @return evaluate or skip page
+     * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doEndTag()
      */
     @Override
     protected int realDoEndTag()

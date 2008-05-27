@@ -22,13 +22,13 @@ import org.infogrid.jee.rest.RestfulRequest;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;
 
 /**
- * <p>A software component of an application's user interface.
+ * <p>A software component of an application's JEE user interface.
  *    Conceptually, the user interface of an InfoGrid web application consists of Viewlets.
  *    These Viewlets can be supported by Servlets and/or JSPs, which can rely on the fact that a specific
  *    JeeViewlet exists for them &quot;behind the,&quot;; this makes programming much simpler.
  *    Among them, it makes it easy to deliver the same JeeViewlet functionality in multiple
  *    locales.</p>
- * <p>Viewlets are somewhat comparable with Java portlets, but much simpler and built around
+ * <p>JEE Viewlets are somewhat comparable with Java portlets, but much simpler and built around
  *    a REST-ful, identity-aware design.</p>
  * <p>A JeeViewlet typically has a subject, which is given as a <code>MeshObject</code>. For example,
  *    a JeeViewlet showing an electronic business card might have the owner of the business card
@@ -40,7 +40,7 @@ public interface JeeViewlet
             Viewlet
 {
     /**
-     * Obtain the Html class name for this Viewlet.
+     * Obtain the Html class name for this Viewlet that will be used for the enclosing <tt>div</tt> tag.
      * 
      * @return the HTML class name
      */
@@ -87,7 +87,7 @@ public interface JeeViewlet
      * <p>Invoked prior to the execution of the Servlet if the POST method has been requested
      *    and the FormTokenService determined that the incoming POST was <b>not</b> safe.
      *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
-     *    the GET execution of the servlet.</p>
+     *    the POST execution of the servlet.</p>
      * <p>It is strongly recommended that JeeViewlets do not regularly process the incoming
      *    POST data, as the request is likely unsafe (e.g. a Cross-Site Request Forgery).</p>
      * 
@@ -114,7 +114,9 @@ public interface JeeViewlet
      * @param thrown if this is non-null, it is the Throwable indicating a problem that occurred
      *        either during execution of performBefore or of the servlet.
      * @throws ServletException thrown if an error occurred
-     * @see #performBefore
+     * @see #performBeforeGet
+     * @see #performBeforeSafePost
+     * @see #performBeforeUnsafePost
      */
     public void performAfter(
             RestfulRequest     request,
@@ -122,24 +124,6 @@ public interface JeeViewlet
             Throwable          thrown )
         throws
             ServletException;
-
-//    /**
-//     * Set the current request.
-//     *
-//     * @param newRequest the new request
-//     */
-//    public void setCurrentRequest(
-//            RestfulRequest newRequest );
-//
-//    /**
-//     * Obtain the path to the Servlet for this JeeViewlet. JeeViewlet may implement this in different ways,
-//     * such as be returning a path to a JSP. This returns the generic path, not a localized version.
-//     * The localized version is constructed by the caller from its information about preferred Locales.
-//     * 
-//     * 
-//     * @return the Servlet path
-//     */
-//    public String getServletPath();
 
     /**
      * Process the incoming RestfulRequest.
@@ -157,8 +141,7 @@ public interface JeeViewlet
             IOException;
             
     /**
-     * Obtain the URL to which forms should be HTTP post'd. This
-     * can be overridden by subclasses.
+     * Obtain the URL to which forms should be HTTP POSTed.
      *
      * @return the URL
      */

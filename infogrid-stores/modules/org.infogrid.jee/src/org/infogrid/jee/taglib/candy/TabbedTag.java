@@ -14,12 +14,11 @@
 
 package org.infogrid.jee.taglib.candy;
 
+import java.io.IOException;
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.jee.taglib.InfoGridJspUtils;
-
-import javax.servlet.jsp.JspException;
-import java.io.IOException;
 
 /**
  * <p>Tag to support tabbed navigation.</p>
@@ -46,6 +45,8 @@ public class TabbedTag
     extends
         AbstractInfoGridBodyTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -60,7 +61,6 @@ public class TabbedTag
     @Override
     protected void initializeToDefaults()
     {
-        theId        = null;
         theHtmlClass = null;
 
         super.initializeToDefaults();
@@ -90,11 +90,11 @@ public class TabbedTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected int realDoStartTag()
         throws
@@ -107,9 +107,10 @@ public class TabbedTag
             print( " " );
             print( theHtmlClass );
         }
-        if( theId != null && theId.length() > 0 ) {
+        
+        if( id != null && id.length() > 0 ) {
             print( "\" id=\"" );
-            print( theId );
+            print( id );
         }
         println( "\">");
         println( " <div class=\"header\">" );
@@ -122,6 +123,11 @@ public class TabbedTag
 
     /**
      * Our implementation of doAfterBody().
+     *
+     * @return evaluate or skip body
+     * @throws JspException thrown if an evaluation error occurred
+     * @throws IgnoreException thrown to abort processing without an error
+     * @throws IOException thrown if an I/O Exception occurred
      */
     @Override
     protected int realDoAfterBody()
@@ -148,10 +154,10 @@ public class TabbedTag
     }
 
     /**
-     * Do the end tag operation.
+     * Our implementation of doEndTag().
      *
-     * @return evaluate or skip page
-     * @see javax.servlet.jsp.tagext.Tag#doEndTag()
+     * @return evaluate or skip body
+     * @throws JspException thrown if an evaluation error occurred
      */
     @Override
     protected int realDoEndTag()
@@ -178,11 +184,6 @@ public class TabbedTag
         return isHead;
     }
 
-    /**
-     * The HTML id attribute.
-     */
-    protected String theId;
-    
     /**
      * The "class" attribute (used like HTML does it). Unfortunately, we can't call it "class"
      * because that would interfere with Java's Object.getClass() method.

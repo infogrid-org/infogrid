@@ -378,11 +378,11 @@ public class WikiObjectEditViewlet
          * @return the found Action
          */
         public static Action findAction(
-                Object modeName )
+                Object keyword )
         {
-            if( modeName != null ) {
+            if( keyword != null ) {
                 for( Action candidate : Action.values() ) {
-                    if( candidate.theActionName.equals( modeName )) {
+                    if( candidate.theActionName.equals( keyword )) {
                         return candidate;
                     }
                 }

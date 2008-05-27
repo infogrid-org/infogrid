@@ -14,9 +14,8 @@
 
 package org.infogrid.jee.taglib.logic;
 
-import org.infogrid.jee.taglib.IgnoreException;
-
 import javax.servlet.jsp.JspException;
+import org.infogrid.jee.taglib.IgnoreException;
 
 /**
  * <p>This tag tests for value inequality. See description in the
@@ -26,6 +25,8 @@ public class NotEqualTag
     extends
         AbstractPropertyCompareTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
