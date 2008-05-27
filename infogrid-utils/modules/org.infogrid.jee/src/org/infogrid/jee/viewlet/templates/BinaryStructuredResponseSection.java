@@ -18,17 +18,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * A section in a StructuredResponse.
+ * A section in a StructuredResponse that contains binary data.
  */
 public class BinaryStructuredResponseSection
         extends
             StructuredResponseSection
 {
     /**
-      * Factory method.
-      *
-      * @return the created StructuredResponseSection
-      */
+     * Factory method.
+     *
+     * @param name the name of the section
+     * @return the created StructuredResponseSection
+     */
     public static BinaryStructuredResponseSection create(
             String name )
     {
@@ -37,8 +38,10 @@ public class BinaryStructuredResponseSection
     }
 
     /**
-      * Constructor for subclasses only, use factory method.
-      */
+     * Constructor for subclasses only, use factory method.
+     * 
+     * @param name the name of the section
+     */
     protected BinaryStructuredResponseSection(
             String name )
     {
@@ -51,6 +54,7 @@ public class BinaryStructuredResponseSection
      * @param s the OutputStream to write to
      * @param structured the StructuredResponse that holds the data
      * @return true if something was output, false otherwise
+     * @throws IOException thrown if an I/O error occurred
      */
     public boolean doOutput(
             OutputStream        s,
@@ -69,9 +73,9 @@ public class BinaryStructuredResponseSection
     }
 
     /**
-     * The single section identifying the content.
+     * The single default section for binary content. Output will be written into this section
+     * unless otherwise specified.
      */
     public static final BinaryStructuredResponseSection DEFAULT_SECTION
             = BinaryStructuredResponseSection.create( "default" );
 }
-

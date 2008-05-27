@@ -29,7 +29,7 @@ import org.infogrid.util.http.SaneRequest;
 
 /**
  * Categorizes incoming POST requests as safe or unsafe, depending on whether they contain
- * a valid form toke or not.
+ * a valid form token or not.
  */
 public class SafeUnsafePostFilter
         implements

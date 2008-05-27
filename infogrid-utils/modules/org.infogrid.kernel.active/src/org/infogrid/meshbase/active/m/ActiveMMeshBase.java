@@ -41,10 +41,11 @@ public class ActiveMMeshBase
     /**
      * Factory method.
      *
+     * @param identifier the MeshBaseIdentifier of this MeshBase
      * @param modelBase the ModelBase with the type definitions we use
      * @param accessMgr the AccessManager that controls access to this MeshBase
-     * @param theHomeObjectTypes the EntityTypes with which the home object should be blessed
      * @param c the Context in which this MeshBase will run
+     * @return the created ActiveMMeshBase
      */
     public static ActiveMMeshBase create(
             MeshBaseIdentifier identifier,

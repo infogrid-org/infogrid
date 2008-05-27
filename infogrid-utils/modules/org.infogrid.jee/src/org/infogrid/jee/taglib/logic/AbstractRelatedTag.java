@@ -14,17 +14,14 @@
 
 package org.infogrid.jee.taglib.logic;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
 import org.infogrid.jee.taglib.IgnoreException;
-
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
-
 import org.infogrid.model.traversal.TraversalDictionary;
 import org.infogrid.model.traversal.TraversalSpecification;
-
-import javax.servlet.jsp.JspException;
 
 /**
  * <p>Abstract superclass for all tags evaluating a MeshObjects related to a start MeshObject.</p>
@@ -172,7 +169,7 @@ public abstract class AbstractRelatedTag
     }
     
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred

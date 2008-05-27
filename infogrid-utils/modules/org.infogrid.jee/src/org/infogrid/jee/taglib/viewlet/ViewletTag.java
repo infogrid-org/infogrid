@@ -21,12 +21,14 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
 /**
- * Container for a JeeViewlet definition in a JSP file.
+ * Container for a JeeViewlet.
  */
 public class ViewletTag
         extends
             TagSupport
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */

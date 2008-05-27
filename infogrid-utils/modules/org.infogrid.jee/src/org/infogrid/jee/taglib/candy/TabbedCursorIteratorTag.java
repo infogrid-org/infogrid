@@ -31,6 +31,8 @@ public class TabbedCursorIteratorTag
     implements
         InfoGridIterationTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -100,10 +102,12 @@ public class TabbedCursorIteratorTag
     }
 
     /**
-     * Process the start tag.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
-     * @throws JspException if a JSP exception has occurred
+     * @throws JspException thrown if an evaluation error occurred
+     * @throws IgnoreException thrown to abort processing without an error
+     * @throws IOException thrown if an I/O Exception occurred
      */
     protected int realDoStartTag()
         throws
@@ -164,10 +168,9 @@ public class TabbedCursorIteratorTag
     }
 
     /**
-     * Process the end tag.
+     * Our implementation of doEndTag().
      *
-     * @return evaluate or skip page
-     * @throws JspException thrown if an error occurred
+     * @return evaluate or skip body
      */
     @Override
     protected int realDoEndTag()
@@ -198,6 +201,8 @@ public class TabbedCursorIteratorTag
     /**
      * Allow enclosed tags to determine whether, during this iteration, the
      * header should be displayed.
+     * 
+     * @return true if the header should be displayed
      */
     public boolean displayHeader()
     {
@@ -209,6 +214,7 @@ public class TabbedCursorIteratorTag
      *
      * @return the CursorIterator to iterate over
      * @throws JspException if a JSP exception has occurred
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected CursorIterator<?> determineCursorIterator()
         throws

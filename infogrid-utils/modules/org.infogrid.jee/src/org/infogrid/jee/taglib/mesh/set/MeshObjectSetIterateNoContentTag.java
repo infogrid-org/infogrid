@@ -14,10 +14,9 @@
 
 package org.infogrid.jee.taglib.mesh.set;
 
-import org.infogrid.jee.taglib.AbstractInfoGridTag;
-
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.Tag;
+import org.infogrid.jee.taglib.AbstractInfoGridTag;
 
 /**
  * Tag that collects the content within the <code>MeshObjectSetIterate</code> tag
@@ -27,6 +26,8 @@ public class MeshObjectSetIterateNoContentTag
     extends
         AbstractInfoGridTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -36,11 +37,10 @@ public class MeshObjectSetIterateNoContentTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
      */
     protected int realDoStartTag()
         throws

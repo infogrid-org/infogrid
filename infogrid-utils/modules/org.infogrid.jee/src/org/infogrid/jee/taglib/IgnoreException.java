@@ -23,6 +23,8 @@ public class IgnoreException
         extends
             Exception
 {
+    private static final long serialVersionUID = 1L; // helps with serialization and to get rid of pesky NetBeans warnings
+    
     /**
      * Parameter-less constructor.
      */

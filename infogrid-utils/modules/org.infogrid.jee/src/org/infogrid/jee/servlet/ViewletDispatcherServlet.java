@@ -150,25 +150,7 @@ public class ViewletDispatcherServlet
             }
         }
 
-//        String            servletPath = null;
-//        RequestDispatcher dispatcher  = null;
-//
-//        if( viewlet != null ) {
-//            servletPath = viewlet.getServletPath();
-//        }
-//
-//        if( servletPath != null ) {
-//            dispatcher = app.findLocalizedRequestDispatcher(
-//                    servletPath,
-//                    restful.getSaneRequest().acceptLanguageIterator(),
-//                    structured.getServletContext() );
-//
-//        } else if( viewlet != null ) {
-//            log.error( "Viewlet " + viewlet + " returned null servletPath" );
-//        }
-//
-//        if( dispatcher != null ) {
-if( viewlet != null ) {
+        if( viewlet != null ) {
             // create a stack of Viewlets
             JeeViewlet oldViewlet = (JeeViewlet) restful.getDelegate().getAttribute( JeeViewlet.VIEWLET_ATTRIBUTE_NAME );
             restful.getDelegate().setAttribute( JeeViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );

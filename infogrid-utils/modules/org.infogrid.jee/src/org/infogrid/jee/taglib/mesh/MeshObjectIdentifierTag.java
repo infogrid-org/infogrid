@@ -14,12 +14,11 @@
 
 package org.infogrid.jee.taglib.mesh;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.jee.taglib.InfoGridJspUtils;
 import org.infogrid.mesh.MeshObject;
-
-import javax.servlet.jsp.JspException;
 
 /**
  * <p>Tag that displays the identifier of a MeshObject.</p>
@@ -28,6 +27,8 @@ public class MeshObjectIdentifierTag
     extends
         AbstractInfoGridBodyTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -118,11 +119,11 @@ public class MeshObjectIdentifierTag
     }
     
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected int realDoStartTag()
         throws
@@ -140,10 +141,11 @@ public class MeshObjectIdentifierTag
     }
 
     /**
-     * Do the end tag operation.
+     * Our implementation of doEndTag().
      *
-     * @return evaluate or skip page
-     * @see javax.servlet.jsp.tagext.Tag#doEndTag()
+     * @return evaluate or skip body
+     * @throws JspException thrown if an evaluation error occurred
+     * @throws IgnoreException thrown to abort processing without an error
      */
     @Override
     protected int realDoEndTag()

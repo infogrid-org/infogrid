@@ -14,15 +14,12 @@
 
 package org.infogrid.jee.taglib.util;
 
-import javax.servlet.jsp.JspException;
-
 import java.io.IOException;
-
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.security.FormTokenService;
 import org.infogrid.jee.taglib.AbstractInfoGridTag;
 import org.infogrid.jee.taglib.IgnoreException;
-
         
 /**
  * <p>Generates an HTML form with a token that reduces CSRF attacks. This token
@@ -540,11 +537,11 @@ public class SafeFormTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected int realDoStartTag()
         throws
@@ -594,10 +591,9 @@ public class SafeFormTag
     }
 
     /**
-     * Do the end tag operation.
+     * Our implementation of doEndTag().
      *
-     * @return evaluate or skip page
-     * @see javax.servlet.jsp.tagext.Tag#doEndTag()
+     * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
      * @throws IOException thrown if an I/O Exception occurred
      */

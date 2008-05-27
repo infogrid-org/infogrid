@@ -23,6 +23,8 @@ public class MeshObjectSinceTimeCreatedTag
     extends
         AbstractMeshObjectDurationTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */

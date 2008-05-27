@@ -14,12 +14,11 @@
 
 package org.infogrid.jee.taglib.mesh.set;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.model.traversal.TraversalSpecification;
-
-import javax.servlet.jsp.JspException;
 
 /**
  * Iterate over a <code>MeshObjectSet</code> that is determined by traversing from a start
@@ -29,6 +28,8 @@ public class MeshObjectSetTraverseIterateTag
     extends
         AbstractMeshObjectSetIterateTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */

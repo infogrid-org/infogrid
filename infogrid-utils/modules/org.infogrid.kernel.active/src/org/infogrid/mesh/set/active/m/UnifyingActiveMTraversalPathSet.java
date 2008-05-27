@@ -24,7 +24,7 @@ import org.infogrid.mesh.set.active.TraversalPathRemovedEvent;
 import org.infogrid.model.traversal.TraversalPath;
 
 /**
- * This unifies N ActiveTraversalPathSets in one ActiveTraversalPathSet.
+ * This in-memory ActiveTraversalPathSet unifies N ActiveTraversalPathSets.
  */
 public class UnifyingActiveMTraversalPathSet
         extends
