@@ -37,7 +37,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 
 /**
- * Factors out functionality common to StoreMeshBaseEntryMappers
+ * Factors out functionality common to StoreMeshBaseEntryMappers.
  */
 public abstract class AbstractStoreMeshBaseEntryMapper
         implements
@@ -46,7 +46,7 @@ public abstract class AbstractStoreMeshBaseEntryMapper
     private static final Log log = Log.getLogInstance( AbstractStoreMeshBaseEntryMapper.class ); // our own, private logger
 
     /**
-     * Set the MeshBase to which we belong.
+     * Set the MeshBase to which this StoreEntryMapper belongs.
      *
      * @param mb the MeshBase
      */
@@ -225,7 +225,7 @@ public abstract class AbstractStoreMeshBaseEntryMapper
     }
 
     /**
-     * The MeshBase that we belong to.
+     * The MeshBase that this StoreMeshBaseMapper belongs to.
      */
     protected AMeshBase theMeshBase; 
 }

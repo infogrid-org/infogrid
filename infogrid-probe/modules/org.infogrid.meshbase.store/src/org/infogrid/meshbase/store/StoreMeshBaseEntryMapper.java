@@ -18,7 +18,7 @@ import org.infogrid.mesh.externalized.ExternalizedMeshObjectEncoder;
 import org.infogrid.mesh.externalized.xml.ExternalizedMeshObjectXmlEncoder;
 
 /**
- * This class helps map in and out MeshObjects from and to Stores.
+ * Helps to map MeshObjects in and out from and to Stores.
  */
 public class StoreMeshBaseEntryMapper
         extends
@@ -32,7 +32,6 @@ public class StoreMeshBaseEntryMapper
     {
         // noop
     }
-
 
     /**
      * Obtain the preferred encodingid of this StoreEntryMapper.
