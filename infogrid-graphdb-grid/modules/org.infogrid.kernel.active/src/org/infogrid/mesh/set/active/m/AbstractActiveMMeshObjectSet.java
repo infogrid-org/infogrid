@@ -37,7 +37,7 @@ import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.WrongMeshBaseException;
 
 /**
- * <p>Factors out common functionality in various ActiveMeshObjectSet implementations.</p>
+ * <p>Factors out common functionality in various in-memory ActiveMeshObjectSet implementations.</p>
  * 
  * <p>This implementation DOES NOT listen to PropertyChangeEvents from its content.
  * If a subclass needs to do that, it needs to do it itself.</p>

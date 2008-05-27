@@ -58,7 +58,7 @@ import java.lang.reflect.Method;
  *   </tr>
  *   <tr>
  *    <td><code>DefaultMeshBaseIdentifier</code></td>
- *    <td>Filter parameter specifying the identifier of the default MeshBase in the
+ *    <td>Filter parameter specifying the MeshBaseIdentifier of the default MeshBase in the
  *        application.</td>
  *    <td>Required</td>
  *   </tr>
@@ -200,6 +200,9 @@ public class InitializationFilter
     
     /**
      * Initialization method for this filter.
+     * 
+     * @param filterConfig the filter configuration
+     * @throws ServletException an exception occurred
      */
     public void init(
             FilterConfig filterConfig )

@@ -34,7 +34,7 @@ import org.infogrid.viewlet.AbstractViewedMeshObjects;
 import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
 /**
- * This Viewlet allows the user to bulk-load data into the MeshBase.
+ * This Viewlet allows the user to bulk-load data into a MeshBase.
  */
 public class BulkLoaderViewlet
         extends
@@ -72,14 +72,14 @@ public class BulkLoaderViewlet
     }
     
     /**
-     * <p>Invoked prior to the execution of the Servlet. It is the hook by which
-     * the JeeViewlet can perform whatever operations needed prior to the execution of the servlet, e.g.
-     * the evaluation of POST commands.</p>
+     * <p>Invoked prior to the execution of the Servlet if the POST method has been requested
+     *    and the FormTokenService determined that the incoming POST was safe.
+     *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
+     *    the POST execution of the servlet, e.g. the evaluation of POST commands.</p>
      * 
-     * @param context the ServletContext
      * @param request the incoming request
      * @param response the response to be assembled
-     * @see #performAfter
+     * @throws ServletException thrown if an error occurred
      */
     @Override
     public void performBeforeSafePost(

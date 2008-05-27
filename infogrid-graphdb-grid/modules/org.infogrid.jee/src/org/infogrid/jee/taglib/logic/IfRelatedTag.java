@@ -14,10 +14,9 @@
 
 package org.infogrid.jee.taglib.logic;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.mesh.set.MeshObjectSet;
-
-import javax.servlet.jsp.JspException;
 
 /**
  * <p>This tag tests whether the number of MeshObjects found by traversal is within the specified
@@ -28,6 +27,8 @@ public class IfRelatedTag
     extends
         AbstractRelatedTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */

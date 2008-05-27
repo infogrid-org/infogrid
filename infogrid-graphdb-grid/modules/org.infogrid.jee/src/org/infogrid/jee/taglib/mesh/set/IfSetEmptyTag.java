@@ -14,9 +14,8 @@
 
 package org.infogrid.jee.taglib.mesh.set;
 
-import org.infogrid.mesh.set.MeshObjectSet;
-
 import javax.servlet.jsp.JspException;
+import org.infogrid.mesh.set.MeshObjectSet;
 
 /**
  * Tag that evaluates its content when a <code>MeshObjectSet</code> is empty.
@@ -25,6 +24,8 @@ public class IfSetEmptyTag
     extends
         AbstractSetTestTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -39,7 +40,6 @@ public class IfSetEmptyTag
      * @param set the MeshObjectSet to evaluate
      * @return true in order to output the Nodes contained in this Node.
      * @throws JspException thrown if an evaluation error occurred
-     * @throws IgnoreException thrown to abort processing without an error
      */
     protected boolean evaluateTest(
             MeshObjectSet set )

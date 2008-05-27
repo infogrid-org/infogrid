@@ -14,16 +14,14 @@
 
 package org.infogrid.jee.taglib.mesh;
 
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.Locale;
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridTag;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.jee.taglib.InfoGridJspUtils;
 import org.infogrid.mesh.MeshObject;
-
-import javax.servlet.jsp.JspException;
-
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Factors out common functionality of tags that deal with the time when something
@@ -182,10 +180,11 @@ public abstract class AbstractMeshObjectTimeTag
             MeshObject obj );
 
     /**
-     * Process the start tag.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
-     * @throws JspException if a JSP exception has occurred
+     * @throws JspException thrown if an evaluation error occurred
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected int realDoStartTag()
         throws

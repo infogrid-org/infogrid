@@ -18,17 +18,18 @@ import java.io.IOException;
 import java.io.Writer;
 
 /**
- * A section in a StructuredResponse.
+ * A section in a StructuredResponse that contains text.
  */
 public class TextStructuredResponseSection
         extends
             StructuredResponseSection
 {
     /**
-      * Factory method.
-      *
-      * @return the created StructuredResponseSection
-      */
+     * Factory method.
+     *
+     * @param name the name of the section
+     * @return the created StructuredResponseSection
+     */
     public static TextStructuredResponseSection create(
             String name )
     {
@@ -37,8 +38,10 @@ public class TextStructuredResponseSection
     }
 
     /**
-      * Constructor for subclasses only, use factory method.
-      */
+     * Constructor for subclasses only, use factory method.
+     * 
+     * @param name the name of the section
+     */
     protected TextStructuredResponseSection(
             String name )
     {
@@ -51,6 +54,7 @@ public class TextStructuredResponseSection
      * @param w the Writer to write to
      * @param structured the StructuredResponse that holds the data
      * @return true if something was output, false otherwise
+     * @throws IOException thrown if an I/O error occurred
      */
     public boolean doOutput(
             Writer             w,
@@ -69,13 +73,14 @@ public class TextStructuredResponseSection
     }
 
     /**
-     * The single section identifying the default.
+     * The single default section for text content. Output will be written into this section
+     * unless otherwise specified.
      */
     public static final TextStructuredResponseSection DEFAULT_SECTION
             = TextStructuredResponseSection.create( "default" );
 
     /**
-     * The single section identifying errors.
+     * The single error section. All errors will be written into this section.
      */
     public static final TextStructuredResponseSection ERROR_SECTION
             = TextStructuredResponseSection.create( "errors" );
