@@ -19,6 +19,7 @@ import org.infogrid.model.traversal.TraversalSpecification;
 import org.infogrid.util.StringHelper;
 
 import java.util.Map;
+import org.infogrid.mesh.MeshObjectIdentifier;
 
 /**
  * Instances of this class are being used to tell a Viewlet which MeshObjects it is supposed
@@ -105,6 +106,7 @@ public class MeshObjectsToView
             TraversalSpecification traversalSpecification )
     {
         theSubject                = subject;
+        theSubjectIdentifier      = subject.getIdentifier();
         theSubjectParameters      = subjectParameters;
         theViewletTypeName        = viewletTypeName;
         theViewletParameters      = viewletParameters;
@@ -119,6 +121,16 @@ public class MeshObjectsToView
     public MeshObject getSubject()
     {
         return theSubject;
+    }
+
+    /**
+     * Obtain the identifier of the subject that the Viewlet is supposed to view.
+     *
+     * @return the subject's identifier
+     */
+    public MeshObjectIdentifier getSubjectIdentifier()
+    {
+        return theSubjectIdentifier;
     }
 
     /**
@@ -154,7 +166,7 @@ public class MeshObjectsToView
     /**
      * Obtain the TraversalSpecification that the Viewlet is supposed to use.
      * 
-     * @eturn the TraversalSpecification that the Viewlet is supposed to use
+     * @return the TraversalSpecification that the Viewlet is supposed to use
      */
     public TraversalSpecification getTraversalSpecification()
     {
@@ -173,6 +185,7 @@ public class MeshObjectsToView
                 this,
                 new String[] {
                     "subject",
+                    "subjectIdentifier",
                     "subjectPars",
                     "viewletTypeName",
                     "viewletPars",
@@ -180,6 +193,7 @@ public class MeshObjectsToView
                 },
                 new Object[] {
                     theSubject,
+                    theSubjectIdentifier,
                     theSubjectParameters,
                     theViewletTypeName,
                     theViewletParameters,
@@ -190,7 +204,12 @@ public class MeshObjectsToView
     /**
      * The subject to view.
      */
-    protected MeshObject theSubject;
+    protected transient MeshObject theSubject;
+
+    /**
+     * The identifier of the subject to view.
+     */
+    protected MeshObjectIdentifier theSubjectIdentifier;
 
     /**
      * The parameters for the subject, if any.
