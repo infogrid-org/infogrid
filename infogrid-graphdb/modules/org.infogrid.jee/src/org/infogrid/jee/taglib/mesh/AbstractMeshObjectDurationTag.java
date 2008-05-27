@@ -14,12 +14,11 @@
 
 package org.infogrid.jee.taglib.mesh;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridTag;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.util.ResourceHelper;
-
-import javax.servlet.jsp.JspException;
 
 /**
  * Factors out common functionality of tags that deal with the duration since something
@@ -44,7 +43,6 @@ public abstract class AbstractMeshObjectDurationTag
     protected void initializeToDefaults()
     {
         theMeshObjectName = null;
-        theLocale         = null;
         theDurationFormat = null;
 
         super.initializeToDefaults();
@@ -73,29 +71,6 @@ public abstract class AbstractMeshObjectDurationTag
         theMeshObjectName = newValue;
     }
 
-    /**
-     * Obtain value of the locale property.
-     *
-     * @return value of the locale property
-     * @see #setLocale
-     */
-    public final String getLocale()
-    {
-        return theLocale;
-    }
-
-    /**
-     * Set value of the locale property.
-     *
-     * @param newValue new value of the locale property
-     * @see #getLocale
-     */
-    public final void setLocale(
-            String newValue )
-    {
-        theLocale = newValue;
-    }
-    
     /**
      * Obtain value of the durationFormat property.
      *
@@ -130,10 +105,11 @@ public abstract class AbstractMeshObjectDurationTag
             MeshObject obj );
 
     /**
-     * Process the start tag.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
-     * @throws JspException if a JSP exception has occurred
+     * @throws JspException thrown if an evaluation error occurred
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected int realDoStartTag()
         throws
@@ -278,11 +254,6 @@ public abstract class AbstractMeshObjectDurationTag
      */
     protected String theMeshObjectName;
     
-    /**
-     * Locale, if any.
-     */
-    protected String theLocale;
-
     /**
      * The format String for formatting of the duration.
      */

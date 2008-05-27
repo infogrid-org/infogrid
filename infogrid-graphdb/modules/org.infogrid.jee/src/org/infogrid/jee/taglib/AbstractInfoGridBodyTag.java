@@ -26,7 +26,7 @@ import java.io.IOException;
 
 /**
  * <p>Factors out common functionality for BodyTags. Also redefines the JEE Tag
- * API, which really makes no sense whatsoever.</p>
+ * API, which fails to make any sense whatsoever.</p>
  *
  * <p>Support for the following attributes is provided to all subclasses:</p>
  * <table class="infogrid-border">
@@ -81,7 +81,7 @@ public abstract class AbstractInfoGridBodyTag
         theScope  = null; // means "search"
     }
 
-     /**
+    /**
      * Obtain value of the filter property.
      *
      * @return value of the filter property
@@ -278,6 +278,7 @@ public abstract class AbstractInfoGridBodyTag
     /**
      * Format a PropertyValue.
      *
+     * @param pageContext the PageContext in which to format the PropertyValue
      * @param value the PropertyValue
      * @param nullString the String to display of the value is null
      * @param stringRepresentation the StringRepresentation for PropertyValues
@@ -313,11 +314,12 @@ public abstract class AbstractInfoGridBodyTag
 
     /**
      * Look up a bean in the scope given by the scope attribute, and
-     * throw JspException if not found.
+     * throw an exception if not found.
      *
      * @param name name of the bean
      * @return the bean
-     * @throws JspException if the bean was not found
+     * @throws JspException if the bean was not found and the ignore attribute was not set
+     * @throws IgnoreException thrown if the bean could not be found but the ignore attribute was set
      */
     protected final Object lookupOrThrow(
             String name )
@@ -339,17 +341,20 @@ public abstract class AbstractInfoGridBodyTag
     }
 
     /**
-     * Look up a bean in the specified scope, and throw JspException if not found.
+     * Look up the property of a bean in the specified scope, and throw an exception if not found.
      *
      * @param name name of the bean
-     * @return the bean
-     * @throws JspException if the bean was not found
+     * @param propertyName name of the property of the bean
+     * @return the bean's property
+     * @throws JspException if the bean was not found and the ignore attribute was not set
+     * @throws IgnoreException thrown if the bean could not be found but the ignore attribute was set
      */
     protected final Object lookupOrThrow(
             String name,
             String propertyName )
         throws
-            JspException
+            JspException,
+            IgnoreException
     {
         if( name == null || name.length() == 0 ) {
             throw new JspException( "Cannot look up bean with empty name" );
@@ -357,9 +362,9 @@ public abstract class AbstractInfoGridBodyTag
         
         Object ret;
         if( InfoGridJspUtils.isTrue( theIgnore )) {
-            ret = InfoGridJspUtils.nestedLookupOrThrow( pageContext, name, propertyName, theScope );
-        } else {
             ret = InfoGridJspUtils.nestedLookup( pageContext, name, propertyName, theScope );
+        } else {
+            ret = InfoGridJspUtils.nestedLookupOrThrow( pageContext, name, propertyName, theScope );
         }
         return ret;
     }
@@ -370,7 +375,9 @@ public abstract class AbstractInfoGridBodyTag
      * a PropertyType with the given name.
      *
      * @param obj the MeshObject
-     * @param name name of the property
+     * @param name name of the PropertyType
+     * @return the found PropertyType
+     * @throws JspException thrown if the PropertyType could not be found
      */
     protected PropertyType findPropertyTypeOrThrow(
             MeshObject obj,

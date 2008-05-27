@@ -33,10 +33,12 @@ public class StructuredResponse
     private static final Log log = Log.getLogInstance( StructuredResponse.class ); // our own, private logger
 
     /**
-      * Factory method.
-      *
-      * @return the created StructuredResponse
-      */
+     * Factory method.
+     *
+     * @param delegate the underlying HttpServletResponse
+     * @param servletContext the ServletContext in which the StructuredResponse is created
+     * @return the created StructuredResponse
+     */
     public static StructuredResponse create(
             HttpServletResponse delegate,
             ServletContext      servletContext )
@@ -46,8 +48,11 @@ public class StructuredResponse
     }
 
     /**
-      * Constructor for subclasses only, use factory method.
-      */
+     * Constructor for subclasses only, use factory method.
+     *
+     * @param delegate the underlying HttpServletResponse
+     * @param servletContext the ServletContext in which the StructuredResponse is created
+     */
     protected StructuredResponse(
             HttpServletResponse delegate,
             ServletContext      servletContext )
@@ -57,7 +62,7 @@ public class StructuredResponse
     }
     
     /**
-     * Obtain the underlying servlet response.
+     * Obtain the underlying HttpServletResponse.
      * 
      * @return the delegate
      */
@@ -170,7 +175,7 @@ public class StructuredResponse
     /**
      * Obtain the content of a section.
      * 
-     * @param sectionName the name of the section
+     * @param section the section
      * @return the content of the section, or null
      */
     public String getSectionContent(
@@ -196,7 +201,7 @@ public class StructuredResponse
     /**
      * Obtain the content of a section.
      * 
-     * @param sectionName the name of the section
+     * @param section the section
      * @return the content of the section, or null
      */
     public byte [] getSectionContent(
@@ -352,6 +357,8 @@ public class StructuredResponse
     /**
      * Obtain a LocalizedObjectFormatter. This can be overridden by subclasses.
      * 
+     * @param request the incoming HttpServletRequest
+     * @param response the outgoing HttpServletResponse
      * @return the LocalizedObjectFormatter to use with this application
      */
     protected LocalizedObjectFormatter obtainLocalizedExceptionObjectFormatter(

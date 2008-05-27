@@ -42,6 +42,8 @@ public class MeshObjectPropertyIterateTag
         implements
             InfoGridIterationTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -232,10 +234,11 @@ public class MeshObjectPropertyIterateTag
     }
 
     /**
-     * Process the start tag.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
-     * @throws JspException if a JSP exception has occurred
+     * @throws JspException thrown if an evaluation error occurred
+     * @throws IgnoreException thrown to abort processing without an error
      */
     protected int realDoStartTag()
         throws
@@ -276,6 +279,11 @@ public class MeshObjectPropertyIterateTag
 
     /**
      * Our implementation of doAfterBody().
+     *
+     * @return evaluate or skip body
+     * @throws JspException thrown if an evaluation error occurred
+     * @throws IgnoreException thrown to abort processing without an error
+     * @throws IOException thrown if an I/O Exception occurred
      */
     @Override
     protected int realDoAfterBody()
@@ -296,6 +304,9 @@ public class MeshObjectPropertyIterateTag
 
     /**
      * Factors out common code for doStartTag and doAfterBody.
+     * 
+     * @return evaluate or skip body
+     * @throws JspException thrown if an evaluation error occurred
      */
     protected int iterateOnce()
             throws
@@ -333,6 +344,11 @@ public class MeshObjectPropertyIterateTag
 
     /**
      * Our implementation of doEndTag().
+     *
+     * @return evaluate or skip body
+     * @throws JspException thrown if an evaluation error occurred
+     * @throws IgnoreException thrown to abort processing without an error
+     * @throws IOException thrown if an I/O Exception occurred
      */
     @Override
     protected int realDoEndTag()

@@ -19,7 +19,7 @@ import org.infogrid.mesh.set.MeshObjectSet;
 /**
   * An ActiveMeshObjectSet is a dynamically growing or shrinking set of MeshObjects.
   * By subscribing, an
-  * {@link us.infogrid.mesh.set.active.ActiveMeshObjectSetListener ActiveMeshObjectSetListener}
+  * {@link org.infogrid.mesh.set.active.ActiveMeshObjectSetListener ActiveMeshObjectSetListener}
   * will be informed of additions to or removals from the set.
   *
   * <p>This type of MeshObjectSet is guaranteed to never contain any dead MeshObjects, the

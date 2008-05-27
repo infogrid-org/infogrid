@@ -49,8 +49,8 @@ public class DefaultStructuredResponseTemplateFactory
     /**
      * Factory method.
      *
-     * @param key the key information required for object creation, if any
-     * @param argument any argument-style information required for object creation, if any
+     * @param restful the incoming RESTful request for which the response is being created
+     * @param structured the StructuredResponse that contains the content to be returned
      * @return the created object
      * @throws FactoryException catch-all Exception, consider its cause
      */
@@ -81,7 +81,13 @@ public class DefaultStructuredResponseTemplateFactory
     }
     
     /**
-     * Find a RequestDispatcher for a given template name and mime type
+     * Find a RequestDispatcher for a given template name and mime type.
+     * 
+     * @param restful the incoming RESTful request for which the response is being created
+     * @param structured the StructuredResponse that contains the content to be returned
+     * @param templateName the name of the template
+     * @param mime the mime type of the response
+     * @return the found RequestDispatcher
      */
     protected RequestDispatcher findRequestDispatcher(
             RestfulRequest     restful,

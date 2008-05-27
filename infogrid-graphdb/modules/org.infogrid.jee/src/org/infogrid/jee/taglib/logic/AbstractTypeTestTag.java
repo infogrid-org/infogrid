@@ -14,18 +14,14 @@
 
 package org.infogrid.jee.taglib.logic;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
 import org.infogrid.jee.taglib.IgnoreException;
-
 import org.infogrid.mesh.MeshObject;
-
 import org.infogrid.model.primitives.EntityType;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.modelbase.MeshTypeNotFoundException;
 import org.infogrid.modelbase.ModelBase;
-
-import org.infogrid.model.primitives.MeshTypeIdentifier;
-
-import javax.servlet.jsp.JspException;
 
 /**
  * <p>Abstract superclass for tags that perform tests related to the type of a MeshObject.</p>

@@ -29,6 +29,9 @@ public abstract class AbstractStructuredResponseTemplate
 {
     /**
      * Constructor for subclasses only.
+     * 
+     * @param restful the incoming RESTful request
+     * @param structured the StructuredResponse that contains the response
      */
     protected AbstractStructuredResponseTemplate(
             RestfulRequest     restful,
@@ -60,6 +63,10 @@ public abstract class AbstractStructuredResponseTemplate
 
     /**
      * Default implentation for how to handle cookies.
+     * 
+     * @param delegate the underlying HttpServletResponse
+     * @param structured the StructuredResponse that contains the response
+     * @throws IOException thrown if an I/O error occurred
      */
     protected void defaultOutputCookies(
             HttpServletResponse delegate,
@@ -84,6 +91,10 @@ public abstract class AbstractStructuredResponseTemplate
 
     /**
      * Default implentation for how to handle the MIME type.
+     * 
+     * @param delegate the underlying HttpServletResponse
+     * @param structured the StructuredResponse that contains the response
+     * @throws IOException thrown if an I/O error occurred
      */
     protected void defaultOutputMimeType(
             HttpServletResponse delegate,

@@ -14,14 +14,12 @@
 
 package org.infogrid.jee.taglib.logic;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
-
-import javax.servlet.jsp.JspException;
 
 /**
  * <p>Abstract superclass for all tags evaluating a <code>PropertyValue</code>.</p>
@@ -121,7 +119,7 @@ public abstract class AbstractPropertyTestTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred

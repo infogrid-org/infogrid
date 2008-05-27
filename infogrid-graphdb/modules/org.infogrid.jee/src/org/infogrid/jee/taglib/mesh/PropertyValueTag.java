@@ -14,13 +14,11 @@
 
 package org.infogrid.jee.taglib.mesh;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridTag;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.jee.taglib.InfoGridJspUtils;
-
 import org.infogrid.model.primitives.PropertyValue;
-
-import javax.servlet.jsp.JspException;
 
 /**
  * Tag that renders an instance of <code>PropertyValue</code>, held in the context.
@@ -31,6 +29,8 @@ public class PropertyValueTag
         extends
             AbstractInfoGridTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -146,7 +146,7 @@ public class PropertyValueTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred

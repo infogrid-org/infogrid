@@ -1,57 +1,8 @@
 <html>
-  <head>
-    <title>Package org.infogrid.j2ee.rest</title>
-  </head>
-  <body>
-   <p>Calculate MeshObjectIdentifiers from URLs.</p>
-   <h1>Algorithm</h1>
-   <table border="1" cellspacing="0">
-    <thead>
-     <tr>
-      <td>Example</td>
-      <td>Obtain the external form of the <code>MeshObjectIdentifier</code></td>
-      <td>Escape it</td>
-      <td>If it does not start with application's root path, strip standard protocol and prepend application's root path</td>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td>0</td>
-      <td>(empty string)</td>
-      <td>(empty string)</td>
-      <td><code>http://example.net/root/</code></td>
-     </tr>
-     <tr>
-      <td>1</td>
-      <td><code>abc</code></td>
-      <td><code>abc</code></td>
-      <td><code>http://example.net/root/abc</code></td>
-     </tr>
-     <tr>
-      <td>2</td>
-      <td><code>def#ghi</code></td>
-      <td><code>def%21ghi</code></td>
-      <td><code>http://example.net/root/def%21ghi</code></td>
-     </tr>
-     <tr>
-      <td>3</td>
-      <td><code>http://example.com/jkl#mno</code></td>
-      <td><code>http://example.com/jkl%21mno</code></td>
-      <td><code>http://example.net/root/example.com/jkl%21mno</code></td>
-     </tr>
-     <tr>
-      <td>4</td>
-      <td><code>http://example.com/pqr&amp;stu=vwx#yz</code></td>
-      <td><code>http://example.com/pqr%38stu%60vwx%21yz</code></td>
-      <td><code>http://example.net/root/example.com/pqr%38stu%60vwx%21yz</code></td>
-     </tr>
-     <tr>
-      <td>5</td>
-      <td><code>http://example.net/root/abc</code></td>
-      <td><code>http://example.net/root/abc</code></td>
-      <td><code>http://example.net/root/abc</code></td>
-     </tr>
-    </tbody>
-   </table>
-  </body>
+ <head>
+  <title>Package org.infogrid.jee.rest</title>
+ </head>
+ <body>
+  <p>Calculates MeshObjectIdentifiers from URLs.</p>
+ </body>
 </html>
