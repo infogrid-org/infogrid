@@ -96,6 +96,8 @@ public abstract class CannotViewException
             extends
                 CannotViewException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -158,6 +160,8 @@ public abstract class CannotViewException
             extends
                 CannotViewException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -204,6 +208,8 @@ public abstract class CannotViewException
             extends
                 CannotViewException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -292,7 +298,7 @@ public abstract class CannotViewException
         /**
          * The ModuleRegistry that did not contain a suitable Viewlet.
          */
-        protected ModuleRegistry theModuleRegistry;
+        protected transient ModuleRegistry theModuleRegistry;
     }
 
     /**
@@ -302,6 +308,8 @@ public abstract class CannotViewException
             extends
                 CannotViewException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -348,6 +356,8 @@ public abstract class CannotViewException
             extends
                 CannotViewException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -403,6 +413,8 @@ public abstract class CannotViewException
             extends
                 CannotViewException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          * 
@@ -448,6 +460,8 @@ public abstract class CannotViewException
             extends
                 CannotViewException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
