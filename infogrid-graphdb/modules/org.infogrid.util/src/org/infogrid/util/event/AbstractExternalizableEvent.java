@@ -22,7 +22,6 @@ import java.util.EventObject;
  * A general-purpose {@link ExternalizableEvent} implementation. It inherits from
  * <code>java.util.EventObject</code> in order to be compatible with the Java APIs.
  * 
- * 
  * @param S the type of the event source
  * @param SID the type of the identifier of the event source
  * @param V the type of the value
@@ -37,10 +36,10 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
     /**
      * Constructor.
      * 
-     * @param source the object that is the source of the event
-     * @param sourceIdentifier the identifier representing the source of the event
-     * @param deltaValue the value that changed
-     * @param deltaValueIdentifier the identifier of the value that changed
+     * @param source the object that is the source of the event, if available
+     * @param sourceIdentifier the identifier representing the source of the event (required)
+     * @param deltaValue the value that changed, if available
+     * @param deltaValueIdentifier the identifier of the value that changed (may be null)
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     protected AbstractExternalizableEvent(
@@ -54,9 +53,6 @@ public abstract class AbstractExternalizableEvent<S,SID,V,VID>
 
         if( sourceIdentifier == null ) {
             throw new NullPointerException( "Null source identifier given" );
-        }
-        if( deltaValueIdentifier == null ) {
-            throw new NullPointerException( "Null delta identifier given" );
         }
         theSource               = source;
         theSourceIdentifier     = sourceIdentifier;
