@@ -14,16 +14,13 @@
 
 package org.infogrid.jee.taglib.mesh;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridTag;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.jee.taglib.InfoGridJspUtils;
-
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.NotPermittedException;
-import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.PropertyType;
-
-import javax.servlet.jsp.JspException;
+import org.infogrid.model.primitives.PropertyValue;
 
 /**
  * Tag that renders a property of a <code>MeshObject</code>.
@@ -32,6 +29,8 @@ public class PropertyTag
         extends
             AbstractInfoGridTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -195,7 +194,7 @@ public class PropertyTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred

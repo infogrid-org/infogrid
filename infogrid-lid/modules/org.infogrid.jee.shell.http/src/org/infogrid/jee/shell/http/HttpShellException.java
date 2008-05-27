@@ -28,6 +28,8 @@ public final class HttpShellException
     implements
         LocalizedException
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor. This is the only constructor provided as this must be invoked with
      * a delegate Throwable.

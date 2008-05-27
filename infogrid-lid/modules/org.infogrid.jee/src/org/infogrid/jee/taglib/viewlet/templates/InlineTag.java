@@ -33,6 +33,8 @@ public class InlineTag
         extends
              AbstractInfoGridTag    
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -76,11 +78,11 @@ public class InlineTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+     * @throws IgnoreException thrown to abort processing without an error
      */
     @Override
     protected int realDoStartTag()

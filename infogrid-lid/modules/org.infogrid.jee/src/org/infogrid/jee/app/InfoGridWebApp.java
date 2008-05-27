@@ -79,9 +79,13 @@ public abstract class InfoGridWebApp
     /**
      * Constructor, for subclasses.
      *
-     * @param meshBase the main MeshBase of the application
+     * @param mainMeshBase the main MeshBase of the application
+     * @param meshBaseNameServer the NameServer that maps MeshBaseIdentifiers to the MeshBases in the application
      * @param viewletFactory the ViewletFactory of the application
      * @param traversalDictionary the TraversalDictionary of the application
+     * @param structuredResponseTemplateFactory factory for StructuredResponseTemplates
+     *             that determine the graphical appearance of the application
+     * @param formTokenService the FormTokenService that allows the insertion and validation of form tokens in HTML forms
      * @param applicationContext the main application Context
      */
     protected InfoGridWebApp(

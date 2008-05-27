@@ -709,7 +709,7 @@ public abstract class TraversalActiveMTraversalPathSet
                     if( realRealEvent instanceof MeshObjectRoleAddedEvent ) {
                         MeshObjectRoleAddedEvent realRealRealEvent = (MeshObjectRoleAddedEvent) realRealEvent;
 
-                        MeshObject added = (MeshObject) realRealRealEvent.getNeighborMeshObject();
+                        MeshObject added = realRealRealEvent.getNeighborMeshObject();
 
                         // create child monitor and add to set
                         TraversalActiveTraversalPathSet addedMonitor = ((ActiveMeshObjectSetFactory)theFactory).createActiveTraversalPathSet(
@@ -730,7 +730,7 @@ public abstract class TraversalActiveMTraversalPathSet
                     } else if( realRealEvent instanceof MeshObjectRoleRemovedEvent ) {
                         MeshObjectRoleRemovedEvent realRealRealEvent = (MeshObjectRoleRemovedEvent) realRealEvent;
 
-                        MeshObject removed = (MeshObject) realRealRealEvent.getNeighborMeshObject();
+                        MeshObject removed = realRealRealEvent.getNeighborMeshObject();
                         
                         // find monitor that goes with this
                         TraversalActiveTraversalPathSet monitorToRemove = null;
@@ -1332,7 +1332,7 @@ public abstract class TraversalActiveMTraversalPathSet
                 return;
             }
 
-            ActiveTraversalPathSet source = (ActiveTraversalPathSet) event.getSource();
+            ActiveTraversalPathSet source = event.getSource();
             TraversalPath          added  = event.getDeltaValue();
 
             if( theUnderlyingSet == source ) {

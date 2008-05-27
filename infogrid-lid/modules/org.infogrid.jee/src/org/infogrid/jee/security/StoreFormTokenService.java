@@ -19,7 +19,7 @@ import org.infogrid.store.StoreEntryMapper;
 import org.infogrid.store.util.StoreBackedMap;
 
 /**
- * A simple implementation of FormTokenService that stores its content in a Store.
+ * A simple implementation of FormTokenService that stores its tokens in a Store.
  */
 public class StoreFormTokenService
         implements

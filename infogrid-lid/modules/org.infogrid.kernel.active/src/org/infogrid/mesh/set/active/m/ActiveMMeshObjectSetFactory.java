@@ -33,8 +33,7 @@ import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.logging.Log;
 
 /**
- * An abstract factory class, and a default factory instance for
- * TraversalActiveMeshObjectSets.
+ * A factory for in-memory ActiveMeshObjectSets.
  */
 public class ActiveMMeshObjectSetFactory
         extends
