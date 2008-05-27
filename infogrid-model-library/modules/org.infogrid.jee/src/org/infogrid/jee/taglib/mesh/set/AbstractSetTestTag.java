@@ -14,13 +14,11 @@
 
 package org.infogrid.jee.taglib.mesh.set;
 
+import java.io.IOException;
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
 import org.infogrid.jee.taglib.IgnoreException;
-
 import org.infogrid.mesh.set.MeshObjectSet;
-
-import javax.servlet.jsp.JspException;
-import java.io.IOException;
 
 /**
  * Factors out common code for tags that examine a condition derived from 
@@ -73,11 +71,12 @@ public abstract class AbstractSetTestTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+     * @throws IgnoreException thrown to abort processing without an error
+     * @throws IOException thrown if an I/O Exception occurred
      */
     protected int realDoStartTag()
         throws
@@ -100,6 +99,7 @@ public abstract class AbstractSetTestTag
      * subclasses of this class need to have the ability to determine what
      * their evaluation criteria are.
      *
+     * @param set the MeshObjectSet to evaluate
      * @return true in order to output the Nodes contained in this Node.
      * @throws JspException thrown if an evaluation error occurred
      */

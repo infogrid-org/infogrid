@@ -575,8 +575,6 @@ public abstract class InfoGridJspUtils
     protected static PropertyType findPropertyType(
             MeshObject obj,
             String     name )
-        throws
-            JspException
     {
         // tolerate lowercase first characters.
         
@@ -610,6 +608,7 @@ public abstract class InfoGridJspUtils
      * @param name the name of the PropertyType
      * @return the found PropertyType
      * @throws NullPointerException thrown if the MeshObject or the name of the PropertyType were null
+     * @throws JspException thrown if the PropertyType could not be found
      */
     protected static PropertyType findPropertyTypeOrThrow(
             MeshObject obj,
@@ -1022,7 +1021,7 @@ public abstract class InfoGridJspUtils
 
         RestfulRequest req         = (RestfulRequest) ((HttpServletRequest)pageContext.getRequest()).getAttribute( RestfulRequest.class.getName());
         String         contextPath = req.getContextPath();
-        boolean isDefaultMeshBase  = isDefaultMeshBase( pageContext, mesh.getMeshBase() );
+        boolean isDefaultMeshBase  = isDefaultMeshBase( mesh.getMeshBase() );
 
         String ret = mesh.toStringRepresentation( rep, contextPath, isDefaultMeshBase );
         return ret;
@@ -1070,7 +1069,7 @@ public abstract class InfoGridJspUtils
             contextPath        = req.getContextPath();
         }
 
-        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, mesh.getMeshBase() );
+        boolean isDefaultMeshBase = isDefaultMeshBase( mesh.getMeshBase() );
 
         String ret = mesh.toStringRepresentationLinkStart( rep, contextPath, isDefaultMeshBase );
         return ret;
@@ -1100,7 +1099,7 @@ public abstract class InfoGridJspUtils
             contextPath = ((HttpServletRequest)pageContext.getRequest()).getContextPath() + "/";
         }
 
-        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, mesh.getMeshBase() );
+        boolean isDefaultMeshBase = isDefaultMeshBase( mesh.getMeshBase() );
 
         String ret = mesh.toStringRepresentationLinkEnd( rep, contextPath, isDefaultMeshBase );
         return ret;
@@ -1109,8 +1108,11 @@ public abstract class InfoGridJspUtils
     /**
      * Recreate an MeshObjectIdentifier from a String.
      * 
+     * @param factory the MeshObjectIdentifierFactory to use
+     * @param representation the StringRepresentation of the to-be-parsed String
      * @param s the String
      * @return the MeshObjectIdentifier
+     * @throws URISyntaxException thrown if a syntax error occurred
      */
     public static MeshObjectIdentifier fromMeshObjectIdentifier(
             MeshObjectIdentifierFactory factory,
@@ -1142,7 +1144,7 @@ public abstract class InfoGridJspUtils
     {
         StringRepresentation rep = determineStringRepresentation( stringRepresentation );
 
-        boolean contextImpliesThisMeshBase = isDefaultMeshBase( pageContext, base );
+        boolean contextImpliesThisMeshBase = isDefaultMeshBase( base );
 
         String ret = base.toStringRepresentation( rep, contextImpliesThisMeshBase );
         return ret;
@@ -1152,7 +1154,7 @@ public abstract class InfoGridJspUtils
      * Format the end of the identifier of a MeshBase.
      *
      * @param pageContext the PageContext object for this page
-     * @param mesh the MeshObject whose identifier is to be formatted
+     * @param base the MeshBase whose identifier is to be formatted
      * @param stringRepresentation the StringRepresentation to use
      * @return the String to display
      */
@@ -1188,7 +1190,7 @@ public abstract class InfoGridJspUtils
             contextPath = ((HttpServletRequest)pageContext.getRequest()).getContextPath() + "/";
         }
 
-        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, base );
+        boolean isDefaultMeshBase = isDefaultMeshBase( base );
 
         String ret = base.toStringRepresentationLinkStart( rep, contextPath, isDefaultMeshBase );
         return ret;
@@ -1198,7 +1200,7 @@ public abstract class InfoGridJspUtils
      * Format the end of a link to a MeshBase.
      *
      * @param pageContext the PageContext object for this page
-     * @param mesh the MeshObject whose identifier is to be formatted
+     * @param base the MeshBase whose identifier is to be formatted
      * @param rootPath alternate root path to use, if any
      * @param stringRepresentation the StringRepresentation to use
      * @return the String to display
@@ -1218,7 +1220,7 @@ public abstract class InfoGridJspUtils
             contextPath = ((HttpServletRequest)pageContext.getRequest()).getContextPath() + "/";
         }
 
-        boolean isDefaultMeshBase = isDefaultMeshBase( pageContext, base );
+        boolean isDefaultMeshBase = isDefaultMeshBase( base );
 
         String ret = base.toStringRepresentationLinkEnd( rep, contextPath, isDefaultMeshBase );
         return ret;
@@ -1251,12 +1253,15 @@ public abstract class InfoGridJspUtils
     /**
      * Determine whether the fully-qualified context path that cane be determined from a
      * PageContext identifies this MeshBase as the default MeshBase.
+     * 
+     * @param base the MeshBase whose identifier is to be formatted
+     * @return true if this MeshBase is the default MeshBase
      */
     public static boolean isDefaultMeshBase(
-            PageContext pageContext,
-            MeshBase    mb )
+            MeshBase base )
     {
-        String mbIdentifier = mb.getIdentifier().toExternalForm();
+        // FIXME this can be simpler right?
+        String mbIdentifier = base.getIdentifier().toExternalForm();
         
         String defaultMbIdentifier = InfoGridWebApp.getSingleton().getDefaultMeshBase().getIdentifier().toExternalForm();
         
@@ -1265,18 +1270,6 @@ public abstract class InfoGridJspUtils
         } else {
             return false;
         }
-        
-//        // construct the full URL
-//        HttpServletRequest realRequest = (HttpServletRequest) pageContext.getRequest();
-//        RestfulRequest     restRequest = (RestfulRequest)     realRequest.getAttribute( RestfulRequest.class.getName() );
-//
-//        String absoluteContextPath = restRequest.getAbsoluteContextPath();
-//        
-//        if( mbIdentifier.equals( absoluteContextPath + "/" )) {
-//            return true;
-//        } else {
-//            return false;
-//        }
     }
 
     /**

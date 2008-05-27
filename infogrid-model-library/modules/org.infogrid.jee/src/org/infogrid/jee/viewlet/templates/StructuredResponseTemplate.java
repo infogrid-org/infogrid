@@ -28,6 +28,8 @@ public interface StructuredResponseTemplate
      * 
      * @param delegate the delegate to stream to
      * @param structured the StructuredResponse
+     * @throws ServletException exception passed on from underlying servlet output
+     * @throws IOException exception passed on from underlying servlet output
      */
     public void doOutput(
             HttpServletResponse delegate,

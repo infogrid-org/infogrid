@@ -14,13 +14,12 @@
 
 package org.infogrid.jee.taglib.mesh;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridTag;
 import org.infogrid.jee.taglib.IgnoreException;
 import org.infogrid.jee.taglib.InfoGridJspUtils;
 import org.infogrid.model.primitives.MeshType;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
-
-import javax.servlet.jsp.JspException;
 
 /**
  * Tag that displays the user-visible String of a <code>MeshType</code>.
@@ -29,6 +28,8 @@ public class MeshTypeIdentifierTag
         extends
             AbstractInfoGridTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -144,7 +145,7 @@ public class MeshTypeIdentifierTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred

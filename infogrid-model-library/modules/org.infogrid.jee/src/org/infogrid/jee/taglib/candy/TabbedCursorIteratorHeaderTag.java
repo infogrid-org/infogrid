@@ -28,6 +28,8 @@ public class TabbedCursorIteratorHeaderTag
     extends
         AbstractInfoGridBodyTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
@@ -37,11 +39,10 @@ public class TabbedCursorIteratorHeaderTag
     }
 
     /**
-     * Do the start tag operation.
+     * Our implementation of doStartTag().
      *
      * @return evaluate or skip body
      * @throws JspException thrown if an evaluation error occurred
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
      */
     protected int realDoStartTag()
         throws
