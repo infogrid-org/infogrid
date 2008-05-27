@@ -20,10 +20,10 @@ import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.model.traversal.TraversalSpecification;
 
 /**
- * This interface represents a collection of MeshObjects, plus information about their context,
+ * A collection of MeshObjects, plus information about their context,
  * that are being viewed by a Viewlet. It is similar to {@link MeshObjectsToView MeshObjectsToView},
- * but MeshObjectsToView is a specification looking for a good Viewlet, while ViewedMeshObjects is
- * what a chosen Viewlet actually does.
+ * but MeshObjectsToView is a specification looking for a good Viewlet, while ViewedMeshObjects
+ * captures what a chosen Viewlet currently actually does.
  */
 public interface ViewedMeshObjects
 {
