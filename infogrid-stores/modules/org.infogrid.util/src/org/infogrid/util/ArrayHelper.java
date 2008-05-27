@@ -1389,6 +1389,8 @@ public abstract class ArrayHelper
      * Same as arrayToString except for Maps.
      *
      * @param map the Map to convert to a String
+     * @param sep1 the separator prior to a key
+     * @param sep2 the separator between the key and the value
      * @return the String form of the Map
      */
     public static String mapToString(
@@ -1521,11 +1523,15 @@ public abstract class ArrayHelper
 
     /**
      * Helper class to return two values.
+     * @param T the underlying type for the values
      */
     public static class Difference<T>
     {
         /**
          * Constructor.
+         * 
+         * @param additions the additions
+         * @param removals the removals
          */
         public Difference(
                 T [] additions,
