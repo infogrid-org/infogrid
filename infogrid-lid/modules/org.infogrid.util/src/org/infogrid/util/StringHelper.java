@@ -19,6 +19,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import org.infogrid.util.logging.Log;
 
@@ -256,6 +257,12 @@ public abstract class StringHelper
                     continue;
                 }
             }
+            if( value instanceof Collection ) {
+                Collection realValue = (Collection) value;
+                if( realValue.isEmpty() && !LOG_FLAGS.showEmptyArrays( flags )) {
+                    continue;
+                }
+            }
             
             buf.append( "    " );
             buf.append( fieldNames[i] );
@@ -270,6 +277,28 @@ public abstract class StringHelper
                         buf.append( "        " ).append( indent( String.valueOf( realValue[j] ))).append( "\n" );
                     }
                     if( max != realValue.length ) {
+                        buf.append( "        ...\n" );
+                    }
+                    buf.append( "    }" );
+
+                } else {
+                    buf.append( "[0] = {}" );
+                }
+
+            } else if( value instanceof Collection ) {
+                Collection realValue = (Collection) value;
+                buf.append( realValue.getClass().getName() );
+                if( realValue.size() > 0 ) {
+                    buf.append( '[' ).append( realValue.size() ).append( "] = {\n" );
+                    int max = Math.min( 8, realValue.size() );
+                    int j   = 0;
+                    for( Object current : realValue ) {
+                        buf.append( "        " ).append( indent( String.valueOf( current ))).append( "\n" );
+                        if( ++j >= max ) {
+                            break;
+                        }
+                    }
+                    if( max != realValue.size() ) {
                         buf.append( "        ...\n" );
                     }
                     buf.append( "    }" );
