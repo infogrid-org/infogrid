@@ -62,13 +62,14 @@ public class IterableNetStoreMeshBase
     /**
      * Factory method.
      * 
-     * @param identifier the NNetMeshBaseIdentifierof the to-be-created NetMeshBase
+     * @param identifier the NetMeshBaseIdentifierof the to-be-created NetMeshBase
      * @param endpointFactory the MessageEndpointFactory to use for proxy communication
      * @param modelBase the ModelBase with the type definitions we use
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param meshObjectStore the Store in which to store the MeshObjects
      * @param proxyStore the Store in which to store the Proxies
      * @param c the Context in which this MeshBase will run
+     * @return IterableNetStoreMeshBase the created IterableNetStoreMeshBase
      * @throws IsAbstractException thrown if the given EntityType for the home object is abstract and cannot be instantiated
      */
     public static IterableNetStoreMeshBase create(
@@ -100,13 +101,14 @@ public class IterableNetStoreMeshBase
     /**
      * Factory method.
      * 
-     * @param identifier the NNetMeshBaseIdentifierof the to-be-created NetMeshBase
+     * @param identifier the NetMeshBaseIdentifierof the to-be-created NetMeshBase
      * @param endpointFactory the MessageEndpointFactory to use for proxy communication
      * @param modelBase the ModelBase with the type definitions we use
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param meshObjectStore the Store in which to store the MeshObjects
      * @param proxyStore the Store in which to store the Proxies
      * @param c the Context in which this MeshBase will run
+     * @return IterableNetStoreMeshBase the created IterableNetStoreMeshBase
      * @throws IsAbstractException thrown if the given EntityType for the home object is abstract and cannot be instantiated
      */
     public static IterableNetStoreMeshBase create(
@@ -150,7 +152,7 @@ public class IterableNetStoreMeshBase
     /**
      * Constructor.
      * 
-     * @param identifier the NNetMeshBaseIdentifierof the to-be-created NetMeshBase
+     * @param identifier the NetMeshBaseIdentifierof the to-be-created NetMeshBase
      * @param modelBase the ModelBase with the type definitions we use
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param cache the in-memory cache to use
