@@ -21,7 +21,7 @@ import org.infogrid.model.traversal.TraversalSpecification;
 import org.infogrid.util.StringHelper;
 
 /**
- * Factors out common functionality of ViewedMeshObjects implementations
+ * Factors out common functionality of ViewedMeshObjects implementations.
  */
 public abstract class AbstractViewedMeshObjects
         implements
@@ -54,6 +54,7 @@ public abstract class AbstractViewedMeshObjects
      * @param subject the new subject of the Viewlet
      * @param subjectParameters the parameters of the newly selected subject, if any
      * @param viewletParameters the parameters of the Viewlet, if any
+     * @param traversal the TraversalSpecification currently in effect on the Viewlet, if any
      */
     public void update(
             MeshObject             subject,
@@ -125,7 +126,7 @@ public abstract class AbstractViewedMeshObjects
     /**
      * Obtain the TraversalSpecification that the Viewlet currently uses.
      * 
-     * @eturn the TraversalSpecification that the Viewlet currently uses
+     * @return the TraversalSpecification that the Viewlet currently uses
      */
     public final TraversalSpecification getTraversalSpecification()
     {
