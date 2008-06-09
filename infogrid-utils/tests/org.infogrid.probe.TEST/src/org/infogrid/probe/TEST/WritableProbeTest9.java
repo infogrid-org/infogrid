@@ -85,7 +85,7 @@ public class WritableProbeTest9
                                             OBJ1 ));
                             boolean success = obj.tryToPushHomeReplica( mainBase.getProxyFor( shadow.getIdentifier() ));
                             
-                            checkCondition( success, "Pushing new object should have succeeded" );
+                            checkCondition( !success, "Pushing new object should have failed" );
 
                         } catch( Throwable ex ) {
                             thrown = ex;
@@ -113,7 +113,7 @@ public class WritableProbeTest9
                                     shadow.getIdentifier(),
                                     OBJ1 ));
 
-                        checkCondition( obj1 == null, "OBJ1 should not exist" );
+                        checkObject( obj1, "OBJ1 is not here any more" );
                     }
             },
             new WritableProbeTestCase( WritableIgnoringTestProbe.class ) {
