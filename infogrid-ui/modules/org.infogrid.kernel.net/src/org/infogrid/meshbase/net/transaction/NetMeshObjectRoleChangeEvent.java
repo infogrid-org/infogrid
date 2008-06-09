@@ -28,6 +28,7 @@ import org.infogrid.model.primitives.RoleType;
 public interface NetMeshObjectRoleChangeEvent
         extends
             MeshObjectRoleChangeEvent,
+            NetMeshObjectRelationshipEvent,
             NetChange<MeshObject,MeshObjectIdentifier,RoleType[],MeshTypeIdentifier[]>
 {
     // nothing

@@ -25,27 +25,27 @@ import org.infogrid.util.CachingMap;
 import org.infogrid.util.MNameServer;
 import org.infogrid.util.NameServer;
 import org.infogrid.util.PatientSmartFactory;
-import org.infogrid.util.logging.Log;
 
 /**
- *
+ * Factors out functionality common to many ProbeManager implementations.
  */
 public abstract class AbstractProbeManager
         extends
-            PatientSmartFactory<NetMeshBaseIdentifier, ShadowMeshBase, CoherenceSpecification>
+            PatientSmartFactory<NetMeshBaseIdentifier,ShadowMeshBase,CoherenceSpecification>
         implements
             ProbeManager
 {
-    private static final Log log = Log.getLogInstance( AbstractProbeManager.class ); // our own, private logger
-
     /**
      * Constructor.
+     * 
+     * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
+     * @param storage the storage to use
      */
     protected AbstractProbeManager(
-            ShadowMeshBaseFactory                            delegate,
+            ShadowMeshBaseFactory                            delegateFactory,
             CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
     {
-        super( delegate, storage );
+        super( delegateFactory, storage );
     }
 
     /**
@@ -66,7 +66,6 @@ public abstract class AbstractProbeManager
         }
         theMainNetMeshBase = main;
     }
-
 
     /**
      * Obtain a NameServer that contains all ShadowMeshBases and the main NetMeshBase.

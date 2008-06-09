@@ -14,13 +14,6 @@
 
 package org.infogrid.testharness;
 
-import org.infogrid.module.ModuleClassLoader;
-
-import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.ResourceHelper;
-import org.infogrid.util.logging.Log;
-import org.infogrid.util.logging.log4j.Log4jLog;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,9 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
 import java.lang.ref.Reference;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -40,11 +31,14 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
+import org.infogrid.module.ModuleClassLoader;
+import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.logging.Log;
+import org.infogrid.util.logging.log4j.Log4jLog;
 
 /**
  * An abstract superclass for tests. It provides a bunch of generic test
@@ -567,7 +561,8 @@ public abstract class AbstractTest
      * Report error if the tested numbers are outside of a certain range.
      *
      * @param tests the sequence of numbers to test
-     * @param media the sequence of medians against which the numbers are being tested
+     * @param medians the sequence of medians against which the numbers are being tested
+     * @param jitter the amount of jitter allowed
      * @param margin the percentage by which the test numbers may be off
      * @param msg message to print
      * @return true if check passed
@@ -586,7 +581,8 @@ public abstract class AbstractTest
      * Report error if the tested numbers are outside of a certain range.
      *
      * @param tests the sequence of numbers to test
-     * @param media the sequence of medians against which the numbers are being tested
+     * @param medians the sequence of medians against which the numbers are being tested
+     * @param jitter the amount of jitter allowed
      * @param margin the percentage by which the test numbers may be off
      * @param offset a static offset between the units in which medians and tests are measured
      * @param msg message to print
@@ -716,6 +712,8 @@ public abstract class AbstractTest
 
     /**
      * This starts a relative timer.
+     * 
+     * @return the time at which the clock was started, in System.currentTimeMillis() format
      */
     protected final long startClock()
     {
@@ -728,7 +726,7 @@ public abstract class AbstractTest
     /**
      * Obtain the absolute start time.
      *
-     * @return the absolute start time of the timer
+     * @return the time at which the clock was started, in System.currentTimeMillis() format
      */
     public final long getStartTime()
     {
@@ -739,6 +737,7 @@ public abstract class AbstractTest
      * Sleep for a specified number of milliseconds.
      *
      * @param delta the number of milliseconds to wait
+     * @throws InterruptedException thrown when another thread interrupts this Thread while sleeping
      */
     protected final void sleepFor(
             long delta )
@@ -1103,7 +1102,11 @@ public abstract class AbstractTest
     }
 
     /**
-     * Obtain a ThreadPool for a test.
+     * Obtain a Thread pool for a test.
+     * 
+     * @param testName name of the test, used to label the Threads created by the ThreadFactory
+     * @param nThreads the number of threads in the thread pool
+     * @return the created ScheduledExecutorService
      */
     protected ScheduledExecutorService createThreadPool(
             String testName,
@@ -1115,7 +1118,10 @@ public abstract class AbstractTest
     }
 
     /**
-     * Obtain a ThreadPool for a test.
+     * Obtain a Thread pool for a test.
+     * 
+     * @param nThreads the number of threads in the thread pool
+     * @return the created ScheduledExecutorService
      */
     protected ScheduledExecutorService createThreadPool(
             int nThreads )
@@ -1146,7 +1152,9 @@ public abstract class AbstractTest
                 ThreadFactory
     {
         /**
-         * Constructor
+         * Constructor.
+         * 
+         * @param testName name of the test, used to label the Threads created by the ThreadFactory
          */
         public TestThreadFactory(
                 String testName )

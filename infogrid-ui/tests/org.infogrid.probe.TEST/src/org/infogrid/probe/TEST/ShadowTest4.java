@@ -44,8 +44,7 @@ import org.infogrid.util.logging.Log;
 
 /**
  * Relates a Shadow-producted MeshObject A to another MeshObject B outside of the Shadow,
- * and makes sure that the relationship goes away without error if B disappears on the
- * next Probe run.
+ * and re-runs the Probe.
  */
 public class ShadowTest4
         extends
@@ -114,9 +113,9 @@ public class ShadowTest4
         
         log.info( "Checking" );
         
-        checkEquals( shadow.size(), 1, "Wrong number of objects in Shadow" );
-        checkEquals( local.traverseToNeighborMeshObjects().size(), 0, "unexpected neighbor of local found" );
-        checkCondition( a1.getIsDead(), "a1 still alive" );
+        checkEquals( shadow.size(), 2, "Wrong number of objects in Shadow" );
+        checkEquals( local.traverseToNeighborMeshObjects().size(), 1, "neighbor of local not found" );
+        checkEquals(    a1.traverseToNeighborMeshObjects().size(), 2, "neighbor of a1 not found" );
         
     }
 
@@ -130,8 +129,8 @@ public class ShadowTest4
     {
         ShadowTest4 test = null;
         try {
-            if( args.length != 1 ) {
-                System.err.println( "Synopsis: <test file>" );
+            if( args.length != 0 ) {
+                System.err.println( "Synopsis: <no argument>" );
                 System.err.println( "aborting ..." );
                 System.exit( 1 );
             }
@@ -188,7 +187,7 @@ public class ShadowTest4
     protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
 
     // Our Logger
-    private static Log log = Log.getLogInstance( ShadowTest2.class );
+    private static Log log = Log.getLogInstance( ShadowTest4.class );
 
     /**
      * The test protocol. In the real world this would be something like "jdbc".
@@ -215,11 +214,6 @@ public class ShadowTest4
      * Our ThreadPool.
      */
     protected ScheduledExecutorService exec = Executors.newScheduledThreadPool( 1 );
-
-    /**
-     * Counts the number of Probe runs.
-     */
-    protected static int theProbeRunCounter = 0;
 
     /**
      * The test Probe superclass.
@@ -278,18 +272,14 @@ public class ShadowTest4
                 TransactionException,
                 URISyntaxException
         {
-            ++theProbeRunCounter;
-            
             MeshBaseLifecycleManager life = mb.getMeshBaseLifecycleManager();
 
             MeshObject home = mb.getHomeObject();
             home.bless( TestSubjectArea.AA );
             
-            if( theProbeRunCounter == 1 ) {
-                MeshObject a = life.createMeshObject( mb.getMeshObjectIdentifierFactory().fromExternalForm( "a" ), TestSubjectArea.B );
-            
-                home.relateAndBless( TestSubjectArea.RR.getSource(), a );
-            }
+            MeshObject a = life.createMeshObject( mb.getMeshObjectIdentifierFactory().fromExternalForm( "a" ), TestSubjectArea.B );
+
+            home.relateAndBless( TestSubjectArea.RR.getSource(), a );
         }
     }
 }

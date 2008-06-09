@@ -40,6 +40,7 @@ public interface ShadowMeshBase
      *
      * @return desired time of the next update, in milliseconds. -1 indicates never.
      * @throws ProbeException thrown if the update was unsuccessful
+     * @throws IsDeadException thrown in this ShadowMeshBase is dead already
      */
     public abstract long doUpdateNow()
         throws
@@ -52,12 +53,20 @@ public interface ShadowMeshBase
      * @param coherence the requested CoherenceSpecification, if any
      * @return desired time of the next update, in milliseconds. -1 indicates never.
      * @throws ProbeException thrown if the update was unsuccessful
+     * @throws IsDeadException thrown in this ShadowMeshBase is dead already
      */
     public abstract long doUpdateNow(
             CoherenceSpecification coherence )
         throws
             ProbeException,
             IsDeadException;
+
+    /**
+     * Determine whether at the last run, this ShadowMeshBase used a WriteableProbe.
+     * 
+     * @return true if at the last run, this ShadowMeshBase used a WriteableProbe
+     */
+    public boolean usesWritableProbe();
 
     /**
      * Obtain the time at which this ShadowMeshBase was created.
@@ -122,6 +131,8 @@ public interface ShadowMeshBase
      * Add a listener to listen to ShadowMeshBase-specific events.
      *
      * @param newListener the listener to be added
+     * @see #addWeakShadowListener
+     * @see #addSoftShadowListener
      * @see #removeShadowListener
      */
     public abstract void addDirectShadowListener(
@@ -131,6 +142,8 @@ public interface ShadowMeshBase
      * Add a listener to listen to ShadowMeshBase-specific events.
      *
      * @param newListener the listener to be added
+     * @see #addDirectShadowListener
+     * @see #addSoftShadowListener
      * @see #removeShadowListener
      */
     public abstract void addWeakShadowListener(
@@ -140,6 +153,8 @@ public interface ShadowMeshBase
      * Add a listener to listen to ShadowMeshBase-specific events.
      *
      * @param newListener the listener to be added
+     * @see #addDirectShadowListener
+     * @see #addWeakShadowListener
      * @see #removeShadowListener
      */
     public abstract void addSoftShadowListener(
@@ -149,7 +164,9 @@ public interface ShadowMeshBase
      * Remove a listener to listen to ShadowMeshBase-specific events.
      *
      * @param oldListener the listener to be removed
-     * @see #addShadowListener
+     * @see #addDirectShadowListener
+     * @see #addWeakShadowListener
+     * @see #addSoftShadowListener
      */
     public abstract void removeShadowListener(
             ShadowMeshBaseListener oldListener );

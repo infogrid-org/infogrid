@@ -24,31 +24,18 @@ public abstract class AbstractXprisoMessage
             XprisoMessage
 {
     /**
-     * Constructor.
+     * Constructor. This does not pass the requestId and responseId as they
+     * are set by the communications framework.
+     * 
+     * @param sender identifies the sender of this message
+     * @param receiver identifies the receiver of this message
      */
-    protected AbstractXprisoMessage()
+    protected AbstractXprisoMessage(
+            NetMeshBaseIdentifier sender,
+            NetMeshBaseIdentifier receiver )
     {
-        // no op
-    }
-
-    /**
-     * Obtain the request ID.
-     *
-     * @return the request ID
-     */
-    public long getRequestId()
-    {
-        return theRequestId;
-    }
-
-    /**
-     * Obtain the response ID.
-     *
-     * @return the response ID
-     */
-    public long getResponseId()
-    {
-        return theResponseId;
+        theSenderIdentifier   = sender;
+        theReceiverIdentifier = receiver;
     }
 
     /**
@@ -69,6 +56,26 @@ public abstract class AbstractXprisoMessage
     public NetMeshBaseIdentifier getReceiverIdentifier()
     {
         return theReceiverIdentifier;
+    }
+
+    /**
+     * Obtain the request ID.
+     *
+     * @return the request ID
+     */
+    public long getRequestId()
+    {
+        return theRequestId;
+    }
+
+    /**
+     * Obtain the response ID.
+     *
+     * @return the response ID
+     */
+    public long getResponseId()
+    {
+        return theResponseId;
     }
 
     /**
@@ -95,31 +102,20 @@ public abstract class AbstractXprisoMessage
         }
         XprisoMessage realOther = (XprisoMessage) other;
 
-        if( theRequestId != realOther.getRequestId() ) {
+        // alphabetically, so we can make sure we have all of them by comparing with the IDE
+        if( theCeaseCommunications != realOther.getCeaseCommunications()) {
             return false;
         }
-        if( theResponseId != realOther.getResponseId() ) {
-            return false;
-        }
-        if( !objectsEquals( theSenderIdentifier, realOther.getSenderIdentifier() )) {
-            return false;
-        }
-        if( !objectsEquals( theReceiverIdentifier, realOther.getReceiverIdentifier() )) {
-            return false;
-        }
-        if( !arraysEquals( getRequestedFirstTimeObjects(), realOther.getRequestedFirstTimeObjects() )) {
-            return false;
-        }
-        if( !arraysEquals( getRequestedCanceledObjects(), realOther.getRequestedCanceledObjects() )) {
-            return false;
-        }
-        if( !arraysEquals( getCreations(), realOther.getCreations() )) {
+        if( !arraysEquals( getConveyedMeshObjects(), realOther.getConveyedMeshObjects() )) {
             return false;
         }
         if( !arraysEquals( getDeletions(), realOther.getDeletions() )) {
             return false;
         }
-        if( !arraysEquals( getConveyedMeshObjects(), realOther.getConveyedMeshObjects() )) {
+        if( !arraysEquals( getEquivalentsAdditions(), realOther.getEquivalentsAdditions() )) {
+            return false;
+        }
+        if( !arraysEquals( getEquivalentsRemovals(), realOther.getEquivalentsRemovals() )) {
             return false;
         }
         if( !arraysEquals( getNeighborAdditions(), realOther.getNeighborAdditions() )) {
@@ -131,40 +127,52 @@ public abstract class AbstractXprisoMessage
         if( !arraysEquals( getPropertyChanges(), realOther.getPropertyChanges() )) {
             return false;
         }
+        if( !arraysEquals( getPushHomeReplicas(), realOther.getPushHomeReplicas() )) {
+            return false;
+        }
+        if( !arraysEquals( getPushLockObjects(), realOther.getPushLockObjects() )) {
+            return false;
+        }
+        if( !objectsEquals( theReceiverIdentifier, realOther.getReceiverIdentifier() )) {
+            return false;
+        }
+        if( !arraysEquals( getReclaimedLockObjects(), realOther.getReclaimedLockObjects() )) {
+            return false;
+        }
+        if( theRequestId != realOther.getRequestId() ) {
+            return false;
+        }
+        if( !arraysEquals( getRequestedCanceledObjects(), realOther.getRequestedCanceledObjects() )) {
+            return false;
+        }
+        if( !arraysEquals( getRequestedFirstTimeObjects(), realOther.getRequestedFirstTimeObjects() )) {
+            return false;
+        }
+        if( !arraysEquals( getRequestedHomeReplicas(), realOther.getRequestedHomeReplicas() )) {
+            return false;
+        }
+        if( !arraysEquals( getRequestedLockObjects(), realOther.getRequestedLockObjects() )) {
+            return false;
+        }
+        if( !arraysEquals( getRequestedResynchronizeReplicas(), realOther.getRequestedResynchronizeReplicas() )) {
+            return false;
+        }
+        if( theResponseId != realOther.getResponseId() ) {
+            return false;
+        }
         if( !arraysEquals( getRoleAdditions(), realOther.getRoleAdditions() )) {
             return false;
         }
         if( !arraysEquals( getRoleRemovals(), realOther.getRoleRemovals() )) {
             return false;
         }
+        if( !objectsEquals( theSenderIdentifier, realOther.getSenderIdentifier() )) {
+            return false;
+        }
         if( !arraysEquals( getTypeAdditions(), realOther.getTypeAdditions() )) {
             return false;
         }
         if( !arraysEquals( getTypeRemovals(), realOther.getTypeRemovals() )) {
-            return false;
-        }
-        if( !arraysEquals( getRequestedLockObjects(), realOther.getRequestedLockObjects() )) {
-            return false;
-        }
-        if( !arraysEquals( getPushLockObjects(), realOther.getPushLockObjects() )) {
-            return false;
-        }
-        if( !arraysEquals( getReclaimedLockObjects(), realOther.getReclaimedLockObjects() )) {
-            return false;
-        }
-        if( !arraysEquals( getRequestedHomeReplicas(), realOther.getRequestedHomeReplicas() )) {
-            return false;
-        }
-        if( !arraysEquals( getPushHomeReplicas(), realOther.getPushHomeReplicas() )) {
-            return false;
-        }
-        if( !arraysEquals( getRequestedResynchronizeDependentReplicas(), realOther.getRequestedResynchronizeDependentReplicas() )) {
-            return false;
-        }
-        if( !arraysEquals( getResynchronizeDependentReplicas(), realOther.getResynchronizeDependentReplicas() )) {
-            return false;
-        }
-        if( theCeaseCommunications != realOther.getCeaseCommunications()) {
             return false;
         }
         return true;
@@ -272,4 +280,9 @@ public abstract class AbstractXprisoMessage
      * If true, this indicates that communications should cease after this message.
      */
     protected boolean theCeaseCommunications = false;
+    
+    /**
+     * Represents "not set" for the request or response id.
+     */
+    public static final int NO_ID = -1;
 }

@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.net;
 
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.mesh.MeshObjectIdentifier;
 
 import org.infogrid.mesh.NotPermittedException;
@@ -389,79 +390,6 @@ public interface NetMeshBase
      */
     public abstract NetMeshObjectIdentifierFactory getMeshObjectIdentifierFactory();
 
-    /**
-     * Set the default value for a new NetMeshObject's willGiveUpLock property if not otherwise specified.
-     *
-     * @param newValue the new value
-     * @see #getDefaultWillGiveUpLock
-     */
-    public abstract void setDefaultWillGiveUpLock(
-            boolean newValue );
-    
-    /**
-     * Obtain the default value for a new NetMeshObject's willGiveUpLock property if not otherwise specified.
-     *
-     * @return the default value
-     * @see #setDefaultWillGiveUpLock
-     */
-    public abstract boolean getDefaultWillGiveUpLock();
-
-    /**
-     * Set the default value for a new NetMeshObject's willGiveUpHomeReplica property if not otherwise specified.
-     *
-     * @param newValue the new value
-     * @see #getDefaultWillGiveUpHomeReplica
-     */
-    public abstract void setDefaultWillGiveUpHomeReplica(
-            boolean newValue );
-    
-    /**
-     * Obtain the default value for a new NetMeshObject's willGiveUpHomeReplica property if not otherwise specified.
-     *
-     * @return the default value
-     * @see #setDefaultWillGiveUpHomeReplica
-     */
-    public abstract boolean getDefaultWillGiveUpHomeReplica();
-
-    /**
-     * If true, the NetMeshBase will never give up locks, regardless what the individual NetMeshObjects
-     * would like.
-     *
-     * @return true never give up locks
-     */
-    public abstract boolean refuseToGiveUpLock();
-    
-    /**
-     * If true, the NetMeshBase will never give up home replicas, regardless what the individual NetMeshObjects
-     * would like.
-     *
-     * @return true never give up home replicas
-     */
-    public abstract boolean refuseToGiveUpHomeReplica();
-
-    /**
-     * If is set to true, this NetMeshBase prefers that new Replicas create a branch from its own Replicas
-     * in the replication graph. If this is set to false, this NetMeshBase prefers that new Replicas create a
-     * branch from the Replicas in the third NetMeshBase from which this NetMeshBase has obtained its own
-     * Replicas (if it has)
-     *
-     * @param newValue the new value
-     * @see #getPointsReplicasToItself
-     */
-    public abstract void setPointsReplicasToItself(
-            boolean newValue );
-
-    /**
-     * If this returns true, this NetMeshBase prefers that new Replicas create a branch from its own Replicas
-     * in the replication graph. If this returns false, this NetMeshBase prefers that new Replicas create a
-     * branch from the Replicas in the third NetMeshBase from which this NetMeshBase has obtained its own
-     * Replicas (if it has)
-     *
-     * @return true if Replicas are supposed to become Replicas of locally held Replicas
-     * @see #setPointsReplicasToItself
-     */
-    public abstract boolean getPointsReplicasToItself();
-    
     /**
      * Obtain or create a Proxy for communication with a NetMeshBase at the specified NetMeshBaseIdentifier.
      * 

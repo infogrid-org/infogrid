@@ -14,40 +14,30 @@
 
 package org.infogrid.probe.shadow.externalized.xml;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.URISyntaxException;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObjectFactory;
-
-import org.infogrid.meshbase.BulkLoadException;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-
-import org.infogrid.meshbase.net.externalized.xml.ExternalizedProxyXmlEncoder;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
-
+import org.infogrid.meshbase.net.externalized.xml.ExternalizedProxyXmlEncoder;
 import org.infogrid.model.primitives.externalized.DecodingException;
 import org.infogrid.model.primitives.externalized.EncodingException;
-
 import org.infogrid.modelbase.MeshTypeIdentifierFactory;
-
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowMeshBase;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowProxy;
 import org.infogrid.probe.shadow.externalized.ParserFriendlyExternalizedShadowMeshBase;
 import org.infogrid.probe.shadow.externalized.ParserFriendlyExternalizedShadowProxy;
-
 import org.infogrid.util.logging.Log;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-
-import java.net.URISyntaxException;
-
 /**
- * Parses the content of a ShadowMeshBase.
+ * Utility methods to encode/decode the content of a ShadowMeshBase to/from XML. Implements the SAX interface.
  */
 public class ExternalizedShadowMeshBaseXmlEncoder
         extends
@@ -66,15 +56,17 @@ public class ExternalizedShadowMeshBaseXmlEncoder
     }
 
     /**
-     * Append an ExternalizedShadowMeshBase to an OutputStream.
-     *
+     * Serialize an ExternalizedShadowMeshBase to an OutputStream.
+     * 
      * @param mb the ExternalizedShadowMeshBase
-     * @param appendProxies if false, do not append the Proxies
-     * @param out the OutputStream to write to
+     * @param includeProxies if false, do not append the Proxies
+     * @param out the OutputStream to which to append the ExternalizedShadowMeshBase
+     * @throws EncodingException thrown if a problem occurred during encoding
+     * @throws IOException thrown if an I/O error occurred
      */
     public void encodeShadowMeshBase(
             ExternalizedShadowMeshBase mb,
-            boolean                    appendProxies,
+            boolean                    includeProxies,
             OutputStream               out )
         throws
             IOException,
@@ -82,7 +74,7 @@ public class ExternalizedShadowMeshBaseXmlEncoder
     {
         StringBuilder buf = new StringBuilder();
 
-        appendShadowMeshBase( mb, appendProxies, buf );
+        appendShadowMeshBase( mb, includeProxies, buf );
 
         OutputStreamWriter w = new OutputStreamWriter( out, ENCODING );
         w.write( buf.toString() );
@@ -90,15 +82,16 @@ public class ExternalizedShadowMeshBaseXmlEncoder
     }
 
     /**
-     * Append an ExternalizedShadowMeshBase to a StringBuilder.
-     *
+     * Serialize an ExternalizedShadowMeshBase to a StringBuilder.
+     * 
      * @param mb the ExternalizedShadowMeshBase
-     * @param appendProxies if false, do not append the Proxies
+     * @param includeProxies if false, do not append the Proxies
      * @param buf the StringBuilder to write to
+     * @throws EncodingException thrown if a problem occurred during encoding
      */
     public void appendShadowMeshBase(
             ExternalizedShadowMeshBase mb,
-            boolean                    appendProxies,
+            boolean                    includeProxies,
             StringBuilder              buf )
         throws
             EncodingException
@@ -108,7 +101,7 @@ public class ExternalizedShadowMeshBaseXmlEncoder
         appendNetworkIdentifier( mb.getNetworkIdentifier(), buf );        
         buf.append( "\">\n" );
 
-        if( appendProxies ) {
+        if( includeProxies ) {
             ExternalizedProxy [] proxies = mb.getExternalizedProxies();
             for( int i=0 ; i<proxies.length ; ++i ) {
                 appendExternalizedProxy( proxies[i], buf );
@@ -124,13 +117,14 @@ public class ExternalizedShadowMeshBaseXmlEncoder
     }
 
     /**
-     * Enables subclasses to add information to an Proxy.
+     * Enables subclasses to add information to an ExternaliProxy.
      * 
-     * @param value the input Proxy
-     * @param buf the StringBuilder to append to
+     * @param value the ExternalizedProxy to serialize
+     * @param buf the StringBuilder to write to
+     * @throws EncodingException thrown if a problem occurred during encoding
      */
     @Override
-    protected void appendExternalizedProxyHook(
+    protected void appendExternalizedProxyEncodingHook(
             ExternalizedProxy value,
             StringBuilder     buf )
         throws
@@ -144,35 +138,38 @@ public class ExternalizedShadowMeshBaseXmlEncoder
             }
         }
     }
-   
+
     /**
-     * Bulk-load data.
-     *
-     * @param inStream the Stream from which to read the data
-     * @param bestEffort if true, the bulk tries to work around errors to the maximum extent possible
-     * @return the iterator over the ExternalizedMeshObjects
+     * Deserialize an ExternalizedShadowMeshBase from a stream.
+     * 
+     * @param contentAsStream the byte [] stream in which the ExternalizedProxy is encoded
+     * @param externalizedMeshObjectFactory the factory to use for ExternalizedMeshObjects
+     * @param meshObjectIdentifierFactory the factory to use for MeshObjectIdentifier
+     * @param meshTypeIdentifierFactory the factory to use for MeshTypes
+     * @return return the just-instantiated ExternalizedShadowMeshBase
+     * @throws DecodingException thrown if a problem occurred during decoding
+     * @throws IOException thrown if an I/O error occurred
      */
     public ExternalizedShadowMeshBase decodeShadowMeshBase(
-            InputStream                                    s,
+            InputStream                                    contentAsStream,
             ParserFriendlyExternalizedNetMeshObjectFactory externalizedMeshObjectFactory,
             NetMeshObjectIdentifierFactory                 meshObjectIdentifierFactory,
             MeshTypeIdentifierFactory                      meshTypeIdentifierFactory )
         throws
             DecodingException,
-            IOException,
-            BulkLoadException
+            IOException
     {
-        theExternalizedMeshObjectFactory = externalizedMeshObjectFactory; // note the synchronized statement
+        theExternalizedMeshObjectFactory = externalizedMeshObjectFactory;
         theMeshObjectIdentifierFactory   = meshObjectIdentifierFactory;
         theMeshTypeIdentifierFactory     = meshTypeIdentifierFactory;
 
         try {
-            theParser.parse( s, this );
+            theParser.parse( contentAsStream, this );
 
             return this.theParsedShadowMeshBase;
             
         } catch( SAXException ex ) {
-            throw new BulkLoadException( ex );
+            throw new DecodingException( ex );
 
         } finally {
             clearState();
@@ -180,12 +177,13 @@ public class ExternalizedShadowMeshBaseXmlEncoder
     }
 
     /**
-     * Addition to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void startElement5(
@@ -219,12 +217,13 @@ public class ExternalizedShadowMeshBaseXmlEncoder
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void startElement6(
             String     namespaceURI,
@@ -238,11 +237,12 @@ public class ExternalizedShadowMeshBaseXmlEncoder
     }
 
     /**
-     * Addition to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void endElement1(
@@ -261,11 +261,12 @@ public class ExternalizedShadowMeshBaseXmlEncoder
     }
 
     /**
-     * Addition to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void endElement4(
@@ -288,12 +289,14 @@ public class ExternalizedShadowMeshBaseXmlEncoder
             super.endElement4( namespaceURI, localName, qName );
         }        
     }
+
     /**
-     * Addition to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void endElement5(
@@ -315,11 +318,12 @@ public class ExternalizedShadowMeshBaseXmlEncoder
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void endElement6(
             String namespaceURI,

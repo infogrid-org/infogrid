@@ -17,7 +17,7 @@ package org.infogrid.probe.xml;
 import org.infogrid.probe.Probe;
 
 /**
- * A Probe that parses XML.
+ * Marker interface for all Probes that know how to parse XML.
  */
 public interface XmlProbe
         extends Probe

@@ -14,7 +14,7 @@
 
 package org.infogrid.jee.taglib.meshbase.net;
 
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 
 import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
 import org.infogrid.jee.taglib.IgnoreException;

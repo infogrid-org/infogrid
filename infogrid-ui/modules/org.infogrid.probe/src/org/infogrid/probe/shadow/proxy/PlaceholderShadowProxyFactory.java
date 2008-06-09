@@ -12,67 +12,42 @@
 // All rights reserved.
 //
 
-package org.infogrid.probe.shadow;
+package org.infogrid.probe.shadow.proxy;
 
-import org.infogrid.meshbase.net.AbstractProxyFactory;
 import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
-
+import org.infogrid.meshbase.net.proxy.AbstractProxyFactory;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.net.NetMessageEndpoint;
-import org.infogrid.net.NetMessageEndpointFactory;
-
-import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowProxy;
-
 import org.infogrid.util.FactoryException;
 
 /**
- * Factory of DefaultShadowProxies.
+ * Factory of passive, non-communicating Proxies for the purposes of the StagingMeshBase only.
  */
-public class DefaultShadowProxyFactory
+public class PlaceholderShadowProxyFactory
         extends
             AbstractProxyFactory
 {
     /** 
      * Factory method.
      *
-     * @param endpointFactory the NetMessageEndpointFactory to use to communicate
-     * @return the created DefaultProxyFactory.
+     * @return the created PlaceholderShadowProxyFactory.
      */
-    public static DefaultShadowProxyFactory create(
-            NetMessageEndpointFactory endpointFactory )
+    public static PlaceholderShadowProxyFactory create()
     {
-        DefaultShadowProxyFactory ret = new DefaultShadowProxyFactory( endpointFactory );
+        PlaceholderShadowProxyFactory ret = new PlaceholderShadowProxyFactory();
         
         return ret;
     }
 
     /**
      * Constructor.
-     * 
-     * @param endpointFactory the NetMessageEndpointFactory to use to communicate
      */
-    protected DefaultShadowProxyFactory(
-            NetMessageEndpointFactory endpointFactory )
+    protected PlaceholderShadowProxyFactory()
     {
-        super( endpointFactory );
-    }
-
-    /**
-     * Set the NetMeshBase to be used with new Proxies. Make sure that this subclass can only
-     * be used with StagingMeshBases.
-     *
-     * @param base the NetMeshBase to use
-     */
-    @Override
-    public void setNetMeshBase(
-            NetMeshBase base )
-    {
-        StagingMeshBase realMeshBase = (StagingMeshBase) base;
-        super.setNetMeshBase( realMeshBase );
+        super( null, null );
     }
 
     /**
@@ -89,14 +64,8 @@ public class DefaultShadowProxyFactory
         throws
             FactoryException
     {
-        NetMessageEndpoint endpoint = theEndpointFactory.obtainFor( partnerMeshBaseIdentifier, theNetMeshBase.getIdentifier() );
-
-        Proxy ret = DefaultShadowProxy.create( endpoint, theNetMeshBase );
-        ret.setCoherenceSpecification( arg );
+        Proxy ret = DefaultShadowProxy.create( null, theNetMeshBase );
         ret.setFactory( this );
-
-        // we don't need to start communicating here yet -- it suffices that we start
-        // when the first message is handed to the NetMessageEndpoint
 
         return ret;
     } 
@@ -104,9 +73,9 @@ public class DefaultShadowProxyFactory
     /**
      * Recreate a Proxy from an ExternalizedProxy.
      *
-     * @param identifier the NetMeshBaseIdentifier of the Proxy
      * @param externalized the ExternalizedProxy
      * @return the recreated Proxy
+     * @throws FactoryException thrown if the Proxy could not be restored
      */
     public Proxy restoreProxy(
             ExternalizedProxy externalized )

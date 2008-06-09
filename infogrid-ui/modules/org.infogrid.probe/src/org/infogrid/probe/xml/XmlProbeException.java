@@ -23,23 +23,23 @@ import org.w3c.dom.DocumentType;
   * This Exception refines ProbeException.SyntaxError in order to
   * indicate specific XML-related errors.
   */
-public class XmlProbeException
+public abstract class XmlProbeException
         extends
             ProbeException.SyntaxError
 {
     /**
-      * Construct one.
-      *
-      * @param u the URL we were trying to read
-      * @param msg the message
-      * @param before the Exception that caused this Exception
-      */
+     * Construct one.
+     *
+     * @param dataSourceIdentifier identifies the data source that is being accessed
+     * @param msg the message
+     * @param cause the Exception that caused this Exception
+     */
     protected XmlProbeException(
-            NetMeshBaseIdentifier id,
-            String            msg,
-            Exception         before )
+            NetMeshBaseIdentifier dataSourceIdentifier,
+            String                msg,
+            Throwable             cause )
     {
-        super( id, msg, before );
+        super( dataSourceIdentifier, msg, cause );
     }
 
     /**
@@ -51,23 +51,25 @@ public class XmlProbeException
             extends
                 XmlProbeException
     {
+        private static final long serialVersionUID = 1L; // helps with serialzation
+
         /**
-         * Construct one. It does NOT take a message, but our best guess at the
+         * Constructor. It does NOT take a message, but our best guess at the
          * document type, which could be null.
          *
-         * @param u the URL we were trying to read
+         * @param dataSourceIdentifier identifies the data source that is being accessed
          * @param docType our best guess at the document type
-         * @param before the Exception that caused this Exception
+         * @param cause the Exception that caused this Exception
          */
         public CannotDetermineDtd(
-                NetMeshBaseIdentifier id,
-                DocumentType      docType,
-                Exception         before )
+                NetMeshBaseIdentifier dataSourceIdentifier,
+                DocumentType          docType,
+                Exception             cause )
         {
-            super(  id,
+            super(  dataSourceIdentifier,
                     docType == null
                             ? "No document type given"
-                            : "Unknown document type \"" + docType.getName() + "\"", before );
+                            : "Unknown document type \"" + docType.getName() + "\"", cause );
         }
     }
 }

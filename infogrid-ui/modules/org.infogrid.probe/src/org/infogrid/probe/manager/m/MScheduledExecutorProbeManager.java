@@ -31,31 +31,31 @@ public class MScheduledExecutorProbeManager
             ScheduledExecutorProbeManager
 {
     /**
-     * Factory method to create a ProbeManager in memory.
+     * Factory method.
      *
-     * @param delegate the underlying Factory
-     * @param executorService the ScheduledExecutorService that schedules our tasks
+     * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
+     * @return the created MPassiveProbeManager
      */
     public static MScheduledExecutorProbeManager create(
-            ShadowMeshBaseFactory delegate )
+            ShadowMeshBaseFactory delegateFactory )
     {
         CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = MCachingHashMap.create();
 
-        MScheduledExecutorProbeManager ret = new MScheduledExecutorProbeManager( delegate, storage );
+        MScheduledExecutorProbeManager ret = new MScheduledExecutorProbeManager( delegateFactory, storage );
         
         return ret;
     }
 
     /**
      * Constructor.
-     *
-     * @param delegate the underlying Factory
-     * @param executorService the ScheduledExecutorService that schedules our tasks
+     * 
+     * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
+     * @param storage the storage to use
      */
     protected MScheduledExecutorProbeManager(
-            ShadowMeshBaseFactory                            delegate,
+            ShadowMeshBaseFactory                            delegateFactory,
             CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
     {
-        super( delegate, storage );
+        super( delegateFactory, storage );
     }
 }

@@ -43,6 +43,9 @@ public class AllTests
                 new TestSpec( XprisoTest4.class ),
                 new TestSpec( XprisoTest5.class ),
                 new TestSpec( XprisoTest6.class ),
+                new TestSpec( XprisoTest6_5a.class ),
+                new TestSpec( XprisoTest6_5b.class ),
+                new TestSpec( XprisoTest6_5c.class ),
                 new TestSpec( XprisoTest7.class ),
                 new TestSpec( XprisoTest8.class ),
                 new TestSpec( XprisoTest9.class ),
@@ -50,7 +53,8 @@ public class AllTests
                 // new TestSpec( XprisoTest11.class ), // FAILS. Not sure it is an error, though. FIXME?
                 new TestSpec( XprisoTest12.class ),
                 new TestSpec( XprisoTest13.class ),
-                new TestSpec( XprisoTest14.class )
+                new TestSpec( XprisoTest14.class ),
+                // new TestSpec( XprisoTest15.class ) // FIXME, to be written: accessLocally to two replicas in different NetMeshBases in parallel
         };
 
         runTests( tests );

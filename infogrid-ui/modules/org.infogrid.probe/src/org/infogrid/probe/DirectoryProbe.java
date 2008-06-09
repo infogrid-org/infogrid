@@ -39,7 +39,7 @@ import java.io.IOException;
  *       wait for some period of time
  *   }
  * </pre>
- * <p>If a class also supports {@link org.infogrid.probe.WritableProbe WritableProbe},
+ * <p>If a class also supports {@link org.infogrid.probe.WriteableProbe WriteableProbe},
  *    the sequence of invocation is:</p>
  * <pre>
  *   constructor
@@ -59,14 +59,14 @@ public interface DirectoryProbe
      * 
      * 
      * @param theFile the File that is being read
-     * @param coherenceSpecification the type of data coherence that is requested by the application. Probe
+     * @param coherence the type of data coherence that is requested by the application. Probe
      *         implementors may ignore this parameter, letting the Probe framework choose its own policy.
      *         If the Probe chooses to define its own policy (considering or ignoring this parameter), the
      *         Probe must bless the Probe's HomeObject with a subtype of ProbeUpdateSpecification (defined
      *         in the <code>org.infogrid.model.Probe</code>) that reflects the policy.
      * @param freshMeshBase the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe.
      *         This MeshBase is empty when passed into this call, except for the home object.
-     * @throws IdeMeshObjectIdentifierNotUniqueExceptionobe throws this Exception, it indicates that the
+     * @throws MeshObjectIdentifierNotUniqueException throws this Exception, it indicates that the
      *         Probe developer incorrectly assigned duplicate Identifiers to created MeshObject
      * @throws RelatedAlreadyException thrown if the Probe developer incorrectly attempted to
      *         relate two already-related MeshObjects

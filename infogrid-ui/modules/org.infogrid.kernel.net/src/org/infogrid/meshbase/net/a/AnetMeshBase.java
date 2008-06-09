@@ -32,8 +32,8 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-import org.infogrid.meshbase.net.Proxy;
-import org.infogrid.meshbase.net.ProxyManager;
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.modelbase.ModelBase;
@@ -59,12 +59,13 @@ public abstract class AnetMeshBase
     private static final Log log = Log.getLogInstance( AnetMeshBase.class ); // our own, private logger
 
     /**
-     * Constructor for subclasses only. This does not initialize content.
+     * Constructor for subclasses only.
      *
      * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
      * @param identifierFactory the factory for NetMeshObjectIdentifiers appropriate for this NetMeshBase
      * @param setFactory the factory for MeshObjectSets appropriate for this NetMeshBase
      * @param modelBase the ModelBase containing type information
+     * @param life the MeshBaseLifecycleManager to use
      * @param accessMgr the AccessManager that controls access to this NetMeshBase
      * @param cache the CachingMap that holds the NetMeshObjects in this NetMeshBase
      * @param proxyManager the ProxyManager used by this NetMeshBase
@@ -75,12 +76,13 @@ public abstract class AnetMeshBase
             NetMeshObjectIdentifierFactory              identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            AnetMeshBaseLifecycleManager                life,
             NetAccessManager                            accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             ProxyManager                                proxyManager,
             Context                                     context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, context );
+        super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, context );
         
         theProxyManager = proxyManager;
     }
@@ -291,7 +293,7 @@ public abstract class AnetMeshBase
      * 
      * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
      *        a replica of the remote MeshObject
-     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
+     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds. -1 means "use default".
      * @return the locally replicated NetMeshObject, or null if not found
      * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
@@ -330,7 +332,7 @@ public abstract class AnetMeshBase
             NotPermittedException
     {
         NetMeshObjectAccessSpecification path = NetMeshObjectAccessSpecification.create( remoteLocation, coherence );
-        return accessLocally( path, theAccessLocallyTimeout );
+        return accessLocally( path, -1L ); // theAccessLocallyTimeout );
     }
     
     /**
@@ -352,7 +354,7 @@ public abstract class AnetMeshBase
             NetMeshObjectAccessException,
             NotPermittedException
     {
-        return accessLocally( remoteLocation, objectIdentifier, theAccessLocallyTimeout );
+        return accessLocally( remoteLocation, objectIdentifier, -1L ); // theAccessLocallyTimeout );
     }
 
     /**
@@ -364,7 +366,7 @@ public abstract class AnetMeshBase
      * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
      *        a replica of the remote MeshObject
      * @param objectIdentifier the NetMeshObjectIdentifier of the remote NetMeshObject
-     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
+     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds. -1 means "use default".
      * @return the locally replicated NetMeshObject, or null if not found
      * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
@@ -411,7 +413,7 @@ public abstract class AnetMeshBase
                 objectIdentifier,
                 coherence );
         
-        return accessLocally( path, theAccessLocallyTimeout );
+        return accessLocally( path, -1L ); // theAccessLocallyTimeout );
     }
     
     /**
@@ -425,7 +427,7 @@ public abstract class AnetMeshBase
      *        a replica of the remote MeshObject
      * @param objectIdentifier the NetMeshObjectIdentifier of the remote NetMeshObject
      * @param coherence the CoherenceSpecification requested by the caller
-     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
+     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds. -1 means "use default".
      * @return the locally replicated NetMeshObject, or null if not found
      * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
@@ -462,7 +464,7 @@ public abstract class AnetMeshBase
             NetMeshObjectAccessException,
             NotPermittedException
     {
-        return accessLocally( pathToObject, theAccessLocallyTimeout );
+        return accessLocally( pathToObject, -1L ); // theAccessLocallyTimeout );
     }
 
     /**
@@ -471,7 +473,7 @@ public abstract class AnetMeshBase
      * This call does not obtain update rights for the obtained replica.</p>
      * 
      * @param pathToObject the NetMeshObjectAccessSpecification indicating the location and path to use to access the remote NetMeshObject
-     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
+     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds. -1 means "use default".
      * @return the locally replicated NetMeshObject, or null if not found
      * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
@@ -507,7 +509,7 @@ public abstract class AnetMeshBase
             NetMeshObjectAccessException,
             NotPermittedException
     {
-        return accessLocally( pathsToObjects, theAccessLocallyTimeout );
+        return accessLocally( pathsToObjects, -1L ); // theAccessLocallyTimeout );
     }
 
     /**
@@ -521,7 +523,7 @@ public abstract class AnetMeshBase
      * that, however.</p>
      * 
      * @param pathsToObjects the NetMeshObjectAccessSpecifications indicating the location and paths to use to access the remote NetMeshObjects
-     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
+     * @param timeoutInMillis the timeout parameter for this call, in milli-seconds. -1 means "use default".
      * @return the locally replicated NetMeshObjects, or null if not found
      * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
@@ -617,6 +619,7 @@ public abstract class AnetMeshBase
         // now break down the still remaining objects into chunks, one chunk per
         // different proxy, and get them until we have everything.
         boolean ok;
+        long    realTimeout = 0L; //
         synchronized( monitor ) {
 
             int pivotIndex = 0;
@@ -669,31 +672,28 @@ public abstract class AnetMeshBase
                 try {
                     theProxy = obtainProxyFor( pivotName, pivotCalc ); // this triggers the Shadow creation in the right subclasses
                     if( theProxy != null ) {
-                        theProxy.obtainReplica( nextObjectPaths, timeoutInMillis ); // FIXME? Should we use a different timeout here?
+                        long requestedTimeout = theProxy.obtainReplicas( nextObjectPaths, timeoutInMillis ); // FIXME? Should we use a different timeout here?
+                        realTimeout = Math.max(  realTimeout, requestedTimeout );
                     }
 
                 } catch( FactoryException ex ) {
-                    // log.error( ex );
                     thrownExceptions.add( ex );
                     failedObjectPaths.add( NetMeshObjectAccessSpecification.withPrefix( pivot, nextObjectPaths ) );
-
-                } catch( NetMeshObjectAccessException ex ) {
-                    // log.error( ex );
-                    thrownExceptions.add( ex );
-                    failedObjectPaths.add( NetMeshObjectAccessSpecification.withPrefix( pivot, nextObjectPaths ) );
-
                 }
                 stillToGet -= nextObjectPaths.length;
             }
 
+            if( timeoutInMillis > 0 ) { // if something has been specified
+                realTimeout = timeoutInMillis;
+            }
             try {
-                ok = theReturnSynchronizer.join( timeoutInMillis );
+                ok = theReturnSynchronizer.join( realTimeout );
 
                 if( !ok && thrownExceptions.size() == 0 ) {
-                    log.warn( this + ".accessLocally() timed out trying to reach " + ArrayHelper.arrayToString( pathsToObjects ) + ", timeout: " + timeoutInMillis );
+                    log.warn( this + ".accessLocally() timed out trying to reach " + ArrayHelper.arrayToString( pathsToObjects ) + ", timeout: " + realTimeout );
                 }
 
-                if( timeoutInMillis < 0L ) {
+                if( realTimeout < 0L ) {
                     ok = true;
                 }
 
@@ -780,17 +780,14 @@ public abstract class AnetMeshBase
     }
     
     /**
-     * <p>Obtain a manager for NetMeshObject lifecycles.</p>
+     * <p>Obtain a manager for MeshObject lifecycles.</p>
      * 
-     * @return a NetMeshBaseLifecycleManager that works on this MeshBase
+     * @return a MeshBaseLifecycleManager that works on this MeshBase
      */
     @Override
-    public synchronized AnetMeshBaseLifecycleManager getMeshBaseLifecycleManager()
+    public AnetMeshBaseLifecycleManager getMeshBaseLifecycleManager()
     {
-        if( theMeshBaseLifecycleManager == null ) {
-            theMeshBaseLifecycleManager = new AnetMeshBaseLifecycleManager( this );
-        }
-        return (AnetMeshBaseLifecycleManager) theMeshBaseLifecycleManager;
+        return (AnetMeshBaseLifecycleManager) super.getMeshBaseLifecycleManager();
     }
 
     /**
@@ -864,58 +861,7 @@ public abstract class AnetMeshBase
         return theDefaultWillGiveUpHomeReplica;
     }
 
-    /**
-     * If true, the NetMeshBase will never give up locks, regardless what the individual NetMeshObjects
-     * would like.
-     *
-     * @return true never give up locks
-     */
-    public boolean refuseToGiveUpLock()
-    {
-        return false;
-    }
-
-    /**
-     * If true, the NetMeshBase will never give up home replicas, regardless what the individual NetMeshObjects
-     * would like.
-     *
-     * @return true never give up home replicas
-     */
-    public boolean refuseToGiveUpHomeReplica()
-    {
-        return false;
-    }
-
-    /**
-     * If is set to true, this NetMeshBase prefers that new Replicas create a branch from its own Replicas
-     * in the replication graph. If this is set to false, this NetMeshBase prefers that new Replicas create a
-     * branch from the Replicas in the third NetMeshBase from which this NetMeshBase has obtained its own
-     * Replicas (if it has)
-     *
-     * @param newValue the new value
-     * @see #getPointsReplicasToItself
-     */
-    public void setPointsReplicasToItself(
-            boolean newValue )
-    {
-        thePointsReplicasToItself = newValue;
-    }
-
-    /**
-     * If this returns true, this NetMeshBase prefers that new Replicas create a branch from its own Replicas
-     * in the replication graph. If this returns false, this NetMeshBase prefers that new Replicas create a
-     * branch from the Replicas in the third NetMeshBase from which this NetMeshBase has obtained its own
-     * Replicas (if it has)
-     *
-     * @return true if Replicas are supposed to become Replicas of locally held Replicas
-     * @see #setPointsReplicasToItself
-     */
-    public boolean getPointsReplicasToItself()
-    {
-        return thePointsReplicasToItself;
-    }
-
-    /**
+     /**
      * Obtain or create a Proxy for communication with a NetMeshBase at the specified NetMeshBaseIdentifier.
      * 
      * @param networkIdentifier the NetMeshBaseIdentifier
@@ -932,7 +878,7 @@ public abstract class AnetMeshBase
     {
         return theProxyManager.obtainFor( networkIdentifier, coherence );
     }
-    
+
     /**
      * Obtain an existing Proxy to the specified NetMeshBaseIdentifier. Return null if no such
      * Proxy exists. Do not attempt to create one.
@@ -1013,85 +959,9 @@ public abstract class AnetMeshBase
             }
         }
     }
-    /**
-     * Set the number of milliseconds this NetMeshBase is willing to suspend
-     * any Thread that invokes an accessLocally operation to wait for results.
-     * After that time, the operation times out and throws a PartialResultException.
-     *
-     * @param delay the new value for the number of milliseconds this NetMeshBase
-     * is willing to suspend any Thread that invokes an accessLocally operation
-     * @see #getAccessLocallyTimesOutAfter
-     */
-    public void setAccessLocallyTimesOutAfter(
-            long delay )
-    {
-        long oldValue = theAccessLocallyTimeout;
-
-        theAccessLocallyTimeout = delay;
-
-        firePropertyChange(
-                this,
-                ACCESS_LOCALLY_TIMES_OUT_AFTER_PROPERTY,
-                new Long( oldValue ),
-                new Long( theAccessLocallyTimeout ));
-    }
 
     /**
-     * Obtain the number of milliseconds this NetMeshBase is willing to suspend
-     * any Thread that invokes an accessLocally operation to wait for results.
-     * After that time, the operation times out and throws a PartialResultException.
-     *
-     * @return the number of milliseconds this NetMeshBase is willing to suspend
-     * any Thread that invokes an accessLocally operation.
-     * @see #setAccessLocallyTimesOutAfter
-     */
-    public final long getAccessLocallyTimesOutAfter()
-    {
-        return theAccessLocallyTimeout;
-    }
-    
-    /**
-     * Obtain the desired timeout, in milliseconds, for tryToObtainLock requests.
-     *
-     * @return the timeout, in milliseconds
-     */
-    public final long getTryToObtainLockTimesOutAfter()
-    {
-        return theTryToObtainLockTimeout;
-    }
-    
-    /**
-     * Obtain the desired timeout, in milliseconds, for tryToPushLock requests.
-     *
-     * @return the timeout, in milliseconds
-     */
-    public final long getTryToPushLockTimesOutAfter()
-    {
-        return theTryToPushLockTimeout;
-    }
-    
-    /**
-     * Obtain the desired timeout, in milliseconds, for tryToObtainHomeReplica requests.
-     *
-     * @return the timeout, in milliseconds
-     */
-    public final long getTryToObtainHomeReplicaTimesOutAfter()
-    {
-        return theTryToObtainHomeReplicaTimeout;
-    }
-    
-    /**
-     * Obtain the desired timeout, in milliseconds, for tryToPushHomeReplica requests.
-     *
-     * @return the timeout, in milliseconds
-     */
-    public final long getTryToPushHomeReplicaTimesOutAfter()
-    {
-        return theTryToPushHomeReplicaTimeout;
-    }
-    
-    /**
-      * Clean up
+      * Clean up.
       * 
       * @param isPermanent if true, this MeshBase will go away permanmently; if false, it may come alive again some time later
       */
@@ -1137,46 +1007,6 @@ public abstract class AnetMeshBase
     private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( NetMeshBase.class );
 
     /**
-     * The duration, in milliseconds, that we are willing to suspend a Thread to wait for accessLocally()
-     * results to come in.
-     */
-    private long theAccessLocallyTimeout = theResourceHelper.getResourceLongOrDefault(
-            "AccessLocallyTimeout",
-            10000L ); // 10 sec
-
-    /**
-     * The duration, in milliseconds, that we are willing to suspend a Thread to wait for tryToObtainLock()
-     * results to come in.
-     */
-    private long theTryToObtainLockTimeout = theResourceHelper.getResourceLongOrDefault(
-            "TryToObtainLockTimeout",
-            5000L ); // 5 sec
-
-    /**
-     * The duration, in milliseconds, that we are willing to suspend a Thread to wait for tryToPushLock()
-     * results to come in.
-     */
-    private long theTryToPushLockTimeout = theResourceHelper.getResourceLongOrDefault(
-            "theTryToPushLockTimeout",
-            theTryToObtainLockTimeout ); // push same as pull
-
-    /**
-     * The duration, in milliseconds, that we are willing to suspend a Thread to wait for tryToObtainHomeReplica()
-     * results to come in.
-     */
-    private long theTryToObtainHomeReplicaTimeout = theResourceHelper.getResourceLongOrDefault(
-            "TryToObtainHomeReplicaTimeout",
-            5000L ); // 5 sec
-
-    /**
-     * The duration, in milliseconds, that we are willing to suspend a Thread to wait for tryToPushHomeReplica()
-     * results to come in.
-     */
-    private long theTryToPushHomeReplicaTimeout = theResourceHelper.getResourceLongOrDefault(
-            "TryToPushHomeReplicaTimeout",
-            theTryToObtainHomeReplicaTimeout ); // push same as pull
-
-    /**
      * The default value for the willGiveUpLock property of newly created NetMeshObjects.
      */
     private boolean theDefaultWillGiveUpLock = theResourceHelper.getResourceBooleanOrDefault(
@@ -1189,11 +1019,6 @@ public abstract class AnetMeshBase
     private boolean theDefaultWillGiveUpHomeReplica = theResourceHelper.getResourceBooleanOrDefault(
             "DefaultWillGiveUpHomeReplica",
             true );
-
-    /**
-     * Will this NetMeshBase point new Replicas to itself in the Replication Graph, or not.
-     */
-    private boolean thePointsReplicasToItself = false;
 
     /**
      * This object helps us with synchronizing results we are getting asynchronously.

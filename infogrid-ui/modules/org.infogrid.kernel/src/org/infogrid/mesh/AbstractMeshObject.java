@@ -14,9 +14,17 @@
 
 package org.infogrid.mesh;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.mesh.security.PropertyReadOnlyException;
-
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.transaction.MeshObjectBecameDeadStateEvent;
@@ -27,9 +35,9 @@ import org.infogrid.meshbase.transaction.MeshObjectRoleAddedEvent;
 import org.infogrid.meshbase.transaction.MeshObjectRoleRemovedEvent;
 import org.infogrid.meshbase.transaction.MeshObjectTypeAddedEvent;
 import org.infogrid.meshbase.transaction.MeshObjectTypeRemovedEvent;
+import org.infogrid.meshbase.transaction.NotWithinTransactionBoundariesException;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
-
 import org.infogrid.model.primitives.AttributableMeshType;
 import org.infogrid.model.primitives.DataType;
 import org.infogrid.model.primitives.EntityType;
@@ -38,27 +46,14 @@ import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.Role;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.model.traversal.TraversalSpecification;
-
 import org.infogrid.modelbase.MeshTypeNotFoundException;
 import org.infogrid.modelbase.PropertyTypeNotFoundException;
-
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.FlexiblePropertyChangeListenerSet;
 import org.infogrid.util.IsDeadException;
 import org.infogrid.util.StringHelper;
 import org.infogrid.util.ZeroElementIterator;
 import org.infogrid.util.logging.Log;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import org.infogrid.meshbase.transaction.NotWithinTransactionBoundariesException;
 
 /**
  * This Collects functionality that is probably useful to all implementations
@@ -195,11 +190,9 @@ public abstract class AbstractMeshObject
         if( mb == null ) {
             return true; // the object itself has been deleted or purged
         }
-
         if( mb.isDead() ) {
             return true; // the whole MeshBase died
         }
-
         return false;
     }
 
@@ -252,9 +245,10 @@ public abstract class AbstractMeshObject
             throw new NullPointerException();
         }
 
+        EntityType requiredType = (EntityType) thePropertyType.getAttributableMeshType();
+        boolean    found        = false;
+
         synchronized( this ) {
-            EntityType requiredType = (EntityType) thePropertyType.getAttributableMeshType();
-            boolean    found        = false;
             
             if( theMeshTypes != null ) {
                 for( AttributableMeshType type : theMeshTypes.keySet() ) {
@@ -271,6 +265,7 @@ public abstract class AbstractMeshObject
             checkPermittedGetProperty( thePropertyType );
 
             updateLastRead();
+
             if( theProperties != null ) {
                 return theProperties.get( thePropertyType );
             } else {
@@ -359,7 +354,7 @@ public abstract class AbstractMeshObject
             NotPermittedException,
             TransactionException
     {
-        return setPropertyValue( thePropertyType, newValue, -1L );
+        return setPropertyValue( thePropertyType, newValue, 0 );
     }
 
     /**
@@ -369,7 +364,7 @@ public abstract class AbstractMeshObject
      * 
      * @param thePropertyType the PropertyType that identifies the correct Property of this MeshObject
      * @param newValue the new value of the Property
-     * @param timeUpdated the time at which this change occurred
+     * @param timeUpdated the time at which this change occurred. -1 means "don't update" and 0 means "current time".
      * @return old value of the Property
      * @throws IllegalPropertyTypeException thrown if the PropertyType does not exist on this MeshObject
      *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
@@ -391,8 +386,8 @@ public abstract class AbstractMeshObject
         return internalSetPropertyValues(
                 new PropertyType[] { thePropertyType },
                 new PropertyValue[] { newValue },
-                timeUpdated,
-                true )[0];
+                true,
+                timeUpdated )[0];
     }
 
     /**
@@ -401,8 +396,8 @@ public abstract class AbstractMeshObject
      *
      * @param thePropertyTypes the sequence of PropertyTypes to set
      * @param newValues the sequence of PropertyValues for the PropertyTypes
-     * @param timeUpdated the time to use as the new timeUpdated
      * @param isMaster if true, check permissions
+     * @param timeUpdated the value for the timeUpdated property after this operation. -1 means "don't update" and 0 means "current time".
      * @return the old values of the Properties
      * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
      *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
@@ -413,8 +408,8 @@ public abstract class AbstractMeshObject
     protected PropertyValue [] internalSetPropertyValues(
             PropertyType []  thePropertyTypes,
             PropertyValue [] newValues,
-            long             timeUpdated,
-            boolean          isMaster )
+            boolean          isMaster,
+            long             timeUpdated )
         throws
             IllegalPropertyTypeException,
             IllegalPropertyValueException,
@@ -458,16 +453,16 @@ public abstract class AbstractMeshObject
             }
         }
 
-        PropertyValue [] oldValues;
-        synchronized( this ) {
-            theMeshBase.checkTransaction();
+        checkTransaction();
 
-            if( isMaster ) {
-                for( int i=0 ; i<thePropertyTypes.length ; ++i ) {
-                    checkPermittedSetProperty( thePropertyTypes[i], newValues[i] );
-                }
+        if( isMaster ) {
+            for( int i=0 ; i<thePropertyTypes.length ; ++i ) {
+                checkPermittedSetProperty( thePropertyTypes[i], newValues[i] );
             }
+        }
 
+        PropertyValue [] oldValues;
+        // synchronized( this ) { it appears that if we do checkTransaction we don't need to do synchronized
             for( int i=0 ; i<thePropertyTypes.length ; ++i ) {
                 EntityType requiredType = (EntityType) thePropertyTypes[i].getAttributableMeshType();
                 boolean    found        = false;
@@ -494,7 +489,8 @@ public abstract class AbstractMeshObject
                 oldValues[i] = theProperties.put( thePropertyTypes[i], newValues[i] );
             }
             updateLastUpdated( timeUpdated, theTimeUpdated );
-        }
+
+            // }
         for( int i=0 ; i<thePropertyTypes.length ; ++i ) {
             if( PropertyValue.compare( oldValues[i], newValues[i] ) != 0 ) {
                 firePropertyChange( thePropertyTypes[i], oldValues[i], newValues[i], theMeshBase );
@@ -526,7 +522,7 @@ public abstract class AbstractMeshObject
             NotPermittedException,
             TransactionException
     {
-        return setPropertyValues( thePropertyTypes, thePropertyValues, -1L );
+        return setPropertyValues( thePropertyTypes, thePropertyValues, 0 );
     }
             
     /**
@@ -567,7 +563,7 @@ public abstract class AbstractMeshObject
      *
      * @param thePropertyTypes the PropertyTypes whose values we want to set
      * @param thePropertyValues the new values for the PropertyTypes for this MeshObject
-     * @param timeUpdated the time at which this change occurred
+     * @param timeUpdated the time at which this change occurred.  -1 means "don't update" and 0 means "current time".
      * @return old value of the Properties
      * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
      *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
@@ -585,7 +581,7 @@ public abstract class AbstractMeshObject
             NotPermittedException,
             TransactionException
     {
-        return internalSetPropertyValues( thePropertyTypes, thePropertyValues, timeUpdated, true );
+        return internalSetPropertyValues( thePropertyTypes, thePropertyValues, true, timeUpdated );
     }
 
     /**
@@ -593,7 +589,7 @@ public abstract class AbstractMeshObject
      * and specify a time when that change happened. This method sets either all values, or none.
      *
      * @param newValues Map of PropertyType to PropertyValue
-     * @param timeUpdated the time at which this change occurred
+     * @param timeUpdated the time at which this change occurred.  -1 means "don't update" and 0 means "current time".
      * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
      *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
      * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this Property
@@ -757,7 +753,7 @@ public abstract class AbstractMeshObject
             TransactionException,
             NotPermittedException
     {
-        internalBless( types, true, true , false );
+        internalBless( types, true, true, false, 0L );
     }
     
     /**
@@ -768,6 +764,7 @@ public abstract class AbstractMeshObject
      * @param isMaster if true, this is the master replica
      * @param checkIsAbstract if false, do not check whether or not the EntityTypes are abstract
      * @param forgiving if true, attempt to ignore errors
+     * @param timeUpdated the value for the timeUpdated property after this operation.  -1 means "don't update" and 0 means "current time".
      * @throws EntityBlessedAlreadyException thrown if this MeshObject is blessed already with at least one of these EntityTypes
      * @throws IsAbstractException thrown if at least one of the EntityTypes is abstract and cannot be instantiated
      * @throws TransactionException thrown if invoked outside of proper transaction boundaries
@@ -777,7 +774,8 @@ public abstract class AbstractMeshObject
             EntityType [] types,
             boolean       isMaster,
             boolean       checkIsAbstract,
-            boolean       forgiving )
+            boolean       forgiving,
+            long          timeUpdated )
         throws
             EntityBlessedAlreadyException,
             IsAbstractException,
@@ -804,18 +802,18 @@ public abstract class AbstractMeshObject
             if( types[i] == null ) {
                 throw new IllegalArgumentException( "null EntityType at index " + i );
             }
+            if( !types[i].getIsAbstract().value() ) {
+                continue;
+            }
             if( checkIsAbstract ) {
-                if( types[i].getIsAbstract().value() ) {
-                    throw new IsAbstractException( this, types[i] );
-                }
-            } else {
-                if( !types[i].getMayBeUsedAsForwardReference().value() ) {
-                    throw new IsAbstractException( this, types[i] );
-                }
+                throw new IsAbstractException( this, types[i] );
+            }
+            if( !types[i].getMayBeUsedAsForwardReference().value() ) {
+                throw new IsAbstractException( this, types[i] );
             }
         }
 
-        synchronized( this ) {
+        // synchronized( this ) { if we do checkTransaction, it does not seem we need to do synchronized
             theMeshBase.checkTransaction();
 
             if( isMaster ) {
@@ -850,14 +848,18 @@ public abstract class AbstractMeshObject
             if( theMeshTypes == null ) {
                 theMeshTypes = createMeshTypes();
             }
+            boolean doTimeUpdate = false;
             for( int i=0 ; i<types.length ; ++i ) {
                 WeakReference<TypedMeshObjectFacade> already = theMeshTypes.get( types[i] );
                 if( already == null ) { // otherwise we have it already
                     theMeshTypes.put( types[i], null );
                 }
-
+                doTimeUpdate = true;
+            }
+            if( doTimeUpdate ) {
                 updateLastUpdated();
             }
+
             fireTypesAdded(
                     ArrayHelper.copyIntoNewArray( oldTypes, EntityType.class ),
                     types,
@@ -868,7 +870,7 @@ public abstract class AbstractMeshObject
                 TypeInitializer init = createTypeInitializer( types[i] );
                 init.initialize( theTimeUpdated );
             }
-        }
+        // }
     }
 
     /**
@@ -929,7 +931,7 @@ public abstract class AbstractMeshObject
             TransactionException,
             NotPermittedException
     {
-        internalUnbless( types, true );
+        internalUnbless( types, true, 0 );
     }
     
     /**
@@ -938,6 +940,7 @@ public abstract class AbstractMeshObject
      * 
      * @param types the EntityTypes that the MeshObject will stop supporting
      * @param isMaster if true, this is the master replica
+     * @param timeUpdated the value for the timeUpdated property after this operation. -1 means "don't update" and 0 means "current time".
      * @throws RoleTypeRequiresEntityTypeException thrown if this MeshObject plays one or more roles that requires the MeshObject to remain being blessed with at least one of the EntityTypes
      * @throws EntityNotBlessedException thrown if this MeshObject does not support at least one of the given EntityTypes
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
@@ -945,7 +948,8 @@ public abstract class AbstractMeshObject
      */
     protected synchronized void internalUnbless(
             EntityType [] types,
-            boolean       isMaster )
+            boolean       isMaster,
+            long          timeUpdated )
         throws
             RoleTypeRequiresEntityTypeException,
             EntityNotBlessedException,
@@ -1025,7 +1029,8 @@ public abstract class AbstractMeshObject
             }
         }
         
-        updateLastUpdated();
+        updateLastUpdated( timeUpdated, theTimeUpdated );
+
         fireTypesRemoved(
                 oldTypes,
                 types,
@@ -1043,6 +1048,7 @@ public abstract class AbstractMeshObject
         checkAlive();
 
         updateLastRead();
+
         if( theMeshTypes != null ) {
             Set<EntityType> keySet = theMeshTypes.keySet();
             EntityType []   ret    = new EntityType[ keySet.size() ];
@@ -1098,6 +1104,7 @@ public abstract class AbstractMeshObject
             checkPermittedBlessedBy( type );
 
             updateLastRead();
+            
             if( theMeshTypes != null ) {
                 Set<EntityType> keySet = theMeshTypes.keySet();
 
@@ -1227,6 +1234,7 @@ public abstract class AbstractMeshObject
         }
 
         updateLastRead();
+        
         Iterator<EntityType> iter = theMeshTypes.keySet().iterator();
         while( iter.hasNext() ) {
             EntityType                       key   = iter.next();
@@ -1886,7 +1894,10 @@ public abstract class AbstractMeshObject
                         canonicalMeshObjectName,
                         time );
         
-        oldMeshBase.getCurrentTransaction().addChange( theEvent );
+        // Let's not insert it into the transaction any more, there is no point of having
+        // both MeshObjectBecameDeadStateEvent and MeshObjectDeletedEvent
+        //
+        // oldMeshBase.getCurrentTransaction().addChange( theEvent );
         
         firePropertyChange( theEvent );
     }
@@ -1946,7 +1957,7 @@ public abstract class AbstractMeshObject
      */
     protected void updateLastUpdated()
     {
-        updateLastUpdated( -1L, theTimeUpdated );
+        updateLastUpdated( 0, theTimeUpdated );
     }
 
     /**
@@ -1955,14 +1966,14 @@ public abstract class AbstractMeshObject
      */
     protected void updateLastRead()
     {
-        updateLastRead( -1L, theTimeRead );
+        updateLastRead( 0, theTimeRead );
     }
 
     /**
      * Update the lastUpdated property. This does not trigger an event generation -- not necessary.
      * This may be overridden.
      *
-     * @param timeUpdated the time to set to, or -1L to indicate the current time
+     * @param timeUpdated the time to set to. -1 means "don't update" and 0 means "current time".
      * @param lastTimeUpdated the time this MeshObject was updated last before
      */
     protected abstract void updateLastUpdated(
@@ -1973,7 +1984,7 @@ public abstract class AbstractMeshObject
      * Update the lastRead property. This does not trigger an event generation -- not necessary.
      * This may be overridden.
      *
-     * @param timeRead the time to set to, or -1L to indicate the current time
+     * @param timeRead the time to set to.  -1 means "don't update" and 0 means "current time".
      * @param lastTimeRead the time this MeshObject was read last before
      */
     protected abstract void updateLastRead(

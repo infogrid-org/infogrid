@@ -40,18 +40,15 @@ import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.primitives.BooleanValue;
 import org.infogrid.model.primitives.ColorValue;
-import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.EnumeratedDataType;
 import org.infogrid.model.primitives.ExtentValue;
 import org.infogrid.model.primitives.FloatValue;
 import org.infogrid.model.primitives.IntegerValue;
 import org.infogrid.model.primitives.MeshType;
-import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MultiplicityValue;
 import org.infogrid.model.primitives.PointValue;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
-import org.infogrid.model.primitives.RoleType;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.model.primitives.TimePeriodValue;
 import org.infogrid.model.primitives.TimeStampValue;
@@ -90,37 +87,35 @@ public class DomMeshObjectSetProbe
     /**
      * Parse a DOM Document and instantiate corresponding MeshObjects.
      * 
-     * 
-     * @param theDocument the pre-parsed Document Object Model of the parsed data source
+     * @param dataSourceIdentifier identifies the data source that is being accessed
      * @param coherenceSpecification the type of data coherence that is requested by the application. Probe
      *         implementors may ignore this parameter, letting the Probe framework choose its own policy.
      *         If the Probe chooses to define its own policy (considering or ignoring this parameter), the
-     *         Probe must bless the Probe's HomeObject with a subtype of ProbeUpdateSpecification (defined
-     *         in the <code>org.infogrid.model.ProbeModel</code>) that reflects the policy.
+     *         Probe must bless the Probe's HomeObject with a subtype of <code>ProbeUpdateSpecification</code> (defined
+     *         in the <code>org.infogrid.model.Probe</code> Subject Area) and suitable Property
+     *         values that reflect the policy.
+     * @param theDocument the DOM document to be interpreted
      * @param freshMeshBase the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe.
-     *         This MeshBase is empty when passed into this call, except for the home object.
-     * @throws DoNotHaveLockException a Probe can declare to throw this Exception,
-     *         which makes programming easier, but if it actually threw it, that would be a programming error
-     * @throws MeshObjectIdentifierNotUniqueException Probe throws this Exception, it indicates that the
-     *         Probe developer incorrectly assigned duplicate Identifiers to created MeshObject
-     * @throws RelationshipExistsAlreadyException if a Probe throws this Exception, it indicates that the
-     *         Probe developer incorrectly attempted to create another RelationshipType instance between
-     *         the same two MeshObjects.
-     * @throws TransactionException a Probe can declare to throw this Exception,
-     *         which makes programming easier, but if it actually threw it, that would be a programming error
+     *         This StagingMeshBase is empty when passed into this call, except for the home object which always exists
+     * @throws IOException an input/output error occurred during execution of the Probe
+     * @throws MeshObjectIdentifierNotUniqueException thrown if the Probe developer incorrectly
+     *         assigned duplicate MeshObjectsIdentifiers to created MeshObjects.
+     *         Throwing this typically indicates a programming error.
+     * @throws NotPermittedException thrown if an operation performed by the Probe was not permitted
      * @throws ProbeException a Probe error occurred per the possible subclasses defined in ProbeException
+     * @throws TransactionException a Transaction problem occurred. Throwing this typically indicates a programming error.
      */
     public void parseDocument(
-            NetMeshBaseIdentifier  theNetworkIdentifier,
-            CoherenceSpecification coherence,
+            NetMeshBaseIdentifier  dataSourceIdentifier,
+            CoherenceSpecification coherenceSpecification,
             Document               theDocument,
             StagingMeshBase        freshMeshBase )
         throws
-            NotPermittedException,
+            IOException,
             MeshObjectIdentifierNotUniqueException,
+            NotPermittedException,
             ProbeException,
-            TransactionException,
-            IOException
+            TransactionException
     {
         ModelBase                       theModelBase = freshMeshBase.getModelBase();
         StagingMeshBaseLifecycleManager life         = freshMeshBase.getMeshBaseLifecycleManager();
@@ -137,7 +132,7 @@ public class DomMeshObjectSetProbe
             }
         }
         if( topNode == null ) {
-            throw new ProbeException.EmptyDataSource( theNetworkIdentifier );
+            throw new ProbeException.EmptyDataSource( dataSourceIdentifier );
         }
         
         meshObjectList = topNode.getChildNodes();
@@ -149,13 +144,13 @@ public class DomMeshObjectSetProbe
             }
             NamedNodeMap attrs = meshObjectNode.getAttributes();
             
-            String identifier       = getTextContent( attrs, IDENTIFIER_TAG );
-            String timeCreated      = getTextContent( attrs, TIME_CREATED_TAG );
-            String timeUpdated      = getTextContent( attrs, TIME_UPDATED_TAG );
-            String timeRead         = getTextContent( attrs, TIME_READ_TAG );
-            String timeAutoDeletes  = getTextContent( attrs, TIME_AUTO_DELETES_TAG );
-            String giveUpLock       = getTextContent( attrs, GIVE_UP_LOCK_TAG );
-            String proxyTowardsHome = getTextContent( attrs, PROXY_TOWARDS_HOME_TAG );
+            String identifier       = MeshObjectSetProbeUtils.getTextContent( attrs, IDENTIFIER_TAG );
+            String timeCreated      = MeshObjectSetProbeUtils.getTextContent( attrs, TIME_CREATED_TAG );
+            String timeUpdated      = MeshObjectSetProbeUtils.getTextContent( attrs, TIME_UPDATED_TAG );
+            String timeRead         = MeshObjectSetProbeUtils.getTextContent( attrs, TIME_READ_TAG );
+            String timeAutoDeletes  = MeshObjectSetProbeUtils.getTextContent( attrs, TIME_AUTO_DELETES_TAG );
+            String giveUpLock       = MeshObjectSetProbeUtils.getTextContent( attrs, GIVE_UP_LOCK_TAG );
+            String proxyTowardsHome = MeshObjectSetProbeUtils.getTextContent( attrs, PROXY_TOWARDS_HOME_TAG );
 
             ExternalizedMeshObject theObjectBeingParsed = new ExternalizedMeshObject();
             
@@ -178,7 +173,7 @@ public class DomMeshObjectSetProbe
                 theObjectBeingParsed.setGiveUpLock( true );
             }
             if( proxyTowardsHome != null && proxyTowardsHome.length() > 0 ) {
-                theObjectBeingParsed.setProxyTowardsHome( constructNetworkIdentifier( theNetworkIdentifier, proxyTowardsHome ));
+                theObjectBeingParsed.setProxyTowardsHome( constructNetworkIdentifier( dataSourceIdentifier, proxyTowardsHome ));
             }
             
             NodeList childNodeList = meshObjectNode.getChildNodes();
@@ -194,7 +189,7 @@ public class DomMeshObjectSetProbe
                     theObjectBeingParsed.addMeshType( theModelBase.getMeshTypeIdentifierFactory().fromExternalForm( typeIdentifier ));
 
                 } else if( PROPERTY_TYPE_TAG.equals( childNodeName )) {
-                    String propertyIdentifier = getTextContent( childNode.getAttributes(), TYPE_TAG );
+                    String propertyIdentifier = MeshObjectSetProbeUtils.getTextContent( childNode.getAttributes(), TYPE_TAG );
                     theObjectBeingParsed.addPropertyType( theModelBase.getMeshTypeIdentifierFactory().fromExternalForm( propertyIdentifier ));
                     
                     NodeList grandNodeList = childNode.getChildNodes();
@@ -211,8 +206,8 @@ public class DomMeshObjectSetProbe
                         PropertyValue propValue  = null;
                         
                         if( BLOB_VALUE_TAG.equals( grandNodeName )) {
-                            String mime      = getTextContent( grandAttrs, BLOB_VALUE_MIME_TAG );
-                            String loadFrom  = getTextContent( grandAttrs, BLOB_VALUE_LOAD_TAG );
+                            String mime      = MeshObjectSetProbeUtils.getTextContent( grandAttrs, BLOB_VALUE_MIME_TAG );
+                            String loadFrom  = MeshObjectSetProbeUtils.getTextContent( grandAttrs, BLOB_VALUE_LOAD_TAG );
 
                             if( mime != null && mime.length() > 0 ) {
                                 if( loadFrom != null && loadFrom.length() > 0 ) {
@@ -223,17 +218,17 @@ public class DomMeshObjectSetProbe
                                     propValue = BlobValue.create( content.trim(), mime );
                                 }
                             } else {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier, "empty '" + BLOB_VALUE_MIME_TAG + "' on '" + BLOB_VALUE_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier, "empty '" + BLOB_VALUE_MIME_TAG + "' on '" + BLOB_VALUE_TAG + "'", null );
                             }
                            
                         } else if( BOOLEAN_VALUE_TAG.equals( grandNodeName )) {
                             propValue = BooleanValue.create( BOOLEAN_VALUE_TRUE_TAG.equals( content.trim() ));
                             
                         } else if( COLOR_VALUE_TAG.equals( grandNodeName )) {
-                            String red   = getTextContent( grandAttrs, COLOR_VALUE_RED_TAG );
-                            String green = getTextContent( grandAttrs, COLOR_VALUE_GREEN_TAG );
-                            String blue  = getTextContent( grandAttrs, COLOR_VALUE_BLUE_TAG );
-                            String alpha = getTextContent( grandAttrs, COLOR_VALUE_ALPHA_TAG );
+                            String red   = MeshObjectSetProbeUtils.getTextContent( grandAttrs, COLOR_VALUE_RED_TAG );
+                            String green = MeshObjectSetProbeUtils.getTextContent( grandAttrs, COLOR_VALUE_GREEN_TAG );
+                            String blue  = MeshObjectSetProbeUtils.getTextContent( grandAttrs, COLOR_VALUE_BLUE_TAG );
+                            String alpha = MeshObjectSetProbeUtils.getTextContent( grandAttrs, COLOR_VALUE_ALPHA_TAG );
 
                             propValue = ColorValue.create( new Color(
                                     Float.parseFloat( red ),
@@ -248,21 +243,21 @@ public class DomMeshObjectSetProbe
                                     EnumeratedDataType realPt = (EnumeratedDataType) ((PropertyType)mt).getDataType();
                                     theObjectBeingParsed.addPropertyValue( realPt.select( content.trim() )); // FIXME?
                                 } else {
-                                    throw new ProbeException.SyntaxError( theNetworkIdentifier, "MeshType with " + propertyIdentifier + " is not a PropertyType", null );
+                                    throw new ProbeException.SyntaxError( dataSourceIdentifier, "MeshType with " + propertyIdentifier + " is not a PropertyType", null );
                                 }
                             } catch( MeshTypeWithIdentifierNotFoundException ex ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier, "Cannot find PropertyType with " + propertyIdentifier, ex );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier, "Cannot find PropertyType with " + propertyIdentifier, ex );
                             }
                             
                         } else if( EXTENT_VALUE_TAG.equals( grandNodeName )) {
-                            String width  = getTextContent( grandAttrs, EXTENT_VALUE_WIDTH_TAG );
-                            String height = getTextContent( grandAttrs, EXTENT_VALUE_HEIGHT_TAG );
+                            String width  = MeshObjectSetProbeUtils.getTextContent( grandAttrs, EXTENT_VALUE_WIDTH_TAG );
+                            String height = MeshObjectSetProbeUtils.getTextContent( grandAttrs, EXTENT_VALUE_HEIGHT_TAG );
 
                             if( width == null || width.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + EXTENT_VALUE_WIDTH_TAG + "' on '" + EXTENT_VALUE_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + EXTENT_VALUE_WIDTH_TAG + "' on '" + EXTENT_VALUE_TAG + "'", null );
                             }            
                             if( height == null && height.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + EXTENT_VALUE_HEIGHT_TAG + "' on '" + EXTENT_VALUE_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + EXTENT_VALUE_HEIGHT_TAG + "' on '" + EXTENT_VALUE_TAG + "'", null );
                             }
                             propValue = ExtentValue.create( Double.parseDouble( width ), Double.parseDouble( height ));
 
@@ -273,22 +268,22 @@ public class DomMeshObjectSetProbe
                             propValue = FloatValue.parseFloatValue( content );
                             
                         } else if( MULTIPLICITY_VALUE_TAG.equals( grandNodeName )) {
-                            String min = getTextContent( grandAttrs, MULTIPLICITY_VALUE_MIN_TAG );
-                            String max = getTextContent( grandAttrs, MULTIPLICITY_VALUE_MAX_TAG );
+                            String min = MeshObjectSetProbeUtils.getTextContent( grandAttrs, MULTIPLICITY_VALUE_MIN_TAG );
+                            String max = MeshObjectSetProbeUtils.getTextContent( grandAttrs, MULTIPLICITY_VALUE_MAX_TAG );
 
                             propValue = MultiplicityValue.create(
                                     ( min != null && min.length() > 0 ) ? Integer.parseInt( min ) : MultiplicityValue.N,
                                     ( max != null && max.length() > 0 ) ? Integer.parseInt( max ) : MultiplicityValue.N );
                             
                         } else if( POINT_VALUE_TAG.equals( grandNodeName )) {
-                            String x = getTextContent( grandAttrs, POINT_VALUE_X_TAG );
-                            String y = getTextContent( grandAttrs, POINT_VALUE_Y_TAG );
+                            String x = MeshObjectSetProbeUtils.getTextContent( grandAttrs, POINT_VALUE_X_TAG );
+                            String y = MeshObjectSetProbeUtils.getTextContent( grandAttrs, POINT_VALUE_Y_TAG );
 
                             if( x == null || x.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + POINT_VALUE_X_TAG + "' on '" + POINT_VALUE_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + POINT_VALUE_X_TAG + "' on '" + POINT_VALUE_TAG + "'", null );
                             }
                             if( y != null || y.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + POINT_VALUE_Y_TAG + "' on '" + POINT_VALUE_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + POINT_VALUE_Y_TAG + "' on '" + POINT_VALUE_TAG + "'", null );
                             }
                             propValue = PointValue.create( Double.parseDouble( x ), Double.parseDouble( y ));
 
@@ -296,30 +291,30 @@ public class DomMeshObjectSetProbe
                             propValue = StringValue.create( content );
 
                         } else if( TIME_PERIOD_TAG.equals( grandNodeName )) {
-                            String yr  = getTextContent( grandAttrs, TIME_PERIOD_YEAR_TAG );
-                            String mon = getTextContent( grandAttrs, TIME_PERIOD_MONTH_TAG );
-                            String day = getTextContent( grandAttrs, TIME_PERIOD_DAY_TAG );
-                            String hr  = getTextContent( grandAttrs, TIME_PERIOD_HOUR_TAG );
-                            String min = getTextContent( grandAttrs, TIME_PERIOD_MINUTE_TAG );
-                            String sec = getTextContent( grandAttrs, TIME_PERIOD_SECOND_TAG );
+                            String yr  = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_PERIOD_YEAR_TAG );
+                            String mon = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_PERIOD_MONTH_TAG );
+                            String day = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_PERIOD_DAY_TAG );
+                            String hr  = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_PERIOD_HOUR_TAG );
+                            String min = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_PERIOD_MINUTE_TAG );
+                            String sec = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_PERIOD_SECOND_TAG );
 
                             if( yr == null || yr.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_PERIOD_YEAR_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_PERIOD_YEAR_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
                             }
                             if( mon == null || mon.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_PERIOD_MONTH_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_PERIOD_MONTH_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
                             }
                             if( day == null || day.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_PERIOD_DAY_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_PERIOD_DAY_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
                             }
                             if( hr == null || hr.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_PERIOD_HOUR_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_PERIOD_HOUR_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
                             }
                             if( min == null || min.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_PERIOD_MINUTE_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_PERIOD_MINUTE_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
                             }
                             if( sec == null || sec.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_PERIOD_SECOND_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_PERIOD_SECOND_TAG + "' on '" + TIME_PERIOD_TAG + "'", null );
                             }
 
                             propValue = TimePeriodValue.create(
@@ -331,30 +326,30 @@ public class DomMeshObjectSetProbe
                                     Float.parseFloat( sec ));
                             
                         } else if( TIME_STAMP_TAG.equals( grandNodeName )) {
-                            String yr  = getTextContent( grandAttrs, TIME_STAMP_YEAR_TAG );
-                            String mon = getTextContent( grandAttrs, TIME_STAMP_MONTH_TAG );
-                            String day = getTextContent( grandAttrs, TIME_STAMP_DAY_TAG );
-                            String hr  = getTextContent( grandAttrs, TIME_STAMP_HOUR_TAG );
-                            String min = getTextContent( grandAttrs, TIME_STAMP_MINUTE_TAG );
-                            String sec = getTextContent( grandAttrs, TIME_STAMP_SECOND_TAG );
+                            String yr  = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_STAMP_YEAR_TAG );
+                            String mon = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_STAMP_MONTH_TAG );
+                            String day = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_STAMP_DAY_TAG );
+                            String hr  = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_STAMP_HOUR_TAG );
+                            String min = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_STAMP_MINUTE_TAG );
+                            String sec = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TIME_STAMP_SECOND_TAG );
 
                             if( yr == null || yr.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_STAMP_YEAR_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_STAMP_YEAR_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
                             }
                             if( mon == null || mon.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_STAMP_MONTH_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_STAMP_MONTH_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
                             }
                             if( day == null || day.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_STAMP_DAY_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_STAMP_DAY_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
                             }
                             if( hr == null || hr.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_STAMP_HOUR_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_STAMP_HOUR_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
                             }
                             if( min == null || min.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_STAMP_MINUTE_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_STAMP_MINUTE_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
                             }
                             if( sec == null || sec.length() == 0 ) {
-                                throw new ProbeException.SyntaxError( theNetworkIdentifier,  "empty '" + TIME_STAMP_SECOND_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier,  "empty '" + TIME_STAMP_SECOND_TAG + "' on '" + TIME_STAMP_TAG + "'", null );
                             }
                             propValue = TimeStampValue.create(
                                     Short.parseShort( yr ),
@@ -366,13 +361,13 @@ public class DomMeshObjectSetProbe
 
             
                         } else {
-                            throw new ProbeException.SyntaxError( theNetworkIdentifier,  "Unknown XML tag: " + grandNodeName, null );
+                            throw new ProbeException.SyntaxError( dataSourceIdentifier,  "Unknown XML tag: " + grandNodeName, null );
                         }
                     
                         theObjectBeingParsed.addPropertyValue( propValue );
                     }
                 } else if( RELATIONSHIP_TAG.equals( childNodeName )) {
-                    String otherSideIdentifier = getTextContent( childNode.getAttributes(), IDENTIFIER_TAG );
+                    String otherSideIdentifier = MeshObjectSetProbeUtils.getTextContent( childNode.getAttributes(), IDENTIFIER_TAG );
 
                     theObjectBeingParsed.addRelationship( otherSideIdentifier );
                     
@@ -386,13 +381,13 @@ public class DomMeshObjectSetProbe
                         }
 
                         NamedNodeMap grandAttrs     = grandNode.getAttributes();
-                        String       typeIdentifier = getTextContent( grandAttrs, TYPE_TAG );
+                        String       typeIdentifier = MeshObjectSetProbeUtils.getTextContent( grandAttrs, TYPE_TAG );
 
                         theObjectBeingParsed.getCurrentRelationship().addRoleType( theModelBase.getMeshTypeIdentifierFactory().fromExternalForm( typeIdentifier ));
                     }
 
                 } else {
-                    throw new ProbeException.SyntaxError( theNetworkIdentifier, "Unknown XML tag: " + childNodeName, null );
+                    throw new ProbeException.SyntaxError( dataSourceIdentifier, "Unknown XML tag: " + childNodeName, null );
                 }
             }
             theBufferedObjects.add( theObjectBeingParsed );
@@ -415,12 +410,12 @@ public class DomMeshObjectSetProbe
                     if( currentIdentifier.indexOf( '#' ) < 0 && proxy == null ) {
                         realCurrentObject = freshMeshBase.getHomeObject();
 
-                        realCurrentObject.bless( lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ));
+                        realCurrentObject.bless( MeshObjectSetProbeUtils.lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ));
 
                     } else if( proxy == null ) {
                         realCurrentObject = life.createMeshObject(
-                                constructIdentifier( theNetworkIdentifier, null, currentObject.getIdentifier()),
-                                lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ),
+                                constructIdentifier( dataSourceIdentifier, currentObject.getIdentifier()),
+                                MeshObjectSetProbeUtils.lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ),
                                 currentObject.getTimeCreated(),
                                 currentObject.getTimeUpdated(),
                                 currentObject.getTimeRead(),
@@ -429,16 +424,16 @@ public class DomMeshObjectSetProbe
                     } else {
                         // ForwardReference
 
-                        NetMeshObjectIdentifier fwdRefName = constructIdentifier( theNetworkIdentifier, proxy, currentObject.getIdentifier() );
+                        NetMeshObjectIdentifier fwdRefName = constructIdentifier( dataSourceIdentifier, currentObject.getIdentifier() );
 
                         realCurrentObject = life.createForwardReference(
                                 proxy,
                                 fwdRefName,
-                                lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ));
+                                MeshObjectSetProbeUtils.lookupEntityTypes( currentObject.getMeshTypes(), theModelBase ));
                     }
 
                     for( int i=currentObject.thePropertyTypes.size()-1 ; i>=0 ; --i ) {
-                        PropertyType  type  = lookupPropertyType( currentObject.thePropertyTypes.get( i ), theModelBase );
+                        PropertyType  type  = MeshObjectSetProbeUtils.lookupPropertyType( currentObject.thePropertyTypes.get( i ), theModelBase );
                         PropertyValue value = currentObject.thePropertyValues.get( i );
                         realCurrentObject.setPropertyValue( type, value );
                     }
@@ -456,15 +451,15 @@ public class DomMeshObjectSetProbe
             // finally relate MeshObjects
 
             for( ExternalizedMeshObject currentObject : theBufferedObjects ) {
-                NetMeshObjectIdentifier currentObjectName = constructIdentifier( theNetworkIdentifier, null, currentObject.getIdentifier() );
+                NetMeshObjectIdentifier currentObjectName = constructIdentifier( dataSourceIdentifier, currentObject.getIdentifier() );
                 MeshObject              realCurrentObject = freshMeshBase.findMeshObjectByIdentifier( currentObjectName );
 
                 for( ExternalizedMeshObject.ExternalizedRelationship currentRelationship : currentObject.theRelationships ) {
-                    NetMeshObjectIdentifier otherSideName = constructIdentifier( theNetworkIdentifier, null, currentRelationship.getIdentifier() );
+                    NetMeshObjectIdentifier otherSideName = constructIdentifier( dataSourceIdentifier, currentRelationship.getIdentifier() );
                     MeshObject              otherSide     = freshMeshBase.findMeshObjectByIdentifier( otherSideName );
 
                     if( otherSide == null ) {
-                        throw new ProbeException.SyntaxError( theNetworkIdentifier, "Referenced MeshObject could not be found: " + otherSide, null );
+                        throw new ProbeException.SyntaxError( dataSourceIdentifier, "Referenced MeshObject could not be found: " + otherSide, null );
                     }
                     try {
                         realCurrentObject.relate( otherSide );
@@ -472,7 +467,7 @@ public class DomMeshObjectSetProbe
                         // this must be the other side of what we related already
                     }
                     try {
-                        realCurrentObject.blessRelationship( lookupRoleTypes( currentRelationship.theRoleTypes, theModelBase ), otherSide );
+                        realCurrentObject.blessRelationship( MeshObjectSetProbeUtils.lookupRoleTypes( currentRelationship.theRoleTypes, theModelBase ), otherSide );
                     } catch( BlessedAlreadyException ex ) {
                         // this must be the other side of what we related already
                     } catch( EntityNotBlessedException ex ) {
@@ -487,108 +482,34 @@ public class DomMeshObjectSetProbe
 
         
         } catch( NotPermittedException ex ) {
-            throw new ProbeException.Other( theNetworkIdentifier, ex );
+            throw new ProbeException.Other( dataSourceIdentifier, ex );
 
         } catch( MeshObjectIdentifierNotUniqueException ex ) {
-            throw new ProbeException.SyntaxError( theNetworkIdentifier, ex );
+            throw new ProbeException.SyntaxError( dataSourceIdentifier, ex );
 
         } catch( MeshTypeNotFoundException ex ) {
-            throw new ProbeException.SyntaxError( theNetworkIdentifier, ex );
-
-        } catch( URISyntaxException ex ) {
-            throw new ProbeException.SyntaxError( theNetworkIdentifier, ex );
+            throw new ProbeException.SyntaxError( dataSourceIdentifier, ex );
         }
     }
 
     /**
-     * Helper method to look up EntityTypes.
-     *
-     * @throws ClassCastException thrown if an Identifier did not refer to an EntityType but something else
-     * @throws ModuleException thrown if the Identifier referred to a Module that is unavailable
-     */
-    protected static EntityType [] lookupEntityTypes(
-            MeshTypeIdentifier[] identifiers,
-            ModelBase            modelBase )
-        throws
-            MeshTypeNotFoundException
-    {
-        EntityType [] ret = new EntityType[ identifiers.length ];
-        for( int i=0 ; i<identifiers.length ; ++i ) {
-            ret[i] = modelBase.findEntityTypeByIdentifier( identifiers[i] );
-        }
-        return ret;
-    }
-    
-    /**
-     * Helper method to look up a PropertyType.
+     * Helper method to construct a fully-qualified NetMeshObjectIdentifier, given a String
+     * in the XML file that represents the Identifier, and a NetMeshBaseIdentifier as context.
      * 
-     * @throws ClassCastException thrown if an identifier did not refer to a PropertyType but something else
-     * @throws ModuleException thrown if the identifier referred to a Module that is unavailable
-     */
-    protected static PropertyType lookupPropertyType(
-            MeshTypeIdentifier identifier,
-            ModelBase          modelBase )
-        throws
-            MeshTypeNotFoundException
-    {
-        PropertyType ret = modelBase.findPropertyTypeByIdentifier( identifier );
-        return ret;
-    }
-    
-    /**
-     * Helper method to look up a RoleType.
-     *
-     * @throws ClassCastException thrown if an Identifier did not refer to a RoleType but something else
-     * @throws ModuleException thrown if the Identifier referred to a Module that is unavailable
-     */
-    protected static RoleType [] lookupRoleTypes(
-            ArrayList<MeshTypeIdentifier> identifier,
-            ModelBase                     modelBase )
-        throws
-            MeshTypeNotFoundException
-    {
-        RoleType [] ret = new RoleType[ identifier.size() ];
-        for( int i=0 ; i<ret.length ; ++i ) {
-            ret[i] = modelBase.findRoleTypeByIdentifier( identifier.get( i ) );
-        }
-        return ret;
-    }
-    
-    /**
-     * Helper method to obtain the text attribute of a node.
-     */
-    protected static String getTextContent(
-            NamedNodeMap attrs,
-            String       name )
-    {
-        Node n = attrs.getNamedItem( name );
-        if( n != null ) {
-            return n.getTextContent();
-        } else {
-            return null;
-        }
-    }
-    
-    /**
-     * Helper method to construct a fully-qualified Identifier, given a String
-     * in the XML file that represents the Identifier, and a NetMeshBaseIdentifier for proxyIdentifier.
+     * @param dataSourceIdentifier identifies the data source
+     * @param externalForm the external form of the NetNeshBaseIdentifier
+     * @return the created NetMeshObjectIdentifier
+     * @throws org.infogrid.probe.ProbeException.SyntaxError thrown if a syntax error was discovered
      */
     protected NetMeshObjectIdentifier constructIdentifier(
             NetMeshBaseIdentifier   dataSourceIdentifier,
-            NetMeshBaseIdentifier   proxyIdentifier,
             String                  externalForm )
         throws
-            ProbeException.SyntaxError,
-            URISyntaxException
+            ProbeException.SyntaxError
     {
-//        if( ret.getPrefix() == null ) {
-//            if( proxyIdentifier != null ) {
-//                ret = MeshObjectIdentifier.create( proxyIdentifier.toExternalForm(), ret.getLocalId() );
-//            }
-//        } else {
-        
+        try {
             NetMeshObjectIdentifier ret;
-            
+
             Matcher m = VARIABLE_PATTERN.matcher( externalForm );
             if( m.find() ) {
                 String variable = m.group( 1 );
@@ -601,28 +522,37 @@ public class DomMeshObjectSetProbe
             } else {
                 ret = DefaultAnetMeshObjectIdentifier.fromExternalForm( dataSourceIdentifier, externalForm );
             }
-//        }
-        return ret;
+            return ret;
+
+        } catch( URISyntaxException ex ) {
+            throw new ProbeException.SyntaxError( dataSourceIdentifier, ex );
+        }
     }
     
     /**
-     * Helper method to construct a NetMeshBaseIdentifier.
+     * Helper method to construct a fully-qualified NetNeshBaseIdentifier, given a String
+     * in the XML file that represents the Identifier, and a NetMeshBaseIdentifier as context.
+     * 
+     * @param dataSourceIdentifier identifies the data source
+     * @param externalForm the external form of the NetNeshBaseIdentifier
+     * @return the created NetNeshBaseIdentifier
+     * @throws org.infogrid.probe.ProbeException.SyntaxError thrown if a syntax error was discovered
      */
     protected NetMeshBaseIdentifier constructNetworkIdentifier(
-            NetMeshBaseIdentifier theNetworkIdentifier,
-            String            raw )
+            NetMeshBaseIdentifier dataSourceIdentifier,
+            String                externalForm )
         throws
             ProbeException.SyntaxError
     {
         try {
-            NetMeshBaseIdentifier ret = NetMeshBaseIdentifier.guessAndCreate( theNetworkIdentifier, raw );
+            NetMeshBaseIdentifier ret = NetMeshBaseIdentifier.guessAndCreate( dataSourceIdentifier, externalForm );
 
-            theVariableReplacements.put( raw, ret.toExternalForm() );
+            theVariableReplacements.put( externalForm, ret.toExternalForm() );
             
             return ret;
 
         } catch( URISyntaxException ex ) {
-            throw new ProbeException.SyntaxError( theNetworkIdentifier, ex );
+            throw new ProbeException.SyntaxError( dataSourceIdentifier, ex );
         }
     }
 

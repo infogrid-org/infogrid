@@ -27,6 +27,7 @@ import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
+import org.infogrid.mesh.RoleTypeRequiresEntityTypeException;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
@@ -41,9 +42,10 @@ import org.infogrid.meshbase.a.AMeshObjectEquivalenceSetComparator;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
+import org.infogrid.meshbase.net.transaction.ReplicaCreatedEvent;
 import org.infogrid.meshbase.net.transaction.ReplicaPurgedEvent;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
@@ -52,7 +54,7 @@ import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.RoleType;
-import org.infogrid.modelbase.MeshTypeNotFoundException;
+import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.FactoryException;
@@ -71,15 +73,23 @@ public class AnetMeshBaseLifecycleManager
     private static final Log log = Log.getLogInstance( AnetMeshBaseLifecycleManager.class ); // our own, private logger
 
     /**
-     * Constructor. The application developer should not call this or a subclass constructor; use
+     * Factory method. The application developer should not call this or a subclass constructor; use
      * MeshBase.getMeshObjectLifecycleManager() instead.
      * 
-     * @param base the MeshBase on which this MeshObjectLifecycleManager works
+     * @return the created AnetMeshBaseLifecycleManager
      */
-    protected AnetMeshBaseLifecycleManager(
-            AnetMeshBase base )
+    public static AnetMeshBaseLifecycleManager create()
     {
-        super( base );
+        return new AnetMeshBaseLifecycleManager();
+    }
+    
+    /**
+     * Constructor. The application developer should not call this or a subclass constructor; use
+     * MeshBase.getMeshObjectLifecycleManager() instead.
+     */
+    protected AnetMeshBaseLifecycleManager()
+    {
+        super();
     }
 
     /**
@@ -540,7 +550,7 @@ public class AnetMeshBaseLifecycleManager
 
         assignOwner( ret );
 
-        return ret;        
+        return ret;
     }
 
     /**
@@ -842,27 +852,6 @@ public class AnetMeshBaseLifecycleManager
     }
 
     /**
-     * Instantiate a replica NetMeshObject in this NetMeshBase, thereby setting 
-     * up a branch in the replication graph. This may also be invoked if the replica exists
-     * already in more complex replication topologies.
-     *
-     * @param original external form of the replica that is being replicated locally
-     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
-     * @return the created NetMeshObject
-     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public AnetMeshObject rippleCreate(
-            ExternalizedNetMeshObject original,
-            NetMeshBaseIdentifier     proxyIdentifier )
-        throws
-            NotPermittedException,
-            TransactionException
-    {
-        return rippleCreateOrSynchronize( original, proxyIdentifier, true );
-    }    
-
-    /**
      * Delete a replica NetMeshObject in this NetMeshBase, thereby removing a
      * branch in the replication graph.
      * 
@@ -881,291 +870,350 @@ public class AnetMeshBaseLifecycleManager
             TransactionException,
             NotPermittedException
     {
-        AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
-
-        AnetMeshObject         theObject      = (AnetMeshObject) realBase.findMeshObjectByIdentifier( identifier );
-        MeshObjectIdentifier   realIdentifier = theObject.getIdentifier();
-        ExternalizedMeshObject externalized   = theObject.asExternalized( true );
+        AnetMeshBase   realBase  = (AnetMeshBase) theMeshBase;
+        AnetMeshObject theObject = (AnetMeshObject) realBase.findMeshObjectByIdentifier( identifier );
         
-        Transaction tx = realBase.checkTransaction();
+        if( theObject != null ) {
+            MeshObjectIdentifier   realIdentifier = theObject.getIdentifier();
+            ExternalizedMeshObject externalized   = theObject.asExternalized( true );
 
-        // we don't do that here because it's the slave replica
-        // theObject.checkPermittedDelete(); // this may throw NotPermittedException
+            Transaction tx = realBase.checkTransaction();
 
-        theObject.delete();
-        removeFromStore( theObject.getIdentifier() );
+            // we don't do that here because it's the slave replica
+            // theObject.checkPermittedDelete(); // this may throw NotPermittedException
 
-        Proxy                 incomingProxy           = realBase.determineIncomingProxy();
-        NetMeshBaseIdentifier incomingProxyIdentifier = incomingProxy != null ? incomingProxy.getPartnerMeshBaseIdentifier() : null;
-
-        tx.addChange( new NetMeshObjectDeletedEvent(
-                realBase,
-                realBase.getIdentifier(),
-                theObject,
-                realIdentifier,
-                incomingProxyIdentifier,
-                externalized,
-                timeEventOccurred ));
-
-        return theObject;
-    }
-    
-    /**
-     * Resynchronize a local replica to the provided ExternalizedNetMeshObject.
-     * 
-     * @param original external form of the replica that is being resynchronized locally
-     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
-     * @return the resynchronized NetMeshObject
-     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public AnetMeshObject resynchronize(
-            ExternalizedNetMeshObject original,
-            NetMeshBaseIdentifier     proxyIdentifier )
-        throws
-            TransactionException,
-            NotPermittedException
-    {
-        return rippleCreateOrSynchronize( original, proxyIdentifier, false );
-    }
-
-    /**
-     * Common implementation method for rippleCreate and resynchronize.
-     * 
-     * @param original external form of the replica that is being created or resynchronized locally
-     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
-     * @param isCreate distinguishes between create and resynchronize
-     * @return the created or resynchronized NetMeshObject
-     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    protected AnetMeshObject rippleCreateOrSynchronize(
-            ExternalizedNetMeshObject original,
-            NetMeshBaseIdentifier     proxyIdentifier,
-            boolean                   isCreate )
-        throws
-            NotPermittedException,
-            TransactionException
-    {
-        AnetMeshBase realBase  = (AnetMeshBase) theMeshBase;
-        ModelBase    modelBase = theMeshBase.getModelBase();
-
-        Proxy proxy;
-        try {
-            proxy = realBase.obtainProxyFor( proxyIdentifier, null );
-
-        } catch( FactoryException ex ) {
-            log.error( ex );
-            return null;
-        }
-        
-        NetMeshObjectIdentifier identifier = original.getIdentifier();
-//        if( identifier instanceof NetMeshObjectIdentifier ) {
-//            NetMeshObjectIdentifier realIdentifier = (NetMeshObjectIdentifier) identifier;
-//
-//            if( realBase.getIdentifier().getCanonicalForm().equals( realIdentifier.getPrefix() )) {
-//                identifier = MeshObjectIdentifier.create( realIdentifier.getLocalId() );
-//            }
-//        }
-        
-        Transaction tx = realBase.checkTransaction();
-
-        int typeCounter = 0;
-        EntityType [] types;
-        if( original.getExternalTypeIdentifiers() != null && original.getExternalTypeIdentifiers().length > 0 ) {
-            types = new EntityType[ original.getExternalTypeIdentifiers().length ];
-            for( int i=0 ; i<original.getExternalTypeIdentifiers().length ; ++i ) {
-                try {
-                    types[typeCounter] = (EntityType) modelBase.findMeshTypeByIdentifier( original.getExternalTypeIdentifiers()[i] );
-                    typeCounter++; // make sure we do the increment after an exception might have been thrown
-                    
-                } catch( MeshTypeNotFoundException ex ) {
-                    log.error( ex );
-                }
-            }
-            if( typeCounter < types.length ) {
-                types = ArrayHelper.copyIntoNewArray( types, 0, typeCounter, EntityType.class );
-            }
-        } else {
-            types = null;
-        }
-        
-
-        HashMap<PropertyType,PropertyValue> localProperties;
-        if( original.getPropertyTypes() != null && original.getPropertyTypes().length > 0 ) {
-
-            localProperties = new HashMap<PropertyType,PropertyValue>( original.getPropertyTypes().length );
-            for( int i=original.getPropertyTypes().length-1 ; i>=0 ; --i ) {
-                
-                try {
-                    PropertyType type = (PropertyType) modelBase.findMeshTypeByIdentifier( original.getPropertyTypes()[i] );             
-                    localProperties.put( type, original.getPropertyValues()[i] );
-                } catch( MeshTypeNotFoundException ex ) {
-                    log.error( ex );
-                }
-            }
-        } else {
-            localProperties = null;
-        }
-
-        NetMeshObjectIdentifier [] otherSides = original.getNeighbors();
-        RoleType [][]              roleTypes  = null;
-        
-        if( otherSides != null ) {
-            roleTypes = new RoleType[ otherSides.length ][];
-
-            for( int i=0 ; i<otherSides.length ; ++i ) {
-                MeshTypeIdentifier [] currentRoleTypes = original.getRoleTypesFor( otherSides[i] );
-
-                roleTypes[i] = new RoleType[ currentRoleTypes.length ];
-                typeCounter = 0;
-
-                for( int j=0 ; j<currentRoleTypes.length ; ++j ) {
-                    try {
-                        roleTypes[i][typeCounter] = (RoleType) modelBase.findMeshTypeByIdentifier( currentRoleTypes[j] );
-                        typeCounter++; // make sure we do the increment after an exception might have been thrown
-                    } catch( Exception ex ) {
-                        log.warn( ex );
-                    }
-                    if( typeCounter < roleTypes[i].length ) {
-                        roleTypes[i] = ArrayHelper.copyIntoNewArray( roleTypes[i], 0, typeCounter, RoleType.class );
-                    }
-                }
-            }
-        }
-        
-        AnetMeshObject existing = findInStore( identifier ); // this may exist already
-        
-        if( existing != null ) {
-            // make type adjustments
-            if( types != null ) {
-                try {
-                    existing.rippleBless( types ); // FIXME: what about unbless?
-
-                } catch( EntityBlessedAlreadyException ex ) {
-                    log.error( ex );
-                } catch( IsAbstractException ex ) {
-                    log.error( ex );
-                }
-            }
-            
-            // make property adjustments
-            if( localProperties != null ) {
-                try {
-                    existing.rippleSetPropertyValues( localProperties );
-                    
-                } catch( IllegalPropertyTypeException ex ) {
-                    log.error( ex );
-                } catch( IllegalPropertyValueException ex ) {
-                    log.error( ex );
-                }
-            }
-
-            // make neighbor adjustments
-            if( otherSides != null ) {
-                // FIXME? remove neighbors?
-                for( int i=0 ; i<otherSides.length ; ++i ) {
-                    try {
-                        existing.rippleRelate( otherSides[i] );
-
-                    } catch( RelatedAlreadyException ex ) {
-                        log.error( ex );
-                    }
-                }
-                
-                if( roleTypes != null ) {
-                    for( int i=0 ; i<roleTypes.length ; ++i ) {
-                        if( roleTypes[i] != null ) {
-                            try {
-                                existing.rippleBless( roleTypes[i], otherSides[i] );
-
-                            } catch( EntityNotBlessedException ex ) {
-                                log.error( ex );
-                            } catch( NotRelatedException ex ) {
-                                log.error( ex );
-                            } catch( RoleTypeBlessedAlreadyException ex ) {
-                                log.error( ex );
-                            } catch( IsAbstractException ex ) {
-                                log.error( ex );
-                            }
-                        }
-                    }
-                }
-            }
-            
-            if( isCreate ) {
-                return existing;
-            } else {
-                // Make Proxy adjustments
-                existing.makeReplicaFrom( proxy );
-            }
-        }
-        
-        // proxyTowardsLock MUST BE the same as the proxyTowardsHome, otherwise there
-        // are two different versions of the replication graph for the purposes of
-        // home and lock, and that won't do.
-
-        Proxy [] proxies;
-        Proxy    proxyTowardsHome = proxy;
-
-        if( original.getProxyTowardsHomeNetworkIdentifier() != null ) {
-            try {
-                proxyTowardsHome = realBase.obtainProxyFor( original.getProxyTowardsHomeNetworkIdentifier(), null );
-
-            } catch( FactoryException ex ) {
-                log.warn( ex );
-                // default is okay
-            }
-        }
-
-        proxies = new Proxy[] { proxyTowardsHome };
-        int proxyTowardsHomeIndex = 0;
-        int proxyTowardsLockIndex = 0;
-        
-        if( proxy != proxyTowardsHome ) {
-            // tell that replica we are here
-            proxyTowardsHome.resynchronizeDependentReplicas( new NetMeshObjectIdentifier[] { identifier } );
-        }
-
-        MeshObjectIdentifier [] equivalents = original.getEquivalents();
-        
-        NetMeshObjectIdentifier [] leftRight = (NetMeshObjectIdentifier [])
-                AMeshObjectEquivalenceSetComparator.SINGLETON.findLeftAndRightEquivalents( original.getIdentifier(), equivalents );
-
-        AnetMeshObject ret = existing;
-        if( ret == null ) {
-            ret = new AnetMeshObject(
-                    identifier,
-                    realBase,
-                    original.getTimeCreated(),
-                    original.getTimeUpdated(),
-                    original.getTimeRead(),
-                    original.getTimeExpires(),
-                    localProperties,
-                    types,
-                    leftRight,
-                    otherSides,
-                    roleTypes,
-                    original.getGiveUpHomeReplica(),
-                    original.getGiveUpLock(),
-                    proxies,
-                    proxyTowardsHomeIndex,
-                    proxyTowardsLockIndex );
-
-            putIntoStore( ret );
+            theObject.delete();
+            removeFromStore( theObject.getIdentifier() );
 
             Proxy                 incomingProxy           = realBase.determineIncomingProxy();
             NetMeshBaseIdentifier incomingProxyIdentifier = incomingProxy != null ? incomingProxy.getPartnerMeshBaseIdentifier() : null;
 
-            tx.addChange( new NetMeshObjectCreatedEvent(
+            tx.addChange( new NetMeshObjectDeletedEvent(
                     realBase,
                     realBase.getIdentifier(),
-                    ret,
-                    incomingProxyIdentifier ));
+                    theObject,
+                    realIdentifier,
+                    incomingProxyIdentifier,
+                    externalized,
+                    timeEventOccurred ));
+        }
+        return theObject;
+    }
+    
+    /**
+     * Instantiate a replica NetMeshObject in this NetMeshBase. Proxy information is provided
+     * as separate parameters, as a ProxyPolicy may choose to use different Proxies than offered
+     * by the NetMeshObject replica being replicated.
+     *
+     * @param externalized the external form of the NetMeshObject that is being replicated locally
+     * @param proxies the Proxies to use
+     * @param proxyTowardsHomeIndex the index, in the proxies, that holds the Proxy towards the home replica. -1 if none.
+     * @param proxyTowardsLockIndex the index, in the proxies, that holds the Proxy towards the replica with the lock. -1 if none.
+     * @return the created or resynchronized NetMeshObject
+     * @throws MeshObjectIdentifierNotUniqueException thrown if a NetMeshObject with this identifier exists locally already
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     */
+    public NetMeshObject rippleCreate(
+            ExternalizedNetMeshObject externalized,
+            Proxy []                  proxies,
+            int                       proxyTowardsHomeIndex,
+            int                       proxyTowardsLockIndex )
+        throws
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException
+    {
+        AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
 
-            // don't assign owner, that comes via replication
+        Transaction tx = realBase.checkTransaction();
+
+        NetMeshObjectIdentifier identifier = externalized.getIdentifier();
+        
+        AnetMeshObject ret = findInStore( identifier );
+        
+        if( ret != null ) {
+            throw new MeshObjectIdentifierNotUniqueException( ret );
+        }
+        
+        long now = System.currentTimeMillis();
+
+        NetMeshObjectIdentifier [] leftRight
+                = (NetMeshObjectIdentifier []) AMeshObjectEquivalenceSetComparator.SINGLETON.findLeftAndRightEquivalents(
+                        identifier,
+                        externalized.getEquivalents() );
+        
+        HashMap<PropertyType,PropertyValue> properties = propertiesFromExternalizedMeshObject( externalized );        
+        EntityType []                       types      = typesFromExternalizedMeshObject( externalized );
+        NetMeshObjectIdentifier []          neighbors  = externalized.getNeighbors();
+        RoleType [][]                       roleTypes  = roleTypesFromExternalizedMeshObject( externalized );
+        
+        ret = instantiateMeshObjectImplementation(
+                identifier,
+                externalized.getTimeCreated(),
+                externalized.getTimeUpdated(),
+                externalized.getTimeRead(),
+                externalized.getTimeExpires(),
+                externalized.getGiveUpHomeReplica(),
+                externalized.getGiveUpLock(),
+                proxies,
+                proxyTowardsHomeIndex,
+                proxyTowardsLockIndex );
+
+        if( types != null && types.length > 0 ) {
+            try {
+                ret.rippleBless( types, externalized.getTimeUpdated() );
+
+            } catch( IsAbstractException ex ) {
+                log.error( ex );
+            } catch( EntityBlessedAlreadyException ex ) {
+                log.error( ex );
+            } catch( NotPermittedException ex ) {
+                log.error( ex );
+            }
+        }
+
+        if( !properties.isEmpty() ) {
+            try {
+                ret.rippleSetPropertyValues( properties, externalized.getTimeUpdated() );
+
+            } catch( IllegalPropertyTypeException ex ) {
+                log.error( ex );
+            } catch( IllegalPropertyValueException ex ) {
+                log.error( ex );
+            } catch( NotPermittedException ex ) {
+                log.error( ex );
+            }
+        }
+        
+        for( int i=0 ; i<neighbors.length ; ++i ) {
+            try {
+                ret.rippleRelate( neighbors[i], externalized.getTimeUpdated() );
+            } catch( RelatedAlreadyException ex ) {
+                log.error( ex );
+            }
+            try {
+                if( roleTypes[i] != null ) {
+                    ret.rippleBless( roleTypes[i], neighbors[i], externalized.getTimeUpdated() );
+                }
+            } catch( NotRelatedException ex ) {
+                log.error( ex );
+            } catch( IsAbstractException ex ) {
+                log.error( ex );
+            } catch( RoleTypeBlessedAlreadyException ex ) {
+                log.error( ex );
+            } catch( EntityNotBlessedException ex ) {
+                log.error( ex );
+            } catch( NotPermittedException ex ) {
+                log.error( ex );
+            }
+        }
+
+        putIntoStore( ret );
+
+        Proxy                 incomingProxy           = realBase.determineIncomingProxy();
+        NetMeshBaseIdentifier incomingProxyIdentifier = incomingProxy != null ? incomingProxy.getPartnerMeshBaseIdentifier() : null;
+
+        tx.addChange( new ReplicaCreatedEvent(
+                realBase,
+                realBase.getIdentifier(),
+                ret,
+                incomingProxyIdentifier,
+                now ));
+        
+        // don't assign owner, that comes via replication
+
+        return ret;        
+    }    
+
+    /**
+     * Resynchronize an existing replica NetMeshObject in this NetMeshBase with the provided information.
+     * Proxy information is provided
+     * as separate parameters, as a ProxyPolicy may choose to use different Proxies than offered
+     * by the NetMeshObject replica being replicated.
+     * 
+     * @param externalized the external form of the NetMeshObject that is being replicated locally
+     * @param proxies the Proxies to use
+     * @param proxyTowardsHomeIndex the index, in the proxies, that holds the Proxy towards the home replica. -1 if none.
+     * @param proxyTowardsLockIndex the index, in the proxies, that holds the Proxy towards the replica with the lock. -1 if none.
+     * @return the created or resynchronized NetMeshObject
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the called did not have sufficient privileges for this operation
+     */
+    public NetMeshObject rippleResynchronize(
+            ExternalizedNetMeshObject externalized,
+            Proxy []                  proxies,
+            int                       proxyTowardsHomeIndex,
+            int                       proxyTowardsLockIndex )
+        throws
+            TransactionException,
+            NotPermittedException
+    {
+        NetMeshObjectIdentifier identifier = externalized.getIdentifier();
+        AnetMeshObject          ret        = findInStore( identifier );
+
+        if( ret == null ) {
+            throw new IllegalStateException( "Should exist: " + identifier );
+        }
+        
+        EntityType [] correctTypes = typesFromExternalizedMeshObject( externalized );
+        EntityType [] currentTypes = ret.getTypes();
+
+        ArrayHelper.Difference<EntityType> typeDifferences = ArrayHelper.determineDifference( currentTypes, correctTypes, false, EntityType.class );
+        
+        for( EntityType toAdd : typeDifferences.getAdditions() ) {
+            try {
+                ret.rippleBless( new EntityType[] { toAdd }, externalized.getTimeUpdated() );
+            } catch( IsAbstractException ex ) {
+                // a real error
+                log.error( ex );
+            } catch( EntityBlessedAlreadyException ex ) {
+                // this can happen
+                if( log.isDebugEnabled() ) {
+                    log.debug( ex );
+                }
+            }
+        }
+        for( EntityType toRemove : typeDifferences.getRemovals() ) {
+            try {
+                ret.rippleUnbless( new EntityType[] { toRemove }, externalized.getTimeUpdated() );
+            } catch( RoleTypeRequiresEntityTypeException ex ) {
+                // This might be a FIXME depending on what we decide to do about neighbors and roles in this method
+                log.error( ex );
+            } catch( EntityNotBlessedException ex ) {
+                // this can happen, e.g. when downcasting
+                if( log.isDebugEnabled() ) {
+                    log.debug( ex );
+                }
+            }
+        }
+        
+        // FIXME: equivalents
+
+        // FIXME: neighbors
+        
+        // FIXME: roles
+        
+        // properties
+        HashMap<PropertyType,PropertyValue> correctProperties = propertiesFromExternalizedMeshObject( externalized );
+        PropertyType []  propertyTypes  = new PropertyType[ correctProperties.size() ];
+        PropertyValue [] propertyValues = new PropertyValue[ propertyTypes.length ];
+        int i = 0;
+        for( PropertyType current : correctProperties.keySet() ) {
+            propertyTypes[i]  = current;
+            propertyValues[i] = correctProperties.get( current );
+            ++i;
+        }
+        
+        try {
+            ret.internalSetPropertyValues( propertyTypes, propertyValues, false, externalized.getTimeUpdated() );
+        } catch( IllegalPropertyTypeException ex ) {
+            log.error( ex );
+        } catch( IllegalPropertyValueException ex ) {
+            log.error( ex );
+        }
+        
+        // should the next two lines be here? FIXME?
+        ret.setWillGiveUpHomeReplica( externalized.getGiveUpHomeReplica() );
+        ret.setWillGiveUpLock( externalized.getGiveUpLock() );
+       
+        ret.proxyOnlyResynchronizeReplica(
+                externalized.getTimeCreated(),
+                externalized.getTimeUpdated(),
+                externalized.getTimeRead(),
+                externalized.getTimeExpires(),
+                proxies,
+                proxyTowardsHomeIndex,
+                proxyTowardsLockIndex );
+        
+        return ret;
+    }
+
+    /**
+     * Internal helper to extract Properties from an ExternalizedNetMeshObject.
+     * 
+     * @param externalized the ExternalizedNetMeshObject
+     * @return the Properties, as PropertyType/PropertyValue pairs
+     */
+    protected HashMap<PropertyType,PropertyValue> propertiesFromExternalizedMeshObject(
+            ExternalizedNetMeshObject externalized )
+    {
+        ModelBase model = theMeshBase.getModelBase();
+
+        HashMap<PropertyType,PropertyValue> ret = new HashMap<PropertyType,PropertyValue>();
+        for( int i=0 ; i<externalized.getPropertyTypes().length ; ++i ) {
+            try {
+                PropertyType  type  = model.findPropertyTypeByIdentifier( externalized.getPropertyTypes()[i] );
+                
+                if( !type.getIsReadOnly().value() ) {
+                    PropertyValue value = externalized.getPropertyValues()[i];
+                    ret.put(  type, value );
+                }
+            } catch( MeshTypeWithIdentifierNotFoundException ex ) {
+                log.error( ex );
+            }
         }
         return ret;
+    }
+        
+    /**
+     * Internal helper to extract EntityTypes from an ExternalizedNetMeshObject.
+     * 
+     * @param externalized the ExternalizedNetMeshObject
+     * @return the EntityTypes
+     */
+    protected EntityType [] typesFromExternalizedMeshObject(
+            ExternalizedMeshObject externalized )
+    {
+        ModelBase model = theMeshBase.getModelBase();
+
+        EntityType [] ret = new EntityType[ externalized.getExternalTypeIdentifiers().length ];
+        int count = 0;
+        for( int i=0 ; i<ret.length ; ++i ) {
+            try {
+                ret[count] = model.findEntityTypeByIdentifier( externalized.getExternalTypeIdentifiers()[i] );
+                ++count;
+            } catch( MeshTypeWithIdentifierNotFoundException ex ) {
+                log.error( ex );
+            }                
+        }
+        if( count < ret.length ) {
+            ret = ArrayHelper.copyIntoNewArray( ret, 0, count, EntityType.class );
+        }
+        return ret;
+    }
+    
+    /**
+     * Internal helper to extract RoleTypes from an ExternalizedNetMeshObject.
+     * 
+     * @param externalized the ExternalizedNetMeshObject
+     * @return the RoleTypes, ordered in the same sequence as the neighbors
+     */
+    protected RoleType [][] roleTypesFromExternalizedMeshObject(
+            ExternalizedMeshObject externalized )
+    {
+        ModelBase model = theMeshBase.getModelBase();
+
+        MeshObjectIdentifier [] neighbors = externalized.getNeighbors();
+        
+        RoleType [][] roleTypes = new RoleType[ neighbors.length ][];
+        for( int i=0 ; i<neighbors.length ; ++i ) {
+            MeshTypeIdentifier [] row = externalized.getRoleTypesFor( neighbors[i] );
+            if( row.length > 0 ) {
+                roleTypes[i] = new RoleType[ row.length ];
+                int count = 0;
+                for( int j=0 ; j<row.length ; ++j ) {
+                    try {
+                        roleTypes[i][count] = model.findRoleTypeByIdentifier( row[j] );
+                        ++count;
+                    } catch( MeshTypeWithIdentifierNotFoundException ex ) {
+                        log.error( ex );
+                    }                
+                }
+                if( count < roleTypes[i].length ) {
+                    roleTypes[i] = ArrayHelper.copyIntoNewArray( roleTypes[i], 0, count, RoleType.class );
+                }
+            }
+        }
+        return roleTypes;
     }
 
     /**

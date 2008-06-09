@@ -15,8 +15,9 @@
 package org.infogrid.probe.shadow.externalized.xml;
 
 import org.infogrid.meshbase.net.externalized.xml.ExternalizedProxyXmlTags;
+
 /**
- *
+ * XML tags used for the default ShadowMeshBase encoding.
  */
 public interface ExternalizedShadowMeshBaseXmlTags
         extends

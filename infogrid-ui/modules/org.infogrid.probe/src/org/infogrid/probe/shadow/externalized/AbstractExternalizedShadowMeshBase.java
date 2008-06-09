@@ -17,7 +17,7 @@ package org.infogrid.probe.shadow.externalized;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 
 /**
- *
+ * Factors out functionality common to ExternalizedShadowMeshBase implementations.
  */
 public abstract class AbstractExternalizedShadowMeshBase
         implements
@@ -34,7 +34,7 @@ public abstract class AbstractExternalizedShadowMeshBase
     /**
      * Obtain the NetMeshBaseIdentifier of the ShadowMeshBase.
      * 
-     * @return the NNetMeshBaseIdentifier
+     * @return the NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getNetworkIdentifier()
     {

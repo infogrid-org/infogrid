@@ -12,27 +12,29 @@
 // All rights reserved.
 //
 
-package org.infogrid.probe.shadow;
+package org.infogrid.probe.shadow.proxy;
 
 import org.infogrid.comm.MessageEndpoint;
-
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBase;
+import org.infogrid.meshbase.net.NetMeshObjectAccessException;
+import org.infogrid.meshbase.net.proxy.AbstractProxy;
+import org.infogrid.meshbase.net.proxy.ProxyPolicy;
+import org.infogrid.meshbase.net.proxy.ProxyProcessingInstructions;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
+import org.infogrid.meshbase.transaction.ChangeSet;
 import org.infogrid.meshbase.transaction.Transaction;
-
 import org.infogrid.net.NetMessageEndpoint;
-
 import org.infogrid.probe.StagingMeshBase;
-
+import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.util.logging.Log;
 
 /**
- * An MProxy specifically used only by Shadows.
+ * A Proxy that is used only by ShadowMeshBases.
  */
 public class DefaultShadowProxy
         extends
-            AbstractShadowProxy
+            AbstractProxy
 {
     private static final Log log = Log.getLogInstance( DefaultShadowProxy.class ); // our own, private logger
 
@@ -41,13 +43,14 @@ public class DefaultShadowProxy
      *
      * @param ep the communications endpoint
      * @param mb the MeshBase this Proxy belongs to
-     * @return the created MProxy
+     * @return the created DefaultShadowProxy
      */
     public static DefaultShadowProxy create(
             NetMessageEndpoint ep,
             NetMeshBase        mb )
     {
-        DefaultShadowProxy ret = new DefaultShadowProxy( ep, mb );
+        DefaultShadowProxyPolicy policy = DefaultShadowProxyPolicy.create(); // in the future, this should become configurable
+        DefaultShadowProxy       ret    = new DefaultShadowProxy( ep, mb, policy );
 
         if( log.isDebugEnabled() ) {
             log.debug( "Created " + ret, new RuntimeException( "marker" ));
@@ -60,10 +63,12 @@ public class DefaultShadowProxy
      *
      * @param ep the communications endpoint
      * @param mb the MeshBase this Proxy belongs to
+     * @param isPlaceholder if true, this is a placeholder Proxy for the purposes of processing forward references
      * @param timeCreated the timeCreated to use
      * @param timeUpdated the timeUpdated to use
      * @param timeRead the timeRead to use
      * @param timeExpires the timeExpires to use
+     * @return the created DefaultShadowProxy
      */
     public static DefaultShadowProxy restoreProxy(
             NetMessageEndpoint ep,
@@ -74,7 +79,8 @@ public class DefaultShadowProxy
             long               timeRead,
             long               timeExpires )
     {
-         DefaultShadowProxy ret = new DefaultShadowProxy( ep, mb, isPlaceholder, timeCreated, timeUpdated, timeRead, timeExpires );
+        DefaultShadowProxyPolicy policy = DefaultShadowProxyPolicy.create(); // in the future, this should become configurable
+        DefaultShadowProxy       ret = new DefaultShadowProxy( ep, mb, policy, isPlaceholder, timeCreated, timeUpdated, timeRead, timeExpires );
 
         if( log.isDebugEnabled() ) {
             log.debug( "Created " + ret, new RuntimeException( "marker" ));
@@ -87,12 +93,14 @@ public class DefaultShadowProxy
      *
      * @param ep the communications endpoint
      * @param mb the MeshBase this Proxy belongs to
+     * @param policy the ProxyPolicy to use
      */
     protected DefaultShadowProxy(
             NetMessageEndpoint ep,
-            NetMeshBase        mb )
+            NetMeshBase        mb,
+            ProxyPolicy        policy )
     {
-        super( ep, mb );
+        super( ep, mb, policy );
         
         theIsPlaceholder = false;
     }
@@ -102,6 +110,8 @@ public class DefaultShadowProxy
      *
      * @param ep the communications endpoint
      * @param mb the MeshBase this Proxy belongs to
+     * @param policy the ProxyPolicy to use
+     * @param isPlaceholder if true, this is a placeholder Proxy for the purposes of processing forward references
      * @param timeCreated the timeCreated to use
      * @param timeUpdated the timeUpdated to use
      * @param timeRead the timeRead to use
@@ -110,13 +120,14 @@ public class DefaultShadowProxy
     protected DefaultShadowProxy(
             NetMessageEndpoint ep,
             NetMeshBase        mb,
+            ProxyPolicy        policy,
             boolean            isPlaceholder,
             long               timeCreated,
             long               timeUpdated,
             long               timeRead,
             long               timeExpires )
     {
-        super( ep, mb );
+        super( ep, mb, policy );
         
         theIsPlaceholder = isPlaceholder;
 
