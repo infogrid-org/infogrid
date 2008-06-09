@@ -17,7 +17,7 @@ package org.infogrid.meshbase.net.externalized.xml;
 import org.infogrid.meshbase.net.xpriso.xml.XprisoMessageXmlTags;
 
 /**
- *
+ * XML tags used for the default Proxy encoding.
  */
 public interface ExternalizedProxyXmlTags
         extends
@@ -43,4 +43,7 @@ public interface ExternalizedProxyXmlTags
     
     /** Tag indicating the section containing the last sent messages. */
     public static final String MESSAGES_LAST_SENT_TAG = "messages-last-sent";
+    
+    /** Tag indicating the CoherenceSpecification of a Proxy. */
+    public static final String COHERENCE_SPECIFICATION_TAG = "coherence-specification";
 }

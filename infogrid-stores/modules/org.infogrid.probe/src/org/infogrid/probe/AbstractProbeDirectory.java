@@ -24,8 +24,15 @@ public abstract class AbstractProbeDirectory
             ProbeDirectory
 {
     /**
-      * Constructor.
-      */
+     * Constructor.
+     * 
+     * @param xmlDomProbes the set of XmlDOMProbeDescriptors to initialize with
+     * @param streamProbes the set of StreamProbeDescriptors to initialize with
+     * @param apiProbes the set of ApiProbeDescriptor to initialize with
+     * @param exactMatches the set of ExactMatchDescriptors to initialize with
+     * @param patternMatches the set of PatternMatchDescriptors to initialize with
+     * @param defaultStreamProbe identifies the default stream Probe to initialize with
+     */
     protected AbstractProbeDirectory(
             Collection<XmlDomProbeDescriptor>  xmlDomProbes,
             Collection<StreamProbeDescriptor>  streamProbes,
@@ -44,7 +51,7 @@ public abstract class AbstractProbeDirectory
     }
 
     /**
-     * Add a Probe that reads from a stream.
+     * Add a Probe to this ProbeDirectory that reads from a stream.
      *
      * @param desc the descriptor describing the Probe.
      */
@@ -116,7 +123,7 @@ public abstract class AbstractProbeDirectory
     }
 
     /**
-     * Add a Probe that expects an XML Document Model as input.
+     * Add a Probe to this ProbeDirectory that expects an XML Document Model as input.
      *
      * @param desc the descriptor describing the Probe
      * @throws IllegalArgumentException thrown if an XML document type is handled already
@@ -132,7 +139,7 @@ public abstract class AbstractProbeDirectory
     }
 
     /**
-     * Add a Probe that will access an API to determine its input.
+     * Add a Probe to this ProbeDirectory that will access an API to determine its input.
      *
      * @param desc the descriptor describing the Probe.
      * @throws IllegalArgumentException thrown if a protocol is handled already
@@ -155,7 +162,7 @@ public abstract class AbstractProbeDirectory
     }
     
     /**
-     * Add an exact match between a data source and a URL.
+     * Add an exact match to this ProbeDirectory between a data source and a URL.
      *
      * @param desc the descriptor of the match
      * @throws IllegalArgumentException thrown if this MatchDescriptor matches the same URL as a previous MatchDescriptor
@@ -172,7 +179,7 @@ public abstract class AbstractProbeDirectory
     }
 
     /**
-     * Add a pattern match between a data source and a URL.
+     * Add a pattern match to this ProbeDirectory between a data source and a URL.
      *
      * @param desc the descriptor of the match
      * @throws IllegalArgumentException thrown if this MatchDescriptor matches the same URL as a previous MatchDescriptor

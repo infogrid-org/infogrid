@@ -16,14 +16,12 @@ package org.infogrid.meshbase.net;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.set.MeshObjectSet;
-
 import org.infogrid.meshbase.IterableMeshBaseDifferencer;
-
+import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
@@ -34,7 +32,6 @@ import org.infogrid.meshbase.net.transaction.NetMeshObjectRoleAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectRoleRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeRemovedEvent;
-
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
@@ -74,6 +71,28 @@ public class IterableNetMeshBaseDifferencer
         for( int i=0 ; i<objs.length ; ++i ) {
             ret[i] = (NetMeshObjectIdentifier) objs[i].getIdentifier();
         }
+        return ret;
+    }
+
+    /**
+     * Allow subclasses to instantiate a more specific event.
+     * 
+     * @param obj the MeshObject that was created
+     * @param time the time at which the creation occurred
+     * @return the MeshObjectCreatedEvent or subclass
+     */
+    @Override
+    protected NetMeshObjectCreatedEvent createMeshObjectCreatedEvent(
+            MeshObject             obj,
+            long                   time )
+    {
+        NetMeshObjectCreatedEvent ret = new NetMeshObjectCreatedEvent(
+                (NetMeshBase) obj.getMeshBase(),
+                (NetMeshBaseIdentifier) obj.getMeshBase().getIdentifier(),
+                (NetMeshObject) obj,
+                null,
+                time );
+
         return ret;
     }
 

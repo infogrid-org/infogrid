@@ -21,6 +21,7 @@ import org.infogrid.mesh.set.active.ActiveMeshObjectSetFactory;
 import org.infogrid.mesh.set.active.m.ActiveMMeshObjectSetFactory;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.MeshObjectIdentifierFactory;
+import org.infogrid.meshbase.a.AMeshBaseLifecycleManager;
 import org.infogrid.meshbase.a.DefaultAMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.m.MMeshBase;
 import org.infogrid.meshbase.security.AccessManager;
@@ -57,8 +58,9 @@ public class ActiveMMeshBase
 
         DefaultAMeshObjectIdentifierFactory identifierFactory = DefaultAMeshObjectIdentifierFactory.create();
         ActiveMMeshObjectSetFactory         setFactory        = ActiveMMeshObjectSetFactory.create( MeshObject.class, MeshObjectIdentifier.class );
+        AMeshBaseLifecycleManager           life              = AMeshBaseLifecycleManager.create();
 
-        ActiveMMeshBase ret = new ActiveMMeshBase( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, c );
+        ActiveMMeshBase ret = new ActiveMMeshBase( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, c );
         setFactory.setMeshBase( ret );
 
         ret.initializeHomeObject();
@@ -77,6 +79,7 @@ public class ActiveMMeshBase
      * @param identifierFactory the factory for MeshObjectIdentifiers appropriate for this MeshBase
      * @param setFactory the factory for MeshObjectSets appropriate for this MeshBase
      * @param modelBase the ModelBase containing type information
+     * @param life the MeshBaseLifecycleManager to use
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param cache the CachingMap that holds the MeshObjects in this MeshBase
      * @param context the Context in which this MeshBase runs.
@@ -86,11 +89,12 @@ public class ActiveMMeshBase
             MeshObjectIdentifierFactory                 identifierFactory,
             ActiveMeshObjectSetFactory                  setFactory,
             ModelBase                                   modelBase,
+            AMeshBaseLifecycleManager                   life,
             AccessManager                               accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             Context                                     context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, context );
+        super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, context );
     }
 
     /**

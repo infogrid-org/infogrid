@@ -252,7 +252,7 @@ public class ExternalizedMeshObject
     /**
      * Set the NetMeshBaseIdentifier towards the home replica.
      * 
-     * @param newValue the NNetMeshBaseIdentifier
+     * @param newValue the NetMeshBaseIdentifier
      */
     public void setProxyTowardsHome(
             NetMeshBaseIdentifier newValue )
@@ -390,6 +390,8 @@ public class ExternalizedMeshObject
 
         /**
          * Add the Identifier of a RoleType.
+         * 
+         * @param identifier the Identifier of the RoleType
          */
         public void addRoleType(
                 MeshTypeIdentifier identifier )

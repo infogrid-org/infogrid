@@ -65,7 +65,7 @@ public class TypeInitializer
      *
      * @param propertyTypes the PropertyTypes of the MeshObject to change
      * @param propertyValues the PropertyValues to set them to
-     * @param timeUpdated the time to use as update time
+     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
      *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
      * @throws IllegalPropertyValueException thrown if the new value is an illegal value for this Property
@@ -82,7 +82,7 @@ public class TypeInitializer
             NotPermittedException,
             TransactionException
     {
-        theMeshObject.internalSetPropertyValues( propertyTypes, propertyValues, timeUpdated, false );
+        theMeshObject.internalSetPropertyValues( propertyTypes, propertyValues, false, timeUpdated );
     }
 
     /**

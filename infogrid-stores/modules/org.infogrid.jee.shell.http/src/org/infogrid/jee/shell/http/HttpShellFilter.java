@@ -98,13 +98,16 @@ public class HttpShellFilter
     implements
         Filter
 {
-    private static final Log log = Log.getLogInstance( HttpShellFilter.class ); // our own, private logger
+    private static Log log; // initialized only after the InitializationFilter has run.
 
     /**
      * Constructor.
      */
     public HttpShellFilter()
     {
+        if( log == null ) {
+            log = Log.getLogInstance( HttpShellFilter.class ); // our own, private logger
+        }
     }
 
     /**

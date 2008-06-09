@@ -16,30 +16,26 @@ package org.infogrid.meshbase.store.net;
 
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
-import org.infogrid.meshbase.net.ProxyFactory;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxyEncoder;
 import org.infogrid.meshbase.net.externalized.xml.ExternalizedProxyXmlEncoder;
-
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyFactory;
 import org.infogrid.model.primitives.externalized.DecodingException;
 import org.infogrid.model.primitives.externalized.EncodingException;
-
 import org.infogrid.store.StoreEntryMapper;
 import org.infogrid.store.StoreValue;
 import org.infogrid.store.StoreValueDecodingException;
 import org.infogrid.store.StoreValueEncodingException;
-
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.logging.Log;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
 /**
- *
+ * Knows how to map StoreProxies to and from StoreValues.
  */
 public class StoreProxyEntryMapper
         implements
@@ -205,6 +201,7 @@ public class StoreProxyEntryMapper
      *
      * @param value the value
      * @return the byte array
+     * @throws StoreValueEncodingException thrown if the MeshObject could not be encoded
      */
     public byte [] asBytes(
             Proxy value )

@@ -4,66 +4,9 @@
     <short-name>candy</short-name>
     <uri>/v/org/infogrid/jee/taglib/logic/logic.tld</uri>
     
-    <tag>
-        <name>if</name>
-        <tagclass>org.infogrid.jee.taglib.logic.IfTag</tagclass>
-        <attribute>
-            <name>meshObjectName</name>
-            <rtexprvalue>true</rtexprvalue>
-            <required>true</required>
-        </attribute>
-        <attribute>
-            <name>propertyTypeName</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>propertyType</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>filter</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>ignore</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>scope</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-    </tag>
-
-    <tag>
-        <name>notIf</name>
-        <tagclass>org.infogrid.jee.taglib.logic.NotIfTag</tagclass>
-        <attribute>
-            <name>meshObjectName</name>
-            <rtexprvalue>true</rtexprvalue>
-            <required>true</required>
-        </attribute>
-        <attribute>
-            <name>propertyTypeName</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>propertyType</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>filter</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>ignore</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>scope</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-    </tag>
-
+    <!-- Tags are ordered alphabetically by Java Class name. Makes it easier
+         to find them in the IDE. -->
+    
     <tag>
         <name>equal</name>
         <tagclass>org.infogrid.jee.taglib.logic.EqualTag</tagclass>
@@ -81,39 +24,9 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
-            <name>value</name>
+            <name>valueName</name>
             <rtexprvalue>true</rtexprvalue>
             <required>true</required>
-        </attribute>
-        <attribute>
-            <name>filter</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>ignore</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>scope</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-    </tag>
-    
-    <tag>
-        <name>notEqual</name>
-        <tagclass>org.infogrid.jee.taglib.logic.NotEqualTag</tagclass>
-        <attribute>
-            <name>meshObjectName</name>
-            <rtexprvalue>true</rtexprvalue>
-            <required>true</required>
-        </attribute>
-        <attribute>
-            <name>propertyTypeName</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>propertyType</name>
-            <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
             <name>value</name>
@@ -133,27 +46,30 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
-    
+
     <tag>
-        <name>match</name>
-        <tagclass>org.infogrid.jee.taglib.logic.MatchTag</tagclass>
+        <name>ifRelated</name>
+        <tagclass>org.infogrid.jee.taglib.logic.IfRelatedTag</tagclass>
         <attribute>
             <name>meshObjectName</name>
             <rtexprvalue>true</rtexprvalue>
             <required>true</required>
         </attribute>
         <attribute>
-            <name>propertyTypeName</name>
+            <name>traversalSpecification</name>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
-            <name>propertyType</name>
+            <name>traversalSpecificationName</name>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
-            <name>expression</name>
+            <name>minFound</name>
             <rtexprvalue>true</rtexprvalue>
-            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>maxFound</name>
+            <rtexprvalue>true</rtexprvalue>
         </attribute>
         <attribute>
             <name>filter</name>
@@ -168,10 +84,10 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
-    
+
     <tag>
-        <name>notMatch</name>
-        <tagclass>org.infogrid.jee.taglib.logic.NotMatchTag</tagclass>
+        <name>if</name>
+        <tagclass>org.infogrid.jee.taglib.logic.IfTag</tagclass>
         <attribute>
             <name>meshObjectName</name>
             <rtexprvalue>true</rtexprvalue>
@@ -184,11 +100,6 @@
         <attribute>
             <name>propertyType</name>
             <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>expression</name>
-            <rtexprvalue>true</rtexprvalue>
-            <required>true</required>
         </attribute>
         <attribute>
             <name>filter</name>
@@ -232,6 +143,111 @@
     </tag>
 
     <tag>
+        <name>match</name>
+        <tagclass>org.infogrid.jee.taglib.logic.MatchTag</tagclass>
+        <attribute>
+            <name>expression</name>
+            <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>meshObjectName</name>
+            <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>propertyTypeName</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>propertyType</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>filter</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>ignore</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>scope</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>notEqual</name>
+        <tagclass>org.infogrid.jee.taglib.logic.NotEqualTag</tagclass>
+        <attribute>
+            <name>meshObjectName</name>
+            <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>propertyTypeName</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>propertyType</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>value</name>
+            <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>valueName</name>
+            <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>filter</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>ignore</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>scope</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+    
+    <tag>
+        <name>notIf</name>
+        <tagclass>org.infogrid.jee.taglib.logic.NotIfTag</tagclass>
+        <attribute>
+            <name>meshObjectName</name>
+            <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>propertyTypeName</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>propertyType</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>filter</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>ignore</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>scope</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+    
+    <tag>
         <name>notIfType</name>
         <tagclass>org.infogrid.jee.taglib.logic.NotIfTypeTag</tagclass>
         <attribute>
@@ -257,4 +273,40 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
+    
+    <tag>
+        <name>notMatch</name>
+        <tagclass>org.infogrid.jee.taglib.logic.NotMatchTag</tagclass>
+        <attribute>
+            <name>expression</name>
+            <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>meshObjectName</name>
+            <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>propertyTypeName</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>propertyType</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>filter</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>ignore</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>scope</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
 </taglib>

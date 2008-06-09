@@ -15,16 +15,19 @@
 package org.infogrid.meshworld.net;
 
 import java.util.ArrayList;
+import org.infogrid.jee.servlet.net.NetViewletDispatcherServlet;
 import org.infogrid.jee.viewlet.PseudoJspViewletFactoryChoice;
 import org.infogrid.jee.viewlet.bulk.BulkLoaderViewlet;
 import org.infogrid.jee.viewlet.meshbase.AllMeshBasesViewlet;
 import org.infogrid.jee.viewlet.meshbase.AllMeshObjectsViewlet;
 import org.infogrid.jee.viewlet.meshbase.net.ProxiesViewlet;
+import org.infogrid.jee.viewlet.meshbase.net.ProxyViewlet;
 import org.infogrid.jee.viewlet.modelbase.AllMeshTypesViewlet;
 import org.infogrid.jee.viewlet.wikiobject.WikiObjectDisplayViewlet;
 import org.infogrid.jee.viewlet.wikiobject.WikiObjectEditViewlet;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBase;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.model.Wiki.WikiSubjectArea;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.viewlet.AbstractViewletFactory;
@@ -69,6 +72,11 @@ public class NetMeshWorldViewletFactory
             ret.add( DefaultViewletFactoryChoice.create( BulkLoaderViewlet.class,     ViewletFactoryChoice.AVERAGE_MATCH_QUALITY ));
             ret.add( DefaultViewletFactoryChoice.create( ProxiesViewlet.class,        ViewletFactoryChoice.AVERAGE_MATCH_QUALITY ));
             ret.add( DefaultViewletFactoryChoice.create( AllMeshBasesViewlet.class,   ViewletFactoryChoice.AVERAGE_MATCH_QUALITY ));
+
+            Proxy p = theObjectsToView.getViewletParameters() != null ? (Proxy) theObjectsToView.getViewletParameters().get( NetViewletDispatcherServlet.PROXY_NAME ) : null;
+            if( p != null ) {
+                ret.add( DefaultViewletFactoryChoice.create( ProxyViewlet.class, ViewletFactoryChoice.PERFECT_MATCH_QUALITY+1.d )); // not quite perfect
+            }
         }
         
         // Type-based rules

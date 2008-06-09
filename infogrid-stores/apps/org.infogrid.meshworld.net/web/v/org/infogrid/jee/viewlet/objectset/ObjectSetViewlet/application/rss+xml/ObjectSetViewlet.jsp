@@ -1,6 +1,6 @@
 <%@    page contentType="application/rss+xml"
  %><%@ taglib prefix="mesh"      uri="/v/org/infogrid/jee/taglib/mesh/mesh.tld"
- %><%@ taglib prefix="objectset" uri="/v/org/infogrid/jee/taglib/mesh/set/set.tld"
+ %><%@ taglib prefix="objectset" uri="/v/org/infogrid/jee/taglib/mesh/set/objectset.tld"
  %><%@ taglib prefix="candy"     uri="/v/org/infogrid/jee/taglib/candy/candy.tld"
  %><%@ taglib prefix="u"         uri="/v/org/infogrid/jee/taglib/util/util.tld"
  %><%@ taglib prefix="v"         uri="/v/org/infogrid/jee/taglib/viewlet/viewlet.tld"

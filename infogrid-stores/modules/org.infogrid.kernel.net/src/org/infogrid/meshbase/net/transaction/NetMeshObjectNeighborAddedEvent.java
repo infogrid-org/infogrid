@@ -15,13 +15,14 @@
 package org.infogrid.meshbase.net.transaction;
 
 
+import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObjectUtils;
 
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 
 import org.infogrid.meshbase.transaction.CannotApplyChangeException;
 import org.infogrid.meshbase.transaction.MeshObjectNeighborAddedEvent;
@@ -31,6 +32,7 @@ import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MeshTypeUtils;
 import org.infogrid.model.primitives.RoleType;
+import org.infogrid.util.event.ValueUnresolvedException;
 
 /**
  * This event indicates that a NetMeshObject was added to the set of neighbors of a NetMeshObject.
@@ -268,6 +270,38 @@ public class NetMeshObjectNeighborAddedEvent
     }
 
     /**
+     * Obtain the Identifier of the neighbor that changed.
+     *
+     * @return the Identifier of the neighbor MeshObject
+     */
+    @Override
+    public NetMeshObjectIdentifier getNeighborMeshObjectIdentifier()
+    {
+        return (NetMeshObjectIdentifier) super.getNeighborMeshObjectIdentifier();
+    }
+
+    /**
+     * Resolve a value of the event.
+     *
+     * @param vid the value identifier
+     * @return a value of the event
+     */
+    @Override
+    protected NetMeshObject [] resolveValue(
+            MeshObjectIdentifier [] vid )
+    {
+        if( theResolver == null ) {
+            throw new ValueUnresolvedException( this );
+        }
+
+        NetMeshObject [] ret = new NetMeshObject[ vid.length ];
+        for( int i=0 ; i<ret.length ; ++i ) {
+            ret[i] = (NetMeshObject) theResolver.findMeshObjectByIdentifier( vid[i] );
+        }
+        return ret;
+    }
+
+    /**
      * <p>Apply this NetChange to a NetMeshObject in this MeshBase. This method
      *    is intended to make it easy to replicate NetChanges that were made to a
      *    replica of one NetMeshObject in one NetMeshBase to another replica
@@ -277,14 +311,16 @@ public class NetMeshObjectNeighborAddedEvent
      * current Thread.</p>
      *
      * @param base the NetMeshBase in which to apply the NetChange
+     * @param incomingProxy the Proxy through which this NetChange was received
      * @return the NetMeshObject to which the NetChange was applied
      * @throws CannotApplyChangeException thrown if the NetChange could not be applied, e.g because
      *         the affected NetMeshObject did not exist in MeshBase base
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
-    public NetMeshObject applyToReplicaIn(
-            NetMeshBase base )
+    public NetMeshObject potentiallyApplyToReplicaIn(
+            NetMeshBase base,
+            Proxy       incomingProxy )
         throws
             CannotApplyChangeException,
             TransactionException
@@ -293,23 +329,26 @@ public class NetMeshObjectNeighborAddedEvent
 
         Transaction tx = null;
 
-        NetMeshObject              otherObject = null; // make compiler happy
         NetMeshObjectIdentifier [] relatedOtherObjects;
         RoleType []                roleTypes;
 
         try {
             tx = base.createTransactionNowIfNeeded();
 
-            otherObject         = (NetMeshObject) getSource();
-            relatedOtherObjects = (NetMeshObjectIdentifier []) getDeltaValueIdentifier();
-            roleTypes           = getProperty();
+            NetMeshObject otherObject = (NetMeshObject) getSource();
+            if( otherObject != null ) { // don't check for the lock here -- relationships can be created without having the lock
 
-            for( int i=0 ; i<relatedOtherObjects.length ; ++i ) {
-                otherObject.rippleRelate( relatedOtherObjects[i] );
-                if( roleTypes != null && roleTypes.length > 0 ) {
-                    otherObject.rippleBless( roleTypes, relatedOtherObjects[i] );
+                relatedOtherObjects = (NetMeshObjectIdentifier []) getDeltaValueIdentifier();
+                roleTypes           = getProperty();
+
+                for( int i=0 ; i<relatedOtherObjects.length ; ++i ) {
+                    otherObject.rippleRelate( relatedOtherObjects[i], getTimeEventOccurred() );
+                    if( roleTypes != null && roleTypes.length > 0 ) {
+                        otherObject.rippleBless( roleTypes, relatedOtherObjects[i], getTimeEventOccurred() );
+                    }
                 }
             }
+            return otherObject;
 
         } catch( TransactionException ex ) {
             throw ex;
@@ -322,7 +361,6 @@ public class NetMeshObjectNeighborAddedEvent
                 tx.commitTransaction();
             }
         }
-        return otherObject;
     }
 
     /**

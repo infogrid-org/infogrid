@@ -12,13 +12,12 @@
 // All rights reserved.
 //
 
-package org.infogrid.meshbase.net;
+package org.infogrid.meshbase.net.proxy;
 
 import org.infogrid.comm.MessageEndpoint;
-
+import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.net.NetMessageEndpoint;
-
 import org.infogrid.util.logging.Log;
 
 /**
@@ -35,13 +34,15 @@ public class DefaultProxy
      *
      * @param ep the communications endpoint
      * @param mb the NetMeshBase this Proxy belongs to
+     * @param policy the ProxyPolicy to use
      * @return the created DefaultProxy
      */
     public static DefaultProxy create(
             NetMessageEndpoint ep,
-            NetMeshBase        mb )
+            NetMeshBase        mb,
+            ProxyPolicy        policy )
     {
-        DefaultProxy ret = new DefaultProxy( ep, mb );
+        DefaultProxy ret = new DefaultProxy( ep, mb, policy );
 
         if( log.isDebugEnabled() ) {
             log.debug( "Created " + ret, new RuntimeException( "marker" ));
@@ -54,6 +55,7 @@ public class DefaultProxy
      *
      * @param ep the communications endpoint
      * @param mb the NetMeshBase this Proxy belongs to
+     * @param policy the ProxyPolicy to use
      * @param timeCreated the timeCreated to use
      * @param timeUpdated the timeUpdated to use
      * @param timeRead the timeRead to use
@@ -63,15 +65,16 @@ public class DefaultProxy
     public static DefaultProxy restoreProxy(
             NetMessageEndpoint ep,
             NetMeshBase        mb,
+            ProxyPolicy        policy,
             long               timeCreated,
             long               timeUpdated,
             long               timeRead,
             long               timeExpires )
     {
-        DefaultProxy ret = new DefaultProxy( ep, mb, timeCreated, timeUpdated, timeRead, timeExpires );
+        DefaultProxy ret = new DefaultProxy( ep, mb, policy, timeCreated, timeUpdated, timeRead, timeExpires );
 
         if( log.isDebugEnabled() ) {
-            log.debug( "Created " + ret, new RuntimeException( "marker" ));
+            log.debug( "Restored " + ret, new RuntimeException( "marker" ));
         }
         return ret;
     }
@@ -81,12 +84,14 @@ public class DefaultProxy
      *
      * @param ep the communications endpoint
      * @param mb the NetMeshBase this Proxy belongs to
+     * @param policy the ProxyPolicy to use
      */
     protected DefaultProxy(
             NetMessageEndpoint ep,
-            NetMeshBase        mb )
+            NetMeshBase        mb,
+            ProxyPolicy        policy )
     {
-        super( ep, mb );
+        super( ep, mb, policy );
     }
 
     /**
@@ -94,6 +99,7 @@ public class DefaultProxy
      *
      * @param ep the communications endpoint
      * @param mb the NetMeshBase this Proxy belongs to
+     * @param policy the ProxyPolicy to use
      * @param timeCreated the timeCreated to use
      * @param timeUpdated the timeUpdated to use
      * @param timeRead the timeRead to use
@@ -102,12 +108,13 @@ public class DefaultProxy
     protected DefaultProxy(
             NetMessageEndpoint ep,
             NetMeshBase        mb,
+            ProxyPolicy        policy,
             long               timeCreated,
             long               timeUpdated,
             long               timeRead,
             long               timeExpires )
     {
-        super( ep, mb );
+        super( ep, mb, policy );
         
         theTimeCreated = timeCreated;
         theTimeUpdated = timeUpdated;

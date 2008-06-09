@@ -1,5 +1,5 @@
 <%@    page contentType="text/html"
- %><%@ taglib prefix="set"   uri="/v/org/infogrid/jee/taglib/mesh/set/set.tld"
+ %><%@ taglib prefix="set"   uri="/v/org/infogrid/jee/taglib/mesh/set/objectset.tld"
  %><%@ taglib prefix="mesh"  uri="/v/org/infogrid/jee/taglib/mesh/mesh.tld"
  %><%@ taglib prefix="candy" uri="/v/org/infogrid/jee/taglib/candy/candy.tld"
  %><%@ taglib prefix="u"     uri="/v/org/infogrid/jee/taglib/util/util.tld"
@@ -252,8 +252,26 @@
              </tr>
              <tr>
               <td class="label">EntityType:</td>
-              <td><a href="#<mesh:meshTypeId meshTypeName="amo.source.entityType.identifier" stringRepresentation="Plain" filter="true"/>"><mesh:type meshTypeName="amo" propertyName="source.entityType.name" nullString="(Any)" filter="false"/></a></td>
-              <td><a href="#<mesh:meshTypeId meshTypeName="amo.destination.entityType.identifier" stringRepresentation="Plain" filter="true"/>"><mesh:type meshTypeName="amo" propertyName="destination.entityType.name" nullString="(Any)" filter="false"/></a></td>
+              <td>
+               <c:choose>
+                <c:when test="${amo.source.entityType != null}">
+                 <a href="#<mesh:meshTypeId meshTypeName="amo.source.entityType.identifier" stringRepresentation="Plain" filter="true"/>"><mesh:type meshTypeName="amo" propertyName="source.entityType.name" nullString="(Any)" filter="false"/></a>
+                </c:when>
+                <c:otherwise>
+                (Any)
+                </c:otherwise>
+               </c:choose>
+              </td>
+              <td>
+               <c:choose>
+                <c:when test="${amo.destination.entityType != null}">
+                <a href="#<mesh:meshTypeId meshTypeName="amo.destination.entityType.identifier" stringRepresentation="Plain" filter="true"/>"><mesh:type meshTypeName="amo" propertyName="destination.entityType.name" nullString="(Any)" filter="false"/></a>
+                </c:when>
+                <c:otherwise>
+                (Any)
+                </c:otherwise>
+               </c:choose>
+              </td>
              </tr>
              <tr>
               <td class="label">Multiplicity:</td>

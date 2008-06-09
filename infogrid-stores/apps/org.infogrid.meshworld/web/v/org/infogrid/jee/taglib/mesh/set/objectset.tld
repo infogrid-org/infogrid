@@ -2,8 +2,11 @@
 <taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd">
     <tlib-version>1.0</tlib-version>
     <short-name>set</short-name>
-    <uri>/v/org/infogrid/jee/taglib/mesh/set/set.tld</uri>
+    <uri>/v/org/infogrid/jee/taglib/mesh/set/objectset.tld</uri>
     
+    <!-- Tags are ordered alphabetically by Java Class name. Makes it easier
+         to find them in the IDE. -->
+
     <tag>
         <name>ifSetEmpty</name>
         <tag-class>org.infogrid.jee.taglib.mesh.set.IfSetEmptyTag</tag-class>
@@ -48,6 +51,21 @@
             <name>scope</name>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
+    </tag>
+
+    <tag>
+        <name>iteratecontentrow</name>
+        <tag-class>org.infogrid.jee.taglib.mesh.set.MeshObjectSetIterateContentRowTag</tag-class>
+    </tag>
+    
+    <tag>
+        <name>iterateheader</name>
+        <tag-class>org.infogrid.jee.taglib.mesh.set.MeshObjectSetIterateHeaderTag</tag-class>
+    </tag>
+    
+    <tag>
+        <name>iteratenocontent</name>
+        <tag-class>org.infogrid.jee.taglib.mesh.set.MeshObjectSetIterateNoContentTag</tag-class>
     </tag>
 
     <tag>
@@ -105,21 +123,5 @@
             <name>scope</name>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
-    </tag>
-    
-    
-    <tag>
-        <name>iterateheader</name>
-        <tag-class>org.infogrid.jee.taglib.mesh.set.MeshObjectSetIterateHeaderTag</tag-class>
-    </tag>
-    
-    <tag>
-        <name>iteratecontentrow</name>
-        <tag-class>org.infogrid.jee.taglib.mesh.set.MeshObjectSetIterateContentRowTag</tag-class>
-    </tag>
-    
-    <tag>
-        <name>iteratenocontent</name>
-        <tag-class>org.infogrid.jee.taglib.mesh.set.MeshObjectSetIterateNoContentTag</tag-class>
     </tag>
 </taglib>

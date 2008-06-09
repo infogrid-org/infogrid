@@ -30,7 +30,7 @@ import java.util.List;
  * response has arrived. This is useful to implement RPC-style communications
  * on top of the ping-pong framework.
  * 
- * @param T the message type
+ * @param <T> the message type
  */
 public class WaitForResponseEndpoint<T extends CarriesInvocationId>
         implements
@@ -41,6 +41,7 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
     /**
      * Factory method.
      *
+     * @param <T> the message type
      * @param messageEndpoint the MessageEndpoint to use as communications endpoint
      * @return the created WaitForResponseEndpoint
      */
@@ -159,6 +160,26 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
         }
     }
     
+    /**
+     * Determine whether a call is waiting for a response with the provided responseId.
+     * 
+     * @param responseId the responseId
+     * @return true a call is waiting for this responseId
+     */
+    public boolean isCallWaitingFor(
+            long responseId )
+    {
+        Object syncObject;
+        synchronized( theOngoingInvocations ) {
+            syncObject = theOngoingInvocations.get( responseId );
+        }
+        if( syncObject != null ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Called when an incoming message has arrived.
      *

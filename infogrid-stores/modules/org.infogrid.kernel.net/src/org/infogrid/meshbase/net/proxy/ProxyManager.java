@@ -12,16 +12,16 @@
 // All rights reserved.
 //
 
-package org.infogrid.meshbase.net;
+package org.infogrid.meshbase.net.proxy;
 
+import java.util.ArrayList;
+import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
-
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.FactoryCreatedObject;
 import org.infogrid.util.PatientSmartFactory;
-
-import java.util.ArrayList;
 
 /**
  * Knows how to manage Proxies.

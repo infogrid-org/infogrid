@@ -23,7 +23,7 @@ import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.transaction.CannotApplyChangeException;
 import org.infogrid.meshbase.transaction.MeshObjectCreatedEvent;
 import org.infogrid.meshbase.transaction.Transaction;
@@ -147,14 +147,16 @@ public abstract class AbstractNetMeshObjectCreatedEvent
      * current Thread.</p>
      *
      * @param base the NetMeshBase in which to apply the NetChange
+     * @param incomingProxy the Proxy through which this NetChange was received
      * @return the NetMeshObject to which the NetChange was applied
      * @throws CannotApplyChangeException thrown if the NetChange could not be applied, e.g because
      *         the affected NetMeshObject did not exist in MeshBase base
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
-    public NetMeshObject applyToReplicaIn(
-            NetMeshBase base )
+    public NetMeshObject potentiallyApplyToReplicaIn(
+            NetMeshBase base,
+            Proxy       incomingProxy )
         throws
             CannotApplyChangeException,
             TransactionException
@@ -188,7 +190,7 @@ public abstract class AbstractNetMeshObjectCreatedEvent
                         theExternalizedMeshObject.getTimeRead(),
                         theExternalizedMeshObject.getTimeExpires() );
 
-            newObject.rippleSetPropertyValues( thePropertyTypes, theExternalizedMeshObject.getPropertyValues() );
+            newObject.rippleSetPropertyValues( thePropertyTypes, theExternalizedMeshObject.getPropertyValues(), getTimeEventOccurred() );
 
             return newObject;
 

@@ -24,6 +24,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,14 +43,16 @@ import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.IterableNetMeshBase;
 import org.infogrid.meshbase.net.IterableNetMeshBaseDifferencer;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.transaction.ChangeSet;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.Probe.ProbeSubjectArea;
 import org.infogrid.model.Probe.ProbeUpdateSpecification;
+import org.infogrid.model.primitives.BooleanValue;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.FloatValue;
 import org.infogrid.model.primitives.IntegerValue;
@@ -66,11 +70,12 @@ import org.infogrid.probe.shadow.ShadowMeshBaseEvent;
 import org.infogrid.probe.shadow.ShadowMeshBaseListener;
 import org.infogrid.probe.shadow.m.MStagingMeshBase;
 import org.infogrid.probe.xml.DomMeshObjectSetProbe;
-import org.infogrid.probe.xml.SaxMeshObjectSetProbe;
+import org.infogrid.probe.xml.MeshObjectSetProbeTags;
 import org.infogrid.probe.xml.XmlDOMProbe;
 import org.infogrid.probe.xml.XmlErrorHandler;
 import org.infogrid.probe.xml.XmlProbeException;
 import org.infogrid.probe.yadis.YadisServiceFactory;
+import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.FlexibleListenerSet;
 import org.infogrid.util.StreamUtils;
 import org.infogrid.util.http.HTTP;
@@ -134,6 +139,7 @@ public class ProbeDispatcher
         long                  ret              = -1L;
         boolean               isFirstRun       = theShadowMeshBase.size() == 0;
         NetMeshBaseIdentifier sourceIdentifier = theShadowMeshBase.getIdentifier();
+        ProbeResult           probeResult      = null;
 
         theCurrentUpdate = System.currentTimeMillis();
         
@@ -179,12 +185,14 @@ public class ProbeDispatcher
                 newBase.initializeHomeObject( theCurrentUpdate );
                 
                 if( isDirectory ) {
-                    updated = handleDirectory( oldBase, newBase, coherence );
+                    probeResult = handleDirectory( oldBase, newBase, coherence );
                 } else if( isStream ) {
-                    updated = handleStream( oldBase, newBase, coherence );
+                    probeResult = handleStream( oldBase, newBase, coherence );
                 } else {
-                    updated = handleApi( oldBase, newBase, coherence );
+                    probeResult = handleApi( oldBase, newBase, coherence );
                 }
+                
+                updated = probeResult.getUpdated();
                 
                 if( newBase != theShadowMeshBase ) {
                     copyProbeUpdateSpecification( theShadowMeshBase.getHomeObject(), newBase.getHomeObject() );
@@ -220,13 +228,12 @@ public class ProbeDispatcher
 
                         // get all the locks back
                         theUpdateInProgress = true;
-                        for( MeshObject current : theShadowMeshBase ) {
-                            ((NetMeshObject)current).forceObtainLock();
-                        }
+                        
+                        forceLockRecovery( theShadowMeshBase );
 
                         IterableNetMeshBaseDifferencer diff = new IterableNetMeshBaseDifferencer( theShadowMeshBase );
 
-                        if( tx2 == null ) {
+                        if( newBase != theShadowMeshBase && tx2 == null ) {
                             tx2 = theShadowMeshBase.createTransactionAsap();
                         }
 
@@ -251,6 +258,23 @@ public class ProbeDispatcher
                             coherence = CoherenceSpecification.getDefault();
                         }
                         blessMeshObjectWithCoherence( coherence, home );
+                    }
+                    
+                    if( probeResult != null ) {
+                        if( newBase != theShadowMeshBase && tx2 == null ) {
+                            tx2 = theShadowMeshBase.createTransactionAsap();
+                        }
+                        try {
+                            home.setPropertyValue(
+                                    ProbeSubjectArea.PROBEUPDATESPECIFICATION_LASTRUNUSEDWRITEABLEPROBE,
+                                    BooleanValue.create( probeResult.getUsedWriteableProbe() ));
+                        } catch( IllegalPropertyTypeException ex3 ) {
+                            log.error( ex3 );
+                        } catch( IllegalPropertyValueException ex3 ) {
+                            log.error( ex3 );
+                        } catch( NotPermittedException ex3 ) {
+                            log.error( ex3 );
+                        }
                     }
                         
                     ProbeUpdateSpecification spec = (ProbeUpdateSpecification) home.getTypedFacadeFor( ProbeSubjectArea.PROBEUPDATESPECIFICATION );
@@ -305,7 +329,8 @@ public class ProbeDispatcher
                     } catch( Throwable ex3 ) {
                         log.error( ex3 );
                     }
-                    theUpdateInProgress = false;
+                    theChangesToWriteBack = null; // otherwise we queue our own changes
+                    theUpdateInProgress   = false;
                 }
             }
 
@@ -351,12 +376,12 @@ public class ProbeDispatcher
      * @param oldBase the StagingMeshBase after the most recent successful run, if any
      * @param newBase the new StagingMeshBase into which to instantiate the data
      * @param coherence the CoherenceSpecification specified by the client, if any
-     * @return true if the data source is known to have been updated
+     * @return the ProbeResult
      * @throws ProbeException thrown if unable to compute a result
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
      * @throws IOException thrown if an I/O error occurred
      */
-    protected boolean handleDirectory(
+    protected ProbeResult handleDirectory(
             StagingMeshBase        oldBase,
             StagingMeshBase        newBase,
             CoherenceSpecification coherence )
@@ -415,13 +440,13 @@ public class ProbeDispatcher
      * @param oldBase the StagingMeshBase after the most recent successful run, if any
      * @param newBase the new StagingMeshBase into which to instantiate the data
      * @param coherence the CoherenceSpecification specified by the client, if any
-     * @return true if the data source is known to have been updated
+     * @return the ProbeResult
      * @throws ProbeException thrown if unable to compute a result
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
      * @throws URISyntaxException thrown if a URI could not be parsed
      * @throws IOException thrown if an I/O error occurred
      */
-    protected boolean handleStream(
+    protected ProbeResult handleStream(
             StagingMeshBase        oldBase,
             StagingMeshBase        newBase,
             CoherenceSpecification coherence )
@@ -438,6 +463,7 @@ public class ProbeDispatcher
         NetMeshBaseIdentifier sourceIdentifier = theShadowMeshBase.getIdentifier();
         String                protocol         = sourceIdentifier.getUrlProtocol();
         URL                   url              = sourceIdentifier.toUrl();
+        Probe                 probe            = null;
 
         String yadisServicesXml  = null;
         String yadisServicesHtml = null;
@@ -543,13 +569,13 @@ public class ProbeDispatcher
             InputStream inStream = new ByteArrayInputStream( content );
             try {
                 if( XML_MIME_TYPE.equals( contentType )) {
-                    handleXml(
+                    probe = handleXml(
                             oldBase,
                             newBase,
                             coherence,
                             inStream );
                 } else {
-                    handleNonXml(
+                    probe = handleNonXml(
                             oldBase,
                             newBase,
                             coherence,
@@ -572,7 +598,9 @@ public class ProbeDispatcher
             }
             
         }
-        return updated;
+        return new ProbeResult(
+                updated, // we don't know, we always say we might have been updated because that's safer
+                probe instanceof WriteableProbe );
     }
 
     /**
@@ -581,13 +609,13 @@ public class ProbeDispatcher
      * @param oldBase the StagingMeshBase after the most recent successful run, if any
      * @param newBase the new StagingMeshBase into which to instantiate the data
      * @param coherence the CoherenceSpecification specified by the client, if any
-     * @return true if the data source is known to have been updated
+     * @return the ProbeResult
      * @throws ProbeException thrown if unable to compute a result
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
      * @throws IOException thrown if an I/O error occurred
      */
     @SuppressWarnings( "unchecked" )
-    protected boolean handleApi(
+    protected ProbeResult handleApi(
             StagingMeshBase        oldBase,
             StagingMeshBase        newBase,
             CoherenceSpecification coherence )
@@ -740,7 +768,10 @@ public class ProbeDispatcher
         } else {
             throw new ProbeException.DontHaveApiProbe( sourceIdentifier, null );
         }
-        return true; // we don't know, we always say we might have been updated because that's safer
+
+        return new ProbeResult(
+                true, // we don't know, we always say we might have been updated because that's safer
+                probe instanceof WriteableProbe );
     }
     
     /**
@@ -750,12 +781,13 @@ public class ProbeDispatcher
      * @param newBase the new StagingMeshBase into which to instantiate the data
      * @param coherence the CoherenceSpecification specified by the client, if any
      * @param inStream the incoming data stream
+     * @return the used Probe instance
      * @throws ProbeException thrown if unable to compute a result
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
      * @throws IOException thrown if an I/O error occurred
      */
     @SuppressWarnings( "unchecked" )
-    protected void handleXml(
+    protected Probe handleXml(
             StagingMeshBase        oldBase,
             StagingMeshBase        newBase,
             CoherenceSpecification coherence,
@@ -810,9 +842,9 @@ public class ProbeDispatcher
         Map<String,Object>     foundParameters  = null; // FIXME not used
 
         if( docType != null ) {
-            if( SaxMeshObjectSetProbe.MESHOBJECT_SET_TAG.equalsIgnoreCase( docType.getName() )) {
-                handleNativeFormat( newBase, coherence, doc );
-                return;
+            if( MeshObjectSetProbeTags.MESHOBJECT_SET_TAG.equalsIgnoreCase( docType.getName() )) {
+                Probe ret = handleNativeFormat( newBase, coherence, doc );
+                return ret;
             }
 
             ProbeDirectory.XmlDomProbeDescriptor desc = theProbeDirectory.getXmlDomProbeDescriptorByDocumentType( docType.getName() );
@@ -956,6 +988,8 @@ public class ProbeDispatcher
         } else {
             throw new ProbeException.DontHaveXmlStreamProbe( sourceIdentifier, docType != null ? docType.getName() : null, tagType, null );
         }
+        
+        return probe;
     }
 
     /**
@@ -966,12 +1000,13 @@ public class ProbeDispatcher
      * @param coherence the CoherenceSpecification specified by the client, if any
      * @param contentType the MIME type of the data source
      * @param inStream the incoming data stream
+     * @return the used Probe instance
      * @throws ProbeException thrown if unable to compute a result
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
      * @throws IOException thrown if an I/O error occurred
      */
     @SuppressWarnings( "unchecked" )
-    protected void handleNonXml(
+    protected NonXmlStreamProbe handleNonXml(
             StagingMeshBase        oldBase,
             StagingMeshBase        newBase,
             CoherenceSpecification coherence,
@@ -1116,6 +1151,8 @@ public class ProbeDispatcher
         } else {
             throw new ProbeException.DontHaveNonXmlStreamProbe( sourceIdentifier, contentType, null );
         }
+        
+        return probe;
     }
 
     /**
@@ -1124,11 +1161,12 @@ public class ProbeDispatcher
      * @param newBase the new StagingMeshBase into which to instantiate the data
      * @param coherence the CoherenceSpecification specified by the client, if any
      * @param doc the XML Document to parse
+     * @return the used Probe instance
      * @throws ProbeException thrown if unable to compute a result
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
      * @throws IOException thrown if an I/O error occurred
      */
-    protected void handleNativeFormat(
+    protected DomMeshObjectSetProbe handleNativeFormat(
             StagingMeshBase        newBase,
             CoherenceSpecification coherence,
             Document               doc )
@@ -1152,6 +1190,8 @@ public class ProbeDispatcher
         } catch( MeshObjectIdentifierNotUniqueException ex ) {
             throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, DomMeshObjectSetProbe.class );
         }
+        
+        return theProbe;
     }
     
     /**
@@ -1339,6 +1379,9 @@ public class ProbeDispatcher
      * Obtain the time at which this ShadowMeshBase was created.
      *
      * @return the time at which this ShadowMeshBase was created, in System.currentTimeMillis() format
+     * @see #getCurrentUpdateStartedTime
+     * @see #getLastSuccessfulUpdateStartedTime
+     * @see #getLastUpdateStartedTime
      */
     public long getTimeCreated()
     {
@@ -1350,6 +1393,9 @@ public class ProbeDispatcher
      * ShadowMeshBase was started.
      *
      * @return the time at which the update started, in System.currentTimeMillis() format
+     * @see #getCurrentUpdateStartedTime
+     * @see #getTimeCreated
+     * @see #getLastUpdateStartedTime
      */
     public long getLastSuccessfulUpdateStartedTime()
     {
@@ -1362,7 +1408,9 @@ public class ProbeDispatcher
      * updated once the update has finished.
      *
      * @return the time at which the update started, in System.currentTimeMillis() format
-     * @see getCurrentUpdateStartedTime
+     * @see #getCurrentUpdateStartedTime
+     * @see #getTimeCreated
+     * @see #getLastSuccessfulUpdateStartedTime
      */
     public long getLastUpdateStartedTime()
     {
@@ -1374,6 +1422,9 @@ public class ProbeDispatcher
      * as the run starts.
      *
      * @return the start time of the current update
+     * @see #getTimeCreated
+     * @see #getLastSuccessfulUpdateStartedTime
+     * @see #getLastUpdateStartedTime
      */
     public long getCurrentUpdateStartedTime()
     {
@@ -1412,6 +1463,34 @@ public class ProbeDispatcher
     }
 
     /**
+     * Determine whether at the last run, this ProbeDispatcher used a WriteableProbe.
+     * 
+     * @return true if at the last run, this ProbeDispatcher used a WriteableProbe
+     */
+    public boolean usesWritableProbe()
+    {
+        if( theUsesWritableProbe == null ) {
+            // need to initialize first
+
+            theUsesWritableProbe = Boolean.FALSE; // now if anything goes wrong
+            MeshObject home = theShadowMeshBase.getHomeObject();
+            try {
+                BooleanValue found = (BooleanValue) home.getPropertyValue( ProbeSubjectArea.PROBEUPDATESPECIFICATION_LASTRUNUSEDWRITEABLEPROBE );
+                if( found == null ) {
+                    return false;
+                }
+                theUsesWritableProbe = found.value();
+
+            } catch( NotPermittedException ex ) {
+                log.error( ex );
+            } catch( IllegalPropertyTypeException ex ) {
+                log.error( ex );
+            }
+        }
+        return theUsesWritableProbe.booleanValue();
+    }
+
+    /**
      * Determine whether this ShadowMeshBase is still needed. It is needed if at least
      * one its MeshObjects is replicated to/from another NetMeshBase.
      *
@@ -1428,6 +1507,35 @@ public class ProbeDispatcher
         return false;
     }
     
+    /**
+     * Forcefully reacquire all locks.
+     * 
+     * @param base the NetMeshBase for whose content the locks shall be acquired
+     */
+    protected void forceLockRecovery(
+            IterableNetMeshBase base )
+    {
+        HashMap<Proxy,ArrayList<NetMeshObject>> buckets = new HashMap<Proxy,ArrayList<NetMeshObject>>();
+        
+        for( MeshObject current : theShadowMeshBase ) {
+            NetMeshObject realCurrent = (NetMeshObject) current;
+            Proxy         towardsLock = realCurrent.getProxyTowardsLockReplica();
+            if( towardsLock != null ) {
+                ArrayList<NetMeshObject> already = buckets.get( towardsLock );
+                if( already == null ) {
+                    already = new ArrayList<NetMeshObject>();
+                    buckets.put( towardsLock, already );
+                }
+                already.add( realCurrent );
+                realCurrent.proxyOnlyPushLock( towardsLock );
+            }
+        }
+        for( Proxy p : buckets.keySet() ) {
+            NetMeshObject [] localReplicas = ArrayHelper.copyIntoNewArray( buckets.get( p ), NetMeshObject.class );
+            p.forceObtainLocks( localReplicas );
+        }
+    }
+
     /**
      * Determine whether this ShadowMeshBase can be deleted, because it is not needed
      * any more, and the necessary timeNotNeededTillExpires has expired.
@@ -1490,6 +1598,8 @@ public class ProbeDispatcher
      * Add a listener to listen to ShadowMeshBase-specific events.
      *
      * @param newListener the listener to be added
+     * @see #addWeakShadowListener
+     * @see #addSoftShadowListener
      * @see #removeShadowListener
      */
     public void addDirectShadowListener(
@@ -1502,6 +1612,8 @@ public class ProbeDispatcher
      * Add a listener to listen to ShadowMeshBase-specific events.
      *
      * @param newListener the listener to be added
+     * @see #addDirectShadowListener
+     * @see #addSoftShadowListener
      * @see #removeShadowListener
      */
     public void addWeakShadowListener(
@@ -1514,6 +1626,8 @@ public class ProbeDispatcher
      * Add a listener to listen to ShadowMeshBase-specific events.
      *
      * @param newListener the listener to be added
+     * @see #addDirectShadowListener
+     * @see #addWeakShadowListener
      * @see #removeShadowListener
      */
     public void addSoftShadowListener(
@@ -1526,7 +1640,9 @@ public class ProbeDispatcher
      * Remove a listener to listen to ShadowMeshBase-specific events.
      *
      * @param oldListener the listener to be removed
-     * @see #addShadowListener
+     * @see #addDirectShadowListener
+     * @see #addWeakShadowListener
+     * @see #addSoftShadowListener
      */
     public void removeShadowListener(
             ShadowMeshBaseListener oldListener )
@@ -1843,6 +1959,11 @@ public class ProbeDispatcher
      */
     protected YadisServiceFactory theServiceFactory;
 
+    /**
+     * If the last Probe run used a Writeable Probe, this is true.
+     */
+    protected Boolean theUsesWritableProbe;
+    
     /**
      * We expect this MIME type to indicate that a stream is XML.
      */

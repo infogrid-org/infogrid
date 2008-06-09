@@ -22,8 +22,8 @@ import org.infogrid.util.ResourceHelper;
 import java.io.IOException;
 
 /**
-  * This Exception indicates that something went wrong when we were trying
-  * to run a Probe. Through delegation, we can find out what exactly went wrong.
+  * Subclasses of this Exception indicate that something went wrong when attempting
+  * to run a Probe. Through the Exception's cause the original Exception may be found.
   */
 public abstract class ProbeException
         extends
@@ -49,7 +49,7 @@ public abstract class ProbeException
     /**
      * Obtain the NetMeshBaseIdentifier that we were trying to access when the Exception occurred.
      * 
-     * @return the NNetMeshBaseIdentifier
+     * @return the NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getNetworkIdentifier()
     {

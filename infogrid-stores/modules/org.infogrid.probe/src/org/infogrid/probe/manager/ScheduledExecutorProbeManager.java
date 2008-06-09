@@ -14,6 +14,7 @@
 
 package org.infogrid.probe.manager;
 
+import java.lang.ref.Reference;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.probe.shadow.ShadowMeshBase;
@@ -48,14 +49,14 @@ public abstract class ScheduledExecutorProbeManager
     /**
      * Constructor.
      *
-     * @param delegate the underlying Factory
-     * @param executorService the ScheduledExecutorService that schedules our tasks
+     * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
+     * @param storage the storage to use
      */
     protected ScheduledExecutorProbeManager(
-            ShadowMeshBaseFactory                            delegate,
+            ShadowMeshBaseFactory                            delegateFactory,
             CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
     {
-        super( delegate, storage );
+        super( delegateFactory, storage );
 
         theExecutorService = null; // must invoke start() to start
     }
@@ -95,7 +96,7 @@ public abstract class ScheduledExecutorProbeManager
             long nextTime = value.getDelayUntilNextUpdate();
             if( nextTime >= 0 ) {  // allow 0 for immediate execution
                 ScheduledFuture<Long> newFuture = theExecutorService.schedule(
-                        new ExecutorAdapter( this, key, nextTime ),
+                        new ExecutorAdapter( new WeakReference<ScheduledExecutorProbeManager>( this ), key, nextTime ),
                         nextTime,
                         TimeUnit.MILLISECONDS );
                 theFutures.add( newFuture );
@@ -142,7 +143,7 @@ public abstract class ScheduledExecutorProbeManager
         long nextTime = value.getDelayUntilNextUpdate();
         if( nextTime >= 0 ) { // allow 0 for immediate execution
             ScheduledFuture<Long> newFuture = theExecutorService.schedule(
-                    new ExecutorAdapter( this, key, nextTime ),
+                    new ExecutorAdapter( new WeakReference<ScheduledExecutorProbeManager>( this ), key, nextTime ),
                     nextTime,
                     TimeUnit.MILLISECONDS );
             theFutures.add( newFuture );
@@ -191,14 +192,17 @@ public abstract class ScheduledExecutorProbeManager
         /**
          * Constructor.
          *
-         * @param shadow the ShadowMeshBase to call
+         * @param belongsTo reference to the ScheduledExecutorProbeManager to which this ExecutorAdaptor belongs
+         * @param shadowIdentifier the Identifier of the ShadowMeshBase to be updated
+         * @param nextTime the relative time, from now, when this ExecutablerAdapter will be called. This is only
+         *        provided for debugging purposes
          */
         public ExecutorAdapter(
-                ScheduledExecutorProbeManager belongsTo,
-                NetMeshBaseIdentifier         shadowIdentifier,
-                long                          nextTime )
+                Reference<ScheduledExecutorProbeManager> belongsTo,
+                NetMeshBaseIdentifier                    shadowIdentifier,
+                long                                     nextTime )
         {
-            theBelongsTo        = new WeakReference<ScheduledExecutorProbeManager>( belongsTo );
+            theBelongsTo        = belongsTo;
             theShadowIdentifier = shadowIdentifier;
             theWillBeCalledAt   = new Date( System.currentTimeMillis() + nextTime );
 
@@ -209,6 +213,9 @@ public abstract class ScheduledExecutorProbeManager
 
         /**
          * The main call when invoked by a background Thread.
+         * 
+         * @throws Exception catch-all Exception
+         * @return desired time of the next update, in milliseconds. -1 indicates never.
          */
         public Long call()
             throws
@@ -221,14 +228,16 @@ public abstract class ScheduledExecutorProbeManager
          * The main call when invoked on the thread of the application programmer.
          * 
          * @param coherence optional CoherenceSpecification
+         * @return desired time of the next update, in milliseconds. -1 indicates never.
+         * @throws Exception catch-all Exception
          */
         public Long call(
                 CoherenceSpecification coherence )
             throws
                 Exception
         {
-            if( log.isDebugEnabled() ) {
-                log.debug( this + ".call( " + coherence + " )" );
+            if( log.isInfoEnabled() ) {
+                log.info( this + ".call( " + coherence + " )" );
             }
             
             ScheduledExecutorProbeManager belongsTo = theBelongsTo.get();
@@ -290,9 +299,9 @@ public abstract class ScheduledExecutorProbeManager
 
         /**
          * The ScheduledExecutorProbeManager that this instance belogs to. This is a static
-         * class with a WeakReference in order to not get in the way of garbage collection.
+         * class with a Reference in order to not get in the way of garbage collection.
          */
-        protected WeakReference<ScheduledExecutorProbeManager> theBelongsTo;
+        protected Reference<ScheduledExecutorProbeManager> theBelongsTo;
 
         /**
          * The NetMeshBaseIdentifier of the ShadowMeshBase to call. This allows the garbage collection

@@ -22,7 +22,7 @@ import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 
 import org.infogrid.meshbase.transaction.CannotApplyChangeException;
 import org.infogrid.meshbase.transaction.MeshObjectPropertyChangeEvent;
@@ -182,14 +182,16 @@ public class NetMeshObjectPropertyChangeEvent
      * current Thread.</p>
      *
      * @param base the NetMeshBase in which to apply the NetChange
+     * @param incomingProxy the Proxy through which this NetChange was received
      * @return the NetMeshObject to which the NetChange was applied
      * @throws CannotApplyChangeException thrown if the NetChange could not be applied, e.g because
      *         the affected NetMeshObject did not exist in MeshBase base
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
-    public NetMeshObject applyToReplicaIn(
-            NetMeshBase base )
+    public NetMeshObject potentiallyApplyToReplicaIn(
+            NetMeshBase base,
+            Proxy       incomingProxy )
         throws
             CannotApplyChangeException,
             TransactionException
@@ -199,18 +201,20 @@ public class NetMeshObjectPropertyChangeEvent
         Transaction tx = null;
 
         try {
-            tx = base.createTransactionNowIfNeeded();
-
             NetMeshObject otherObject = (NetMeshObject) getSource();
+            if( otherObject != null && incomingProxy == otherObject.getProxyTowardsLockReplica() ) {
 
-            PropertyType  affectedProperty = getProperty();
-            PropertyValue newValue         = getNewValue();
-            long          updateTime       = getTimeEventOccurred();
+                tx = base.createTransactionNowIfNeeded();
 
-            otherObject.rippleSetPropertyValues(
-                    new PropertyType []  { affectedProperty },
-                    new PropertyValue [] { newValue } );
+                PropertyType  affectedProperty = getProperty();
+                PropertyValue newValue         = getNewValue();
+                long          updateTime       = getTimeEventOccurred();
 
+                otherObject.rippleSetPropertyValues(
+                        new PropertyType []  { affectedProperty },
+                        new PropertyValue [] { newValue },
+                        getTimeEventOccurred() );
+            }
             return otherObject;
 
         } catch( TransactionException ex ) {

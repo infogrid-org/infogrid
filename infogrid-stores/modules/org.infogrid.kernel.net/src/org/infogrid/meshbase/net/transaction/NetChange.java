@@ -18,7 +18,7 @@ import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.transaction.CannotApplyChangeException;
 import org.infogrid.meshbase.transaction.Change;
 import org.infogrid.meshbase.transaction.TransactionException;
@@ -27,10 +27,10 @@ import org.infogrid.meshbase.transaction.TransactionException;
  * Extends Change to cover the NetMeshBase use cases, and return the more specific
  * subtypes.
  * 
- * @param S the type of the event source
- * @param SID the type of the identifier of the event source
- * @param V the type of the value
- * @param VID the type of the identifier of the value
+ * @param <S> the type of the event source
+ * @param <SID> the type of the identifier of the event source
+ * @param <V> the type of the value
+ * @param <VID> the type of the identifier of the value
  */
 public interface NetChange<S,SID,V,VID>
         extends
@@ -60,14 +60,16 @@ public interface NetChange<S,SID,V,VID>
      * current Thread.</p>
      *
      * @param base the NetMeshBase in which to apply the NetChange
+     * @param incomingProxy the Proxy through which this NetChange was received
      * @return the NetMeshObject to which the NetChange was applied
      * @throws CannotApplyChangeException thrown if the NetChange could not be applied, e.g because
      *         the affected NetMeshObject did not exist in MeshBase base
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
-    public NetMeshObject applyToReplicaIn(
-            NetMeshBase base )
+    public NetMeshObject potentiallyApplyToReplicaIn(
+            NetMeshBase base,
+            Proxy       incomingProxy )
         throws
             CannotApplyChangeException,
             TransactionException;

@@ -26,8 +26,9 @@ import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.a.DefaultAnetMeshObjectIdentifierFactory;
+import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.store.net.StoreProxyManager;
 
@@ -36,14 +37,14 @@ import org.infogrid.modelbase.ModelBase;
 import org.infogrid.net.NetMessageEndpointFactory;
 
 import org.infogrid.probe.ProbeDirectory;
-import org.infogrid.probe.shadow.DefaultShadowProxyFactory;
+import org.infogrid.probe.shadow.proxy.DefaultShadowProxyFactory;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowMeshBase;
 import org.infogrid.probe.shadow.a.AShadowMeshBase;
 
+import org.infogrid.probe.shadow.proxy.DefaultShadowProxyPolicyFactory;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.util.IterableStoreBackedMap;
 
-import org.infogrid.util.CachingMap;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.MCachingHashMap;
@@ -61,8 +62,8 @@ public class StoreShadowMeshBase
     private static final Log log = Log.getLogInstance( StoreShadowMeshBase.class ); // our own, private logger
 
     /**
-      * Factory method.
-      *
+     * Factory method.
+     *
      * @param identifier the MeshBaseIdentifier of this MeshBase
      * @param modelBase the ModelBase containing type information
      * @param accessMgr the AccessManager that controls access to this MeshBase
@@ -76,7 +77,7 @@ public class StoreShadowMeshBase
      *         If this is 0, it will expire immediately after the first Probe run, before the caller returns, which is probably
      *         not very useful.
      * @param context the Context in which this MeshBase runs.
-      */
+     */
     public static StoreShadowMeshBase create(
             NetMeshBaseIdentifier     identifier,
             NetMessageEndpointFactory endpointFactory,
@@ -87,7 +88,50 @@ public class StoreShadowMeshBase
             IterableStore             proxyStore,
             Context                   context )
     {
-        DefaultShadowProxyFactory   proxyFactory   = DefaultShadowProxyFactory.create( endpointFactory );
+        DefaultShadowProxyPolicyFactory proxyPolicyFactory = DefaultShadowProxyPolicyFactory.create();
+
+        StoreShadowMeshBase ret = create(
+                identifier,
+                endpointFactory,
+                proxyPolicyFactory,
+                modelBase,
+                accessMgr,
+                directory,
+                timeNotNeededTillExpires,
+                proxyStore,
+                context );
+        return ret;
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param identifier the MeshBaseIdentifier of this MeshBase
+     * @param modelBase the ModelBase containing type information
+     * @param accessMgr the AccessManager that controls access to this MeshBase
+     * @param proxyManager the ProxyManager for this NetMeshBase
+     * @param placeholderProxyManager the ProxyManager for the placeholder Proxies (for forward references only)
+     * @param directory the ProbeDirectory to use
+     * @param shadowStore the Store into which the ShadowMeshBase's MeshObjects are written
+     * @param shadowStoreEntryKey the key that identifies the location in the ShadowStore for the bulk MeshObjects
+     * @param timeNotNeededTillExpires the time, in milliseconds, that this MShadowMeshBase will continue operating
+     *         even if none of its MeshObjects are replicated to another NetMeshBase. If this is negative, it means "forever".
+     *         If this is 0, it will expire immediately after the first Probe run, before the caller returns, which is probably
+     *         not very useful.
+     * @param context the Context in which this MeshBase runs.
+     */
+    public static StoreShadowMeshBase create(
+            NetMeshBaseIdentifier     identifier,
+            NetMessageEndpointFactory endpointFactory,
+            ProxyPolicyFactory        proxyPolicyFactory,
+            ModelBase                 modelBase,
+            NetAccessManager          accessMgr,
+            ProbeDirectory            directory,
+            long                      timeNotNeededTillExpires,
+            IterableStore             proxyStore,
+            Context                   context )
+    {
+        DefaultShadowProxyFactory   proxyFactory   = DefaultShadowProxyFactory.create( endpointFactory, proxyPolicyFactory );
         ShadowStoreProxyEntryMapper theProxyMapper = new ShadowStoreProxyEntryMapper( proxyFactory );
         
         MCachingHashMap<MeshObjectIdentifier,MeshObject>    objectStorage = MCachingHashMap.create();
@@ -95,14 +139,16 @@ public class StoreShadowMeshBase
 
         StoreProxyManager proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
 
-        NetMeshObjectIdentifierFactory identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( identifier );
-        ImmutableMMeshObjectSetFactory setFactory        = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
+        NetMeshObjectIdentifierFactory      identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( identifier );
+        ImmutableMMeshObjectSetFactory      setFactory        = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
+        StoreShadowMeshBaseLifecycleManager life              = StoreShadowMeshBaseLifecycleManager.create();
 
         StoreShadowMeshBase ret = new StoreShadowMeshBase(
                 identifier,
                 identifierFactory,
                 setFactory,
                 modelBase,
+                life,
                 accessMgr,
                 objectStorage,
                 proxyManager,
@@ -131,6 +177,7 @@ public class StoreShadowMeshBase
             NetMeshBaseIdentifier      identifier,
             ExternalizedShadowMeshBase externalized,
             NetMessageEndpointFactory  endpointFactory,
+            ProxyPolicyFactory         proxyPolicyFactory,
             ModelBase                  modelBase,
             NetAccessManager           accessMgr,
             ProbeDirectory             directory,
@@ -138,7 +185,7 @@ public class StoreShadowMeshBase
             IterableStore              proxyStore,
             Context                    c )
     {
-        DefaultShadowProxyFactory   proxyFactory   = DefaultShadowProxyFactory.create( endpointFactory );
+        DefaultShadowProxyFactory   proxyFactory   = DefaultShadowProxyFactory.create( endpointFactory, proxyPolicyFactory );
         ShadowStoreProxyEntryMapper theProxyMapper = new ShadowStoreProxyEntryMapper( proxyFactory );
 
         MCachingHashMap<MeshObjectIdentifier,MeshObject>    objectStorage = MCachingHashMap.create();
@@ -146,14 +193,16 @@ public class StoreShadowMeshBase
 
         StoreProxyManager proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
 
-        NetMeshObjectIdentifierFactory identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( identifier );
-        ImmutableMMeshObjectSetFactory setFactory        = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
+        NetMeshObjectIdentifierFactory      identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( identifier );
+        ImmutableMMeshObjectSetFactory      setFactory        = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
+        StoreShadowMeshBaseLifecycleManager life              = StoreShadowMeshBaseLifecycleManager.create();
 
         StoreShadowMeshBase ret = new StoreShadowMeshBase(
                 identifier,
                 identifierFactory,
                 setFactory,
                 modelBase,
+                life,
                 accessMgr,
                 objectStorage,
                 proxyManager,
@@ -165,8 +214,6 @@ public class StoreShadowMeshBase
         setFactory.setMeshBase( ret );
         proxyFactory.setNetMeshBase( ret );
         theProxyMapper.setMeshBase( ret );
-
-        StoreShadowMeshBaseLifecycleManager life = ret.getMeshBaseLifecycleManager();
 
         // cannot restore the Proxies here, we don't have the data
 
@@ -209,6 +256,7 @@ public class StoreShadowMeshBase
             NetMeshObjectIdentifierFactory              identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            StoreShadowMeshBaseLifecycleManager         life,
             NetAccessManager                            accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             StoreProxyManager                           proxyManager,
@@ -221,6 +269,7 @@ public class StoreShadowMeshBase
                 identifierFactory,
                 setFactory,
                 modelBase,
+                life,
                 accessMgr,
                 cache,
                 proxyManager,
@@ -236,11 +285,8 @@ public class StoreShadowMeshBase
      * @return a MeshBaseLifecycleManager that works on this MeshBase with the specified parameters
      */
     @Override
-    public synchronized StoreShadowMeshBaseLifecycleManager getMeshBaseLifecycleManager()
+    public StoreShadowMeshBaseLifecycleManager getMeshBaseLifecycleManager()
     {
-        if( theMeshBaseLifecycleManager == null ) {
-            theMeshBaseLifecycleManager = new StoreShadowMeshBaseLifecycleManager( this );
-        }
         return (StoreShadowMeshBaseLifecycleManager) theMeshBaseLifecycleManager;
     }
     

@@ -14,38 +14,6 @@
 
 package org.infogrid.meshworld.net;
 
-import org.infogrid.context.SimpleContext;
-
-import org.infogrid.jee.app.InfoGridWebApp;
-
-import org.infogrid.meshbase.MeshBaseIdentifier;
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.local.store.IterableLocalNetStoreMeshBase;
-import org.infogrid.meshbase.net.security.NetAccessManager;
-
-import org.infogrid.modelbase.ModelBase;
-import org.infogrid.modelbase.ModelBaseSingleton;
-
-import org.infogrid.module.Module;
-import org.infogrid.module.ModuleRegistry;
-import org.infogrid.module.ModuleRequirement;
-import org.infogrid.module.SoftwareInstallation;
-import org.infogrid.module.servlet.ServletBootLoader;
-
-import org.infogrid.probe.ProbeDirectory;
-import org.infogrid.probe.m.MProbeDirectory;
-
-import org.infogrid.store.sql.SqlStore;
-
-import org.infogrid.util.NameServer;
-import org.infogrid.util.ResourceHelper;
-import org.infogrid.util.logging.Log;
-import org.infogrid.util.logging.log4j.Log4jLog;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
 import java.io.BufferedInputStream;
 import java.net.URISyntaxException;
 import java.util.Locale;
@@ -53,10 +21,33 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+import org.infogrid.context.SimpleContext;
+import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.security.FormTokenService;
 import org.infogrid.jee.security.StoreFormTokenService;
 import org.infogrid.jee.viewlet.templates.DefaultStructuredResponseTemplateFactory;
+import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.local.store.IterableLocalNetStoreMeshBase;
+import org.infogrid.meshbase.net.security.NetAccessManager;
+import org.infogrid.modelbase.ModelBase;
+import org.infogrid.modelbase.ModelBaseSingleton;
+import org.infogrid.module.Module;
+import org.infogrid.module.ModuleRegistry;
+import org.infogrid.module.ModuleRequirement;
+import org.infogrid.module.SoftwareInstallation;
+import org.infogrid.module.servlet.ServletBootLoader;
+import org.infogrid.probe.ProbeDirectory;
+import org.infogrid.probe.m.MProbeDirectory;
+import org.infogrid.store.sql.SqlStore;
+import org.infogrid.util.NameServer;
+import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.logging.Log;
+import org.infogrid.util.logging.log4j.Log4jLog;
 
 /**
  * NetMeshWorldApp application class.
@@ -70,7 +61,10 @@ public class NetMeshWorldApp
     /**
      * Factory method.
      *
-     * @param defaultMeshBaseIdentifier the MeshBaseIdentifier of the default MeshBase
+     * @param defaultMeshBaseIdentifier String form of tthe NetMeshBaseIdentifier of the default NetMeshBase
+     * @return the created NetMeshWorldApp
+     * @throws NamingException thrown if a JNDI problem occurred
+     * @throws URISyntaxException thrown if the defaultMeshBaseIdentifier could not be parsed
      */
     public static NetMeshWorldApp create(
             String defaultMeshBaseIdentifier )
@@ -194,7 +188,9 @@ public class NetMeshWorldApp
     /**
      * Constructor, to be invoked by factory method only.
      *
-     * @param meshBase the main MeshBase of the application
+     * @param mainMeshBase the main MeshBase of the application
+     * @param meshBaseNameServer the NameServer mapping NetMeshBaseIdentifiers to NetMeshBases, such as ShadowMeshBases
+     * @param formTokenService the FormTokenService to use
      * @param applicationContext the main application Context
      */
     @SuppressWarnings(value={"unchecked"})
