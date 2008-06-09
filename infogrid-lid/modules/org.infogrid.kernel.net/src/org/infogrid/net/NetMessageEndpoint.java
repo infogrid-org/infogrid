@@ -31,7 +31,7 @@ public interface NetMessageEndpoint
     /**
      * Determine the NetMeshBaseIdentifier of the partner MeshBase.
      * 
-     * @return the NNetMeshBaseIdentifierof the partner MeshBase
+     * @return the NetMeshBaseIdentifier of the partner MeshBase
      */
     public abstract NetMeshBaseIdentifier getNetworkIdentifierOfPartner();
 

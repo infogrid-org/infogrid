@@ -14,10 +14,10 @@
 
 package org.infogrid.meshbase.net.externalized;
 
-import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-
 import java.util.List;
+import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 
 /**
  *
@@ -90,6 +90,17 @@ public class ParserFriendlyExternalizedProxy
             NetMeshBaseIdentifier newValue )
     {
         theNetworkIdentifierOfPartner = newValue;
+    }
+
+    /**
+     * Set the CoherenceSpecification used by this Proxy.
+     * 
+     * @param newValue the new value
+     */
+    public void setCoherenceSpecification(
+            CoherenceSpecification newValue )
+    {
+        theCoherenceSpecification = newValue;
     }
 
     /**

@@ -35,6 +35,7 @@ import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowMeshBase;
 
+import org.infogrid.probe.shadow.proxy.DefaultShadowProxyPolicyFactory;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.prefixing.IterablePrefixingStore;
 
@@ -132,12 +133,14 @@ public class StoreShadowMeshBaseFactory
         throws
             FactoryException
     {
-        IterablePrefixingStore thisProxyStore = IterablePrefixingStore.create( key.toExternalForm(), theShadowProxyStore );
+        IterablePrefixingStore          thisProxyStore     = IterablePrefixingStore.create( key.toExternalForm(), theShadowProxyStore );
+        DefaultShadowProxyPolicyFactory proxyPolicyFactory = DefaultShadowProxyPolicyFactory.create();
 
         ShadowMeshBase ret = StoreShadowMeshBase.restore(
                 key,
                 externalized,
                 theEndpointFactory,
+                proxyPolicyFactory,
                 theModelBase,
                 null,
                 theProbeDirectory,

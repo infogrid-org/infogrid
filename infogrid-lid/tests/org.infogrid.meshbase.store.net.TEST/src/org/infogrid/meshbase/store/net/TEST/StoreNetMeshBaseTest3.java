@@ -14,14 +14,17 @@
 
 package org.infogrid.meshbase.store.net.TEST;
 
+import java.lang.ref.WeakReference;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.a.AnetMeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.store.net.NetStoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
@@ -32,9 +35,6 @@ import org.infogrid.store.prefixing.IterablePrefixingStore;
 import org.infogrid.util.MNameServer;
 import org.infogrid.util.WritableNameServer;
 import org.infogrid.util.logging.Log;
-
-import java.lang.ref.WeakReference;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * More complex test to make sure that replication info is written correctly into the Store.
@@ -113,6 +113,10 @@ public class StoreNetMeshBaseTest3
         checkEquals( mb2MeshStore.size(),  1, "Wrong number of entries in mb2MeshStore" );
         checkEquals( mb2ProxyStore.size(), 0, "Wrong number of entries in mb2ProxyStore" );
 
+        checkEquals( ((AnetMeshObject)obj1_mb1).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj2_mb1).getInternalNeighborList().length, 2, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj3_mb1).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+
         //
 
         log.info( "replicating first object" );
@@ -121,6 +125,7 @@ public class StoreNetMeshBaseTest3
                 obj1_mb1.getIdentifier() );
 
         log.info( "checking on first replication" );
+
         checkObject( obj1_mb2, "accessLocally() did not work" );
         checkTypesReplication(      obj1_mb1, obj1_mb2, "accessLocally() types replication didn't work" );
         checkPropertiesReplication( obj1_mb1, obj1_mb2, "accessLocally() properties replication didn't work" );
@@ -136,6 +141,17 @@ public class StoreNetMeshBaseTest3
         checkEquals( mb2MeshStore.size(),  2, "Wrong number of entries in mb2MeshStore" );
         checkEquals( mb2ProxyStore.size(), 1, "Wrong number of entries in mb2ProxyStore" );
 
+        checkEquals( ((AnetMeshObject)obj1_mb1).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj2_mb1).getInternalNeighborList().length, 2, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj3_mb1).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj1_mb2).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        
+        NetMeshObject obj2_mb2   = mb2.findMeshObjectByIdentifier( obj2Name );
+        checkCondition( obj2_mb2 == null, "obj2 should not be here yet" );
+
+        NetMeshObject obj3_mb2   = mb2.findMeshObjectByIdentifier( obj3Name );
+        checkCondition( obj3_mb2 == null, "obj3 should not be here yet" );
+
         //
 
         log.info( "traverse from replicated object 1" );
@@ -146,7 +162,7 @@ public class StoreNetMeshBaseTest3
         //
 
         log.info( "checking replicated object 2" );
-        NetMeshObject obj2_mb2 = (NetMeshObject) replicaSet.getSingleMember();
+        obj2_mb2 = (NetMeshObject) replicaSet.getSingleMember();
         checkTypesReplication(      obj2_mb1, obj2_mb2, "destination MeshObject types replication didn't work" );
         checkPropertiesReplication( obj2_mb1, obj2_mb2, "destination MeshObject properties replication didn't work" );
 
@@ -162,6 +178,12 @@ public class StoreNetMeshBaseTest3
         checkEquals( mb2MeshStore.size(),  3, "Wrong number of entries in mb2MeshStore" );
         checkEquals( mb2ProxyStore.size(), 1, "Wrong number of entries in mb2ProxyStore" );
 
+        checkEquals( ((AnetMeshObject)obj1_mb1).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj2_mb1).getInternalNeighborList().length, 2, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj3_mb1).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj1_mb2).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj2_mb2).getInternalNeighborList().length, 2, "Wrong number of internal neighbors" );
+
         //
 
         log.info( "traverse from replicated object 2" );
@@ -172,7 +194,7 @@ public class StoreNetMeshBaseTest3
         //
 
         log.info( "checking replicated object 3" );
-        NetMeshObject obj3_mb2 = (NetMeshObject) replicaSet.getSingleMember();
+        obj3_mb2 = (NetMeshObject) replicaSet.getSingleMember();
         checkTypesReplication(      obj3_mb1, obj3_mb2, "destination MeshObject types replication didn't work" );
         checkPropertiesReplication( obj3_mb1, obj3_mb2, "destination MeshObject properties replication didn't work" );
 
@@ -187,6 +209,13 @@ public class StoreNetMeshBaseTest3
         checkEquals( mb1ProxyStore.size(), 1, "Wrong number of entries in mb1ProxyStore" );
         checkEquals( mb2MeshStore.size(),  4, "Wrong number of entries in mb2MeshStore" );
         checkEquals( mb2ProxyStore.size(), 1, "Wrong number of entries in mb2ProxyStore" );
+
+        checkEquals( ((AnetMeshObject)obj1_mb1).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj2_mb1).getInternalNeighborList().length, 2, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj3_mb1).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj1_mb2).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj2_mb2).getInternalNeighborList().length, 2, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj3_mb2).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
 
         //
 
@@ -248,6 +277,13 @@ public class StoreNetMeshBaseTest3
         checkObject( obj1_mb2, "obj1_mb2 not found" );
         checkObject( obj2_mb2, "obj2_mb2 not found" );
         checkObject( obj3_mb2, "obj3_mb2 not found" );
+
+        checkEquals( ((AnetMeshObject)obj1_mb1).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj2_mb1).getInternalNeighborList().length, 2, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj3_mb1).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj1_mb2).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj2_mb2).getInternalNeighborList().length, 2, "Wrong number of internal neighbors" );
+        checkEquals( ((AnetMeshObject)obj3_mb2).getInternalNeighborList().length, 1, "Wrong number of internal neighbors" );
 
         //
         

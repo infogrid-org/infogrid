@@ -18,7 +18,7 @@ import org.infogrid.jee.viewlet.AbstractCursorIterableViewlet;
 
 import org.infogrid.context.Context;
 
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.viewlet.AbstractViewedMeshObjects;
 import org.infogrid.viewlet.DefaultViewedMeshObjects;
 

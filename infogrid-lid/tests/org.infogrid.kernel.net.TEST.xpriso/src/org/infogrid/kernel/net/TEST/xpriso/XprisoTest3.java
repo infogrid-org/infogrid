@@ -149,10 +149,11 @@ public class XprisoTest3
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception all kinds of things can happen in a test
+     */
     public XprisoTest3(
             String [] args )
         throws
@@ -195,12 +196,12 @@ public class XprisoTest3
     /**
      * The first NetMeshBase.
      */
-    protected NetMeshBase mb1;
+    protected NetMMeshBase mb1;
 
     /**
      * The second NetMeshBase.
      */
-    protected NetMeshBase mb2;
+    protected NetMMeshBase mb2;
 
     /**
      * Our ThreadPool.

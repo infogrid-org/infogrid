@@ -16,7 +16,7 @@ package org.infogrid.jee.taglib.net;
 
 import org.infogrid.jee.taglib.InfoGridJspUtils;
 
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 
 import org.infogrid.util.text.StringRepresentation;
 

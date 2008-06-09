@@ -16,8 +16,8 @@ package org.infogrid.jee.servlet;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Map;
 import javax.servlet.GenericServlet;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -44,8 +44,6 @@ import org.infogrid.util.logging.Log;
 import org.infogrid.viewlet.CannotViewException;
 import org.infogrid.viewlet.MeshObjectsToView;
 
-
-
 /**
  * <p>Main JeeViewlet dispatcher to determine the REST subject, the best JeeViewlet, and
  *    the best available localization.</p>
@@ -55,7 +53,8 @@ public class ViewletDispatcherServlet
         extends
             GenericServlet
 {
-    private static final Log log = Log.getLogInstance( ViewletDispatcherServlet.class ); // our own, private logger
+    private static final Log  log              = Log.getLogInstance( ViewletDispatcherServlet.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Main servlet method.
@@ -102,8 +101,12 @@ public class ViewletDispatcherServlet
     /**
      * Do the work. This may be overridden by subclasses.
      *
-     * @param request the incoming request
-     * @param response the outgoing response
+     * @param restful the incoming RESTful request
+     * @param structured the outgoing structured response
+     * @throws MeshObjectAccessException thrown if one or more MeshObjects could not be accessed
+     * @throws CannotViewException thrown if a Viewlet could not view the requested MeshObjects
+     * @throws URISyntaxException thrown if a URI parsing error occurred
+     * @throws NotPermittedException thrown if an attempted operation was not permitted
      * @throws ServletException thrown if an error occurred
      * @throws IOException thrown if an I/O error occurred
      */
@@ -115,23 +118,12 @@ public class ViewletDispatcherServlet
             CannotViewException,
             URISyntaxException,
             NotPermittedException,
-            IllegalArgumentException,
             ServletException,
             IOException
     {
-        InfoGridWebApp       app               = InfoGridWebApp.getSingleton();
-        MeshObject           subject           = restful.determineRequestedMeshObject();
-        MeshObjectIdentifier subjectIdentifier = restful.determineRequestedMeshObjectIdentifier();
-        String               viewletClassName  = restful.getRequestedViewletClassName();
-        String               traversalString   = restful.getRequestedTraversal();
-        TraversalDictionary  traversalDict     = app.getTraversalDictionary();
-
-        TraversalSpecification traversal = ( traversalDict != null ) ? traversalDict.translate( subject, traversalString ) : null;
-        MeshObjectsToView      toView    = MeshObjectsToView.create( subject, null, viewletClassName, null, traversal );
-
-        if( subject == null ) {
-            throw new CannotViewException.NoSubject( subjectIdentifier );
-        }
+        InfoGridWebApp    app     = InfoGridWebApp.getSingleton();
+        MeshObject        subject = restful.determineRequestedMeshObject();
+        MeshObjectsToView toView  = createMeshObjectsToView( restful, app.getTraversalDictionary() );
 
         Context        c              = app.getApplicationContext();
         JeeViewlet     viewlet        = null;
@@ -233,6 +225,47 @@ public class ViewletDispatcherServlet
                 lidRequest,
                 context,
                 defaultMeshBaseIdentifier );
+        return ret;
+    }
+
+    /**
+     * Create a MeshObjectsToView object. This can be overridden by subclasses.
+     * 
+     * @param restful the incoming RESTful request
+     * @param traversalDict the TraversalDictionary to use
+     * @return the created MeshObjectsToView
+     * @throws MeshObjectAccessException thrown if one or more MeshObjects could not be accessed
+     * @throws CannotViewException thrown if a Viewlet could not view the requested MeshObjects
+     * @throws URISyntaxException thrown if a URI parsing error occurred
+     * @throws NotPermittedException thrown if an attempted operation was not permitted
+     */
+    protected MeshObjectsToView createMeshObjectsToView(
+            RestfulRequest       restful,
+            TraversalDictionary  traversalDict )
+        throws
+            MeshObjectAccessException,
+            CannotViewException,
+            URISyntaxException,
+            NotPermittedException
+    {
+        MeshObject           subject           = restful.determineRequestedMeshObject();
+        MeshObjectIdentifier subjectIdentifier = restful.determineRequestedMeshObjectIdentifier();
+        String               viewletClassName  = restful.getRequestedViewletClassName();
+        String               traversalString   = restful.getRequestedTraversal();
+
+        if( subject == null ) {
+            throw new CannotViewException.NoSubject( subjectIdentifier );
+        }
+
+        TraversalSpecification traversal   = ( traversalDict != null ) ? traversalDict.translate( subject, traversalString ) : null;
+        Map<String,Object>     viewletPars = null;
+        
+        MeshObjectsToView ret = MeshObjectsToView.create(
+                subject,
+                null,
+                viewletClassName,
+                viewletPars,
+                traversal );
         return ret;
     }
 }

@@ -14,11 +14,16 @@
 
 package org.infogrid.probe.TEST;
 
+import java.util.Iterator;
 import org.infogrid.context.Context;
 import org.infogrid.context.SimpleContext;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.IterableMeshBase;
 import org.infogrid.meshbase.net.IterableNetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.transaction.Change;
 import org.infogrid.meshbase.transaction.ChangeSet;
 import org.infogrid.model.primitives.EntityType;
@@ -27,8 +32,6 @@ import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.logging.Log;
-
-import java.util.Iterator;
 
 /**
  * Provides functionality useful for ProbeTests.
@@ -71,14 +74,14 @@ public abstract class AbstractProbeTest
      * @param mylog if given, log the found objects there
      * @return the number of Objects found
      */
-    public static <T> int countFromIterator(
-            Iterator<T> iter,
+    public static int countFromIterator(
+            Iterator<?> iter,
             Log         mylog )
     {
         int ret = 0;
         StringBuilder buf = new StringBuilder(); // do this instead of logging directly, that way we don't changing the threading behavior
         while( iter.hasNext() ) {
-            T current = iter.next();
+            Object current = iter.next();
 
             ++ret;
             buf.append( "found " + current );
@@ -157,6 +160,104 @@ public abstract class AbstractProbeTest
         }
     }
 
+    /**
+     * Check the position of the Proxies.
+     *
+     * @param obj the NetMeshObject whose proxies are checked
+     * @param proxiesTowards the NetMeshBases to which the proxies are supposed to be pointing
+     * @param proxyTowardHome the NetMeshBase towards which the proxyTowardHome is supposed to be pointing, or null
+     * @param proxyTowardLock the NetMeshBase towards which the proxyTowardsLock is supposed to be pointing, or null
+     * @param msg the message to print when the proxies are not correct
+     * @return true if check passed
+     */
+    protected boolean checkProxies(
+            NetMeshObject  obj,
+            NetMeshBase [] proxiesTowards,
+            NetMeshBase    proxyTowardHome,
+            NetMeshBase    proxyTowardLock,
+            String         msg )
+    {
+        boolean ret = true;
+        
+        if( obj == null ) {
+            reportError( "Cannot check proxies of null object" );
+            return false;
+        }
+        
+        Proxy [] proxies = obj.getAllProxies();
+
+        if( proxies == null || proxies.length == 0 ) {
+            if( !( proxiesTowards == null || proxiesTowards.length == 0 )) {
+                reportError( msg + ": object has no proxies, should have " + proxiesTowards.length + ": " + obj.getIdentifier().toExternalForm() );
+                return false;
+            } else {
+                return true; // no proxies is correct
+            }
+        } else if( proxiesTowards == null || proxiesTowards.length == 0 ) {
+            reportError( msg + ": object has " + proxies.length + " proxies, should have none: " + obj.getIdentifier().toExternalForm() );
+            return false;
+        }
+        if( proxies.length != proxiesTowards.length ) {
+            reportError( msg + ": object has wrong number of proxies. Should have " + proxiesTowards.length + ", does have " + proxies.length );
+            ret = false;
+        }
+        
+        NetMeshBaseIdentifier [] proxiesIdentifiers        = new NetMeshBaseIdentifier[ proxies.length ];
+        NetMeshBaseIdentifier [] proxiesTowardsIdentifiers = new NetMeshBaseIdentifier[ proxiesTowards.length ];
+        for( int i=0 ; i<proxies.length ; ++i ) {
+            proxiesIdentifiers[i] = proxies[i].getPartnerMeshBaseIdentifier();
+        }
+        for( int i=0 ; i<proxiesTowards.length ; ++i ) {
+            proxiesTowardsIdentifiers[i] = proxiesTowards[i].getIdentifier();
+        }
+        if( !checkEqualsOutOfSequence( proxiesIdentifiers, proxiesTowardsIdentifiers, null )) {
+            StringBuilder buf = new StringBuilder();
+            buf.append( msg ).append( ": not the same content: " );
+            String sep = "{ ";
+            for( NetMeshBaseIdentifier current : proxiesIdentifiers ) {
+                buf.append( sep );
+                buf.append( current.toExternalForm() );
+                sep = ", ";
+            }
+            sep = " } vs. { ";
+            for( NetMeshBaseIdentifier current : proxiesTowardsIdentifiers ) {
+                buf.append( sep );
+                buf.append( current.toExternalForm() );
+                sep = ", ";
+            }
+            buf.append( " }" );
+            reportError( buf.toString() );
+        }
+
+        if( proxyTowardLock == null ) {
+            if( obj.getProxyTowardsLockReplica() != null ) {
+                reportError( msg + ": has proxyTowardsLock but should not: " + obj.getIdentifier().toExternalForm() );
+                ret = false;
+            }
+
+        } else if( obj.getProxyTowardsLockReplica() == null ) {
+            reportError( msg + ": does not have proxyTowardsLock but should: " + obj.getIdentifier().toExternalForm() );
+            ret = false;
+
+        } else {
+            ret &= checkEquals( proxyTowardLock.getIdentifier(), obj.getProxyTowardsLockReplica().getPartnerMeshBaseIdentifier(), msg + ": wrong proxyTowardLock" );
+        }
+        if( proxyTowardHome == null ) {
+            if( obj.getProxyTowardsHomeReplica() != null ) {
+                reportError( msg + ": has proxyTowardHome but should not: " + obj.getIdentifier().toExternalForm() );
+                ret = false;
+            }
+
+        } else if( obj.getProxyTowardsHomeReplica() == null ) {
+            reportError( msg + ": does not have proxyTowardHome but should: " + obj.getIdentifier().toExternalForm() );
+            ret = false;
+
+        } else {
+            ret &= checkEquals( proxyTowardHome.getIdentifier(), obj.getProxyTowardsHomeReplica().getPartnerMeshBaseIdentifier(), msg + ": wrong proxyTowardLock" );
+        }
+        return ret;
+    }
+    
     /**
      * The root context for these tests.
      */

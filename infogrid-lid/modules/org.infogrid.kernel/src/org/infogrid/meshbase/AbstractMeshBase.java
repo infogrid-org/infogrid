@@ -66,6 +66,7 @@ public abstract class AbstractMeshBase
      * @param identifierFactory the factory for MeshObjectIdentifiers appropriate for this MeshBase
      * @param setFactory the factory for MeshObjectSets appropriate for this MeshBase
      * @param modelBase the ModelBase containing type information
+     * @param life the MeshBaseLifecycleManager to use
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param cache the CachingMap that holds the MeshObjects in this MeshBase
      * @param context the Context in which this MeshBase runs
@@ -75,6 +76,7 @@ public abstract class AbstractMeshBase
             MeshObjectIdentifierFactory                 identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            AbstractMeshBaseLifecycleManager            life,
             AccessManager                               accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             Context                                     context )
@@ -83,9 +85,12 @@ public abstract class AbstractMeshBase
         this.theMeshObjectIdentifierFactory = identifierFactory;
         this.theMeshObjectSetFactory        = setFactory;
         this.theModelBase                   = modelBase;
+        this.theMeshBaseLifecycleManager    = life;
         this.theAccessManager               = accessMgr;
         this.theCache                       = cache;
         this.theContext                     = context;
+
+        this.theMeshBaseLifecycleManager.setMeshBase( this );
 
         QuitManager qm = getContext().findContextObject( QuitManager.class );
         if( qm != null ) {
@@ -418,6 +423,16 @@ public abstract class AbstractMeshBase
      {
          // no op
      }
+
+    /**
+     * <p>Obtain a manager for MeshObject lifecycles.</p>
+     * 
+     * @return a MeshBaseLifecycleManager that works on this MeshBase
+     */
+    public MeshBaseLifecycleManager getMeshBaseLifecycleManager()
+    {
+        return theMeshBaseLifecycleManager;
+    }
 
     /**
       * Obtain the ModelBase that contains the type descriptions
@@ -1255,6 +1270,11 @@ public abstract class AbstractMeshBase
       * The ModelBase containing the MeshTypes used by this MeshBase.
       */
     protected ModelBase theModelBase;
+
+    /**
+     * The lifecycle manager.
+     */
+    protected AbstractMeshBaseLifecycleManager theMeshBaseLifecycleManager;
 
     /**
      * The AccessManager that enforces access control, if any.

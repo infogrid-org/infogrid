@@ -54,44 +54,46 @@ public class ExternalizedNetMeshObjectXmlEncoder
      */
     public ExternalizedNetMeshObjectXmlEncoder()
     {
+        // no op
     }
 
     /**
-     * Factored out to make it easy for subclasses to add to the attributes list.
+     * Serialize the opening tag, to make it easy for subclasses to add to the attributes list.
      *
-     * @param theObject the AMeshObject to encode
-     * @param buf the StringBuffer to write to
+     * @param obj the AMeshObject to encode
+     * @param meshObjectTagName the XML top-level tag to use for this ExternalizedMeshObject
+     * @param buf the StringBuilder to which to append the ExternalizedMeshObject
      */
     @Override
     protected void encodeOpeningTag(
-            ExternalizedMeshObject theObject,
+            ExternalizedMeshObject obj,
             String                 meshObjectTagName,
             StringBuilder          buf )
     {
-        ExternalizedNetMeshObject realObject = (ExternalizedNetMeshObject) theObject;
+        ExternalizedNetMeshObject realObject = (ExternalizedNetMeshObject) obj;
         
         buf.append( "<" );
         buf.append( meshObjectTagName );
         buf.append( " " );
         buf.append( IDENTIFIER_TAG );
         buf.append( "=\"" );
-        appendIdentifier( theObject.getIdentifier(), buf );
+        appendIdentifier( obj.getIdentifier(), buf );
         buf.append( "\" " );
         buf.append( TIME_CREATED_TAG );
         buf.append( "=\"" );
-        appendLong( theObject.getTimeCreated(), buf );
+        appendLong( obj.getTimeCreated(), buf );
         buf.append( "\" " );
         buf.append( TIME_UPDATED_TAG );
         buf.append( "=\"" );
-        appendLong( theObject.getTimeUpdated(), buf );
+        appendLong( obj.getTimeUpdated(), buf );
         buf.append( "\" " );
         buf.append( TIME_READ_TAG );
         buf.append( "=\"" );
-        appendLong( theObject.getTimeRead(), buf );
+        appendLong( obj.getTimeRead(), buf );
         buf.append( "\" " );
         buf.append( TIME_EXPIRES_TAG );
         buf.append( "=\"" );
-        appendLong( theObject.getTimeExpires(), buf );
+        appendLong( obj.getTimeExpires(), buf );
         if( realObject.getGiveUpLock()) {
             buf.append( "\" " );
             buf.append( GIVE_UP_LOCK_TAG );
@@ -102,17 +104,17 @@ public class ExternalizedNetMeshObjectXmlEncoder
     }
 
     /**
-     * Hook to enable subclasses to add to the encoding defined on this level.
+     * Hook to enable subclasses to add to the encoding of an ExternalizedMeshObject.
      *
-     * @param theObject the MeshObject to encode
-     * @param buf the StringBuffer to add to
+     * @param obj the ExternalizedMeshObject to encode
+     * @param buf the StringBuilder to which to append the ExternalizedMeshObject
      */
     @Override
-    protected void subclassEncodingHook(
-            ExternalizedMeshObject theObject,
+    protected void appendExternalizedMeshObjectEncodingHook(
+            ExternalizedMeshObject obj,
             StringBuilder          buf )
     {
-        ExternalizedNetMeshObject realObject = (ExternalizedNetMeshObject) theObject;
+        ExternalizedNetMeshObject realObject = (ExternalizedNetMeshObject) obj;
 
         NetMeshBaseIdentifier [] proxyNames = realObject.getProxyIdentifiers();
         NetMeshBaseIdentifier    homeProxy  = realObject.getProxyTowardsHomeNetworkIdentifier();
@@ -160,7 +162,7 @@ public class ExternalizedNetMeshObjectXmlEncoder
      * @param path the NetMeshObjectAccessSpecification
      * @param buf the StringBuilder
      */
-    protected void appendNetworkPath(
+    protected void appendNetMeshObjectAccessSpecification(
             NetMeshObjectAccessSpecification path,
             StringBuilder                    buf )
     {
@@ -171,18 +173,18 @@ public class ExternalizedNetMeshObjectXmlEncoder
     }
 
     /**
-     * Deserialize an ExternalizedMeshObject from a byte stream.
-     *
-     * @param s the InputStream from which to read
-     * @param externalizedMeshObjectFactory the factory for ParserFriendlyExternalizedMeshObjects
-     * @param meshObjectIdentifierFactory the factory for MeshObjectIdentifiers
-     * @param meshTypeIdentifierFactory the factory for MeshTypeIdentifiers
-     * @return return the just-instantiated ExternalizedMeshObject
+     * Deserialize a ExternalizedNetMeshObject from a stream.
+     * 
+     * @param contentAsStream the byte [] stream in which the ExternalizedProxy is encoded
+     * @param externalizedMeshObjectFactory the factory to use for ExternalizedMeshObjects
+     * @param meshObjectIdentifierFactory the factory to use for MeshObjectIdentifier
+     * @param meshTypeIdentifierFactory the factory to use for MeshTypes
+     * @return return the just-instantiated ExternalizedNetMeshObject
      * @throws DecodingException thrown if a problem occurred during decoding
-     * @throws IOException thrown if a problem occurred during writing the output
+     * @throws IOException thrown if an I/O error occurred
      */
     public synchronized ExternalizedNetMeshObject decodeExternalizedMeshObject(
-            InputStream                                    s,
+            InputStream                                    contentAsStream,
             ParserFriendlyExternalizedNetMeshObjectFactory externalizedMeshObjectFactory,
             NetMeshObjectIdentifierFactory                 meshObjectIdentifierFactory,
             MeshTypeIdentifierFactory                      meshTypeIdentifierFactory )
@@ -191,18 +193,18 @@ public class ExternalizedNetMeshObjectXmlEncoder
             IOException
     {
         ExternalizedMeshObject ret = super.decodeExternalizedMeshObject(
-                s,
+                contentAsStream,
                 externalizedMeshObjectFactory,
                 meshObjectIdentifierFactory,
                 meshTypeIdentifierFactory );
 
         return (ExternalizedNetMeshObject) ret;
     }    
-    
+
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
@@ -230,9 +232,9 @@ public class ExternalizedNetMeshObjectXmlEncoder
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
@@ -269,13 +271,13 @@ public class ExternalizedNetMeshObjectXmlEncoder
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
-     * @throws SAXException thrown if a parsing error occurs
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void startElement3(
             String     namespaceURI,
@@ -289,12 +291,12 @@ public class ExternalizedNetMeshObjectXmlEncoder
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
-     * @throws SAXException thrown if a parsing error occurs
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected final void endElement2(
@@ -311,14 +313,14 @@ public class ExternalizedNetMeshObjectXmlEncoder
             endElement3( namespaceURI, localName, qName );
         }
     }
-    
+
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
-     * @throws SAXException thrown if a parsing error occurs
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void endElement3(
             String namespaceURI,

@@ -44,9 +44,10 @@ import java.net.URISyntaxException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import org.infogrid.meshbase.net.CoherenceSpecification;
 
 /**
- *
+ * Utility methods to encode/decode Proxies to/from XML. Implements the SAX interface.
  */
 public class ExternalizedProxyXmlEncoder
         extends
@@ -58,14 +59,23 @@ public class ExternalizedProxyXmlEncoder
     private static final Log log = Log.getLogInstance( ExternalizedProxyXmlEncoder.class ); // our own, private logger
 
     /**
+     * Constructor.
+     */
+    public ExternalizedProxyXmlEncoder()
+    {
+        // no op        
+    }
+
+    /**
      * Serialize an ExternalizedProxy to an OutputStream.
      * 
-     * @param obj the input ExternalizedProxy
-     * @param out the OutputStream to which to append the ExternalizedProxy
+     * @param value the ExternalizedProxy
+     * @param out the OutputStream to which to append the PropertyValue
      * @throws EncodingException thrown if a problem occurred during encoding
+     * @throws IOException thrown if an I/O error occurred
      */
     public void encodeExternalizedProxy(
-            ExternalizedProxy p,
+            ExternalizedProxy value,
             OutputStream      out )
         throws
             EncodingException,
@@ -73,7 +83,7 @@ public class ExternalizedProxyXmlEncoder
     {
         StringBuilder buf = new StringBuilder();
 
-        appendExternalizedProxy( p, buf );
+        appendExternalizedProxy( value, buf );
 
         OutputStreamWriter w = new OutputStreamWriter( out, ENCODING );
         w.write( buf.toString() );
@@ -81,10 +91,11 @@ public class ExternalizedProxyXmlEncoder
     }
 
     /**
-     * Encode an ExternalizedProxy.
+     * Serialize an ExternalizedProxy to a StringBuilder.
      * 
-     * @param value the input Proxy
-     * @param buf the StringBuilder to append to
+     * @param value the ExternalizedProxy
+     * @param buf the StringBuilder to which to append the ExternalizedProxy
+     * @throws EncodingException thrown if a problem occurred during encoding
      */
     public void appendExternalizedProxy(
             ExternalizedProxy value,
@@ -113,7 +124,7 @@ public class ExternalizedProxyXmlEncoder
         buf.append( "\"" );
         buf.append( ">\n" );
 
-        appendExternalizedProxyHook( value, buf );
+        appendExternalizedProxyEncodingHook( value, buf );
 
         buf.append( "  <" ).append( LAST_SENT_TOKEN_TAG     ).append( ">" );
         appendLong( value.getLastSentToken(), buf );
@@ -122,6 +133,12 @@ public class ExternalizedProxyXmlEncoder
         appendLong( value.getLastReceivedToken(), buf );
         buf.append( "</" ).append( LAST_RECEIVED_TOKEN_TAG ).append( ">\n" );
 
+        if( value.getCoherenceSpecification() != null ) {
+            buf.append( "  <" ).append( COHERENCE_SPECIFICATION_TAG ).append( ">" );
+            buf.append( value.getCoherenceSpecification().toExternalForm() ); // this might not be the best way of encoding this?
+            buf.append( "</" ).append( COHERENCE_SPECIFICATION_TAG     ).append( ">\n" );
+        }
+        
         buf.append( "  <" ).append( MESSAGES_TO_SEND_TAG ).append( ">\n" );
         Iterator<XprisoMessage> iter = value.messagesToBeSent().iterator();
         while( iter.hasNext() ) {
@@ -140,12 +157,13 @@ public class ExternalizedProxyXmlEncoder
     }        
 
     /**
-     * Enables subclasses to add information to an Proxy.
+     * Enable subclasses to add information when serializing the ExternalizedProxy.
      * 
-     * @param value the input Proxy
+     * @param value the ExternalizedProxy to be serialized
      * @param buf the StringBuilder to append to
+     * @throws EncodingException thrown if a problem occurred during encoding
      */
-    protected void appendExternalizedProxyHook(
+    protected void appendExternalizedProxyEncodingHook(
             ExternalizedProxy value,
             StringBuilder     buf )
         throws
@@ -155,13 +173,18 @@ public class ExternalizedProxyXmlEncoder
     }
 
     /**
-     * Deserialize an ExternalizedProxy from a byte stream.
-     *
-     * @param s the InputStream from which to read
+     * Deserialize a ExternalizedProxy from a stream.
+     * 
+     * @param contentAsStream the byte [] stream in which the ExternalizedProxy is encoded
+     * @param externalizedMeshObjectFactory the factory to use for ExternalizedMeshObjects
+     * @param meshObjectIdentifierFactory the factory to use for MeshObjectIdentifier
+     * @param meshTypeIdentifierFactory the factory to use for MeshTypes
+     * @return return the just-instantiated ExternalizedProxy
      * @throws DecodingException thrown if a problem occurred during decoding
+     * @throws IOException thrown if an I/O error occurred
      */
     public ExternalizedProxy decodeExternalizedProxy(
-            InputStream                                    s,
+            InputStream                                    contentAsStream,
             ParserFriendlyExternalizedNetMeshObjectFactory externalizedMeshObjectFactory,
             NetMeshObjectIdentifierFactory                 meshObjectIdentifierFactory,
             MeshTypeIdentifierFactory                      meshTypeIdentifierFactory )
@@ -169,12 +192,12 @@ public class ExternalizedProxyXmlEncoder
             DecodingException,
             IOException
     {
-        theExternalizedMeshObjectFactory = externalizedMeshObjectFactory; // note the synchronized statement
+        theExternalizedMeshObjectFactory = externalizedMeshObjectFactory;
         theMeshObjectIdentifierFactory   = meshObjectIdentifierFactory;
         theMeshTypeIdentifierFactory     = meshTypeIdentifierFactory;
 
         try {
-            theParser.parse( s, this );
+            theParser.parse( contentAsStream, this );
 
             return theProxyBeingParsed;
 
@@ -187,23 +210,13 @@ public class ExternalizedProxyXmlEncoder
     }
 
     /**
-     * Obtain an encodingId that reflects this ExternalizedProxyXmlEncoder.
-     * 
-     * @return the encodingId.
-     */
-    @Override
-    public String getEncodingId()
-    {
-        return getClass().getName();
-    }
-
-    /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void startElement4(
@@ -247,6 +260,8 @@ public class ExternalizedProxyXmlEncoder
             // no op
         } else if( LAST_RECEIVED_TOKEN_TAG.equals( qName )) {
             // no op
+        } else if( COHERENCE_SPECIFICATION_TAG.equals( qName )) {
+            // no op
         } else if( MESSAGES_TO_SEND_TAG.equals( qName )) {
             theMessagesBeingParsed = new ArrayList<XprisoMessage>();
 
@@ -257,14 +272,15 @@ public class ExternalizedProxyXmlEncoder
             startElement5( namespaceURI, localName, qName, attrs );
         }
     }
-    
+
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void startElement5(
             String     namespaceURI,
@@ -276,13 +292,14 @@ public class ExternalizedProxyXmlEncoder
     {
         log.error( "unknown qname " + qName );
     }
-    
+
     /**
-     * Override end-of-message handling.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void endElement3(
@@ -300,11 +317,12 @@ public class ExternalizedProxyXmlEncoder
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void endElement4(
@@ -323,6 +341,9 @@ public class ExternalizedProxyXmlEncoder
         } else if( LAST_RECEIVED_TOKEN_TAG.equals( qName )) {
             theProxyBeingParsed.setLastReceivedToken( parseLong( theCharacters.toString(), -1 ));
     
+        } else if( COHERENCE_SPECIFICATION_TAG.equals( qName )) {
+            theProxyBeingParsed.setCoherenceSpecification( CoherenceSpecification.fromExternalForm( theCharacters.toString() ));
+
         } else if( MESSAGES_TO_SEND_TAG.equals( qName )) {
             theProxyBeingParsed.setMessagesToSend( theMessagesBeingParsed );
             theMessagesBeingParsed = null;
@@ -337,11 +358,12 @@ public class ExternalizedProxyXmlEncoder
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void endElement5(
             String namespaceURI,
@@ -382,7 +404,7 @@ public class ExternalizedProxyXmlEncoder
     protected ParserFriendlyExternalizedProxy theProxyBeingParsed;
     
     /**
-     * The currently parsed list of XprisoMessages.
+     * The list of XprisoMessages currently being parsed.
      */
     protected ArrayList<XprisoMessage> theMessagesBeingParsed;
 }

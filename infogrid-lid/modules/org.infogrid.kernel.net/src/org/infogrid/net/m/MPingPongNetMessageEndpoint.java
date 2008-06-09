@@ -19,7 +19,7 @@ import org.infogrid.comm.pingpong.m.MPingPongMessageEndpoint;
 
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 
 import org.infogrid.net.NetMessageEndpoint;
@@ -169,7 +169,7 @@ public class MPingPongNetMessageEndpoint
     /**
      * Determine the NetMeshBaseIdentifier of the partner MeshBase.
      * 
-     * @return the NNetMeshBaseIdentifierof the partner MeshBase
+     * @return the NetMeshBaseIdentifier of the partner MeshBase
      */
     public NetMeshBaseIdentifier getNetworkIdentifierOfPartner()
     {

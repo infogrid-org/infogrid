@@ -15,7 +15,7 @@
 package org.infogrid.probe.xml;
 
 /**
- * The tags of the MeshObjectSetProbe representation.
+ * The tags used for the MeshObjectSetProbe XML format.
  */
 public interface MeshObjectSetProbeTags
 {

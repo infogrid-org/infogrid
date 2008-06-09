@@ -14,35 +14,30 @@
 
 package org.infogrid.meshbase.net.local.a;
 
+import java.util.Collection;
 import org.infogrid.context.Context;
-
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-
+import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-import org.infogrid.meshbase.net.Proxy;
-import org.infogrid.meshbase.net.ProxyManager;
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.a.AnetMeshBase;
+import org.infogrid.meshbase.net.a.AnetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.local.LocalNetMeshBase;
 import org.infogrid.meshbase.net.security.NetAccessManager;
-
 import org.infogrid.modelbase.ModelBase;
-
 import org.infogrid.probe.manager.ProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
-
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.NameServer;
 import org.infogrid.util.FactoryException;
 
-import java.util.Collection;
-import org.infogrid.mesh.set.MeshObjectSetFactory;
-
 /**
- * This NetMeshBase manages local ShadowMeshBases.
+ * This NetMeshBase manages local ShadowMeshBases, ie in the same address space.
  */
 public abstract class LocalAnetMeshBase
         extends
@@ -51,40 +46,43 @@ public abstract class LocalAnetMeshBase
             LocalNetMeshBase           
 {
     /**
-     * Constructor for subclasses only. This does not initialize content.
+     * Constructor for subclasses only.
      *
-     * @param identifier the MeshBaseIdentifier of this MeshBase
-     * @param identifierFactory the factory for MeshObjectIdentifiers appropriate for this MeshBase
+     * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
+     * @param identifierFactory the factory for NetMeshObjectIdentifiers appropriate for this NetMeshBase
+     * @param setFactory the factory for MeshObjectSets appropriate for this NetMeshBase
      * @param modelBase the ModelBase containing type information
-     * @param accessMgr the AccessManager that controls access to this MeshBase
-     * @param cache the CachingMap that holds the MeshObjects in this MeshBase
-     * @param proxyManager the ProxyManager for this NetMeshBase
+     * @param life the MeshBaseLifecycleManager to use
+     * @param accessMgr the AccessManager that controls access to this NetMeshBase
+     * @param cache the CachingMap that holds the NetMeshObjects in this NetMeshBase
+     * @param proxyManager the ProxyManager used by this NetMeshBase
      * @param probeManager the ProbeManager for this LocalNetMeshBase
-     * @param endpointFactory the MessageEndpointFactory to use for proxy communication
-     * @param context the Context in which this MeshBase runs.
+     * @param context the Context in which this NetMeshBase runs.
      */
     protected LocalAnetMeshBase(
             NetMeshBaseIdentifier                       identifier,
             NetMeshObjectIdentifierFactory              identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            AnetMeshBaseLifecycleManager                life,
             NetAccessManager                            accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             ProxyManager                                proxyManager,
             ProbeManager                                probeManager,
-            Context                                     c )
+            Context                                     context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, proxyManager, c );
+        super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, proxyManager, context );
         
         theProbeManager = probeManager;
     }
 
-    /**
-     * Obtain or create a Proxy to the specified NetMeshBaseIdentifier.
+     /**
+     * Obtain or create a Proxy for communication with a NetMeshBase at the specified NetMeshBaseIdentifier.
      * 
      * @param networkIdentifier the NetMeshBaseIdentifier
-     * @param coherence the CoherenceSpecification to use
+     * @param coherence the CoherenceSpecification to use, if any
      * @return the Proxy
+     * @throws FactoryException thrown if the Proxy could not be created
      */
     @Override
     public Proxy obtainProxyFor(
@@ -102,8 +100,10 @@ public abstract class LocalAnetMeshBase
     }
     
     /**
-     * Obtain a ShadowMeshBase that we are operating.
+     * Obtain an existing ShadowMeshBase operated by this LocalAnetMeshBase with the specified
+     * NetMeshBaseIdentifier. Return null if no such ShadowMeshBase exists. Do not attempt to create one.
      *
+     * @param networkId the NetMeshBaseIdentifier
      * @return the ShadowMeshBase, or null
      */
     public ShadowMeshBase getShadowMeshBaseFor(

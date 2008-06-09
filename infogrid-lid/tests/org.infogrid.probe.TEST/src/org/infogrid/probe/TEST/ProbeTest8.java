@@ -14,14 +14,18 @@
 
 package org.infogrid.probe.TEST;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
+import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.module.ModuleException;
 import org.infogrid.probe.ApiProbe;
@@ -29,16 +33,11 @@ import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.StagingMeshBaseLifecycleManager;
+import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.instrument.Breakpoint;
 import org.infogrid.util.instrument.InstrumentedThread;
 import org.infogrid.util.logging.Log;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import org.infogrid.probe.m.MProbeDirectory;
 
 /**
   * Tests multi-threaded behavior of Probes / Shadows.
@@ -48,7 +47,9 @@ public class ProbeTest8
         AbstractProbeTest
 {
     /**
-     * run the test
+     * Run the test.
+     * 
+     * @throws Exception all kinds of things can go wrong in tests
      */
     public void run()
         throws

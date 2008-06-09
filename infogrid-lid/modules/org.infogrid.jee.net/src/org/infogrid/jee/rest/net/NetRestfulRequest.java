@@ -19,7 +19,7 @@ import org.infogrid.jee.rest.RestfulRequest;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 
 /**
  * Encapsulates parameter parsing according to InfoGrid REST conventions.
