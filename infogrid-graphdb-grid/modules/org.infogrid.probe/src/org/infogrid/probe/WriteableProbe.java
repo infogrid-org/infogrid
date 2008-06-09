@@ -25,16 +25,20 @@ import java.io.IOException;
  * <p>This interface is supported by all Probes that can both
  *    read and write their data. This interface is supported in addition
  *    to whatever other subtype of Probe they support.</p>
- *
  * <p>The sequence of invocations is:</p>
  * <pre>
- *   constructor
+ *   Probe constructor
  *   for( one or more times ) {
  *       read( ... )
- *       wait for some period of time
+ *       wait for some period of time, depending on the CoherenceSpecification in effect
  *       write( ... )
  *   }
  * </pre>
+ * <p>This sequence may be repeated itself many times, even for the same data source:
+ * the Probe instance may be garbage collected in between. Garbage collection may also
+ * occur between the read and the write call.</p>
+ * <p>Note: Probes <b>must not</b> store persistent data in any place other than the
+ * MeshObjects that they instantiate.</p>
  */
 public interface WriteableProbe
         extends
@@ -45,20 +49,21 @@ public interface WriteableProbe
      * indicating that no changes need to be written, but the call is made anyway in order to
      * provide consistent invocation behavior.</p>
      * <p>Note: the MeshBase provided to this call is <i>different</i> from the MeshBase that
-     * is being passed into the readXXX call on the Probe instance invoked right after: for
+     * is being passed into the readXXX call on the Probe instance invoked right after. For
      * each Probe run, a fresh, empty StagingMeshBase is created (which by definition is empty
-     * except for the home object), while the StagingMeshBase provided to this call contains
+     * except for the Home Object), while the StagingMeshBase provided to this call contains
      * the content of the last Probe run, plus any modifications since.</p>
      *
-     * @param networkId the location of the data source to which we write
+     * @param dataSourceIdentifier identifies the data source that is being accessed
      * @param updateSet the set of changes to write, or null
-     * @param previousMeshBaseWithUpdates the StagingMeshBase in which the Changes have occurred.
+     * @param previousMeshBaseWithUpdates the StagingMeshBase from the previous run, in which the Changes have occurred.
+     *        Given the invocation sequence, notice that it is impossible that this null.
      * @throws ProbeException a Probe error occurred per the possible subclasses defined in ProbeException
      * @throws IOException an input/output error occurred during execution of the Probe
      * @throws ModuleException thrown if a Module required by the Probe could not be written
      */
     public void write(
-            NetMeshBaseIdentifier networkId,
+            NetMeshBaseIdentifier dataSourceIdentifier,
             ChangeSet             updateSet,
             StagingMeshBase       previousMeshBaseWithUpdates )
         throws

@@ -125,8 +125,6 @@ public class ProxySerializationTest1
                                 null,
                                 null,
                                 null,
-                                null,
-                                null,
                                 false )
                     },
                     null ),
@@ -162,8 +160,6 @@ public class ProxySerializationTest1
                                 null,
                                 null,
                                 null,
-                                null,
-                                null,
                                 false )
                     },
                     new SimpleXprisoMessage[] {
@@ -172,8 +168,6 @@ public class ProxySerializationTest1
                                 678,
                                 "http://testing.org/some/where",
                                 "http://testing.org/abcdef",
-                                null,
-                                null,
                                 null,
                                 null,
                                 null,
@@ -404,7 +398,6 @@ public class ProxySerializationTest1
                 NetMeshObjectIdentifier []           requestedCanceledObjects,
                 NetMeshObjectDeletedEvent []         deleteChanges,
                 long   []                            deleteUpdateTimes,
-                NetMeshObjectCreatedEvent []         creations,
                 ExternalizedNetMeshObject[]          conveyedMeshObjects,
                 NetMeshObjectNeighborAddedEvent []   neighborAdditions,
                 NetMeshObjectNeighborRemovedEvent [] neighborRemovals,
@@ -417,11 +410,12 @@ public class ProxySerializationTest1
                 NetMeshObjectIdentifier []           pushLockObjects,
                 NetMeshObjectIdentifier []           reclaimedLockObjects,
                 NetMeshObjectIdentifier []           requestedResynchronizeDependentReplicas,
-                SimpleExternalizedNetMeshObject []   resynchronizedDependentReplicas,
                 boolean                              ceaseCommunications )
             throws
                 Exception
         {
+            super( null, null );
+
             setRequestId( requestId );
             setResponseId( responseId );
 
@@ -441,9 +435,6 @@ public class ProxySerializationTest1
             }
             if( deleteChanges != null ) {
                 setDeleteChanges( deleteChanges );
-            }
-            if( creations != null ) {
-                super.setCreations( creations );
             }
             if( conveyedMeshObjects != null ) {
                 super.setConveyedMeshObjects( conveyedMeshObjects );
@@ -480,10 +471,7 @@ public class ProxySerializationTest1
                 super.setReclaimedLockObjects( reclaimedLockObjects );
             }
             if( requestedResynchronizeDependentReplicas != null ) {
-                super.setRequestedResynchronizeDependentReplicas( requestedResynchronizeDependentReplicas );
-            }
-            if( resynchronizedDependentReplicas != null ) {
-                super.setResynchronizeDependentReplicas( resynchronizedDependentReplicas );
+                super.setRequestedResynchronizeReplicas( requestedResynchronizeDependentReplicas );
             }
 
             super.setCeaseCommunications( ceaseCommunications );

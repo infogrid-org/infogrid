@@ -42,7 +42,7 @@ import org.infogrid.util.logging.Log;
  */
 public abstract class AbstractMeshObjectNeighborChangeEvent
         extends
-            AbstractExternalizablePropertyChangeEvent<MeshObject, MeshObjectIdentifier, RoleType[], MeshTypeIdentifier[], MeshObject[], MeshObjectIdentifier[]>
+            AbstractExternalizablePropertyChangeEvent<MeshObject,MeshObjectIdentifier,RoleType[],MeshTypeIdentifier[],MeshObject[],MeshObjectIdentifier[]>
         implements
             MeshObjectNeighborChangeEvent
 {
@@ -241,7 +241,7 @@ public abstract class AbstractMeshObjectNeighborChangeEvent
      * @return a value of the event
      */
     protected MeshObject [] resolveValue(
-            MeshObjectIdentifier[] vid )
+            MeshObjectIdentifier [] vid )
     {
         if( theResolver == null ) {
             throw new ValueUnresolvedException( this );

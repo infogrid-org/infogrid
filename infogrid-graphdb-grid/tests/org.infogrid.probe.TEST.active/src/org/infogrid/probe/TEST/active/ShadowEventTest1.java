@@ -40,7 +40,9 @@ import org.infogrid.mesh.set.active.OrderedActiveMeshObjectSetReorderedEvent;
 import org.infogrid.mesh.set.active.m.ActiveMMeshObjectSetFactory;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.a.AnetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
+import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.module.ModuleException;
@@ -77,9 +79,11 @@ public class ShadowEventTest1
                         TEST1_URL.toExternalForm(),
                         TestApiProbe.class ));
         
-        ActiveMeshObjectSetFactory setFactory = ActiveMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
+        NiceAndTrustingProxyPolicyFactory proxyPolicyFactory = NiceAndTrustingProxyPolicyFactory.create();
+        ActiveMeshObjectSetFactory        setFactory         = ActiveMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
+        AnetMeshBaseLifecycleManager      life               = AnetMeshBaseLifecycleManager.create();
 
-        LocalNetMMeshBase base = LocalNetMMeshBase.create( here, setFactory, theModelBase, null, exec, probeDirectory, rootContext );
+        LocalNetMMeshBase base = LocalNetMMeshBase.create( here, proxyPolicyFactory, setFactory, theModelBase, life, null, exec, probeDirectory, rootContext );
 
         //
 

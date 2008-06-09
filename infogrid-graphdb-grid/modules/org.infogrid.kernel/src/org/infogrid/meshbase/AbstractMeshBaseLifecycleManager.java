@@ -46,13 +46,24 @@ public abstract class AbstractMeshBaseLifecycleManager
     /**
      * Constructor. The application developer should not call this or a subclass constructor; use
      * MeshBase.getMeshObjectLifecycleManager() instead.
-     * 
-     * @param base the MeshBase on which this MeshBaseLifecycleManager works
      */
-    protected AbstractMeshBaseLifecycleManager(
-            MeshBase base )
+    protected AbstractMeshBaseLifecycleManager()
     {
-        theMeshBase = base;
+        // no op
+    }
+
+    /**
+     * Enable the AbstractMeshBase to tell this MeshBaseLifecycleManager that they are working together.
+     * 
+     * @param meshBase the AbstractMeshBase with which this MeshBaseLifecycleManager works
+     */
+    void setMeshBase(
+            AbstractMeshBase meshBase )
+    {
+        if( theMeshBase != null ) {
+            throw new IllegalStateException( "Have MeshBase already: " + theMeshBase );
+        }
+        theMeshBase = meshBase;
     }
 
     /**
@@ -503,7 +514,7 @@ public abstract class AbstractMeshBaseLifecycleManager
     /**
      * The MeshBase that we work on.
      */
-    protected final MeshBase theMeshBase;
+    protected MeshBase theMeshBase;
     
     /**
      * The default time at which MeshObjects auto-deleteMeshObjects, unless otherwise specified.

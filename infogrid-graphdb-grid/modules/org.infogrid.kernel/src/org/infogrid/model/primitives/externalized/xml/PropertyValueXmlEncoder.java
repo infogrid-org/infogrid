@@ -95,7 +95,7 @@ public class PropertyValueXmlEncoder
         w.write( buf.toString() );
         w.flush();
     }
-    
+
     /**
      * Serialize a PropertyValue to a StringBuilder.
      * 
@@ -225,6 +225,17 @@ public class PropertyValueXmlEncoder
     }
 
     /**
+     * Obtain the identifier for the encoding performed by this PropertyValueXmlEncoder.
+     * This also works for all subclasses.
+     * 
+     * @return the encodingId.
+     */
+    public String getEncodingId()
+    {
+        return getClass().getName();
+    }
+
+    /**
      * Deserialize a PropertyValue from a stream.
      * 
      * @param contentAsStream the byte [] stream in which the PropertyValue is encoded
@@ -248,16 +259,6 @@ public class PropertyValueXmlEncoder
         } finally {
             clearState();
         }
-    }
-
-    /**
-     * Obtain an encodingId that reflects this ExternalizedMeshObjectEncoder.
-     * 
-     * @return the encodingId.
-     */
-    public String getEncodingId()
-    {
-        return getClass().getName();
     }
 
     /**
@@ -458,9 +459,9 @@ public class PropertyValueXmlEncoder
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
@@ -572,7 +573,7 @@ public class PropertyValueXmlEncoder
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
@@ -604,10 +605,10 @@ public class PropertyValueXmlEncoder
      * Throw exception in case of an Exception indicating an error.
      *
      * @param ex the Exception
-     * @throws SAXParseException thrown if a parsing error occurs
+     * @throws org.xml.sax.SAXParseException thrown if a parsing error occurs
      */
     public final void error(
-            Exception ex )
+            Throwable ex )
         throws
             SAXParseException
     {
@@ -933,14 +934,14 @@ public class PropertyValueXmlEncoder
          * 
          * @param message the error message
          * @param locator indicates the location of the error in the stream
-         * @param cause the underlying cause
+         * @param cause the underlying cause, if any
          */
         public FixedSAXParseException(
                 String    message,
                 Locator   locator,
-                Exception cause )
+                Throwable cause )
         {
-            super( message, locator, cause );
+            super( message, locator );
             
             initCause( cause );
         }

@@ -23,6 +23,7 @@ import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.MeshObjectIdentifierFactory;
 import org.infogrid.meshbase.a.AIterableMeshBase;
+import org.infogrid.meshbase.a.AMeshBaseLifecycleManager;
 import org.infogrid.meshbase.a.DefaultAMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.modelbase.ModelBase;
@@ -48,6 +49,7 @@ public class MMeshBase
      * @param modelBase the ModelBase with the type definitions we use
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param c the Context in which this MeshBase will run
+     * @return the created MMeshBase
      */
     public static MMeshBase create(
             MeshBaseIdentifier identifier,
@@ -66,9 +68,11 @@ public class MMeshBase
      * Factory method.
      *
      * @param identifier the MeshBaseIdentifier of this MeshBase
+     * @param setFactory the factory for MeshObjectSets appropriate for this NetMeshBase
      * @param modelBase the ModelBase with the type definitions we use
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param c the Context in which this MeshBase will run
+     * @return the created MMeshBase
      */
     public static MMeshBase create(
             MeshBaseIdentifier   identifier,
@@ -80,8 +84,9 @@ public class MMeshBase
         MCachingHashMap<MeshObjectIdentifier,MeshObject> cache = MCachingHashMap.create();
 
         DefaultAMeshObjectIdentifierFactory identifierFactory = DefaultAMeshObjectIdentifierFactory.create();
+        AMeshBaseLifecycleManager           life              = AMeshBaseLifecycleManager.create();
 
-        MMeshBase ret = new MMeshBase( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, c );
+        MMeshBase ret = new MMeshBase( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, c );
 
         setFactory.setMeshBase( ret );
         ret.initializeHomeObject();
@@ -100,6 +105,7 @@ public class MMeshBase
      * @param identifierFactory the factory for MeshObjectIdentifiers appropriate for this MeshBase
      * @param setFactory the factory for MeshObjectSets appropriate for this MeshBase
      * @param modelBase the ModelBase containing type information
+     * @param life the MeshBaseLifecycleManager to use
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param cache the CachingMap that holds the MeshObjects in this MeshBase
      * @param context the Context in which this MeshBase runs.
@@ -109,11 +115,12 @@ public class MMeshBase
             MeshObjectIdentifierFactory                 identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            AMeshBaseLifecycleManager                   life,
             AccessManager                               accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             Context                                     context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, context );
+        super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, context );
     }
 
 
@@ -135,7 +142,7 @@ public class MMeshBase
     /**
      * Determine the number of MeshObjects in this MeshBase.
      *
-     * @return the number of MeshObjets in this MeshBase
+     * @return the number of MeshObjects in this MeshBase
      */
     public int size()
     {

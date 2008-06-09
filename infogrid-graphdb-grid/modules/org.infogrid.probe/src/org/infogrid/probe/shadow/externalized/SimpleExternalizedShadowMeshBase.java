@@ -19,7 +19,8 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 
 /**
- *
+ * This implementation of ExternalizedShadowMeshBase is fully initialized in the
+ * factory method.
  */
 public class SimpleExternalizedShadowMeshBase
         extends
@@ -27,9 +28,14 @@ public class SimpleExternalizedShadowMeshBase
 {
     /**
      * Factory method.
+     * 
+     * @param identifier the NetMeshBaseIdentifier for the ShadowMeshBase
+     * @param externalizedProxies externalized representation of the Proxies of the ShadowMeshBase
+     * @param externalizedNetMeshObjects externalized representation of the NetMeshObjects held by this ShadowMeshBase
+     * @return the created SimpleExternalizedShadowMeshBase
      */
     public static SimpleExternalizedShadowMeshBase create(
-            NetMeshBaseIdentifier            identifier,
+            NetMeshBaseIdentifier        identifier,
             ExternalizedProxy []         externalizedProxies,
             ExternalizedNetMeshObject [] externalizedNetMeshObjects )
     {
@@ -41,9 +47,13 @@ public class SimpleExternalizedShadowMeshBase
 
     /**
      * Constructor.
+     * 
+     * @param identifier the NetMeshBaseIdentifier for the ShadowMeshBase
+     * @param externalizedProxies externalized representation of the Proxies of the ShadowMeshBase
+     * @param externalizedNetMeshObjects externalized representation of the NetMeshObjects held by this ShadowMeshBase
      */
     protected SimpleExternalizedShadowMeshBase(
-            NetMeshBaseIdentifier            identifier,
+            NetMeshBaseIdentifier        identifier,
             ExternalizedProxy []         externalizedProxies,
             ExternalizedNetMeshObject [] externalizedNetMeshObjects )
     {

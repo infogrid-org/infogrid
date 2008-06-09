@@ -15,8 +15,8 @@
 package org.infogrid.probe.shadow.store;
 
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
-import org.infogrid.meshbase.net.ProxyFactory;
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyFactory;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxyEncoder;
 

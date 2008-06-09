@@ -14,11 +14,11 @@
 
 package org.infogrid.meshbase.net.externalized;
 
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 
 /**
  *
@@ -77,7 +77,7 @@ public abstract class AbstractExternalizedProxy
     /**
      * Obtain the NetMeshBaseIdentifier of the NetMeshBase to which this Proxy belongs.
      * 
-     * @return the NNetMeshBaseIdentifier
+     * @return the NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getNetworkIdentifier()
     {
@@ -87,11 +87,21 @@ public abstract class AbstractExternalizedProxy
     /**
      * Obtain the NetMeshBaseIdentifier of the NetMeshBase to which this Proxy talks to.
      * 
-     * @return the NNetMeshBaseIdentifier
+     * @return the NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getNetworkIdentifierOfPartner()
     {
         return theNetworkIdentifierOfPartner;
+    }
+
+    /**
+     * Obtain the CoherenceSpecification used by this Proxy.
+     * 
+     * @return the CoherenceSpecification
+     */
+    public CoherenceSpecification getCoherenceSpecification()
+    {
+        return theCoherenceSpecification;
     }
 
     /**
@@ -164,6 +174,11 @@ public abstract class AbstractExternalizedProxy
      */
     protected NetMeshBaseIdentifier theNetworkIdentifierOfPartner;
     
+    /**
+     * The CoherenceSpecification used by the Proxy.
+     */
+    protected CoherenceSpecification theCoherenceSpecification;
+
     /**
      * The token last sent by this Proxy.
      */

@@ -14,18 +14,18 @@
 
 package org.infogrid.kernel.net.TEST.xpriso;
 
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
+import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.m.NetMMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.util.logging.Log;
-
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Tests property replication.
@@ -49,7 +49,8 @@ public class XprisoTest4
             StringValue.create( "ghi" ),
         };
         
-        NetMeshBaseLifecycleManager life1 = mb1.getMeshBaseLifecycleManager();
+        NetMeshBaseLifecycleManager    life1 = mb1.getMeshBaseLifecycleManager();
+        NetMeshObjectIdentifierFactory fact1 = mb1.getMeshObjectIdentifierFactory();
 
         //
         
@@ -57,7 +58,7 @@ public class XprisoTest4
 
         Transaction tx1 = mb1.createTransactionAsap();
 
-        NetMeshObject obj_mb1 = life1.createMeshObject( TestSubjectArea.AA );
+        NetMeshObject obj_mb1 = life1.createMeshObject( fact1.fromExternalForm( "one"), TestSubjectArea.AA );
         obj_mb1.setPropertyValue( TestSubjectArea.A_X, values[0] );
 
         tx1.commitTransaction();

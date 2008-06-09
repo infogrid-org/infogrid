@@ -23,12 +23,12 @@ import java.beans.PropertyChangeEvent;
  * It inherits from <code>java.beans.PropertyChangeEvent</code> in order to be
  * compatible with the Java APIs.
  * 
- * @param S the type of the event source
- * @param SID the type of the identifier of the event source
- * @param P the type of the property
- * @param PID type of the identifier of the property
- * @param V the type of the value
- * @param VID the type of the identifier of the value
+ * @param <S> the type of the event source
+ * @param <SID> the type of the identifier of the event source
+ * @param <P> the type of the property
+ * @param <PID> type of the identifier of the property
+ * @param <V> the type of the value
+ * @param <VID> the type of the identifier of the value
  */
 public abstract class AbstractExternalizablePropertyChangeEvent<S,SID,P,PID,V,VID>
         extends

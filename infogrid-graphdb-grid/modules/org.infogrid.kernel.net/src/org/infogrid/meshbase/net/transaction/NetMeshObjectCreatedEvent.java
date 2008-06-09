@@ -65,7 +65,7 @@ public class NetMeshObjectCreatedEvent
     }
 
     /**
-     * Constructor for subclasses only.
+     * Constructor.
      *
      * @param source the NetMeshBase that is the source of the event
      * @param sourceIdentifier the NetMeshBaseIdentifier representing the source of the event
@@ -73,7 +73,7 @@ public class NetMeshObjectCreatedEvent
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
-    protected NetMeshObjectCreatedEvent(
+    public NetMeshObjectCreatedEvent(
             NetMeshBase           source,
             NetMeshBaseIdentifier sourceIdentifier,
             NetMeshObject         createdObject,
