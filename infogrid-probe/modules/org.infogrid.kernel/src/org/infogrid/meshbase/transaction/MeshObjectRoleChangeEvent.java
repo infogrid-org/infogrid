@@ -16,7 +16,6 @@ package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.RoleType;
 
@@ -26,6 +25,7 @@ import org.infogrid.model.primitives.RoleType;
  */
 public interface MeshObjectRoleChangeEvent
         extends
+            MeshObjectRelationshipEvent,
             Change<MeshObject,MeshObjectIdentifier,RoleType[],MeshTypeIdentifier[]>
 {
     /**

@@ -21,8 +21,10 @@ import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
+//import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
+import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
+import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectPropertyChangeEvent;
@@ -39,27 +41,6 @@ public interface XprisoMessage
             CarriesInvocationId
 {
     /**
-     * Determine whether this XprisoMessage contains any valid payload or is empty.
-     *
-     * @return true if it is empty
-     */
-    public boolean isEmpty();
-    
-    /**
-     * Obtain the request ID.
-     *
-     * @return the request ID
-     */
-    public long getRequestId();
-
-    /**
-     * Obtain the response ID.
-     *
-     * @return the response ID
-     */
-    public long getResponseId();
-
-    /**
      * Obtain the NetMeshBaseIdentifier of the sender.
      * 
      * @return the sender's NetMeshBaseIdentifier
@@ -72,6 +53,35 @@ public interface XprisoMessage
      * @return the receiver's NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getReceiverIdentifier();
+
+    /**
+     * Obtain the request ID. From CarriesInvocationId.
+     *
+     * @return the request ID
+     */
+    public long getRequestId();
+
+    /**
+     * Obtain the response ID. From CarriesInvocationId.
+     *
+     * @return the response ID
+     */
+    public long getResponseId();
+
+    /**
+     * Determine whether or not to cease communications after this message.
+     *
+     * @return if true, cease communications
+     */
+    public boolean getCeaseCommunications();
+
+    /**
+     * Obtain the externalized representation of the NetMeshObjects that are conveyed
+     * by the sender to the receiver, e.g. in response to a request.
+     *
+     * @return the ExternalizedNetMeshObjects
+     */
+    public ExternalizedNetMeshObject [] getConveyedMeshObjects();
 
     /**
      * Obtain the NetMeshObjectAccessSpecifications to the NetMeshObjects for which the sender requests
@@ -90,84 +100,12 @@ public interface XprisoMessage
     public NetMeshObjectIdentifier [] getRequestedCanceledObjects();
 
     /**
-     * Obtain the creation events that the sender needs to convey to the
-     * receiver.
+     * Obtain the identifiers for the NetMeshObjects for which the sender has a replica
+     * that it wishes to resynchronize.
      *
-     * @return the creation events
+     * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
-    public NetMeshObjectCreatedEvent [] getCreations();
-
-    /**
-     * Obtain the deletion events for the MeshObjects that the sender has deleted
-     * semantically, and of whose deletion the receiver needs to be notified.
-     *
-     * @return the deletion events
-     */
-    public NetMeshObjectDeletedEvent [] getDeletions();
-
-    /**
-     * Obtain the externalized representation of the NetMeshObjects that are conveyed
-     * by the sender to the receiver, e.g. in response to a first-time lease request.
-     *
-     * @return the ExternalizedNetMeshObjects
-     */
-    public ExternalizedNetMeshObject[] getConveyedMeshObjects();
-
-    /**
-     * Obtain the neighbor addition events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the neighbor addition events
-     */
-    public NetMeshObjectNeighborAddedEvent [] getNeighborAdditions();
-
-    /**
-     * Obtain the neighbor removal events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the neighbor removal events
-     */
-    public NetMeshObjectNeighborRemovedEvent [] getNeighborRemovals();
-
-    /**
-     * Obtain the property change events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the property change events
-     */
-    public NetMeshObjectPropertyChangeEvent [] getPropertyChanges();
-
-    /**
-     * Obtain the role addition events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the role addition events
-     */
-    public NetMeshObjectRoleAddedEvent [] getRoleAdditions();
-
-    /**
-     * Obtain the role removal events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the role removal events
-     */
-    public NetMeshObjectRoleRemovedEvent [] getRoleRemovals();
-
-    /**
-     * Obtain the type addition events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the type addition events
-     */
-    public NetMeshObjectTypeAddedEvent [] getTypeAdditions();
-
-    /**
-     * Obtain the type removal events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the type removal events
-     */
-    public NetMeshObjectTypeRemovedEvent [] getTypeRemovals();
+    public NetMeshObjectIdentifier [] getRequestedResynchronizeReplicas();
 
     /**
      * Obtain the identifiers for the NetMeshObjects for which the sender requests
@@ -208,27 +146,91 @@ public interface XprisoMessage
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
     public NetMeshObjectIdentifier [] getPushHomeReplicas();
+    
+    /**
+     * Obtain the type addition events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the type addition events
+     */
+    public NetMeshObjectTypeAddedEvent [] getTypeAdditions();
 
     /**
-     * Obtain the identifiers for the NetMeshObjects for which the sender has a replica
-     * that it wishes to resynchronize as a dependent replica.
+     * Obtain the type removal events that the sender needs to convey to the
+     * receiver.
      *
-     * @return the NetMeshObjectIdentifiers for the NetMeshObjects
+     * @return the type removal events
      */
-    public NetMeshObjectIdentifier [] getRequestedResynchronizeDependentReplicas();
+    public NetMeshObjectTypeRemovedEvent [] getTypeRemovals();
 
     /**
-     * Obtain the externalized representation of the NetMeshObjects that are sent
-     * by the sender to the receiver in response to a resynchronizeDependent request.
+     * Obtain the property change events that the sender needs to convey to the
+     * receiver.
      *
-     * @return the ExternalizedNetMeshObjects
+     * @return the property change events
      */
-    public ExternalizedNetMeshObject[] getResynchronizeDependentReplicas();
+    public NetMeshObjectPropertyChangeEvent [] getPropertyChanges();
 
     /**
-     * Determine whether or not to cease communications after this message.
+     * Obtain the neighbor addition events that the sender needs to convey to the
+     * receiver.
      *
-     * @return if true, cease communications
+     * @return the neighbor addition events
      */
-    public boolean getCeaseCommunications();
+    public NetMeshObjectNeighborAddedEvent [] getNeighborAdditions();
+
+    /**
+     * Obtain the neighbor removal events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the neighbor removal events
+     */
+    public NetMeshObjectNeighborRemovedEvent [] getNeighborRemovals();
+
+    /**
+     * Obtain the equivalent addition events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the equivalent addition events
+     */
+    public NetMeshObjectEquivalentsAddedEvent [] getEquivalentsAdditions();
+
+    /**
+     * Obtain the equivalent removal events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the equivalent addition events
+     */
+    public NetMeshObjectEquivalentsRemovedEvent [] getEquivalentsRemovals();
+
+    /**
+     * Obtain the role addition events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the role addition events
+     */
+    public NetMeshObjectRoleAddedEvent [] getRoleAdditions();
+
+    /**
+     * Obtain the role removal events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the role removal events
+     */
+    public NetMeshObjectRoleRemovedEvent [] getRoleRemovals();
+
+    /**
+     * Obtain the deletion events for the NetMeshObjects that the sender has deleted
+     * semantically and that the sender needs to convey to the receiver.
+     *
+     * @return the deletion events
+     */
+    public NetMeshObjectDeletedEvent [] getDeletions();
+
+    /**
+     * Determine whether this XprisoMessage contains any valid payload or is empty.
+     *
+     * @return true if it is empty
+     */
+    public boolean isEmpty();
 }

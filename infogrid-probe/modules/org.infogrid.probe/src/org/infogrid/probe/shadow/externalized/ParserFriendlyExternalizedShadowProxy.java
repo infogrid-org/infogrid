@@ -17,7 +17,7 @@ package org.infogrid.probe.shadow.externalized;
 import org.infogrid.meshbase.net.externalized.ParserFriendlyExternalizedProxy;
 
 /**
- * Parser-friendly implementaiton of ExternalizedShadowProxy.
+ * Parser-friendly implementation of ExternalizedShadowProxy.
  */
 public class ParserFriendlyExternalizedShadowProxy
         extends

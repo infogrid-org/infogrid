@@ -14,11 +14,10 @@
 
 package org.infogrid.meshbase.net.externalized;
 
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-
 import java.util.List;
 
 /**
@@ -31,8 +30,8 @@ public class SimpleExternalizedProxy
     /**
      * Factory method.
      *
-     * @param proxy the Proxy to externalized
-     * @return the ExternalizedProxy
+     * @param proxy the Proxy to be externalized
+     * @return the SimpleExternalizedProxy
      */
     public static SimpleExternalizedProxy create(
             Proxy proxy )
@@ -46,6 +45,7 @@ public class SimpleExternalizedProxy
                 proxy.getMessageEndpoint().getLastReceivedToken(),
                 proxy.getNetMeshBase().getIdentifier(),
                 proxy.getPartnerMeshBaseIdentifier(),
+                proxy.getCoherenceSpecification(),
                 proxy.getMessageEndpoint().messagesToBeSent(),
                 proxy.getMessageEndpoint().messagesLastSent() );
     }
@@ -54,16 +54,17 @@ public class SimpleExternalizedProxy
      * Constructor.
      */
     protected SimpleExternalizedProxy(
-            long                timeCreated,
-            long                timeUpdated,
-            long                timeRead,
-            long                timeExpires,
-            long                lastSentToken,
-            long                lastReceivedToken,
+            long                    timeCreated,
+            long                    timeUpdated,
+            long                    timeRead,
+            long                    timeExpires,
+            long                    lastSentToken,
+            long                    lastReceivedToken,
             NetMeshBaseIdentifier   networkIdentifier,
             NetMeshBaseIdentifier   networkIdentifierOfPartner,
-            List<XprisoMessage> messagesToSend,
-            List<XprisoMessage> messagesLastSent )
+            CoherenceSpecification  coherenceSpecification,
+            List<XprisoMessage>     messagesToSend,
+            List<XprisoMessage>     messagesLastSent )
     {
         theTimeCreated = timeCreated;
         theTimeUpdated = timeUpdated;
@@ -75,6 +76,7 @@ public class SimpleExternalizedProxy
         
         theNetworkIdentifier          = networkIdentifier;
         theNetworkIdentifierOfPartner = networkIdentifierOfPartner;
+        theCoherenceSpecification     = coherenceSpecification;
         
         theMessagesToSend   = messagesToSend;
         theMessagesLastSent = messagesLastSent;

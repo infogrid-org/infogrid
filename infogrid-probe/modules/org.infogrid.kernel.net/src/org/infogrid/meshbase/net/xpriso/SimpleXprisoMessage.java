@@ -14,13 +14,14 @@
 
 package org.infogrid.meshbase.net.xpriso;
 
+import java.io.Serializable;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
-
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
+import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
+import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectPropertyChangeEvent;
@@ -28,10 +29,7 @@ import org.infogrid.meshbase.net.transaction.NetMeshObjectRoleAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectRoleRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeRemovedEvent;
-
 import org.infogrid.util.StringHelper;
-
-import java.io.Serializable;
 
 /**
  * This captures the information exchanged between Proxies.
@@ -48,117 +46,28 @@ public class SimpleXprisoMessage
     /**
      * Create a blank SimpleXprisoMessage.
      * 
+     * @param sender identifies the sender of this message
+     * @param receiver identifies the receiver of this message
      * @return the created SimpleXprisoMessage
      */
-    public static SimpleXprisoMessage create()
+    public static SimpleXprisoMessage create(
+            NetMeshBaseIdentifier sender,
+            NetMeshBaseIdentifier receiver )
     {
-        return new SimpleXprisoMessage();
+        return new SimpleXprisoMessage( sender, receiver );
     }
 
     /**
      * Constructor.
+     * 
+     * @param sender identifies the sender of this message
+     * @param receiver identifies the receiver of this message
      */
-    protected SimpleXprisoMessage()
+    protected SimpleXprisoMessage(
+            NetMeshBaseIdentifier sender,
+            NetMeshBaseIdentifier receiver )
     {
-        // no op
-    }
-
-    /**
-     * Determine whether this message contains any valid payload or is empty.
-     *
-     * @return true if it is empty
-     */
-    public boolean isEmpty()
-    {
-        // This is listed in alphabetical sequence to make it easier in IDEs to check whether we have all of them
-
-        if( theCeaseCommunications ) {
-            return false;
-        }
-        if( theConveyedMeshObjects != null && theConveyedMeshObjects.length > 0 ) {
-            return false;
-        }
-        if( theCreations != null && theCreations.length > 0 ) {
-            return false;
-        }
-        if( theDeleteChanges != null && theDeleteChanges.length > 0 ) {
-            return false;
-        }
-        if( theNeighborAdditions != null && theNeighborAdditions.length > 0 ) {
-            return false;
-        }
-        if( theNeighborRemovals != null && theNeighborRemovals.length > 0 ) {
-            return false;
-        }
-        if( thePropertyChanges != null && thePropertyChanges.length > 0 ) {
-            return false;
-        }
-        if( thePushHomeReplicas != null && thePushHomeReplicas.length > 0 ) {
-            return false;
-        }
-        if( thePushLockObjects != null && thePushLockObjects.length > 0 ) {
-            return false;
-        }
-        // ignore theReceiverIdentifier;
-        if( theReclaimedLockObjects != null && theReclaimedLockObjects.length > 0 ) {
-            return false;
-        }
-        // ignore theRequestId;
-        if( theRequestedCanceledObjects != null && theRequestedCanceledObjects.length > 0 ) {
-            return false;
-        }
-        if( theRequestedFirstTimeObjects != null && theRequestedFirstTimeObjects.length > 0 ) {
-            return false;
-        }
-        if( theRequestedHomeReplicas != null && theRequestedHomeReplicas.length > 0 ) {
-            return false;
-        }
-        if( theRequestedLockObjects != null && theRequestedLockObjects.length > 0 ) {
-            return false;
-        }
-        if( theRequestedResynchronizeDependentReplicas != null && theRequestedResynchronizeDependentReplicas.length > 0 ) {
-            return false;
-        }
-        // ignore theResponseId
-        if( theResynchronizedDependentReplicas != null && theResynchronizedDependentReplicas.length > 0 ) {
-            return false;
-        }
-        if( theRoleAdditions != null && theRoleAdditions.length > 0 ) {
-            return false;
-        }
-        if( theRoleRemovals != null && theRoleRemovals.length > 0 ) {
-            return false;
-        }
-        // ignore theSenderIdentifier;        
-        if( theTypeAdditions != null && theTypeAdditions.length > 0 ) {
-            return false;
-        }
-        if( theTypeRemovals != null && theTypeRemovals.length > 0 ) {
-            return false;
-        }
-        return true;
-    }
-    
-    /**
-     * Set the request ID.
-     *
-     * @param id the request ID
-     */
-    public void setRequestId(
-            long id )
-    {
-        theRequestId = id;
-    }
-    
-    /**
-     * Set the response ID.
-     *
-     * @param id the response ID
-     */
-    public void setResponseId(
-            long id )
-    {
-        theResponseId = id;
+        super( sender, receiver );
     }
     
     /**
@@ -184,97 +93,38 @@ public class SimpleXprisoMessage
     }
 
     /**
-     * Set the NetMeshObjectAccessSpecification to the NetMeshObjects for which the sender requests
-     * a lease for the first time.
+     * Set the request ID.
      *
-     * @param newValue the NetMeshObjectAccessSpecification for the NetMeshObjects
+     * @param id the request ID
      */
-    public void setRequestedFirstTimeObjects(
-            NetMeshObjectAccessSpecification [] newValue )
+    public void setRequestId(
+            long id )
     {
-        theRequestedFirstTimeObjects = newValue;
+        theRequestId = id;
     }
     
     /**
-     * Obtain the NetMeshObjectAccessSpecifications to the NetMeshObjects for which the sender requests
-     * a lease for the first time.
+     * Set the response ID.
      *
-     * @return the NetMeshObjectAccessSpecifications for the NetMeshObjects
+     * @param id the response ID
      */
-    public NetMeshObjectAccessSpecification [] getRequestedFirstTimeObjects()
+    public void setResponseId(
+            long id )
     {
-        return theRequestedFirstTimeObjects;
+        theResponseId = id;
     }
 
     /**
-     * Set the identifiers for the NetMeshObjects for which the sender requests
-     * that a currently valid lease be chanceled.
+     * Set whether or not to cease communications after this message.
      *
-     * @param newValue the NetMeshObjectIdentifier for the NetMeshObjects
+     * @param newValue the new value
      */
-    public void setRequestedCanceledObjects(
-            NetMeshObjectIdentifier [] newValue )
+    public void setCeaseCommunications(
+            boolean newValue )
     {
-        theRequestedCanceledObjects = newValue;
+        theCeaseCommunications = newValue;
     }
     
-    /**
-     * Obtain the identifiers for the NetMeshObjects for which the sender requests
-     * that a currently valid lease be chanceled.
-     *
-     * @return the NetMeshObjectIdentifier for the NetMeshObjects
-     */
-    public NetMeshObjectIdentifier [] getRequestedCanceledObjects()
-    {
-        return theRequestedCanceledObjects;
-    }
-
-    /**
-     * Set the creation events that the sender needs to convey to the
-     * receiver.
-     *
-     * @param newValue the creation events
-     */
-    public void setCreations(
-            NetMeshObjectCreatedEvent [] newValue )
-    {
-        theCreations = newValue;
-    }
-    
-    /**
-     * Obtain the creation events that the sender needs to convey to the
-     * receiver
-     *
-     * @return the creation events
-     */
-    public NetMeshObjectCreatedEvent [] getCreations()
-    {
-        return theCreations;
-    }
-
-    /**
-     * Set the deletion events for the MeshObjects that the sender has deleted
-     * semantically, and of whose deletion the receiver needs to be notified.
-     *
-     * @param newValue the deletion events
-     */
-    public void setDeleteChanges(
-            NetMeshObjectDeletedEvent [] newValue )
-    {
-        theDeleteChanges = newValue;
-    }
-
-    /**
-     * Obtain the deletion events for the MeshObjects that the sender has deleted
-     * semantically, and of whose deletion the receiver needs to be notified.
-     *
-     * @return the deletion events
-     */
-    public NetMeshObjectDeletedEvent [] getDeletions()
-    {
-        return theDeleteChanges;
-    }
-
     /**
      * Set the externalized representation of the NetMeshObjects that are conveyed
      * by the sender to the receiver, e.g. in response to a first-time lease request.
@@ -297,166 +147,74 @@ public class SimpleXprisoMessage
     {
         return theConveyedMeshObjects;
     }
-
+    
     /**
-     * Set the neighbor addition events that the sender needs to convey to the
-     * receiver.
+     * Set the NetMeshObjectAccessSpecifications to the NetMeshObjects for which the sender requests
+     * a lease for the first time.
      *
-     * @param newValue the neighbor addition events
+     * @param newValue the NetMeshObjectAccessSpecifications for the NetMeshObjects
      */
-    public void setNeighborAdditions(
-            NetMeshObjectNeighborAddedEvent [] newValue )
+    public void setRequestedFirstTimeObjects(
+            NetMeshObjectAccessSpecification [] newValue )
     {
-        theNeighborAdditions = newValue;
+        theRequestedFirstTimeObjects = newValue;
+    }
+    
+    /**
+     * Obtain the NetMeshObjectAccessSpecifications to the NetMeshObjects for which the sender requests
+     * a lease for the first time.
+     *
+     * @return the NetMeshObjectAccessSpecifications for the NetMeshObjects
+     */
+    public NetMeshObjectAccessSpecification [] getRequestedFirstTimeObjects()
+    {
+        return theRequestedFirstTimeObjects;
     }
 
     /**
-     * Obtain the neighbor addition events that the sender needs to convey to the
-     * receiver.
+     * Set the identifiers for the NetMeshObjects for which the sender requests
+     * that a currently valid lease be canceled.
      *
-     * @return the neighbor addition events
+     * @param newValue the NetMeshObjectIdentifiers for the NetMeshObjects
      */
-    public NetMeshObjectNeighborAddedEvent [] getNeighborAdditions()
+    public void setRequestedCanceledObjects(
+            NetMeshObjectIdentifier [] newValue )
     {
-        return theNeighborAdditions;
+        theRequestedCanceledObjects = newValue;
+    }
+    
+    /**
+     * Obtain the identifiers for the NetMeshObjects for which the sender requests
+     * that a currently valid lease be canceled.
+     *
+     * @return the NetMeshObjectIdentifiers for the NetMeshObjects
+     */
+    public NetMeshObjectIdentifier [] getRequestedCanceledObjects()
+    {
+        return theRequestedCanceledObjects;
     }
 
     /**
-     * Set the neighbor removal events that the sender needs to convey to the
-     * receiver.
+     * Set the identifiers for the NetMeshObjects for which the sender has a replica
+     * that it wishes to resynchronize.
      *
-     * @param newValue the neighbor removal events
+     * @param newValue the NetMeshObjectIdentifiers for the NetMeshObjects
      */
-    public void setNeighborRemovals(
-            NetMeshObjectNeighborRemovedEvent [] newValue )
+    public void setRequestedResynchronizeReplicas(
+            NetMeshObjectIdentifier [] newValue )
     {
-        theNeighborRemovals = newValue;
+        theRequestedResynchronizeReplicas = newValue;
     }
 
     /**
-     * Obtain the neighbor removal events that the sender needs to convey to the
-     * receiver.
+     * Obtain the identifiers for the NetMeshObjects for which the sender has a replica
+     * that it wishes to resynchronize.
      *
-     * @return the neighbor removal events
+     * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
-    public NetMeshObjectNeighborRemovedEvent [] getNeighborRemovals()
+    public NetMeshObjectIdentifier [] getRequestedResynchronizeReplicas()
     {
-        return theNeighborRemovals;
-    }
-
-    /**
-     * Set the property change events that the sender needs to convey to the
-     * received.
-     *
-     * @param newValue the property change events
-     */
-    public void setPropertyChanges(
-            NetMeshObjectPropertyChangeEvent [] newValue )
-    {
-        thePropertyChanges = newValue;
-    }
-
-    /**
-     * Obtain the property change events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the property change events
-     */
-    public NetMeshObjectPropertyChangeEvent [] getPropertyChanges()
-    {
-        return thePropertyChanges;
-    }
-
-    /**
-     * Set the role addition events that the sender needs to convey to the
-     * receiver.
-     *
-     * @param newValue the role addition events
-     */
-    public void setRoleAdditions(
-            NetMeshObjectRoleAddedEvent [] newValue )
-    {
-        theRoleAdditions = newValue;
-    }
-
-    /**
-     * Obtain the role addition events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the role addition events
-     */
-    public NetMeshObjectRoleAddedEvent [] getRoleAdditions()
-    {
-        return theRoleAdditions;
-    }
-
-    /**
-     * Set the role removal events that the sender needs to convey to the
-     * receiver.
-     *
-     * @param newValue the role removal events
-     */
-    public void setRoleRemovals(
-            NetMeshObjectRoleRemovedEvent [] newValue )
-    {
-        theRoleRemovals = newValue;
-    }
-
-    /**
-     * Obtain the role removal events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the role removal events
-     */
-    public NetMeshObjectRoleRemovedEvent [] getRoleRemovals()
-    {
-        return theRoleRemovals;
-    }
-
-    /**
-     * Set the type addition events that the sender needs to convey to the
-     * receiver.
-     *
-     * @param newValue the type addition events
-     */
-    public void setTypeAdditions(
-            NetMeshObjectTypeAddedEvent [] newValue )
-    {
-        theTypeAdditions = newValue;
-    }
-
-    /**
-     * Obtain the type addition events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the type addition events
-     */
-    public NetMeshObjectTypeAddedEvent [] getTypeAdditions()
-    {
-        return theTypeAdditions;
-    }
-
-    /**
-     * Set the type removal events that the sender needs to convey to the
-     * receiver.
-     *
-     * @param newValue the type removal events
-     */
-    public void setTypeRemovals(
-            NetMeshObjectTypeRemovedEvent [] newValue )
-    {
-        theTypeRemovals = newValue;
-    }
-
-    /**
-     * Obtain the type removal events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the type removal events
-     */
-    public NetMeshObjectTypeRemovedEvent [] getTypeRemovals()
-    {
-        return theTypeRemovals;
+        return theRequestedResynchronizeReplicas;
     }
 
     /**
@@ -575,62 +333,318 @@ public class SimpleXprisoMessage
     }
     
     /**
-     * Set the identifiers for the NetMeshObjects for which the sender has a replica
-     * that it wishes to resynchronize as a dependent replica.
+     * Set the type addition events that the sender needs to convey to the
+     * receiver.
      *
-     * @param newValue the NetMeshObjectIdentifiers for the NetMeshObjects
+     * @param newValue the type addition events
      */
-    public void setRequestedResynchronizeDependentReplicas(
-            NetMeshObjectIdentifier [] newValue )
+    public void setTypeAdditions(
+            NetMeshObjectTypeAddedEvent [] newValue )
     {
-        theRequestedResynchronizeDependentReplicas = newValue;
+        theTypeAdditions = newValue;
     }
 
     /**
-     * Obtain the identifiers for the NetMeshObjects for which the sender has a replica
-     * that it wishes to resynchronize as a dependent replica.
+     * Obtain the type addition events that the sender needs to convey to the
+     * receiver.
      *
-     * @return the NetMeshObjectIdentifiers for the NetMeshObjects
+     * @return the type addition events
      */
-    public NetMeshObjectIdentifier [] getRequestedResynchronizeDependentReplicas()
+    public NetMeshObjectTypeAddedEvent [] getTypeAdditions()
     {
-        return theRequestedResynchronizeDependentReplicas;
+        return theTypeAdditions;
     }
 
     /**
-     * Set the externalized representation of the NetMeshObjects that are sent
-     * by the sender to the receiver in response to a resynchronizeDependent request.
+     * Set the type removal events that the sender needs to convey to the
+     * receiver.
      *
-     * @param newValue the MeshObjects
+     * @param newValue the type removal events
      */
-    public void setResynchronizeDependentReplicas(
-            ExternalizedNetMeshObject [] newValue )
+    public void setTypeRemovals(
+            NetMeshObjectTypeRemovedEvent [] newValue )
     {
-        theResynchronizedDependentReplicas = newValue;
+        theTypeRemovals = newValue;
     }
 
     /**
-     * Obtain the externalized representation of the NetMeshObjects that are sent
-     * by the sender to the receiver in response to a resynchronizeDependent request.
+     * Obtain the type removal events that the sender needs to convey to the
+     * receiver.
      *
-     * @return the ExternalizedNetMeshObjects
+     * @return the type removal events
      */
-    public ExternalizedNetMeshObject [] getResynchronizeDependentReplicas()
+    public NetMeshObjectTypeRemovedEvent [] getTypeRemovals()
     {
-        return theResynchronizedDependentReplicas;
+        return theTypeRemovals;
     }
 
     /**
-     * Set whether or not to cease communications after this message.
+     * Set the property change events that the sender needs to convey to the
+     * received.
      *
-     * @param newValue the new value
+     * @param newValue the property change events
      */
-    public void setCeaseCommunications(
-            boolean newValue )
+    public void setPropertyChanges(
+            NetMeshObjectPropertyChangeEvent [] newValue )
     {
-        theCeaseCommunications = newValue;
+        thePropertyChanges = newValue;
     }
-    
+
+    /**
+     * Obtain the property change events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the property change events
+     */
+    public NetMeshObjectPropertyChangeEvent [] getPropertyChanges()
+    {
+        return thePropertyChanges;
+    }
+
+    /**
+     * Set the neighbor addition events that the sender needs to convey to the
+     * receiver.
+     *
+     * @param newValue the neighbor addition events
+     */
+    public void setNeighborAdditions(
+            NetMeshObjectNeighborAddedEvent [] newValue )
+    {
+        theNeighborAdditions = newValue;
+    }
+
+    /**
+     * Obtain the neighbor addition events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the neighbor addition events
+     */
+    public NetMeshObjectNeighborAddedEvent [] getNeighborAdditions()
+    {
+        return theNeighborAdditions;
+    }
+
+    /**
+     * Set the neighbor removal events that the sender needs to convey to the
+     * receiver.
+     *
+     * @param newValue the neighbor removal events
+     */
+    public void setNeighborRemovals(
+            NetMeshObjectNeighborRemovedEvent [] newValue )
+    {
+        theNeighborRemovals = newValue;
+    }
+
+    /**
+     * Obtain the neighbor removal events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the neighbor removal events
+     */
+    public NetMeshObjectNeighborRemovedEvent [] getNeighborRemovals()
+    {
+        return theNeighborRemovals;
+    }
+
+    /**
+     * Set the equivalent addition events that the sender needs to convey to the
+     * receiver.
+     * 
+     * @param newValue the equivalent addition events
+     */
+    public void setEquivalentAdditions(
+            NetMeshObjectEquivalentsAddedEvent [] newValue )
+    {
+        theEquivalentAdditions = newValue;
+    }
+
+    /**
+     * Obtain the equivalent addition events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the equivalent addition events
+     */
+    public NetMeshObjectEquivalentsAddedEvent [] getEquivalentsAdditions()
+    {
+        return theEquivalentAdditions;
+    }
+
+    /**
+     * Set the equivalent removal events that the sender needs to convey to the
+     * receiver.
+     * 
+     * @param newValue the equivalent removal events
+     */
+    public void setEquivalentRemovals(
+            NetMeshObjectEquivalentsRemovedEvent [] newValue )
+    {
+        theEquivalentRemovals = newValue;
+    }
+
+    /**
+     * Obtain the equivalent removal events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the equivalent removal events
+     */
+    public NetMeshObjectEquivalentsRemovedEvent [] getEquivalentsRemovals()
+    {
+        return theEquivalentRemovals;
+    }
+
+    /**
+     * Set the role addition events that the sender needs to convey to the
+     * receiver.
+     *
+     * @param newValue the role addition events
+     */
+    public void setRoleAdditions(
+            NetMeshObjectRoleAddedEvent [] newValue )
+    {
+        theRoleAdditions = newValue;
+    }
+
+    /**
+     * Obtain the role addition events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the role addition events
+     */
+    public NetMeshObjectRoleAddedEvent [] getRoleAdditions()
+    {
+        return theRoleAdditions;
+    }
+
+    /**
+     * Set the role removal events that the sender needs to convey to the
+     * receiver.
+     *
+     * @param newValue the role removal events
+     */
+    public void setRoleRemovals(
+            NetMeshObjectRoleRemovedEvent [] newValue )
+    {
+        theRoleRemovals = newValue;
+    }
+
+    /**
+     * Obtain the role removal events that the sender needs to convey to the
+     * receiver.
+     *
+     * @return the role removal events
+     */
+    public NetMeshObjectRoleRemovedEvent [] getRoleRemovals()
+    {
+        return theRoleRemovals;
+    }
+
+    /**
+     * Set the deletion events for the NetMeshObjects that the sender has deleted
+     * semantically and that the sender needs to convey to the receiver.
+     *
+     * @param newValue the deletion events
+     */
+    public void setDeleteChanges(
+            NetMeshObjectDeletedEvent [] newValue )
+    {
+        theDeleteChanges = newValue;
+    }
+
+    /**
+     * Obtain the deletion events for the NetMeshObjects that the sender has deleted
+     * semantically and that the sender needs to convey to the receiver.
+     *
+     * @return the deletion events
+     */
+    public NetMeshObjectDeletedEvent [] getDeletions()
+    {
+        return theDeleteChanges;
+    }
+
+    /**
+     * Determine whether this message contains any valid payload or is empty.
+     *
+     * @return true if it is empty
+     */
+    public boolean isEmpty()
+    {
+        // ignore theSenderIdentifier;
+        // ignore theReceiverIdentifier;
+        // ignore theRequestId;
+        // do NOT ignore responseID: may acknowledge receipt of incoming message
+        
+        // alphabetically, so we can make sure we have all of them by comparing with the IDE
+
+        if( theCeaseCommunications ) {
+            return false;
+        }
+        if( theConveyedMeshObjects != null && theConveyedMeshObjects.length > 0 ) {
+            return false;
+        }
+        if( theDeleteChanges != null && theDeleteChanges.length > 0 ) {
+            return false;
+        }
+        if( theEquivalentAdditions != null && theEquivalentAdditions.length > 0 ) {
+            return false;
+        }
+        if( theEquivalentRemovals != null && theEquivalentRemovals.length > 0 ) {
+            return false;
+        }
+        if( theNeighborAdditions != null && theNeighborAdditions.length > 0 ) {
+            return false;
+        }
+        if( theNeighborRemovals != null && theNeighborRemovals.length > 0 ) {
+            return false;
+        }
+        if( thePropertyChanges != null && thePropertyChanges.length > 0 ) {
+            return false;
+        }
+        if( thePushHomeReplicas != null && thePushHomeReplicas.length > 0 ) {
+            return false;
+        }
+        if( thePushLockObjects != null && thePushLockObjects.length > 0 ) {
+            return false;
+        }
+        // ignore theReceiverIdentifier;
+        if( theReclaimedLockObjects != null && theReclaimedLockObjects.length > 0 ) {
+            return false;
+        }
+        // ignore theRequestId;
+        if( theRequestedCanceledObjects != null && theRequestedCanceledObjects.length > 0 ) {
+            return false;
+        }
+        if( theRequestedFirstTimeObjects != null && theRequestedFirstTimeObjects.length > 0 ) {
+            return false;
+        }
+        if( theRequestedHomeReplicas != null && theRequestedHomeReplicas.length > 0 ) {
+            return false;
+        }
+        if( theRequestedLockObjects != null && theRequestedLockObjects.length > 0 ) {
+            return false;
+        }
+        if( theRequestedResynchronizeReplicas != null && theRequestedResynchronizeReplicas.length > 0 ) {
+            return false;
+        }
+        if( theResponseId != 0 ) {
+            return false;
+        }
+        if( theRoleAdditions != null && theRoleAdditions.length > 0 ) {
+            return false;
+        }
+        if( theRoleRemovals != null && theRoleRemovals.length > 0 ) {
+            return false;
+        }
+        // ignore theSenderIdentifier;
+        if( theTypeAdditions != null && theTypeAdditions.length > 0 ) {
+            return false;
+        }
+        if( theTypeRemovals != null && theTypeRemovals.length > 0 ) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Convert to String representation, for debugging.
      *
@@ -642,59 +656,65 @@ public class SimpleXprisoMessage
         return StringHelper.objectLogString(
                 this,
                 new String[] {
-                    "theRequestId",
-                    "theResponseId",
                     "theSenderIdentifier",
                     "theReceiverIdentifier",
+                    "theRequestId",
+                    "theResponseId",
+                    "theCeaseCommunications",
                     "theConveyedMeshObjects",
-                    "thePropertyChanges",
-                    "theTypeAdditions",
-                    "theTypeRemovals",
-                    "theCreations",
-                    "theDeleteChanges",
-                    "theNeighborAdditions",
-                    "theNeighborRemovals",
-                    "theRoleAdditions",
-                    "theRoleRemovals",
-                    "thePushLockObjects",
                     "theRequestedFirstTimeObjects",
-                    "theRequestedLockObjects",
-                    "theReclaimedLockObjects",
                     "theRequestedCanceledObjects",
                     "theRequestedResynchronizeDependentReplicas",
-                    "theResynchronizedDependentReplicas",
+                    "theRequestedLockObjects",
+                    "thePushLockObjects",
+                    "theReclaimedLockObjects",
                     "theRequestedHomeReplicas",
                     "thePushHomeReplicas",
-                    "theCeaseCommunications"
+                    "theTypeAdditions",
+                    "theTypeRemovals",
+                    "thePropertyChanges",
+                    "theNeighborAdditions",
+                    "theNeighborRemovals",
+                    "theEquivalentAdditions",
+                    "theEquivalentRemovals",
+                    "theRoleAdditions",
+                    "theRoleRemovals",
+                    "theDeleteChanges",
                 },
                 new Object[] {
-                    theRequestId,
-                    theResponseId,
                     theSenderIdentifier,
                     theReceiverIdentifier,
+                    theRequestId,
+                    theResponseId,
+                    theCeaseCommunications,
                     theConveyedMeshObjects,
-                    thePropertyChanges,
-                    theTypeAdditions,
-                    theTypeRemovals,
-                    theCreations,
-                    theDeleteChanges,
-                    theNeighborAdditions,
-                    theNeighborRemovals,
-                    theRoleAdditions,
-                    theRoleRemovals,
-                    thePushLockObjects,
                     theRequestedFirstTimeObjects,
-                    theRequestedLockObjects,
-                    theReclaimedLockObjects,
                     theRequestedCanceledObjects,
-                    theRequestedResynchronizeDependentReplicas,
-                    theResynchronizedDependentReplicas,
+                    theRequestedResynchronizeReplicas,
+                    theRequestedLockObjects,
+                    thePushLockObjects,
+                    theReclaimedLockObjects,
                     theRequestedHomeReplicas,
                     thePushHomeReplicas,
-                    theCeaseCommunications
+                    theTypeAdditions,
+                    theTypeRemovals,
+                    thePropertyChanges,
+                    theNeighborAdditions,
+                    theNeighborRemovals,
+                    theEquivalentAdditions,
+                    theEquivalentRemovals,
+                    theRoleAdditions,
+                    theRoleRemovals,
+                    theDeleteChanges,
                 },
                 StringHelper.LOG_FLAGS.SHOW_NON_NULL | StringHelper.LOG_FLAGS.SHOW_NON_ZERO );
     }
+
+    /**
+     * The set of MeshObjects that is being conveyed by the sender to the receiver,
+     * e.g. in response to a first-time lease requested.
+     */
+    protected ExternalizedNetMeshObject[] theConveyedMeshObjects = {};
 
     /**
      * The set of MeshObjects, identified by a NetMeshObjectAccessSpecification, for which the
@@ -710,58 +730,11 @@ public class SimpleXprisoMessage
     protected NetMeshObjectIdentifier [] theRequestedCanceledObjects = NetMeshObjectIdentifier.NET_EMPTY_ARRAY;
     
     /**
-     * The set of MeshObjects, identified by their MeshObjectIdentifier, that have been
-     * deleted semantically by the sender, and of whose deletion the receiver
-     * needs to be notified.
+     * The set of MeshObjects, identified by their MeshObjectIdentifier, that the sender
+     * wishes to resynchronize as dependent replicas.
      */
-    protected NetMeshObjectDeletedEvent [] theDeleteChanges = {};
-    
-    /**
-     * The set of MeshObjectCreatedEvents that the sender needs to convey to the receiver.
-     */
-    protected NetMeshObjectCreatedEvent [] theCreations = {};
-    
-    /**
-     * The set of MeshObjects that is being conveyed by the sender to the receiver,
-     * e.g. in response to a first-time lease requested.
-     */
-    protected ExternalizedNetMeshObject[] theConveyedMeshObjects = {};
+    protected NetMeshObjectIdentifier [] theRequestedResynchronizeReplicas = NetMeshObjectIdentifier.NET_EMPTY_ARRAY;
 
-    /**
-     * The set of NeighborAddedEvents that the sender needs to convey to the receiver.
-     */
-    protected NetMeshObjectNeighborAddedEvent [] theNeighborAdditions = {};
-    
-    /**
-     * The set of NeighborAddedEvents that the sender needs to convey to the receiver.
-     */
-    protected NetMeshObjectNeighborRemovedEvent [] theNeighborRemovals = {};
-    
-    /**
-     * The set of PropertyChanges that the sender needs to convey to the receiver.
-     */
-    protected NetMeshObjectPropertyChangeEvent [] thePropertyChanges = {};
-    
-    /**
-     * The set of RoleChanges that the sender needs to convey to the receiver.
-     */
-    protected NetMeshObjectRoleAddedEvent [] theRoleAdditions = {};
-    
-    /**
-     * The set of RoleChanges that the sender needs to convey to the receiver.
-     */
-    protected NetMeshObjectRoleRemovedEvent [] theRoleRemovals = {};
-    
-    /**
-     * The set of TypeAddedEvents that the sender needs to convey to the receiver.
-     */
-    protected NetMeshObjectTypeAddedEvent [] theTypeAdditions = {};
-    
-    /**
-     * The set of TypeRemovedEvents that the sender needs to convey to the receiver.
-     */
-    protected NetMeshObjectTypeRemovedEvent [] theTypeRemovals = {};
-    
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifier, for which the
      * sender requests the lock.
@@ -793,14 +766,55 @@ public class SimpleXprisoMessage
     protected NetMeshObjectIdentifier [] thePushHomeReplicas = NetMeshObjectIdentifier.NET_EMPTY_ARRAY;
 
     /**
-     * The set of MeshObjects, identified by their MeshObjectIdentifier, that the sender
-     * wishes to resynchronize as dependent replicas.
+     * The set of TypeAddedEvents that the sender needs to convey to the receiver.
      */
-    protected NetMeshObjectIdentifier [] theRequestedResynchronizeDependentReplicas = NetMeshObjectIdentifier.NET_EMPTY_ARRAY;
+    protected NetMeshObjectTypeAddedEvent [] theTypeAdditions = {};
+    
+    /**
+     * The set of TypeRemovedEvents that the sender needs to convey to the receiver.
+     */
+    protected NetMeshObjectTypeRemovedEvent [] theTypeRemovals = {};
+    
+    /**
+     * The set of PropertyChanges that the sender needs to convey to the receiver.
+     */
+    protected NetMeshObjectPropertyChangeEvent [] thePropertyChanges = {};
+    
+    /**
+     * The set of NeighborAddedEvents that the sender needs to convey to the receiver.
+     */
+    protected NetMeshObjectNeighborAddedEvent [] theNeighborAdditions = {};
+    
+    /**
+     * The set of NeighborAddedEvents that the sender needs to convey to the receiver.
+     */
+    protected NetMeshObjectNeighborRemovedEvent [] theNeighborRemovals = {};
+    
+    /**
+     * The set of EquivalentsAddedEvents that the sender needs to convey to the receiver.
+     */
+    protected NetMeshObjectEquivalentsAddedEvent [] theEquivalentAdditions = {};
 
     /**
-     * The set of MeshObjects that are being sent by the sender to the receiver in
-     * response to a synchronizedDependent request.
+     * The set of EquivalentsRemovedEvents that the sender needs to convey to the receiver.
      */
-    protected ExternalizedNetMeshObject[] theResynchronizedDependentReplicas = {};
+    protected NetMeshObjectEquivalentsRemovedEvent [] theEquivalentRemovals = {};
+
+    /**
+     * The set of RoleChanges that the sender needs to convey to the receiver.
+     */
+    protected NetMeshObjectRoleAddedEvent [] theRoleAdditions = {};
+    
+    /**
+     * The set of RoleChanges that the sender needs to convey to the receiver.
+     */
+    protected NetMeshObjectRoleRemovedEvent [] theRoleRemovals = {};
+    
+    /**
+     * The set of MeshObjects, identified by their MeshObjectIdentifier, that have been
+     * deleted semantically by the sender, and of whose deletion the receiver
+     * needs to be notified.
+     */
+    protected NetMeshObjectDeletedEvent [] theDeleteChanges = {};
+    
 }

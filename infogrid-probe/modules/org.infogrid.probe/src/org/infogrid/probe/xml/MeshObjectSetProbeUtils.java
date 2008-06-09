@@ -14,11 +14,20 @@
 
 package org.infogrid.probe.xml;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.model.primitives.EntityType;
+import org.infogrid.model.primitives.MeshTypeIdentifier;
+import org.infogrid.model.primitives.PropertyType;
+import org.infogrid.model.primitives.RoleType;
+import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
+import org.infogrid.modelbase.ModelBase;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  * Utility functions.
@@ -33,6 +42,7 @@ public abstract class MeshObjectSetProbeUtils
      * @return the original String
      * @see #escape
      */
+    @SuppressWarnings( "fallthrough" )
     static String descape(
             String enc )
     {
@@ -65,6 +75,10 @@ public abstract class MeshObjectSetProbeUtils
 
     /**
      * Helper to parse an ISO time to a long.
+     * 
+     * @param timeString the String containing the ISO time
+     * @return the long, in System.currentTimeMillis() format
+     * @throws IllegalArgumentException thrown in case of a syntax error
      */
     static long parseTime(
             String timeString )
@@ -100,6 +114,86 @@ public abstract class MeshObjectSetProbeUtils
         return ret;
     }
     
+
+    /**
+     * Helper method to look up EntityTypes.
+     *
+     * @param identifiers the identifiers of the EntityTypes to be found
+     * @param modelBase the ModelBase in which to find the EntityTypes
+     * @return the found EntityTypes
+     * @throws MeshTypeWithIdentifierNotFoundException thrown if an EntityType with one of the Identifiers cannot be found
+     */
+    protected static EntityType [] lookupEntityTypes(
+            MeshTypeIdentifier[] identifiers,
+            ModelBase            modelBase )
+        throws
+            MeshTypeWithIdentifierNotFoundException
+    {
+        EntityType [] ret = new EntityType[ identifiers.length ];
+        for( int i=0 ; i<identifiers.length ; ++i ) {
+            ret[i] = modelBase.findEntityTypeByIdentifier( identifiers[i] );
+        }
+        return ret;
+    }
+    
+    /**
+     * Helper method to look up a PropertyType.
+     * 
+     * @param identifier the identifier of the PropertyType to be found
+     * @param modelBase the ModelBase in which to find the PropertyType
+     * @return the found PropertyType
+     * @throws MeshTypeWithIdentifierNotFoundException thrown if a PropertyType with the Identifier cannot be found
+     */
+    protected static PropertyType lookupPropertyType(
+            MeshTypeIdentifier identifier,
+            ModelBase          modelBase )
+        throws
+            MeshTypeWithIdentifierNotFoundException
+    {
+        PropertyType ret = modelBase.findPropertyTypeByIdentifier( identifier );
+        return ret;
+    }
+    
+    /**
+     * Helper method to look up RoleTypes.
+     *
+     * @param identifiers list of identifiers of the RoleTypes to be found
+     * @param modelBase the ModelBase in which to find the RoleTypes
+     * @return the found RoleTypes
+     * @throws MeshTypeWithIdentifierNotFoundException thrown if a RoleType with one of the Identifiers cannot be found
+     */
+    protected static RoleType [] lookupRoleTypes(
+            ArrayList<MeshTypeIdentifier> identifiers,
+            ModelBase                     modelBase )
+        throws
+            MeshTypeWithIdentifierNotFoundException
+    {
+        RoleType [] ret = new RoleType[ identifiers.size() ];
+        for( int i=0 ; i<ret.length ; ++i ) {
+            ret[i] = modelBase.findRoleTypeByIdentifier( identifiers.get( i ) );
+        }
+        return ret;
+    }
+    
+    /**
+     * Helper method to obtain the text attribute of a node.
+     * 
+     * @param attrs XML element
+     * @param name name of the element containing the text
+     * @return the text contained in the named element
+     */
+    protected static String getTextContent(
+            NamedNodeMap attrs,
+            String       name )
+    {
+        Node n = attrs.getNamedItem( name );
+        if( n != null ) {
+            return n.getTextContent();
+        } else {
+            return null;
+        }
+    }
+ 
     /**
      * The pattern to parse an ISO time.
      */

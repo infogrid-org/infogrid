@@ -14,19 +14,15 @@
 
 package org.infogrid.mesh.set;
 
+import java.beans.PropertyChangeListener;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.WrongMeshBaseException;
-
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.traversal.TraversalSpecification;
-
 import org.infogrid.util.CursorIterable;
 import org.infogrid.util.CursorIterator;
-
-import java.beans.PropertyChangeListener;
-import org.infogrid.meshbase.MeshBase;
 
 /**
   * An unordered collection of MeshObject without duplicates (set semantics).

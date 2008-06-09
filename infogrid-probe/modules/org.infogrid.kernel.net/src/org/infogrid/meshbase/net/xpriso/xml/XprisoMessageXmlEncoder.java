@@ -29,7 +29,6 @@ import org.infogrid.mesh.net.externalized.xml.ExternalizedNetMeshObjectXmlEncode
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborRemovedEvent;
@@ -49,7 +48,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- * Encodes and decodes XprisoMessages in default XML format.
+ * Utility methods to encode/decode am XPRISO message to/from XML. Implements the SAX interface.
  */
 public class XprisoMessageXmlEncoder
         extends
@@ -64,15 +63,16 @@ public class XprisoMessageXmlEncoder
      */
     public XprisoMessageXmlEncoder()
     {
+        // no op
     }
 
     /**
      * Serialize an XprisoMessage to an OutputStream.
      * 
-     * 
-     * @param msg the input XprisoMessage
+     * @param msg the XprisoMessage
      * @param out the OutputStream to which to append the XprisoMessage
      * @throws EncodingException thrown if a problem occurred during encoding
+     * @throws IOException thrown if an I/O error occurred
      */
     public void encodeXprisoMessage(
             XprisoMessage msg,
@@ -91,10 +91,10 @@ public class XprisoMessageXmlEncoder
     }
 
     /**
-     * Encode an XprisoMessage.
+     * Serialize an XprisoMessage to a StringBuilder.
      * 
-     * @param msg the input XprisoMessage
-     * @param buf the StringBuilder to append to
+     * @param msg the XprisoMessage
+     * @param buf the StringBuilder to which to append the ExternalizedMeshObject
      * @throws EncodingException thrown if a problem occurred during encoding
      */
     public void appendXprisoMessage(
@@ -123,7 +123,7 @@ public class XprisoMessageXmlEncoder
             for( NetMeshObjectAccessSpecification current : requestedFirstTimeObjects ) {
                 buf.append( "    <" ).append( REQUESTED_FIRST_TIME_OBJECT_TAG );
                 buf.append( " " ).append( NETWORK_PATH_TAG ).append( "=\"" );
-                appendNetworkPath( current, buf );
+                appendNetMeshObjectAccessSpecification( current, buf );
                 buf.append( "\"/>\n" );
             }
         }
@@ -145,12 +145,6 @@ public class XprisoMessageXmlEncoder
                 buf.append( "\" " ).append( TIME_UPDATED_TAG ).append( "=\"" );
                 appendLong( current.getTimeEventOccurred(), buf );
                 buf.append( "\"/>\n" );
-            }
-        }
-        NetMeshObjectCreatedEvent [] creations = msg.getCreations();
-        if( creations != null ) {
-            for( NetMeshObjectCreatedEvent current : creations ) {
-                appendExternalizedMeshObject( current.getExternalizedMeshObject(), MESH_OBJECT_CREATED_TAG, buf );
             }
         }
         ExternalizedNetMeshObject [] conveyedMeshObjects = msg.getConveyedMeshObjects();
@@ -307,19 +301,13 @@ public class XprisoMessageXmlEncoder
                 buf.append( "\"/>\n" );
             }
         }
-        MeshObjectIdentifier [] requestedResynchronizeDependentReplicas = msg.getRequestedResynchronizeDependentReplicas();
+        MeshObjectIdentifier [] requestedResynchronizeDependentReplicas = msg.getRequestedResynchronizeReplicas();
         if( requestedResynchronizeDependentReplicas != null ) {
             for( MeshObjectIdentifier current : requestedResynchronizeDependentReplicas ) {
                 buf.append( "    <" ).append( REQUESTED_RESYNCHRONIZE_DEPENDENT_REPLICA_TAG );
                 buf.append( " " ).append( IDENTIFIER_TAG ).append( "=\"" );
                 appendIdentifier( current, buf );
                 buf.append( "\"/>\n" );
-            }
-        }
-        ExternalizedNetMeshObject [] resynchronizedDependentReplicas = msg.getResynchronizeDependentReplicas();
-        if( resynchronizedDependentReplicas != null ) {
-            for( ExternalizedNetMeshObject current : resynchronizedDependentReplicas ) {
-                appendExternalizedMeshObject( current, RESYNCHRONIZED_DEPENDENT_REPLICA_TAG, buf );
             }
         }
         if( msg.getCeaseCommunications() ) {
@@ -329,15 +317,18 @@ public class XprisoMessageXmlEncoder
     }
 
     /**
-     * Deserialize an XprisoMessage from a byte stream.
-     *
-     * @param s the InputStream from which to read
-     * @param life the MeshBaseLifecycleManager appropriate to create an appropriate ExternalizedMeshObject
-     * @return return the found XprisoMessage
+     * Deserialize a XprisoMessage from a stream.
+     * 
+     * @param contentAsStream the byte [] stream in which the ExternalizedProxy is encoded
+     * @param externalizedMeshObjectFactory the factory to use for ExternalizedMeshObjects
+     * @param meshObjectIdentifierFactory the factory to use for MeshObjectIdentifier
+     * @param meshTypeIdentifierFactory the factory to use for MeshTypes
+     * @return return the just-instantiated XprisoMessage
      * @throws DecodingException thrown if a problem occurred during decoding
+     * @throws IOException thrown if an I/O error occurred
      */
     public synchronized XprisoMessage decodeXprisoMessage(
-            InputStream                                    s,
+            InputStream                                    contentAsStream,
             ParserFriendlyExternalizedNetMeshObjectFactory externalizedMeshObjectFactory,
             NetMeshObjectIdentifierFactory                 meshObjectIdentifierFactory,
             MeshTypeIdentifierFactory                      meshTypeIdentifierFactory )
@@ -350,7 +341,7 @@ public class XprisoMessageXmlEncoder
         theMeshTypeIdentifierFactory     = meshTypeIdentifierFactory;
 
         try {
-            theParser.parse( s, this );
+            theParser.parse( contentAsStream, this );
             return theMessage;
 
         } catch( SAXException ex ) {
@@ -360,13 +351,15 @@ public class XprisoMessageXmlEncoder
             clearState();
         }
     }
+
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void startElement3(
@@ -401,10 +394,10 @@ public class XprisoMessageXmlEncoder
             }
 
             theMessage = ParserFriendlyXprisoMessage.create(
-                    requestId,
-                    responseId,
                     senderId,
                     receiverId );
+            theMessage.setRequestId( requestId );
+            theMessage.setResponseId( responseId );
             
         } else if( REQUESTED_FIRST_TIME_OBJECT_TAG.equals( qName )) {
             String pathString = attrs.getValue( NETWORK_PATH_TAG );
@@ -433,10 +426,7 @@ public class XprisoMessageXmlEncoder
                 log.warn( ex );
             }
             
-        } else if(    MESH_OBJECT_CREATED_TAG.equals( qName )
-                   || CONVEYED_MESH_OBJECT_TAG.equals( qName )
-                   || RESYNCHRONIZED_DEPENDENT_REPLICA_TAG.equals( qName ))
-        {
+        } else if( CONVEYED_MESH_OBJECT_TAG.equals( qName )) {
             theMeshObjectBeingParsed = theExternalizedMeshObjectFactory.createParserFriendlyExternalizedMeshObject();
             ParserFriendlyExternalizedNetMeshObject realObjectBeingParsed = (ParserFriendlyExternalizedNetMeshObject) theMeshObjectBeingParsed;
 
@@ -515,7 +505,7 @@ public class XprisoMessageXmlEncoder
         } else if( REQUESTED_LOCK_OBJECT_TAG.equals( qName )) {
             try {
                 NetMeshObjectIdentifier ref = ((NetMeshObjectIdentifierFactory)theMeshObjectIdentifierFactory).fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
-                theMessage.addRequestedLockObjects( ref );
+                theMessage.addRequestedLockObject( ref );
             } catch( URISyntaxException ex ) {
                 log.warn( ex );
             }
@@ -539,7 +529,7 @@ public class XprisoMessageXmlEncoder
         } else if( REQUESTED_RESYNCHRONIZE_DEPENDENT_REPLICA_TAG.equals( qName )) {
             try {
                 NetMeshObjectIdentifier ref = ((NetMeshObjectIdentifierFactory)theMeshObjectIdentifierFactory).fromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
-                theMessage.addRequestedResynchronizeDependentReplica( ref );
+                theMessage.addRequestedResynchronizeReplica( ref );
             } catch( URISyntaxException ex ) {
                 log.warn( ex );
             }
@@ -551,14 +541,15 @@ public class XprisoMessageXmlEncoder
             startElement4( namespaceURI, localName, qName, attrs );
         }
     }
-    
+
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void startElement4(
             String     namespaceURI,
@@ -572,11 +563,12 @@ public class XprisoMessageXmlEncoder
     }
     
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     @Override
     protected void endElement3(
@@ -596,20 +588,10 @@ public class XprisoMessageXmlEncoder
             // no op
 
         } else if( MESH_OBJECT_DELETED_TAG.equals( qName )) {
-            
-        } else if( MESH_OBJECT_CREATED_TAG.equals( qName )) {
-            theMessage.addCreation( new NetMeshObjectCreatedEvent(
-                    null,
-                    theMessage.getSenderIdentifier(),
-                    (ExternalizedNetMeshObject) theMeshObjectBeingParsed,
-                    theMessage.getSenderIdentifier() ));
-            
+            // no op
+
         } else if( CONVEYED_MESH_OBJECT_TAG.equals( qName )) {
             theMessage.addConveyedMeshObject( (ExternalizedNetMeshObject) theMeshObjectBeingParsed );
-            theMeshObjectBeingParsed = null;
-            
-        } else if( RESYNCHRONIZED_DEPENDENT_REPLICA_TAG.equals( qName )) {
-            theMessage.addResynchronizeDependentReplica( (ExternalizedNetMeshObject) theMeshObjectBeingParsed );
             theMeshObjectBeingParsed = null;
             
         } else if( NEIGHBOR_ADDITION_TAG.equals( qName )) {
@@ -634,7 +616,7 @@ public class XprisoMessageXmlEncoder
             theHasTypesBeingParsed = null;
             
         } else if( ROLE_ADDITION_TAG.equals( qName )) {
-            theMessage.addRoleAdditions( new NetMeshObjectRoleAddedEvent(
+            theMessage.addRoleAddition( new NetMeshObjectRoleAddedEvent(
                     (NetMeshObjectIdentifier) theHasTypesBeingParsed.getIdentifier(),
                     theHasTypesBeingParsed.getTypes(),
                     (NetMeshObjectIdentifier) ((ParserFriendlyExternalizedNetMeshObject.HasRoleTypes)theHasTypesBeingParsed).getNeighborIdentifier(),
@@ -701,13 +683,14 @@ public class XprisoMessageXmlEncoder
             endElement4( namespaceURI, localName, qName );
         }
     }
-    
+
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
+     * @throws SAXException thrown if a parsing error occurrs
      */
     protected void endElement4(
             String namespaceURI,
@@ -734,7 +717,7 @@ public class XprisoMessageXmlEncoder
     protected ParserFriendlyXprisoMessage theMessage;
     
     /**
-     * The PropertyChangeEvent currently being parsed.
+     * The MeshObject currently being parsed.
      */
     protected ParserFriendlyExternalizedMeshObject.HasProperties theHasPropertiesBeingParsed;
 }

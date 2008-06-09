@@ -43,40 +43,45 @@ import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
  *
  * <p>The sequence of invocations is:</p>
  * <pre>
- *   constructor
+ *   Probe constructor
  *   for( one or more times ) {
- *       readFromApi( ... )
- *       wait for some period of time
+ *       read( ... )
+ *       wait for some period of time, depending on the CoherenceSpecification in effect
+ *       write( ... ) [optional: only for Probes that also implement WriteableProbe]
  *   }
  * </pre>
- * <p>If a class also supports {@link org.infogrid.probe.WritableProbe WritableProbe},
- *    the sequence of invocation is:</p>
- * <pre>
- *   constructor
- *   for( one or more times ) {
- *       readFromApi( ... )
- *       wait for some period of time
- *       writeFromApi( ...)
- *   }
- * </pre>
+ * <p>This sequence may be repeated itself many times, even for the same data source:
+ * the Probe instance may be garbage collected in between. Garbage collection may also
+ * occur between the read and the write call.</p>
+ * <p>Note: Probes <b>must not</b> store persistent data in any place other than the
+ * MeshObjects that they instantiate.</p>
  */
 public interface ApiProbe
         extends
             Probe
 {
     /**
-     * Read from the API and instantiate corresponding MeshObjects.
+     * <p>Read from the API and instantiate corresponding MeshObjects.</p>
+     * <p>This method declares
+     * many different types of Exceptions; that enables the Probe Framework to handle many
+     * possible error conditions out of the box, thereby making Probe programming easier.
+     * Note that many of the declared Exceptions, if actually thrown, indicate a programming
+     * error in the Probe implementation (e.g. IsAbstractException).</p>
+     * <p>The Probe framework invokes this method with an open Transaction on the current Thread;
+     * the Probe developer does not have to worry about Transactions.</p>
+     * <p> It is not recommended that Probe instances
+     * keep around connection handles after this call ends: Probe invocation tends to be
+     * a relatively infrequent operations (e.g. minutes, hours or days apart).
      * 
      * @param dataSourceIdentifier identifies the data source that is being accessed
      * @param coherenceSpecification the type of data coherence that is requested by the application. Probe
      *         implementors may ignore this parameter, letting the Probe framework choose its own policy.
      *         If the Probe chooses to define its own policy (considering or ignoring this parameter), the
-     *         Probe must bless the Probe's HomeObject with a subtype of ProbeUpdateSpecification (defined
-     *         in the <code>org.infogrid.model.Probe</code> Subject Area) that reflects the policy.
+     *         Probe must bless the Probe's HomeObject with a subtype of <code>ProbeUpdateSpecification</code> (defined
+     *         in the <code>org.infogrid.model.Probe</code> Subject Area) and suitable Property
+     *         values that reflect the policy.
      * @param freshMeshBase the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe.
-     *         This MeshBase is empty when passed into this call, except for the home object.
-     * @throws IsAbstractException thrown if an EntityType or a Relationship could not be instantiated because
-     *         it was abstract. Throwing this typically indicates a programming error.
+     *         This StagingMeshBase is empty when passed into this call, except for the home object which always exists
      * @throws EntityBlessedAlreadyException thrown if a MeshObject was incorrectly blessed twice with the same
      *         EntityType. Throwing this typically indicates a programming error.
      * @throws EntityNotBlessedException thrown if a MeshObject was not blessed with a required EntityType.
@@ -86,20 +91,21 @@ public interface ApiProbe
      * @throws IllegalPropertyValueException thrown if a PropertyValue was assigned to a property that was
      *         outside of the allowed range. Throwing this typically indicates a programming error.
      * @throws IOException an input/output error occurred during execution of the Probe
+     * @throws IsAbstractException thrown if an EntityType or a Relationship could not be instantiated because
+     *         it was abstract. Throwing this typically indicates a programming error.
      * @throws MeshObjectIdentifierNotUniqueException thrown if the Probe developer incorrectly
      *         assigned duplicate MeshObjectsIdentifiers to created MeshObjects.
      *         Throwing this typically indicates a programming error.
      * @throws ModuleException thrown if a Module required by the Probe could not be loaded
      * @throws NotPermittedException thrown if an operation performed by the Probe was not permitted
-     * @throws NotRelatedException thrown if a relationship was supposed to be blessed, but the relationship
+     * @throws NotRelatedException thrown if a relationship was supposed to become blessed, but the relationship
      *         did not exist. Throwing this typically indicates a programming error.
+     * @throws ProbeException a Probe error occurred per the possible subclasses defined in ProbeException
      * @throws RelatedAlreadyException thrown if the Probe developer incorrectly attempted to
      *         relate two already-related MeshObjects. Throwing this typically indicates a programming error.
      * @throws RoleTypeBlessedAlreadyException thrown if a relationship was incorrectly blessed twice with the same
      *         RelationshipType, in the same direction. Throwing this typically indicates a programming error.
-     * @throws TransactionException this Exception is declared to make programming easier,
-     *         although actually throwing it would be a programming error. Throwing this typically indicates a programming error.
-     * @throws ProbeException a Probe error occurred per the possible subclasses defined in ProbeException
+     * @throws TransactionException a Transaction problem occurred. Throwing this typically indicates a programming error.
      * @throws URISyntaxException thrown if a URI was constructed in an invalid way
      */
     public void readFromApi(
@@ -107,12 +113,12 @@ public interface ApiProbe
             CoherenceSpecification coherenceSpecification,
             StagingMeshBase        freshMeshBase )
         throws
-            IsAbstractException,
             EntityBlessedAlreadyException,
             EntityNotBlessedException,
             IllegalPropertyTypeException,
             IllegalPropertyValueException,
             IOException,
+            IsAbstractException,
             MeshObjectIdentifierNotUniqueException,
             ModuleException,
             NotPermittedException,

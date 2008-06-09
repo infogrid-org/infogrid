@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * <p>This class supports a regular and a low-level logger, which reflect application-developer
  *    vs. protocol-developer-centric views of logging.</p>
  * 
- * @param T the message type
+ * @param <T> the message type
  */
 public abstract class PingPongMessageEndpoint<T>
         implements

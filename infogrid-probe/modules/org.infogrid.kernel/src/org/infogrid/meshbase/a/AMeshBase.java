@@ -59,6 +59,7 @@ public abstract class AMeshBase
      * @param identifierFactory the factory for MeshObjectIdentifiers appropriate for this MeshBase
      * @param setFactory the factory for MeshObjectSets appropriate for this MeshBase
      * @param modelBase the ModelBase containing type information
+     * @param life the MeshBaseLifecycleManager to use
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param cache the CachingMap that holds the MeshObjects in this MeshBase
      * @param context the Context in which this MeshBase runs.
@@ -68,24 +69,23 @@ public abstract class AMeshBase
             MeshObjectIdentifierFactory                 identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            AMeshBaseLifecycleManager                   life,
             AccessManager                               accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             Context                                     context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, context );
+        super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, context );
     }
 
-   /**
+    /**
      * <p>Obtain a manager for MeshObject lifecycles.</p>
      * 
      * @return a MeshBaseLifecycleManager that works on this MeshBase
      */
-    public synchronized AMeshBaseLifecycleManager getMeshBaseLifecycleManager()
+    @Override
+    public AMeshBaseLifecycleManager getMeshBaseLifecycleManager()
     {
-        if( theMeshBaseLifecycleManager == null ) {
-            theMeshBaseLifecycleManager = new AMeshBaseLifecycleManager( this );
-        }
-        return theMeshBaseLifecycleManager;
+        return (AMeshBaseLifecycleManager) super.getMeshBaseLifecycleManager();
     }
 
     /**
@@ -234,7 +234,7 @@ public abstract class AMeshBase
      * Update the lastUpdated property. This is delegated to here so ShadowMeshBases
      * can do this differently than regular MeshBases.
      *
-     * @param timeUpdated the time to set to, or -1L to indicate the current time
+     * @param timeUpdated the time to set to. -1 means "don't update" and 0 means "current time".
      * @param lastTimeUpdated the time this MeshObject was updated the last time
      * @return the time to set to
      */
@@ -243,10 +243,13 @@ public abstract class AMeshBase
             long lastTimeUpdated )
     {
         long ret;
-        if( timeUpdated != -1L ) {
-            ret = timeUpdated;
-        } else {
+        
+        if( timeUpdated == -1L ) {
+            ret = lastTimeUpdated;
+        } else if( timeUpdated == 0L ) {
             ret = System.currentTimeMillis();
+        } else {
+            ret = timeUpdated;
         }
         return ret;
     }
@@ -255,7 +258,7 @@ public abstract class AMeshBase
      * Update the lastRead property. This is delegated to here so ShadowMeshBases
      * can do this differently than regular MeshBases.
      *
-     * @param timeRead the time to set to, or -1L to indicate the current time
+     * @param timeRead the time to set to.  -1 means "don't update" and 0 means "current time".
      * @param lastTimeRead the time this MeshObject was read the last time
      * @return the time to set to
      */
@@ -264,10 +267,12 @@ public abstract class AMeshBase
             long lastTimeRead )
     {
         long ret;
-        if( timeRead != -1L ) {
-            ret = timeRead;
-        } else {
+        if( timeRead == -1L ) {
+            ret = lastTimeRead;
+        } else if( timeRead == 0L ) {
             ret = System.currentTimeMillis();
+        } else {
+            ret = timeRead;
         }
         return ret;
     }
@@ -282,9 +287,4 @@ public abstract class AMeshBase
     {
         return ResourceHelper.getInstance( AMeshBase.class );
     }
-
-    /**
-     * The lifecycle manager.
-     */
-    protected AMeshBaseLifecycleManager theMeshBaseLifecycleManager;
 }

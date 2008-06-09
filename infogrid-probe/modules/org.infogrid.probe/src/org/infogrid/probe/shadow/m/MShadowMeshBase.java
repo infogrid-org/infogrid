@@ -15,29 +15,26 @@
 package org.infogrid.probe.shadow.m;
 
 import org.infogrid.context.Context;
-
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-import org.infogrid.meshbase.net.Proxy;
-import org.infogrid.meshbase.net.ProxyManager;
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.a.DefaultAnetMeshObjectIdentifierFactory;
+import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.security.NetAccessManager;
-
 import org.infogrid.modelbase.ModelBase;
-
 import org.infogrid.net.NetMessageEndpointFactory;
-
 import org.infogrid.probe.ProbeDirectory;
-import org.infogrid.probe.shadow.DefaultShadowProxyFactory;
+import org.infogrid.probe.shadow.proxy.DefaultShadowProxyFactory;
+import org.infogrid.probe.shadow.proxy.DefaultShadowProxyPolicyFactory;
 import org.infogrid.probe.shadow.a.AShadowMeshBase;
-
+import org.infogrid.probe.shadow.a.AStagingMeshBaseLifecycleManager;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.MCachingHashMap;
 import org.infogrid.util.logging.Log;
@@ -53,11 +50,20 @@ public class MShadowMeshBase
     private static final Log log = Log.getLogInstance( MShadowMeshBase.class ); // our own, private logger
 
     /**
-      * Factory method.
-      *
-      * @param modelBase the ModelBase with the type definitions we use
-      * @param c the Context in which this MeshBase will run
-      */
+     * Factory method.
+     *
+     * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
+     * @param endpointFactory the factory for communications endpoints
+     * @param modelBase the ModelBase containing type information
+     * @param accessMgr the AccessManager that controls access to this NetMeshBase
+     * @param directory the ProbeDirectory to use
+     * @param timeNotNeededTillExpires the time, in milliseconds, that this MShadowMeshBase will continue operating
+     *         even if none of its MeshObjects are replicated to another NetMeshBase. If this is negative, it means "forever".
+     *         If this is 0, it will expire immediately after the first Probe run, before the caller returns, which is probably
+     *         not very useful.
+     * @param context the Context in which this NetMeshBase runs.
+     * @return the created MShadowMeshBase
+     */
     public static MShadowMeshBase create(
             NetMeshBaseIdentifier     identifier,
             NetMessageEndpointFactory endpointFactory,
@@ -65,29 +71,72 @@ public class MShadowMeshBase
             NetAccessManager          accessMgr,
             ProbeDirectory            directory,
             long                      timeNotNeededTillExpires,
-            Context                   c )
+            Context                   context )
+    {
+        DefaultShadowProxyPolicyFactory proxyPolicyFactory = DefaultShadowProxyPolicyFactory.create();
+
+        MShadowMeshBase ret = create(
+                identifier,
+                endpointFactory,
+                proxyPolicyFactory,
+                modelBase,
+                accessMgr,
+                directory,
+                timeNotNeededTillExpires,
+                context );
+        
+        return ret;
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
+     * @param endpointFactory the factory for communications endpoints
+     * @param proxyPolicyFactory the factory for ProxyPolicies for communications with other NetMeshBases
+     * @param modelBase the ModelBase containing type information
+     * @param accessMgr the AccessManager that controls access to this NetMeshBase
+     * @param directory the ProbeDirectory to use
+     * @param timeNotNeededTillExpires the time, in milliseconds, that this MShadowMeshBase will continue operating
+     *         even if none of its MeshObjects are replicated to another NetMeshBase. If this is negative, it means "forever".
+     *         If this is 0, it will expire immediately after the first Probe run, before the caller returns, which is probably
+     *         not very useful.
+     * @param context the Context in which this NetMeshBase runs.
+     * @return the created MShadowMeshBase
+     */
+    public static MShadowMeshBase create(
+            NetMeshBaseIdentifier     identifier,
+            NetMessageEndpointFactory endpointFactory,
+            ProxyPolicyFactory        proxyPolicyFactory,
+            ModelBase                 modelBase,
+            NetAccessManager          accessMgr,
+            ProbeDirectory            directory,
+            long                      timeNotNeededTillExpires,
+            Context                   context )
     {
         MCachingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = MCachingHashMap.create();
         MCachingHashMap<NetMeshBaseIdentifier,Proxy>     proxyStorage  = MCachingHashMap.create();
 
-        DefaultShadowProxyFactory proxyFactory = DefaultShadowProxyFactory.create( endpointFactory );
+        DefaultShadowProxyFactory proxyFactory = DefaultShadowProxyFactory.create( endpointFactory, proxyPolicyFactory );
         ProxyManager              proxyManager = ProxyManager.create( proxyFactory, proxyStorage );
 
-        NetMeshObjectIdentifierFactory identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( identifier );
-        ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
+        NetMeshObjectIdentifierFactory   identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( identifier );
+        ImmutableMMeshObjectSetFactory   setFactory        = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
+        AStagingMeshBaseLifecycleManager life              = AStagingMeshBaseLifecycleManager.create();
 
         MShadowMeshBase ret = new MShadowMeshBase(
                 identifier,
                 identifierFactory,
                 setFactory,
                 modelBase,
+                life,
                 accessMgr,
                 objectStorage,
                 proxyManager,
                 directory,
                 System.currentTimeMillis(), // a memory Shadow could only have been created now
                 timeNotNeededTillExpires,
-                c );
+                context );
 
         setFactory.setMeshBase( ret );
         proxyFactory.setNetMeshBase( ret );
@@ -102,45 +151,48 @@ public class MShadowMeshBase
     /**
      * Constructor. This does not initialize content.
      *
-     * @param identifier the MeshBaseIdentifier of this MeshBase
-     * @param identifierFactory the factory for MeshObjectIdentifiers appropriate for this MeshBase
+     * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
+     * @param identifierFactory the factory for NetMeshObjectIdentifiers appropriate for this NetMeshBase
+     * @param setFactory the factory for MeshObjectSets appropriate for this NetMeshBase
      * @param modelBase the ModelBase containing type information
-     * @param accessMgr the AccessManager that controls access to this MeshBase
-     * @param cache the CachingMap that holds the MeshObjects in this MeshBase
-     * @param proxyManager the ProxyManager for this NetMeshBase
+     * @param life the MeshBaseLifecycleManager to use
+     * @param accessMgr the AccessManager that controls access to this NetMeshBase
+     * @param cache the CachingMap that holds the NetMeshObjects in this NetMeshBase
+     * @param proxyManager the ProxyManager used by this NetMeshBase
      * @param directory the ProbeDirectory to use
      * @param timeCreated the time at which the data source was created (if this is a recreate operation) or -1
      * @param timeNotNeededTillExpires the time, in milliseconds, that this MShadowMeshBase will continue operating
      *         even if none of its MeshObjects are replicated to another NetMeshBase. If this is negative, it means "forever".
      *         If this is 0, it will expire immediately after the first Probe run, before the caller returns, which is probably
      *         not very useful.
-     * @param endpointFactory the MessageEndpointFactory to use for proxy communication
-     * @param context the Context in which this MeshBase runs.
+     * @param context the Context in which this NetMeshBase runs.
      */
     protected MShadowMeshBase(
             NetMeshBaseIdentifier                       identifier,
             NetMeshObjectIdentifierFactory              identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            AStagingMeshBaseLifecycleManager            life,
             NetAccessManager                            accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             ProxyManager                                proxyManager,
             ProbeDirectory                              directory,
             long                                        timeCreated,
             long                                        timeNotNeededTillExpires,
-            Context                                     c )
+            Context                                     context )
     {
         super(  identifier,
                 identifierFactory,
                 setFactory,
                 modelBase,
+                life,
                 accessMgr,
                 cache,
                 proxyManager,
                 directory,
                 timeCreated,
                 timeNotNeededTillExpires,
-                c );
+                context );
     }
 
     /**

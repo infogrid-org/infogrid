@@ -19,14 +19,14 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 
 /**
- *
+ * Representation of a ShadowMeshBase that can be easily serialized and deserialized.
  */
 public interface ExternalizedShadowMeshBase
 {
     /**
      * Obtain the NetMeshBaseIdentifier of the ShadowMeshBase.
      * 
-     * @return the NNetMeshBaseIdentifier
+     * @return the NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getNetworkIdentifier();
 

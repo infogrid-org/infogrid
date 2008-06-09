@@ -24,7 +24,7 @@ import org.infogrid.util.CachingMap;
 import org.infogrid.util.MCachingHashMap;
 
 /**
- * In-memory implementation of MPassiveProbeManager.
+ * In-memory implementation of PassiveProbeManager.
  */
 public class MPassiveProbeManager
         extends
@@ -33,23 +33,27 @@ public class MPassiveProbeManager
     /**
      * Factory method.
      *
-     * @param delegate the underlying Factory
+     * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
+     * @return the created MPassiveProbeManager
      */
     public static MPassiveProbeManager create(
-            ShadowMeshBaseFactory delegate )
+            ShadowMeshBaseFactory delegateFactory )
     {
         CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = MCachingHashMap.create();
 
-        return new MPassiveProbeManager( delegate, storage );
+        return new MPassiveProbeManager( delegateFactory, storage );
     }
 
     /**
      * Constructor.
+     * 
+     * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
+     * @param storage the storage to use
      */
     protected MPassiveProbeManager(
-            ShadowMeshBaseFactory                            delegate,
+            ShadowMeshBaseFactory                            delegateFactory,
             CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
     {
-        super( delegate, storage );
+        super( delegateFactory, storage );
     }
 }

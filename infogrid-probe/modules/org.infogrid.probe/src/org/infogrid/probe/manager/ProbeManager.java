@@ -25,8 +25,7 @@ import org.infogrid.util.NameServer;
 import org.infogrid.util.SmartFactory;
 
 /**
- * Objects that support this interface know how to manage ShadowMeshBases,
- * which usually update themselves.
+ * Objects that support this interface know how to manage ShadowMeshBases.
  */
 public interface ProbeManager
         extends

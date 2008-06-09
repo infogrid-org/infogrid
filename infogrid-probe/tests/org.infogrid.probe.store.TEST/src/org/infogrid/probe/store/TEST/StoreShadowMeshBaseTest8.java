@@ -14,23 +14,24 @@
 
 package org.infogrid.probe.store.TEST;
 
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.local.store.IterableLocalNetStoreMeshBase;
 import org.infogrid.meshbase.net.local.store.LocalNetStoreMeshBase;
+import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.store.prefixing.IterablePrefixingStore;
 import org.infogrid.util.logging.Log;
-
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Tests that shadow updates survive a reboot.
@@ -63,10 +64,12 @@ public class StoreShadowMeshBaseTest8
         
         log.info( "Creating MeshBase" );
         
-        NetMeshBaseIdentifier baseIdentifier = NetMeshBaseIdentifier.create(  "http://here.local/" );
+        NetMeshBaseIdentifier             baseIdentifier     = NetMeshBaseIdentifier.create(  "http://here.local/" );
+        NiceAndTrustingProxyPolicyFactory proxyPolicyFactory = NiceAndTrustingProxyPolicyFactory.create();
         
         IterableLocalNetStoreMeshBase base = IterableLocalNetStoreMeshBase.create(
                 baseIdentifier,
+                proxyPolicyFactory,
                 theModelBase,
                 null,
                 theMeshStore,
@@ -91,6 +94,7 @@ public class StoreShadowMeshBaseTest8
 
         checkEquals( base.getAllShadowMeshBases().size(), 1, "Wrong number of shadows" );
 
+        
         ShadowMeshBase shadow = base.getShadowMeshBaseFor( found.getProxyTowardsHomeReplica().getPartnerMeshBaseIdentifier() );
         checkObject( shadow, "Shadow not found" );
 
@@ -98,6 +102,9 @@ public class StoreShadowMeshBaseTest8
 
         NetMeshObject foundInShadow = shadow.findMeshObjectByIdentifier( foundIdentifier );
         checkObject( foundInShadow, "Object not found in shadow" );
+
+        checkProxies( found,         new NetMeshBase[] { shadow }, shadow, shadow, "Wrong proxies in main NetMeshBase" );
+        checkProxies( foundInShadow, new NetMeshBase[] { base },   null,   null,   "Wrong proxies in shadow" );
 
         //
         
@@ -134,6 +141,7 @@ public class StoreShadowMeshBaseTest8
 
         IterableLocalNetStoreMeshBase base2 = IterableLocalNetStoreMeshBase.create(
                 baseIdentifier,
+                proxyPolicyFactory,
                 theModelBase,
                 null,
                 theMeshStore,
@@ -158,6 +166,9 @@ public class StoreShadowMeshBaseTest8
         NetMeshObject foundInShadow2 = shadow2.findMeshObjectByIdentifier( foundIdentifier );
         checkObject( foundInShadow2, "Object not found in shadow" );
         checkCondition( !foundInShadow2.isBlessedBy( TestSubjectArea.AA ), "Not blessed correctly" );
+
+        checkProxies( found2,         new NetMeshBase[] { shadow2 }, shadow2, shadow2, "Wrong proxies in main NetMeshBase" );
+        checkProxies( foundInShadow2, new NetMeshBase[] { base2 },   null,    null,    "Wrong proxies in shadow" );
         
         //
         
@@ -209,6 +220,7 @@ public class StoreShadowMeshBaseTest8
      * Constructor.
      *
      * @param args the command-line arguments
+     * @throws Exception tests can throw all kinds of Exceptions
      */
     public StoreShadowMeshBaseTest8(
             String [] args )

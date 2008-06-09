@@ -27,7 +27,7 @@ import org.infogrid.meshbase.net.IterableNetMeshBaseDifferencer;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.NetSweeper;
-import org.infogrid.meshbase.net.ProxyManager;
+import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.sweeper.SweepStep;
 import org.infogrid.modelbase.ModelBase;
@@ -51,6 +51,7 @@ public abstract class AIterableNetMeshBase
      * @param identifierFactory the factory for NetMeshObjectIdentifiers appropriate for this NetMeshBase
      * @param setFactory the factory for MeshObjectSets appropriate for this NetMeshBase
      * @param modelBase the ModelBase containing type information
+     * @param life the MeshBaseLifecycleManager to use
      * @param accessMgr the AccessManager that controls access to this NetMeshBase
      * @param cache the CachingMap that holds the NetMeshObjects in this NetMeshBase
      * @param proxyManager the ProxyManager used by this NetMeshBase
@@ -61,12 +62,13 @@ public abstract class AIterableNetMeshBase
             NetMeshObjectIdentifierFactory              identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            AnetMeshBaseLifecycleManager                life,
             NetAccessManager                            accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             ProxyManager                                proxyManager,
             Context                                     context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, proxyManager, context );
+        super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, proxyManager, context );
     }
 
     /**
@@ -97,7 +99,7 @@ public abstract class AIterableNetMeshBase
     /**
      * Determine the number of MeshObjects in this MeshBase.
      *
-     * @return the number of MeshObjets in this MeshBase
+     * @return the number of MeshObjects in this MeshBase
      */
     public int size()
     {

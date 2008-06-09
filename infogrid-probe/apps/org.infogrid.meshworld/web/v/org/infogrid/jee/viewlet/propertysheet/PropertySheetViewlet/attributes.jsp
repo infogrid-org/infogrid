@@ -23,7 +23,7 @@
       <td class="name"><mesh:type meshTypeName="propertyType" /></td>
       <td class="value">
        <div class="slide-in-button"><a href="javascript:overlay_show( 'org-infogrid-jee-shell-http-HttpShellVerb-setProperty', { 'mesh.subject' : '<mesh:meshObjectId meshObjectName="Subject" stringRepresentation="Plain" filter="true" />', 'mesh.propertytype' : '<mesh:meshTypeId meshTypeName="propertyType" stringRepresentation="Plain" filter="true" />', 'mesh.propertyvalue' : '<mesh:property meshObjectName="Subject" propertyTypeName="propertyType" stringRepresentation="Plain" filter="true" />' } )" title="Change this property"><img src="${CONTEXT}/s/icons/edit.png" alt="Edit"/></a></div>
-       <mesh:propertyValue propertyValueName="propertyValue" />
+       <mesh:propertyValue propertyValueName="propertyValue" ignore="true"/>
       </td>
      </tr>
     </mesh:propertyIterate>

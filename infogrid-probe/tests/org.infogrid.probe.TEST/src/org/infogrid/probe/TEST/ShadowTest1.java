@@ -55,7 +55,7 @@ public class ShadowTest1
 
         //
         
-        log.info( "accessing #abc of test file with NetworkedMeshBase" );
+        log.info( "accessing #abc of test file with NetMeshBase" );
         
         MeshObject abc = base.accessLocally(
                 NetMeshObjectAccessSpecification.create(
@@ -68,7 +68,7 @@ public class ShadowTest1
         
         //
         
-        log.info( "accessing #def of test file with NetworkedMeshBase" );
+        log.info( "accessing #def of test file with NetMeshBase" );
         
         MeshObject def = base.accessLocally(
                 NetMeshObjectAccessSpecification.create(
@@ -102,13 +102,14 @@ public class ShadowTest1
         MeshObject baseHome   = base.getHomeObject();
         MeshObject shadowHome = shadow.getHomeObject();
         
-        checkEquals( changes.size(), 3, "wrong number of changes" );
+        checkEquals( changes.size(), 4, "wrong number of changes" );
         // These changes should be:
         // 1. Home Object created
         // 2. Home Object deleted
-        // 3. ProbeUpdateCounter changed
+        // 3. ProbeUpdateSpecification#ProbeRunCounter changed
+        // 4. ProbeUpdateSpecification#LastRunUsedWriteableProbe changed
 
-        if( changes.size() != 2 ) {
+        if( changes.size() != 4 ) {
             dumpChangeSet( changes, log );
         }
     }

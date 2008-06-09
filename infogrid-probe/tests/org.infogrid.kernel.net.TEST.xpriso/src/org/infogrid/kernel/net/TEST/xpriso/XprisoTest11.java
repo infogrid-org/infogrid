@@ -18,7 +18,7 @@ import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.IterableNetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.m.NetMMeshBase;
 import org.infogrid.meshbase.net.sweeper.UnnecessaryReplicasSweeper;
 import org.infogrid.meshbase.transaction.Transaction;

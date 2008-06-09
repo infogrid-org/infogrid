@@ -24,8 +24,8 @@ import org.infogrid.util.CachingMap;
 import org.infogrid.util.FactoryException;
 
 /**
- * This ProbeManager implementation is entirely passive and does not attempt
- * any automatic updates.
+ * This slightly degenerate ProbeManager implementation is entirely passive and does not attempt
+ * any automatic updates, regardless of requested CoherenceSpecifications.
  */
 public abstract class PassiveProbeManager
         extends
@@ -34,22 +34,23 @@ public abstract class PassiveProbeManager
     /**
      * Constructor.
      *
-     * @param delegate the underlying Factory
+     * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
+     * @param storage the storage to use
      */
     protected PassiveProbeManager(
-            ShadowMeshBaseFactory                            delegate,
+            ShadowMeshBaseFactory                            delegateFactory,
             CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
     {
-        super( delegate, storage );
+        super( delegateFactory, storage );
     }
 
     /**
      * Create a new, or obtain an already existing value for a provided key.
      *
      * @param key the key for which we want to obtain a value
-     * @param arguments optional arguments to pass through to the createFor method
+     * @param argument optional argument to pass through to the createFor method
      * @return the found or created value for this key
-     * @throws Exception catch-all Exception
+     * @throws FactoryException catch-all Exception, consider its cause
      */
     @Override
     public ShadowMeshBase obtainFor(
@@ -64,7 +65,7 @@ public abstract class PassiveProbeManager
     }
 
     /**
-     * We are not needed any more.
+     * Tell this ProbeManager that it is not needed any more.
      * 
      * @param isPermanent if true, this ProbeManager will go away permanently; if false, it may come alive again some time later
      */

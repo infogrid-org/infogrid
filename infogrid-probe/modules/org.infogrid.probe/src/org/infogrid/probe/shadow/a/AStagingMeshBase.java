@@ -14,30 +14,24 @@
 
 package org.infogrid.probe.shadow.a;
 
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.context.Context;
-
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-
+import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.meshbase.net.IterableNetMeshBaseDifferencer;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-import org.infogrid.meshbase.net.ProxyManager;
+import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.a.AnetMeshBase;
 import org.infogrid.meshbase.net.security.NetAccessManager;
-
 import org.infogrid.modelbase.ModelBase;
-
 import org.infogrid.probe.StagingMeshBase;
-
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CursorIterator;
 
-import java.util.concurrent.ScheduledExecutorService;
-import org.infogrid.mesh.set.MeshObjectSetFactory;
-
 /**
- * Factors out common functionality of ShadowMeshBases and MStagingMeshBase.
+ * Factors out common functionality of ShadowMeshBases and StagingMeshBase.
  */
 public abstract class AStagingMeshBase
         extends
@@ -48,28 +42,31 @@ public abstract class AStagingMeshBase
     /**
      * Constructor for subclasses only. This does not initialize content.
      *
-     * @param identifier the MeshBaseIdentifier of this MeshBase
-     * @param identifierFactory the factory for MeshObjectIdentifiers appropriate for this MeshBase
+     * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
+     * @param identifierFactory the factory for NetMeshObjectIdentifiers appropriate for this NetMeshBase
+     * @param setFactory the factory for MeshObjectSets appropriate for this NetMeshBase
      * @param modelBase the ModelBase containing type information
-     * @param accessMgr the AccessManager that controls access to this MeshBase
-     * @param cache the CachingMap that holds the MeshObjects in this MeshBase
-     * @param proxyManager the ProxyManager for this NetMeshBase
-     * @param context the Context in which this MeshBase runs.
+     * @param life the MeshBaseLifecycleManager to use
+     * @param accessMgr the AccessManager that controls access to this NetMeshBase
+     * @param cache the CachingMap that holds the NetMeshObjects in this NetMeshBase
+     * @param proxyManager the ProxyManager used by this NetMeshBase
+     * @param context the Context in which this NetMeshBase runs.
      */
     protected AStagingMeshBase(
             NetMeshBaseIdentifier                       identifier,
             NetMeshObjectIdentifierFactory              identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            AStagingMeshBaseLifecycleManager            life,
             NetAccessManager                            accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             ProxyManager                                proxyManager,
             Context                                     context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, proxyManager, context );
+        super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, proxyManager, context );
 
         setDefaultWillGiveUpLock( false ); // a shadow, after all
-        setPointsReplicasToItself( false ); // shadow is not authoritative except for its very own objects
+        // setDefaultPointsReplicasToItself( false ); // shadow is not authoritative except for its very own objects
     }
 
     /**
@@ -78,11 +75,8 @@ public abstract class AStagingMeshBase
      * @return a MeshBaseLifecycleManager that works on this MeshBase with the specified parameters
      */
     @Override
-    public synchronized AStagingMeshBaseLifecycleManager getMeshBaseLifecycleManager()
+    public AStagingMeshBaseLifecycleManager getMeshBaseLifecycleManager()
     {
-        if( theMeshBaseLifecycleManager == null ) {
-            theMeshBaseLifecycleManager = new AStagingMeshBaseLifecycleManager( this );
-        }
         return (AStagingMeshBaseLifecycleManager) theMeshBaseLifecycleManager;
     }
     
@@ -142,7 +136,7 @@ public abstract class AStagingMeshBase
     /**
      * Determine the number of MeshObjects in this MeshBase.
      *
-     * @return the number of MeshObjets in this MeshBase
+     * @return the number of MeshObjects in this MeshBase
      */
     public int size()
     {
@@ -169,8 +163,6 @@ public abstract class AStagingMeshBase
      */
     public void startBackgroundSweeping(
             ScheduledExecutorService scheduleVia )
-        throws
-            NullPointerException
     {
         // no op
     }
