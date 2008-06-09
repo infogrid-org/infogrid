@@ -14,19 +14,20 @@
 
 package org.infogrid.kernel.net.TEST.xpriso;
 
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.m.NetMMeshBase;
+import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
+import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.util.logging.Log;
-
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Tests multi-hop access to MeshObjects with NetMeshBases that point replicas to themselves.
@@ -51,10 +52,14 @@ public class XprisoTest2b
 
         NetMeshBaseLifecycleManager life1 = mb1.getMeshBaseLifecycleManager();
 
-        NetMeshObject obj1_mb1 = life1.createMeshObject( TestSubjectArea.AA );
+        NetMeshObject obj1_mb1 = life1.createMeshObject(
+                mb1.getMeshObjectIdentifierFactory().fromExternalForm( "obj1" ),
+                TestSubjectArea.AA );
         obj1_mb1.setPropertyValue( TestSubjectArea.A_X, StringValue.create( "This is a obj1." ));
 
-        NetMeshObject obj2_mb1 = life1.createMeshObject( TestSubjectArea.AA );
+        NetMeshObject obj2_mb1 = life1.createMeshObject(
+                mb1.getMeshObjectIdentifierFactory().fromExternalForm( "obj2" ),
+                TestSubjectArea.AA );
         obj2_mb1.setPropertyValue( TestSubjectArea.A_X, StringValue.create( "This is a obj2." ));
 
         obj1_mb1.relate( obj2_mb1 );
@@ -77,9 +82,11 @@ public class XprisoTest2b
                         obj2_mb1.getIdentifier() ));
         checkObject( obj2_mb3, "mb3 fails to access obj2." );
 
+        Thread.sleep( 12000L );
+
+        log.info( "Finding obj2_mb2" );
+
         NetMeshObject obj2_mb2 = mb2.findMeshObjectByIdentifier( obj2_mb1.getIdentifier() );
-        
-        Thread.sleep( 3500L );
         
         checkProxies( obj2_mb1, new NetMeshBase[] { mb2 },      null, null, "obj2_mb1 has wrong proxies" );
         checkProxies( obj2_mb2, new NetMeshBase[] { mb1, mb3 }, mb1,  mb1,  "obj2_mb2 has wrong proxies" );
@@ -96,7 +103,7 @@ public class XprisoTest2b
     {
         XprisoTest2b test = null;
         try {
-            if( args.length < 0 ) { // well, not quite possible but to stay with the general outline
+            if( args.length != 0 ) {
                 System.err.println( "Synopsis: <no arguments>" );
                 System.err.println( "aborting ..." );
                 System.exit( 1 );
@@ -121,10 +128,11 @@ public class XprisoTest2b
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception all kinds of things can go wrong in tests
+     */
     public XprisoTest2b(
             String [] args )
         throws
@@ -135,13 +143,11 @@ public class XprisoTest2b
         MPingPongNetMessageEndpointFactory endpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactory.setNameServer( theNameServer );
 
-        mb1 = NetMMeshBase.create( net1, endpointFactory, theModelBase, null, rootContext );
-        mb2 = NetMMeshBase.create( net2, endpointFactory, theModelBase, null, rootContext );
-        mb3 = NetMMeshBase.create( net3, endpointFactory, theModelBase, null, rootContext );
-
-        mb1.setPointsReplicasToItself( true );
-        mb2.setPointsReplicasToItself( true );
-        mb3.setPointsReplicasToItself( true );
+        ProxyPolicyFactory proxyPolicyFactory = NiceAndTrustingProxyPolicyFactory.create( true );
+        
+        mb1 = NetMMeshBase.create( net1, endpointFactory, proxyPolicyFactory, theModelBase, null, rootContext );
+        mb2 = NetMMeshBase.create( net2, endpointFactory, proxyPolicyFactory, theModelBase, null, rootContext );
+        mb3 = NetMMeshBase.create( net3, endpointFactory, proxyPolicyFactory, theModelBase, null, rootContext );
 
         theNameServer.put( mb1.getIdentifier(), mb1 );
         theNameServer.put( mb2.getIdentifier(), mb2 );
@@ -179,17 +185,17 @@ public class XprisoTest2b
     /**
      * The first NetMeshBase.
      */
-    protected NetMeshBase mb1;
+    protected NetMMeshBase mb1;
 
     /**
      * The second NetMeshBase.
      */
-    protected NetMeshBase mb2;
+    protected NetMMeshBase mb2;
 
     /**
      * The third NetMeshBase.
      */
-    protected NetMeshBase mb3;
+    protected NetMMeshBase mb3;
 
     /**
      * Our ThreadPool.

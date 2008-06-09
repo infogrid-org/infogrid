@@ -131,7 +131,7 @@ public class AMeshObject
      * Update the lastUpdated property. This does not trigger an event generation -- not necessary.
      * This may be overridden.
      *
-     * @param timeUpdated the time to set to, or -1L to indicate the current time
+     * @param timeUpdated the time to set to. -1 means "don't update" and 0 means "current time".
      * @param lastTimeUpdated the time this MeshObject was updated last before
      */
     protected void updateLastUpdated(
@@ -146,7 +146,7 @@ public class AMeshObject
      * Update the lastRead property. This does not trigger an event generation -- not necessary.
      * This may be overridden.
      *
-     * @param timeRead the time to set to, or -1L to indicate the current time
+     * @param timeRead the time to set to. -1 means "don't update" and 0 means "current time".
      * @param lastTimeRead the time this MeshObject was read last before
      */
     protected void updateLastRead(
@@ -434,7 +434,7 @@ public class AMeshObject
             TransactionException,
             NotPermittedException
     {
-        internalUnrelate( otherObject, theMeshBase, true );
+        internalUnrelate( otherObject, theMeshBase, true, 0L );
     }
     
     /**
@@ -443,6 +443,7 @@ public class AMeshObject
      * @param otherObject the MeshObject to unrelate from
      * @param mb the MeshBase that this MeshObject does or used to belong to
      * @param isMaster true if this is the master replica
+     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws NotRelatedException thrown if this MeshObject is not already related to the otherObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the operation is not permitted
@@ -450,7 +451,8 @@ public class AMeshObject
     protected void internalUnrelate(
             MeshObject otherObject,
             MeshBase   mb,
-            boolean    isMaster )
+            boolean    isMaster,
+            long       timeUpdated )
         throws
             NotRelatedException,
             TransactionException,
@@ -568,7 +570,7 @@ public class AMeshObject
                 realOtherObject.fireNeighborRemoved( oldHereSides, here, realOtherObject.theOtherSides, mb );
             }
         }
-        updateLastUpdated();
+        updateLastUpdated( timeUpdated, theTimeUpdated );
     }
 
     /**
@@ -629,7 +631,7 @@ public class AMeshObject
             TransactionException,
             NotPermittedException
     {
-        internalBless( thisEnds, otherObject, true, false );
+        internalBless( thisEnds, otherObject, true, false, 0L );
     }
     
     /**
@@ -640,6 +642,7 @@ public class AMeshObject
      * @param otherObject the MeshObject whose relationship to this MeshObject shall be blessed
      * @param isMaster if true, this is the master replica
      * @param forgiving if true, attempt to ignore errors
+     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws RoleTypeBlessedAlreadyException thrown if the relationship to the other MeshObject is blessed
      *         already with one ore more of the given RoleTypes
      * @throws EntityNotBlessedException thrown if the source or destination MeshObject was not blessed with a required EntityType
@@ -652,7 +655,8 @@ public class AMeshObject
             RoleType [] roleTypesToAddHere,
             MeshObject  otherObject,
             boolean     isMaster,
-            boolean     forgiving )
+            boolean     forgiving,
+            long        timeUpdated )
         throws
             RoleTypeBlessedAlreadyException,
             EntityNotBlessedException,
@@ -838,7 +842,7 @@ public class AMeshObject
                 }
             }
         }
-        updateLastUpdated();
+        updateLastUpdated( timeUpdated, theTimeUpdated );
     }
 
     /**
@@ -860,7 +864,7 @@ public class AMeshObject
             TransactionException,
             NotPermittedException
     {
-        internalUnbless( thisEnds, otherObject, true );
+        internalUnbless( thisEnds, otherObject, true, 0L );
     }
     
     /**
@@ -870,6 +874,7 @@ public class AMeshObject
      * @param roleTypesToRemoveHere the RoleType of the RelationshipType at the end that this MeshObject is attached to, and that shall be removed
      * @param otherObject the other MeshObject whose relationship to this MeshObject shall be unblessed
      * @param isMaster if true, this is the master replica
+     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws RoleTypeNotBlessedException thrown if the relationship to the other MeshObject does not support the RoleType
      * @throws NotRelatedException thrown if this MeshObject is not currently related to otherObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
@@ -878,7 +883,8 @@ public class AMeshObject
     protected void internalUnbless(
             RoleType [] roleTypesToRemoveHere,
             MeshObject  otherObject,
-            boolean     isMaster )
+            boolean     isMaster,
+            long        timeUpdated )
         throws
             RoleTypeNotBlessedException,
             NotRelatedException,
@@ -992,8 +998,8 @@ public class AMeshObject
                 fireTypesRemoved( oldRoleTypesHere, roleTypesToRemoveHere, newRoleTypesHere, otherObject, theMeshBase );
                 realOtherObject.fireTypesRemoved( oldRoleTypesThere, roleTypesToRemoveThere, newRoleTypesThere, this, theMeshBase );
             }
-        }        
-        updateLastUpdated();
+        }
+        updateLastUpdated( timeUpdated, theTimeUpdated );
     }
 
     /**
@@ -1433,7 +1439,7 @@ public class AMeshObject
             TransactionException,
             NotPermittedException
     {
-        internalAddAsEquivalent( equiv, true );
+        internalAddAsEquivalent( equiv, true, 0L );
     }
 
     /**
@@ -1442,13 +1448,15 @@ public class AMeshObject
      * 
      * @param equiv the new equivalent
      * @param isMaster is true, this is the master replica
+     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     protected synchronized void internalAddAsEquivalent(
             MeshObject equiv,
-            boolean    isMaster )
+            boolean    isMaster,
+            long       timeUpdated )
         throws
             EquivalentAlreadyException,
             TransactionException,
@@ -1507,7 +1515,7 @@ public class AMeshObject
         }
         leftMostHere.theEquivalenceSetPointers[0] = rightMostThere.getIdentifier();
         
-        updateLastUpdated();
+        updateLastUpdated( timeUpdated, theTimeUpdated );
     }
     
     /**
@@ -1568,7 +1576,7 @@ public class AMeshObject
             TransactionException,
             NotPermittedException
     {
-        internalRemoveAsEquivalent( true );
+        internalRemoveAsEquivalent( true, 0L );
     }
     
     /**
@@ -1576,11 +1584,13 @@ public class AMeshObject
      * factoring out this method makes any sense, subclasses may appreciate it.
      * 
      * @param isMaster if true, this is the master replica
+     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     protected void internalRemoveAsEquivalent(
-            boolean    isMaster )
+            boolean isMaster,
+            long    timeUpdated )
         throws
             TransactionException,
             NotPermittedException
@@ -1602,7 +1612,7 @@ public class AMeshObject
         
         theEquivalenceSetPointers = null;
 
-        updateLastUpdated();
+        updateLastUpdated( timeUpdated, theTimeUpdated );
     }
 
     /**
@@ -1629,7 +1639,7 @@ public class AMeshObject
             TransactionException,
             NotPermittedException
     {
-        internalDelete( true );
+        internalDelete( true, 0L );
     }
     
     /**
@@ -1637,11 +1647,13 @@ public class AMeshObject
      * factoring out this method makes any sense, subclasses may appreciate it.
      * 
      * @param isMaster true if this is the master replica
+     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     protected void internalDelete(
-            boolean isMaster )
+            boolean isMaster,
+            long    timeUpdated )
         throws
             TransactionException,
             NotPermittedException
@@ -1683,14 +1695,15 @@ public class AMeshObject
             for( int i=0 ; i<realOtherSides.length ; ++i ) {
                 if( realOtherSides[i] != null ) {
                     try {
-                        internalUnrelate( realOtherSides[i], oldMeshBase, isMaster );
+                        internalUnrelate( realOtherSides[i], oldMeshBase, isMaster, timeUpdated );
                     } catch( NotRelatedException ex ) {
                         // that's fine, ignore
                     } catch( NotPermittedException ex ) {
                         log.error( ex );
                     }
                 } else {
-                    log.error( "Unexpectedly other side not found: " + theOtherSides[i] );
+                    // that's fine, ignore -- may happen when a Probe drops both source and
+                    // destination at the same time
                 }
             }
         }

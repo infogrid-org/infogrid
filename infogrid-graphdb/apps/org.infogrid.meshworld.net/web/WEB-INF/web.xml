@@ -53,7 +53,7 @@
 
  <servlet>
   <servlet-name>ViewletDispatcher</servlet-name>
-  <servlet-class>org.infogrid.jee.servlet.ViewletDispatcherServlet</servlet-class>
+  <servlet-class>org.infogrid.jee.servlet.net.NetViewletDispatcherServlet</servlet-class>
  </servlet>
 
  <filter-mapping>
@@ -67,12 +67,12 @@
  </filter-mapping>
 
  <filter-mapping>
-  <filter-name>MainDispatcherFilter</filter-name>
+  <filter-name>HttpShellFilter</filter-name>
   <url-pattern>/*</url-pattern>
  </filter-mapping>
 
  <filter-mapping>
-  <filter-name>HttpShellFilter</filter-name>
+  <filter-name>MainDispatcherFilter</filter-name>
   <url-pattern>/*</url-pattern>
  </filter-mapping>
     

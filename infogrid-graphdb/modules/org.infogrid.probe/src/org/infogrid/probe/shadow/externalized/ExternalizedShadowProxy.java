@@ -17,8 +17,7 @@ package org.infogrid.probe.shadow.externalized;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 
 /**
- * An ExternalizedProxy that can represent the additional information on Proxies
- * required by ShadowMeshBases.
+ * Representation of a ShadowProxy that can be easily serialized and deserialized.
  */
 public interface ExternalizedShadowProxy
         extends

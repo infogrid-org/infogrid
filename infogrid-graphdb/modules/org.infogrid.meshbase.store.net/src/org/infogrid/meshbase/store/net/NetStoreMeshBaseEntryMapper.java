@@ -14,22 +14,17 @@
 
 package org.infogrid.meshbase.store.net;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.externalized.ExternalizedMeshObjectEncoder;
-
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObjectEncoder;
 import org.infogrid.mesh.net.externalized.xml.ExternalizedNetMeshObjectXmlEncoder;
-
-import org.infogrid.model.primitives.externalized.EncodingException;
-
 import org.infogrid.meshbase.store.AbstractStoreMeshBaseEntryMapper;
-
+import org.infogrid.model.primitives.externalized.EncodingException;
 import org.infogrid.store.StoreValueEncodingException;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 /**
  * Extends StoreMeshBaseEntryMapper for NetMeshObject data.
@@ -51,6 +46,7 @@ public class NetStoreMeshBaseEntryMapper
      *
      * @param value the value
      * @return the byte array
+     * @throws StoreValueEncodingException thrown if the MeshObject could not be encoded
      */
     @Override
     public byte [] asBytes(

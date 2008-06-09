@@ -1,15 +1,23 @@
-div.org-infogrid-jee-viewlet-propertysheet-net-NetPropertySheetViewlet > div.audit {
-    float: right;
+div.org-infogrid-jee-viewlet-propertysheet-net-NetPropertySheetViewlet > table.audit,
+div.org-infogrid-jee-viewlet-propertysheet-net-NetPropertySheetViewlet > table.audit > * > tr > td {
+    border-width: 0;
+    border-style: none;
+}
+div.org-infogrid-jee-viewlet-propertysheet-net-NetPropertySheetViewlet > table.audit > * > tr > td > div.audit {
     border-width: 1px;
     border-style: solid;
-    padding: 10px;
+    padding: 0 10px;
     font-size: 0.7em;
     margin: 0 0 10px 10px;
 }
-div.org-infogrid-jee-viewlet-propertysheet-net-NetPropertySheetViewlet > div.audit > table {
+div.org-infogrid-jee-viewlet-propertysheet-net-NetPropertySheetViewlet > table.audit > * > tr > td.audit {
+    width: 220px;
+}
+
+div.org-infogrid-jee-viewlet-propertysheet-net-NetPropertySheetViewlet div.audit > table {
     width: auto;
 }
-div.org-infogrid-jee-viewlet-propertysheet-net-NetPropertySheetViewlet > div.audit .label {
+div.org-infogrid-jee-viewlet-propertysheet-net-NetPropertySheetViewlet div.audit .label {
     text-align: right;
     font-weight: bold;
     padding-right: 8px;

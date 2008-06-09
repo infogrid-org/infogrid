@@ -38,6 +38,7 @@ public class MeshObjectsToView
     {
         return new MeshObjectsToView(
                 subject,
+                subject != null ? subject.getIdentifier() : null,
                 null,
                 null,
                 null,
@@ -57,6 +58,7 @@ public class MeshObjectsToView
     {
         return new MeshObjectsToView(
                 subject,
+                subject != null ? subject.getIdentifier() : null,
                 null,
                 viewletTypeName,
                 null,
@@ -83,6 +85,7 @@ public class MeshObjectsToView
     {
         return new MeshObjectsToView(
                 subject,
+                subject != null ? subject.getIdentifier() : null,
                 subjectParameters,
                 viewletTypeName,
                 viewletParameters,
@@ -93,6 +96,7 @@ public class MeshObjectsToView
      * Private constructor, use factory method.
      * 
      * @param subject the subject for the Viewlet
+     * @param subjectIdentifier the identifier of the subject for the Viewlet
      * @param subjectParameters the parameters for the Viewlet
      * @param viewletTypeName the type of Viewlet to use
      * @param viewletParameters the Viewlet parameters (eg size, zoom, ...) to use
@@ -100,13 +104,13 @@ public class MeshObjectsToView
      */
     protected MeshObjectsToView(
             MeshObject             subject,
+            MeshObjectIdentifier   subjectIdentifier,
             Map<String,Object>     subjectParameters,
             String                 viewletTypeName,
             Map<String,Object>     viewletParameters,
             TraversalSpecification traversalSpecification )
     {
         theSubject                = subject;
-        theSubjectIdentifier      = subject.getIdentifier();
         theSubjectParameters      = subjectParameters;
         theViewletTypeName        = viewletTypeName;
         theViewletParameters      = viewletParameters;

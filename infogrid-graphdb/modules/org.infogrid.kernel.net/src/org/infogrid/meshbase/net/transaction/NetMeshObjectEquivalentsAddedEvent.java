@@ -19,7 +19,7 @@ import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectUtils;
 
 import org.infogrid.meshbase.net.NetMeshBase;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.transaction.CannotApplyChangeException;
 import org.infogrid.meshbase.transaction.MeshObjectEquivalentsAddedEvent;
 import org.infogrid.meshbase.transaction.Transaction;
@@ -117,6 +117,7 @@ public class NetMeshObjectEquivalentsAddedEvent
      * @param newValueIdentifiers the identifiers representing the new values of the equivalents, after the event
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     * @param resolver the MeshBase against which the MeshObjectIdentifiers are currently resolved, if any
      */
     protected NetMeshObjectEquivalentsAddedEvent(
             NetMeshObject              source,
@@ -177,14 +178,16 @@ public class NetMeshObjectEquivalentsAddedEvent
      * current Thread.</p>
      *
      * @param base the NetMeshBase in which to apply the NetChange
+     * @param incomingProxy the Proxy through which this NetChange was received
      * @return the NetMeshObject to which the NetChange was applied
      * @throws CannotApplyChangeException thrown if the NetChange could not be applied, e.g because
      *         the affected NetMeshObject did not exist in MeshBase base
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
-    public NetMeshObject applyToReplicaIn(
-            NetMeshBase base )
+    public NetMeshObject potentiallyApplyToReplicaIn(
+            NetMeshBase base,
+            Proxy       incomingProxy )
         throws
             CannotApplyChangeException,
             TransactionException
@@ -194,21 +197,23 @@ public class NetMeshObjectEquivalentsAddedEvent
         Transaction tx = null;
 
         try {
-            tx = base.createTransactionNowIfNeeded();
+            NetMeshObject otherObject = (NetMeshObject) getSource();
+            if( otherObject != null && incomingProxy == otherObject.getProxyTowardsLockReplica() ) {
 
-            NetMeshObject    otherObject = (NetMeshObject) getSource();
-            NetMeshObject [] equivalents = (NetMeshObject []) getDeltaValue();
+                tx = base.createTransactionNowIfNeeded();
+                NetMeshObject [] equivalents = (NetMeshObject []) getDeltaValue();
 
-            // because we don't know which of the other MeshObjects are already equivalent, we simply try
-            // all. Some will fail, in which case we ignore exceptions.
-            for( NetMeshObject current : equivalents ) {
-                try {
-                    otherObject.rippleAddAsEquivalent( current.getIdentifier() );
+                // because we don't know which of the other MeshObjects are already equivalent, we simply try
+                // all. Some will fail, in which case we ignore exceptions.
+                for( NetMeshObject current : equivalents ) {
+                    try {
+                        otherObject.rippleAddAsEquivalent( current.getIdentifier(), getTimeEventOccurred() );
 
-                } catch( EquivalentAlreadyException ex ) {
+                    } catch( EquivalentAlreadyException ex ) {
 
-                    if( log.isDebugEnabled()) {
-                        log.debug( ex );
+                        if( log.isDebugEnabled()) {
+                            log.debug( ex );
+                        }
                     }
                 }
             }

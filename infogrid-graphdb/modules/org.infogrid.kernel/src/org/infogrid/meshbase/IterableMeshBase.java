@@ -31,7 +31,7 @@ public interface IterableMeshBase
             CursorIterable<MeshObject>
 {
     /**
-     * Returns a CursorIterator over the content of this MeshBase
+     * Returns a CursorIterator over the content of this MeshBase.
      * 
      * @return a CursorIterator.
      */
@@ -40,7 +40,7 @@ public interface IterableMeshBase
     /**
      * Determine the number of MeshObjects in this MeshBase.
      *
-     * @return the number of MeshObjets in this MeshBase
+     * @return the number of MeshObjects in this MeshBase
      */
     public abstract int size();
     

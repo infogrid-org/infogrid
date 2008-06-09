@@ -585,7 +585,9 @@ public class NetMeshObjectAccessSpecification
     {
         NetMeshObjectIdentifier [] ret = new NetMeshObjectIdentifier[ specs.length ];
         for( int i=0 ; i<ret.length ; ++i ) {
-            ret[i] = specs[i].getNetMeshObjectIdentifier();
+            if( specs[i] != null ) {
+                ret[i] = specs[i].getNetMeshObjectIdentifier();
+            } // else null
         }
         return ret;
     }

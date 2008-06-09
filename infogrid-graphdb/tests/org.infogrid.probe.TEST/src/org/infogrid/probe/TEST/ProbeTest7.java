@@ -14,23 +14,34 @@
 
 package org.infogrid.probe.TEST;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.comm.AbstractMessageEndpointListener;
 import org.infogrid.comm.MessageEndpoint;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.meshbase.net.DefaultProxyFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
-import org.infogrid.meshbase.net.ProxyManager;
+import org.infogrid.meshbase.net.a.AnetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.a.DefaultAnetMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
+import org.infogrid.meshbase.net.proxy.DefaultProxyFactory;
+import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyManager;
+import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.net.m.MPingPongNetMessageEndpoint;
 import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.probe.ApiProbe;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.StagingMeshBase;
+import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.manager.ScheduledExecutorProbeManager;
 import org.infogrid.probe.manager.m.MScheduledExecutorProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
@@ -39,15 +50,6 @@ import org.infogrid.util.CachingMap;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.MCachingHashMap;
 import org.infogrid.util.logging.Log;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import org.infogrid.mesh.net.NetMeshObject;
-import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
-import org.infogrid.probe.m.MProbeDirectory;
 
 /**
  * Make sure PingPong stops if a Probe fails.
@@ -95,21 +97,23 @@ public class ProbeTest7
 
         endpointFactory.setNameServer( probeManager.getNetMeshBaseNameServer() );
 
-        MCachingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage = MCachingHashMap.create();
-        DefaultProxyFactory                          proxyFactory = DefaultProxyFactory.create( endpointFactory );        
+        MCachingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage       = MCachingHashMap.create();
+        ProxyPolicyFactory                           proxyPolicyFactory = NiceAndTrustingProxyPolicyFactory.create();
+        DefaultProxyFactory                          proxyFactory       = DefaultProxyFactory.create( endpointFactory, proxyPolicyFactory );        
         
         ProxyManager proxyManager = ProxyManager.create( proxyFactory, proxyStorage );
                 
         CachingMap<MeshObjectIdentifier,MeshObject> theCache          = MCachingHashMap.create();
         DefaultAnetMeshObjectIdentifierFactory      identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( here );
         ImmutableMMeshObjectSetFactory              setFactory        = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
-        
+        AnetMeshBaseLifecycleManager                life              = AnetMeshBaseLifecycleManager.create();
         
         LocalNetMMeshBase base = new LocalNetMMeshBase(
                 here,
                 identifierFactory,
                 setFactory,
                 theModelBase,
+                life,
                 null,
                 theCache,
                 proxyManager,

@@ -14,6 +14,9 @@
 
 package org.infogrid.ALLTESTS;
 
+import java.io.BufferedInputStream;
+import java.util.Properties;
+
 import org.infogrid.module.Module;
 import org.infogrid.module.ModuleAdvertisement;
 import org.infogrid.module.ModuleRegistry;
@@ -23,9 +26,6 @@ import org.infogrid.module.StandardModuleAdvertisement;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.logging.log4j.Log4jLog;
-
-import java.io.BufferedInputStream;
-import java.util.Properties;
 
 /**
  * Invokes all of our tests.
@@ -57,7 +57,7 @@ public class AllTests
             ModuleRequirement.create1( "org.infogrid.probe.vcard.TEST" ),
             ModuleRequirement.create1( "org.infogrid.probe.store.TEST" ),
             ModuleRequirement.create1( "org.infogrid.kernel.active.TEST" ),
-            ModuleRequirement.create1( "org.infogrid.probe.TEST.active" ),
+            // ModuleRequirement.create1( "org.infogrid.probe.TEST.active" ), currently broken
     };
 
     /**

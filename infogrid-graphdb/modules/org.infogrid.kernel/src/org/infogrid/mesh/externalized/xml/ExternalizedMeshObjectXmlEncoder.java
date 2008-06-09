@@ -53,6 +53,7 @@ public class ExternalizedMeshObjectXmlEncoder
      */
     public ExternalizedMeshObjectXmlEncoder()
     {
+        // no op
     }
 
     /**
@@ -80,40 +81,40 @@ public class ExternalizedMeshObjectXmlEncoder
     }
 
     /**
-     * Encode a MeshObject value.
-     *
-     * @param theObject the MeshObject to encode
-     * @param buf the StringBuilder to append to
+     * Serialize an ExternalizedMeshObject to a StringBuilder.
+     * 
+     * @param obj the ExternalizedMeshObject to encode
+     * @param buf the StringBuilder to which to append the ExternalizedMeshObject
      * @throws EncodingException thrown if a problem occurred during encoding
      */
     public void appendExternalizedMeshObject(
-            ExternalizedMeshObject theObject,
+            ExternalizedMeshObject obj,
             StringBuilder          buf )
         throws
             EncodingException
     {
-        appendExternalizedMeshObject( theObject, MESHOBJECT_TAG, buf );
+        appendExternalizedMeshObject( obj, MESHOBJECT_TAG, buf );
     }
 
     /**
-     * Encode a MeshObject value.
+     * Serialize an ExternalizedMeshObject to a StringBuilder with an alternate XML top-level tag.
      *
-     * @param theObject the MeshObject to encode
-     * @param meshObjectTagName the XML tag name for this ExternalizedMeshObject
-     * @param buf the StringBuilder to append to
+     * @param obj the ExternalizedMeshObject to encode
+     * @param meshObjectTagName the XML top-level tag to use for this ExternalizedMeshObject
+     * @param buf the StringBuilder to which to append the ExternalizedMeshObject
      * @throws EncodingException thrown if a problem occurred during encoding
      */
     public void appendExternalizedMeshObject(
-            ExternalizedMeshObject theObject,
+            ExternalizedMeshObject obj,
             String                 meshObjectTagName,
-            StringBuilder          buf )
+            StringBuilder          buf  )
         throws
             EncodingException
     {
-        encodeOpeningTag( theObject, meshObjectTagName, buf );
+        encodeOpeningTag( obj, meshObjectTagName, buf  );
 
         // types
-        MeshTypeIdentifier [] allTypes = theObject.getExternalTypeIdentifiers();
+        MeshTypeIdentifier [] allTypes = obj.getExternalTypeIdentifiers();
         if( allTypes != null ) {
             for( int i=0 ; i<allTypes.length ; ++i ) {
                 buf.append( " " );
@@ -128,8 +129,8 @@ public class ExternalizedMeshObjectXmlEncoder
         }
 
         // properties
-        MeshTypeIdentifier [] allPropertyTypes  = theObject.getPropertyTypes();
-        PropertyValue []      allPropertyValues = theObject.getPropertyValues();
+        MeshTypeIdentifier [] allPropertyTypes  = obj.getPropertyTypes();
+        PropertyValue []      allPropertyValues = obj.getPropertyValues();
         if( allPropertyTypes != null ) {
             for( int i=0 ; i<allPropertyTypes.length ; ++i ) {
                 PropertyValue value        = allPropertyValues[i];
@@ -150,11 +151,11 @@ public class ExternalizedMeshObjectXmlEncoder
         }
         
         // neighbors
-        MeshObjectIdentifier [] neighbors = theObject.getNeighbors();
+        MeshObjectIdentifier [] neighbors = obj.getNeighbors();
         if( neighbors != null ) {
             for( int i=0 ; i<neighbors.length ; ++i ) {
                 MeshObjectIdentifier  currentNeighbor  = neighbors[i];
-                MeshTypeIdentifier [] currentRoleTypes = theObject.getRoleTypesFor( currentNeighbor );
+                MeshTypeIdentifier [] currentRoleTypes = obj.getRoleTypesFor( currentNeighbor );
                 buf.append( " <" );
                 buf.append( RELATIONSHIP_TAG );
                 buf.append( " " );
@@ -183,7 +184,7 @@ public class ExternalizedMeshObjectXmlEncoder
         }
         
         // equivalents. If we have this, we have to write even null values, because otherwise we can't distinguish right from left
-        MeshObjectIdentifier [] equivalentsNames = theObject.getEquivalents();
+        MeshObjectIdentifier [] equivalentsNames = obj.getEquivalents();
         if( equivalentsNames != null ) {
             for( int i=0 ; i<equivalentsNames.length ; ++i ) {
                 buf.append( " <" );
@@ -196,20 +197,20 @@ public class ExternalizedMeshObjectXmlEncoder
             }
         }
         
-        subclassEncodingHook( theObject, buf );
+        appendExternalizedMeshObjectEncodingHook( obj, buf  );
 
         buf.append( "</" ).append( meshObjectTagName ).append( ">\n" );
     }
 
     /**
-     * Factored out to make it easy for subclasses to add to the attributes list.
+     * Serialize the opening tag, to make it easy for subclasses to add to the attributes list.
      *
-     * @param theObject the AMeshObject to encode
-     * @param meshObjectTagName the XML tag name for this ExternalizedMeshObject
-     * @param buf the StringBuffer to write to
+     * @param obj the ExternalizedMeshObject to encode
+     * @param meshObjectTagName the XML top-level tag to use for this ExternalizedMeshObject
+     * @param buf the StringBuilder to which to append the ExternalizedMeshObject
      */
     protected void encodeOpeningTag(
-            ExternalizedMeshObject theObject,
+            ExternalizedMeshObject obj,
             String                 meshObjectTagName,
             StringBuilder          buf )
     {
@@ -218,49 +219,52 @@ public class ExternalizedMeshObjectXmlEncoder
         buf.append( " " );
         buf.append( IDENTIFIER_TAG );
         buf.append( "=\"" );
-        appendIdentifier( theObject.getIdentifier(), buf );
+        appendIdentifier( obj.getIdentifier(), buf );
         buf.append( "\" " );
         buf.append( TIME_CREATED_TAG );
         buf.append( "=\"" );
-        appendLong( theObject.getTimeCreated(), buf );
+        appendLong( obj.getTimeCreated(), buf );
         buf.append( "\" " );
         buf.append( TIME_UPDATED_TAG );
         buf.append( "=\"" );
-        appendLong( theObject.getTimeUpdated(), buf );
+        appendLong( obj.getTimeUpdated(), buf );
         buf.append( "\" " );
         buf.append( TIME_READ_TAG );
         buf.append( "=\"" );
-        appendLong( theObject.getTimeRead(), buf );
+        appendLong( obj.getTimeRead(), buf );
         buf.append( "\" " );
         buf.append( TIME_EXPIRES_TAG );
         buf.append( "=\"" );
-        appendLong( theObject.getTimeExpires(), buf );
+        appendLong( obj.getTimeExpires(), buf );
         buf.append( "\">\n" );
     }
     
     /**
-     * Hook to enable subclasses to add to the encoding defined on this level.
+     * Hook to enable subclasses to add to the encoding of an ExternalizedMeshObject.
      *
-     * @param theObject the MeshObject to encode
-     * @param buf the StringBuilder to add to
+     * @param obj the ExternalizedMeshObject to encode
+     * @param buf the StringBuilder to which to append the ExternalizedMeshObject
      */
-    protected void subclassEncodingHook(
-            ExternalizedMeshObject theObject,
+    protected void appendExternalizedMeshObjectEncodingHook(
+            ExternalizedMeshObject obj,
             StringBuilder          buf )
     {
         // noop on this level
     }
     
     /**
-     * Deserialize an ExternalizedMeshObject from a byte stream.
-     *
-     * @param s the InputStream from which to read
-     * @return return the deserialized ExternalizedMeshObject
+     * Deserialize a ExternalizedMeshObject from a stream.
+     * 
+     * @param contentAsStream the byte [] stream in which the ExternalizedProxy is encoded
+     * @param externalizedMeshObjectFactory the factory to use for ExternalizedMeshObjects
+     * @param meshObjectIdentifierFactory the factory to use for MeshObjectIdentifier
+     * @param meshTypeIdentifierFactory the factory to use for MeshTypes
+     * @return return the just-instantiated ExternalizedMeshObject
      * @throws DecodingException thrown if a problem occurred during decoding
      * @throws IOException thrown if an I/O error occurred
      */
     public synchronized ExternalizedMeshObject decodeExternalizedMeshObject(
-            InputStream                                 s,
+            InputStream                                 contentAsStream,
             ParserFriendlyExternalizedMeshObjectFactory externalizedMeshObjectFactory,
             MeshObjectIdentifierFactory                 meshObjectIdentifierFactory,
             MeshTypeIdentifierFactory                   meshTypeIdentifierFactory )
@@ -273,7 +277,7 @@ public class ExternalizedMeshObjectXmlEncoder
         theMeshTypeIdentifierFactory     = meshTypeIdentifierFactory;
         
         try {
-            theParser.parse( s, this );
+            theParser.parse( contentAsStream, this );
             return theMeshObjectBeingParsed;
 
         } catch( SAXException ex ) {
@@ -285,9 +289,9 @@ public class ExternalizedMeshObjectXmlEncoder
     }
 
     /**
-     * Addition to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
@@ -366,9 +370,9 @@ public class ExternalizedMeshObjectXmlEncoder
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous start-element parsing rule has matched. Allows subclasses to add to parsing.
      *
-     * @param namespaceURI URI of the namespace
+     * @param namespaceURI the URI of the namespace
      * @param localName the local name
      * @param qName the qName
      * @param attrs the Attributes at this element
@@ -386,7 +390,7 @@ public class ExternalizedMeshObjectXmlEncoder
     }
 
     /**
-     * Addition to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
@@ -438,7 +442,7 @@ public class ExternalizedMeshObjectXmlEncoder
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Invoked when no previous end-element parsing rule has matched. Allows subclasses to add to parsing.
      *
      * @param namespaceURI the URI of the namespace
      * @param localName the local name
@@ -467,17 +471,17 @@ public class ExternalizedMeshObjectXmlEncoder
     }
 
     /**
-     * The factory for ParserFriendlyExternalizedMeshObjects to use.
+     * The factory to use for ParserFriendlyExternalizedMeshObjects.
      */
     protected ParserFriendlyExternalizedMeshObjectFactory theExternalizedMeshObjectFactory;
 
     /**
-     * The factory for MeshObjectIdentifiers.
+     * The factory to use for MeshObjectIdentifiers.
      */
     protected MeshObjectIdentifierFactory theMeshObjectIdentifierFactory;
     
     /**
-     * The factory for MeshTypeIdentifiers.
+     * The factory to use for MeshTypeIdentifiers.
      */
     protected MeshTypeIdentifierFactory theMeshTypeIdentifierFactory;
 

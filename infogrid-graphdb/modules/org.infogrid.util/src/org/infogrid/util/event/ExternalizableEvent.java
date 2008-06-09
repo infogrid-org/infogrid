@@ -26,10 +26,10 @@ package org.infogrid.util.event;
  *    which enables a receiver of this event to re-create source and/or delta value
  *    if those could not be serialized directly.</p>
  * 
- * @param S the type of the event source
- * @param SID the type of the identifier of the event source
- * @param V the type of the value
- * @param VID the type of the identifier of the value
+ * @param <S> the type of the event source
+ * @param <SID> the type of the identifier of the event source
+ * @param <V> the type of the value
+ * @param <VID> the type of the identifier of the value
  */
 public interface ExternalizableEvent<S,SID,V,VID>
 {

@@ -28,7 +28,8 @@ import org.infogrid.meshbase.net.IterableNetMeshBaseDifferencer;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.NetSweeper;
-import org.infogrid.meshbase.net.ProxyManager;
+import org.infogrid.meshbase.net.a.AnetMeshBaseLifecycleManager;
+import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 
 import org.infogrid.modelbase.ModelBase;
@@ -50,35 +51,38 @@ public abstract class LocalAIterableNetMeshBase
             IterableNetMeshBase
 {
     /**
-     * Constructor for subclasses only. This does not initialize content.
+     * Constructor for subclasses only.
      *
-     * @param identifier the MeshBaseIdentifier of this MeshBase
-     * @param identifierFactory the factory for MeshObjectIdentifiers appropriate for this MeshBase
+     * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
+     * @param identifierFactory the factory for NetMeshObjectIdentifiers appropriate for this NetMeshBase
+     * @param setFactory the factory for MeshObjectSets appropriate for this NetMeshBase
      * @param modelBase the ModelBase containing type information
-     * @param accessMgr the AccessManager that controls access to this MeshBase
-     * @param cache the CachingMap that holds the MeshObjects in this MeshBase
-     * @param proxyManager the ProxyManager for this NetMeshBase
+     * @param life the MeshBaseLifecycleManager to use
+     * @param accessMgr the AccessManager that controls access to this NetMeshBase
+     * @param cache the CachingMap that holds the NetMeshObjects in this NetMeshBase
+     * @param proxyManager the ProxyManager used by this NetMeshBase
      * @param probeManager the ProbeManager for this LocalNetMeshBase
-     * @param context the Context in which this MeshBase runs.
+     * @param context the Context in which this NetMeshBase runs.
      */
     protected LocalAIterableNetMeshBase(
             NetMeshBaseIdentifier                       identifier,
             NetMeshObjectIdentifierFactory              identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            AnetMeshBaseLifecycleManager                life,
             NetAccessManager                            accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             ProxyManager                                proxyManager,
             ProbeManager                                probeManager,
-            Context                                     c )
+            Context                                     context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, proxyManager, probeManager, c );
+        super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, proxyManager, probeManager, context );
     }
 
     /**
-     * Map iterator.
-     *
-     * @return the iterator
+     * Returns a CursorIterator over the content of this NetMeshBase.
+     * 
+     * @return a CursorIterator.
      */
     public final CursorIterator<MeshObject> getIterator()
     {
@@ -88,7 +92,7 @@ public abstract class LocalAIterableNetMeshBase
     /**
      * Determine the number of MeshObjects in this MeshBase.
      *
-     * @return the number of MeshObjets in this MeshBase
+     * @return the number of MeshObjects in this MeshBase
      */
     public int size()
     {

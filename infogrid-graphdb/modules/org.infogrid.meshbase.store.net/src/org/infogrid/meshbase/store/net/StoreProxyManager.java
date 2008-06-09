@@ -15,9 +15,9 @@
 package org.infogrid.meshbase.store.net;
 
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
-import org.infogrid.meshbase.net.ProxyFactory;
-import org.infogrid.meshbase.net.ProxyManager;
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyFactory;
+import org.infogrid.meshbase.net.proxy.ProxyManager;
 
 import org.infogrid.store.util.StoreBackedMap;
 
@@ -26,7 +26,7 @@ import org.infogrid.util.SwappingHashMap;
 
 /**
  * Adds a listener to the ProxyManager that "patches" the Proxies recreated from
- * Storage.
+ * Storage by telling them about the StoreProxyManager.
  */
 public class StoreProxyManager
     extends
@@ -37,6 +37,7 @@ public class StoreProxyManager
      * 
      * @param proxyFactory the underlying factory of Proxies
      * @param storage the storage for the Proxies managed by this ProxyManager
+     * @return the created StoreProxyManager
      */
     public static StoreProxyManager create(
             ProxyFactory                                proxyFactory,

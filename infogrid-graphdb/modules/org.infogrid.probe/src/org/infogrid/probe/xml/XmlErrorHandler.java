@@ -30,14 +30,14 @@ public class XmlErrorHandler
             ErrorHandler
 {
     /**
-     * Construct one.
+     * Constructor.
      * 
-     * @param id the NNetMeshBaseIdentifierthat we attempted to access
+     * @param id the NetMeshBaseIdentifier we attempted to access
      * @param l the logger where to log errors to
      */
     public XmlErrorHandler(
             NetMeshBaseIdentifier id,
-            Log               l )
+            Log                   l )
     {
         theNetworkIdentifier = id;
         log                  = l;
@@ -136,8 +136,8 @@ public class XmlErrorHandler
     protected NetMeshBaseIdentifier theNetworkIdentifier;
 
     /**
-      * Error counter.
-      */
+     * Error counter.
+     */
     protected int theNumberOfErrors = 0;
 
     /**

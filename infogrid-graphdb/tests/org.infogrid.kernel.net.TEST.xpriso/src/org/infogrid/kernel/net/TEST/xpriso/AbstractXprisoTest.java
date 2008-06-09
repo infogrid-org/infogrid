@@ -23,7 +23,7 @@ import org.infogrid.mesh.set.MeshObjectSelector;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
@@ -146,7 +146,7 @@ public abstract class AbstractXprisoTest
         }
         return ret;
     }
-    
+
     /**
      * Check the position of the Proxies
      *
@@ -165,6 +165,11 @@ public abstract class AbstractXprisoTest
             String         msg )
     {
         boolean ret = true;
+        
+        if( obj == null ) {
+            reportError( "Cannot check proxies of null object" );
+            return false;
+        }
         
         Proxy [] proxies = obj.getAllProxies();
 
@@ -192,7 +197,24 @@ public abstract class AbstractXprisoTest
         for( int i=0 ; i<proxiesTowards.length ; ++i ) {
             proxiesTowardsIdentifiers[i] = proxiesTowards[i].getIdentifier();
         }
-        checkEqualsOutOfSequence( proxiesIdentifiers, proxiesTowardsIdentifiers, msg + ": same length, but not the same content" );
+        if( !checkEqualsOutOfSequence( proxiesIdentifiers, proxiesTowardsIdentifiers, null )) {
+            StringBuilder buf = new StringBuilder();
+            buf.append( msg ).append( ": not the same content: " );
+            String sep = "{ ";
+            for( NetMeshBaseIdentifier current : proxiesIdentifiers ) {
+                buf.append( sep );
+                buf.append( current.toExternalForm() );
+                sep = ", ";
+            }
+            sep = " } vs. { ";
+            for( NetMeshBaseIdentifier current : proxiesTowardsIdentifiers ) {
+                buf.append( sep );
+                buf.append( current.toExternalForm() );
+                sep = ", ";
+            }
+            buf.append( " }" );
+            reportError( buf.toString() );
+        }
 
         if( proxyTowardLock == null ) {
             if( obj.getProxyTowardsLockReplica() != null ) {
@@ -205,7 +227,7 @@ public abstract class AbstractXprisoTest
             ret = false;
 
         } else {
-            ret &= checkEquals( proxyTowardLock.getIdentifier(), obj.getProxyTowardsLockReplica().getPartnerMeshBaseIdentifier(), msg + ": wrong proxyTorwardLock" );
+            ret &= checkEquals( proxyTowardLock.getIdentifier(), obj.getProxyTowardsLockReplica().getPartnerMeshBaseIdentifier(), msg + ": wrong proxyTowardLock" );
         }
         if( proxyTowardHome == null ) {
             if( obj.getProxyTowardsHomeReplica() != null ) {
@@ -218,7 +240,7 @@ public abstract class AbstractXprisoTest
             ret = false;
 
         } else {
-            ret &= checkEquals( proxyTowardHome.getIdentifier(), obj.getProxyTowardsHomeReplica().getPartnerMeshBaseIdentifier(), msg + ": wrong proxyTorwardLock" );
+            ret &= checkEquals( proxyTowardHome.getIdentifier(), obj.getProxyTowardsHomeReplica().getPartnerMeshBaseIdentifier(), msg + ": wrong proxyTowardLock" );
         }
         return ret;
     }

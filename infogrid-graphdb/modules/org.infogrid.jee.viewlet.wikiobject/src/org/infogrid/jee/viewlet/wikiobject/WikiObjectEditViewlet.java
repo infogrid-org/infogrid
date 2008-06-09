@@ -14,24 +14,21 @@
 
 package org.infogrid.jee.viewlet.wikiobject;
 
+import javax.servlet.ServletException;
 import org.infogrid.context.Context;
-import org.infogrid.jee.viewlet.SimpleJeeViewlet;
+import org.infogrid.jee.rest.RestfulRequest;
+import org.infogrid.jee.viewlet.AbstractJeeViewlet;
+import org.infogrid.jee.viewlet.templates.StructuredResponse;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
-
 import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.Wiki.WikiSubjectArea;
-
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
-
-import javax.servlet.ServletException;
-import org.infogrid.jee.rest.RestfulRequest;
-import org.infogrid.jee.viewlet.templates.StructuredResponse;
-import org.infogrid.mesh.IllegalPropertyTypeException;
-import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.viewlet.AbstractViewedMeshObjects;
 import org.infogrid.viewlet.DefaultViewedMeshObjects;
 
@@ -40,7 +37,7 @@ import org.infogrid.viewlet.DefaultViewedMeshObjects;
  */
 public class WikiObjectEditViewlet
         extends
-            SimpleJeeViewlet
+            AbstractJeeViewlet
 {
     private static final Log log = Log.getLogInstance( WikiObjectEditViewlet.class ); // our own, private logger
 
@@ -75,6 +72,25 @@ public class WikiObjectEditViewlet
     }
 
     /**
+     * <p>Invoked prior to the execution of the Servlet if the GET method has been requested.
+     *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
+     *    the GET execution of the servlet.</p>
+     * 
+     * @param request the incoming request
+     * @param response the response to be assembled
+     * @throws ServletException thrown if an error occurred
+     */
+    @Override
+    public void performBeforeGet(
+            RestfulRequest     request,
+            StructuredResponse response )
+        throws
+            ServletException
+    {
+        preprocess( request, response );
+    }
+    
+    /**
      * <p>Invoked prior to the execution of the Servlet if the POST method has been requested
      *    and the FormTokenService determined that the incoming POST was safe.
      *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
@@ -86,6 +102,22 @@ public class WikiObjectEditViewlet
      */
     @Override
     public void performBeforeSafePost(
+            RestfulRequest     request,
+            StructuredResponse response )
+        throws
+            ServletException
+    {
+        preprocess( request, response );
+    }
+    
+    /**
+     * Internal helper to set up prior to rendering.
+     * 
+     * @param request the incoming request
+     * @param response the response to be assembled
+     * @throws ServletException thrown if an error occurred
+     */
+    protected void preprocess(
             RestfulRequest     request,
             StructuredResponse response )
         throws

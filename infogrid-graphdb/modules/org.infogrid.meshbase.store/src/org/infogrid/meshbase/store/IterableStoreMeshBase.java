@@ -25,6 +25,7 @@ import org.infogrid.meshbase.IterableMeshBaseDifferencer;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.MeshObjectIdentifierFactory;
 import org.infogrid.meshbase.Sweeper;
+import org.infogrid.meshbase.a.AMeshBaseLifecycleManager;
 import org.infogrid.meshbase.a.DefaultAMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.sweeper.SweepStep;
@@ -94,8 +95,9 @@ public class IterableStoreMeshBase
         IterableStoreBackedMap<MeshObjectIdentifier,MeshObject> objectStorage = IterableStoreBackedMap.createWeak( objectMapper, meshObjectStore );
 
         MeshObjectIdentifierFactory identifierFactory = DefaultAMeshObjectIdentifierFactory.create();
+        AMeshBaseLifecycleManager   life              = AMeshBaseLifecycleManager.create();
 
-        IterableStoreMeshBase ret = new IterableStoreMeshBase( identifier, identifierFactory, setFactory, modelBase, accessMgr, objectStorage, context );
+        IterableStoreMeshBase ret = new IterableStoreMeshBase( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, objectStorage, context );
 
         objectMapper.setMeshBase( ret );
         ret.initializeHomeObject();
@@ -113,6 +115,7 @@ public class IterableStoreMeshBase
      * @param identifierFactory the factory for MeshObjectIdentifiers appropriate for this MeshBase
      * @param setFactory the factory for MeshObjectSets appropriate for this MeshBase
      * @param modelBase the ModelBase containing type information
+     * @param life the MeshBaseLifecycleManager to use
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param cache the CachingMap that holds the MeshObjects in this MeshBase
      * @param context the Context in which this MeshBase runs
@@ -122,11 +125,12 @@ public class IterableStoreMeshBase
             MeshObjectIdentifierFactory                             identifierFactory,
             MeshObjectSetFactory                                    setFactory,
             ModelBase                                               modelBase,
+            AMeshBaseLifecycleManager                               life,
             AccessManager                                           accessMgr,
             IterableStoreBackedMap<MeshObjectIdentifier,MeshObject> cache,
             Context                                                 context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, context );
+        super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, context );
     }
     
     /**
@@ -152,7 +156,7 @@ public class IterableStoreMeshBase
     /**
      * Determine the number of MeshObjects in this MeshBase.
      *
-     * @return the number of MeshObjets in this MeshBase
+     * @return the number of MeshObjects in this MeshBase
      */
     public int size()
     {

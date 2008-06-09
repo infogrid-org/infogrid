@@ -21,12 +21,13 @@
     <target name="-pre-compile" depends="-module-setup"/>
 
     <!-- take out all the dependencies for the debug & run targets, so no automatic recompile etc.  -->
-    <target name="debug" description="Debug project in IDE." if="netbeans.home">
-        <nbdeploy debugmode="true" clientUrlPart="${client.urlPart}"/>
+    <target depends="init" description="Debug project in IDE." if="netbeans.home" name="debug">
+        <nbdeploy clientUrlPart="${client.urlPart}" debugmode="true"/>
         <antcall target="connect-debugger"/>
         <antcall target="debug-display-browser"/>
+        <antcall target="connect-client-debugger"/>
     </target>
-    <target name="run-deploy"  depends="init,-pre-run-deploy,-pre-nbmodule-run-deploy,-run-deploy-nb,-init-deploy-ant,-deploy-ant,-run-deploy-am,-post-nbmodule-run-deploy,-post-run-deploy"/>
+    <target name="run-deploy" depends="init,-pre-run-deploy,-pre-nbmodule-run-deploy,-run-deploy-nb,-init-deploy-ant,-deploy-ant,-run-deploy-am,-post-nbmodule-run-deploy,-post-run-deploy"/>
 
     <property file="production.properties"/>
 

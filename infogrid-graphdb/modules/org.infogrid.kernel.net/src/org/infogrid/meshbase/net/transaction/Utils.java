@@ -15,7 +15,7 @@
 package org.infogrid.meshbase.net.transaction;
 
 import org.infogrid.mesh.net.NetMeshObject;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 
 /**

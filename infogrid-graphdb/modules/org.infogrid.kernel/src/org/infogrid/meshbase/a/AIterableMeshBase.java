@@ -52,6 +52,7 @@ public abstract class AIterableMeshBase
      * @param identifierFactory the factory for MeshObjectIdentifiers appropriate for this MeshBase
      * @param setFactory the factory for MeshObjectSets appropriate for this MeshBase
      * @param modelBase the ModelBase containing type information
+     * @param life the MeshBaseLifecycleManager to use
      * @param accessMgr the AccessManager that controls access to this MeshBase
      * @param cache the CachingMap that holds the MeshObjects in this MeshBase
      * @param context the Context in which this MeshBase runs.
@@ -61,11 +62,12 @@ public abstract class AIterableMeshBase
             MeshObjectIdentifierFactory                 identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            AMeshBaseLifecycleManager                   life,
             AccessManager                               accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             Context                                     context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, context );
+        super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, context );
     }
 
     /**
