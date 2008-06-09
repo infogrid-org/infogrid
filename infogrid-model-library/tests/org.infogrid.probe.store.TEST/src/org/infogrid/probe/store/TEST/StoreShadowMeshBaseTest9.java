@@ -14,21 +14,21 @@
 
 package org.infogrid.probe.store.TEST;
 
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.local.store.IterableLocalNetStoreMeshBase;
 import org.infogrid.meshbase.net.local.store.LocalNetStoreMeshBase;
+import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
 import org.infogrid.model.Probe.ProbeSubjectArea;
 import org.infogrid.model.primitives.IntegerValue;
 import org.infogrid.store.prefixing.IterablePrefixingStore;
 import org.infogrid.util.logging.Log;
-
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Tests that shadows resume running probes at the right time after a reboot.
@@ -59,10 +59,12 @@ public class StoreShadowMeshBaseTest9
         
         log.info( "Creating MeshBase" );
         
-        NetMeshBaseIdentifier baseIdentifier = NetMeshBaseIdentifier.create(  "http://here.local/" );
+        NetMeshBaseIdentifier             baseIdentifier     = NetMeshBaseIdentifier.create(  "http://here.local/" );
+        NiceAndTrustingProxyPolicyFactory proxyPolicyFactory = NiceAndTrustingProxyPolicyFactory.create();
         
         IterableLocalNetStoreMeshBase base = IterableLocalNetStoreMeshBase.create(
                 baseIdentifier,
+                proxyPolicyFactory,
                 theModelBase,
                 null,
                 theMeshStore,
@@ -116,6 +118,7 @@ public class StoreShadowMeshBaseTest9
 
         IterableLocalNetStoreMeshBase base2 = IterableLocalNetStoreMeshBase.create(
                 baseIdentifier,
+                proxyPolicyFactory,
                 theModelBase,
                 null,
                 theMeshStore,
@@ -180,7 +183,7 @@ public class StoreShadowMeshBaseTest9
      * Constructor.
      *
      * @param args the command-line arguments
-     * @throws tests can throw all kinds of Exceptions
+     * @throws Exception tests can throw all kinds of Exceptions
      */
     public StoreShadowMeshBaseTest9(
             String [] args )

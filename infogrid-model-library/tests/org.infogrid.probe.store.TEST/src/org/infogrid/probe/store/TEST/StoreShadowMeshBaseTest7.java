@@ -16,22 +16,6 @@ package org.infogrid.probe.store.TEST;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.NotPermittedException;
-import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.local.store.LocalNetStoreMeshBase;
-import org.infogrid.meshbase.transaction.TransactionException;
-import org.infogrid.model.Test.TestSubjectArea;
-import org.infogrid.probe.ApiProbe;
-import org.infogrid.probe.ProbeDirectory;
-import org.infogrid.probe.StagingMeshBase;
-import org.infogrid.store.AbstractStoreListener;
-import org.infogrid.store.Store;
-import org.infogrid.store.StoreValue;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
-import org.infogrid.util.logging.Log;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
@@ -39,12 +23,28 @@ import org.infogrid.mesh.EntityNotBlessedException;
 import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.IsAbstractException;
+import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
+import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
+import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.local.store.LocalNetStoreMeshBase;
+import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
+import org.infogrid.meshbase.transaction.TransactionException;
+import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.module.ModuleException;
+import org.infogrid.probe.ApiProbe;
+import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.ProbeException;
+import org.infogrid.probe.StagingMeshBase;
+import org.infogrid.store.AbstractStoreListener;
+import org.infogrid.store.Store;
+import org.infogrid.store.StoreValue;
+import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.util.logging.Log;
 
 /**
  * Tests that LocalStoreNetMeshBase writes the data in the right tables.
@@ -93,8 +93,12 @@ public class StoreShadowMeshBaseTest7
         
         log.info( "Creating MeshBase" );
         
+        NetMeshBaseIdentifier             baseIdentifier     = NetMeshBaseIdentifier.create(  "http://here.local/" );
+        NiceAndTrustingProxyPolicyFactory proxyPolicyFactory = NiceAndTrustingProxyPolicyFactory.create();
+
         LocalNetStoreMeshBase base = LocalNetStoreMeshBase.create(
-                NetMeshBaseIdentifier.create(  "http://here.local/" ),
+                baseIdentifier,
+                proxyPolicyFactory,
                 theModelBase,
                 null,
                 theMeshStore,

@@ -26,10 +26,10 @@ import org.infogrid.util.event.ExternalizableEvent;
  * {@link org.infogrid.mesh.MeshObject} during a {@link Transaction}. Any instance of Change
  * represents an "elemental" change, there are no composites.
  * 
- * @param S the type of the event source
- * @param SID the type of the identifier of the event source
- * @param V the type of the value
- * @param VID the type of the identifier of the value
+ * @param <S> the type of the event source
+ * @param <SID> the type of the identifier of the event source
+ * @param <V> the type of the value
+ * @param <VID> the type of the identifier of the value
  */
 public interface Change<S,SID,V,VID>
         extends

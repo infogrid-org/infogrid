@@ -15,7 +15,6 @@
 package org.infogrid.testharness;
 
 import org.infogrid.util.logging.Log;
-
 import java.lang.reflect.Constructor;
 
 /**

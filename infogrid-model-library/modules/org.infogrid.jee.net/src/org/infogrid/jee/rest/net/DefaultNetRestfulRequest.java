@@ -14,26 +14,22 @@
 
 package org.infogrid.jee.rest.net;
 
-import org.infogrid.jee.app.InfoGridWebApp;
-import org.infogrid.jee.rest.AbstractRestfulRequest;
-import org.infogrid.jee.sane.SaneServletRequest;
-
-import org.infogrid.meshbase.MeshBase;
-import org.infogrid.meshbase.MeshBaseIdentifier;
-import org.infogrid.meshbase.MeshObjectAccessException;
-
-import org.infogrid.meshbase.net.NetMeshBase;
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
-
-import org.infogrid.util.NameServer;
-import org.infogrid.util.http.HTTP;
-import org.infogrid.util.logging.Log;
-
 import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.jee.app.InfoGridWebApp;
+import org.infogrid.jee.rest.AbstractRestfulRequest;
+import org.infogrid.jee.sane.SaneServletRequest;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.meshbase.MeshObjectAccessException;
+import org.infogrid.meshbase.net.NetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.util.NameServer;
+import org.infogrid.util.http.HTTP;
+import org.infogrid.util.logging.Log;
 
 /**
  * Default implementation of Net RestfulRequest.
@@ -118,13 +114,12 @@ public class DefaultNetRestfulRequest
                 throw new URISyntaxException( meshBaseIdentifierString, "Cannot find a MeshBase with this identifier" );
             }
             
+            theRequestedMeshObjectIdentifier = mb.getMeshObjectIdentifierFactory().fromExternalForm( meshObjectIdentifierString );
+            theRequestedMeshObject           = mb.accessLocally( theRequestedMeshObjectIdentifier );
+
             if( proxyIdentifierString != null ) {
                 theRequestedProxyIdentifier = NetMeshBaseIdentifier.create( proxyIdentifierString );
                 theRequestedProxy           = ((NetMeshBase)mb).getProxyFor( theRequestedProxyIdentifier );
-
-            } else {
-                theRequestedMeshObjectIdentifier = mb.getMeshObjectIdentifierFactory().fromExternalForm( meshObjectIdentifierString );
-                theRequestedMeshObject           = mb.accessLocally( theRequestedMeshObjectIdentifier );
             }
             
         } else {

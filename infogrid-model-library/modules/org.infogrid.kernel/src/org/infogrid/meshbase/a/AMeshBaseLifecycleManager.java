@@ -54,15 +54,22 @@ public class AMeshBaseLifecycleManager
     private static final Log log = Log.getLogInstance( AMeshBaseLifecycleManager.class ); // our own, private logger
 
     /**
-     * Constructor. The application developer should not call this or a subclass constructor; use
+     * Factory method. The application developer should not call this or a subclass constructor; use
      * MeshBase.getMeshObjectLifecycleManager() instead.
      * 
-     * @param base the AMeshBase on which this MeshBaseLifecycleManager works
+     * @return the created AMeshBaseLifecycleManager
      */
-    protected AMeshBaseLifecycleManager(
-            AMeshBase base )
+    public static AMeshBaseLifecycleManager create()
     {
-        super( base );
+        return new AMeshBaseLifecycleManager();
+    }
+    
+    /**
+     * Constructor, for subclasses only.
+     */
+    protected AMeshBaseLifecycleManager()
+    {
+        super();
     }
 
     /**
@@ -409,7 +416,7 @@ public class AMeshBaseLifecycleManager
         }
 
         MeshObjectIdentifier [] otherSides = theObjectBeingParsed.getNeighbors();
-        RoleType [][]     roleTypes  = new RoleType[ otherSides.length ][];
+        RoleType [][]           roleTypes  = new RoleType[ otherSides.length ][];
 
         for( int i=0 ; i<otherSides.length ; ++i ) {
             MeshTypeIdentifier [] currentRoleTypes = theObjectBeingParsed.getRoleTypesFor( otherSides[i] );
@@ -424,9 +431,9 @@ public class AMeshBaseLifecycleManager
                 } catch( Exception ex ) {
                     log.warn( ex );
                 }
-                if( typeCounter < roleTypes[i].length ) {
-                    roleTypes[i] = ArrayHelper.copyIntoNewArray( roleTypes[i], 0, typeCounter, RoleType.class );
-                }
+            }
+            if( typeCounter < roleTypes[i].length ) {
+                roleTypes[i] = ArrayHelper.copyIntoNewArray( roleTypes[i], 0, typeCounter, RoleType.class );
             }
         }
                 

@@ -23,7 +23,7 @@ import org.infogrid.util.ArrayHelper;
 import java.util.ArrayList;
 
 /**
- *
+ * A temporary buffer for a to-be-deserialized ShadowMeshBase.
  */
 public class ParserFriendlyExternalizedShadowMeshBase
         extends
@@ -31,6 +31,8 @@ public class ParserFriendlyExternalizedShadowMeshBase
 {
     /**
      * Factory method.
+     * 
+     * @return the created ParserFriendlyExternalizedShadowMeshBase
      */
     public static ParserFriendlyExternalizedShadowMeshBase create()
     {

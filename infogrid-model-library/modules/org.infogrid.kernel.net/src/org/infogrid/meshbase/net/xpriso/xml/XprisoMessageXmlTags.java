@@ -53,9 +53,6 @@ public interface XprisoMessageXmlTags
     /** Tag indicating objects to be deleted. */
     public static final String MESH_OBJECT_DELETED_TAG = "request-delete";
 
-    /** Tag indicating a MeshObject-created event. */
-    public static final String MESH_OBJECT_CREATED_TAG = "created";
-
     /** Tag indicating a conveyed, in-lined MeshObject. */
     public static final String CONVEYED_MESH_OBJECT_TAG = "conveyed";
     
@@ -91,9 +88,6 @@ public interface XprisoMessageXmlTags
     
     /** Tag indicating which MeshObjects are requested to be resynchronized. */
     public static final String REQUESTED_RESYNCHRONIZE_DEPENDENT_REPLICA_TAG = "requested-resynchronize";
-    
-    /** Tag indicating a resynchronized MeshObject. */
-    public static final String RESYNCHRONIZED_DEPENDENT_REPLICA_TAG = "resynchronized";
     
     /** Tag indicating that the sending Proxy wishes to cease communications. */
     public static final String CEASE_COMMUNICATIONS_TAG = "cease-communications";

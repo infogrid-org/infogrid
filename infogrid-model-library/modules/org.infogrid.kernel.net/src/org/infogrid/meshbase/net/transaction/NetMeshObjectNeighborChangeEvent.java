@@ -16,21 +16,16 @@ package org.infogrid.meshbase.net.transaction;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.transaction.MeshObjectNeighborChangeEvent;
 
 /**
- *
+ * Indicates that a NetMeshObject's set of neighbors has changed.
  */
 public interface NetMeshObjectNeighborChangeEvent
         extends
             MeshObjectNeighborChangeEvent,
+            NetMeshObjectRelationshipEvent,
             NetChange<MeshObject,MeshObjectIdentifier,MeshObject[],MeshObjectIdentifier[]>
 {
-    /**
-     * Obtain the neighbor that changed.
-     *
-     * @return the neighbor MeshObject
-     */
-    public NetMeshObject getNeighborMeshObject();
+    // nothing
 }

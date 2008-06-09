@@ -197,12 +197,12 @@ public class XprisoTest14
     /**
      * The first NetMeshBase.
      */
-    protected NetMeshBase mb1;
+    protected NetMMeshBase mb1;
 
     /**
      * The second NetMeshBase.
      */
-    protected NetMeshBase mb2;
+    protected NetMMeshBase mb2;
 
     /**
      * Our ThreadPool.

@@ -28,8 +28,8 @@ import org.infogrid.util.logging.Log;
  * after all of them have produced results. These results can come
  * in in any order. Queries are identified by keys.</p>
  * 
- * @param K the type of key
- * @param R the type of return value
+ * @param <K> the type of key
+ * @param <R> the type of return value
  */
 public class ReturnSynchronizer<K,R>
 {

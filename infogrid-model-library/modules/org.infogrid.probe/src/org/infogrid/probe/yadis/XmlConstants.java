@@ -15,7 +15,7 @@
 package org.infogrid.probe.yadis;
 
 /**
- * This pseudo-interface collects constants used in YADIS XML files.
+ * Collects constants used in Yadis XML files.
  */
 public interface XmlConstants
 {

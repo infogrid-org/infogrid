@@ -20,7 +20,7 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.util.Factory;
 
 /**
- * This type knows how to create ShadowMeshBases.
+ * Factory for ShadowMeshBases.
  */
 public interface ShadowMeshBaseFactory
         extends

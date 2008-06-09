@@ -21,15 +21,16 @@ import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
-import org.infogrid.meshbase.net.ProxyManager;
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 
 import org.infogrid.probe.StagingMeshBase;
-import org.infogrid.probe.shadow.PlaceholderShadowProxyFactory;
+import org.infogrid.probe.shadow.proxy.PlaceholderShadowProxyFactory;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.a.AStagingMeshBase;
 
+import org.infogrid.probe.shadow.a.AStagingMeshBaseLifecycleManager;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.MapCursorIterator;
@@ -37,11 +38,11 @@ import org.infogrid.util.MCachingHashMap;
 import org.infogrid.util.logging.Log;
 
 /**
- * This class is an in-memory MeshBase that is used as a staging area for Probes
- * to write their data into.
+ * <p>An in-memory MeshBase that is used as a staging area for Probes
+ * to write their data into.</p>
  *
- * This needs to inherit from NetMMeshBase, not just MMeshBase, in order to get the canonicalization
- * of Identifiers right.
+ * <p>This needs to inherit from NetMMeshBase, not just MMeshBase, in order to get the canonicalization
+ * of Identifiers right.</p>
  */
 public class MStagingMeshBase
         extends
@@ -66,9 +67,11 @@ public class MStagingMeshBase
         PlaceholderShadowProxyFactory proxyFactory = PlaceholderShadowProxyFactory.create();
         ProxyManager                  proxyManager = ProxyManager.create( proxyFactory, proxyStorage );
 
-        NetAccessManager accessMgr = null;
+        AStagingMeshBaseLifecycleManager life      = AStagingMeshBaseLifecycleManager.create();
+        NetAccessManager                 accessMgr = null;
 
         MStagingMeshBase ret = new MStagingMeshBase(
+                life,
                 accessMgr,
                 objectStorage,
                 proxyManager,
@@ -85,24 +88,27 @@ public class MStagingMeshBase
     /**
      * Constructor.
      *
+     * @param life the MeshBaseLifecycleManager to use
      * @param accessMgr the NetAccessManager to use. This is usually null. (FIUXME?)
      * @param cache stores the MeshObjects
      * @param shadow the ShadowMeshBase to which this MStagingMeshBase belongs
      * @param placeholderProxyManager the ProxyManager for this MStagingMeshBase. It only creates PlaceholderProxies.
      */
     protected MStagingMeshBase(
+            AStagingMeshBaseLifecycleManager            life,
             NetAccessManager                            accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
-            ProxyManager                                proxyManager,
+            ProxyManager                                placeholderProxyManager,
             ShadowMeshBase                              shadow )
     {
         super(  shadow.getIdentifier(),
                 shadow.getMeshObjectIdentifierFactory(),
                 ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class ),
                 shadow.getModelBase(),
+                life,
                 accessMgr,
                 cache,
-                proxyManager,
+                placeholderProxyManager,
                 shadow.getContext() );
 
         getMeshObjectSetFactory().setMeshBase( this );

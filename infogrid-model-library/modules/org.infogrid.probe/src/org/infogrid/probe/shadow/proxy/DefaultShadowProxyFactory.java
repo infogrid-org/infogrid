@@ -1,4 +1,3 @@
-//
 // This file is part of InfoGrid(tm). You may not use this file except in
 // compliance with the InfoGrid license. The InfoGrid license and important
 // disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
@@ -12,45 +11,69 @@
 // All rights reserved.
 //
 
-package org.infogrid.probe.shadow;
+package org.infogrid.probe.shadow.proxy;
 
-import org.infogrid.meshbase.net.AbstractProxyFactory;
 import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
-
+import org.infogrid.meshbase.net.proxy.AbstractProxyFactory;
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.net.NetMessageEndpoint;
-
+import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowProxy;
-
 import org.infogrid.util.FactoryException;
 
 /**
- * Factory of passive, non-communicating Proxies for the purposes of the StagingMeshBase only.
+ * Factory of DefaultShadowProxies.
  */
-public class PlaceholderShadowProxyFactory
+public class DefaultShadowProxyFactory
         extends
             AbstractProxyFactory
 {
     /** 
      * Factory method.
      *
-     * @return the created PlaceholderShadowProxyFactory.
+     * @param endpointFactory the NetMessageEndpointFactory to use to communicate
+     * @param proxyPolicyFactory the factory for ProxyPolicies for communications with other NetMeshBases
+     * @return the created DefaultProxyFactory.
      */
-    public static PlaceholderShadowProxyFactory create()
+    public static DefaultShadowProxyFactory create(
+            NetMessageEndpointFactory endpointFactory,
+            ProxyPolicyFactory        proxyPolicyFactory )
     {
-        PlaceholderShadowProxyFactory ret = new PlaceholderShadowProxyFactory();
+        DefaultShadowProxyFactory ret = new DefaultShadowProxyFactory( endpointFactory, proxyPolicyFactory );
         
         return ret;
     }
 
     /**
      * Constructor.
+     * 
+     * @param endpointFactory the NetMessageEndpointFactory to use to communicate
+     * @param proxyPolicyFactory the factory for ProxyPolicies for communications with other NetMeshBases
      */
-    protected PlaceholderShadowProxyFactory()
+    protected DefaultShadowProxyFactory(
+            NetMessageEndpointFactory endpointFactory,
+            ProxyPolicyFactory        proxyPolicyFactory )
     {
-        super( null );
+        super( endpointFactory, proxyPolicyFactory );
+    }
+
+    /**
+     * Set the NetMeshBase to be used with new Proxies. Make sure that this subclass can only
+     * be used with StagingMeshBases.
+     *
+     * @param base the NetMeshBase to use
+     */
+    @Override
+    public void setNetMeshBase(
+            NetMeshBase base )
+    {
+        StagingMeshBase realMeshBase = (StagingMeshBase) base;
+        super.setNetMeshBase( realMeshBase );
     }
 
     /**
@@ -67,8 +90,9 @@ public class PlaceholderShadowProxyFactory
         throws
             FactoryException
     {
-        Proxy ret = DefaultShadowProxy.create( null, theNetMeshBase );
-        ret.setCoherenceSpecification( arg );
+        NetMessageEndpoint endpoint = theEndpointFactory.obtainFor( partnerMeshBaseIdentifier, theNetMeshBase.getIdentifier() );
+
+        Proxy ret = DefaultShadowProxy.create( endpoint, theNetMeshBase );
         ret.setFactory( this );
 
         // we don't need to start communicating here yet -- it suffices that we start
@@ -80,9 +104,9 @@ public class PlaceholderShadowProxyFactory
     /**
      * Recreate a Proxy from an ExternalizedProxy.
      *
-     * @param identifier the NetMeshBaseIdentifier of the Proxy
      * @param externalized the ExternalizedProxy
      * @return the recreated Proxy
+     * @throws FactoryException thrown if the Proxy could not be restored
      */
     public Proxy restoreProxy(
             ExternalizedProxy externalized )

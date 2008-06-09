@@ -29,36 +29,55 @@ import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.util.FactoryException;
 
 /**
- * Knows how to instantiate MShadowMeshBases.
+ * Factory for MShadowMeshBases.
  */
 public class MShadowMeshBaseFactory
         extends
             AbstractShadowMeshBaseFactory
 {
     /**
-     * Factory method.
+     * Factory method for the MShadowMeshBaseFactory itself.
+     * 
+     * @param modelBase the ModelBase containing type information to be used by all created MShadowMeshBases
+     * @param endpointFactory factory for communications endpoints, to be used by all created MShadowMeshBases
+     * @param probeDirectory the ProbeDirectory to use for all Probes
+     * @param timeNotNeededTillExpires the time, in milliseconds, that all created MShadowMeshBases will continue operating
+     *         even if none of their MeshObjects are replicated to another NetMeshBase. If this is negative, it means "forever".
+     *         If this is 0, it will expire immediately after the first Probe run, before the caller returns, which is probably
+     *         not very useful.
+     * @param context the Context in which this all created MShadowMeshBases will run.
+     * @return MShadowMeshBaseFactory the created MShadowMeshBaseFactory
      */
     public static MShadowMeshBaseFactory create(
             ModelBase                 modelBase,
             NetMessageEndpointFactory endpointFactory,
             ProbeDirectory            probeDirectory,
             long                      timeNotNeededTillExpires,
-            Context                   c )
+            Context                   context )
     {
-        return new MShadowMeshBaseFactory( modelBase, endpointFactory, probeDirectory, timeNotNeededTillExpires, c );
+        return new MShadowMeshBaseFactory( modelBase, endpointFactory, probeDirectory, timeNotNeededTillExpires, context );
     }
 
     /**
      * Constructor.
+     * 
+     * @param modelBase the ModelBase containing type information to be used by all created MShadowMeshBases
+     * @param endpointFactory factory for communications endpoints, to be used by all created MShadowMeshBases
+     * @param probeDirectory the ProbeDirectory to use for all Probes
+     * @param timeNotNeededTillExpires the time, in milliseconds, that all created MShadowMeshBases will continue operating
+     *         even if none of their MeshObjects are replicated to another NetMeshBase. If this is negative, it means "forever".
+     *         If this is 0, it will expire immediately after the first Probe run, before the caller returns, which is probably
+     *         not very useful.
+     * @param context the Context in which this all created MShadowMeshBases will run.
      */
     protected MShadowMeshBaseFactory(
             ModelBase                 modelBase,
             NetMessageEndpointFactory endpointFactory,
             ProbeDirectory            probeDirectory,
             long                      timeNotNeededTillExpires,
-            Context                   c )
+            Context                   context )
     {
-        super( modelBase, endpointFactory, probeDirectory, timeNotNeededTillExpires, c );
+        super( modelBase, endpointFactory, probeDirectory, timeNotNeededTillExpires, context );
     }
 
     /**
@@ -69,7 +88,7 @@ public class MShadowMeshBaseFactory
      * @return the created object
      */
     public ShadowMeshBase obtainFor(
-            NetMeshBaseIdentifier      key,
+            NetMeshBaseIdentifier  key,
             CoherenceSpecification argument )
         throws
             FactoryException
@@ -85,8 +104,9 @@ public class MShadowMeshBaseFactory
         
         ret.setFactory( this );
 
+        Long next; // put out here for easier debugging
         try {
-            Long next = ret.doUpdateNow( argument );
+            next = ret.doUpdateNow( argument );
 
         } catch( Throwable ex ) {
             throw new FactoryException( ex );

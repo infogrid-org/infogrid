@@ -12,8 +12,9 @@
 // All rights reserved.
 //
 
-package org.infogrid.meshbase.net;
+package org.infogrid.meshbase.net.proxy;
 
+import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.net.NetMessageEndpointFactory;
 
 /**
@@ -27,11 +28,14 @@ public abstract class AbstractProxyFactory
      * Constructor.
      * 
      * @param endpointFactory the NetMessageEndpointFactory to use to communicate
+     * @param proxyPolicyFactory the factory for ProxyPolicies for communications with other NetMeshBases
      */
     protected AbstractProxyFactory(
-            NetMessageEndpointFactory endpointFactory )
+            NetMessageEndpointFactory endpointFactory,
+            ProxyPolicyFactory        proxyPolicyFactory )
     {
-        theEndpointFactory = endpointFactory;
+        theEndpointFactory    = endpointFactory;
+        theProxyPolicyFactory = proxyPolicyFactory;
     }
 
     /**
@@ -64,4 +68,9 @@ public abstract class AbstractProxyFactory
      * Factory for endpoints.
      */
     protected NetMessageEndpointFactory theEndpointFactory;
+    
+    /**
+     * Factory for ProxyPolicies.
+     */
+    protected ProxyPolicyFactory theProxyPolicyFactory;
 }

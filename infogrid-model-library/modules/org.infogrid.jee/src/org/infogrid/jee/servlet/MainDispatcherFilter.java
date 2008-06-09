@@ -124,6 +124,8 @@ public class MainDispatcherFilter
     
     /**
      * Initialization method for this filter.
+     * 
+     * @param filterConfig the Filter configuration
      */
     public void init(
             FilterConfig filterConfig )

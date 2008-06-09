@@ -14,19 +14,20 @@
 
 package org.infogrid.probe.TEST;
 
-import org.infogrid.mesh.net.NetMeshObject;
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
-import org.infogrid.meshbase.net.sweeper.UnnecessaryReplicasSweeper;
-import org.infogrid.probe.shadow.ShadowMeshBase;
-import org.infogrid.util.logging.Log;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
+import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
+import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
+import org.infogrid.meshbase.net.sweeper.UnnecessaryReplicasSweeper;
 import org.infogrid.probe.m.MProbeDirectory;
+import org.infogrid.probe.shadow.ShadowMeshBase;
+import org.infogrid.util.logging.Log;
 
 /**
  * Tests expiration of MeshObjects in the context of Shadows.
@@ -44,8 +45,9 @@ public class ProbeTest6
         throws
             Exception
     {
-        NetMeshBaseIdentifier  here = NetMeshBaseIdentifier.create( "http://here.local/" ); // this is not going to work for communications
-        LocalNetMMeshBase      base = LocalNetMMeshBase.create( here, theModelBase, null, exec, theProbeDirectory, 1000L, rootContext );
+        NetMeshBaseIdentifier here               = NetMeshBaseIdentifier.create( "http://here.local/" ); // this is not going to work for communications
+        ProxyPolicyFactory    proxyPolicyFactory = NiceAndTrustingProxyPolicyFactory.create();
+        LocalNetMMeshBase     base               = LocalNetMMeshBase.create( here, proxyPolicyFactory, theModelBase, null, exec, theProbeDirectory, 3000L, rootContext );
         
         base.setSweeper( UnnecessaryReplicasSweeper.create( 500L ));
         
@@ -136,7 +138,7 @@ public class ProbeTest6
         
         shadow.doUpdateNow();
 
-        Thread.sleep( 3000L );
+        Thread.sleep( 4000L );
         
         checkEquals( countFromIterator( base.proxies(), log ), 0, "Wrong number of proxies after second probe call" );
         checkEquals( base.getAllShadowMeshBases().size(), 0, "Wrong number of shadows after second probe call" );
@@ -180,6 +182,7 @@ public class ProbeTest6
      * Constructor.
      *
      * @param args command-line arguments
+     * @throws Exception all kinds of things can happen in a test
      */
     public ProbeTest6(
             String [] args )

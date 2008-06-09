@@ -74,6 +74,8 @@ public abstract class AbstractWritableProbeTest
                 // create MeshBase and run Probe
                 base = LocalNetMMeshBase.create( here, theModelBase, null, exec, theProbeDirectory, rootContext );
 
+                myLog.info( "Performing accessLocally" );
+
                 NetMeshObject shadowHomeInMain = base.accessLocally( TEST1_URL );
                 checkObject( shadowHomeInMain, "could not find shadow's home object in main MeshBase" );
 
@@ -142,7 +144,7 @@ public abstract class AbstractWritableProbeTest
     static {
         NetMeshBaseIdentifier temp;
         try {
-            temp = NetMeshBaseIdentifier.createUnresolvable( PROTOCOL_NAME + "://some.where/one" );
+            temp = NetMeshBaseIdentifier.createUnresolvable( PROTOCOL_NAME + "://shadow.some.where/one" );
         } catch( Exception ex ) {
             log.error( ex );
             temp = null; // make compiler happy
