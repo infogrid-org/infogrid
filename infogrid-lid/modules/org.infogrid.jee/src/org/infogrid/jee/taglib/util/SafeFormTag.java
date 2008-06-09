@@ -574,11 +574,20 @@ public class SafeFormTag
         print( ">" );
 
         if( "POST".equalsIgnoreCase( theMethod )) {
-            FormTokenService service = InfoGridWebApp.getSingleton().getFormTokenService();
-            if( service != null ) {
-                // no service, no output
-                String value = service.generateNewToken();
-
+            
+            String value = (String) pageContext.getAttribute( FORM_TOKEN_NAME );
+            
+            if( value == null ) {
+                FormTokenService service = InfoGridWebApp.getSingleton().getFormTokenService();
+                if( service != null ) {
+                    // no service, no output
+                    value = service.generateNewToken();
+                }
+                if( value != null ) {
+                    pageContext.setAttribute(  FORM_TOKEN_NAME, value );
+                }
+            }
+            if( value != null ) {
                 print( "<input name=\"" );
                 print( INPUT_FIELD_NAME );
                 print( "\" type=\"hidden\" value=\"" );
@@ -722,4 +731,9 @@ public class SafeFormTag
      * Name of the hidden field in the form.
      */
     public static final String INPUT_FIELD_NAME = "org-infogrid-jee-store-StoreTokenFormTag-csrf-field";
+    
+    /**
+     * Name of the buffered token in the page context.
+     */
+    public static final String FORM_TOKEN_NAME = SafeFormTag.class.getName() + "-token";
 }
