@@ -423,9 +423,7 @@ public class IterableMeshBaseDifferencer
             // If the MeshObject from COMPARISON does not exist in BASE, add a MeshObjectCreatedEvent to the ChangeSet
             if( meshObjectInBase == null ) {
 
-                AbstractMeshObjectLifecycleEvent creationChange = new MeshObjectCreatedEvent(
-                        comparisonBase,
-                        comparisonBase.getIdentifier(),
+                AbstractMeshObjectLifecycleEvent creationChange = createMeshObjectCreatedEvent( 
                         meshObjectInComparison,
                         meshObjectInComparison.getTimeCreated() );
                 entityChanges.addChange( creationChange );
@@ -564,6 +562,26 @@ public class IterableMeshBaseDifferencer
         for( int i=0 ; i<objs.length ; ++i ) {
             ret[i] = objs[i].getIdentifier();
         }
+        return ret;
+    }
+
+    /**
+     * Allow subclasses to instantiate a more specific event.
+     * 
+     * @param obj the MeshObject that was created
+     * @param time the time at which the creation occurred
+     * @return the MeshObjectCreatedEvent or subclass
+     */
+    protected MeshObjectCreatedEvent createMeshObjectCreatedEvent(
+            MeshObject             obj,
+            long                   time )
+    {
+        MeshObjectCreatedEvent ret = new MeshObjectCreatedEvent(
+                obj.getMeshBase(),
+                obj.getMeshBase().getIdentifier(),
+                obj,
+                time );
+
         return ret;
     }
 

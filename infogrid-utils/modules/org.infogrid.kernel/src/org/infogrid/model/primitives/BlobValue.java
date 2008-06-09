@@ -388,7 +388,7 @@ public abstract class BlobValue
             PropertyValue o )
     {
         // type cast to ensure ClassCastException
-        if( equals( (ByteBlob) o )) {
+        if( equals( (BlobValue) o )) {
             return 0;
         } else {
             return +2; // not comparable convention: +2
@@ -1232,8 +1232,7 @@ public abstract class BlobValue
                 if( theValue.length != realOtherValue.theValue.length ) {
                     return false;
                 }
-                for( int i=0 ; i<theValue.length ; ++i )
-                {
+                for( int i=0 ; i<theValue.length ; ++i ) {
                     if( theValue[i] != realOtherValue.theValue[i] ) {
                         return false;
                     }

@@ -22,19 +22,8 @@ import org.infogrid.mesh.MeshObjectIdentifier;
  */
 public interface MeshObjectNeighborChangeEvent
         extends
+            MeshObjectRelationshipEvent,
             Change<MeshObject,MeshObjectIdentifier,MeshObject[],MeshObjectIdentifier[]>
 {
-    /**
-     * Obtain the Identifier of the neighbor that changed.
-     *
-     * @return the Identifier of the neighbor MeshObject
-     */
-    public MeshObjectIdentifier getNeighborMeshObjectIdentifier();
-
-    /**
-     * Obtain the neighbor that changed.
-     *
-     * @return the neighbor MeshObject
-     */
-    public MeshObject getNeighborMeshObject();
+    // nothing
 }

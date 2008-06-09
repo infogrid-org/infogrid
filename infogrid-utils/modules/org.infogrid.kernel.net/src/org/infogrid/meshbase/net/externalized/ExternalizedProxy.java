@@ -14,11 +14,10 @@
 
 package org.infogrid.meshbase.net.externalized;
 
-import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-
 import java.util.List;
+import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 
 /**
  * Representation of Proxy that can be easily serialized and deserialized.
@@ -56,7 +55,7 @@ public interface ExternalizedProxy
     /**
      * Obtain the NetMeshBaseIdentifier of the NetMeshBase to which this Proxy belongs.
      * 
-     * @return the NNetMeshBaseIdentifier
+     * @return the NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getNetworkIdentifier();
 
@@ -66,6 +65,13 @@ public interface ExternalizedProxy
      * @return the NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getNetworkIdentifierOfPartner();
+
+    /**
+     * Obtain the CoherenceSpecification used by this Proxy.
+     * 
+     * @return the CoherenceSpecification
+     */
+    public CoherenceSpecification getCoherenceSpecification();
 
     /**
      * Obtain the token that was last sent by this Proxy.

@@ -23,7 +23,7 @@ import org.infogrid.mesh.net.a.AnetMeshObject;
 
 import org.infogrid.meshbase.a.AMeshObjectEquivalenceSetComparator;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.Proxy;
+import org.infogrid.meshbase.net.proxy.Proxy;
 
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
@@ -53,15 +53,24 @@ public class StoreShadowMeshBaseLifecycleManager
     private static final Log log = Log.getLogInstance( StoreShadowMeshBaseLifecycleManager.class ); // our own, private logger
     
     /**
-     * Constructor. The application developer should not call this or a subclass constructor; use
+     * Factory method. The application developer should not call this or a subclass constructor; use
      * MeshBase.getMeshObjectLifecycleManager() instead.
      * 
-     * @param base the StoreShadowMeshBase on which this MeshBaseLifecycleManager works
+     * @return the created StoreShadowMeshBaseLifecycleManager
      */
-    protected StoreShadowMeshBaseLifecycleManager(
-            StoreShadowMeshBase base )
+    public static StoreShadowMeshBaseLifecycleManager create()
     {
-        super( base );
+        StoreShadowMeshBaseLifecycleManager ret = new StoreShadowMeshBaseLifecycleManager();
+        return ret;
+    }
+
+    /**
+     * Constructor. The application developer should not call this or a subclass constructor; use
+     * MeshBase.getMeshObjectLifecycleManager() instead.
+     */
+    protected StoreShadowMeshBaseLifecycleManager()
+    {
+        super();
     }
     
     /**

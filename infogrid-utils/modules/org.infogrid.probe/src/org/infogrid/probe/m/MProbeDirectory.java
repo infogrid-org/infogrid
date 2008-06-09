@@ -20,14 +20,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * In-memory implementation of ProbeDirectory.
+ * Simple in-memory implementation of ProbeDirectory.
  */
 public class MProbeDirectory
         extends
             AbstractProbeDirectory
 {
     /**
-     * Factory method.
+     * Factory method to create an empty MProbeDirectory.
      *
      * @return the created MProbeDirectory
      */
@@ -43,7 +43,42 @@ public class MProbeDirectory
     }
 
     /**
+     * Factory method to create a MProbeDirectory with the specified content.
+     *
+     * @param xmlDomProbes the set of XmlDOMProbeDescriptors to initialize with
+     * @param streamProbes the set of StreamProbeDescriptors to initialize with
+     * @param apiProbes the set of ApiProbeDescriptor to initialize with
+     * @param exactMatches the set of ExactMatchDescriptors to initialize with
+     * @param patternMatches the set of PatternMatchDescriptors to initialize with
+     * @param defaultStreamProbe identifies the default stream Probe to initialize with
+     * @return the created MProbeDirectory
+     */
+    public static MProbeDirectory create(
+            Collection<XmlDomProbeDescriptor>  xmlDomProbes,
+            Collection<StreamProbeDescriptor>  streamProbes,
+            Collection<ApiProbeDescriptor>     apiProbes,
+            Collection<ExactMatchDescriptor>   exactMatches,
+            Collection<PatternMatchDescriptor> patternMatches,
+            StreamProbeDescriptor              defaultStreamProbe )
+    {
+        return new MProbeDirectory(
+                new ArrayList<XmlDomProbeDescriptor>(),
+                new ArrayList<StreamProbeDescriptor>(),
+                new ArrayList<ApiProbeDescriptor>(),
+                new ArrayList<ExactMatchDescriptor>(),
+                new ArrayList<PatternMatchDescriptor>(),
+                null );
+    }
+
+    /**
      * Constructor.
+     * 
+     * @param xmlDomProbes the set of XmlDOMProbeDescriptors to initialize with
+     * @param streamProbes the set of StreamProbeDescriptors to initialize with
+     * @param apiProbes the set of ApiProbeDescriptor to initialize with
+     * @param exactMatches the set of ExactMatchDescriptors to initialize with
+     * @param patternMatches the set of PatternMatchDescriptors to initialize with
+     * @param defaultStreamProbe identifies the default stream Probe to initialize with
      */
     protected MProbeDirectory(
             Collection<XmlDomProbeDescriptor>  xmlDomProbes,

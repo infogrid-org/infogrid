@@ -14,38 +14,32 @@
 
 package org.infogrid.probe.shadow.a;
 
+import java.util.Iterator;
 import org.infogrid.context.Context;
-
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
-
+import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-import org.infogrid.meshbase.net.Proxy;
-import org.infogrid.meshbase.net.ProxyManager;
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.net.security.NetAccessManager;
-import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.meshbase.transaction.ChangeSet;
-
+import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.modelbase.ModelBase;
-
+import org.infogrid.module.ModuleRegistry;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.ProbeDispatcher;
 import org.infogrid.probe.ProbeException;
-
 import org.infogrid.probe.manager.ProbeManager;
-
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseListener;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowMeshBase;
 import org.infogrid.probe.shadow.externalized.SimpleExternalizedShadowMeshBase;
-
-import org.infogrid.module.ModuleRegistry;
-
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.Factory;
@@ -53,10 +47,7 @@ import org.infogrid.util.Invocable;
 import org.infogrid.util.IsDeadException;
 import org.infogrid.util.MapCursorIterator;
 import org.infogrid.util.RemoteQueryTimeoutException;
-
 import org.infogrid.util.logging.Log;
-
-import java.util.Iterator;
 
 /**
  * A ShadowMeshBase in the A implementation.
@@ -72,25 +63,28 @@ public abstract class AShadowMeshBase
     /**
      * Constructor for subclasses only. This does not initialize content.
      *
-     * @param identifier the MeshBaseIdentifier of this MeshBase
-     * @param identifierFactory the factory for MeshObjectIdentifiers appropriate for this MeshBase
+     * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
+     * @param identifierFactory the factory for NetMeshObjectIdentifiers appropriate for this NetMeshBase
+     * @param setFactory the factory for MeshObjectSets appropriate for this NetMeshBase
      * @param modelBase the ModelBase containing type information
-     * @param accessMgr the AccessManager that controls access to this MeshBase
-     * @param cache the CachingMap that holds the MeshObjects in this MeshBase
-     * @param proxyManager the ProxyManager for this NetMeshBase
+     * @param life the MeshBaseLifecycleManager to use
+     * @param accessMgr the AccessManager that controls access to this NetMeshBase
+     * @param cache the CachingMap that holds the NetMeshObjects in this NetMeshBase
+     * @param proxyManager the ProxyManager used by this NetMeshBase
      * @param directory the ProbeDirectory to use
      * @param timeCreated the time at which the data source was created (if this is a recreate operation) or -1
      * @param timeNotNeededTillExpires the time, in milliseconds, that this MShadowMeshBase will continue operating
      *         even if none of its MeshObjects are replicated to another NetMeshBase. If this is negative, it means "forever".
      *         If this is 0, it will expire immediately after the first Probe run, before the caller returns, which is probably
      *         not very useful.
-     * @param context the Context in which this MeshBase runs.
+     * @param context the Context in which this NetMeshBase runs.
      */
     protected AShadowMeshBase(
             NetMeshBaseIdentifier                       identifier,
             NetMeshObjectIdentifierFactory              identifierFactory,
             MeshObjectSetFactory                        setFactory,
             ModelBase                                   modelBase,
+            AStagingMeshBaseLifecycleManager            life,
             NetAccessManager                            accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
             ProxyManager                                proxyManager,
@@ -99,7 +93,7 @@ public abstract class AShadowMeshBase
             long                                        timeNotNeededTillExpires,
             Context                                     context )
     {
-        super( identifier, identifierFactory, setFactory, modelBase, accessMgr, cache, proxyManager, context );
+        super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, proxyManager, context );
         
         ModuleRegistry registry = context.findContextObject( ModuleRegistry.class );
         
@@ -171,12 +165,23 @@ public abstract class AShadowMeshBase
     }
 
     /**
+     * Determine whether at the last run, this ShadowMeshBase used a WriteableProbe.
+     * 
+     * @return true if at the last run, this ShadowMeshBase used a WriteableProbe
+     */
+    public boolean usesWritableProbe()
+    {
+        return theDispatcher.usesWritableProbe();
+    }
+
+    /**
      * Invoke a run now.
      *
      * @return desired time of the next update, in milliseconds. -1 indicates never.
      * @throws ProbeException thrown if the update was unsuccessful
+     * @throws IsDeadException thrown if the ShadowMeshBase is dead already when this method is being invoked
      */
-    public synchronized long doUpdateNow()
+    public long doUpdateNow()
         throws
             ProbeException,
             IsDeadException
@@ -190,8 +195,9 @@ public abstract class AShadowMeshBase
      * @param coherence the requested CoherenceSpecification, if any
      * @return desired time of the next update, in milliseconds. -1 indicates never.
      * @throws ProbeException thrown if the update was unsuccessful
+     * @throws IsDeadException thrown if the ShadowMeshBase is dead already when this method is being invoked
      */
-    public synchronized long doUpdateNow(
+    public long doUpdateNow(
             CoherenceSpecification coherence )
         throws
             ProbeException,
@@ -201,59 +207,61 @@ public abstract class AShadowMeshBase
             log.info( this + ".doUpdateNow()" );
         }
 
-        checkDead();
+        synchronized( theDispatcher ) { // we can't synchronize on the shadow, because incoming transactions need to be able to create threads
+            checkDead();
 
-        long nextTime = theDispatcher.doUpdateNow( coherence );
-        
-        if( theProbeManager != null ) {
-            if( log.isDebugEnabled() ) {
-                log.debug( this + ".doUpdateNow() --- telling factory about it" );
+            long nextTime = theDispatcher.doUpdateNow( coherence );
+
+            if( theProbeManager != null ) {
+                if( log.isDebugEnabled() ) {
+                    log.debug( this + ".doUpdateNow() --- telling factory about it" );
+                }
+
+                // the first time this runs, as part of the factory method, this has not been set yet
+                theProbeManager.factoryCreatedObjectUpdated( this );
+            } else {
+                if( log.isDebugEnabled() ) {
+                    log.debug( this + ".doUpdateNow() --- CANNOT TELL factory about it" );
+                }
             }
 
-            // the first time this runs, as part of the factory method, this has not been set yet
-            theProbeManager.factoryCreatedObjectUpdated( this );
-        } else {
-            if( log.isDebugEnabled() ) {
-                log.debug( this + ".doUpdateNow() --- CANNOT TELL factory about it" );
+            if( !theDispatcher.mayBeDeleted() ) {
+                return nextTime;
+
+            } else {
+
+                if( log.isDebugEnabled() ) {
+                    log.debug( this + ": not needed any more" );
+                }
+
+                // got to do this trick with the callback, otherwise we get a race condition
+                theProbeManager.remove( (NetMeshBaseIdentifier) theMeshBaseIdentifier, new Invocable<ShadowMeshBase,Void>() {
+                        public Void invoke(
+                                ShadowMeshBase toDelete )
+                        {
+                            Iterator<Proxy> iter = toDelete.proxies();
+                            while( iter.hasNext() ) {
+                                Proxy current = iter.next();
+
+                                if( log.isDebugEnabled() ) {
+                                    log.debug( AShadowMeshBase.this + ": removing proxy " + current );
+                                }
+
+                                try {
+                                    current.initiateCeaseCommunications();
+
+                                } catch( RemoteQueryTimeoutException ex ) {
+                                    log.warn( ex );
+                                }
+                                theProxyManager.remove( current.getPartnerMeshBaseIdentifier() );
+                            }
+                            return null;
+                        }
+                });
+
+                return -1L;
             }
         }
-
-        if( !theDispatcher.mayBeDeleted() ) {
-            return nextTime;
-
-        } else {
-            
-            if( log.isDebugEnabled() ) {
-                log.debug( this + ": not needed any more" );
-            }
-
-            // got to do this trick with the callback, otherwise we get a race condition
-            theProbeManager.remove( (NetMeshBaseIdentifier) theMeshBaseIdentifier, new Invocable<ShadowMeshBase,Void>() {
-                    public Void invoke(
-                            ShadowMeshBase toDelete )
-                    {
-                        Iterator<Proxy> iter = toDelete.proxies();
-                        while( iter.hasNext() ) {
-                            Proxy current = iter.next();
-
-                            if( log.isDebugEnabled() ) {
-                                log.debug( AShadowMeshBase.this + ": removing proxy " + current );
-                            }
-
-                            try {
-                                current.initiateCeaseCommunications();
-
-                            } catch( RemoteQueryTimeoutException ex ) {
-                                log.warn( ex );
-                            }
-                            theProxyManager.remove( current.getPartnerMeshBaseIdentifier() );
-                        }
-                        return null;
-                    }
-            });
-            
-            return -1L;
-        }    
     }
 
     /**
@@ -313,6 +321,20 @@ public abstract class AShadowMeshBase
     }
 
     /**
+     * Update the cache when Transactions are committed.
+     *
+     * @param tx Transaction the Transaction that was committed
+     */
+    @Override
+    protected void transactionCommittedHook(
+            Transaction tx )
+    {
+        super.transactionCommittedHook( tx );
+        
+        theDispatcher.queueNewChanges( tx.getChangeSet() );
+    }
+
+    /**
      * Queue new changes for the Shadow. These changes will be written out by the Probe
      * prior to reading the data source again. The application programmer should have
      * no need to call this.
@@ -335,19 +357,7 @@ public abstract class AShadowMeshBase
     {
         return theDispatcher.isNeeded();
     }
-    
-    /**
-     * If true, the NetMeshBase will never give up locks, regardless what the individual MeshObjects
-     * would like.
-     *
-     * @return true never give up locks
-     */
-    @Override
-    public final boolean refuseToGiveUpLock()
-    {
-        return theDispatcher.getIsUpdateInProgress();
-    }
-    
+
     /**
      * Enable the associated MeshBaseLifecycleManager to determine the start of the current update.
      * This is only invoked during an actual update.
@@ -363,6 +373,8 @@ public abstract class AShadowMeshBase
      * Add a listener to listen to ShadowMeshBase-specific events.
      *
      * @param newListener the listener to be added
+     * @see #addWeakShadowListener
+     * @see #addSoftShadowListener
      * @see #removeShadowListener
      */
     public final void addDirectShadowListener(
@@ -375,6 +387,8 @@ public abstract class AShadowMeshBase
      * Add a listener to listen to ShadowMeshBase-specific events.
      *
      * @param newListener the listener to be added
+     * @see #addDirectShadowListener
+     * @see #addSoftShadowListener
      * @see #removeShadowListener
      */
     public final void addWeakShadowListener(
@@ -387,6 +401,8 @@ public abstract class AShadowMeshBase
      * Add a listener to listen to ShadowMeshBase-specific events.
      *
      * @param newListener the listener to be added
+     * @see #addDirectShadowListener
+     * @see #addWeakShadowListener
      * @see #removeShadowListener
      */
     public final void addSoftShadowListener(
@@ -399,27 +415,15 @@ public abstract class AShadowMeshBase
      * Remove a listener to listen to ShadowMeshBase-specific events.
      *
      * @param oldListener the listener to be removed
-     * @see #addShadowListener
+     * @see #addDirectShadowListener
+     * @see #addWeakShadowListener
+     * @see #addSoftShadowListener
      */
     public final void removeShadowListener(
             ShadowMeshBaseListener oldListener )
     {
         theDispatcher.removeShadowListener( oldListener );
     }
-
-    /**
-     * Override finalize, so we get a debug message.
-     */
-//    @Override
-//    protected void finalize()
-//        throws
-//            Throwable
-//    {
-//        if( log.isDebugEnabled() ) {
-//            log.debug( this + ".finalize()" );
-//        }
-//        super.finalize();
-//    }
 
     /**
      * Obtain the same MeshBase as ExternalizedMeshBase so it can be easily serialized.

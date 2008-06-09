@@ -14,24 +14,20 @@
 
 package org.infogrid.kernel.net.TEST.xpriso;
 
-
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
-
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
+import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.m.NetMMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
-
+import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.primitives.StringValue;
-import org.infogrid.model.Test.TestSubjectArea;
-
 import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.util.logging.Log;
-
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Tests initial replication in a very basic manner.
@@ -53,17 +49,18 @@ public class XprisoTest1
 
         Transaction tx = mb1.createTransactionAsap();
 
-        NetMeshBaseLifecycleManager life1 = mb1.getMeshBaseLifecycleManager();
+        NetMeshBaseLifecycleManager    life1 = mb1.getMeshBaseLifecycleManager();
+        NetMeshObjectIdentifierFactory idf1  = mb1.getMeshObjectIdentifierFactory();
 
-        NetMeshObject obj1_mb1 = life1.createMeshObject( TestSubjectArea.AA );
+        NetMeshObject obj1_mb1 = life1.createMeshObject( idf1.fromExternalForm( "#1" ), TestSubjectArea.AA );
         obj1_mb1.setPropertyValue( TestSubjectArea.A_X,  StringValue.create( "Object 1" ) );
         obj1_mb1.setPropertyValue( TestSubjectArea.A_XX, BlobValue.create( "This is a (1) very looooong description" ));
 
-        NetMeshObject obj2_mb1 = life1.createMeshObject( TestSubjectArea.AA );
+        NetMeshObject obj2_mb1 = life1.createMeshObject( idf1.fromExternalForm( "#2" ), TestSubjectArea.AA );
         obj2_mb1.setPropertyValue( TestSubjectArea.A_X,  StringValue.create( "Object 2" ) );
         obj2_mb1.setPropertyValue( TestSubjectArea.A_XX, BlobValue.create( "This is a (2) very looooong description" ));
 
-        NetMeshObject obj3_mb1 = life1.createMeshObject( TestSubjectArea.AA );
+        NetMeshObject obj3_mb1 = life1.createMeshObject( idf1.fromExternalForm( "#3" ), TestSubjectArea.AA );
         obj3_mb1.setPropertyValue( TestSubjectArea.A_X,  StringValue.create( "Object 3" ) );
         obj3_mb1.setPropertyValue( TestSubjectArea.A_XX, BlobValue.create( "This is a (3) very looooong description" ));
 

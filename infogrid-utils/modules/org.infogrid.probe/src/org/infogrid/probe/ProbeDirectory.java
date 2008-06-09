@@ -27,17 +27,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
-  * This class represents a directory of Probes. It may backed by an XML file, which is
-  * loaded upon demand.
+  * Represents a directory of Probes. This enables the Probe framework to find the
+ * right Probe class to instantiate and run, given a to-be-accessed data source.
   */
 public interface ProbeDirectory
 {
     /**
-     * Obtain the default Probe that reads from a stream. If not other Probe matches
+     * Obtain the default Probe that reads from a stream. If not other StreamProbe matches
      * a stream data source, this is the one that will be used.
      *
      * @return the descriptor describing the Probe.
-     * @see #setDefaultStreamProbe
      */
     public StreamProbeDescriptor getDefaultStreamProbe();
     
@@ -140,16 +139,15 @@ public interface ProbeDirectory
     public String getStreamProbeClassByMimeType(
             String mimeType );
     
-    
     /**
-     * This is the abstract superclass of all Probe descriptors.
+     * Abstract superclass for all Probe descriptors.
      */
     public abstract static class ProbeDescriptor
         implements
             Serializable
     {
         /**
-         * Construct one.
+         * Constructor.
          *
          * @param className the name of the class implementing the Probe
          * @param clazz the actual Class we are supposed to instantiate (this is optional)
@@ -226,7 +224,7 @@ public interface ProbeDirectory
     }
 
     /**
-     * This is an entry in the set of XML Probes.
+     * An entry in the set of XML Probes.
      */
     public abstract static class XmlProbeDescriptor
         extends
@@ -348,6 +346,8 @@ public interface ProbeDirectory
             extends
                 XmlProbeDescriptor
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Convenience constructor.
          *
@@ -369,7 +369,6 @@ public interface ProbeDirectory
          * @param documentTypes the XML document types that this Probe can access
          * @param tagTypes the XML tag types that this Probe can access
          * @param className name of the Probe class
-         * @param mode the invocation mode for the Probe, such as asynchronous. This must be MODE_SYNCHRONOUS or MODE_ASYNCHRONOUS.
          */
         public XmlDomProbeDescriptor(
                 String []                    documentTypes,
@@ -431,7 +430,7 @@ public interface ProbeDirectory
     }
 
     /**
-     * This is an entry in the list of Non-XML Probes reading from a stream.
+     * An entry in the list of Non-XML Probes reading from a stream.
      */
     public static class StreamProbeDescriptor
         extends
@@ -439,6 +438,8 @@ public interface ProbeDirectory
         implements
             Serializable
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Convenience constructor.
          *
@@ -572,6 +573,8 @@ public interface ProbeDirectory
         implements
             Serializable
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Convenience constructor.
          *
@@ -590,7 +593,6 @@ public interface ProbeDirectory
          *
          * @param protocols the URL protocols for this Probe (eg jdbc)
          * @param className the name of the Probe class
-         * @param mode the invocation mode for the Probe, such as asynchronous. This must be MODE_SYNCHRONOUS or MODE_ASYNCHRONOUS.
          */
         public ApiProbeDescriptor(
                 String []             protocols,
@@ -738,6 +740,8 @@ public interface ProbeDirectory
         implements
             Serializable
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Convenience constructor.
          *
@@ -820,6 +824,8 @@ public interface ProbeDirectory
         implements
             Serializable
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Convenience constructor.
          *

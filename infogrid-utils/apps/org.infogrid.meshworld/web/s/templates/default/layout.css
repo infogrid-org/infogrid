@@ -42,7 +42,9 @@ img#app-logo {
 
 #canvas-middle > div.canvas-main {
     min-height: 300px;
-    padding: 20px;
+    margin: 0 auto 0 auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 #canvas-bottom > div.canvas-main {
@@ -58,6 +60,7 @@ div.viewlet {
     padding: 10px 10px 10px 20px;
     -moz-border-radius: 20px;
     clear: right;
+    margin: 0px;
 }
 
 div.slide-in-button {

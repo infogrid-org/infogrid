@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.net;
 
+import org.infogrid.meshbase.net.proxy.Proxy;
 import java.util.EventObject;
 
 /**

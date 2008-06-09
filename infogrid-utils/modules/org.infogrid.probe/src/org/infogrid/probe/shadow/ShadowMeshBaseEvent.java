@@ -14,16 +14,23 @@
 
 package org.infogrid.probe.shadow;
 
-import java.util.EventObject;
+import org.infogrid.meshbase.net.NetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.util.NameServer;
+import org.infogrid.util.event.AbstractExternalizableEvent;
+import org.infogrid.util.event.SourceUnresolvedException;
+import org.infogrid.util.event.ValueUnresolvedException;
 
 /**
-  * This is a ShadowModelObjectRepository-specific event. The actual meaning
+  * This is a ShadowMeshBase-specific event. The actual meaning
   * of the event is determined by which of the listener methods have been invoked.
   */
 public class ShadowMeshBaseEvent
     extends
-        EventObject
+        AbstractExternalizableEvent<ShadowMeshBase,NetMeshBaseIdentifier,Throwable,Throwable>
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor. No problem occurred.
      *
@@ -32,7 +39,7 @@ public class ShadowMeshBaseEvent
     public ShadowMeshBaseEvent(
             ShadowMeshBase meshBase )
     {
-        this( meshBase, null );
+        this( meshBase, meshBase.getIdentifier(), null, null, System.currentTimeMillis() );
     }
 
     /**
@@ -45,9 +52,40 @@ public class ShadowMeshBaseEvent
             ShadowMeshBase meshBase,
             Throwable      problem )
     {
-        super( meshBase );
+        this( meshBase, meshBase.getIdentifier(), problem, problem, System.currentTimeMillis() );
+    }
 
-        theProblem = problem;
+    /**
+     * Internal constructor.
+     * 
+     * @param source the object that is the source of the event
+     * @param sourceIdentifier the identifier representing the source of the event
+     * @param deltaValue the value that changed
+     * @param deltaValueIdentifier the identifier of the value that changed
+     * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
+     */
+    protected ShadowMeshBaseEvent(
+            ShadowMeshBase        source,
+            NetMeshBaseIdentifier sourceIdentifier,
+            Throwable             deltaValue,
+            Throwable             deltaValueIdentifier,
+            long                  timeEventOccurred )
+    {
+        super( source, sourceIdentifier, deltaValue, deltaValueIdentifier, timeEventOccurred );
+    }
+       
+    /**
+     * Set a suitable resolver.
+     * 
+     * @param resolver the new resolver
+     */
+    public void setResolver(
+            NameServer<NetMeshBaseIdentifier,NetMeshBase> resolver )
+    {
+        if( theResolver != resolver ) {
+            clearCachedObjects();
+            theResolver = resolver;
+        }
     }
 
     /**
@@ -57,11 +95,42 @@ public class ShadowMeshBaseEvent
      */
     public final Throwable getProblem()
     {
-        return theProblem;
+        return getDeltaValueIdentifier();
     }
 
     /**
-     * The problem that occurred, if any.
+     * Enable subclass to resolve the source of the event.
+     *
+     * @return the source of the event
+     * @throws SourceUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the source failed
      */
-    protected Throwable theProblem;
+    protected ShadowMeshBase resolveSource()
+            throws
+                SourceUnresolvedException
+    {
+        NetMeshBase ret = theResolver.get( getSourceIdentifier() );
+        return (ShadowMeshBase) ret;
+    }
+    
+    /**
+     * Enable subclass to resolve a value of the event.
+     *
+     * @param vid the identifier of the value of the event
+     * @return a value of the event
+     * @throws ValueUnresolvedException thrown if this ExternalizableEvent was serialized/deserialized,
+     *         and re-resolving the value failed
+     */
+    protected Throwable resolveValue(
+            Throwable vid )
+       throws
+           ValueUnresolvedException
+    {
+        return vid;
+    }
+    
+    /**
+     * The resolver to be used.
+     */
+    protected transient NameServer<NetMeshBaseIdentifier,NetMeshBase> theResolver;
 }

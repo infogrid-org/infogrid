@@ -62,8 +62,7 @@ public class DefaultAnetMeshObjectIdentifierFactory
     {
         theNetMeshBaseIdentifier = meshBaseIdentifier;
 
-        NET_HOME_OBJECT = new DefaultAnetMeshObjectIdentifier( theNetMeshBaseIdentifier, null ) {} ; // subclass so we can avoid making it public
-    
+        NET_HOME_OBJECT = new HomeObject( theNetMeshBaseIdentifier );
     }
 
     /**
@@ -245,4 +244,24 @@ public class DefaultAnetMeshObjectIdentifierFactory
      * not of the factory. This is private so no conflicts with subtypes occur.
      */
     private static final ResourceHelper RESOURCEHELPER = ResourceHelper.getInstance( DefaultAnetMeshObjectIdentifier.class );
+
+    /**
+     * This subclass of DefaultAnetMeshObjectIdentifier is only used for identifiers
+     * of home objects.
+     */
+    private static class HomeObject
+            extends
+                DefaultAnetMeshObjectIdentifier
+    {
+        /**
+         * Constructor.
+         * 
+         * @param meshBaseIdentifier the NetMeshBaseIdentifier of the owning NetMeshBase
+         */
+        public HomeObject(
+                NetMeshBaseIdentifier meshBaseIdentifier )
+        {
+            super( meshBaseIdentifier, null );
+        }
+    }
 }

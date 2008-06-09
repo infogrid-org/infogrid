@@ -14,6 +14,7 @@
 
 package org.infogrid.kernel.net.TEST.xpriso;
 
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBase;
@@ -21,13 +22,13 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.m.NetMMeshBase;
+import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
+import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.util.logging.Log;
-
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
   * Tests the replication mechanism with chains of NetMeshBases.
@@ -45,7 +46,7 @@ public class XprisoTest8
         throws
             Exception
     {
-        log.info( "Instantiating objects in mb1" );
+        log.info( "Instantiating obj1 in mb1" );
 
         Transaction   tx_1     = null;
         NetMeshObject obj1_mb1 = null;
@@ -233,8 +234,9 @@ public class XprisoTest8
         } catch( Exception ex ) {
             reportError( "cannot set giveUpLock( TRUE ) in mb2" );
         } finally {
-            if( tx_2 != null )
+            if( tx_2 != null ) {
                 tx_2.commitTransaction();
+            }
         }
 
         checkProxies( obj2_mb2, new NetMeshBase[] { mb3 },      null, null, "obj2_mb2 has wrong proxies" );
@@ -334,10 +336,11 @@ public class XprisoTest8
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception all kinds of things can happen in a test
+     */
     public XprisoTest8(
             String [] args )
         throws
@@ -348,15 +351,12 @@ public class XprisoTest8
         MPingPongNetMessageEndpointFactory endpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactory.setNameServer( theNameServer );
         
-        mb1 = NetMMeshBase.create( net1, endpointFactory, theModelBase, null, rootContext );
-        mb2 = NetMMeshBase.create( net2, endpointFactory, theModelBase, null, rootContext );
-        mb3 = NetMMeshBase.create( net3, endpointFactory, theModelBase, null, rootContext );
-        mb4 = NetMMeshBase.create( net4, endpointFactory, theModelBase, null, rootContext );
+        ProxyPolicyFactory proxyPolicyFactory = NiceAndTrustingProxyPolicyFactory.create( true );
 
-        mb1.setPointsReplicasToItself( true );
-        mb2.setPointsReplicasToItself( true );
-        mb3.setPointsReplicasToItself( true );
-        mb4.setPointsReplicasToItself( true );
+        mb1 = NetMMeshBase.create( net1, endpointFactory, proxyPolicyFactory, theModelBase, null, rootContext );
+        mb2 = NetMMeshBase.create( net2, endpointFactory, proxyPolicyFactory, theModelBase, null, rootContext );
+        mb3 = NetMMeshBase.create( net3, endpointFactory, proxyPolicyFactory, theModelBase, null, rootContext );
+        mb4 = NetMMeshBase.create( net4, endpointFactory, proxyPolicyFactory, theModelBase, null, rootContext );
 
         theNameServer.put( mb1.getIdentifier(), mb1 );
         theNameServer.put( mb2.getIdentifier(), mb2 );
@@ -401,22 +401,22 @@ public class XprisoTest8
     /**
      * The first NetMeshBase.
      */
-    protected NetMeshBase mb1;
+    protected NetMMeshBase mb1;
 
     /**
      * The second NetMeshBase.
      */
-    protected NetMeshBase mb2;
+    protected NetMMeshBase mb2;
 
     /**
      * The third NetMeshBase.
      */
-    protected NetMeshBase mb3;
+    protected NetMMeshBase mb3;
 
     /**
      * The fourth NetMeshBase.
      */
-    protected NetMeshBase mb4;
+    protected NetMMeshBase mb4;
 
     /**
      * Our ThreadPool.

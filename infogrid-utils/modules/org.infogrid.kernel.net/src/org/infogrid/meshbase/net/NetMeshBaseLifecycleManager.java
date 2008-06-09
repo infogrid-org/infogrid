@@ -18,16 +18,14 @@ import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
-
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObjectFactory;
 import org.infogrid.mesh.security.MustNotDeleteHomeObjectException;
-
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.transaction.TransactionException;
-
 import org.infogrid.model.primitives.EntityType;
 
 /**
@@ -404,19 +402,46 @@ public interface NetMeshBaseLifecycleManager
             MustNotDeleteHomeObjectException;
 
     /**
-     * Instantiate a replica NetMeshObject in this NetMeshBase, thereby setting 
-     * up a branch in the replication graph. This may also be invoked if the replica exists
-     * already in more complex replication topologies.
+     * Instantiate a replica NetMeshObject in this NetMeshBase. Proxy information is provided
+     * as separate parameters, as a ProxyPolicy may choose to use different Proxies than offered
+     * by the NetMeshObject replica being replicated.
      *
-     * @param original external form of the replica that is being replicated locally
-     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
-     * @return the created NetMeshObject
+     * @param externalized the external form of the NetMeshObject that is being replicated locally
+     * @param proxies the Proxies to use
+     * @param proxyTowardsHomeIndex the index, in the proxies, that holds the Proxy towards the home replica. -1 if none.
+     * @param proxyTowardsLockIndex the index, in the proxies, that holds the Proxy towards the replica with the lock. -1 if none.
+     * @return the created or resynchronized NetMeshObject
+     * @throws MeshObjectIdentifierNotUniqueException thrown if a NetMeshObject with this identifier exists locally already
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
-    public abstract NetMeshObject rippleCreate(
-            ExternalizedNetMeshObject original,
-            NetMeshBaseIdentifier     proxyIdentifier )
+    public NetMeshObject rippleCreate(
+            ExternalizedNetMeshObject externalized,
+            Proxy []                  proxies,
+            int                       proxyTowardsHomeIndex,
+            int                       proxyTowardsLockIndex )
+        throws
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException;
+
+    /**
+     * Resynchronize an existing replica NetMeshObject in this NetMeshBase with the provided information.
+     * Proxy information is provided
+     * as separate parameters, as a ProxyPolicy may choose to use different Proxies than offered
+     * by the NetMeshObject replica being replicated.
+     * 
+     * @param externalized the external form of the NetMeshObject that is being replicated locally
+     * @param proxies the Proxies to use
+     * @param proxyTowardsHomeIndex the index, in the proxies, that holds the Proxy towards the home replica. -1 if none.
+     * @param proxyTowardsLockIndex the index, in the proxies, that holds the Proxy towards the replica with the lock. -1 if none.
+     * @return the created or resynchronized NetMeshObject
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the called did not have sufficient privileges for this operation
+     */
+    public NetMeshObject rippleResynchronize(
+            ExternalizedNetMeshObject externalized,
+            Proxy []                  proxies,
+            int                       proxyTowardsHomeIndex,
+            int                       proxyTowardsLockIndex )
         throws
             TransactionException,
             NotPermittedException;
@@ -436,22 +461,6 @@ public interface NetMeshBaseLifecycleManager
             NetMeshObjectIdentifier identifier,
             NetMeshBaseIdentifier   proxyIdentifier,
             long                    timeEventOccurred )
-        throws
-            TransactionException,
-            NotPermittedException;
-    
-    /**
-     * Resynchronize a local replica to the provided ExternalizedNetMeshObject.
-     * 
-     * @param original external form of the replica that is being resynchronized locally
-     * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
-     * @return the resynchronized NetMeshObject
-     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public abstract NetMeshObject resynchronize(
-            ExternalizedNetMeshObject original,
-            NetMeshBaseIdentifier     proxyIdentifier )
         throws
             TransactionException,
             NotPermittedException;

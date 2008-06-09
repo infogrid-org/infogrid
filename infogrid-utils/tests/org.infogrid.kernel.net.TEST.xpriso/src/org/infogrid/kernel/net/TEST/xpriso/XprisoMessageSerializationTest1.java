@@ -130,7 +130,9 @@ public class XprisoMessageSerializationTest1
         
         // Message 0
         
-        ParserFriendlyXprisoMessage zero = ParserFriendlyXprisoMessage.create( 0, 33, id1, id2 );
+        ParserFriendlyXprisoMessage zero = ParserFriendlyXprisoMessage.create( id1, id2 );
+        zero.setRequestId( 0 );
+        zero.setResponseId( 33 );
         zero.addRequestedFirstTimeObject( NetMeshObjectAccessSpecification.create( id2 ));
         zero.addRequestedFirstTimeObject( NetMeshObjectAccessSpecification.create(
                 NetMeshBaseAccessSpecification.create( new NetMeshBaseIdentifier[] { id3, id1 } )));
@@ -139,19 +141,23 @@ public class XprisoMessageSerializationTest1
         zero.addPushLockObject( nmo_ref4 );
         
         zero.addRequestedCanceledObject( nmo_ref1 );
-        zero.addRequestedLockObjects( nmo_ref2 );
+        zero.addRequestedLockObject( nmo_ref2 );
         
         // Message 1
         
-        ParserFriendlyXprisoMessage one = ParserFriendlyXprisoMessage.create( 111, 123456, null, null );
+        ParserFriendlyXprisoMessage one = ParserFriendlyXprisoMessage.create( null, null );
+        one.setRequestId( 111 );
+        one.setResponseId( 123456 );
         one.addReclaimedLockObject( nmo_ref2 );
         one.addReclaimedLockObject( nmo_ref3 );
-        one.addRequestedResynchronizeDependentReplica( nmo_ref1 );
+        one.addRequestedResynchronizeReplica( nmo_ref1 );
         one.setCeaseCommunications( true );
         
         // Message 2
         
-        ParserFriendlyXprisoMessage two = ParserFriendlyXprisoMessage.create( 222, 0, id3, id1 );
+        ParserFriendlyXprisoMessage two = ParserFriendlyXprisoMessage.create( id3, id1 );
+        two.setRequestId( 222 );
+        two.setResponseId( 0 );
         two.addConveyedMeshObject( SimpleExternalizedNetMeshObject.create(
                 nmo_ref1, // identifier
                 new MeshTypeIdentifier[] {
@@ -193,45 +199,9 @@ public class XprisoMessageSerializationTest1
         
         // Message 3
         
-        ParserFriendlyXprisoMessage three = ParserFriendlyXprisoMessage.create( 333, -27, id3, id1 );
-        three.addCreation( new NetMeshObjectCreatedEvent(
-                null,
-                id2,
-                SimpleExternalizedNetMeshObject.create(
-                        nmo_ref2, // identifier
-                        new MeshTypeIdentifier[] {
-                                mt_ref4
-                        }, // typeNames
-                        112L, // timeCreated
-                        134L, // timeUpdated
-                        156L, // timeRead
-                        178L, // timeExpires
-                        new MeshTypeIdentifier[] {
-                                mt_ref4,
-                                mt_ref1
-                        }, // propertyTypes
-                        new PropertyValue[] {
-                                IntegerValue.create( 77778 ),
-                                TimeStampValue.create( (short) 1, (short) 2, (short) 3, (short) 4, (short) 5, 6.f )
-                        }, // propertyValues
-                        new NetMeshObjectIdentifier[] {
-                                nmo_ref2
-                        }, // neighbors
-                        new MeshTypeIdentifier [][] {
-                                new MeshTypeIdentifier [] { mt_ref3 },
-                                new MeshTypeIdentifier [] { mt_ref5 }
-                        }, // roleTypes
-                        new NetMeshObjectIdentifier[] {
-                                nmo_ref5
-                        }, // equivalents
-                        true, // giveUpHomeReplica
-                        false, // giveUpLock
-                        new NetMeshBaseIdentifier[] {
-                                id1
-                        }, // proxyNames
-                        -1, // proxyTowardsHomeIndex
-                        0 ), // proxyTowardsLockIndex
-                id3 ));
+        ParserFriendlyXprisoMessage three = ParserFriendlyXprisoMessage.create( id3, id1 );
+        three.setRequestId( 333 );
+        three.setResponseId( -27 );
         three.addDeleteChange( new NetMeshObjectDeletedEvent(
                 null,
                 id2,
@@ -243,8 +213,10 @@ public class XprisoMessageSerializationTest1
 
         // Message 4
         
-        ParserFriendlyXprisoMessage four = ParserFriendlyXprisoMessage.create( 444, -11111, id2, id3 );
-        four.addResynchronizeDependentReplica( SimpleExternalizedNetMeshObject.create(
+        ParserFriendlyXprisoMessage four = ParserFriendlyXprisoMessage.create( id2, id3 );
+        four.setRequestId( 444 );
+        four.setResponseId( -11111 );
+        four.addConveyedMeshObject( SimpleExternalizedNetMeshObject.create(
                         nmo_ref1, // identifier
                         new MeshTypeIdentifier[] {
                                 mt_ref2
@@ -266,7 +238,8 @@ public class XprisoMessageSerializationTest1
 
         // Message 5
         
-        ParserFriendlyXprisoMessage five = ParserFriendlyXprisoMessage.create( 555, 0, null, null );
+        ParserFriendlyXprisoMessage five = ParserFriendlyXprisoMessage.create( null, null );
+        five.setRequestId( 555 );
         five.addNeighborAddition( new NetMeshObjectNeighborAddedEvent(
                 nmo_ref3,
                 new MeshTypeIdentifier[] { mt_ref5, mt_ref1 },
@@ -277,7 +250,8 @@ public class XprisoMessageSerializationTest1
 
         // Message 6
 
-        ParserFriendlyXprisoMessage six = ParserFriendlyXprisoMessage.create( 666, 0, null, null );
+        ParserFriendlyXprisoMessage six = ParserFriendlyXprisoMessage.create( null, null );
+        six.setRequestId( 666 );
         six.addNeighborRemoval( new NetMeshObjectNeighborRemovedEvent(
                 nmo_ref2,
                 nmo_ref3,
@@ -287,8 +261,9 @@ public class XprisoMessageSerializationTest1
         
         // Message 7
 
-        ParserFriendlyXprisoMessage seven = ParserFriendlyXprisoMessage.create( 777, 0, null, null );
-        seven.addRoleAdditions( new NetMeshObjectRoleAddedEvent(
+        ParserFriendlyXprisoMessage seven = ParserFriendlyXprisoMessage.create( null, null );
+        seven.setRequestId( 777 );
+        seven.addRoleAddition( new NetMeshObjectRoleAddedEvent(
                 nmo_ref4,
                 new MeshTypeIdentifier[] { mt_ref4, mt_ref3 },
                 nmo_ref1,
@@ -305,7 +280,8 @@ public class XprisoMessageSerializationTest1
         
         // Message 8
 
-        ParserFriendlyXprisoMessage eight = ParserFriendlyXprisoMessage.create( 888, 0, null, null );
+        ParserFriendlyXprisoMessage eight = ParserFriendlyXprisoMessage.create( null, null );
+        eight.setRequestId( 888 );
         eight.addTypeAddition( new NetMeshObjectTypeAddedEvent(
                 nmo_ref3,
                 new MeshTypeIdentifier[] { mt_ref4, mt_ref1 },
@@ -321,7 +297,8 @@ public class XprisoMessageSerializationTest1
 
         // Message 7
         
-        ParserFriendlyXprisoMessage nine = ParserFriendlyXprisoMessage.create( 999, 0, null, null );
+        ParserFriendlyXprisoMessage nine = ParserFriendlyXprisoMessage.create( null, null );
+        nine.setRequestId( 999 );
         nine.addPropertyChange( new NetMeshObjectPropertyChangeEvent(
                 nmo_ref3,
                 mt_ref4,
