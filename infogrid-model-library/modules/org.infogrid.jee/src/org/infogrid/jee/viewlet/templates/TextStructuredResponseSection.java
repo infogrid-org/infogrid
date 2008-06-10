@@ -78,10 +78,4 @@ public class TextStructuredResponseSection
      */
     public static final TextStructuredResponseSection DEFAULT_SECTION
             = TextStructuredResponseSection.create( "default" );
-
-    /**
-     * The single error section. All errors will be written into this section.
-     */
-    public static final TextStructuredResponseSection ERROR_SECTION
-            = TextStructuredResponseSection.create( "errors" );
 }
