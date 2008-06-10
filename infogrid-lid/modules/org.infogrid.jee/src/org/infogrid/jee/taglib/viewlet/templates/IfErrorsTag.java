@@ -14,61 +14,27 @@
 
 package org.infogrid.jee.taglib.viewlet.templates;
 
+import javax.servlet.jsp.JspException;
 import org.infogrid.jee.taglib.AbstractInfoGridBodyTag;
 import org.infogrid.jee.taglib.IgnoreException;
-
-import javax.servlet.jsp.JspException;
 import org.infogrid.jee.viewlet.templates.JspStructuredResponseTemplate;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;
-import org.infogrid.jee.viewlet.templates.StructuredResponseSection;
 
 /**
- * <p>Abstract superclass for all tags evaluating a <code>StructuredResponseSection</code>.</p>
+ * Tests whether one or more errors has been reported.
  */
-public abstract class AbstractSectionTestTag
+public class IfErrorsTag
     extends
         AbstractInfoGridBodyTag
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Constructor.
      */
-    protected AbstractSectionTestTag()
+    public IfErrorsTag()
     {
         // noop
-    }
-
-    /**
-     * Initialize all default values. To be invoked by subclasses.
-     */
-    @Override
-    protected void initializeToDefaults()
-    {
-        theName = null;
-
-        super.initializeToDefaults();
-    }
-    
-    /**
-     * Obtain value of the name property.
-     *
-     * @return value of the name property
-     * @see #setName
-     */
-    public final String getName()
-    {
-        return theName;
-    }
-
-    /**
-     * Set value of the name property.
-     *
-     * @param newValue new value of the name property
-     * @see #getName
-     */
-    public final void setName(
-            String newValue )
-    {
-        theName = newValue;
     }
 
     /**
@@ -101,34 +67,17 @@ public abstract class AbstractSectionTestTag
      * @throws JspException thrown if an evaluation error occurred
      * @throws IgnoreException thrown to abort processing without an error
      */
-    protected abstract boolean evaluateTest()
-        throws
-            JspException,
-            IgnoreException;
-
-    /**
-     * Determine the PropertyValue to be used in the test.
-     *
-     * @return the PropertyValue
-     * @throws JspException thrown if an evaluation error occurred
-     * @throws IgnoreException thrown to abort processing without an error
-     */
-    protected StructuredResponseSection evaluate()
+    protected boolean evaluateTest()
         throws
             JspException,
             IgnoreException
     {
         StructuredResponse response = (StructuredResponse) lookup( JspStructuredResponseTemplate.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
         if( response == null ) {
-            return null;
+            return false;
         }
-        StructuredResponseSection ret  = response.findSectionByName( theName );
+        boolean ret = response.haveProblemsBeenReported();
 
         return ret;
     }
-
-    /**
-     * The name of the section in the StructuredResponse that is being evaluated.
-     */
-    protected String theName;
 }
