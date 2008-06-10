@@ -96,6 +96,6 @@ public class ProxyViewlet
             throw new ServletException( ex );
         }
         
-        processRequest( restful, structured );
+        super.processRequest( restful, structured );
     }
 }
