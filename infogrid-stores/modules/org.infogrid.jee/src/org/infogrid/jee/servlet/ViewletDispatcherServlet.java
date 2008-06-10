@@ -16,6 +16,7 @@ package org.infogrid.jee.servlet;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletContext;
@@ -82,6 +83,16 @@ public class ViewletDispatcherServlet
         ServletContext     servletContext = getServletContext();
         StructuredResponse structured     = StructuredResponse.create( realResponse, servletContext );
 
+        // insert all error messages we have gotten so far
+        @SuppressWarnings( "unchecked" )
+        List<Throwable> problems = (List<Throwable>) request.getAttribute( PROCESSING_PROBLEM_EXCEPTION_NAME );
+
+        if( problems != null ) {
+            for( Throwable current : problems ) {
+                structured.reportProblem( current );
+            }
+        }
+        
         try {
             performService( restfulRequest, structured );
             
@@ -107,6 +118,7 @@ public class ViewletDispatcherServlet
      * @throws CannotViewException thrown if a Viewlet could not view the requested MeshObjects
      * @throws URISyntaxException thrown if a URI parsing error occurred
      * @throws NotPermittedException thrown if an attempted operation was not permitted
+     * @throws UnsafePostException thrown if an unsafe POST operation was not acceptable
      * @throws ServletException thrown if an error occurred
      * @throws IOException thrown if an I/O error occurred
      */
@@ -118,6 +130,7 @@ public class ViewletDispatcherServlet
             CannotViewException,
             URISyntaxException,
             NotPermittedException,
+            UnsafePostException,
             ServletException,
             IOException
     {
@@ -268,4 +281,9 @@ public class ViewletDispatcherServlet
                 traversal );
         return ret;
     }
+    
+    /**
+     * Name of a Request-level attribute that contains the problems that have occurred.
+     */
+    public static final String PROCESSING_PROBLEM_EXCEPTION_NAME = ViewletDispatcherServlet.class.getName() + "-Problems";
 }
