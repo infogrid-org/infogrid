@@ -18,6 +18,11 @@
     </tag>
 
     <tag>
+        <name>ifErrors</name>
+        <tag-class>org.infogrid.jee.taglib.viewlet.templates.IfErrorsTag</tag-class>
+    </tag>
+
+    <tag>
         <name>ifNotEmpty</name>
         <tag-class>org.infogrid.jee.taglib.viewlet.templates.IfNotEmptyTag</tag-class>
         <attribute>
@@ -33,6 +38,15 @@
         <attribute>
             <name>name</name>
             <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>inlineErrors</name>
+        <tag-class>org.infogrid.jee.taglib.viewlet.templates.InlineErrorsTag</tag-class>
+        <attribute>
+            <name>stringRepresentation</name>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>

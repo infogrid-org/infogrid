@@ -21,6 +21,7 @@ import org.infogrid.context.Context;
 import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.rest.RestfulRequest;
 import org.infogrid.jee.servlet.BufferedServletResponse;
+import org.infogrid.jee.servlet.UnsafePostException;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;
 import org.infogrid.util.http.HTTP;
 import org.infogrid.util.logging.Log;
@@ -36,7 +37,7 @@ public abstract class AbstractJeeViewlet
         implements
             JeeViewlet
 {
-    private static final Log log = Log.getLogInstance( AbstractJeeViewlet.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance( AbstractJeeViewlet.class ); // our own, private loger
 
     /**
      * Constructor, for subclasses only.
@@ -121,6 +122,7 @@ public abstract class AbstractJeeViewlet
      * 
      * @param request the incoming request
      * @param response the response to be assembled
+     * @throws UnsafePostException thrown if the unsafe POST operation was not acceptable
      * @throws ServletException thrown if an error occurred
      * @see #performBeforeGet
      * @see #performBeforeSafePost
@@ -130,9 +132,10 @@ public abstract class AbstractJeeViewlet
             RestfulRequest     request,
             StructuredResponse response )
         throws
+            UnsafePostException,
             ServletException
     {
-        throw new ServletException( "Unsafe POST" ); // FIXME what about better error reporting ;-)
+        throw new UnsafePostException( request );
     }
 
     /**
