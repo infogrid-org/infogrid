@@ -19,7 +19,6 @@
    <tr>
     <th>Identifier</th>
     <th>Types and Attributes</th>
-    <th>Neighbors</th>
     <th>Audit</th>
    </tr>
   </thead>
@@ -44,26 +43,6 @@
          </ul>
         </li>
        </mesh:blessedByIterate>
-      </ul>
-     </td>
-     <td>
-      <div class="slide-in-button"><a href="javascript:overlay_show( 'org-infogrid-jee-shell-http-HttpShellVerb-relate', { 'mesh.subject' : '<mesh:meshObjectId meshObjectName="current" stringRepresentation="Plain" filter="true" />' } )" title="Relate to a new neighbor"><img src="${CONTEXT}/s/icons/add.png" alt="Relate to neighbor"/></a></div>
-      <ul class="neighbors">
-       <mesh:neighborIterate meshObjectName="current" neighborLoopVar="neighbor">
-        <li>
-         <div class="slide-in-button"><a href="javascript:overlay_show( 'org-infogrid-jee-shell-http-HttpShellVerb-blessRole', { 'mesh.subject' : '<mesh:meshObjectId meshObjectName="current" stringRepresentation="Plain" filter="true" />', 'mesh.object' : '<mesh:meshObjectId meshObjectName="neighbor" stringRepresentation="Plain" filter="true" />' } )" title="Add a role"><img src="${CONTEXT}/s/icons/add.png" alt="Add role"/></a></div>
-         <div class="slide-in-button"><a href="javascript:overlay_show( 'org-infogrid-jee-shell-http-HttpShellVerb-unrelate', { 'mesh.subject' : '<mesh:meshObjectId meshObjectName="current" stringRepresentation="Plain" filter="true" />', 'mesh.object' : '<mesh:meshObjectId meshObjectName="neighbor" stringRepresentation="Plain" filter="true" />' } )" title="Remove a neighbor"><img src="${CONTEXT}/s/icons/trash.png" alt="Delete neighbor"/></a></div>
-         <p><mesh:meshObjectLink meshObjectName="neighbor"><mesh:meshObjectId meshObjectName="neighbor" stringRepresentation="Html" maxLength="30" /></mesh:meshObjectLink></p>
-         <ul class="neighborRoleTypes">
-          <mesh:roleIterate startMeshObjectName="current" destinationMeshObjectName="neighbor" roleTypeLoopVar="roleType">
-           <li>
-            <div class="slide-in-button"><a href="javascript:overlay_show( 'org-infogrid-jee-shell-http-HttpShellVerb-unblessRole', { 'mesh.subject' : '<mesh:meshObjectId meshObjectName="current" stringRepresentation="Plain" filter="true" />', 'mesh.object' : '<mesh:meshObjectId meshObjectName="neighbor" stringRepresentation="Plain" filter="true" />', 'mesh.roletype' : '<mesh:meshTypeId meshTypeName="roleType" stringRepresentation="Plain" filter="true" />' } )" title="Remove a role"><img src="${CONTEXT}/s/icons/trash.png" alt="Delete role"/></a></div>
-            <p><mesh:type meshTypeName="roleType" filter="false"/></p>
-           </li>
-          </mesh:roleIterate>
-         </ul>
-        </li>
-       </mesh:neighborIterate>       
       </ul>
      </td>
      <td>
