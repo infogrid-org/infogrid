@@ -74,7 +74,7 @@ public class VerbatimResponseTemplate
         
         // stream default section(s)
             
-        String errorContent = structured.getSectionContent( TextStructuredResponseSection.ERROR_SECTION );
+        String errorContent = structured.getErrorContentAsPlain();
         if( errorContent != null ) {
             Writer w = delegate.getWriter();
             w.write( errorContent );

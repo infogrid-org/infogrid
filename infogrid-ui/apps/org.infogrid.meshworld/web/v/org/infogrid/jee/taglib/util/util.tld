@@ -4,6 +4,14 @@
     <short-name>set</short-name>
     <uri>/v/org/infogrid/jee/taglib/util/util.tld</uri>
 
+    <!-- Tags are ordered alphabetically by Java Class name. Makes it easier
+         to find them in the IDE. -->
+
+    <tag>
+        <name>ifIterationHasNext</name>
+        <tag-class>org.infogrid.jee.taglib.util.IfIterationHasNextTag</tag-class>
+    </tag>
+
     <tag>
         <name>namedServletInclude</name>
         <tag-class>org.infogrid.jee.taglib.util.NamedServletIncludeTag</tag-class>
@@ -14,18 +22,6 @@
         </attribute>
         <attribute>
             <name>flush</name>
-        </attribute>
-        <attribute>
-            <name>filter</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>ignore</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>scope</name>
-            <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
 
@@ -62,73 +58,8 @@
     </tag>
 
     <tag>
-        <name>timeStamp</name>
-        <tag-class>org.infogrid.jee.taglib.util.TimeStampTag</tag-class>
-        <attribute>
-            <name>objectName</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>formatString</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>filter</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>ignore</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>scope</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-    </tag>
-
-    <tag>
-        <name>toExternalForm</name>
-        <tag-class>org.infogrid.jee.taglib.util.ToExternalFormTag</tag-class>
-        <attribute>
-            <name>objectName</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>filter</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>ignore</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>scope</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-    </tag>
-
-    <tag>
-        <name>ifIterationHasNext</name>
-        <tag-class>org.infogrid.jee.taglib.util.IfIterationHasNextTag</tag-class>
-    </tag>
-
-    <tag>
         <name>safeForm</name>
         <tag-class>org.infogrid.jee.taglib.util.SafeFormTag</tag-class>
-        <attribute>
-            <name>filter</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>ignore</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>scope</name>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
         <attribute>
             <name>id</name>
             <rtexprvalue>true</rtexprvalue>
@@ -218,4 +149,58 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
+    
+    <tag>
+        <name>timeStamp</name>
+        <tag-class>org.infogrid.jee.taglib.util.TimeStampTag</tag-class>
+        <attribute>
+            <name>objectName</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>formatString</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>never</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>filter</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>ignore</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>scope</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>toExternalForm</name>
+        <tag-class>org.infogrid.jee.taglib.util.ToExternalFormTag</tag-class>
+        <attribute>
+            <name>objectName</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>filter</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>ignore</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>scope</name>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+
 </taglib>

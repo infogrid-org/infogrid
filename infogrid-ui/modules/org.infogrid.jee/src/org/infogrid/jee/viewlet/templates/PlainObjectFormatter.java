@@ -27,14 +27,14 @@ import org.infogrid.util.ResourceHelper;
 /**
  * A default LocalizedObjectFormatter for InfoGrid Web Apps.
  */
-public class HtmlObjectFormatter
+public class PlainObjectFormatter
         implements
             LocalizedObjectFormatter
 {
     /**
      * Constructor.
      */
-    public HtmlObjectFormatter()
+    public PlainObjectFormatter()
     {
         // no op
     }
@@ -49,25 +49,25 @@ public class HtmlObjectFormatter
             Object o )
     {
         if( o == null ) {
-            return theResourceHelper.getResourceStringOrDefault( "NullString", "<tt>null</tt>" );
+            return theResourceHelper.getResourceStringOrDefault( "NullString", "null" );
 
         } else if( o instanceof MeshObject || o instanceof MeshObjectIdentifier ) {
             MeshObjectIdentifier ref = ( o instanceof MeshObjectIdentifier ) ? ((MeshObjectIdentifier)o) : ((MeshObject)o).getIdentifier();
 
-            String ret = ref.toStringRepresentation( ModelPrimitivesStringRepresentation.TEXT_HTML );
-            return "&quot;" + ret + "&quot;";
+            String ret = ref.toStringRepresentation( ModelPrimitivesStringRepresentation.TEXT_PLAIN );
+            return ret;
 
         } else if( o instanceof MeshType ) {
             MeshType realO = (MeshType) o;
 
-            String ret = PropertyValue.toStringRepresentation( realO.getUserVisibleName(), ModelPrimitivesStringRepresentation.TEXT_HTML );
-            return "&quot;" + ret + "&quot;";
+            String ret = PropertyValue.toStringRepresentation( realO.getUserVisibleName(), ModelPrimitivesStringRepresentation.TEXT_PLAIN );
+            return ret;
             
         } else if( o instanceof Class ) {
             Class realO = (Class) o;
 
             String ret = realO.getName();
-            return "&quot;" + ret + "&quot;";
+            return ret;
            
         } else {
             return o.toString();
@@ -77,5 +77,5 @@ public class HtmlObjectFormatter
     /**
      * Our ResourceHelper.
      */
-    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( HtmlObjectFormatter.class  );
+    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( PlainObjectFormatter.class  );
 }

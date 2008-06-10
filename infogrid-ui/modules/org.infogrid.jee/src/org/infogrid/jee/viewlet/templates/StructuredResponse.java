@@ -20,8 +20,8 @@ import java.util.HashMap;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.infogrid.util.LocalizedObject;
 import org.infogrid.util.LocalizedObjectFormatter;
 import org.infogrid.util.logging.Log;
 
@@ -245,77 +245,116 @@ public class StructuredResponse
             // make sure we aren't growing this indefinitely
             theCurrentProblems.add( t );
 
-            String report = createStackTrace( t );
-            appendToSectionContent( TextStructuredResponseSection.ERROR_SECTION, report );
-
         } else {
             log.error( "Too many problems. Ignored ", t );
         }
     }
 
     /**
-     * Create a String that represents the Stacktrace. Subclasses may override this and return an
-     * empty String.
-     *
-     * @param t the Throwable for the stack trace
-     * @return the String
+     * Obtain the error content as plain text.
+     * 
+     * @return the error content
      */
-    protected String createStackTrace(
-            Throwable t )
+    public String getErrorContentAsPlain()
     {
-        StringBuilder        buf   = new StringBuilder();
-        StackTraceElement [] trace = t.getStackTrace();
+        StringBuilder            buf       = new StringBuilder();
+        LocalizedObjectFormatter formatter = obtainPlainObjectFormatter( );
 
-        boolean isHtml = theMimeType != null && theMimeType.indexOf( "html" ) >= 0;
-                // "text/html".equals( theMimeType ) || "application/xhtml+xml".equals( theMimeType );
-        
-        if( isHtml ) {
-            buf.append( "<div class=\"error\">\n<h1>" );
-        }
-        buf.append( t.getMessage() );
-        if( isHtml ) {
-            buf.append( "</h1>" );
-        }
-
-        for( int i=0 ; i<trace.length ; ++i ) {
-            buf.append( "\n" );
-            if( isHtml ) {
-                buf.append( "\n<div class=\"stacktracelement\">" );
+        for( Throwable t : theCurrentProblems ) {
+            String msg;
+            if( t instanceof LocalizedObject ) {
+                msg = ((LocalizedObject) t).getLocalizedMessage( formatter );
             } else {
-                buf.append( "    " );
+                msg = t.getMessage();
             }
-            buf.append( "at " ).append( trace[i] );
-            if( isHtml ) {
-                buf.append( "</div>" );
+            if( msg == null ) {
+                msg = t.getClass().getName();
             }
-        }
-
-        // now causes.
-        for( Throwable cause = findCause( t ) ; cause != null ; cause = findCause( cause )) {
-            buf.append( "\n" );
-            if( isHtml ) {
-                buf.append( "<h2>" );
-            }
-            buf.append( cause.toString() );
-            if( isHtml ) {
-                buf.append( "</h2>" );
-            }
+            buf.append( msg );
             
-            StackTraceElement [] causeTrace = cause.getStackTrace();
-            for( int i=0 ; i<causeTrace.length ; ++i ) {
+            for( StackTraceElement trace : t.getStackTrace() ) {
+                buf.append( "    " );
+                buf.append( trace );
                 buf.append( "\n" );
-                if( isHtml ) {
-                    buf.append( "\n<div class=\"stacktracelement\">" );
+            }            
+
+            // now causes.
+            for( Throwable cause = findCause( t ) ; cause != null ; cause = findCause( cause )) {
+                buf.append( "Caused by: " );
+                String msg2;
+                if( t instanceof LocalizedObject ) {
+                    msg2 = ((LocalizedObject) cause).getLocalizedMessage( formatter );
                 } else {
-                    buf.append( "    " );
+                    msg2 = cause.getMessage();
                 }
-                buf.append( "at " ).append( causeTrace[i] );
-                if( isHtml ) {
-                    buf.append( "</div>" );
+                if( msg2 == null ) {
+                    msg2 = cause.getClass().getName();
+                }
+                buf.append( msg2 );
+
+                for( StackTraceElement trace : cause.getStackTrace() ) {
+                    buf.append( "    " );
+                    buf.append( trace );
+                    buf.append( "\n" );
                 }
             }
         }
-        if( isHtml ) {
+        return buf.toString();
+    }
+
+    /**
+     * Obtain the error content as HTML text.
+     * 
+     * @return the error content
+     */
+    public String getErrorContentAsHtml()
+    {
+        StringBuilder            buf       = new StringBuilder();
+        LocalizedObjectFormatter formatter = obtainHtmlObjectFormatter( );
+
+        for( Throwable t : theCurrentProblems ) {
+            buf.append( "<div class=\"error\">\n" );
+            String msg;
+            if( t instanceof LocalizedObject ) {
+                msg = ((LocalizedObject) t).getLocalizedMessage( formatter );
+            } else {
+                msg = t.getMessage();
+            }
+            if( msg == null ) {
+                msg = t.getClass().getName();
+            }
+            buf.append( "<h1>" ).append( msg ).append( "</h1>\n" );
+            
+            buf.append( "<div class=\"stacktrace\">\n" );
+            
+            for( StackTraceElement trace : t.getStackTrace() ) {
+                buf.append( "<div class=\"stacktracelement\">" );
+                buf.append( trace );
+                buf.append( "</div>\n" );
+            }            
+
+            // now causes.
+            for( Throwable cause = findCause( t ) ; cause != null ; cause = findCause( cause )) {
+                buf.append( "<div class=\"cause\">\n" );
+
+                String msg2;
+                if( t instanceof LocalizedObject ) {
+                    msg2 = ((LocalizedObject) cause).getLocalizedMessage( formatter );
+                } else {
+                    msg2 = cause.getMessage();
+                }
+                if( msg2 == null ) {
+                    msg2 = cause.getClass().getName();
+                }
+                buf.append( "<h2>" ).append( msg2 ).append( "</h2>\n" );
+
+                for( StackTraceElement trace : cause.getStackTrace() ) {
+                    buf.append( "<div class=\"stacktracelement\">" );
+                    buf.append( trace );
+                    buf.append( "</div>\n" );
+                }            
+                buf.append( "</div>\n" );
+            }
             buf.append( "</div>\n" );
         }
         return buf.toString();
@@ -355,20 +394,33 @@ public class StructuredResponse
     }
 
     /**
-     * Obtain a LocalizedObjectFormatter. This can be overridden by subclasses.
+     * Obtain a LocalizedObjectFormatter for Html output. This can be overridden by subclasses.
      * 
-     * @param request the incoming HttpServletRequest
-     * @param response the outgoing HttpServletResponse
      * @return the LocalizedObjectFormatter to use with this application
      */
-    protected LocalizedObjectFormatter obtainLocalizedExceptionObjectFormatter(
-            HttpServletRequest  request,
-            HttpServletResponse response )
+    protected LocalizedObjectFormatter obtainHtmlObjectFormatter()
     {
-        if( theExceptionObjectFormatter == null ) {
-            theExceptionObjectFormatter = new HtmlObjectFormatter( request.getContextPath() + "/" );
-        }
-        return theExceptionObjectFormatter;
+        return new HtmlObjectFormatter();
+    }
+
+    /**
+     * Obtain a LocalizedObjectFormatter for plain text output. This can be overridden by subclasses.
+     * 
+     * @return the LocalizedObjectFormatter to use with this application
+     */
+    protected LocalizedObjectFormatter obtainPlainObjectFormatter()
+    {
+        return new PlainObjectFormatter();
+    }
+
+    /**
+     * Determine whether problems have been reported.
+     * 
+     * @return true if at least one problem has been reported
+     */
+    public boolean haveProblemsBeenReported()
+    {
+        return !theCurrentProblems.isEmpty();
     }
 
     /**
@@ -387,9 +439,9 @@ public class StructuredResponse
     protected HttpServletResponse theDelegate;
 
     /**
-     * The mime type of the response.
+     * The mime type of the response. HTML is default
      */
-    protected String theMimeType;
+    protected String theMimeType = "text/html";
 
     /**
      * The cookies to be sent. This is represented as a HashMap in order to easily be
@@ -413,11 +465,6 @@ public class StructuredResponse
      * The current problems, in sequence of occurrence.
      */
     protected ArrayList<Throwable> theCurrentProblems = new ArrayList<Throwable>();
-
-    /**
-     * The LocalizedObjectFormatter to use for error reporting.
-     */
-    protected LocalizedObjectFormatter theExceptionObjectFormatter;
 
     /**
      * The ServletContext within which this response is assembled.

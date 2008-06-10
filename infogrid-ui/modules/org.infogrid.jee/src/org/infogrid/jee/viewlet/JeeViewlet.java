@@ -19,6 +19,7 @@ import org.infogrid.viewlet.Viewlet;
 
 import javax.servlet.ServletException;
 import org.infogrid.jee.rest.RestfulRequest;
+import org.infogrid.jee.servlet.UnsafePostException;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;
 
 /**
@@ -93,6 +94,7 @@ public interface JeeViewlet
      * 
      * @param request the incoming request
      * @param response the response to be assembled
+     * @throws UnsafePostException thrown if the unsafe POST operation was not acceptable
      * @throws ServletException thrown if an error occurred
      * @see #performBeforeGet
      * @see #performBeforeSafePost
@@ -102,6 +104,7 @@ public interface JeeViewlet
             RestfulRequest     request,
             StructuredResponse response )
         throws
+            UnsafePostException,
             ServletException;
 
     /**
