@@ -21,11 +21,11 @@
   </div>
   <div id="canvas-middle">
    <div class="canvas-main">
-    <tmpl:ifNotEmpty name="html-errors">
+    <tmpl:ifErrors>
      <div class="errors">
-      <tmpl:inline name="html-errors"/>
+      <tmpl:inlineErrors stringRepresentation="Html"/>
      </div>
-    </tmpl:ifNotEmpty>
+    </tmpl:ifErrors>
     <tmpl:inline name="default"/>
    </div>
   </div>
