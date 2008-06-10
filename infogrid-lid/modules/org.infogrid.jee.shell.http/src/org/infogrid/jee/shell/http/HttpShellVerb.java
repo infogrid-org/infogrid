@@ -163,21 +163,9 @@ public enum HttpShellVerb
             if( subject != null ) {
                 throw new MeshObjectIdentifierNotUniqueException( subject );
             }
-
-            String subjectString = lidRequest.getPostArgument( HttpShellFilter.SUBJECT_TAG );
-            if( subjectString != null ) {
-                subjectString = subjectString.trim();
-            }
-
-            MeshObjectIdentifier toCreateName;
-            if( subjectString == null || subjectString.length() == 0 ) {
-                toCreateName = null;
-            } else {
-                toCreateName = mb.getMeshObjectIdentifierFactory().fromExternalForm( subjectString );
-            }
-
-            if( toCreateName != null ) {
-                subject = mb.getMeshBaseLifecycleManager().createMeshObject( toCreateName );
+            
+            if( subjectIdentifier != null ) {
+                subject = mb.getMeshBaseLifecycleManager().createMeshObject( subjectIdentifier );
             } else {
                 subject = mb.getMeshBaseLifecycleManager().createMeshObject();
             }
@@ -243,6 +231,148 @@ public enum HttpShellVerb
      */
     ACCESS_LOCALLY( "accessLocally" ) {
         /**
+         * Perform the operation that goes with this verb.
+         * 
+         * @param lidRequest the incoming request
+         * @throws NotPermittedException thrown if the caller did not have sufficient privileges for the operation
+         * @throws HttpShellException thrown if the operation could not be performed
+         */
+        @Override
+        public void performVerb(
+                SaneServletRequest lidRequest )
+            throws
+                NotPermittedException,
+                HttpShellException
+        {
+            String meshBaseString = lidRequest.getPostArgument( HttpShellFilter.MESH_BASE_TAG );
+            String subjectString  = lidRequest.getPostArgument( HttpShellFilter.SUBJECT_TAG );
+            String objectString   = lidRequest.getPostArgument( HttpShellFilter.OBJECT_TAG );
+
+            if( meshBaseString != null ) {
+                meshBaseString = meshBaseString.trim();
+            }
+            if( subjectString != null ) {
+                subjectString = subjectString.trim();
+            }
+            if( objectString != null ) {
+                objectString = objectString.trim();
+            }
+            if( "".equals( subjectString )) {
+                subjectString = null; // empty field should not mean home object here
+            }
+            if( "".equals( objectString )) {
+                objectString = null; // empty field should not mean home object here
+            }
+
+            InfoGridWebApp app = InfoGridWebApp.getSingleton();
+
+            NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = app.getMeshBaseNameServer();
+            MeshBaseIdentifier                      meshBaseName       = null;
+
+            if( meshBaseString != null ) {
+                try {
+                    meshBaseName = app.createMeshBaseIdentifier( meshBaseString );
+
+                } catch( URISyntaxException ex ) {
+                    throw new HttpShellException( ex );
+                }
+            }
+
+            MeshBase meshBase = null;
+            if( meshBaseName != null ) {
+                meshBase = meshBaseNameServer.get( meshBaseName );
+            } else {
+                meshBase = app.getDefaultMeshBase();
+            }
+
+            if( meshBase == null ) {
+                throw new HttpShellException( new RuntimeException( "Meshbase cannot be found" ));
+            }
+
+            MeshObjectIdentifier subjectName;
+            MeshObjectIdentifier objectName;
+            try {
+                subjectName = InfoGridJspUtils.fromMeshObjectIdentifier( meshBase.getMeshObjectIdentifierFactory(), ModelPrimitivesStringRepresentation.TEXT_PLAIN, subjectString );
+                objectName  = InfoGridJspUtils.fromMeshObjectIdentifier( meshBase.getMeshObjectIdentifierFactory(), ModelPrimitivesStringRepresentation.TEXT_PLAIN, objectString );
+
+            } catch( URISyntaxException ex ) {
+                throw new HttpShellException( ex );
+            }
+
+            MeshObject subject;
+            try {
+                subject = ( subjectName != null ) ? meshBase.accessLocally( subjectName ) : null;
+
+            } catch( MeshObjectAccessException ex ) {
+                throw new HttpShellException( ex );
+            }
+            MeshObject object  = ( objectName  != null ) ? meshBase.findMeshObjectByIdentifier( objectName  ) : null;
+
+            Transaction tx = null;
+            try {
+                tx = meshBase.createTransactionAsapIfNeeded();
+
+                performVerbWithinTransaction( lidRequest, subjectName, subject, objectName, object, meshBase );
+
+            } catch( EssentialArgumentMissingException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( IsAbstractException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( EntityBlessedAlreadyException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( IllegalPropertyTypeException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( RoleTypeBlessedAlreadyException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( MeshObjectIdentifierNotUniqueException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( InconsistentArgumentsException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( EntityNotBlessedException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( RelatedAlreadyException ex ) {
+                throw new HttpShellException( ex );
+
+//            } catch( RoleTypeRequiresEntityTypeException ex ) {
+//                throw new HttpShellException( ex );
+//
+//            } catch( RoleTypeNotBlessedException ex ) {
+//                throw new HttpShellException( ex );
+//
+            } catch( NotRelatedException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( MeshTypeNotFoundException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( MeshObjectAccessException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( PropertyValueParsingException ex ) {
+                throw new HttpShellException( ex );
+
+            } catch( TransactionException ex ) {
+                log.error( ex );
+
+            } catch( URISyntaxException ex ) {
+                throw new HttpShellException( ex );
+
+            } finally {
+                if( tx != null ) {
+                    tx.commitTransaction();
+                }
+            }
+        }
+
+        /**
          * Perform the operation, assuming a Transaction is in place.
          *
          * @param lidRequest the incoming request
@@ -285,24 +415,8 @@ public enum HttpShellVerb
                 TransactionException,
                 URISyntaxException
         {
-            String subjectString = lidRequest.getPostArgument( HttpShellFilter.SUBJECT_TAG );
-            if( subjectString != null ) {
-                subjectString = subjectString.trim();
-            }
-
-            MeshObjectIdentifier toFindName;
-            if( subjectString == null || subjectString.length() == 0 ) {
-                toFindName = null;
-            } else {
-                toFindName = mb.getMeshObjectIdentifierFactory().fromExternalForm( subjectString );
-            }
-
-            if( toFindName != null ) {
-                subject  = mb.accessLocally( toFindName );
-            }
-            if( subject == null ) {
-                throw new MeshObjectsNotFoundException( mb, toFindName );
-            }
+            // That's all that's left here
+            
             potentiallyBlessEntityTypes( lidRequest, subject, mb, false );
             potentiallySetProperties(    lidRequest, subject, mb, false );
             potentiallyRelateAndBless(   lidRequest, subject, object, mb, false );
@@ -1065,15 +1179,8 @@ public enum HttpShellVerb
             throw new HttpShellException( ex );
         }
         
-        MeshObject subject;
-        MeshObject object;
-        try {
-            subject = ( subjectName != null ) ? meshBase.accessLocally( subjectName ) : null;
-            object  = ( objectName  != null ) ? meshBase.accessLocally( objectName  ) : null;
-            
-        } catch( MeshObjectAccessException ex ) {
-            throw new HttpShellException( ex );
-        }
+        MeshObject subject = ( subjectName != null ) ? meshBase.findMeshObjectByIdentifier( subjectName ) : null;
+        MeshObject object  = ( objectName  != null ) ? meshBase.findMeshObjectByIdentifier( objectName  ) : null;
 
         Transaction tx = null;
         try {
