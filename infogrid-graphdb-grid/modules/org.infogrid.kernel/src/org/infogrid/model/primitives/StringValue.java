@@ -187,9 +187,9 @@ public final class StringValue
     {
         StringBuffer buf = new StringBuffer( theValue.length() + 2 );
         buf.append( getClass().getName() );
-        buf.append( DataType.CREATE_STRING ).append( "\"" );
-        buf.append( theValue );
-        buf.append( "\" )" );
+        buf.append( DataType.CREATE_STRING );
+        buf.append( encodeAsJavaString( theValue ));
+        buf.append( " )" );
         return buf.toString();
     }
 
@@ -223,6 +223,34 @@ public final class StringValue
             StringRepresentation representation )
     {
         return representation.formatEntry( RESOURCEHELPER, DEFAULT_ENTRY, theValue );
+    }
+
+    /**
+     * Helper method to encode a String as a Java string.
+     * 
+     * @param s the String
+     * @return the encoded String
+     */
+    public static String encodeAsJavaString(
+            String s )
+    {
+        StringBuilder ret = new StringBuilder( s.length() * 4 / 3 ); // fudge
+        ret.append( '"' );
+        
+        for( int i=0 ; i<s.length() ; ++i ) {
+            char c = s.charAt( i );
+            
+            switch( c ) {
+                case '"':
+                    ret.append( "\\\"" );
+                    break;
+                default:
+                    ret.append( c );
+                    break;
+            }
+        }
+        ret.append( '"' );
+        return ret.toString();
     }
 
     /**
