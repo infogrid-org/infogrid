@@ -30,6 +30,8 @@ public class DereferencingIteratorTest1
 {
     /**
      * Run the test.
+     * 
+     * @throws Exception all sorts of things may go wrong in a test
      */
     public void run()
         throws
@@ -131,6 +133,7 @@ public class DereferencingIteratorTest1
      * Constructor.
      *
      * @param args command-line arguments
+     * @throws Exception all sorts of things may go wrong in a test
      */
     public DereferencingIteratorTest1(
             String [] args )

@@ -21,7 +21,7 @@ import org.infogrid.util.logging.Log;
 import java.util.ArrayList;
 
 /**
- *
+ * Listener for SmartFactoryTests.
  */
 public class SmartFactoryTestListener
         implements
@@ -38,6 +38,8 @@ public class SmartFactoryTestListener
     
     /**
      * Receive an "added" event.
+     * 
+     * @param event the received event
      */
     public void smartFactoryElementAdded(
             SmartFactoryEvent.Added event )
@@ -50,6 +52,8 @@ public class SmartFactoryTestListener
 
     /**
      * Receive an "removed" event.
+     * 
+     * @param event the received event
      */
     public void smartFactoryElementRemoved(
             SmartFactoryEvent.Removed event )
