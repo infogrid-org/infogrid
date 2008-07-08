@@ -28,12 +28,17 @@ public abstract class AbstractCursorIteratorTest
             AbstractTest
 {
     /**
-     * Run the test with the provided test data and to-be-tested iterator.
+     * Run the test.
+     * 
+     * @param <T> the type of Iterator to test
+     * @param testData the provided test data
+     * @param iter the to-be-tested iterator
+     * @param log the Logger to use
      */
-    protected void runWith(
-            String []              testData,
-            CursorIterator<String> iter,
-            Log                    log )
+    protected <T> void runWith(
+            T []              testData,
+            CursorIterator<T> iter,
+            Log               log )
     {
         //
         
@@ -51,7 +56,7 @@ public abstract class AbstractCursorIteratorTest
         for( int i=0 ; i<testData.length ; ++i ) {
             checkCondition( iter.hasNext(), "Not found next: " + i );
             
-            String found = iter.next();
+            Object found = iter.next();
             checkEquals( testData[i], found, "Not found element: " + i );
         }
 
@@ -77,7 +82,7 @@ public abstract class AbstractCursorIteratorTest
         for( int i=testData.length-1 ; i>=0 ; --i ) {
             checkCondition( iter.hasPrevious(), "Not found previous: " + i );
             
-            String found = iter.previous();
+            Object found = iter.previous();
             checkEquals( testData[i], found, "Not found element: " + i );
         }
         
@@ -126,7 +131,7 @@ public abstract class AbstractCursorIteratorTest
         
         log.info( "Copy" );
         
-        CursorIterator<String> copy = iter.createCopy();
+        CursorIterator<?> copy = iter.createCopy();
         
         checkEquals( iter.peekNext(), copy.peekNext(), "copied iterator in a different place" );
         checkEquals( iter.peekNext(),     testData[3], "wrong element found" );
@@ -138,7 +143,7 @@ public abstract class AbstractCursorIteratorTest
         
         log.info( "Look backward" );
 
-        String [] before = iter.previous( 100 );
+        Object [] before = iter.previous( 100 );
 
         checkEquals( before.length, 3, "wrong number of elements before" );
         for( int i=0 ; i<3 ; ++i ) {
@@ -149,7 +154,7 @@ public abstract class AbstractCursorIteratorTest
         
         log.info( "Look forward" );
         
-        String [] after  = copy.next( 100 );
+        Object [] after  = copy.next( 100 );
 
         checkEquals( after.length, testData.length - 3, "wrong number of elements after" );
         for( int i=3 ; i<testData.length ; ++i ) {
@@ -160,7 +165,7 @@ public abstract class AbstractCursorIteratorTest
     /**
      * Constructor.
      *
-     * @param args command-line arguments
+     * @throws Exception all kinds of things may go wrong in a test
      */
     protected AbstractCursorIteratorTest()
         throws

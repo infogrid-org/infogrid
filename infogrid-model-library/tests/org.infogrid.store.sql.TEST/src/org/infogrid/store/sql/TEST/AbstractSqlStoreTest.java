@@ -14,13 +14,11 @@
 
 package org.infogrid.store.sql.TEST;
 
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import java.sql.SQLException;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.sql.SqlStore;
 import org.infogrid.testharness.AbstractTest;
-
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-
-import java.sql.SQLException;
 
 /**
  * Factors out common functionality of SqlStoreTests.
@@ -33,6 +31,7 @@ public abstract class AbstractSqlStoreTest
      * Constructor.
      * 
      * @param testClass the actual test Class
+     * @throws SQLException thrown if the SqlStore could not be accessed
      */
     public AbstractSqlStoreTest(
             Class testClass )

@@ -38,6 +38,8 @@ public class SwappingHashMapTestListener
     
     /**
      * Receive an "added" event.
+     * 
+     * @param event the received event
      */
     public void swappingHashMapElementAdded(
             CachingMapEvent.Added event )
@@ -50,6 +52,8 @@ public class SwappingHashMapTestListener
 
     /**
      * Receive an "removed" event.
+     * 
+     * @param event the received event
      */
     public void swappingHashMapElementRemoved(
             CachingMapEvent.Removed event )
@@ -62,6 +66,8 @@ public class SwappingHashMapTestListener
     
     /**
      * Receive an "removed" event.
+     * 
+     * @param event the received event
      */
     public void swappingHashMapElementExpired(
             CachingMapEvent.Expired event )

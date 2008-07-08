@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
  * to be returned going forward, and one after than the next element to be returned
  * going backwards.
  * 
- * @param E the type of element to iterate over
+ * @param <E> the type of element to iterate over
  */
 public class FilteringCursorIterator<E>
         extends
@@ -32,6 +32,10 @@ public class FilteringCursorIterator<E>
      * Factory method.
      *
      * @param delegate the delegate CursorIterator
+     * @param filter the Filter to use that determines which elements from the underlying CursorIterator to select
+     * @param arrayComponentType component type of the array that is allocated for return values
+     * @return the created FilteringCursorIterator
+     * @param <E> the type of element to iterate over
      */
     public static <E> FilteringCursorIterator<E> create(
             CursorIterator<E> delegate,
@@ -85,6 +89,8 @@ public class FilteringCursorIterator<E>
      * @param delegate the delegate CursorIterator
      * @param filter the Filter to use that determines which elements from the underlying CursorIterator to select
      * @param arrayComponentType component type of the array that is allocated for return values
+     * @param isAhead if true, the delegate iterator is as far ahead as possible.
+     * @param isBack if true, the delegate iterator is as far back as possible.
      */
     protected FilteringCursorIterator(
             CursorIterator<E> delegate,
@@ -108,6 +114,7 @@ public class FilteringCursorIterator<E>
      * @return the next element
      * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public E peekNext()
     {
         if( !theIsAhead ) {
@@ -123,6 +130,7 @@ public class FilteringCursorIterator<E>
      * @return the previous element
      * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public E peekPrevious()
     {
         if( !theIsBack ) {
@@ -169,10 +177,8 @@ public class FilteringCursorIterator<E>
     /**
      * Returns <tt>true</tt> if the iteration has at least N more elements in the forward direction.
      *
-     * @return <tt>true</tt> if the iterator has at least N more elements in the forward direction.
-     *
      * @param n the number of elements for which to check
-     * @return true if there at least N next elements
+     * @return <tt>true</tt> if the iterator has at least N more elements in the forward direction.
      * @see #hasNext()
      * @see #hasPrevious()
      * @see #hasPrevious(int)
@@ -203,10 +209,8 @@ public class FilteringCursorIterator<E>
     /**
      * Returns <tt>true</tt> if the iteration has at least N more elements in the backwards direction.
      *
-     * @return <tt>true</tt> if the iterator has at least N more elements in the backwards direction.
-     *
      * @param n the number of elements for which to check
-     * @return true if there at least N previous elements
+     * @return <tt>true</tt> if the iterator has at least N more elements in the backwards direction.
      * @see #hasNext()
      * @see #hasPrevious()
      * @see #hasNext(int)
@@ -341,6 +345,46 @@ public class FilteringCursorIterator<E>
     }
 
     /**
+     * Move the cursor to just before the first element, i.e. return the first element when
+     * {@link #next next} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToBeforeFirst()
+    {
+        int ret = 0;
+        while( theDelegate.hasPrevious() ) {
+            E candidate = theDelegate.previous();
+            if( theFilter.accept( candidate )) {
+                --ret;
+            }
+        }
+        
+        return ret;
+    }
+
+    /**
+     * Move the cursor to just after the last element, i.e. return the last element when
+     * {@link #previous previous} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToAfterLast()
+    {
+        int ret = 0;
+        while( theDelegate.hasNext() ) {
+            E candidate = theDelegate.next();
+            if( theFilter.accept( candidate )) {
+                ++ret;
+            }
+        }
+        
+        return ret;
+    }
+
+    /**
      * The filter.
      */
     protected Filter<E> theFilter;
@@ -350,12 +394,21 @@ public class FilteringCursorIterator<E>
      */
     protected CursorIterator<E> theDelegate;
     
+    /**
+     * If true, the delegate iterator is as far ahead as possible.
+     */
     protected boolean theIsAhead;
+    
+    /**
+     * If true, the delegate iterator is as far back as possible.
+     */
     protected boolean theIsBack;
 
     /**
      * This inner interface is implemented by users of FilteringIterator to determine whether
      * or not we should accept a certain Object.
+     * 
+     * @param <E> the type of element to iterate over
      */
     public static interface Filter<E>
     {

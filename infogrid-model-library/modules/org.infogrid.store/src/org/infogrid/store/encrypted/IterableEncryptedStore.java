@@ -14,6 +14,7 @@
 
 package org.infogrid.store.encrypted;
 
+import java.io.IOException;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.IterableStoreCursor;
 import org.infogrid.store.Store;
@@ -109,8 +110,11 @@ public class IterableEncryptedStore
      * this interface may only return an approximation.
      *
      * @return the number of data elements in this Store
+     * @throws IOException thrown if an I/O error occurred
      */
     public int size()
+        throws
+            IOException
     {
         return ((IterableStore)theDelegate).size();
     }
@@ -120,9 +124,12 @@ public class IterableEncryptedStore
      *
      * @param startsWith the String the key starts with
      * @return the number of StoreValues in this Store whose key starts with this String
+     * @throws IOException thrown if an I/O error occurred
      */
     public int size(
             String startsWith )
+        throws
+            IOException
     {
         return ((IterableStore)theDelegate).size( startsWith );
     }
@@ -131,8 +138,11 @@ public class IterableEncryptedStore
      * Determine whether this Store is empty.
      *
      * @return true if this Store is empty
+     * @throws IOException thrown if an I/O error occurred
      */
     public boolean isEmpty()
+        throws
+            IOException
     {
         return ((IterableStore)theDelegate).isEmpty();
     }
@@ -463,6 +473,32 @@ public class IterableEncryptedStore
         public final CursorIterator<StoreValue> getIterator()
         {
             return iterator();
+        }
+
+        /**
+         * Move the cursor to just before the first element, i.e. return the first element when
+         * {@link #next next} is invoked right afterwards.
+         *
+         * @return the number of steps that were taken to move. Positive number means
+         *         forward, negative backward
+         */
+        public int moveToBeforeFirst()
+        {
+            int ret = theDelegateIter.moveToBeforeFirst();
+            return ret;
+        }
+
+        /**
+         * Move the cursor to just after the last element, i.e. return the last element when
+         * {@link #previous previous} is invoked right afterwards.
+         *
+         * @return the number of steps that were taken to move. Positive number means
+         *         forward, negative backward
+         */
+        public int moveToAfterLast()
+        {
+            int ret = theDelegateIter.moveToAfterLast();
+            return ret;
         }
 
         /**

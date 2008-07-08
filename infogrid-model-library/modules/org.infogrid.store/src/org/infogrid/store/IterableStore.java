@@ -14,6 +14,7 @@
 
 package org.infogrid.store;
 
+import java.io.IOException;
 import org.infogrid.util.CursorIterable;
 
 /**
@@ -45,22 +46,31 @@ public interface IterableStore
      * this interface may only return an approximation.
      *
      * @return the number of data elements in this Store
+     * @throws IOException thrown if an I/O error occurred
      */
-    public abstract int size();
+    public abstract int size()
+            throws
+                IOException;
 
     /**
      * Determine the number of StoreValues in this Store whose key starts with this String
      *
      * @param startsWith the String the key starts with
      * @return the number of StoreValues in this Store whose key starts with this String
+     * @throws IOException thrown if an I/O error occurred
      */
     public abstract int size(
-            String startsWith );
+            String startsWith )
+        throws
+            IOException;
 
     /**
      * Determine whether this Store is empty.
      *
      * @return true if this Store is empty
+     * @throws IOException thrown if an I/O error occurred
      */
-    public abstract boolean isEmpty();
+    public abstract boolean isEmpty()
+        throws
+            IOException;
 }
