@@ -27,6 +27,8 @@ import java.io.ObjectStreamException;
 public final class ColorDataType
         extends DataType
 {
+    private static final long serialVersionUID = 1L; // helps with serialization
+
     /**
       * This is the default instance of this class.
       */
@@ -187,22 +189,22 @@ public final class ColorDataType
             switch( found.length ) {
                 case 1:
                     color = new Color(
-                            ((Integer) found[0]).intValue());
+                            ((Long) found[0]).intValue());
                     break;
 
                 case 3:
                     color = new Color(
-                            ((Integer) found[0]).intValue(),
-                            ((Integer) found[1]).intValue(),
-                            ((Integer) found[2]).intValue() );
+                            ((Long) found[0]).intValue(),
+                            ((Long) found[1]).intValue(),
+                            ((Long) found[2]).intValue() );
                     break;
 
                 case 4:
                     color = new Color(
-                            ((Integer) found[0]).intValue(),
-                            ((Integer) found[1]).intValue(),
-                            ((Integer) found[2]).intValue(),
-                            ((Integer) found[3]).intValue() );
+                            ((Long) found[0]).intValue(),
+                            ((Long) found[1]).intValue(),
+                            ((Long) found[2]).intValue(),
+                            ((Long) found[3]).intValue() );
                     break;
 
                 default:

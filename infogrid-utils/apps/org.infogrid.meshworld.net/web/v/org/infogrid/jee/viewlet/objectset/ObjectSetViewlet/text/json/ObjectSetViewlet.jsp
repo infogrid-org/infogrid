@@ -10,15 +10,16 @@
 [
 <objectset:iterate meshObjectSetName="Viewlet.Objects" meshObjectLoopVar="current">
   {
-    "Identifier" : "<mesh:meshObjectId meshObjectName="current" />",
+    "Identifier" : <mesh:meshObjectId meshObjectName="current" stringRepresentation="Java"/>,
     "Types"      : [
   <mesh:blessedByIterate meshObjectName="current" blessedByLoopVar="blessedBy">
-      "<mesh:meshTypeId meshTypeName="blessedBy" stringRepresentation="Plain" />",
+      <mesh:meshTypeId meshTypeName="blessedBy" stringRepresentation="Java" />,
   </mesh:blessedByIterate>
                    ]
   <mesh:blessedByIterate meshObjectName="current" blessedByLoopVar="blessedBy">
     <mesh:propertyIterate meshObjectName="current" meshTypeName="blessedBy" propertyTypeLoopVar="propertyType" propertyValueLoopVar="propertyValue" skipNullProperty="false">
-       , "<mesh:meshTypeId meshTypeName="propertyType" stringRepresentation="Plain" />" : "${propertyValue}"
+       , <mesh:meshTypeId meshTypeName="propertyType" stringRepresentation="Java" />
+       : <mesh:propertyValue propertyValueName="propertyValue" stringRepresentation="Java" ignore="true" nullString="null"/>
     </mesh:propertyIterate>
   </mesh:blessedByIterate>
   }<u:ifIterationHasNext>,</u:ifIterationHasNext>
