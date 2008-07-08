@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.store.net;
 
+import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.context.Context;
 import org.infogrid.mesh.IsAbstractException;
@@ -249,7 +250,13 @@ public class IterableNetStoreMeshBase
      */
     public int size()
     {
-        return getCachingMap().getStore().size();
+        try {
+            return getCachingMap().getStore().size();
+
+        } catch( IOException ex ) {
+            log.error( ex );
+            return 0;
+        }
     }
 
     /**

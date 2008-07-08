@@ -14,19 +14,6 @@
 
 package org.infogrid.store.sql;
 
-import org.infogrid.store.AbstractStore;
-import org.infogrid.store.IterableStore;
-import org.infogrid.store.IterableStoreCursor;
-import org.infogrid.store.StoreKeyDoesNotExistException;
-import org.infogrid.store.StoreKeyExistsAlreadyException;
-import org.infogrid.store.StoreValue;
-
-import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.StringHelper;
-import org.infogrid.util.logging.Log;
-
-import javax.sql.DataSource;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,6 +21,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import javax.sql.DataSource;
+import org.infogrid.store.AbstractStore;
+import org.infogrid.store.IterableStore;
+import org.infogrid.store.IterableStoreCursor;
+import org.infogrid.store.StoreKeyDoesNotExistException;
+import org.infogrid.store.StoreKeyExistsAlreadyException;
+import org.infogrid.store.StoreValue;
+import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.StringHelper;
+import org.infogrid.util.logging.Log;
 
 /**
  * SQL implementation of the Store interface.
@@ -791,6 +788,27 @@ public class SqlStore
     }
     
     /**
+     * Find the next n keys, including key. This method
+     * will return fewer values if only fewer values could be found.
+     *
+     * @param key the first key
+     * @param n the number of keys to find
+     * @return the found keys
+     */
+    String [] findNextKeyIncluding(
+            String key,
+            int    n )
+    {
+        // FIXME, this can be made more efficient
+        StoreValue [] values = findNextIncluding( key, n );
+        String     [] ret    = new String[0];
+        for( int i=0 ; i<values.length ; ++i ) {
+            ret[i] = values[i].getKey();
+        }
+        return ret;
+    }
+
+    /**
      * Find the previous n StoreValues, excluding the StoreValue for key. This method
      * will return fewer values if only fewer values could be found.
      *
@@ -857,6 +875,27 @@ public class SqlStore
             log.error( ex );
         }
         return ret;           
+    }
+
+    /**
+     * Find the previous n keys, excluding the key for key. This method
+     * will return fewer values if only fewer values could be found.
+     *
+     * @param key the first key NOT to be returned
+     * @param n the number of keys to find
+     * @return the found keys
+     */
+    String [] findPreviousKeyExcluding(
+            String key,
+            int    n )
+    {
+        // FIXME, this can be made more efficient
+        StoreValue [] values = findPreviousExcluding( key, n );
+        String     [] ret    = new String[0];
+        for( int i=0 ; i<values.length ; ++i ) {
+            ret[i] = values[i].getKey();
+        }
+        return ret;
     }
 
     /**
@@ -956,7 +995,13 @@ public class SqlStore
             String key )
     {
         if( key == null ) {
-            return size();
+            try {
+                int ret = size();
+                return ret;
+            } catch( IOException ex ) {
+                log.error( ex );
+                return 0;
+            }
         }
         return countRows( theHasPreviousExcludingPreparedStatement, key );
     }
@@ -1091,7 +1136,7 @@ public class SqlStore
         }
         return null;
     }
-    
+
     /**
      * Determine the number of rows between two keys.
      *
@@ -1157,8 +1202,11 @@ public class SqlStore
      * Determine the number of StoreValues in this Store.
      *
      * @return the number of StoreValues in this Store
+     * @throws IOException thrown if an I/O error occurred
      */
     public int size()
+        throws
+            IOException
     {
         return size( "" );
     }
@@ -1168,9 +1216,12 @@ public class SqlStore
      *
      * @param startsWith the String the key starts with
      * @return the number of StoreValues in this Store whose key starts with this String
+     * @throws IOException thrown if an I/O error occurred
      */
     public int size(
             final String startsWith )
+        throws
+            IOException
     {
         try {
             int ret = new SqlExecutionAction<Integer>( theSizePreparedStatement ) {
@@ -1207,8 +1258,11 @@ public class SqlStore
      * Determine whether this Store is empty.
      *
      * @return true if this Store is empty
+     * @throws IOException thrown if an I/O error occurred
      */
     public boolean isEmpty()
+        throws
+            IOException
     {
         return size() == 0;
     }

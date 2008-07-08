@@ -31,6 +31,8 @@ public class DoubleStringifierTest1
 {
     /**
      * Run the test.
+     * 
+     * @throws Exception all sorts of things may happen in a test
      */
     @SuppressWarnings(value={"unchecked"})
     public void run()
@@ -156,6 +158,7 @@ public class DoubleStringifierTest1
      * Constructor.
      *
      * @param args command-line arguments
+     * @throws Exception all sorts of things may happen in a test
      */
     public DoubleStringifierTest1(
             String [] args )

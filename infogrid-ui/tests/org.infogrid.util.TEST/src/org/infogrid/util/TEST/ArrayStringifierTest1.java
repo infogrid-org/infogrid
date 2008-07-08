@@ -29,8 +29,10 @@ public class ArrayStringifierTest1
 {
     /**
      * Run the test.
+     * 
+     * @throws Exception all sorts of things may happen in a test
      */
-    @SuppressWarnings(value={"unchecked"})
+//    @SuppressWarnings(value={"unchecked"})
     public void run()
         throws
             Exception
@@ -99,6 +101,7 @@ public class ArrayStringifierTest1
      * Constructor.
      *
      * @param args command-line arguments
+     * @throws Exception all sorts of things may happen in a test
      */
     public ArrayStringifierTest1(
             String [] args )
