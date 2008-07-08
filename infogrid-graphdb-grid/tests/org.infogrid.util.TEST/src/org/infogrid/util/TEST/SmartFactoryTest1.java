@@ -28,6 +28,8 @@ public class SmartFactoryTest1
 {
     /**
      * Run the test.
+     * 
+     * @throws Exception all sorts of things may happen in a test
      */
     public void run()
         throws
@@ -166,6 +168,7 @@ public class SmartFactoryTest1
      * Constructor.
      *
      * @param args command-line arguments
+     * @throws Exception all sorts of things may happen in a test
      */
     public SmartFactoryTest1(
             String [] args )

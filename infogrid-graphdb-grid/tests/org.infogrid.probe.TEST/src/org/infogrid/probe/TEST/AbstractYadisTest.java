@@ -14,6 +14,11 @@
 
 package org.infogrid.probe.TEST;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URISyntaxException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.httpd.HttpResponseFactory;
 import org.infogrid.httpd.server.HttpServer;
 import org.infogrid.lid.LidSubjectArea;
@@ -29,17 +34,14 @@ import org.infogrid.model.primitives.MeshType;
 import org.infogrid.model.Probe.ProbeSubjectArea;
 import org.infogrid.modelbase.MeshTypeNotFoundException;
 import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.manager.PassiveProbeManager;
 import org.infogrid.probe.manager.m.MPassiveProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.m.MShadowMeshBaseFactory;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.logging.Log;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.URISyntaxException;
-import org.infogrid.probe.m.MProbeDirectory;
 
 /**
  * Factors out the commonalities of the Yadis tests.
@@ -69,7 +71,7 @@ public abstract class AbstractYadisTest
         // start the server
         theServer.start();
 
-        NetMessageEndpointFactory endpointsFactory = null; // MPingPongNetMessageEndpointFactory.create()
+        NetMessageEndpointFactory endpointsFactory = MPingPongNetMessageEndpointFactory.create( exec );
         
         ShadowMeshBaseFactory theShadowFactory
                 = MShadowMeshBaseFactory.create( theModelBase, endpointsFactory, theProbeDirectory, -1L, rootContext );
@@ -86,6 +88,7 @@ public abstract class AbstractYadisTest
         if( theServer != null ) {
             theServer.stop();
         }
+        exec.shutdown();
 
         theProbeManager1 = null;
     }
@@ -158,6 +161,11 @@ public abstract class AbstractYadisTest
      * with different numbers of threads?
      */
     protected static final int NUMBER_THREADS = 0;
+
+    /**
+     * Our ThreadPool.
+     */
+    protected ScheduledExecutorService exec = Executors.newScheduledThreadPool( 1 );
 
     /**
      * The NetworkIdentifer of the first test file.

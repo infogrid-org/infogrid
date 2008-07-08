@@ -24,6 +24,8 @@ public final class BooleanValue
         extends
             PropertyValue
 {
+    private final static long serialVersionUID = 1L; // helps with serialization
+
     /**
      * This is a convenience function, given that this class only has a singleton instance.
      *

@@ -14,36 +14,40 @@
 
 package org.infogrid.store.util;
 
+import java.io.IOException;
+import java.lang.ref.Reference;
+import java.util.AbstractSet;
+import java.util.Iterator;
+import java.util.Set;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.IterableStoreCursor;
 import org.infogrid.store.StoreEntryMapper;
 import org.infogrid.store.StoreValue;
 import org.infogrid.util.CursorIterator;
-
-import java.lang.ref.Reference;
-
-import java.util.AbstractSet;
-import java.util.Iterator;
-import java.util.Set;
+import org.infogrid.util.logging.Log;
 
 /**
  * This is a <code>java.util.Map</code> that stores the values in the
  * {@link org.infogrid.store.IterableStore IterableStore}
  * and keeps only <code>References</code> to them in memory.
  * 
- * @param K the type of key
- * @param V the type of value
+ * @param <K> the type of key
+ * @param <V> the type of value
  */
 public abstract class IterableStoreBackedMap<K,V>
         extends
             StoreBackedMap<K,V>
 {
+    private static final Log log = Log.getLogInstance( IterableStoreBackedMap.class ); // our own, private logger
+
     /**
      * Create a <code>IterableStoreBackedMap</code> that uses <code>SoftReferences</code>.
      * 
      * @param mapper the <code>SStoreEntryMapper/code> to use
      * @param store the underlying <code>IterableStore</code>
      * @return the created <code>StoreBackedMap</code>
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     public static <K,V> IterableStoreBackedMap<K,V> createSoft(
             StoreEntryMapper<K,V> mapper,
@@ -59,6 +63,8 @@ public abstract class IterableStoreBackedMap<K,V>
      * @param mapper the <code>StStoreEntryMappercode> to use
      * @param store the underlying <code>IterableStore</code>
      * @return the created <code>StoreBackedMap</code>
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     public static <K,V> IterableStoreBackedMap<K,V> createSoft(
             int                   initialSize,
@@ -148,8 +154,14 @@ public abstract class IterableStoreBackedMap<K,V>
     @Override
     public int size()
     {
-        int ret = ((IterableStore)theStore).size();
-        return ret;
+        try {
+            int ret = ((IterableStore)theStore).size();
+            return ret;
+
+        } catch( IOException ex ) {
+            log.error( ex );
+            return 0;
+        }
     }
 
     /**
@@ -160,8 +172,14 @@ public abstract class IterableStoreBackedMap<K,V>
     @Override
     public boolean isEmpty()
     {
-        boolean ret = ((IterableStore)theStore).isEmpty();
-        return ret;
+        try {
+            boolean ret = ((IterableStore)theStore).isEmpty();
+            return ret;
+
+        } catch( IOException ex ) {
+            log.error( ex );
+            return true;
+        }
     }
     
     /**
@@ -224,8 +242,8 @@ public abstract class IterableStoreBackedMap<K,V>
     /**
      * This class is instantiated to create a "projection" of the keys in the Store.
      * 
-     * @param K the type of key
-     * @param V the type of value
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     protected static class MyKeySet<K,V>
             extends
@@ -259,8 +277,14 @@ public abstract class IterableStoreBackedMap<K,V>
          */
         public int size()
         {
-            IterableStore store = (IterableStore) theDelegate.theStore;
-            return store.size();
+            try {
+                IterableStore store = (IterableStore) theDelegate.theStore;
+                return store.size();
+
+            } catch( IOException ex ) {
+                log.error( ex );
+                return 0;
+            }
         }
 
         /**
@@ -272,8 +296,8 @@ public abstract class IterableStoreBackedMap<K,V>
     /**
      * Iterator over the MyValueCollection.
      * 
-     * @param K the type of key
-     * @param V the type of value
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     static class MyKeyIterator<K,V>
             implements

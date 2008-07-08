@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.store;
 
+import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.context.Context;
 import org.infogrid.mesh.MeshObject;
@@ -160,7 +161,13 @@ public class IterableStoreMeshBase
      */
     public int size()
     {
-        return ((IterableStore) getCachingMap().getStore()).size();
+        try {
+            return ((IterableStore) getCachingMap().getStore()).size();
+
+        } catch( IOException ex ) {
+            log.error( ex );
+            return 0;
+        }
     }
 
     /**
