@@ -31,6 +31,7 @@ import org.infogrid.meshbase.transaction.TransactionException;
 
 import org.infogrid.model.primitives.EntityType;
 
+import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -171,10 +172,10 @@ public abstract class AbstractMeshBaseLifecycleManager
         long time = determineCreationTime();
         long autoExpires;
         
-        if( DEFAULT_RELATIVE_TIME_AUTO_DELETES > 0 ) {
-            autoExpires = time + DEFAULT_RELATIVE_TIME_AUTO_DELETES;
+        if( DEFAULT_RELATIVE_TIME_EXPIRES > 0 ) {
+            autoExpires = time + DEFAULT_RELATIVE_TIME_EXPIRES;
         } else {
-            autoExpires = DEFAULT_RELATIVE_TIME_AUTO_DELETES;
+            autoExpires = DEFAULT_RELATIVE_TIME_EXPIRES;
         }
 
         return createMeshObject( identifier, time, time, time, autoExpires );
@@ -239,7 +240,7 @@ public abstract class AbstractMeshBaseLifecycleManager
      */
     public MeshObject createMeshObject(
             MeshObjectIdentifier identifier,
-            EntityType []  types )
+            EntityType []        types )
         throws
             IsAbstractException,
             MeshObjectIdentifierNotUniqueException,
@@ -517,9 +518,16 @@ public abstract class AbstractMeshBaseLifecycleManager
     protected MeshBase theMeshBase;
     
     /**
-     * The default time at which MeshObjects auto-deleteMeshObjects, unless otherwise specified.
+     * Our ResourceHelper.
+     */
+    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( AbstractMeshBaseLifecycleManager.class );
+
+    /**
+     * The default time at which MeshObjects auto-expire, unless otherwise specified.
      * This is given as a relative time, from the current time. If -1 is given, it means
      * "never".
      */
-    public static final long DEFAULT_RELATIVE_TIME_AUTO_DELETES = -1L;
+    public static final long DEFAULT_RELATIVE_TIME_EXPIRES = theResourceHelper.getResourceLongOrDefault( 
+            "DefaultRelativeTimeExpires",
+            -1L );
 }

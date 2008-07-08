@@ -19,7 +19,7 @@ import java.util.NoSuchElementException;
 /**
  * A {@link CursorIterator} that iterates over a subset of another <code>CursorIterator</code>.
  * 
- * @param E the type of element to iterate over
+ * @param <E> the type of element to iterate over
  */
 public class SubsettingCursorIterator<E>
         extends
@@ -52,6 +52,7 @@ public class SubsettingCursorIterator<E>
      * @return the next element
      * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public E peekNext()
     {
         E ret = theDelegate.peekNext();
@@ -68,6 +69,7 @@ public class SubsettingCursorIterator<E>
      * @return the previous element
      * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public E peekPrevious()
     {
         E ret = theDelegate.peekPrevious();
@@ -109,10 +111,8 @@ public class SubsettingCursorIterator<E>
     /**
      * Returns <tt>true</tt> if the iteration has at least N more elements in the forward direction.
      *
-     * @return <tt>true</tt> if the iterator has at least N more elements in the forward direction.
-     *
      * @param n the number of elements for which to check
-     * @return true if there at least N next elements
+     * @return <tt>true</tt> if the iterator has at least N more elements in the forward direction.
      * @see #hasNext()
      * @see #hasPrevious()
      * @see #hasPrevious(int)
@@ -138,10 +138,8 @@ public class SubsettingCursorIterator<E>
     /**
      * Returns <tt>true</tt> if the iteration has at least N more elements in the backwards direction.
      *
-     * @return <tt>true</tt> if the iterator has at least N more elements in the backwards direction.
-     *
      * @param n the number of elements for which to check
-     * @return true if there at least N previous elements
+     * @return <tt>true</tt> if the iterator has at least N more elements in the backwards direction.
      * @see #hasNext()
      * @see #hasPrevious()
      * @see #hasNext(int)
@@ -432,6 +430,30 @@ public class SubsettingCursorIterator<E>
         }
         
         theDelegate.setPositionTo( realPosition.theDelegate );
+    }
+
+    /**
+     * Move the cursor to just before the first element, i.e. return the first element when
+     * {@link #next next} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToBeforeFirst()
+    {
+        return theDelegate.moveToBefore( theMin );
+    }
+
+    /**
+     * Move the cursor to just after the last element, i.e. return the last element when
+     * {@link #previous previous} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToAfterLast()
+    {
+        return theDelegate.moveToAfter( theMax );
     }
 
     /**

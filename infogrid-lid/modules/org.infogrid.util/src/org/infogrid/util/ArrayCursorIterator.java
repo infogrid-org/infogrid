@@ -281,6 +281,36 @@ public class ArrayCursorIterator<E>
         throw new NoSuchElementException();
     }
     
+    /**
+     * Move the cursor to just before the first element, i.e. return the first element when
+     * {@link #next next} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToBeforeFirst()
+    {
+        int ret = -thePosition;
+        thePosition = 0;
+        
+        return ret;
+    }
+
+    /**
+     * Move the cursor to just after the last element, i.e. return the last element when
+     * {@link #previous previous} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToAfterLast()
+    {
+        int ret = theArray.length - thePosition;
+        thePosition = theArray.length;
+        
+        return ret;
+        
+    }
 
     /**
      * Reset the Iterator to the first position.

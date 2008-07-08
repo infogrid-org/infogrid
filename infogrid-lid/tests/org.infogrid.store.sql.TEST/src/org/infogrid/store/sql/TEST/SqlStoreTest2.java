@@ -120,10 +120,11 @@ public class SqlStoreTest2
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception all sorts of things may go wrong in a test
+     */
     public SqlStoreTest2(
             String [] args )
         throws
@@ -135,10 +136,11 @@ public class SqlStoreTest2
     }
 
     /**
-      * Constructor for subclasses.
-      *
-      * @param c test class
-      */
+     * Constructor for subclasses.
+     *
+     * @param c test class
+     * @throws Exception all sorts of things may go wrong in a test
+     */
     protected SqlStoreTest2(
             Class c )
         throws
@@ -157,6 +159,8 @@ public class SqlStoreTest2
             implements
                 Serializable
     {
+        private static final long serialVersionUID = 1L; // make IDE happy
+
         public Foo(
                 int myA )
         {

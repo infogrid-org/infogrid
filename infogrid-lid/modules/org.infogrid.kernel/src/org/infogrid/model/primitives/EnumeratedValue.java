@@ -28,6 +28,8 @@ public final class EnumeratedValue
         extends
             PropertyValue
 {
+    private final static long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Factory method, to be used only by EnumeratedDataType. Use those factory methods and select
      * methods instead, do not instantiate EnumeratedValue using this factory method.
