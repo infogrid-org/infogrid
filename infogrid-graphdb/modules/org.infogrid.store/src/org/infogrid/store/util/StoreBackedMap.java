@@ -34,8 +34,8 @@ import java.lang.ref.Reference;
  * This is a <code>java.util.Map</code> that stores the values in the <code>Store</code>
  * and keeps only <code>References</code> to them in memory.
  * 
- * @param K the type of key
- * @param V the type of value
+ * @param <K> the type of key
+ * @param <V> the type of value
  */
 public abstract class StoreBackedMap<K,V>
         extends
@@ -49,6 +49,8 @@ public abstract class StoreBackedMap<K,V>
      * @param mapper the <code>StoreEntryMapper</code> to use
      * @param store the underlying <code>Store</code>
      * @return the created <code>StoreBackedMap</code>
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     public static <K,V> StoreBackedMap<K,V> createSoft(
             StoreEntryMapper<K,V> mapper,
@@ -64,6 +66,8 @@ public abstract class StoreBackedMap<K,V>
      * @param mapper the <code>StoreEntryMapper</code> to use
      * @param store the underlying <code>Store</code>
      * @return the created <code>StoreBackedMap</code>
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     public static <K,V> StoreBackedMap<K,V> createSoft(
             int                   initialSize,
@@ -86,6 +90,8 @@ public abstract class StoreBackedMap<K,V>
      * @param mapper the <code>StoreEntryMapper</code> to use
      * @param store the underlying <code>Store</code>
      * @return the created <code>StoreBackedMap</code>
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     public static <K,V> StoreBackedMap<K,V> createWeak(
             StoreEntryMapper<K,V> mapper,
@@ -101,8 +107,10 @@ public abstract class StoreBackedMap<K,V>
      * @param mapper the <code>StoreEntryMapper</code> to use
      * @param store the underlying <code>Store</code>
      * @return the created <code>StoreBackedMap</code>
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
-    public static <K,V,A> StoreBackedMap<K,V> createWeak(
+    public static <K,V> StoreBackedMap<K,V> createWeak(
             int                   initialSize,
             StoreEntryMapper<K,V> mapper,
             Store                 store )
@@ -218,11 +226,14 @@ public abstract class StoreBackedMap<K,V>
     @Override
     public int size()
     {
-        int ret;
+        int ret = Integer.MAX_VALUE; // not sure what else to return, given that we don't know
         if( theStore instanceof IterableStore ) {
-            ret = ((IterableStore)theStore).size();
-        } else {
-            ret = Integer.MAX_VALUE; // not sure what else to return, given that we don't know
+            try {
+                ret = ((IterableStore)theStore).size();
+
+            } catch( IOException ex ) {
+                log.error( ex );
+            }
         }
         return ret;
     }

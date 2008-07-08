@@ -14,6 +14,7 @@
 
 package org.infogrid.store.prefixing;
 
+import java.io.IOException;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.IterableStoreCursor;
 import org.infogrid.store.StoreValue;
@@ -98,8 +99,11 @@ public class IterablePrefixingStore
      * Determine the number of StoreValues in this Store.
      *
      * @return the number of StoreValues in this Store
+     * @throws IOException thrown if an I/O error occurred
      */
     public int size()
+        throws
+            IOException
     {
         return ((IterableStore)theDelegate).size( thePrefixAndSeparator );
     }
@@ -109,9 +113,12 @@ public class IterablePrefixingStore
      *
      * @param prefix the prefix
      * @return the number of StoreValues in this Store with this prefix
+     * @throws IOException thrown if an I/O error occurred
      */
     public int size(
             String prefix )
+        throws
+            IOException
     {
         return ((IterableStore)theDelegate).size( thePrefixAndSeparator + prefix );
     }
@@ -120,8 +127,11 @@ public class IterablePrefixingStore
      * Determine whether this Store is empty.
      *
      * @return true if this Store is empty
+     * @throws IOException thrown if an I/O error occurred
      */
     public boolean isEmpty()
+        throws
+            IOException
     {
         int size = ((IterableStore)theDelegate).size( thePrefixAndSeparator );
         return size == 0;
@@ -443,6 +453,32 @@ public class IterablePrefixingStore
             return ret;
         }
 
+       /**
+         * Move the cursor to just before the first element, i.e. return the first element when
+         * {@link #next next} is invoked right afterwards.
+         *
+         * @return the number of steps that were taken to move. Positive number means
+         *         forward, negative backward
+         */
+        public int moveToBeforeFirst()
+        {
+            int ret = theFilterIterator.moveToBeforeFirst();
+            return ret;
+        }
+
+        /**
+         * Move the cursor to just after the last element, i.e. return the last element when
+         * {@link #previous previous} is invoked right afterwards.
+         *
+         * @return the number of steps that were taken to move. Positive number means
+         *         forward, negative backward
+         */
+        public int moveToAfterLast()
+        {
+            int ret = theFilterIterator.moveToAfterLast();
+            return ret;
+        }
+
         /**
           * Do we have more elements?
           *
@@ -601,6 +637,5 @@ public class IterablePrefixingStore
         {
             return new MyFilteringIterator( (IterableStoreCursor) theDelegate.createCopy() );
         }
-
     }
 }

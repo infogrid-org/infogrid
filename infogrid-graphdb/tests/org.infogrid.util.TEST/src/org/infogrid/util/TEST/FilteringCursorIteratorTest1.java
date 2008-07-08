@@ -27,6 +27,8 @@ public class FilteringCursorIteratorTest1
 {
     /**
      * Run the test.
+     * 
+     * @throws Exception all sorts of things may happen in a test
      */
     public void run()
         throws
@@ -115,6 +117,7 @@ public class FilteringCursorIteratorTest1
      * Constructor.
      *
      * @param args command-line arguments
+     * @throws Exception all sorts of things may happen in a test
      */
     public FilteringCursorIteratorTest1(
             String [] args )

@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Tests the basic SqlStore functions.
+ * Tests the basic SqlStore functions. See also FilesystemStoreTest1.
  */
 public class SqlStoreTest1
         extends
@@ -230,10 +230,11 @@ public class SqlStoreTest1
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception all sorts of things may go wrong in a test
+     */
     public SqlStoreTest1(
             String [] args )
         throws
@@ -245,10 +246,11 @@ public class SqlStoreTest1
     }
 
     /**
-      * Constructor for subclasses.
-      *
-      * @param c test class
-      */
+     * Constructor for subclasses.
+     *
+     * @param c test class
+     * @throws Exception all sorts of things may go wrong in a test
+     */
     protected SqlStoreTest1(
             Class c )
         throws
@@ -275,15 +277,15 @@ public class SqlStoreTest1
         testImage = data;
     }
     protected static final TestData[] one = new TestData[] {
-        new TestData( "abc",       "enc1",           12345L, 67890L, 10111213L,     -1L, "some data".getBytes() ),
-        new TestData( "def",       "other encoding",    11L,    22L,       33L,     12L, "some longer data, but not very long".getBytes() ),
-        new TestData( "testImage", "third encoding",      1,      2,         3, 123456L, testImage )
+        new TestData( "/x/abc",       "enc1",           12345L, 67890L, 10111213L,     -1L, "some data".getBytes() ),
+        new TestData( "/x/def",       "other encoding",    11L,    22L,       33L,     12L, "some longer data, but not very long".getBytes() ),
+        new TestData( "/x",           "third encoding",      1,      2,         3, 123456L, testImage )
     };
     protected static final TestData[] two = new TestData[] {
-        new TestData( "abc", "testing", 5555L, 666L, 1111L,  -1L, "some changed data".getBytes() ),
+        new TestData( "/x/abc", "testing", 5555L, 666L, 1111L,  -1L, "some changed data".getBytes() ),
     };
     protected static final TestData[] three = new TestData[] {
-        new TestData( "ghi", "Shakespeare's collected cucumbers", now,    now+1,  now+10000L, 99999L, "Some <b>HTML</b> data".getBytes() )
+        new TestData( "/x/ghi", "Shakespeare's collected cucumbers", now,    now+1,  now+10000L, 99999L, "Some <b>HTML</b> data".getBytes() )
     };
     protected static final TestData[] firstSet  = ArrayHelper.append( one, three, TestData.class );
     protected static final TestData[] secondSet = two;
@@ -365,7 +367,6 @@ public class SqlStoreTest1
          * A get operation was performed.
          *
          * @param store the Store that emitted this event
-         * @param key the key with which the data element was stored
          * @param value the StoreValue that was gotten
          */
         public void getPerformed(

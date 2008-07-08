@@ -39,6 +39,7 @@ public class AllTests
 
                 new TestSpec( DereferencingIteratorTest1.class, subArgs ),
                 new TestSpec( ArrayCursorIteratorTest1.class, subArgs ),
+                new TestSpec( FileTreeFacadeCursorIteratorTest1.class, subArgs ),
                 new TestSpec( FilteringCursorIteratorTest1.class, subArgs ),
 
                 new TestSpec( ReturnSynchronizerTest1.class, subArgs ),

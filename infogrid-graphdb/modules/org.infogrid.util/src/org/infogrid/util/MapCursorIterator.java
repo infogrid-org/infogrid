@@ -21,8 +21,8 @@ import java.util.NoSuchElementException;
 /**
  * Provides {@link CursorIterator}s for the keys and values of <code>java.util.HashMap</code>s.
  * 
- * @param K the type of key
- * @param V the type of value
+ * @param <K> the type of key
+ * @param <V> the type of value
  */
 public abstract class MapCursorIterator<K,V>
 {
@@ -33,6 +33,8 @@ public abstract class MapCursorIterator<K,V>
      * @param keyArrayComponentType the Class to use for arrays containing keys
      * @param valueArrayComponentType the Class to use for arrays containing values
      * @return the created MapCursorIterator, iterating over the keys
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     @SuppressWarnings(value={"unchecked"})
     public static <K,V> Keys<K,V> createForKeys(
@@ -53,6 +55,8 @@ public abstract class MapCursorIterator<K,V>
      * @param keyArrayComponentType the Class to use for arrays containing keys
      * @param valueArrayComponentType the Class to use for arrays containing values
      * @return the created MapCursorIterator, iterating over the values
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     @SuppressWarnings(value={"unchecked"})
     public static <K,V> Values<K,V> createForValues(
@@ -311,6 +315,32 @@ public abstract class MapCursorIterator<K,V>
     }
     
     /**
+     * Move the cursor to just before the first element, i.e. return the first element when
+     * {@link #next next} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToBeforeFirst()
+    {
+        int ret = theDelegate.moveToBeforeFirst();
+        return ret;
+    }
+
+    /**
+     * Move the cursor to just after the last element, i.e. return the last element when
+     * {@link #previous previous} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToAfterLast()
+    {
+        int ret = theDelegate.moveToAfterLast();
+        return ret;
+    }
+
+    /**
      * The Map to iterate over.
      */
     protected Map<K,V> theMap;
@@ -338,8 +368,8 @@ public abstract class MapCursorIterator<K,V>
     /**
      * An iterator over the keys.
      * 
-     * @param K the type of keys
-     * @param V the type of values
+     * @param <K> the type of keys
+     * @param <V> the type of values
      */
     public static class Keys<K,V>
             extends
@@ -555,8 +585,8 @@ public abstract class MapCursorIterator<K,V>
     /**
      * An iterator over the values.
      * 
-     * @param K the type of keys
-     * @param V the type of values
+     * @param <K> the type of keys
+     * @param <V> the type of values
      */
     public static class Values<K,V>
             extends

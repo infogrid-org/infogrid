@@ -94,10 +94,10 @@ public class AMeshBaseLifecycleManager
         long                 time         = determineCreationTime();
         long                 autoExpires;
         
-        if( DEFAULT_RELATIVE_TIME_AUTO_DELETES > 0 ) {
-            autoExpires = time + DEFAULT_RELATIVE_TIME_AUTO_DELETES;
+        if( DEFAULT_RELATIVE_TIME_EXPIRES > 0 ) {
+            autoExpires = time + DEFAULT_RELATIVE_TIME_EXPIRES;
         } else {
-            autoExpires = DEFAULT_RELATIVE_TIME_AUTO_DELETES;
+            autoExpires = DEFAULT_RELATIVE_TIME_EXPIRES;
         }
         try {
             return createMeshObject( identifier, time, time, time, autoExpires );
@@ -138,9 +138,7 @@ public class AMeshBaseLifecycleManager
             TransactionException,
             NotPermittedException
     {
-        if( identifier == null ) {
-            throw new IllegalArgumentException( "null Identifier" );
-        }
+        checkPermittedCreate( identifier );
 
         AccessManager access = theMeshBase.getAccessManager();
         if( access != null ) {
@@ -163,11 +161,6 @@ public class AMeshBaseLifecycleManager
 
         Transaction tx = realBase.checkTransaction();
 
-        MeshObject existing = findInStore( identifier );
-        if( existing != null ) {
-            throw new MeshObjectIdentifierNotUniqueException( existing );
-        }
-
         AMeshObject ret = instantiateMeshObjectImplementation(
                 identifier,
                 timeCreated,
@@ -182,6 +175,31 @@ public class AMeshBaseLifecycleManager
         assignOwner( ret );
 
         return ret;
+    }
+
+    /**
+     * Check whether it is permitted to create a MeshObject with the specfied parameters.
+     * 
+     * @param identifier the identifier of the to-be-created MeshObject. This must not be null.
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws NotPermittedException thrown if the combination of arguments was not permitted
+     * @throws IllegalArgumentException thrown if an illegal argument was specified
+     */
+    protected void checkPermittedCreate(
+            MeshObjectIdentifier identifier )
+        throws
+            MeshObjectIdentifierNotUniqueException,
+            NotPermittedException,
+            IllegalArgumentException
+    {
+        if( identifier == null ) {
+            throw new IllegalArgumentException( "null MeshObjectIdentifier" );
+        }
+
+        MeshObject existing = findInStore( identifier );
+        if( existing != null ) {
+            throw new MeshObjectIdentifierNotUniqueException( existing );
+        }
     }
 
     /**

@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
  * A more fully-featured version of <code>java.util.Iterator</code> that can move
  * backwards just as well as forwards, and take N steps at a time instead of just one.
  * 
- * @param E the type of element to iterate over
+ * @param <E> the type of element to iterate over
  */
 public interface CursorIterator<E>
         extends
@@ -36,7 +36,9 @@ public interface CursorIterator<E>
      * @return the next element
      * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
-    public E peekNext();
+    public E peekNext()
+        throws
+            NoSuchElementException;
 
     /**
      * Obtain the previous element, without iterating backward.
@@ -44,7 +46,9 @@ public interface CursorIterator<E>
      * @return the previous element
      * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
-    public E peekPrevious();
+    public E peekPrevious()
+        throws
+            NoSuchElementException;
 
     /**
      * Returns <tt>true</tt> if the iteration has more elements in the forward direction.
@@ -94,14 +98,18 @@ public interface CursorIterator<E>
      * Returns the next element in the iteration.
      *
      * @return the next element in the iteration.
-     * @exception NoSuchElementException iteration has no more elements.
+     * @throws NoSuchElementException iteration has no more elements.
+     * @see #previous()
      */
-    public E next();
+    public E next()
+        throws
+            NoSuchElementException;
 
     /**
      * <p>Obtain the next N elements. If fewer than N elements are available, return
      * as many elements are available in a shorter array.</p>
      * 
+     * @param n the number of elements to return
      * @return the next no more than N elements
      * @see #previous(int)
      */
@@ -112,9 +120,12 @@ public interface CursorIterator<E>
      * Returns the previous element in the iteration.
      *
      * @return the previous element in the iteration.
+     * @throws NoSuchElementException iteration has no more elements.
      * @see #next()
      */
-    public E previous();
+    public E previous()
+        throws
+            NoSuchElementException;
 
     /**
      * <p>Obtain the previous N elements. If fewer than N elements are available, return
@@ -125,6 +136,7 @@ public interface CursorIterator<E>
      * returned in the sequence in which the CursorIterator visits them, not in the
      * sequence in which the underlying {@link CursorIterable} stores them.</p>
      *
+     * @param n the number of elements to return
      * @return the previous no more than N elements
      * @see #next(int)
      */
@@ -136,7 +148,7 @@ public interface CursorIterator<E>
      * negative numbers indicate backward movement.
      *
      * @param n the number of positions to move
-     * @throws NoSuchElementExceptionif the position does not exist
+     * @throws NoSuchElementException thrown if the position does not exist
      */
     public void moveBy(
             int n )
@@ -174,12 +186,29 @@ public interface CursorIterator<E>
             NoSuchElementException;
 
     /**
+     * Move the cursor to just before the first element, i.e. return the first element when
+     * {@link #next next} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToBeforeFirst();
+
+    /**
+     * Move the cursor to just after the last element, i.e. return the last element when
+     * {@link #previous previous} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToAfterLast();
+
+    /**
      * Removes from the underlying collection the last element returned by the
      * iterator (optional operation). This is the same as the current element.
      *
      * @throws UnsupportedOperationException if the <tt>remove</tt>
-     *		  operation is not supported by this Iterator.
-     
+     *		  operation is not supported by this Iterator.     
      * @throws IllegalStateException if the <tt>next</tt> method has not
      *		  yet been called, or the <tt>remove</tt> method has already
      *		  been called after the last call to the <tt>next</tt>

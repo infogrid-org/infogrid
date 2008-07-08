@@ -14,7 +14,6 @@
 
 package org.infogrid.store.sql.TEST;
 
-import org.infogrid.store.IterableStore;
 import org.infogrid.store.StoreKeyDoesNotExistException;
 import org.infogrid.store.StoreValue;
 import org.infogrid.store.sql.SqlStoreIOException;
@@ -26,6 +25,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import org.infogrid.store.Store;
 
 /**
  * Tests the DynamicLoadFromStoreMap.
@@ -144,10 +144,11 @@ public class SqlStoreTest5
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception all sorts of things may go wrong in a test
+     */
     public SqlStoreTest5(
             String [] args )
         throws
@@ -159,10 +160,11 @@ public class SqlStoreTest5
     }
 
     /**
-      * Constructor for subclasses.
-      *
-      * @param c test class
-      */
+     * Constructor for subclasses.
+     *
+     * @param c test class
+     * @throws Exception all sorts of things may go wrong in a test
+     */
     protected SqlStoreTest5(
             Class c )
         throws
@@ -198,16 +200,23 @@ public class SqlStoreTest5
     {
         /**
          * Constructor.
+         * 
+         * @param store the Store to load from
+         * @param storeEntryKey the key used to write the entire content of the Map into the Store
          */
         public MyTestMap(
-                IterableStore store,
-                String        storeEntryKey )
+                Store  store,
+                String storeEntryKey )
         {
             super( store, storeEntryKey );
         }
         
         /**
          * Override load method.
+         * 
+         * @return the new delegate HashMap
+         * @throws StoreKeyDoesNotExistException thrown if no map content could be found
+         * @throws IOException thrown if loading failed
          */
         @SuppressWarnings(value={"unchecked"})
         protected HashMap<Integer,String> load()
@@ -230,6 +239,8 @@ public class SqlStoreTest5
         
         /**
          * Override save method.
+         * 
+         * @throws IOException thrown if saving failed
          */
         protected void save()
             throws
@@ -249,6 +260,8 @@ public class SqlStoreTest5
         
         /**
          * Obtain delegate, this is for test instrumentation.
+         * 
+         * @return the delegate
          */
         public HashMap<Integer,String> getDelegate()
         {

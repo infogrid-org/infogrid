@@ -14,6 +14,7 @@
 
 package org.infogrid.store;
 
+import java.io.IOException;
 import org.infogrid.util.FlexibleListenerSet;
 
 /**
@@ -24,6 +25,119 @@ public abstract class AbstractStore
         implements
             Store
 {
+    /**
+     * Put a data element into the Store for the first time. Throw an Exception if a data
+     * element has already been store using the same key.
+     *
+     * @param key the key with which the specified data element is to be associated
+     * @param encodingId the id of the encoding that was used to encode the data element.
+     * @param timeCreated the time at which the data element was created
+     * @param timeUpdated the time at which the data element was successfully updated the most recent time
+     * @param timeRead the time at which the data element was last read by some client
+     * @param timeExpires if positive, the time at which the data element expires
+     * @param data the data element, expressed as a sequence of bytes
+     * @throws StoreKeyExistsAlreadyException thrown if a data element is already stored in the Store using this key
+     * @throws IOException thrown if an I/O error occurred
+     *
+     * @see #update if a data element with this key exists already
+     * @see #putOrUpdate if a data element with this key may exist already
+     */
+    public void put(
+            final String  key,
+            final String  encodingId,
+            final long    timeCreated,
+            final long    timeUpdated,
+            final long    timeRead,
+            final long    timeExpires,
+            final byte [] data )
+        throws
+            StoreKeyExistsAlreadyException,
+            IOException
+    {
+        StoreValue toPut = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
+
+        put( toPut );
+    }
+
+    /**
+     * Update a data element that already exists in the Store, by overwriting it with a new value. Throw an
+     * Exception if a data element with this key does not exist already.
+     *
+     * @param key the key with which the specified data element is already, and will continue to be stored
+     * @param encodingId the id of the encoding that was used to encode the data element.
+     * @param timeCreated the time at which the data element was created
+     * @param timeUpdated the time at which the data element was successfully updated the most recent time
+     * @param timeRead the time at which the data element was last read by some client
+     * @param timeExpires if positive, the time at which the data element expires
+     * @param data the data element, expressed as a sequence of bytes
+     * @throws StoreKeyDoesNotExistException thrown if no data element exists in the Store using this key
+     * @throws IOException thrown if an I/O error occurred
+     *
+     * @see #put if a data element with this key does not exist already
+     * @see #putOrUpdate if a data element with this key may exist already
+     */
+    public void update(
+            final String  key,
+            final String  encodingId,
+            final long    timeCreated,
+            final long    timeUpdated,
+            final long    timeRead,
+            final long    timeExpires,
+            final byte [] data )
+        throws
+            StoreKeyDoesNotExistException,
+            IOException
+    {
+        StoreValue toPut = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
+
+        update( toPut );
+    }
+
+    
+    /**
+     * Put (if does not exist already) or update (if it does exist) a data element in the Store.
+     *
+     * @param key the key with which the specified data element is already, and will continue to be stored
+     * @param encodingId the id of the encoding that was used to encode the data element.
+     * @param timeCreated the time at which the data element was created
+     * @param timeUpdated the time at which the data element was successfully updated the most recent time
+     * @param timeRead the time at which the data element was last read by some client
+     * @param timeExpires if positive, the time at which the data element expires
+     * @param data the data element, expressed as a sequence of bytes
+     * @return true if the value was updated, false if it was put
+     * @throws IOException thrown if an I/O error occurred
+     *
+     * @see #put if a data element with this key does not exist already
+     * @see #update if a data element with this key exists already
+     */
+    public boolean putOrUpdate(
+            final String  key,
+            final String  encodingId,
+            final long    timeCreated,
+            final long    timeUpdated,
+            final long    timeRead,
+            final long    timeExpires,
+            final byte [] data )
+        throws
+            IOException
+    {
+        StoreValue toPutOrUpdate = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
+
+        boolean ret = putOrUpdate( toPutOrUpdate );
+        return ret;
+    }
+    
+    /**
+     * Remove all data in this Store.
+     *
+     * @throws IOException thrown if an I/O error occurred
+     */
+    public void deleteAll()
+        throws
+            IOException
+    {
+        deleteAll( "" );
+    }
 
     /**
       * Add a listener.

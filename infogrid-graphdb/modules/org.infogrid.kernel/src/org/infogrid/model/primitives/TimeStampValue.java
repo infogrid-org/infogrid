@@ -29,6 +29,8 @@ public final class TimeStampValue
         extends
             PropertyValue
 {
+    private final static long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Factory method.
      *

@@ -28,6 +28,8 @@ public final class MultiplicityValue
         extends
             PropertyValue
 {
+    private final static long serialVersionUID = 1L; // helps with serialization
+
     /**
       * Represents the "N" or "*" (open ended).
       * This is a very unusual value so we won't randomly do the wrong thing.
