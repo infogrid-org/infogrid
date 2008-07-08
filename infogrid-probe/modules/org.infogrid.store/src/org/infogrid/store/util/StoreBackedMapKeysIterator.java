@@ -26,8 +26,8 @@ import java.util.NoSuchElementException;
 /**
  * Iterator over all keys in an InterableStoreBackedMap.
  * 
- * @param K the type of key
- * @param V the type of value
+ * @param <K> the type of key
+ * @param <V> the type of value
  */
 public class StoreBackedMapKeysIterator<K,V>
         extends
@@ -70,6 +70,7 @@ public class StoreBackedMapKeysIterator<K,V>
      * @return the next element
      * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public K peekNext()
     {
         StoreValue value = theDelegate.peekNext();
@@ -84,6 +85,7 @@ public class StoreBackedMapKeysIterator<K,V>
      * @return the previous element
      * @exception NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public K peekPrevious()
     {
         StoreValue value = theDelegate.peekNext();
@@ -331,6 +333,32 @@ public class StoreBackedMapKeysIterator<K,V>
         }
         
         theDelegate.setPositionTo( realPosition.theDelegate ); // this may throw
+    }
+
+   /**
+     * Move the cursor to just before the first element, i.e. return the first element when
+     * {@link #next next} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToBeforeFirst()
+    {
+        int ret = theDelegate.moveToBeforeFirst();
+        return ret;
+    }
+
+    /**
+     * Move the cursor to just after the last element, i.e. return the last element when
+     * {@link #previous previous} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToAfterLast()
+    {
+        int ret = theDelegate.moveToAfterLast();
+        return ret;
     }
 
     /**

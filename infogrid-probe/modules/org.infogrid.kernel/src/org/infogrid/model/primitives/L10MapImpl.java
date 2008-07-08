@@ -33,6 +33,8 @@ public class L10MapImpl
         implements
             L10Map
 {
+    private final static long serialVersionUID = 1L; // helps with serialization
+
     /**
       * Construct an empty L10Map with only a default value and no Locale-specific values.
       *

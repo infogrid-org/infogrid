@@ -14,17 +14,16 @@
 
 package org.infogrid.store.sql;
 
-import java.io.IOException;
+import org.infogrid.util.DelegatingIOException;
+
 import java.sql.SQLException;
 
 /**
- * Subclass of <code>java.io.IOException</code> that can carry a SQLException as a
- * payload. Unfortunately Java IOException's constructor does not allow us to specify
- * a cause directly, so this class is a workaround.
+ * <p>An <code>IOException</code> that delegates to a <code>SQLException</code>.</p>
  */
 public class SqlStoreIOException
         extends
-            IOException
+            DelegatingIOException
 {
     private static final long serialVersionUID = 1L; // helps with serialization
 
@@ -36,8 +35,6 @@ public class SqlStoreIOException
     public SqlStoreIOException(
             SQLException cause )
     {
-        super( "SQL Exception" );
-        
-        super.initCause( cause ); // stupid API
+        super( "SQL Exception", cause );
     }
 }

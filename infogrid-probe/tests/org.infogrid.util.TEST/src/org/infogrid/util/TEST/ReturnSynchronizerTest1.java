@@ -27,6 +27,8 @@ public class ReturnSynchronizerTest1
 {
     /**
      * Run the test.
+     * 
+     * @throws Exception all sorts of things may happen in a test
      */
     public void run()
         throws
@@ -45,9 +47,7 @@ public class ReturnSynchronizerTest1
             Object theMonitor = theSync.getSyncObject();
 
             synchronized( theMonitor ) {
-
-                for( int j=0 ; j<t.theDelayTimes.length ; ++j )
-                {
+                for( int j=0 ; j<t.theDelayTimes.length ; ++j ) {
                     theSync.addOpenQuery( t.theKeys[j] );
                     new ResultProducer( theSync, t.theDelayTimes[j], t.theKeys[j], t.theResults[j] );
                 }
@@ -60,8 +60,9 @@ public class ReturnSynchronizerTest1
             for( int j=0 ; j<t.theDelayTimes.length ; ++j )
             {
                 Object r = theSync.takeResultFor( t.theKeys[j] );
-                if( r != t.theResults[j] )
+                if( r != t.theResults[j] ) {
                     reportError( "not the same result" );
+                }
 
                 Exception caughtException = null;
                 try {
@@ -70,8 +71,9 @@ public class ReturnSynchronizerTest1
                 } catch( IllegalStateException ex ) {
                     caughtException = ex;
                 }
-                if( caughtException == null )
+                if( caughtException == null ) {
                     reportError( "Exception not thrown" );
+                }
             }
 
             log.info( "done with ReturnSynchronizer " + theSync );
@@ -79,8 +81,10 @@ public class ReturnSynchronizerTest1
     }
 
     /**
-      * Main program.
-      */
+     * Main program.
+     * 
+     * @param args command-line arguments
+     */
     public static void main(
              String [] args )
     {
@@ -100,19 +104,24 @@ public class ReturnSynchronizerTest1
             log.error( ex );
             System.exit(1);
         }
-        if( test != null )
+        if( test != null ) {
             test.cleanup();
+        }
 
-        if( errorCount == 0 )
+        if( errorCount == 0 ) {
             log.info( "PASS" );
-        else
+        } else {
             log.error( "FAIL (" + errorCount + " errors)" );
+        }
 
         System.exit( errorCount );
     }
 
     /**
      * Constructor.
+     * 
+     * @param args command-line arguments
+     * @throws Exception all sorts of things may happen in a test
      */
     public ReturnSynchronizerTest1(
             String [] args )
@@ -207,7 +216,12 @@ public class ReturnSynchronizerTest1
                 Thread
     {
         /**
-         * create and start
+         * Constructor.
+         * 
+         * @param sync the ReturnSynchronizer to use
+         * @param theDelayTime the time to delay before producing a result
+         * @param theKey the key to use for depositing the result
+         * @param theResult the result
          */
         public ResultProducer(
                 ReturnSynchronizer<Object,Object> sync,

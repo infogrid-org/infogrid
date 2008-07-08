@@ -59,11 +59,6 @@ public class WritableProbeTest9
             Exception
     {
         WritableProbeTestCase [] cases = new WritableProbeTestCase[] {
-            // There is currently no mechanism by which pushing the home replica fails.
-            // Perhaps (FIXME?) there should be. This means that even if a Probe is not
-            // a WriteableProbe, we can still create Objects for it and push them into
-            // the direction of the Probe. They will go away after the next Probe run,
-            // but the attempt won't fail outright.
             new WritableProbeTestCase( NonWritableTestProbe.class ) {
                     public void afterFirstRun(
                             NetMeshBase    mainBase,
@@ -113,7 +108,7 @@ public class WritableProbeTest9
                                     shadow.getIdentifier(),
                                     OBJ1 ));
 
-                        checkObject( obj1, "OBJ1 is not here any more" );
+                        checkCondition( obj1 == null, "OBJ1 is still here" );
                     }
             },
             new WritableProbeTestCase( WritableIgnoringTestProbe.class ) {

@@ -1,4 +1,3 @@
-//
 // This file is part of InfoGrid(tm). You may not use this file except in
 // compliance with the InfoGrid license. The InfoGrid license and important
 // disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
@@ -26,6 +25,8 @@ public class ArrayCursorIteratorTest1
 {
     /**
      * Run the test.
+     * 
+     * @throws Exception all sorts of things may happen in a test
      */
     public void run()
         throws
@@ -89,6 +90,7 @@ public class ArrayCursorIteratorTest1
      * Constructor.
      *
      * @param args command-line arguments
+     * @throws Exception all sorts of things may happen in a test
      */
     public ArrayCursorIteratorTest1(
             String [] args )

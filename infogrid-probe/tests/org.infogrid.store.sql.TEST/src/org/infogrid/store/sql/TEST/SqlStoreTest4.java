@@ -22,7 +22,7 @@ import org.infogrid.util.logging.Log;
 import java.util.NoSuchElementException;
 
 /**
- * Tests the SqlStoreIterator.
+ * Tests the SqlStoreIterator. See also FilesystemStoreTest2.
  */
 public class SqlStoreTest4
         extends
@@ -175,10 +175,11 @@ public class SqlStoreTest4
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception all sorts of things may go wrong in a test
+     */
     public SqlStoreTest4(
             String [] args )
         throws
@@ -190,10 +191,11 @@ public class SqlStoreTest4
     }
 
     /**
-      * Constructor for subclasses.
-      *
-      * @param c test class
-      */
+     * Constructor for subclasses.
+     *
+     * @param c test class
+     * @throws Exception all sorts of things may go wrong in a test
+     */
     protected SqlStoreTest4(
             Class c )
         throws

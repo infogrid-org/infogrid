@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * Factors out common behaviors of {@link CursorIterator}s.
  * 
- * @param E the type of element to iterate over
+ * @param <E> the type of element to iterate over
  */
 public abstract class AbstractCursorIterator<E>
         implements
@@ -34,6 +34,38 @@ public abstract class AbstractCursorIterator<E>
             Class<E> arrayComponentType )
     {
         theArrayComponentType = arrayComponentType;
+    }
+
+    /**
+     * Obtain the next element, without iterating forward.
+     *
+     * @return the next element
+     * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+     */
+    public E peekNext()
+        throws
+            NoSuchElementException
+    {
+        CursorIterator<E> clone = this.createCopy();
+        E                 ret   = clone.next();
+        
+        return ret;
+    }
+
+    /**
+     * Obtain the previous element, without iterating backward.
+     *
+     * @return the previous element
+     * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+     */
+    public E peekPrevious()
+        throws
+            NoSuchElementException
+    {
+        CursorIterator<E> clone = this.createCopy();
+        E                 ret   = clone.previous();
+        
+        return ret;
     }
 
     /**

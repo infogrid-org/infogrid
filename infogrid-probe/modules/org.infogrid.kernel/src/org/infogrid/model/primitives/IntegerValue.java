@@ -26,6 +26,8 @@ public final class IntegerValue
         extends
             PropertyValue
 {
+    private final static long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Factory method.
      *
