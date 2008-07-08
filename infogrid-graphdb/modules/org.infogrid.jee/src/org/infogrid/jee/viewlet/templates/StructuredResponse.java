@@ -338,7 +338,7 @@ public class StructuredResponse
                 buf.append( "<div class=\"cause\">\n" );
 
                 String msg2;
-                if( t instanceof LocalizedObject ) {
+                if( cause instanceof LocalizedObject ) {
                     msg2 = ((LocalizedObject) cause).getLocalizedMessage( formatter );
                 } else {
                     msg2 = cause.getMessage();
