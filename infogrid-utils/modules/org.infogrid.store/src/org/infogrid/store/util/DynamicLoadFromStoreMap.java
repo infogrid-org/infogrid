@@ -32,8 +32,8 @@ import java.util.Set;
  * A <code>org.infogrid.util.CachingMap} whose cache is either entirely empty or complete,
  * and if empty, is transparently reloaded from the specified {@link org.infogrid.store.Store}.
  * 
- * @param K the type of key
- * @param V the type of value
+ * @param <K> the type of key
+ * @param <V> the type of value
  */
 public abstract class DynamicLoadFromStoreMap<K,V>
         extends
@@ -392,7 +392,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
                 IOException;
 
     /**
-     * Create a new delegate HashMap by loading from the Store.
+     * Save the delegate HashMap to the Store.
      *
      * @throws IOException thrown if saving failed
      */

@@ -25,8 +25,8 @@ import java.util.NoSuchElementException;
 /**
  * Iterates over the values in a StoreBackedMap.
  * 
- * @param K the type of key
- * @param V the type of value
+ * @param <K> the type of key
+ * @param <V> the type of value
  */
 public class StoreBackedMapValuesIterator<K,V>
         extends
@@ -71,6 +71,7 @@ public class StoreBackedMapValuesIterator<K,V>
      * @return the next element
      * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public V peekNext()
     {
         K key = theKeysIterator.peekNext();
@@ -85,6 +86,7 @@ public class StoreBackedMapValuesIterator<K,V>
      * @return the previous element
      * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public V peekPrevious()
     {
         K key = theKeysIterator.peekPrevious();
@@ -298,6 +300,32 @@ public class StoreBackedMapValuesIterator<K,V>
 //        theKeysIterator.setPositionTo( realPosition.theKeysIterator ); // this may throw
     }
     
+   /**
+     * Move the cursor to just before the first element, i.e. return the first element when
+     * {@link #next next} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToBeforeFirst()
+    {
+        int ret = theKeysIterator.moveToBeforeFirst();
+        return ret;
+    }
+
+    /**
+     * Move the cursor to just after the last element, i.e. return the last element when
+     * {@link #previous previous} is invoked right afterwards.
+     *
+     * @return the number of steps that were taken to move. Positive number means
+     *         forward, negative backward
+     */
+    public int moveToAfterLast()
+    {
+        int ret = theKeysIterator.moveToAfterLast();
+        return ret;
+    }
+
     /**
      * The underlying keys iterator.
      */

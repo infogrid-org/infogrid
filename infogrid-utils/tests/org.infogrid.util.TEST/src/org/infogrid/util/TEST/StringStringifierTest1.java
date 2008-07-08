@@ -31,6 +31,8 @@ public class StringStringifierTest1
 {
     /**
      * Run the test.
+     * 
+     * @throws Exception all sorts of things may happen in a test
      */
     @SuppressWarnings(value={"unchecked"})
     public void run()
@@ -123,6 +125,7 @@ public class StringStringifierTest1
      * Constructor.
      *
      * @param args command-line arguments
+     * @throws Exception all sorts of things may happen in a test
      */
     public StringStringifierTest1(
             String [] args )

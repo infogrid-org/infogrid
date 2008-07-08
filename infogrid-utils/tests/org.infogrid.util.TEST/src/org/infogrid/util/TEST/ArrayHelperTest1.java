@@ -27,6 +27,8 @@ public class ArrayHelperTest1
 {
     /**
      * Run the test.
+     * 
+     * @throws Exception all sorts of things may happen in a test
      */
     public void run()
         throws
@@ -73,8 +75,7 @@ public class ArrayHelperTest1
     {
         ArrayHelperTest1 test = null;
         try {
-            if( false && args.length != 0 )
-            {
+            if( false && args.length != 0 ){
                 System.err.println( "Synopsis: {no arguments}" );
                 System.err.println( "aborting ..." );
                 System.exit( 1 );
@@ -104,6 +105,7 @@ public class ArrayHelperTest1
      * Constructor.
      *
      * @param args command-line arguments
+     * @throws Exception all sorts of things may happen in a test
      */
     public ArrayHelperTest1(
             String [] args )

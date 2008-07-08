@@ -34,6 +34,7 @@ import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.a.AnetMeshObject;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObject;
+import org.infogrid.mesh.net.security.CannotCreateNonLocalMeshObjectException;
 import org.infogrid.mesh.net.security.CannotObtainLockException;
 import org.infogrid.mesh.security.MustNotDeleteHomeObjectException;
 import org.infogrid.meshbase.a.AMeshBase;
@@ -491,9 +492,7 @@ public class AnetMeshBaseLifecycleManager
             MeshObjectIdentifierNotUniqueException,
             NotPermittedException
     {
-        if( identifier == null ) {
-            throw new IllegalArgumentException( "null Identifier" );
-        }
+        checkPermittedCreate( identifier );
 
         long now = determineCreationTime();
         if( timeCreated < 0 ) {
@@ -505,16 +504,11 @@ public class AnetMeshBaseLifecycleManager
         if( timeRead < 0 ) {
             timeRead = now;
         }
-        // not timeAutoDeletes
+        // not timeExpires
 
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
 
         Transaction tx = realBase.checkTransaction();
-
-        MeshObject existing = findInStore( identifier );
-        if( existing != null ) {
-            throw new MeshObjectIdentifierNotUniqueException( existing );
-        }
 
         AnetMeshObject ret = instantiateMeshObjectImplementation(
                 identifier,
@@ -551,6 +545,32 @@ public class AnetMeshBaseLifecycleManager
         assignOwner( ret );
 
         return ret;
+    }
+
+    /**
+     * Check whether it is permitted to create a MeshObject with the specfied parameters.
+     * 
+     * @param identifier the identifier of the to-be-created MeshObject. This must not be null.
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
+     * @throws NotPermittedException thrown if the combination of arguments was not permitted
+     * @throws IllegalArgumentException thrown if an illegal argument was specified
+     */
+    @Override
+    protected void checkPermittedCreate(
+            MeshObjectIdentifier identifier )
+        throws
+            MeshObjectIdentifierNotUniqueException,
+            NotPermittedException,
+            IllegalArgumentException
+    {
+        NetMeshObjectIdentifier realIdentifier = (NetMeshObjectIdentifier) identifier;
+
+        super.checkPermittedCreate( identifier );
+
+        NetMeshBaseIdentifier baseIdentifier = realIdentifier.getNetMeshBaseIdentifier();
+        if( !theMeshBase.getIdentifier().equals( baseIdentifier ) ) {
+            throw new CannotCreateNonLocalMeshObjectException( (NetMeshBase) theMeshBase, realIdentifier );
+        }
     }
 
     /**

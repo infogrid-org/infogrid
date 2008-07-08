@@ -27,6 +27,8 @@ public final class FloatValue
         extends
             PropertyValue
 {
+    private final static long serialVersionUID = 1L; // helps with serialization
+
     /**
      * Convenience constant like Float.NaN.
      */
