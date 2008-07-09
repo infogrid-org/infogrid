@@ -20,6 +20,8 @@ import org.infogrid.kernel.active.TEST.objectset.ActiveMeshObjectSetTest3;
 import org.infogrid.kernel.active.TEST.objectset.ActiveMeshObjectSetTest4;
 import org.infogrid.kernel.active.TEST.objectset.ActiveMeshObjectSetTest5;
 import org.infogrid.kernel.active.TEST.objectset.ActiveMeshObjectSetTest6;
+import org.infogrid.kernel.active.TEST.objectset.ActiveMeshObjectSetTest7;
+import org.infogrid.kernel.active.TEST.objectset.ActiveMeshObjectSetTest8;
 import org.infogrid.kernel.active.TEST.traversalpathset.ActiveTraversalPathSetTest1;
 import org.infogrid.kernel.active.TEST.traversalpathset.ActiveTraversalPathSetTest2;
 
@@ -41,14 +43,14 @@ public class AllTests
             String [] args )
     {
         TestSpec [] tests = {
-                new TestSpec( ActiveMeshObjectSetTest1.class ), // ok
-                new TestSpec( ActiveMeshObjectSetTest2.class ), // ok
-                new TestSpec( ActiveMeshObjectSetTest3.class ), // ok
-                new TestSpec( ActiveMeshObjectSetTest4.class ), // ok
-                new TestSpec( ActiveMeshObjectSetTest5.class ), // ok
-                new TestSpec( ActiveMeshObjectSetTest6.class ), // ok
-//                new TestSpec( ActiveMeshObjectSetTest7.class ), // FIXME
-//                new TestSpec( ActiveMeshObjectSetTest8.class ), // FIXME
+                new TestSpec( ActiveMeshObjectSetTest1.class ),
+                new TestSpec( ActiveMeshObjectSetTest2.class ),
+                new TestSpec( ActiveMeshObjectSetTest3.class ),
+                new TestSpec( ActiveMeshObjectSetTest4.class ),
+                new TestSpec( ActiveMeshObjectSetTest5.class ),
+                new TestSpec( ActiveMeshObjectSetTest6.class ),
+                // new TestSpec( ActiveMeshObjectSetTest7.class ), // FIXME
+                new TestSpec( ActiveMeshObjectSetTest8.class ),
 
                 new TestSpec( ActiveTraversalPathSetTest1.class ),
                 new TestSpec( ActiveTraversalPathSetTest2.class )

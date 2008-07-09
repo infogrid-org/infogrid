@@ -197,6 +197,7 @@ public class ProbeTest7
      * Constructor.
      *
      * @param args command-line arguments
+     * @throws Exception all kinds of things may go wrong in tests
      */
     public ProbeTest7(
             String [] args )
@@ -259,17 +260,6 @@ public class ProbeTest7
             implements
                 ApiProbe
     {
-        /**
-         * Read from the API and instantiate corresponding MeshObjects.
-         * 
-         * @param networkId the NetMeshBaseIdentifier that is being accessed
-         * @param coherenceSpecification the type of data coherence that is requested by the application. Probe
-         *         implementors may ignore this parameter, letting the Probe framework choose its own policy.
-         *         If the Probe chooses to define its own policy (considering or ignoring this parameter), the
-         *         Probe must bless the Probe's HomeObject with a subtype of ProbeUpdateSpecification (defined
-         *         in the <code>org.infogrid.model.Probe</code>) that reflects the policy.
-         * @param mb the StagingMeshBase in which the corresponding MeshObjects are instantiated by the Probe
-         */
         public void readFromApi(
                 NetMeshBaseIdentifier  networkId,
                 CoherenceSpecification coherence,
@@ -342,6 +332,8 @@ public class ProbeTest7
         
         /**
          * Obtain the found disabling errors.
+         * 
+         * @return the found errors
          */
         public ArrayList<Throwable> getDisablingErrors()
         {
