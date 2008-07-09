@@ -990,13 +990,9 @@ public abstract class AbstractProxyPolicy
                 
                 // D:
                 if( issueResyncMessage ) {
-                    try {
-                        ret.addToResynchronizeInstructions(
-                                current.getIdentifier(),
-                                theMeshBase.obtainProxyFor( current.getProxyTowardsHomeNetworkIdentifier(), null ));
-                    } catch( FactoryException ex ) {
-                        log.error( ex );
-                    }
+                    ret.addToResynchronizeInstructions(
+                            current.getIdentifier(),
+                            current.getProxyTowardsHomeNetworkIdentifier());
                 }
             }
         }
