@@ -44,6 +44,7 @@ public abstract class AllTests
                 new TestSpec( SqlStoreTest3.class, subArgs ),
                 new TestSpec( SqlStoreTest4.class, subArgs ),
                 new TestSpec( SqlStoreTest5.class, subArgs ),
+                new TestSpec( SqlStoreTest6.class, subArgs ),
 
                 new TestSpec( SqlKeyStoreTest1.class, keyStoreSubArgs ),
                 new TestSpec( SqlStorePerformanceTest1.class, subArgs ),
@@ -52,8 +53,7 @@ public abstract class AllTests
                 new TestSpec( EncryptedSqlStoreTest2.class, encryptedSubArgs ),
                 new TestSpec( EncryptedSqlStoreTest3.class, encryptedSubArgs ),
 
-                new TestSpec( EncryptedSqlStorePerformanceTest1.class, encryptedSubArgs ),
-                new TestSpec( SqlStoreTest6.class, subArgs )
+                new TestSpec( EncryptedSqlStorePerformanceTest1.class, encryptedSubArgs )
         };
 
         runTests( tests );
