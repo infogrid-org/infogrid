@@ -18,9 +18,9 @@ import org.infogrid.util.logging.Log;
 
 /**
  * Factors out common functionality of sets of listeners.
- * @param T the type of the listener
- * @param E the type of the event
- * @param P the type of parameter that allows this AbstractListenerSet to invoke the right listener method
+ * @param <T> the type of the listener
+ * @param <E> the type of the event
+ * @param <P> the type of parameter that allows this AbstractListenerSet to invoke the right listener method
  */
 public abstract class AbstractListenerSet<T,E,P>
         implements
@@ -121,18 +121,45 @@ public abstract class AbstractListenerSet<T,E,P>
     {
         // now fire outside of the synchronized block
         if( theCatchRuntimeExceptions ) {
-            for( int i=startIndex ; i<realList.length ; ++i ) {
+            if( realList.length > 0 ) {
+                for( int i=startIndex ; i<realList.length ; ++i ) {
+                    try {
+                        fireEventToListener( realList[i], event, parameter );
+                    } catch( RuntimeException ex ) {
+                        log.error( ex );
+                    }
+                }
+            } else {
                 try {
-                    fireEventToListener( realList[i], event, parameter );
+                    fireEventIfNoListeners( event, parameter );
                 } catch( RuntimeException ex ) {
                     log.error( ex );
                 }
             }
         } else {
-            for( int i=startIndex ; i<realList.length ; ++i ) {
-                fireEventToListener( realList[i], event, parameter );
+            if( realList.length > 0 ) {
+                for( int i=startIndex ; i<realList.length ; ++i ) {
+                    fireEventToListener( realList[i], event, parameter );
+                }
+            } else {
+                fireEventIfNoListeners( event, parameter );
             }
         }
+    }
+    
+    /**
+     * If this ListenerSet does not currently have any listeners, invoke this
+     * overridable method that can handle that case. By default, this method
+     * does nothing.
+     * 
+     * @param event the event, such as PropertyChangeEvent
+     * @param parameter a user-specific paramater that can be used to dispatch to the right method in the fireEventToListener method
+     */
+    protected void fireEventIfNoListeners(
+            E event,
+            P parameter )
+    {
+        // do nothing
     }
 
     /**

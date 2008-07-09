@@ -166,9 +166,11 @@ public class AllTests
                                 AbstractTest.fileSystemFile( ForwardReferenceTest1.class, "ForwardReferenceTest1_1.xml" )
                                 // ForwardReferenceRest1_2.xml included by reference from ForwardReferenceRest1.xml
                         } ),
-
                 new TestSpec(
                         ForwardReferenceTest2.class,
+                        noArgs ),
+                new TestSpec(
+                        ForwardReferenceTest3.class,
                         noArgs ),
 
                 new TestSpec(

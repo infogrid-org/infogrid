@@ -14,12 +14,11 @@
 
 package org.infogrid.meshbase.net.proxy;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import org.infogrid.comm.MessageEndpoint;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-import org.infogrid.meshbase.net.NetMeshObjectAccessException;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
@@ -33,7 +32,6 @@ import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeRemovedEvent;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.StringHelper;
 import org.infogrid.util.logging.Log;
 
@@ -148,29 +146,6 @@ public class ProxyProcessingInstructions
         return theWaitForReplicaResponseEndpointTimeout;
     }
     
-    /**
-     * An error occurred when attempting to send the XprisoMessage via the
-     * WaitForReplicaResponseEndpoint.
-     * 
-     * @param p the Proxy attempting to perform the send
-     * @param t the problem that occurred
-     * @throws NetMeshObjectAccessException the remote NetMeshObject could not be accessed
-     */
-    public void sendViaWaitForReplicaResponseEndpointFailed(
-            Proxy     p,
-            Throwable t )
-        throws
-            NetMeshObjectAccessException
-    {
-        if( t instanceof RemoteQueryTimeoutException ) {
-            log.warn( t );
-            throw new NetMeshObjectAccessException( p.getNetMeshBase(), null, theRequestedFirstTimePaths, t );
-
-        } else if( t instanceof InvocationTargetException ) {
-            log.warn( t );
-        }
-    }
-    
 //
 
     /**
@@ -216,29 +191,6 @@ public class ProxyProcessingInstructions
     public long getWaitForLockResponseEndpointTimeout()
     {
         return theWaitForLockResponseEndpointTimeout;
-    }
-    
-    /**
-     * An error occurred when attempting to send the XprisoMessage via the
-     * WaitForLockResponseEndpoint.
-     * 
-     * @param p the Proxy attempting to perform the send
-     * @param t the problem that occurred
-     * @throws NetMeshObjectAccessException the remote NetMeshObject could not be accessed
-     */
-    public void sendViaWaitForLockResponseEndpointFailed(
-            Proxy     p,
-            Throwable t )
-        throws
-            NetMeshObjectAccessException
-    {
-        if( t instanceof RemoteQueryTimeoutException ) {
-            log.warn( t );
-            throw new NetMeshObjectAccessException( p.getNetMeshBase(), null, theRequestedFirstTimePaths, t );
-
-        } else if( t instanceof InvocationTargetException ) {
-            log.warn( t );
-        }
     }
     
 //
@@ -288,30 +240,6 @@ public class ProxyProcessingInstructions
         return theWaitForHomeResponseEndpointTimeout;
     }
     
-    /**
-     * An error occurred when attempting to send the XprisoMessage via the
-     * WaitForHomeResponseEndpoint.
-     * 
-     * @param p the Proxy attempting to perform the send
-     * @param t the problem that occurred
-     * @throws NetMeshObjectAccessException the remote NetMeshObject could not be accessed
-     */
-    public void sendViaWaitForHomeResponseEndpointFailed(
-            Proxy     p,
-            Throwable t )
-        throws
-            NetMeshObjectAccessException
-    {
-        if( t instanceof RemoteQueryTimeoutException ) {
-            log.warn( t );
-            throw new NetMeshObjectAccessException( p.getNetMeshBase(), null, theRequestedFirstTimePaths, t );
-
-        } else if( t instanceof InvocationTargetException ) {
-            log.warn( t );
-        }
-    }
-    
-    
 //
     
     public void setSendViaEndpoint(
@@ -322,7 +250,7 @@ public class ProxyProcessingInstructions
         }
         theSendViaEndpoint = outgoing;
     }
-    public XprisoMessage getSendViaWaitEndpoint()
+    public XprisoMessage getSendViaEndpoint()
     {
         return theSendViaEndpoint;
     }
@@ -405,11 +333,11 @@ public class ProxyProcessingInstructions
     
     public void addToResynchronizeInstructions(
             NetMeshObjectIdentifier identifierToAdd,
-            Proxy                   proxyToAdd )
+            NetMeshBaseIdentifier   proxyIdentifierToAdd )
     {
         ResynchronizeInstructions found = null;
         for( ResynchronizeInstructions current : theResynchronizeInstructions ) {
-            if( current.getProxy() == proxyToAdd ) {
+            if( current.getProxyIdentifier().equals( proxyIdentifierToAdd )) {
                 found = current;
                 break;
             }
@@ -419,7 +347,7 @@ public class ProxyProcessingInstructions
         } else {
             ResynchronizeInstructions toAdd = new ResynchronizeInstructions();
             toAdd.addNetMeshObjectIdentifier( identifierToAdd );
-            toAdd.setProxy( proxyToAdd );
+            toAdd.setProxyIdentifier( proxyIdentifierToAdd );
             theResynchronizeInstructions.add( toAdd );
         }
     }
