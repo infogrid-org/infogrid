@@ -22,9 +22,8 @@ import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.util.logging.Log;
 
-
 /**
- * This file tests the TransitiveClosureTraversalActiveMeshObjectSet
+ * This file tests the TransitiveClosureTraversalActiveMeshObjectSet.
  */
 public class ActiveMeshObjectSetTest7
     extends
