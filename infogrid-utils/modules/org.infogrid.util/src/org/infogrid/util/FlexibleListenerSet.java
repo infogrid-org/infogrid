@@ -30,9 +30,9 @@ import java.util.Iterator;
  * class catches all RuntimeExceptions thrown by its listeners. This
  * behavior can be configured through a parameter in the constructor.</p>
  * 
- * @param T the type of listener
- * @param E the type of event
- * @param P the type of parameter
+ * @param <T> the type of listener
+ * @param <E> the type of event
+ * @param <P> the type of parameter
  */
 public abstract class FlexibleListenerSet<T,E,P>
         extends
@@ -328,7 +328,7 @@ public abstract class FlexibleListenerSet<T,E,P>
     /**
      * Iterator implementation for this set.
      * 
-     * @param T the type of element to iterate over
+     * @param <T> the type of element to iterate over
      */
     class MyIterator<T>
         implements

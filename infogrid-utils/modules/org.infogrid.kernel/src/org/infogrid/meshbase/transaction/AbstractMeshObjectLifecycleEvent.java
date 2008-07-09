@@ -116,7 +116,7 @@ public abstract class AbstractMeshObjectLifecycleEvent
             MeshObjectIdentifier vid )
     {
         if( theResolver == null ) {
-            throw new ValueUnresolvedException( this );
+            throw new ValueUnresolvedException( this, vid );
         }
         MeshObject ret = theResolver.findMeshObjectByIdentifier( vid );
         return ret;
