@@ -90,6 +90,7 @@ public class XprisoTest11
         boolean lockAcquired = obj1_mb2.tryToObtainLock();
         checkCondition( lockAcquired, "failed acquiring the lock" );
         tx.commitTransaction();
+        tx = null;
 
         //
 
@@ -108,6 +109,9 @@ public class XprisoTest11
         checkEquals(    obj1_mb1.getAllProxies(), null, "Wrong number of Proxies on obj1_mb1" );
         checkCondition( obj1_mb1.hasLock(), "obj1_mb1 did not re-acquire lock" );
         checkCondition( obj1_mb2.getIsDead(), "obj1_mb2 not dead" );
+
+        obj1_mb2 = null;
+        collectGarbage();
 
         //
 
@@ -171,10 +175,11 @@ public class XprisoTest11
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception all sorts of things may go wrong in tests
+     */
     public XprisoTest11(
             String [] args )
         throws
