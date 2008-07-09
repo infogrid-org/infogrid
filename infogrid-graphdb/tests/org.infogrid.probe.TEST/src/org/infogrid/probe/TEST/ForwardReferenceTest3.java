@@ -16,6 +16,7 @@ package org.infogrid.probe.TEST;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
@@ -32,6 +33,11 @@ import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
+import org.infogrid.meshbase.net.proxy.InitiateResynchronizeFailedEvent;
+import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyEvent;
+import org.infogrid.meshbase.net.proxy.ProxyListener;
+import org.infogrid.meshbase.net.proxy.SendFailedEvent;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.model.Test.TestSubjectArea;
@@ -46,9 +52,9 @@ import org.infogrid.testharness.util.IteratorElementCounter;
 import org.infogrid.util.logging.Log;
 
 /**
- * Tests resolving ForwardReferences in API Probes. Same as ForwardReferenceTest1, just with ApiProbes instead of files.
+ * Tests that unresolvable ForwardReferences behave. Very similar to ForwardReferenceTest2.
  */
-public class ForwardReferenceTest2
+public class ForwardReferenceTest3
         extends
             AbstractProbeTest
 {
@@ -78,6 +84,17 @@ public class ForwardReferenceTest2
 
         //
         
+        log.info(  "subscribe" );
+        
+        MyListener listener = new MyListener();
+        
+        Proxy p = base.getProxyFor( OUTER_URL );
+        checkObject( p, "No proxy found" );
+        p.addWeakProxyListener( listener );
+        checkEquals( listener.events.size(), 0, "found events already" );
+
+        //
+        
         log.info( "Finding ForwardReference" );
         
         NetMeshObject fwdReference = (NetMeshObject) abc.traverseToNeighborMeshObjects().getSingleMember();
@@ -86,18 +103,21 @@ public class ForwardReferenceTest2
         checkCondition( !fwdReference.isBlessedBy( TestSubjectArea.B, false ), "Blessed by wrong type" );
         checkEquals( fwdReference.getPropertyValue( TestSubjectArea.A_X ), "forwardreference", "wrong property value" );
 
+        
         // wait some
         
         Thread.sleep( 3500L );
         
-        checkEquals( fwdReference.getPropertyValue( TestSubjectArea.A_X ), "resolved", "ForwardReference was not successfully resolved: " + fwdReference.getIdentifier().toExternalForm() );
+        checkEquals( fwdReference.getPropertyValue( TestSubjectArea.A_X ), "forwardreference", "ForwardReference was unexpectedly resolved: " + fwdReference.getIdentifier().toExternalForm() );
 
         checkEquals(    fwdReference.getAllProxies().length, 1, "Wrong number of proxies on forward reference" );
-        checkCondition( fwdReference.getAllProxies()[0].getPartnerMeshBaseIdentifier().equals( INNER_URL ), "Wrong proxy on forward reference" );
-        checkCondition( !fwdReference.isBlessedBy( TestSubjectArea.A,  false ), "Blessed still by old type" );
-        checkCondition(  fwdReference.isBlessedBy( TestSubjectArea.AA, false ), "Not blessed by the right type (AA)" );
-        checkCondition(  fwdReference.isBlessedBy( TestSubjectArea.B,  false ), "Not blessed by the right type (B)" );
-        checkEquals( fwdReference.getPropertyValue( TestSubjectArea.A_X ), "resolved", "wrong property value" );
+        checkCondition( fwdReference.getAllProxies()[0].getPartnerMeshBaseIdentifier().equals( OUTER_URL ), "Wrong proxy on forward reference" );
+        checkCondition( fwdReference.isBlessedBy( TestSubjectArea.A,  false ), "Not blessed by old type" );
+        
+        checkEquals( listener.events.size(), 1, "found wrong number of events" );
+        checkCondition( listener.events.get( 0 ) instanceof InitiateResynchronizeFailedEvent, "wrong type of event found" );
+        
+        
     }
 
     /**
@@ -108,7 +128,7 @@ public class ForwardReferenceTest2
     public static void main(
             String [] args )
     {
-        ForwardReferenceTest2 test = null;
+        ForwardReferenceTest3 test = null;
         try {
             if( args.length > 0 ) {
                 System.err.println( "Synopsis: <no args>" );
@@ -116,7 +136,7 @@ public class ForwardReferenceTest2
                 System.exit( 1 );
             }
 
-            test = new ForwardReferenceTest2( args );
+            test = new ForwardReferenceTest3( args );
             test.run();
 
         } catch( Throwable ex ) {
@@ -137,15 +157,15 @@ public class ForwardReferenceTest2
     /**
      * Constructor.
      * 
-     * @param command-line arguments
+     * @param args command-line arguments
      * @throws Exception all kinds of things may happen in tests
      */
-    public ForwardReferenceTest2(
+    public ForwardReferenceTest3(
             String [] args )
         throws
             Exception
     {
-        super( ForwardReferenceTest2.class );
+        super( ForwardReferenceTest3.class );
 
         theProbeDirectory.addExactUrlMatch( new ProbeDirectory.ExactMatchDescriptor(
                 OUTER_URL.toExternalForm(),
@@ -157,7 +177,7 @@ public class ForwardReferenceTest2
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( ForwardReferenceTest2.class);
+    private static Log log = Log.getLogInstance( ForwardReferenceTest3.class);
 
     /**
      * The ProbeDirectory to use.
@@ -234,12 +254,13 @@ public class ForwardReferenceTest2
     }
 
     /**
-     * The Probe to the inner data feed.
+     * The Probe to the inner data feed. This always throws an exception
      */
     public static class InnerTestApiProbe
             implements
                 ApiProbe
     {
+
         public void readFromApi(
                 NetMeshBaseIdentifier  networkId,
                 CoherenceSpecification coherence,
@@ -260,12 +281,32 @@ public class ForwardReferenceTest2
                 ModuleException,
                 URISyntaxException
         {
-            MeshObject home = mb.getHomeObject();
-            
-            home.bless( TestSubjectArea.AA );
-            home.bless( TestSubjectArea.B );
-            
-            home.setPropertyValue( TestSubjectArea.A_X, StringValue.create( "resolved" ) );
+            throw new ProbeException.EmptyDataSource( networkId );
         }
+    }
+    
+    /**
+     * Listener that captures ProxyEvents.
+     */
+    public static class MyListener
+            implements
+                ProxyListener
+    {
+        public void synchronousSendFailedEvent(
+                SendFailedEvent theEvent )
+        {
+            events.add( theEvent );
+        }
+
+        public void initiateResynchronizeFailedEvent(
+                InitiateResynchronizeFailedEvent theEvent )
+        {
+            events.add( theEvent );
+        }
+        
+        /**
+         * Stores the received events.
+         */
+        public ArrayList<ProxyEvent> events = new ArrayList<ProxyEvent>();
     }
 }
