@@ -12,18 +12,26 @@
 // All rights reserved.
 //
 
-package org.infogrid.meshbase.net;
+package org.infogrid.meshbase.net.proxy;
 
 /**
- * Interface supported by listeners to lease events.
+ * Interface supported by objects wishing to listen to Proxy activity.
  */
-public interface LeaseManagementListener
+public interface ProxyListener
 {
     /**
-     * A lease was updated.
+     * The synchronous sending of a message failed.
      *
      * @param theEvent the event
      */
-    public abstract void leaseUpdated(
-            LeaseManagementEvent theEvent );
+    public abstract void synchronousSendFailedEvent(
+            SendFailedEvent theEvent );
+    
+    /**
+     * The initiation of a resynchronization failed.
+     * 
+     * @param theEvent the event
+     */
+    public abstract void initiateResynchronizeFailedEvent(
+            InitiateResynchronizeFailedEvent theEvent );
 }

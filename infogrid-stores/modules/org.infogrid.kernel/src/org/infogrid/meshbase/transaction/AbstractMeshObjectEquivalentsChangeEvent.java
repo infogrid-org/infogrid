@@ -159,7 +159,7 @@ public abstract class AbstractMeshObjectEquivalentsChangeEvent
             MeshObjectIdentifier[] vid )
     {
         if( theResolver == null ) {
-            throw new ValueUnresolvedException( this );
+            throw new ValueUnresolvedException( this, vid );
         }
         MeshObject [] ret = new MeshObject[ vid.length ];
 

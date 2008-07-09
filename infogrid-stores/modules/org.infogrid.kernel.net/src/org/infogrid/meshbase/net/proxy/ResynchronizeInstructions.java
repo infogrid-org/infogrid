@@ -16,6 +16,7 @@ package org.infogrid.meshbase.net.proxy;
 
 import java.util.ArrayList;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.StringHelper;
 
@@ -35,14 +36,14 @@ public class ResynchronizeInstructions
         return ArrayHelper.copyIntoNewArray( theNetMeshObjectIdentifiers, NetMeshObjectIdentifier.class );
     }
     
-    public void setProxy(
-            Proxy newValue )
+    public void setProxyIdentifier(
+            NetMeshBaseIdentifier newValue )
     {
-        theProxy = newValue;
+        theProxyIdentifier = newValue;
     }
-    public Proxy getProxy()
+    public NetMeshBaseIdentifier getProxyIdentifier()
     {
-        return theProxy;
+        return theProxyIdentifier;
     }
     
     @Override
@@ -51,17 +52,17 @@ public class ResynchronizeInstructions
         return StringHelper.objectLogString(
                 this,
                 new String[] {
-                    "theProxy",
+                    "theProxyIdentifier",
                     "theNetMeshObjectIdentifiers"
                 },
                 new Object[] {
-                    theProxy,
+                    theProxyIdentifier,
                     theNetMeshObjectIdentifiers
                 },
                 StringHelper.LOG_FLAGS.SHOW_ALL);
     }
             
     protected ArrayList<NetMeshObjectIdentifier> theNetMeshObjectIdentifiers = new ArrayList<NetMeshObjectIdentifier>();
-    protected Proxy theProxy;
+    protected NetMeshBaseIdentifier theProxyIdentifier;
 }
 

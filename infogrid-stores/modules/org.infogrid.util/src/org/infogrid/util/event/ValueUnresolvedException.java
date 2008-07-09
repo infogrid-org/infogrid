@@ -16,6 +16,8 @@ package org.infogrid.util.event;
 
 /**
  * Indicates that a value carried by an ExternalizableEvent was not resolved.
+ * The identifier of the unresolved value is carried as an Object, as Java does
+ * not like generics in Exceptions.
  */
 public class ValueUnresolvedException
         extends
@@ -27,24 +29,47 @@ public class ValueUnresolvedException
      * Constructor.
      *
      * @param event the ExternalizableEvent that was not resolved
+     * @param unresolvedValueIdentifier the identifier of the unresolved value
      */
     public ValueUnresolvedException(
-            ExternalizableEvent event )
+            ExternalizableEvent event,
+            Object              unresolvedValueIdentifier )
     {
         super( event, null );
+        
+        theUnresolvedValueIdentifier = unresolvedValueIdentifier;
     }
 
     /**
      * Constructor.
      *
      * @param event the ExternalizableEvent that was not resolved
+     * @param unresolvedValueIdentifier the identifier of the unresolved value
      * @param cause the cause of the Exception, if any
      */
     public ValueUnresolvedException(
             ExternalizableEvent event,
+            Object              unresolvedValueIdentifier,
             Throwable           cause )
     {
         super( event, cause );
+
+        theUnresolvedValueIdentifier = unresolvedValueIdentifier;
     }
+    
+    /**
+     * Obtain the identifier of the unresolved value.
+     * 
+     * @return the identifier
+     */
+    public Object getUnresolvedValueIdentifier()
+    {
+        return theUnresolvedValueIdentifier;
+    }
+
+    /**
+     * The Value identifier that could not be resolved.
+     */
+    protected Object theUnresolvedValueIdentifier;
 }
 
