@@ -172,16 +172,17 @@ public class ProbeTest8
             Runnable [] runs,
             String []   names )
     {
-        if( getLog().isDebugEnabled() )
+        if( getLog().isDebugEnabled() ) {
             getLog().debug( "createThreads( " + ArrayHelper.arrayToString( runs ) + " )" );
+        }
 
         InstrumentedThread [] ret = new InstrumentedThread[ runs.length ];
-        for( int i=0 ; i<runs.length ; ++i )
-        {
-            if( runs[i] != null )
+        for( int i=0 ; i<runs.length ; ++i ) {
+            if( runs[i] != null ) {
                 ret[i] = new InstrumentedThread( runs[i], names != null ? names[i] : null );
-            else
+            } else {
                 log.info( "Skipping start of Thread with index " + i );
+            }
         }
         return ret;
     }
@@ -224,13 +225,14 @@ public class ProbeTest8
      * Constructor.
      *
      * @param args command-line arguments
+     * @throws Exception all sorts of things may go wrong in a test
      */
     public ProbeTest8(
             String [] args )
         throws
             Exception
     {
-        super( ProbeTest7.class );
+        super( ProbeTest8.class );
 
         theProbeDirectory.addExactUrlMatch( new ProbeDirectory.ExactMatchDescriptor(
                 TEST1_URL.toExternalForm(),
@@ -296,9 +298,9 @@ public class ProbeTest8
 
     static {
         try {
-            TEST1_URL = NetMeshBaseIdentifier.createUnresolvable( PROTOCOL_NAME + "://myhost.local/remainder" );
-            TEST2_URL = NetMeshBaseIdentifier.createUnresolvable( PROTOCOL_NAME + "://otherhost.local/remainder" );
-            TEST3_URL = NetMeshBaseIdentifier.createUnresolvable( PROTOCOL_NAME + "://otherhost.local/empty" );
+            TEST1_URL = NetMeshBaseIdentifier.createUnresolvable( PROTOCOL_NAME + "://TEST1_myhost.local/remainder" );
+            TEST2_URL = NetMeshBaseIdentifier.createUnresolvable( PROTOCOL_NAME + "://TEST2_otherhost.local/remainder" );
+            TEST3_URL = NetMeshBaseIdentifier.createUnresolvable( PROTOCOL_NAME + "://TEST3_otherhost.local/empty" );
 
         } catch( Exception ex ) {
             log.error( ex );
@@ -356,28 +358,6 @@ public class ProbeTest8
         implements
             ApiProbe
     {
-        /**
-         * Read from the API and instantiate corresponding MeshObjects.
-         * 
-         * @param networkId the NetMeshBaseIdentifier that is being accessed
-         * @param coherenceSpecification the type of data coherence that is requested by the application. Probe
-         *         implementors may ignore this parameter, letting the Probe framework choose its own policy.
-         *         If the Probe chooses to define its own policy (considering or ignoring this parameter), the
-         *         Probe must bless the Probe's HomeObject with a subtype of ProbeUpdateSpecification (defined
-         *         in the <code>org.infogrid.model.Probe</code>) that reflects the policy.
-         * @param mb the StagingMeshBase in which the corresponding MeshObjects are instantiated by the Probe
-         * @throws IdeMeshObjectIdentifierNotUniqueExceptionrown if the Probe developer incorrectly
-         *         assigned duplicate Identifiers to created MeshObjects
-         * @throws RelatedAlreadyException thrown if the Probe developer incorrectly attempted to
-         *         relate two already-related MeshObjects
-         * @throws TransactionException this Exception is declared to make programming easier,
-         *         although actually throwing it would be a programming error
-         * @throws NotPermittedException thrown if an operation performed by the Probe was not permitted
-         * @throws ProbeException a Probe error occurred per the possible subclasses defined in ProbeException
-         * @throws IOException an input/output error occurred during execution of the Probe
-         * @throws ModuleException thrown if a Module required by the Probe could not be loaded
-         * @throws URISyntaxException thrown if a URI was constructed in an invalid way
-         */
         public void readFromApi(
                 NetMeshBaseIdentifier  networkId,
                 CoherenceSpecification coherence,
@@ -476,6 +456,9 @@ public class ProbeTest8
 
         public void run()
         {
+            if( log.isDebugEnabled() ) {
+                log.debug( "MyRunnable starting: " + thePath );
+            }
             try {
                 MeshObject obj = theMeshBase.accessLocally(
                         thePath,
@@ -484,6 +467,9 @@ public class ProbeTest8
 
             } catch( Exception ex ) {
                 reportError( "Unexpected exception", ex );
+            }
+            if( log.isDebugEnabled() ) {
+                log.debug( "MyRunnable ending: " + thePath );
             }
         }
 

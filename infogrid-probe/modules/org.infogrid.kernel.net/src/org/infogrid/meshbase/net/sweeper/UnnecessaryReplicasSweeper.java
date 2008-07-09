@@ -18,7 +18,7 @@ import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
 
 /**
- *
+ * A Sweeper that gets rid of unused non-master/non-home-object replicas.
  */
 public class UnnecessaryReplicasSweeper
         extends
@@ -27,6 +27,7 @@ public class UnnecessaryReplicasSweeper
     /**
      * Factory method.
      *
+     * @param unusedSlaveReplicaExpiration for which a slave replica must be unused until it becomes a candidate for sweeping, in milliseconds
      * @return the created UnnecessaryReplicasSweeper
      */
     public static UnnecessaryReplicasSweeper create(
@@ -37,6 +38,8 @@ public class UnnecessaryReplicasSweeper
 
     /**
      * Constructor.
+     * 
+     * @param unusedSlaveReplicaExpiration for which a slave replica must be unused until it becomes a candidate for sweeping, in milliseconds
      */
     protected UnnecessaryReplicasSweeper(
             long unusedSlaveReplicaExpiration )
