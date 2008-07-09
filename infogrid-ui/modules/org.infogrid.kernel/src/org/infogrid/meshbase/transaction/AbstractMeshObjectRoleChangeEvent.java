@@ -230,7 +230,7 @@ public abstract class AbstractMeshObjectRoleChangeEvent
             MeshTypeIdentifier [] vid )
     {
         if( theResolver == null ) {
-            throw new ValueUnresolvedException( this );
+            throw new ValueUnresolvedException( this, vid );
         }
         if( vid == null || vid.length == 0 ) {
             return new RoleType[0];

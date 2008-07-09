@@ -17,7 +17,7 @@ package org.infogrid.meshbase.net.proxy;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.meshbase.net.LeaseManagementListener;
+import org.infogrid.meshbase.net.proxy.ProxyListener;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
@@ -251,45 +251,45 @@ public interface Proxy
      * Subscribe to lease-related events, without using a Reference.
      *
      * @param newListener the to-be-added listener
-     * @see #addWeakLeaseManagementListener
-     * @see #addSoftLeaseManagementListener
-     * @see #removeLeaseManagementListener
+     * @see #addWeakProxyListener
+     * @see #addSoftProxyListener
+     * @see #removeProxyListener
      */
-    public abstract void addDirectLeaseManagementListener(
-            LeaseManagementListener newListener );
+    public abstract void addDirectProxyListener(
+            ProxyListener newListener );
 
     /**
      * Subscribe to lease-related events, using a WeakReference.
      *
      * @param newListener the to-be-added listener
-     * @see #addDirectLeaseManagementListener
-     * @see #addSoftLeaseManagementListener
-     * @see #removeLeaseManagementListener
+     * @see #addDirectProxyListener
+     * @see #addSoftProxyListener
+     * @see #removeProxyListener
      */
-    public abstract void addWeakLeaseManagementListener(
-            LeaseManagementListener newListener );
+    public abstract void addWeakProxyListener(
+            ProxyListener newListener );
 
     /**
      * Subscribe to lease-related events, using a SoftReference.
      *
      * @param newListener the to-be-added listener
-     * @see #addWeakLeaseManagementListener
-     * @see #addDirectLeaseManagementListener
-     * @see #removeLeaseManagementListener
+     * @see #addWeakProxyListener
+     * @see #addDirectProxyListener
+     * @see #removeProxyListener
      */
-    public abstract void addSoftLeaseManagementListener(
-            LeaseManagementListener newListener );
+    public abstract void addSoftProxyListener(
+            ProxyListener newListener );
 
     /**
      * Unsubscribe from lease-related events.
      *
      * @param oldListener the to-be-removed listener
-     * @see #addDirectLeaseManagementListener
-     * @see #addWeakLeaseManagementListener
-     * @see #addSoftLeaseManagementListener
+     * @see #addDirectProxyListener
+     * @see #addWeakProxyListener
+     * @see #addSoftProxyListener
      */
-    public abstract void removeLeaseManagementListener(
-            LeaseManagementListener oldListener );
+    public abstract void removeProxyListener(
+            ProxyListener oldListener );
 
     /**
      * Obtain a String representation of this Proxy that can be shown to the user.

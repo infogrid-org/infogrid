@@ -58,7 +58,7 @@ public class MeshTypeCreatedEvent
             return ret;
 
         } catch( MeshTypeWithIdentifierNotFoundException ex ) {
-            throw new ValueUnresolvedException( this );
+            throw new ValueUnresolvedException( this, vid );
         }
     }
 }
