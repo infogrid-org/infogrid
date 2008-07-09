@@ -50,7 +50,7 @@ public class AllTests
                 new TestSpec( XprisoTest8.class ),
                 new TestSpec( XprisoTest9.class ),
                 new TestSpec( XprisoTest10.class ),
-                // new TestSpec( XprisoTest11.class ), // FAILS. Not sure it is an error, though. FIXME?
+                // new TestSpec( XprisoTest11.class ), // FAILS (minor). Requires memory debugger to make progress. See also ProbeTest6
                 new TestSpec( XprisoTest12.class ),
                 new TestSpec( XprisoTest13.class ),
                 new TestSpec( XprisoTest14.class ),
