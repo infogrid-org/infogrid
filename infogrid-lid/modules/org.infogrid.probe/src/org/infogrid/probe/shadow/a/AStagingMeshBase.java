@@ -18,9 +18,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.context.Context;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.meshbase.net.IterableNetMeshBaseDifferencer;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.a.AnetMeshBase;
@@ -191,5 +194,55 @@ public abstract class AStagingMeshBase
     public void scheduleSweepStep()
     {
         // no op
+    }
+    
+    /**
+     * <p>Find an already-created ForwardReference in this StagingMeshBase. Specify the NetMeshBaseIdentifier
+     * of the NetMeshBase whose home object the to-be-found ForwardReference references.</p>
+     * <p>If not found, returns <code>null</code>.</p>
+     * 
+     * @param meshObjectLocation identifies the data source where the MeshObject can be found
+     * @return the found ForwardReference, or null if not found
+     * @see #findMeshObjectByIdentifierOrThrow
+     */
+    public NetMeshObject findForwardReference(
+            NetMeshBaseIdentifier meshObjectLocation )
+    {
+        return findForwardReference( NetMeshObjectAccessSpecification.create( meshObjectLocation ));
+    }
+
+    /**
+     * <p>Find an already-created ForwardReference in this StagingMeshBase. Specify the NetMeshBaseIdentifier
+     * of the NetMeshBase which contains the NetMeshObject that the to-be-found ForwardReference references.</p>
+     * <p>If not found, returns <code>null</code>.</p>
+     * 
+     * @param meshObjectLocation identifies the data source where the MeshObject can be found
+     * @param identifier the Identifier of the MeshObject into which this ForwardReference resolves
+     * @return the found ForwardReference, or null if not found
+     * @see #findMeshObjectByIdentifierOrThrow
+     */
+    public NetMeshObject findForwardReference(
+            NetMeshBaseIdentifier   meshObjectLocation,
+            NetMeshObjectIdentifier identifier )
+    {
+        return findForwardReference( NetMeshObjectAccessSpecification.create( meshObjectLocation, identifier ));
+    }
+
+    /**
+     * <p>Find an already-created ForwardReference in this StagingMeshBase. Specify the NetMeshObjectAccessSpecification
+     *    of the ForwardReference.</p>
+     * <p>If not found, returns <code>null</code>.</p>
+     * 
+     * @param pathToObject specifies where and how the MeshObject can be found
+     * @return the found ForwardReference, or null if not found
+     * @see #findMeshObjectByIdentifierOrThrow
+     */
+    public NetMeshObject findForwardReference(
+            NetMeshObjectAccessSpecification pathToObject )
+    {
+        NetMeshObjectIdentifier identifier = pathToObject.getNetMeshObjectIdentifier();
+        NetMeshObject           ret        = findMeshObjectByIdentifier( identifier );
+        
+        return ret;
     }
 }

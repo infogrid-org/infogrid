@@ -291,7 +291,7 @@ public class NetMeshObjectNeighborAddedEvent
             MeshObjectIdentifier [] vid )
     {
         if( theResolver == null ) {
-            throw new ValueUnresolvedException( this );
+            throw new ValueUnresolvedException( this, vid );
         }
 
         NetMeshObject [] ret = new NetMeshObject[ vid.length ];
