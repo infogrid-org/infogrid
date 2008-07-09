@@ -25,12 +25,9 @@ import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.meshbase.net.LeaseManagementEvent;
-import org.infogrid.meshbase.net.LeaseManagementListener;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
-import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.net.externalized.SimpleExternalizedProxy;
@@ -53,6 +50,7 @@ import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.net.NetMessageEndpoint;
 import org.infogrid.util.Factory;
+import org.infogrid.util.FactoryException;
 import org.infogrid.util.FlexibleListenerSet;
 import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.ResourceHelper;
@@ -98,9 +96,9 @@ public abstract class AbstractProxy
 
         // Don't use the factory. We dispatch the incoming messages ourselves, so we can make
         // sure we process them in order.
-        theWaitForLockResponseEndpoint        = new MyWaitForLockResponseEndpoint( theEndpoint );
-        theWaitForHomeResponseEndpoint = new MyWaitForHomeReplicaResponseEndpoint( theEndpoint );
-        theWaitForReplicaResponseEndpoint     = new MyWaitForReplicaResponseEndpoint( theEndpoint );
+        theWaitForLockResponseEndpoint    = new MyWaitForLockResponseEndpoint( theEndpoint );
+        theWaitForHomeResponseEndpoint    = new MyWaitForHomeReplicaResponseEndpoint( theEndpoint );
+        theWaitForReplicaResponseEndpoint = new MyWaitForReplicaResponseEndpoint( theEndpoint );
 
         // default, subclass constructors can reset
         theTimeCreated = theTimeUpdated = theTimeRead = System.currentTimeMillis();
@@ -258,16 +256,10 @@ public abstract class AbstractProxy
             NetMeshObjectAccessSpecification [] paths,
             long                                duration )
     {
-        try {
-            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForObtainReplicas( paths, duration, this );
-            performInstructions( instructions );
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForObtainReplicas( paths, duration, this );
+        performInstructions( instructions );
 
-            return instructions.getExpectedObtainReplicasWait();
-            
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-            return 0; // what else?
-        }
+        return instructions.getExpectedObtainReplicasWait();
     }
     
     /**
@@ -285,13 +277,8 @@ public abstract class AbstractProxy
         throws
             RemoteQueryTimeoutException
     {
-        try {
-            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToObtainLocks( localReplicas, duration, this );
-            performInstructions( instructions );
-
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-        }
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToObtainLocks( localReplicas, duration, this );
+        performInstructions( instructions );
     }
     
     /**
@@ -312,13 +299,8 @@ public abstract class AbstractProxy
         throws
             RemoteQueryTimeoutException
     {
-        try {
-            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToPushLocks( localReplicas, isNewProxy, duration, this );
-            performInstructions( instructions );
-
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-        }
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToPushLocks( localReplicas, isNewProxy, duration, this );
+        performInstructions( instructions );
     }
 
     /**
@@ -336,13 +318,8 @@ public abstract class AbstractProxy
         throws
             RemoteQueryTimeoutException
     {
-        try {
-            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToObtainHomeReplicas( localReplicas, duration, this );
-            performInstructions( instructions );
-
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-        }
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToObtainHomeReplicas( localReplicas, duration, this );
+        performInstructions( instructions );
     }
 
     /**
@@ -363,13 +340,8 @@ public abstract class AbstractProxy
         throws
             RemoteQueryTimeoutException
     {
-        try {
-            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToPushHomeReplicas( localReplicas, isNewProxy, duration, this );
-            performInstructions( instructions );
-
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-        }
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToPushHomeReplicas( localReplicas, isNewProxy, duration, this );
+        performInstructions( instructions );
     }
 
     /**
@@ -381,13 +353,8 @@ public abstract class AbstractProxy
     public void forceObtainLocks(
             NetMeshObject [] localReplicas )
     {
-        try {
-            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForForceObtainLocks( localReplicas, this );
-            performInstructions( instructions );
-
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-        }
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForForceObtainLocks( localReplicas, this );
+        performInstructions( instructions );
     }
 
     /**
@@ -401,13 +368,8 @@ public abstract class AbstractProxy
     public void tryResynchronizeReplicas(
             NetMeshObjectIdentifier [] identifiers )
     {
-        try {
-            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryResynchronizeReplicas( identifiers, this );
-            performInstructions( instructions );
-
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-        }
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryResynchronizeReplicas( identifiers, this );
+        performInstructions( instructions );
     }
 
     /**
@@ -418,13 +380,8 @@ public abstract class AbstractProxy
     public void cancelReplicas(
             NetMeshObject [] localReplicas )
     {
-        try {
-            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForCancelReplicas( localReplicas, this );
-            performInstructions( instructions );
-
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-        }        
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForCancelReplicas( localReplicas, this );
+        performInstructions( instructions );
     }
 
     /**
@@ -435,13 +392,8 @@ public abstract class AbstractProxy
     @SuppressWarnings(value={"unchecked"})
     public void initiateCeaseCommunications()
     {
-        try {
-            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForCeaseCommunications( this );
-            performInstructions( instructions );
-
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-        }
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForCeaseCommunications( this );
+        performInstructions( instructions );
     }
 
     /**
@@ -484,14 +436,9 @@ public abstract class AbstractProxy
         if( log.isDebugEnabled() ) {
             log.debug( this + ".transactionCommitted( " + theTransaction + " )" );
         }
-        
-        try {
-            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTransactionCommitted( theTransaction, this );
-            performInstructions( instructions );
 
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-        }
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTransactionCommitted( theTransaction, this );
+        performInstructions( instructions );
     }
 
     /**
@@ -541,13 +488,8 @@ public abstract class AbstractProxy
             callIsWaiting = theWaitForReplicaResponseEndpoint.isCallWaitingFor( responseId );
         }
 
-        try {
-            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForIncomingMessage( endpoint, incoming, callIsWaiting, this );
-            performInstructions( instructions );
-
-        } catch( NetMeshObjectAccessException ex ) {
-            log.error( ex );
-        }
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForIncomingMessage( endpoint, incoming, callIsWaiting, this );
+        performInstructions( instructions );
     }
 
     /**
@@ -555,12 +497,9 @@ public abstract class AbstractProxy
      * may be null, in which case nothing is done.
      * 
      * @param instructions the ProxyProcessingInstructions
-     * @throws NetMeshObjectAccessException accessing the NetMeshBase and obtaining a replica failed
      */
     protected void performInstructions(
             ProxyProcessingInstructions instructions )
-        throws
-            NetMeshObjectAccessException
     {
         if( log.isInfoEnabled() ) {
             log.info( this + ".performInstructions( " + instructions + " )" );
@@ -775,14 +714,24 @@ public abstract class AbstractProxy
         }
         
         for( ResynchronizeInstructions current : instructions.getResynchronizeInstructions() ) {
-            NetMeshObjectIdentifier [] toResync = current.getNetMeshObjectIdentifiers();
-            current.getProxy().tryResynchronizeReplicas( toResync );
+            NetMeshObjectIdentifier [] toResync    = current.getNetMeshObjectIdentifiers();
+            
+            try {
+                Proxy resyncProxy = theMeshBase.obtainProxyFor( current.getProxyIdentifier(), null );
+                resyncProxy.tryResynchronizeReplicas( toResync );
+
+            } catch( FactoryException ex ) {
+                theProxyListeners.fireEvent( new InitiateResynchronizeFailedEvent(
+                        this,
+                        current.getProxyIdentifier(),
+                        current.getNetMeshObjectIdentifiers(),
+                        ex.getCause() ));
+            }
         }
         for( CancelInstructions current : instructions.getCancelInstructions() ) {
             NetMeshObject [] toCancel = current.getNetMeshObjects();
             current.getProxy().cancelReplicas( toCancel );
         }
-        
         
     // send messages
         
@@ -797,7 +746,7 @@ public abstract class AbstractProxy
                 incoming2 = theWaitForReplicaResponseEndpoint.call( outgoing, instructions.getWaitForReplicaResponseEndpointTimeout() );
 
             } catch( Throwable t ) {
-                instructions.sendViaWaitForReplicaResponseEndpointFailed( this, t );
+                theProxyListeners.fireEvent( new SendViaWaitForReplicaResponseEndpointFailedEvent( this, outgoing, t ));
             }
         }
 
@@ -808,7 +757,7 @@ public abstract class AbstractProxy
                 incoming2 = theWaitForHomeResponseEndpoint.call( outgoing, instructions.getWaitForHomeResponseEndpointTimeout() );
 
             } catch( Throwable t ) {
-                instructions.sendViaWaitForHomeResponseEndpointFailed( this, t );
+                theProxyListeners.fireEvent( new SendViaWaitForHomeResponseEndpointFailedEvent( this, outgoing, t ));
             }
         }
         
@@ -819,11 +768,11 @@ public abstract class AbstractProxy
                 incoming2 = theWaitForLockResponseEndpoint.call( outgoing, instructions.getWaitForLockResponseEndpointTimeout() );
 
             } catch( Throwable t ) {
-                instructions.sendViaWaitForLockResponseEndpointFailed( this, t );
+                theProxyListeners.fireEvent( new SendViaWaitForLockResponseEndpointFailedEvent( this, outgoing, t ));
             }
         }
         
-        outgoing = instructions.getSendViaWaitEndpoint();
+        outgoing = instructions.getSendViaEndpoint();
         if( outgoing != null ) {
             theEndpoint.enqueueMessageForSend( outgoing );
         }
@@ -940,11 +889,12 @@ public abstract class AbstractProxy
     }
     
     /**
+     * Helper method to make sure the current Thread has been initialized right.
      * 
-     * @param access
-     * @param tx
-     * @return
-     * @throws org.infogrid.meshbase.transaction.TransactionException
+     * @param access the AccessManager to use
+     * @param tx the current Transaction, if any
+     * @return the current Transaction, if any
+     * @throws TransactionException thrown if a Transaction should have been created, but could not
      */
     protected Transaction ensureRights(
             AccessManager access,
@@ -970,91 +920,56 @@ public abstract class AbstractProxy
      * Subscribe to lease-related events, without using a Reference.
      *
      * @param newListener the to-be-added listener
-     * @see #addWeakLeaseManagementListener
-     * @see #addSoftLeaseManagementListener
-     * @see #removeLeaseManagementListener
+     * @see #addWeakProxyListener
+     * @see #addSoftProxyListener
+     * @see #removeProxyListener
      */
-    public final void addDirectLeaseManagementListener(
-            LeaseManagementListener newListener )
+    public final void addDirectProxyListener(
+            ProxyListener newListener )
     {
-        initializeLeaseManagementListenersIfNeeded();
-        theLeaseManagementListeners.addDirect( newListener );
+        theProxyListeners.addDirect( newListener );
     }
 
     /**
      * Subscribe to lease-related events, using a WeakReference.
      *
      * @param newListener the to-be-added listener
-     * @see #addDirectLeaseManagementListener
-     * @see #addSoftLeaseManagementListener
-     * @see #removeLeaseManagementListener
+     * @see #addDirectProxyListener
+     * @see #addSoftProxyListener
+     * @see #removeProxyListener
      */
-    public final void addWeakLeaseManagementListener(
-            LeaseManagementListener newListener )
+    public final void addWeakProxyListener(
+            ProxyListener newListener )
     {
-        initializeLeaseManagementListenersIfNeeded();
-        theLeaseManagementListeners.addWeak( newListener );
+        theProxyListeners.addWeak( newListener );
     }
 
     /**
      * Subscribe to lease-related events, using a SoftReference.
      *
      * @param newListener the to-be-added listener
-     * @see #addWeakLeaseManagementListener
-     * @see #addDirectLeaseManagementListener
-     * @see #removeLeaseManagementListener
+     * @see #addWeakProxyListener
+     * @see #addDirectProxyListener
+     * @see #removeProxyListener
      */
-    public final void addSoftLeaseManagementListener(
-            LeaseManagementListener newListener )
+    public final void addSoftProxyListener(
+            ProxyListener newListener )
     {
-        initializeLeaseManagementListenersIfNeeded();
-        theLeaseManagementListeners.addSoft( newListener );
+        theProxyListeners.addSoft( newListener );
     }
 
     /**
      * Unsubscribe from lease-related events.
      *
      * @param oldListener the to-be-removed listener
-     * @see #addDirectLeaseManagementListener
-     * @see #addWeakLeaseManagementListener
-     * @see #addSoftLeaseManagementListener
+     * @see #addDirectProxyListener
+     * @see #addWeakProxyListener
+     * @see #addSoftProxyListener
      */
-    public final void removeLeaseManagementListener(
-            LeaseManagementListener oldListener )
+    public final void removeProxyListener(
+            ProxyListener oldListener )
     {
-        theLeaseManagementListeners.remove( oldListener );
-    }
-
-    /**
-     * Internal helper to initialize theLeaseManagementListeners if needed.
-     */
-    protected synchronized void initializeLeaseManagementListenersIfNeeded()
-    {
-        if( theLeaseManagementListeners == null ) {
-            theLeaseManagementListeners = new FlexibleListenerSet<LeaseManagementListener,LeaseManagementEvent,Object>() {
-                public void fireEventToListener(
-                        LeaseManagementListener listener,
-                        LeaseManagementEvent    event,
-                        Object                  arg )
-                {
-                    listener.leaseUpdated( event );
-                }
-            };
-        }
-    }
-    
-    /**
-     * Fire a lease-management event indicating that our lease status has changed.
-     */
-    protected void fireLeaseUpdated()
-    {
-        // myRepository.flushProxy( this ); FIXME?
-
-        FlexibleListenerSet<LeaseManagementListener,LeaseManagementEvent,Object> listeners = theLeaseManagementListeners;
-
-        if( listeners != null ) {
-            listeners.fireEvent( new LeaseManagementEvent( this ));
-        }
+        theProxyListeners.remove( oldListener );
     }
 
     /**
@@ -1241,9 +1156,33 @@ public abstract class AbstractProxy
     protected long theTimeExpires;
 
     /**
-     * The lease management listeners.
+     * The Proxy listeners.
      */
-    protected FlexibleListenerSet<LeaseManagementListener,LeaseManagementEvent,Object> theLeaseManagementListeners;
+    protected FlexibleListenerSet<ProxyListener,ProxyEvent,Object> theProxyListeners
+            = new FlexibleListenerSet<ProxyListener,ProxyEvent,Object>() {
+                protected void fireEventToListener(
+                        ProxyListener listener,
+                        ProxyEvent    event,
+                        Object        arg )
+                {
+                    if( event instanceof SendFailedEvent ) {
+                        listener.synchronousSendFailedEvent( (SendFailedEvent) event );
+                    } else if( event instanceof InitiateResynchronizeFailedEvent ) {
+                        listener.initiateResynchronizeFailedEvent( (InitiateResynchronizeFailedEvent) event );
+                    } else {
+                        log.error( "What is this: " + event );
+                    }
+                }
+
+                @Override
+                protected void fireEventIfNoListeners(
+                        ProxyEvent event,
+                        Object     arg )
+                {
+                    // If there are no listeners, we at least log errors
+                    log.error( event );
+                }
+            };
 
     /**
      * Our ResourceHelper.

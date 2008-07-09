@@ -22,10 +22,10 @@ import java.util.EventObject;
  * A general-purpose {@link ExternalizableEvent} implementation. It inherits from
  * <code>java.util.EventObject</code> in order to be compatible with the Java APIs.
  * 
- * @param S the type of the event source
- * @param SID the type of the identifier of the event source
- * @param V the type of the value
- * @param VID the type of the identifier of the value
+ * @param <S> the type of the event source
+ * @param <SID> the type of the identifier of the event source
+ * @param <V> the type of the value
+ * @param <VID> the type of the identifier of the value
  */
 public abstract class AbstractExternalizableEvent<S,SID,V,VID>
         extends

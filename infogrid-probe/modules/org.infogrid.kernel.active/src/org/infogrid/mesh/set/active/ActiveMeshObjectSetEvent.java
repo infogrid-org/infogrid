@@ -97,12 +97,12 @@ public abstract class ActiveMeshObjectSetEvent
             return null;
         }
         if( theMeshBase == null ) {
-            throw new ValueUnresolvedException( this );
+            throw new ValueUnresolvedException( this, vid );
         }
         
         MeshObject ret = theMeshBase.findMeshObjectByIdentifier( vid );
         if( ret == null ) {
-            throw new ValueUnresolvedException( this );
+            throw new ValueUnresolvedException( this, vid );
         }
         return ret;
     }
