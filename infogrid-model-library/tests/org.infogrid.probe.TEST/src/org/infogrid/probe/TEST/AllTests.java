@@ -64,7 +64,7 @@ public class AllTests
                 new TestSpec(
                         ProbeTest5.class,
                         noArgs ),
-//                new TestSpec( // BROKEN
+//                new TestSpec( // FAILS (minor). Requires memory debugger to make progress. See also ProbeTest6
 //                        ProbeTest6.class,
 //                        new String [] {
 //                                AbstractTest.fileSystemFile( ProbeTest6.class, "ProbeTest6.xml" )
@@ -73,7 +73,9 @@ public class AllTests
                         ProbeTest7.class,
                         noArgs ),
 
-// FIXME: ProbeTest8 seems to work, but spits out way too many warnings. This needs more investigation
+// FIXME: ProbeTest8 seems to work, but spits out way too many warnings (but only when run in this test suite,
+// not when run standalone). It may be related to failure to clean up Proxies to expired Shadows, and perhaps
+// ProbeTest6. This needs more investigation but does not appear to be critical.
 //                new TestSpec(
 //                        ProbeTest8.class,
 //                        noArgs ),
@@ -123,7 +125,7 @@ public class AllTests
 //                        WritableProbeTest8.class,
 //                        noArgs ),
 //                new TestSpec( // create object -- BROKEN: need new API call to "createAndPush" to avoid triggering the non-local NetMeshObjectIdentifier exception
-//                        WritableProbeTest9.class,
+//                       .class,
 //                        noArgs ),
 //                new TestSpec( // create and relate object
 //                        WritableProbeTest10.class,
