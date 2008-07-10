@@ -372,6 +372,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                 COMPILATION SECTION
             -->
     <target depends="init" if="no.dist.ear.dir" name="deps-module-jar" unless="no.deps">
+        <ant antfile="${project.org_infogrid_comm}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.org_infogrid_comm_pingpong}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.org_infogrid_jee}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.org_infogrid_jee_net}/build.xml" inheritall="false" target="jar"/>
@@ -406,6 +407,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         <ant antfile="${project.org_infogrid_util_logging_log4j}/build.xml" inheritall="false" target="jar"/>
     </target>
     <target depends="init" if="dist.ear.dir" name="deps-ear-jar" unless="no.deps">
+        <ant antfile="${project.org_infogrid_comm}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.org_infogrid_comm_pingpong}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.org_infogrid_jee}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.org_infogrid_jee_net}/build.xml" inheritall="false" target="jar"/>
@@ -579,6 +581,8 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
     </target>
     <target depends="init,compile,compile-jsps,-pre-dist,-do-dist-with-manifest,-do-dist-without-manifest" name="do-dist"/>
     <target depends="init" if="dist.ear.dir" name="library-inclusion-in-manifest">
+        <basename file="${reference.org_infogrid_comm.jar}" property="included.lib.reference.org_infogrid_comm.jar"/>
+        <copy-ear-war file="${reference.org_infogrid_comm.jar}" propname="included.lib.reference.org_infogrid_comm.jar.X"/>
         <basename file="${reference.org_infogrid_comm_pingpong.jar}" property="included.lib.reference.org_infogrid_comm_pingpong.jar"/>
         <copy-ear-war file="${reference.org_infogrid_comm_pingpong.jar}" propname="included.lib.reference.org_infogrid_comm_pingpong.jar.X"/>
         <basename file="${reference.org_infogrid_model_Test.jar}" property="included.lib.reference.org_infogrid_model_Test.jar"/>
@@ -651,11 +655,12 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         <copy-ear-war file="${libs.JSTL.classpath.libfile.1}" propname="included.lib.libs.JSTL.classpath.1.X"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${included.lib.reference.org_infogrid_comm_pingpong.jar} ${included.lib.reference.org_infogrid_model_Test.jar} ${included.lib.reference.org_infogrid_model_Wiki.jar} ${included.lib.reference.org_infogrid_model_Viewlet.jar} ${included.lib.reference.org_infogrid_model_AclBasedSecurity.jar} ${included.lib.reference.org_infogrid_model_Probe.jar} ${included.lib.reference.org_infogrid_model_Blob.jar} ${included.lib.reference.org_infogrid_model_Common.jar} ${included.lib.reference.org_infogrid_jee.jar} ${included.lib.reference.org_infogrid_jee_shell_http.jar} ${included.lib.reference.org_infogrid_jee_net.jar} ${included.lib.reference.org_infogrid_viewlet.jar} ${included.lib.reference.org_infogrid_jee_viewlet_wikiobject.jar} ${included.lib.reference.org_infogrid_jee_viewlet_bulk.jar} ${included.lib.reference.org_infogrid_kernel.jar} ${included.lib.reference.org_infogrid_meshbase_store.jar} ${included.lib.reference.org_infogrid_probe.jar} ${included.lib.reference.org_infogrid_probe_store.jar} ${included.lib.reference.org_infogrid_net_local.jar} ${included.lib.reference.org_infogrid_lid.jar} ${included.lib.reference.org_infogrid_lid_yadis.jar} ${included.lib.reference.org_infogrid_lid_openid.jar} ${included.lib.reference.org_infogrid_net_local_store.jar} ${included.lib.reference.org_infogrid_kernel_net.jar} ${included.lib.reference.org_infogrid_meshbase_store_net.jar} ${included.lib.reference.org_infogrid_modelbase_m.jar} ${included.lib.reference.org_infogrid_store.jar} ${included.lib.reference.org_infogrid_store_sql.jar} ${included.lib.reference.org_infogrid_util.jar} ${included.lib.reference.org_infogrid_module.jar} ${included.lib.reference.org_infogrid_module_servlet.jar} ${included.lib.reference.org_infogrid_util_logging_log4j.jar} ${included.lib.libs.Log4j.classpath} ${included.lib.libs.JSTL.classpath.1.X} ${included.lib.libs.JSTL.classpath.2.X} "/>
+            <attribute name="Class-Path" value="${included.lib.reference.org_infogrid_comm.jar} ${included.lib.reference.org_infogrid_comm_pingpong.jar} ${included.lib.reference.org_infogrid_model_Test.jar} ${included.lib.reference.org_infogrid_model_Wiki.jar} ${included.lib.reference.org_infogrid_model_Viewlet.jar} ${included.lib.reference.org_infogrid_model_AclBasedSecurity.jar} ${included.lib.reference.org_infogrid_model_Probe.jar} ${included.lib.reference.org_infogrid_model_Blob.jar} ${included.lib.reference.org_infogrid_model_Common.jar} ${included.lib.reference.org_infogrid_jee.jar} ${included.lib.reference.org_infogrid_jee_shell_http.jar} ${included.lib.reference.org_infogrid_jee_net.jar} ${included.lib.reference.org_infogrid_viewlet.jar} ${included.lib.reference.org_infogrid_jee_viewlet_wikiobject.jar} ${included.lib.reference.org_infogrid_jee_viewlet_bulk.jar} ${included.lib.reference.org_infogrid_kernel.jar} ${included.lib.reference.org_infogrid_meshbase_store.jar} ${included.lib.reference.org_infogrid_probe.jar} ${included.lib.reference.org_infogrid_probe_store.jar} ${included.lib.reference.org_infogrid_net_local.jar} ${included.lib.reference.org_infogrid_lid.jar} ${included.lib.reference.org_infogrid_lid_yadis.jar} ${included.lib.reference.org_infogrid_lid_openid.jar} ${included.lib.reference.org_infogrid_net_local_store.jar} ${included.lib.reference.org_infogrid_kernel_net.jar} ${included.lib.reference.org_infogrid_meshbase_store_net.jar} ${included.lib.reference.org_infogrid_modelbase_m.jar} ${included.lib.reference.org_infogrid_store.jar} ${included.lib.reference.org_infogrid_store_sql.jar} ${included.lib.reference.org_infogrid_util.jar} ${included.lib.reference.org_infogrid_module.jar} ${included.lib.reference.org_infogrid_module_servlet.jar} ${included.lib.reference.org_infogrid_util_logging_log4j.jar} ${included.lib.libs.Log4j.classpath} ${included.lib.libs.JSTL.classpath.1.X} ${included.lib.libs.JSTL.classpath.2.X} "/>
         </manifest>
         <delete dir="${dist.ear.dir}/temp"/>
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
+        <copy file="${reference.org_infogrid_comm.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${reference.org_infogrid_comm_pingpong.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${reference.org_infogrid_model_Test.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${reference.org_infogrid_model_Wiki.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
@@ -977,6 +982,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                 CLEANUP SECTION
             -->
     <target depends="init" if="no.dist.ear.dir" name="deps-clean" unless="no.deps">
+        <ant antfile="${project.org_infogrid_comm}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.org_infogrid_comm_pingpong}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.org_infogrid_jee}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.org_infogrid_jee_net}/build.xml" inheritall="false" target="clean"/>
