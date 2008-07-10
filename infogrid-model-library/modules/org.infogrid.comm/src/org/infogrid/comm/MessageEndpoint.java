@@ -19,7 +19,7 @@ package org.infogrid.comm;
  * enqueueMessageForSend is used for asynchronous sending of messages.
  * Incoming responses are received by subscribed MessageEndpointListeners.
  * 
- * @param T the message type
+ * @param <T> the message type
  */
 public interface MessageEndpoint<T>
 {

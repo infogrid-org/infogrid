@@ -15,8 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.comm</name>
- <username>The PingPong Communications Module</username>
- <userdescription>The PingPong communications module provides an abstract
+ <username>Abstract Communications Module</username>
+ <userdescription>The Communications Module provides an abstract
    peer-to-peer, symmetric communications framework in which endpoints can send messages
    to each other. It also implements RPC-style call-response patterns on top.</userdescription>
  <dependencies>
