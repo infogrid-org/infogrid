@@ -14,26 +14,22 @@
 
 package org.infogrid.comm.pingpong;
 
-import org.infogrid.comm.MessageEndpoint;
-import org.infogrid.comm.MessageEndpointIsDeadException;
-import org.infogrid.comm.MessageEndpointListener;
-import org.infogrid.comm.MessageSendException;
-
-import org.infogrid.util.AbstractListenerSet;
-import org.infogrid.util.FlexibleListenerSet;
-import org.infogrid.util.StringHelper;
-import org.infogrid.util.logging.Log;
-
 import java.lang.ref.WeakReference;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.MessageEndpointIsDeadException;
+import org.infogrid.comm.MessageEndpointListener;
+import org.infogrid.comm.MessageSendException;
+import org.infogrid.util.AbstractListenerSet;
+import org.infogrid.util.FlexibleListenerSet;
+import org.infogrid.util.StringHelper;
+import org.infogrid.util.logging.Log;
 
 /**
  * <p>Endpoint for bidirectional communications using the ping-pong protocol.
@@ -584,6 +580,7 @@ public abstract class PingPongMessageEndpoint<T>
          * @param sender the endpoint that sent the event
          * @param listener the listener to which the event should be sent
          * @param event the event Object itself
+         * @param <T> the message type
          */
         abstract public <T> void fireEvent(
                 PingPongMessageEndpoint<T> sender,
