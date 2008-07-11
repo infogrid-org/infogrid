@@ -28,6 +28,8 @@ public class NetMeshWorldAccessManager
 {
     /**
      * Factory method.
+     * 
+     * @return the created NetMeshWorldAccessManager
      */
     public static NetMeshWorldAccessManager create()
     {
