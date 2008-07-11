@@ -36,7 +36,7 @@ import org.infogrid.viewlet.MeshObjectsToView;
 import org.infogrid.viewlet.ViewletFactoryChoice;
 
 /**
- * ViewletFactory for the MeshWorld.
+ * ViewletFactory for the NetMeshWorld.
  */
 public class NetMeshWorldViewletFactory
         extends
