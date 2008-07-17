@@ -15,6 +15,7 @@
 package org.infogrid.util.tree;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * Implements {@link TreeFacade} for files in the local file system.
@@ -85,6 +86,9 @@ public class FileTreeFacade
             return new File[0];
         }
         File [] ret = node.listFiles();
+        
+        // need to order them in the same sequence as defined by forward and back operations
+        Arrays.sort( ret );
         return ret;
     }
     
