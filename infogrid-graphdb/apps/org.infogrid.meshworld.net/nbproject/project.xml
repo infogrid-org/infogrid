@@ -20,6 +20,10 @@
             <minimum-ant-version>1.6</minimum-ant-version>
             <web-module-libraries>
                 <library files="1">
+                    <file>${reference.org_infogrid_util_logging_log4j.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library files="1">
                     <file>${reference.org_infogrid_comm.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
@@ -145,10 +149,6 @@
                 </library>
                 <library files="1">
                     <file>${reference.org_infogrid_module_servlet.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library files="1">
-                    <file>${reference.org_infogrid_util_logging_log4j.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
