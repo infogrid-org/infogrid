@@ -14,21 +14,15 @@
 
 package org.infogrid.lid.gpg;
 
-import org.infogrid.util.FactoryException;
 import org.infogrid.util.SmartFactory;
 
 /**
- *
+ * Obtains and manages LID public keys for given identities that are not maintained locally.
+ * The key into the  SmartFactory is the LID identifier, the created value is the public key.
+ * There is no argument.
  */
 public interface LidGpgPublicKeyManager
     extends
-        SmartFactory<String,String,Object>
+        SmartFactory<String,String,Void>
 {
-    /**
-     * Factory method with default parameters.
-     */
-    public String obtainFor(
-            String key )
-        throws
-            FactoryException;
 }

@@ -26,7 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.StringTokenizer;
 
 /**
- *
+ * Maps RelyingPartySideAssociations into StoreValues and vice versa.
  */
 public class RelyingPartySideAssociationMapper
         implements
@@ -34,6 +34,8 @@ public class RelyingPartySideAssociationMapper
 {
     /**
      * Factory method.
+     * 
+     * @return the created RelyingPartySideAssociationMapper
      */
     public static RelyingPartySideAssociationMapper create()
     {
@@ -44,7 +46,7 @@ public class RelyingPartySideAssociationMapper
      * Constructor.
      */
     protected RelyingPartySideAssociationMapper()
-{
+    {
     }
     
     /**
@@ -77,6 +79,7 @@ public class RelyingPartySideAssociationMapper
      * @param key the key to the StoreValue
      * @param value the StoreValue
      * @return the value
+     * @throws StoreValueDecodingException thrown if the StoreValue could not be decoded
      */
     public RelyingPartySideAssociation decodeValue(
             String     key,

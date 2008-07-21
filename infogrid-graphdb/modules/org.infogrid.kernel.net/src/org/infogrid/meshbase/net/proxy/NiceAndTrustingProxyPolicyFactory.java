@@ -16,6 +16,7 @@ package org.infogrid.meshbase.net.proxy;
 
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.FactoryException;
 
 /**
@@ -23,6 +24,8 @@ import org.infogrid.util.FactoryException;
  * be too wise in a production environment that isn't otherwise tightly controlled.
  */
 public class NiceAndTrustingProxyPolicyFactory
+        extends
+            AbstractFactory<NetMeshBaseIdentifier,ProxyPolicy,CoherenceSpecification>
         implements
             ProxyPolicyFactory
 {

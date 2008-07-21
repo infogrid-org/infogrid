@@ -40,6 +40,8 @@ public abstract class AssociationException
         extends
             AssociationException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -66,6 +68,8 @@ public abstract class AssociationException
         extends
             AssociationException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *
@@ -93,6 +97,8 @@ public abstract class AssociationException
         extends
             AssociationException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          */
@@ -109,6 +115,8 @@ public abstract class AssociationException
         extends
             AssociationException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          */
@@ -125,6 +133,8 @@ public abstract class AssociationException
         extends
             AssociationException
     {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
         /**
          * Constructor.
          *

@@ -14,12 +14,6 @@
 
 package org.infogrid.lid.gpg;
 
-import org.infogrid.lid.LidNonceGenerator;
-
-import org.infogrid.util.ResourceHelper;
-import org.infogrid.util.http.HTTP;
-import org.infogrid.util.logging.Log;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,92 +21,105 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.infogrid.lid.LidNonceManager;
+import org.infogrid.util.FactoryException;
+import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.http.HTTP;
+import org.infogrid.util.logging.Log;
 
 /**
- * Arapper around the GPG commandline tool.
+ * Wrapper around the GPG commandline tool.
  */
 public class LidGpg
 {
     protected static final Log log = Log.getLogInstance( LidGpg.class ); // our own, private logger
 
     /**
-     * Factory method for the singleton.
+     * Factory method.
      *
-     * @return the singleton instance
+     * @param nonceManager the LidNonceManager to use
+     * @return the created instance
      */
-    public static LidGpg create()
+    public static LidGpg create(
+            LidNonceManager nonceManager )
     {
-        if( theSingleton == null ) {
-            theSingleton = new LidGpg();
-        }
-        return theSingleton;
+        LidGpg ret = new LidGpg( nonceManager );
+        return ret;
     }
 
     /**
      * Constructor.
+     * 
+     * @param nonceManager the LidNonceManager to use
      */
-    protected LidGpg()
+    protected LidGpg(
+            LidNonceManager nonceManager )
     {
-        // noop
+        theNonceManager = nonceManager;
     }
 
     /**
      * Generate private/public key pair for this LID.
      *
-     * @param lid the LID URL for which a key pair needs to be generated
-     * @return String[2] containing the public key, and the private key
-     * @throws AbortProcessingException thrown if the key generation failed
+     * @param key the LID URL for which a key pair needs to be generated
+     * @return the generated LidKeyPair
+     * @throws FactoryException thrown if the LidKeyPair could not be created
      */
-    public String [] generatePrivatePublicKey(
-            String lid )
+    public static LidKeyPair createKeyPair(
+            String key )
         throws
-            IOException
+            FactoryException
     {
-        // This follows the example from the gpg doc/DETAILS file
-        String batchFileContent =
-                  "Key-Type: DSA\n"
-                + "Key-Length: 1024\n"
-                + "Subkey-Type: ELG-E\n"
-                + "Subkey-Length: 1024\n"
-                + "Name-Real: $lid\n"
-                + "Expire-Date: 0\n"
-                + "%commit\n";
+        try {
+            // This follows the example from the gpg doc/DETAILS file
+            String batchFileContent =
+                      "Key-Type: DSA\n"
+                    + "Key-Length: 1024\n"
+                    + "Subkey-Type: ELG-E\n"
+                    + "Subkey-Length: 1024\n"
+                    + "Name-Real: $lid\n"
+                    + "Expire-Date: 0\n"
+                    + "%commit\n";
 
-        File       batchFile       = File.createTempFile( "", "" );
-        FileWriter batchFileWriter = new FileWriter( batchFile );
+            File       batchFile       = File.createTempFile( "", "" );
+            FileWriter batchFileWriter = new FileWriter( batchFile );
 
-        batchFileWriter.write( batchFileContent );
-        batchFileWriter.close();
+            batchFileWriter.write( batchFileContent );
+            batchFileWriter.close();
 
-        String command = theExecutable + " --batch --gen-key " + batchFile.getAbsolutePath();
+            String command = theExecutable + " --batch --gen-key " + batchFile.getAbsolutePath();
 
-        execute( command, null, null, null );
+            execute( command, null, null, null );
 
-        batchFile.delete();
+            batchFile.delete();
 
-        // now construct return values
+            // now construct return values
 
-        StringBuffer output = new StringBuffer();
-        command = theExecutable + " --export --armor =" + lid;
-        execute( command, null, output, null );
+            StringBuffer output = new StringBuffer();
+            command = theExecutable + " --export --armor =" + key;
+            execute( command, null, output, null );
 
-        String publicKey = output.toString();
+            String publicKey = output.toString();
 
-        output = new StringBuffer();
-        command = theExecutable + " --export-secret-keys --armor =" + lid;
-        execute( command, null, output, null );
+            output = new StringBuffer();
+            command = theExecutable + " --export-secret-keys --armor =" + key;
+            execute( command, null, output, null );
 
-        String privateKey = output.toString();
+            String privateKey = output.toString();
 
-        return new String[] { publicKey, privateKey };
+            LidKeyPair ret = new LidKeyPair( key, publicKey, privateKey );
+            return ret;
+
+        } catch( IOException ex ) {
+            throw new FactoryException( ex );
+        }
     }
 
     /**
      * Import a public key into the key store.
      *
      * @param key the public key to import
-     * @throws AbortProcessingException throw if the import failed
+     * @throws IOException an I/O error occurred
      */
     public void importPublicKey(
             String key )
@@ -128,7 +135,7 @@ public class LidGpg
      * Import a private key into the key store.
      *
      * @param key the private key to import
-     * @throws AbortProcessingException throw if the import failed
+     * @throws IOException an I/O error occurred
      */
     public void importPrivateKey(
             String key )
@@ -163,7 +170,7 @@ public class LidGpg
         }
         if( credentialIndex >= 0 ) {
             url = url.substring( 0, credentialIndex );
-        } else {
+        } else if( postData != null ) {
             // try postData because argument list didn't work
 
             credentialIndex = postData.indexOf( "&credential=" );
@@ -208,7 +215,7 @@ public class LidGpg
      * @param lid the LID URL
      * @param signedText the signed text
      * @return true if the validation was successful
-     * @throws AbortProcessingException thrown if the validation process was unsuccessful (not necessarily the result)
+     * @throws IOException an I/O error occurred
      */
     public boolean validateSignedText(
             String lid,
@@ -261,7 +268,7 @@ public class LidGpg
      * @param url the URL to be signed
      * @param lidVersion the LID protocol version to use
      * @return the signed URL
-     * @throws AbortProcessingException thrown if signing of the URL failed
+     * @throws IOException an I/O error occurred
      */
     public String signUrl(
             String lid,
@@ -281,7 +288,7 @@ public class LidGpg
         append.append( HTTP.encodeUrl( lid ));
         append.append( "&lid-credtype=gpg%20--clearsign" );
 
-        String nonce = LidNonceGenerator.generateNewNonce();
+        String nonce = theNonceManager.generateNewNonce();
         append.append( "&lid-nonce=" );
         append.append( HTTP.encodeUrl( nonce ));
 
@@ -321,7 +328,7 @@ public class LidGpg
      *
      * @param lid the LID whose public session key we want to obtain
      * @return the public session key
-     * @throws AbortProcessingException thrown if export failed
+     * @throws IOException an I/O error occurred
      */
     public String exportPublicSessionKey(
             String lid )
@@ -437,7 +444,7 @@ public class LidGpg
                                     buf = new StringBuffer();
                                 }
                             }
-                            if( buf.length() > 0 ); {
+                            if( buf.length() > 0 ) {
                                 log.debug( "Process reported: " + buf );
                             }
                         } catch( IOException ex ) {
@@ -481,14 +488,14 @@ public class LidGpg
     }
 
     /**
-     * Our singleton instance, allocated as needed.
+     * The LidNonceManager to use.
      */
-    protected static LidGpg theSingleton = null;
-
+    protected LidNonceManager theNonceManager;
+    
     /**
      * Name of the executable.
      */
-    protected String theExecutable = ResourceHelper.getInstance( LidGpg.class ).getResourceStringOrDefault( "GpgPath", "/usr/bin/gpg" );
+    protected static String theExecutable = ResourceHelper.getInstance( LidGpg.class ).getResourceStringOrDefault( "GpgPath", "/usr/bin/gpg" );
 
     /**
      * The pattern in the gpg output that contains our LID.

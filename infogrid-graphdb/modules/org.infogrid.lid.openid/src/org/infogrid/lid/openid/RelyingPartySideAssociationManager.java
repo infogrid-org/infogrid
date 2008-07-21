@@ -14,21 +14,13 @@
 
 package org.infogrid.lid.openid;
 
-import org.infogrid.util.FactoryException;
 import org.infogrid.util.SmartFactory;
 
 /**
- *
+ * Knows how to manage RelyingParty-side OpenID associations.
  */
 public interface RelyingPartySideAssociationManager
     extends
         SmartFactory<String,RelyingPartySideAssociation,AssociationNegotiationParameters>
 {
-    /**
-     * Factory method with default parameters.
-     */
-    public RelyingPartySideAssociation obtainFor(
-            String key )
-        throws
-            FactoryException;
 }

@@ -18,17 +18,14 @@ import org.infogrid.lid.openid.AssociationNegotiationParameters;
 import org.infogrid.lid.openid.RelyingPartySideAssociation;
 import org.infogrid.lid.openid.RelyingPartySideAssociationManager;
 import org.infogrid.lid.openid.RelyingPartySideAssociationNegotiator;
-
 import org.infogrid.store.Store;
-import org.infogrid.store.util.StoreBackedMap;
-
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.Factory;
-import org.infogrid.util.FactoryException;
 import org.infogrid.util.PatientSmartFactory;
 
 /**
- *
+ * A RelyingPartySideAssociationManager implemented using Store.
  */
 public class StoreRelyingPartySideAssociationManager
         extends
@@ -37,13 +34,16 @@ public class StoreRelyingPartySideAssociationManager
             RelyingPartySideAssociationManager
 {
     /**
-     * Factory method
+     * Factory method.
+     * 
+     * @param store the Store to use
+     * @return the created StoreRelyingPartySideAssociationManager
      */
     public static StoreRelyingPartySideAssociationManager create(
             Store store )
     {
         RelyingPartySideAssociationMapper                  mapper          = RelyingPartySideAssociationMapper.create();
-        StoreBackedMap<String,RelyingPartySideAssociation> storage         = StoreBackedMap.createWeak( mapper, store );
+        StoreBackedSwappingHashMap<String,RelyingPartySideAssociation> storage         = StoreBackedSwappingHashMap.createWeak( mapper, store );
         RelyingPartySideAssociationNegotiator              delegateFactory = RelyingPartySideAssociationNegotiator.create();
         
         return new StoreRelyingPartySideAssociationManager( delegateFactory, storage );
@@ -51,6 +51,9 @@ public class StoreRelyingPartySideAssociationManager
 
     /**
      * Constructor.
+     * 
+     * @param delegateFactory the factory for RelyingPartySideAssociations
+     * @param storage the storage for the RelyingPartySideAssociations
      */
     protected StoreRelyingPartySideAssociationManager(
             Factory<String,RelyingPartySideAssociation,AssociationNegotiationParameters> delegateFactory,
@@ -59,18 +62,6 @@ public class StoreRelyingPartySideAssociationManager
         super( delegateFactory, storage );
     }
     
-    /**
-     * Factory method with default parameters.
-     */
-    @Override
-    public RelyingPartySideAssociation obtainFor(
-            String key )
-        throws
-            FactoryException
-    {
-        return obtainFor( key, null );
-    }
-
     /**
      * This overridable method allows our subclasses to judge whether a value retrieved
      * from cache is still good. If not, it will be discarded and the factory proceeeds

@@ -14,15 +14,10 @@
 
 package org.infogrid.lid;
 
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.MeshBase;
-
 import org.infogrid.util.http.SaneRequest;
 
-import java.io.IOException;
-
 /**
- *
+ * Captures the information provided by the client to a Relying Party.
  */
 public interface LidClientSignature
 {
@@ -32,6 +27,13 @@ public interface LidClientSignature
      * @return the LSaneRequest
      */
     public SaneRequest getSaneRequest();
+
+    /**
+     * Obtain the URL of the Relying Party without any identity parameters/
+     * 
+     * @return the URL of the Relying Party
+     */
+    public String getRelyingPartyUrl();
 
     /**
      * Obtain the identifier of the client.
@@ -78,13 +80,9 @@ public interface LidClientSignature
     /**
      * Is this Request signed, and if so, is the signature good.
      *
-     * @return the endpoint MeshObject if the Request is signed and the signature is good, null otherwise
-     * @throws AbortProcessingException thrown if an error occurred
+     * @return true if the Request is signed and the signature is good, false otherwise
      */
-    public MeshObject isSignedGoodRequest(
-            MeshObject persona )
-        throws
-            IOException;
+    public boolean isSignedGoodRequest();
 
     /**
      * Determine the session id that was provided as part of this Request,
@@ -103,6 +101,13 @@ public interface LidClientSignature
     public String getTarget();
 
     /**
+     * Obtain the realm parameter that is part of this request, if any.
+     * 
+     * @return the realm
+     */
+    public String getRealm();
+
+    /**
      * Obtain the nonce that is part of this request, if any.
      *
      * @return the nonce
@@ -110,10 +115,9 @@ public interface LidClientSignature
     public String getNonce();
     
     /**
-     * Obtain the MeshObject that represents the identity provider used, if any.
-     *
-     * @return the identity provider
+     * Obtain the URL of the identity provider's endpoint.
+     * 
+     * @return the identifier of the identity provider's endpoint, if any
      */
-    public MeshObject determineIdentityProvider(
-            MeshBase mb );
+    public String getIdpEndpointIdentifier();
 }

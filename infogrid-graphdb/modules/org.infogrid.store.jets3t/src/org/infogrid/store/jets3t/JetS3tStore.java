@@ -24,7 +24,6 @@ import org.infogrid.store.IterableStore;
 import org.infogrid.store.StoreKeyDoesNotExistException;
 import org.infogrid.store.StoreKeyExistsAlreadyException;
 import org.infogrid.store.StoreValue;
-
 import org.infogrid.store.util.SimpleStoreValueMapper;
 import org.infogrid.store.util.StoreValueMapper;
 import org.infogrid.util.DelegatingIOException;

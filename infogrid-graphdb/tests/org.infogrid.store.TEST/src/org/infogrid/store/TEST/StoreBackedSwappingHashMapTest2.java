@@ -17,13 +17,13 @@ package org.infogrid.store.TEST;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.SerializingStoreEntryMapper;
 import org.infogrid.store.m.MStore;
-import org.infogrid.store.util.IterableStoreBackedMap;
+import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
 import org.infogrid.util.logging.Log;
 
 /**
  *
  */
-public class StoreBackedMapTest2
+public class StoreBackedSwappingHashMapTest2
         extends
             AbstractStoreTest
 {
@@ -48,7 +48,7 @@ public class StoreBackedMapTest2
             }
         };
         
-        IterableStoreBackedMap<String,Integer> map = IterableStoreBackedMap.createWeak( mapper, store );
+        IterableStoreBackedSwappingHashMap<String,Integer> map = IterableStoreBackedSwappingHashMap.createWeak( mapper, store );
                 
         String [] keys = {
             "a",
@@ -108,7 +108,7 @@ public class StoreBackedMapTest2
     public static void main(
             String [] args )
     {
-        StoreBackedMapTest2 test = null;
+        StoreBackedSwappingHashMapTest2 test = null;
         try {
             if( args.length < 0 ) { // well, not quite possible but to stay with the general outline
                 System.err.println( "Synopsis: <no arguments>" );
@@ -116,7 +116,7 @@ public class StoreBackedMapTest2
                 System.exit( 1 );
             }
 
-            test = new StoreBackedMapTest2( args );
+            test = new StoreBackedSwappingHashMapTest2( args );
             test.run();
 
         } catch( Throwable ex ) {
@@ -139,14 +139,14 @@ public class StoreBackedMapTest2
       *
       * @param args command-line arguments
       */
-    public StoreBackedMapTest2(
+    public StoreBackedSwappingHashMapTest2(
             String [] args )
         throws
             Exception
     {
-        super( StoreBackedMapTest2.class );
+        super( StoreBackedSwappingHashMapTest2.class  );
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( StoreBackedMapTest2.class );
+    private static Log log = Log.getLogInstance( StoreBackedSwappingHashMapTest2.class  );
 }

@@ -14,63 +14,56 @@
 
 package org.infogrid.lid;
 
-import org.infogrid.context.Context;
-import org.infogrid.context.ObjectInContext;
-
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.MeshBase;
-
-import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.http.SaneRequest;
-
 import org.infogrid.util.logging.Log;
-
-import java.io.IOException;
-import java.util.regex.Pattern;
 
 /**
  * Captures the information provided by the client that is relevant to authenticate a request.
  */
 public abstract class AbstractLidClientSignature
         implements
-            LidClientSignature,
-            ObjectInContext
+            LidClientSignature
 {
     private static final Log log = Log.getLogInstance( AbstractLidClientSignature.class ); // our own, private logger
 
     /**
      * Constructor for subclasses only.
+     * 
+     * @param request the incoming request
+     * @param rpUrl the Relying Party's URL without identity parameters
+     * @param identifier the provided identifier
+     * @param credential the provided credential
+     * @param lidCookieString the identifier held by the LID identifier cookie, if any
+     * @param sessionId the content of the LID session cookie, if any
+     * @param target the user's destination URL, if any
+     * @param realm the realm of the trust request, if any
+     * @param nonce the nonce in the request, if any
+     * @param nonceManager the LidNonceManager to use to validate the nonce
      */
     protected AbstractLidClientSignature(
-            SaneRequest      request,
+            SaneRequest     request,
+            String          rpUrl,
             String          identifier,
             String          credential,
             String          lidCookieString,
             String          sessionId,
             String          target,
+            String          realm,
             String          nonce,
-            Context         context )
+            LidNonceManager nonceManager )
     {
         theRequest             = request;
+        theRelyingPartyUrl     = rpUrl;
         theIdentifier          = identifier;
         theCredential          = credential;
-        theSaneCookieString     = lidCookieString;
+        theSaneCookieString    = lidCookieString;
         theSessionId           = sessionId;
         theTarget              = target;
+        theRealm               = realm;
         theNonce               = nonce;
-        theContext             = context;
+        theNonceManager        = nonceManager;
     }
     
-    /**
-     * The Context in which we operate.
-     *
-     * @return the Context
-     */
-    public final Context getContext()
-    {
-        return theContext;
-    }
-
     /**
      * Obtain the SaneRequest from which this LidClientSignature was derived.
      * 
@@ -79,6 +72,16 @@ public abstract class AbstractLidClientSignature
     public final SaneRequest getSaneRequest()
     {
         return theRequest;
+    }
+
+    /**
+     * Obtain the URL of the Relying Party without any identity parameters/
+     * 
+     * @return the URL of the Relying Party
+     */
+    public String getRelyingPartyUrl()
+    {
+        return theRelyingPartyUrl;
     }
 
     /**
@@ -141,32 +144,30 @@ public abstract class AbstractLidClientSignature
     /**
      * Is this Request signed, and if so, is the signature good.
      *
-     * @return the endpoint MeshObject if the Request is signed and the signature is good, null otherwise
-     * @throws AbortProcessingException thrown if an error occurred
+     * @return true if the Request is signed and the signature is good, false otherwise
      */
-    public final MeshObject isSignedGoodRequest(
-            MeshObject persona )
-        throws
-            IOException
+    public final boolean isSignedGoodRequest()
     {
         if( !isSignedRequest() ) {
-            return null;
+            return false;
         }
-        MeshObject endpoint = determineSignedGoodRequest( persona );
-        return endpoint;
-     }
+        if( theNonce != null ) {
+            if( !theNonceManager.validateNonce( theNonce )) {
+                return false;
+            }
+        }
+        
+        boolean ret = determineSignedGoodRequest();
+        return ret;
+    }
 
-     /**
-      * The internal method that determines whether or not a request was signed, and if so,
-      * whether the signature is any good.
-      *
-      * @return the endpoint MeshObject if the Request is signed and the signature is good, null otherwise
-      * @throws AbortProcessingException thrown if an error occurred
-      */
-    protected abstract MeshObject determineSignedGoodRequest(
-            MeshObject persona )
-        throws
-            IOException;
+    /**
+     * The internal method that determines whether or not a request was signed, and if so,
+     * whether the signature is any good.
+     *
+     * @return true if the Request is signed and the signature is good, false otherwise
+     */
+    protected abstract boolean determineSignedGoodRequest();
 
     /**
      * Determine the session id that was provided as part of this Request,
@@ -191,6 +192,16 @@ public abstract class AbstractLidClientSignature
     }
 
     /**
+     * Obtain the realm that is part of this request, if any.
+     *
+     * @return the realm
+     */
+    public String getRealm()
+    {
+        return theRealm;
+    }
+
+    /**
      * Obtain the nonce that is part of this request, if any.
      *
      * @return the nonce
@@ -199,23 +210,17 @@ public abstract class AbstractLidClientSignature
     {
         return theNonce;
     }
-    
-    /**
-     * Obtain the MeshObject that represents the identity provider used, if any.
-     *
-     * @return the identity provider
-     */
-    public MeshObject determineIdentityProvider(
-            MeshBase mb )
-    {
-        throw new UnsupportedOperationException();
-    }
 
     /**
      * The incoming SaneRequest.
      */
     protected SaneRequest theRequest;
 
+    /**
+     * The RelyingParty URL without identity parameters.
+     */
+    protected String theRelyingPartyUrl;
+    
     /**
      * The provided identifier of the client.
      */
@@ -237,6 +242,11 @@ public abstract class AbstractLidClientSignature
     protected String theTarget;
 
     /**
+     * The realm.
+     */
+    protected String theRealm;
+
+    /**
      * The provided credential.
      */
     protected String theCredential;
@@ -247,28 +257,7 @@ public abstract class AbstractLidClientSignature
     protected String theNonce;
 
     /**
-     * The Context in which we operate.
+     * The LidNonceManager to use.
      */
-    protected Context theContext;
-
-    /**
-     * The pattern for the LID V2 nonce.
-     */
-    protected static final Pattern theLidNoncePattern = Pattern.compile(
-            "^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})\\.(\\d{3})Z$" );
-
-    /**
-     * Our ResourceHelper.
-     */
-    protected static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( AbstractLidClientSignature.class );
-
-    /**
-     * The maximum age of a nonce that we tolerate.
-     */
-    protected static long theMaxNonceAge = theResourceHelper.getResourceLongOrDefault( "MaxNonceAge", 60L*60L*1000L ); // 1 hour
-    
-    /**
-     * The maximum amount of time we tolerate a nonce to be in the future.
-     */
-    protected static long theMaxNonceFuture = theResourceHelper.getResourceLongOrDefault( "MaxNonceAge", 5L*60L*1000L ); // 5 minutes
+    protected LidNonceManager theNonceManager;
 }
