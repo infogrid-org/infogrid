@@ -27,7 +27,7 @@ import org.infogrid.meshbase.a.DefaultAMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.store.Store;
-import org.infogrid.store.util.StoreBackedMap;
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.logging.Log;
 
@@ -86,7 +86,7 @@ public class StoreMeshBase
     {
         StoreMeshBaseEntryMapper objectMapper = new StoreMeshBaseEntryMapper();
         
-        StoreBackedMap<MeshObjectIdentifier,MeshObject> objectStorage = StoreBackedMap.createWeak( objectMapper, meshObjectStore );
+        StoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = StoreBackedSwappingHashMap.createWeak( objectMapper, meshObjectStore );
 
         MeshObjectIdentifierFactory identifierFactory = DefaultAMeshObjectIdentifierFactory.create();
         AMeshBaseLifecycleManager   life              = AMeshBaseLifecycleManager.create();
@@ -133,8 +133,8 @@ public class StoreMeshBase
      * 
      * @return the cache
      */
-    protected StoreBackedMap<MeshObjectIdentifier, MeshObject> getCachingMap()
+    protected StoreBackedSwappingHashMap<MeshObjectIdentifier, MeshObject> getCachingMap()
     {
-        return (StoreBackedMap<MeshObjectIdentifier,MeshObject>) theCache;
+        return (StoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject>) theCache;
     }
 }

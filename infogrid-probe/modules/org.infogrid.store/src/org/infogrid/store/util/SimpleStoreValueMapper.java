@@ -14,7 +14,6 @@
 
 package org.infogrid.store.util;
 
-import org.infogrid.store.util.StoreValueMapper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,6 +24,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import org.infogrid.store.StoreValue;
+import org.infogrid.store.util.StoreValueMapper;
 import org.infogrid.util.StreamUtils;
 
 /**

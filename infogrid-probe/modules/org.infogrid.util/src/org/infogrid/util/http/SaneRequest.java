@@ -284,6 +284,13 @@ public abstract class SaneRequest
     }
 
     /**
+     * Obtain the query string, if any.
+     * 
+     * @return the query string
+     */
+    public abstract String getQueryString();
+    
+    /**
      * Obtain the content of the request, e.g. HTTP POST data.
      *
      * @return the content of the request, or null

@@ -25,6 +25,10 @@ public class RelyingPartySideAssociation
      * Factory method.
      *
      * @param serverUrl URL of the identity server with which we have this Association
+     * @param associationHandle the unique identifier for the association
+     * @param sharedSecret the secret negotiated for the association
+     * @param issuedTime the time the association was created
+     * @param expiryTime the time the association will expire
      * @return the created RelyingPartySideAssociation
      */
     public static RelyingPartySideAssociation create(
@@ -39,6 +43,12 @@ public class RelyingPartySideAssociation
 
     /**
      * Constructor.
+     * 
+     * @param serverUrl URL of the identity server with which we have this Association
+     * @param associationHandle the unique identifier for the association
+     * @param sharedSecret the secret negotiated for the association
+     * @param issuedTime the time the association was created
+     * @param expiryTime the time the association will expire
      */
     protected RelyingPartySideAssociation(
             String  serverUrl,
@@ -71,24 +81,36 @@ public class RelyingPartySideAssociation
         throws
             IllegalStateException
     {
-        StringBuffer error = new StringBuffer();
-
+        StringBuilder error = new StringBuilder();
+        String        sep   = "";
+        
         if( theServerUrl == null ) {
-            error.append( "Have no serverUrl. " );
+            error.append( "Have no serverUrl." );
+            sep = " ";
         }
         if( theAssociationHandle == null ) {
+            error.append( sep );
             error.append( "Have no associationHandle. " );
+            sep = " ";
         }
         if( theSharedSecret == null ) {
+            error.append( sep );
             error.append( "Have no shared secret. " );
+            sep = " ";
         } else if( theSharedSecret.length != 20 ) {
+            error.append( sep );
             error.append( "Have shared secret with wrong length (" ).append( theSharedSecret.length ).append( "). " );
+            sep = " ";
         }
         if( theIssuedTime < 0L ) {
+            error.append( sep );
             error.append( "Have no issuedTime. " );
+            sep = " ";
         }
         if( theExpiryTime < 0L ) {
+            error.append( sep );
             error.append( "Have no expiryTime. " );
+            sep = " ";
         }
 
         if( error.length() > 0 ) {

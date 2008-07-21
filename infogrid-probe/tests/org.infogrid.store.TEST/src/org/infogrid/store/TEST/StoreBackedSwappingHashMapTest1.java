@@ -17,7 +17,7 @@ package org.infogrid.store.TEST;
 import org.infogrid.store.SerializingStoreEntryMapper;
 import org.infogrid.store.Store;
 import org.infogrid.store.m.MStore;
-import org.infogrid.store.util.StoreBackedMap;
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.SwappingHashMap;
 import org.infogrid.util.SwappingHashMapListener;
 import org.infogrid.util.logging.Log;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 /**
  *
  */
-public class StoreBackedMapTest1
+public class StoreBackedSwappingHashMapTest1
         extends
             AbstractStoreTest
 {
@@ -54,7 +54,7 @@ public class StoreBackedMapTest1
         
         MyListener<String,Integer> listener = new MyListener<String,Integer>();
         
-        StoreBackedMap<String,Integer> map = StoreBackedMap.createWeak( mapper, store );
+        StoreBackedSwappingHashMap<String,Integer> map = StoreBackedSwappingHashMap.createWeak( mapper, store );
         map.addSoftSwappingHashMapListener( listener );
         
         
@@ -109,7 +109,7 @@ public class StoreBackedMapTest1
     public static void main(
             String [] args )
     {
-        StoreBackedMapTest1 test = null;
+        StoreBackedSwappingHashMapTest1 test = null;
         try {
             if( args.length < 0 ) { // well, not quite possible but to stay with the general outline
                 System.err.println( "Synopsis: <no arguments>" );
@@ -117,7 +117,7 @@ public class StoreBackedMapTest1
                 System.exit( 1 );
             }
 
-            test = new StoreBackedMapTest1( args );
+            test = new StoreBackedSwappingHashMapTest1( args );
             test.run();
 
         } catch( Throwable ex ) {
@@ -140,16 +140,16 @@ public class StoreBackedMapTest1
       *
       * @param args command-line arguments
       */
-    public StoreBackedMapTest1(
+    public StoreBackedSwappingHashMapTest1(
             String [] args )
         throws
             Exception
     {
-        super( StoreBackedMapTest1.class );
+        super( StoreBackedSwappingHashMapTest1.class  );
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( StoreBackedMapTest1.class );
+    private static Log log = Log.getLogInstance( StoreBackedSwappingHashMapTest1.class  );
 
     /**
      * Listener implementation for this test.

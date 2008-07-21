@@ -41,11 +41,11 @@ public class SwappingHashMapTestListener
      * 
      * @param event the received event
      */
-    public void swappingHashMapElementAdded(
+    public void mapElementAdded(
             CachingMapEvent.Added event )
     {
         if( log.isDebugEnabled() ) {
-            log.debug( this + ".smartFactoryElementAdded( " + event + " )" );
+            log.debug( this + ".mapElementAdded( " + event + " )" );
         }
         theAddedEvents.add( event );
     }
@@ -55,11 +55,11 @@ public class SwappingHashMapTestListener
      * 
      * @param event the received event
      */
-    public void swappingHashMapElementRemoved(
+    public void mapElementRemoved(
             CachingMapEvent.Removed event )
     {
         if( log.isDebugEnabled() ) {
-            log.debug( this + ".smartFactoryElementRemoved( " + event + " )" );
+            log.debug( this + ".mapElementRemoved( " + event + " )" );
         }
         theRemovedEvents.add( event );
     }
@@ -69,11 +69,11 @@ public class SwappingHashMapTestListener
      * 
      * @param event the received event
      */
-    public void swappingHashMapElementExpired(
+    public void mapElementExpired(
             CachingMapEvent.Expired event )
     {
         if( log.isDebugEnabled() ) {
-            log.debug( this + ".swappingHashMapElementExpired( " + event + " )" );
+            log.debug( this + ".mapElementExpired( " + event + " )" );
         }
         theExpiredEvents.add( event );
     }
