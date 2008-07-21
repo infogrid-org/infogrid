@@ -21,7 +21,7 @@ import org.infogrid.probe.shadow.store.StoreShadowMeshBaseFactory;
 import org.infogrid.probe.manager.PassiveProbeManager;
 
 import org.infogrid.store.IterableStore;
-import org.infogrid.store.util.IterableStoreBackedMap;
+import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
 
 import org.infogrid.util.AbstractSwappingHashMapListener;
 import org.infogrid.util.SwappingHashMap;
@@ -45,7 +45,7 @@ public class StorePassiveProbeManager
     {
         StoreProbeManagerMapper theMapper = new StoreProbeManagerMapper( delegate );
 
-        IterableStoreBackedMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = IterableStoreBackedMap.createWeak( theMapper, shadowStore );
+        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = IterableStoreBackedSwappingHashMap.createWeak( theMapper, shadowStore );
 
         StorePassiveProbeManager ret = new StorePassiveProbeManager( delegate, storage );
 
@@ -57,7 +57,7 @@ public class StorePassiveProbeManager
      */
     protected StorePassiveProbeManager(
             StoreShadowMeshBaseFactory                                   delegate,
-            IterableStoreBackedMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
+            IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
     {
         super( delegate, storage );
 

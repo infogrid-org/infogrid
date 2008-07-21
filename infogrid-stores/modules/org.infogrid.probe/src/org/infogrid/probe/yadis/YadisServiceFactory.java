@@ -280,31 +280,29 @@ public class YadisServiceFactory
                 }
 
                 String realFound = found.toString().trim();
-        //        if( realFound.indexOf( "://" ) > 0 ) {
-                    NetMeshObjectIdentifier endpointIdentifier = base.getMeshObjectIdentifierFactory().fromExternalForm( realFound );
+                NetMeshObjectIdentifier endpointIdentifier = base.getMeshObjectIdentifierFactory().fromExternalForm( realFound );
 
-                    NetMeshObject endpoint = findOrCreateAndBless( endpointIdentifier, YadisSubjectArea.SITE, base );
-                    
-                    // FIXME? endpoint.setPropertyValue( ServiceEndPoint.Priority_PROPERTYTYPE, decodePriorityValue( infoNode ));
-                    // endpoint.setPropertyValue( ServiceEndPoint.URI_PROPERTYTYPE, StringValue.create( realFound ));
-                    try {
-                        serviceMeshObject.relate( endpoint );
-                    } catch( RelatedAlreadyException ex ) {
-                        // ignore
-                    }
-                    try {
-                        serviceMeshObject.blessRelationship( Service._Service_IsProvidedAtEndpoint_Site_SOURCE, endpoint );
+                NetMeshObject endpoint = findOrCreateAndBless( endpointIdentifier, YadisSubjectArea.SITE, base );
 
-                    } catch( BlessedAlreadyException ex ) {
-                        // ignore
-                    } catch( EntityNotBlessedException ex ) {
-                        log.error( ex );
-                    } catch( NotRelatedException ex ) {
-                        log.error( ex );
-                    } catch( IsAbstractException ex ) {
-                        log.error( ex );
-                    }
-       //         }
+                // FIXME? endpoint.setPropertyValue( ServiceEndPoint.Priority_PROPERTYTYPE, decodePriorityValue( infoNode ));
+                // endpoint.setPropertyValue( ServiceEndPoint.URI_PROPERTYTYPE, StringValue.create( realFound ));
+                try {
+                    serviceMeshObject.relate( endpoint );
+                } catch( RelatedAlreadyException ex ) {
+                    // ignore
+                }
+                try {
+                    serviceMeshObject.blessRelationship( Service._Service_IsProvidedAtEndpoint_Site_SOURCE, endpoint );
+
+                } catch( BlessedAlreadyException ex ) {
+                    // ignore
+                } catch( EntityNotBlessedException ex ) {
+                    log.error( ex );
+                } catch( NotRelatedException ex ) {
+                    log.error( ex );
+                } catch( IsAbstractException ex ) {
+                    log.error( ex );
+                }
             }
         }
     }
@@ -603,7 +601,6 @@ public class YadisServiceFactory
                 try {
                     NetMeshObject serviceMeshObject = base.getMeshBaseLifecycleManager().createMeshObject(
                             base.getMeshObjectIdentifierFactory().fromExternalForm( prefix ),
-                            // MeshObjectIdentifier.create( sourceIdentifier.toExternalForm(), prefix ),
                             Service._TYPE );
 
                     serviceMeshObject.bless( Authentication1_0Service._TYPE ); // FIXME? OpenIDAuthentication.TYPE );
@@ -618,7 +615,7 @@ public class YadisServiceFactory
                     // endpoint.setPropertyValue( ServiceEndPoint.URI_PROPERTYTYPE, StringValue.create( identityServer ));
 
                     serviceMeshObject.relateAndBless( Service._Service_IsProvidedAtEndpoint_Site_SOURCE, endpoint );
-                    serviceMeshObject.relateAndBless( Service._Site_Offers_Service_DESTINATION, subject );
+                    serviceMeshObject.relateAndBless( Service._Site_MakesUseOf_Service_DESTINATION, subject );
 
                 } catch( IsAbstractException ex ) {
                     log.error( ex );

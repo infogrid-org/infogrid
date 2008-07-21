@@ -16,13 +16,17 @@ package org.infogrid.probe.shadow.proxy;
 
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.proxy.ProxyPolicy;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
+import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.FactoryException;
 
 /**
  * A ProxyPolicyFactory that generates default ProxyPolicies for ShadowMeshBases.
  */
 public class DefaultShadowProxyPolicyFactory
+        extends
+            AbstractFactory<NetMeshBaseIdentifier,ProxyPolicy,CoherenceSpecification>
         implements
             ProxyPolicyFactory
 {

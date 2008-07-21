@@ -17,8 +17,8 @@
  <name>org.infogrid.vendors.org.apache.hadoop</name>
  <username>Hadoop module</username>
  <provides>
-  <jar>hadoop-0.17.1-core.jar</jar>
-  <jar>commons-logging-1.0.4.jar</jar>
+  <jar>hadoop-core.jar</jar>
+  <jar>commons-logging-api.jar</jar>
  </provides>
  <dependencies>
   <requires name="org.infogrid.util.logging.log4j"/>

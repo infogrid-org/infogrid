@@ -29,7 +29,7 @@ import java.util.NoSuchElementException;
  * @param <K> the type of key
  * @param <V> the type of value
  */
-public class StoreBackedMapKeysIterator<K,V>
+public class StoreBackedSwappingHashMapKeysIterator<K,V>
         extends
             AbstractCursorIterator<K>
 {
@@ -41,11 +41,11 @@ public class StoreBackedMapKeysIterator<K,V>
      * @param mapper the mapper to use
      * @param arrayComponentClass the Class to use when returning arrays
      */
-    public StoreBackedMapKeysIterator(
-            IterableStoreCursor   delegate,
-            StoreBackedMap<K,V>   cache,
-            StoreEntryMapper<K,V> mapper,
-            Class<K>              arrayComponentClass )
+    public StoreBackedSwappingHashMapKeysIterator(
+            IterableStoreCursor             delegate,
+            StoreBackedSwappingHashMap<K,V> cache,
+            StoreEntryMapper<K,V>           mapper,
+            Class<K>                        arrayComponentClass )
     {
         super( arrayComponentClass );
 
@@ -57,9 +57,9 @@ public class StoreBackedMapKeysIterator<K,V>
     /**
      * Obtain the Map that this Iterator iterates over.
      *
-     * @return the StoreBackedMap
+     * @return the StoreBackedSwappingHashMap
      */
-    public StoreBackedMap<K,V> getMap()
+    public StoreBackedSwappingHashMap<K,V> getMap()
     {
         return theCache;
     }
@@ -303,9 +303,9 @@ public class StoreBackedMapKeysIterator<K,V>
      *
      * @return identical new instance
      */
-    public StoreBackedMapKeysIterator<K,V> createCopy()
+    public StoreBackedSwappingHashMapKeysIterator<K,V> createCopy()
     {
-        return new StoreBackedMapKeysIterator<K,V>( theDelegate.createCopy(), theCache, theMapper, theArrayComponentType );
+        return new StoreBackedSwappingHashMapKeysIterator<K,V>( theDelegate.createCopy(), theCache, theMapper, theArrayComponentType );
     }
     
     /**
@@ -320,10 +320,10 @@ public class StoreBackedMapKeysIterator<K,V>
         throws
             IllegalArgumentException
     {
-        if( !( position instanceof StoreBackedMapKeysIterator )) {
+        if( !( position instanceof StoreBackedSwappingHashMapKeysIterator )) {
             throw new IllegalArgumentException( "Wrong type of CursorIterator: " + position );
         }
-        StoreBackedMapKeysIterator realPosition = (StoreBackedMapKeysIterator) position;
+        StoreBackedSwappingHashMapKeysIterator realPosition = (StoreBackedSwappingHashMapKeysIterator) position;
 
         if( theCache != realPosition.theCache ) {
             throw new IllegalArgumentException( "Not the same instance of cache" );
@@ -369,7 +369,7 @@ public class StoreBackedMapKeysIterator<K,V>
     /**
      * The cache to use.
      */
-    protected StoreBackedMap<K,V> theCache;
+    protected StoreBackedSwappingHashMap<K,V> theCache;
 
     /**
      * The mapper to use.

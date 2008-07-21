@@ -14,13 +14,13 @@
 
 package org.infogrid.util.TEST;
 
+import java.util.Iterator;
 import org.infogrid.testharness.AbstractTest;
+import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.Factory;
 import org.infogrid.util.MSmartFactory;
 import org.infogrid.util.logging.Log;
-
-import java.util.Iterator;
 
 /**
  * Tests the behavior of the values iterator.
@@ -38,7 +38,7 @@ public class SmartFactoryTest4
         throws
             Exception
     {
-        Factory<String,Foo,Integer> delegateFactory = new Factory<String,Foo,Integer>() {
+        Factory<String,Foo,Integer> delegateFactory = new AbstractFactory<String,Foo,Integer>() {
             public Foo obtainFor(
                     String  key,
                     Integer argument )
