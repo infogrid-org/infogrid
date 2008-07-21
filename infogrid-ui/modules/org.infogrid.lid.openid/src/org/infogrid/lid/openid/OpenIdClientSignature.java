@@ -14,25 +14,13 @@
 
 package org.infogrid.lid.openid;
 
+import java.util.Map;
+import java.util.StringTokenizer;
 import org.infogrid.lid.AbstractLidClientSignature;
-
-import org.infogrid.context.Context;
-
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.set.ByTypeMeshObjectSelector;
-import org.infogrid.mesh.set.MeshObjectSet;
-import org.infogrid.mesh.set.m.ImmutableMMeshObjectSet;
-
-import org.infogrid.lid.yadis.YadisSubjectArea;
-
+import org.infogrid.lid.LidNonceManager;
 import org.infogrid.util.Base64;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
-
-import java.util.Map;
-import java.util.StringTokenizer;
-
-import java.io.IOException;
 
 /**
  * An OpenId-based ClientSignature.
@@ -44,28 +32,48 @@ public class OpenIdClientSignature
     private static final Log log = Log.getLogInstance( OpenIdClientSignature.class ); // our own, private logger
     
     /**
-     * Constructor. Use factory method.
+     * Constructor.
+     * 
+     * @param request the incoming request
+     * @param rpUrl the Relying Party's URL without identity parameters
+     * @param identifier the provided identifier
+     * @param credential the provided credential
+     * @param lidCookieString the identifier held by the LID identifier cookie, if any
+     * @param sessionId the content of the LID session cookie, if any
+     * @param target the user's destination URL, if any
+     * @param realm the realm of the trust request, if any
+     * @param nonce the nonce in the request, if any
+     * @param nonceManager the LidNonceManager to use to validate the nonce
+     * @param openIdMode the provided OpenID mode parameter
+     * @param openIdAssocHandle the provided association handle
+     * @param openIdSigned the signed OpenID fields
+     * @param openIdFields the fields as name-value pairs
+     * @param associationManager the OpenID RelyingPartySideAssociationManager to use
      */
     public OpenIdClientSignature(
-            SaneRequest         request,
-            String             identifier,
-            String             openIdSignature,
-            String             lidCookieString,
-            String             sessionId,
-            String             target,
-            String             nonce,
-            String             openIdMode,
-            String             openIdAssocHandle,
-            String             openIdSigned,
-            Map<String,String> openIdFields,
-            Context            context )
+            SaneRequest                        request,
+            String                             rpUrl,
+            String                             identifier,
+            String                             credential,
+            String                             lidCookieString,
+            String                             sessionId,
+            String                             target,
+            String                             realm,
+            String                             nonce,
+            LidNonceManager                    nonceManager,
+            String                             openIdMode,
+            String                             openIdAssocHandle,
+            String                             openIdSigned,
+            Map<String,String>                 openIdFields,
+            RelyingPartySideAssociationManager associationManager )
     {
-        super( request, identifier, openIdSignature, lidCookieString, sessionId, target, nonce, context );
+        super( request, rpUrl, identifier, credential, lidCookieString, sessionId, target, realm, nonce, nonceManager );
 
         theOpenIdMode              = openIdMode;
         theOpenIdAssociationHandle = openIdAssocHandle;
         theOpenIdSigned            = openIdSigned;
         theOpenIdFields            = openIdFields;
+        theAssociationManager      = associationManager;
     }
 
     /**
@@ -90,66 +98,28 @@ public class OpenIdClientSignature
     }
 
     /**
-      * The internal method that determines whether or not a request was signed, and if so,
-      * whether the signature is any good.
-      *
-      * @return true if the request was signed validly
-      * @throws AbortProcessingException thrown if an error occurred
-      */
-    protected MeshObject determineSignedGoodRequest(
-            MeshObject persona )
-        throws
-            IOException
+     * The internal method that determines whether or not a request was signed, and if so,
+     * whether the signature is any good.
+     *
+     * @return true if the Request is signed and the signature is good, false otherwise
+     */
+    protected boolean determineSignedGoodRequest()
     {
-        MeshObjectSet openIdServices = persona.getMeshBase().getMeshObjectSetFactory().createImmutableMeshObjectSet(
-                persona.traverse( YadisSubjectArea.SITE_MAKESUSEOF_SERVICE.getSource() ),
-                ByTypeMeshObjectSelector.create( OpenidSubjectArea.AUTHENTICATIONSERVICE ));
-
-        if( openIdServices.isEmpty() ) {
-            return null;
-        }
-        MeshObjectSet endpoints = openIdServices.traverse( YadisSubjectArea.SERVICE_ISPROVIDEDATENDPOINT_SITE.getSource() );
-
-        RelyingPartySideAssociationManager theAssociationManager = theContext.findContextObject( RelyingPartySideAssociationManager.class );
-        if( theAssociationManager == null ) {
-            log.error( "Cannot find RelyingPartySideAssociationManager in the context: OpenID validation not possible" );
-            return null;
-        }
-
-        RelyingPartySideAssociation theAssociation = null;
-        MeshObject                  foundEndpoint  = null;
-
-        for( MeshObject currentEndpoint : endpoints ) {
-            String endpointIdentifier = currentEndpoint.getIdentifier().toExternalForm();
-            theAssociation = theAssociationManager.get( endpointIdentifier );
-            if( theAssociation == null ) {
-                continue;
-            }
-            if(    !theAssociation.isCurrentlyValid()
-                || !theAssociation.getAssociationHandle().equals( theOpenIdAssociationHandle ) )
-            {
-                theAssociationManager.remove( endpointIdentifier );
-                theAssociation = null;
-            } else {
-                foundEndpoint = currentEndpoint;
-                break;
-            }
-        }
         if( theAssociation == null ) {
-            return null; // we don't do dumb mode
+            // this is not going to be multi-threaded
+            theAssociation = theAssociationManager.get( theOpenIdAssociationHandle );
         }
 
-        // FIXME nonces
-        // if( theRemotePersona != null && !theRemotePersona.isNewNonce() ) {
-        //     return false;
-        // }
+        if( theAssociation == null ) {
+            return false; // we don't do dumb mode
+        }
 
-        StringBuffer toSign1 = new StringBuffer( 256 );
+        StringBuilder toSign1 = new StringBuilder( 256 );
 
         StringTokenizer tokenizer = new StringTokenizer( theOpenIdSigned, "," );
         while( tokenizer.hasMoreTokens() ) {
             String field = tokenizer.nextToken();
-            String value = (String) theOpenIdFields.get( "openid." + field );
+            String value = theOpenIdFields.get( "openid." + field );
 
             toSign1.append( field ).append( ":" ).append( value );
             toSign1.append( "\n" );
@@ -160,10 +130,25 @@ public class OpenIdClientSignature
         String  locallySigned = Base64.base64encodeNoCr( hmacSha1 );
 
         if( locallySigned.equals( theCredential )) {
-            return foundEndpoint;
+            return true;
         } else {
-            return null;
+            return false;
         }
+    }
+
+    /**
+     * Obtain the URL of the identity provider's endpoint.
+     * 
+     * @return the identifier of the identity provider's endpoint, if any
+     */
+    public String getIdpEndpointIdentifier()
+    {
+        if( theAssociation == null ) {
+            // this is not going to be multi-threaded
+            theAssociation = theAssociationManager.get( theOpenIdAssociationHandle );
+        }
+        String ret = theAssociation.getServerUrl();
+        return ret;
     }
 
     /**
@@ -187,8 +172,17 @@ public class OpenIdClientSignature
     protected Map<String,String> theOpenIdFields;
 
     /**
+     * The RelyingPartyAssociationManager to use.
+     */
+    protected RelyingPartySideAssociationManager theAssociationManager;
+
+    /**
+     * The actual association, once it has been retried.
+     */
+    protected RelyingPartySideAssociation theAssociation;
+
+    /**
      * The name of the default OpenIdSignature credential type.
      */
     public static final String OPENID_CREDENTIAL_TYPE = "net.openid.credentialtype.HMAC-SHA1";
 }
-    

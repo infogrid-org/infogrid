@@ -15,12 +15,17 @@
 package org.infogrid.lid.openid;
 
 /**
- *
+ * Abstract supertype of an OpenID association.
  */
 public abstract class EitherSideAssociation
 {
     /**
      * Constructor.
+     * 
+     * @param associationHandle the unique identifier for the association
+     * @param sharedSecret the secret negotiated for the association
+     * @param issuedTime the time the association was created
+     * @param expiryTime the time the association will expire
      */
     protected EitherSideAssociation(
             String  associationHandle,

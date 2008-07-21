@@ -20,9 +20,9 @@ package org.infogrid.util;
  * However, I don't like that that interface isn't type-safe with respect to keys,
  * and so we are currently not inheriting from there.
  * 
- * @param K the type of key
- * @param V the type of value
- * @param A the type of argument
+ * @param <K> the type of key
+ * @param <V> the type of value
+ * @param <A> the type of argument
  */
 public interface SmartFactory<K,V,A>
         extends

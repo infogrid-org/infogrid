@@ -15,6 +15,7 @@
 package org.infogrid.util.TEST;
 
 import org.infogrid.testharness.AbstractTest;
+import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.Factory;
 import org.infogrid.util.MSmartFactory;
 import org.infogrid.util.logging.Log;
@@ -35,7 +36,7 @@ public class SmartFactoryTest3
         throws
             Exception
     {
-        Factory<String,Foo,Integer> delegateFactory = new Factory<String,Foo,Integer>() {
+        Factory<String,Foo,Integer> delegateFactory = new AbstractFactory<String,Foo,Integer>() {
             public Foo obtainFor(
                     String  key,
                     Integer argument )
