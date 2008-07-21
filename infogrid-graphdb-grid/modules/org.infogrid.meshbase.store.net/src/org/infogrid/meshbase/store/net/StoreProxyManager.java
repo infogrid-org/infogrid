@@ -19,7 +19,7 @@ import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.ProxyFactory;
 import org.infogrid.meshbase.net.proxy.ProxyManager;
 
-import org.infogrid.store.util.StoreBackedMap;
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
 
 import org.infogrid.util.AbstractSwappingHashMapListener;
 import org.infogrid.util.SwappingHashMap;
@@ -41,7 +41,7 @@ public class StoreProxyManager
      */
     public static StoreProxyManager create(
             ProxyFactory                                proxyFactory,
-            StoreBackedMap<NetMeshBaseIdentifier,Proxy> storage )
+            StoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> storage )
     {
         return new StoreProxyManager( proxyFactory, storage );
     }
@@ -54,7 +54,7 @@ public class StoreProxyManager
      */
     protected StoreProxyManager(
             ProxyFactory                                proxyFactory,
-            StoreBackedMap<NetMeshBaseIdentifier,Proxy> storage )
+            StoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> storage )
     {
         super( proxyFactory, storage );
 

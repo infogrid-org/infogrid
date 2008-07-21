@@ -48,8 +48,8 @@ import org.infogrid.store.IterableStore;
 import org.infogrid.store.Store;
 import org.infogrid.store.prefixing.IterablePrefixingStore;
 import org.infogrid.store.prefixing.PrefixingStore;
-import org.infogrid.store.util.IterableStoreBackedMap;
-import org.infogrid.store.util.StoreBackedMap;
+import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
 
@@ -413,8 +413,8 @@ public class LocalNetStoreMeshBase
         NetStoreMeshBaseEntryMapper objectMapper = new NetStoreMeshBaseEntryMapper();
         StoreProxyEntryMapper       proxyMapper  = new StoreProxyEntryMapper( proxyFactory );
 
-        StoreBackedMap<MeshObjectIdentifier,MeshObject>     objectStorage = StoreBackedMap.createWeak( objectMapper, meshObjectStore );
-        IterableStoreBackedMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedMap.createWeak( proxyMapper,  proxyStore );
+        StoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject>     objectStorage = StoreBackedSwappingHashMap.createWeak( objectMapper, meshObjectStore );
+        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( proxyMapper,  proxyStore );
 
         StoreProxyManager proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
 
@@ -467,7 +467,7 @@ public class LocalNetStoreMeshBase
             ModelBase                                       modelBase,
             AnetMeshBaseLifecycleManager                    life,
             NetAccessManager                                accessMgr,
-            StoreBackedMap<MeshObjectIdentifier,MeshObject> cache,
+            StoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> cache,
             StoreProxyManager                               proxyManager,
             ProbeManager                                    probeManager,
             Context                                         context )

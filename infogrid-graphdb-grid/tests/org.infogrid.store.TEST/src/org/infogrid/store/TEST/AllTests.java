@@ -34,8 +34,8 @@ public abstract class AllTests
         String [] subArgs = new String[] {};
         
         TestSpec [] tests = {
-                new TestSpec( StoreBackedMapTest1.class, subArgs ),
-                new TestSpec( StoreBackedMapTest2.class, subArgs ),
+                new TestSpec( StoreBackedSwappingHashMapTest1.class, subArgs ),
+                new TestSpec( StoreBackedSwappingHashMapTest2.class, subArgs ),
         };
 
         runTests( tests );
