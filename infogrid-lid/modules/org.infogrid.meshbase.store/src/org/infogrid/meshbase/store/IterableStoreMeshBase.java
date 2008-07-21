@@ -32,7 +32,7 @@ import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.sweeper.SweepStep;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.store.IterableStore;
-import org.infogrid.store.util.IterableStoreBackedMap;
+import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.logging.Log;
 
@@ -93,7 +93,7 @@ public class IterableStoreMeshBase
     {
         StoreMeshBaseEntryMapper objectMapper = new StoreMeshBaseEntryMapper();
         
-        IterableStoreBackedMap<MeshObjectIdentifier,MeshObject> objectStorage = IterableStoreBackedMap.createWeak( objectMapper, meshObjectStore );
+        IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = IterableStoreBackedSwappingHashMap.createWeak( objectMapper, meshObjectStore );
 
         MeshObjectIdentifierFactory identifierFactory = DefaultAMeshObjectIdentifierFactory.create();
         AMeshBaseLifecycleManager   life              = AMeshBaseLifecycleManager.create();
@@ -128,7 +128,7 @@ public class IterableStoreMeshBase
             ModelBase                                               modelBase,
             AMeshBaseLifecycleManager                               life,
             AccessManager                                           accessMgr,
-            IterableStoreBackedMap<MeshObjectIdentifier,MeshObject> cache,
+            IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> cache,
             Context                                                 context )
     {
         super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, context );

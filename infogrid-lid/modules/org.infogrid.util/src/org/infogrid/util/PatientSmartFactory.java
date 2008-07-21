@@ -29,9 +29,9 @@ import java.util.*;
  * <p>This currently blocks while objects are removed. This could potentially be made to
  *    be more friendly to Threads.</p>
  * 
- * @param K the type of key
- * @param V the type of value
- * @param A the type of argument
+ * @param <K> the type of key
+ * @param <V> the type of value
+ * @param <A> the type of argument
  */
 public class PatientSmartFactory<K,V,A>
         extends
@@ -52,22 +52,6 @@ public class PatientSmartFactory<K,V,A>
         super( delegateFactory, storage );
 
         theOngoingObjectCreations = new HashMap<K,Object>(); // FIXME? We don't know the right size here
-    }
-
-    /**
-     * Create a new, or obtain an already existing value for a provided key.
-     * This may be overridden by subclasses. Short-hand for "empty argument".
-     *
-     * @param key the key for which we want to obtain a value
-     * @return the found or created value for this key
-     * @throws FactoryException catch-all Exception, consider its cause
-     */
-    public V obtainFor(
-            K key )
-        throws
-            FactoryException
-    {
-        return obtainFor( key, null );
     }
 
     /**

@@ -43,7 +43,7 @@ import org.infogrid.probe.shadow.a.AShadowMeshBase;
 
 import org.infogrid.probe.shadow.proxy.DefaultShadowProxyPolicyFactory;
 import org.infogrid.store.IterableStore;
-import org.infogrid.store.util.IterableStoreBackedMap;
+import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
 
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.FactoryException;
@@ -135,7 +135,7 @@ public class StoreShadowMeshBase
         ShadowStoreProxyEntryMapper theProxyMapper = new ShadowStoreProxyEntryMapper( proxyFactory );
         
         MCachingHashMap<MeshObjectIdentifier,MeshObject>    objectStorage = MCachingHashMap.create();
-        IterableStoreBackedMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedMap.createWeak( theProxyMapper, proxyStore );
+        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( theProxyMapper, proxyStore );
 
         StoreProxyManager proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
 
@@ -189,7 +189,7 @@ public class StoreShadowMeshBase
         ShadowStoreProxyEntryMapper theProxyMapper = new ShadowStoreProxyEntryMapper( proxyFactory );
 
         MCachingHashMap<MeshObjectIdentifier,MeshObject>    objectStorage = MCachingHashMap.create();
-        IterableStoreBackedMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedMap.createWeak( theProxyMapper, proxyStore );
+        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( theProxyMapper, proxyStore );
 
         StoreProxyManager proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
 

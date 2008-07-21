@@ -14,24 +14,24 @@
 
 package org.infogrid.net.m;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.List;
+import org.infogrid.meshbase.net.NetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.net.NetMessageEndpoint;
 import org.infogrid.net.NetMessageEndpointFactory;
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-
-import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-import org.infogrid.meshbase.net.NetMeshBase;
-
+import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.NameServer;
 import org.infogrid.util.ResourceHelper;
-
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.List;
 
 /**
  *
  */
 public class MPingPongNetMessageEndpointFactory
+        extends
+            AbstractFactory<NetMeshBaseIdentifier,NetMessageEndpoint,NetMeshBaseIdentifier>
         implements
             NetMessageEndpointFactory
 {
