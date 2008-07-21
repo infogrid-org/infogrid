@@ -14,11 +14,8 @@
 
 package org.infogrid.kernel.active.TEST.objectset;
 
-import java.util.Comparator;
-import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.NotPermittedException;
-import org.infogrid.mesh.set.DefaultMeshObjectSorter;
+import org.infogrid.mesh.set.ByPropertyValueSorter;
 import org.infogrid.mesh.set.MeshObjectSorter;
 import org.infogrid.mesh.set.active.ActiveMeshObjectSetFactory;
 import org.infogrid.mesh.set.active.OrderedActiveMeshObjectSet;
@@ -27,7 +24,6 @@ import org.infogrid.meshbase.MeshBaseLifecycleManager;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
-import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.util.logging.Log;
 
@@ -39,7 +35,9 @@ public class ActiveMeshObjectSetTest8
         AbstractActiveMeshObjectSetTest
 {
     /**
-     * run the test
+     * Tun the test.
+     * 
+     * @throws Exception all kinds of things may go wrong during a test
      */
     public void run()
         throws
@@ -58,7 +56,7 @@ public class ActiveMeshObjectSetTest8
         tx.commitTransaction();
 
         int depth = 3;
-        MeshObjectSorter theSorter = new DefaultMeshObjectSorter( new TestComparator( typeX ) );
+        MeshObjectSorter theSorter = ByPropertyValueSorter.create( typeX );
 
         TestMeshObjectSet inputSet = new TestMeshObjectSet( theMeshObjectSetFactory, testData );
         dumpMeshObjectSet( inputSet, "TestData", typeX, log );
@@ -234,7 +232,14 @@ public class ActiveMeshObjectSetTest8
     }
 
     /**
-     * create one test object
+     * Create one test object.
+     * 
+     * @param life the lifecycle manager to create the test MeshObject
+     * @param eType the type of MeshObject
+     * @param pType the PropertyType of the property to set
+     * @param index the value of the property
+     * @return the created MeshObject
+     * @throws Exception all kinds of things may go wrong during a test
      */
     protected MeshObject createTestObject(
             MeshBaseLifecycleManager   life,
@@ -251,7 +256,9 @@ public class ActiveMeshObjectSetTest8
     }
 
     /**
-      * the main program
+      * Main program.
+     * 
+     * @param args command-line arguments
       */
     public static void main(
              String [] args )
@@ -283,8 +290,11 @@ public class ActiveMeshObjectSetTest8
     }
 
     /**
-      * constructor
-      */
+     * Constructor.
+     * 
+     * @param args command-line arguments
+     * @throws Exception all kinds of things may go wrong during a test
+     */
     public ActiveMeshObjectSetTest8(
             String [] args )
         throws
@@ -298,14 +308,17 @@ public class ActiveMeshObjectSetTest8
 
 
     /**
-     * the ActiveMeshObjectSet that contains our input data
+     * The ActiveMeshObjectSet that contains our input data.
      */
     static class TestMeshObjectSet
         extends
             ConstantActiveMMeshObjectSet
     {
         /**
-         * construct one
+         * Constructor.
+         * 
+         * @param factory the ActiveMeshObjectSetFactory
+         * @param data the data held by the set
          */
         public TestMeshObjectSet(
                 ActiveMeshObjectSetFactory factory,
@@ -315,7 +328,9 @@ public class ActiveMeshObjectSetTest8
         }
 
         /**
-         * add an object
+         * Add an object.
+         * 
+         * @param toAdd the object to add
          */
         public void add(
                 MeshObject toAdd  )
@@ -324,54 +339,14 @@ public class ActiveMeshObjectSetTest8
         }
 
         /**
-         * remove an object
+         * Remove an object.
+         * 
+         * @param toRemove the object to remove
          */
         public void remove(
                 MeshObject toRemove )
         {
             super.certainlyRemove( toRemove );
         }
-    }
-
-    /**
-     * Our sorter.
-     */
-    static class TestComparator
-        implements
-            Comparator<MeshObject>
-    {
-        /**
-         * The PropertyValue that we compare.
-         */
-        public TestComparator(
-                PropertyType propType )
-        {
-            thePropertyType = propType;
-        }
-
-        /**
-         * Comparison method
-         */
-        public int compare(
-                 MeshObject one,
-                 MeshObject two )
-        {
-            try {
-                PropertyValue oneValue = one.getPropertyValue( thePropertyType );
-                PropertyValue twoValue = two.getPropertyValue( thePropertyType );
-
-                return PropertyValue.compare( oneValue, twoValue );
-
-            } catch( IllegalPropertyTypeException ex ) {
-                return 0;
-            } catch( NotPermittedException ex ) {
-                return 0;
-            }
-        }
-        
-        /**
-         * The PropertyType by which to compare.
-         */
-        protected PropertyType thePropertyType;
     }
 }

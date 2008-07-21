@@ -34,22 +34,22 @@ import org.infogrid.util.logging.Log;
  * @param <K> the type of key
  * @param <V> the type of value
  */
-public abstract class IterableStoreBackedMap<K,V>
+public abstract class IterableStoreBackedSwappingHashMap<K,V>
         extends
-            StoreBackedMap<K,V>
+            StoreBackedSwappingHashMap<K,V>
 {
-    private static final Log log = Log.getLogInstance( IterableStoreBackedMap.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance( IterableStoreBackedSwappingHashMap.class  ); // our own, private logger
 
     /**
-     * Create a <code>IterableStoreBackedMap</code> that uses <code>SoftReferences</code>.
+     * Create a <code>IterableStoreBackedSwappingHashMap</code> that uses <code>SoftReferences</code>.
      * 
      * @param mapper the <code>SStoreEntryMapper/code> to use
      * @param store the underlying <code>IterableStore</code>
-     * @return the created <code>StoreBackedMap</code>
+     * @return the created <code>StoreBackedSwappingHashMap</code>
      * @param <K> the type of key
      * @param <V> the type of value
      */
-    public static <K,V> IterableStoreBackedMap<K,V> createSoft(
+    public static <K,V> IterableStoreBackedSwappingHashMap<K,V> createSoft(
             StoreEntryMapper<K,V> mapper,
             IterableStore         store )
     {
@@ -57,21 +57,21 @@ public abstract class IterableStoreBackedMap<K,V>
     }
     
     /**
-     * Create a <code>IterableStoreBackedMap</code> that uses <code>SoftReferences</code>.
+     * Create a <code>IterableStoreBackedSwappingHashMap</code> that uses <code>SoftReferences</code>.
      * 
-     * @param initialSize the initial size of the <code>IterableStoreBackedMap</code>
+     * @param initialSize the initial size of the <code>IterableStoreBackedSwappingHashMap</code>
      * @param mapper the <code>StStoreEntryMappercode> to use
      * @param store the underlying <code>IterableStore</code>
-     * @return the created <code>StoreBackedMap</code>
+     * @return the created <code>StoreBackedSwappingHashMap</code>
      * @param <K> the type of key
      * @param <V> the type of value
      */
-    public static <K,V> IterableStoreBackedMap<K,V> createSoft(
+    public static <K,V> IterableStoreBackedSwappingHashMap<K,V> createSoft(
             int                   initialSize,
             StoreEntryMapper<K,V> mapper,
             IterableStore         store )
     {
-        return new IterableStoreBackedMap<K,V>( initialSize, mapper, store ) {
+        return new IterableStoreBackedSwappingHashMap<K,V>( initialSize, mapper, store ) {
                 protected Reference<V> createReference(
                         K key,
                         V value )
@@ -82,13 +82,13 @@ public abstract class IterableStoreBackedMap<K,V>
     }
     
     /**
-     * Create a <code>IterableStoreBackedMap</code> that uses <code>WeakReferences</code>.
+     * Create a <code>IterableStoreBackedSwappingHashMap</code> that uses <code>WeakReferences</code>.
      * 
      * @param mapper the <code>SStoreEntryMapper/code> to use
      * @param store the underlying <code>IterableStore</code>
-     * @return the created <code>IterableStoreBackedMap</code>
+     * @return the created <code>IterableStoreBackedSwappingHashMap</code>
      */
-    public static <K,V> IterableStoreBackedMap<K,V> createWeak(
+    public static <K,V> IterableStoreBackedSwappingHashMap<K,V> createWeak(
             StoreEntryMapper<K,V> mapper,
             IterableStore         store )
     {
@@ -96,19 +96,19 @@ public abstract class IterableStoreBackedMap<K,V>
     }
     
     /**
-     * Create a <code>IterableStoreBackedMap</code> that uses <code>WeakReferences</code>.
+     * Create a <code>IterableStoreBackedSwappingHashMap</code> that uses <code>WeakReferences</code>.
      * 
-     * @param initialSize the initial size of the <code>IterableStoreBackedMap</code>
+     * @param initialSize the initial size of the <code>IterableStoreBackedSwappingHashMap</code>
      * @param mapper the <code>StStoreEntryMappercode> to use
      * @param store the underlying <code>IterableStore</code>
-     * @return the created <code>IterableStoreBackedMap</code>
+     * @return the created <code>IterableStoreBackedSwappingHashMap</code>
      */
-    public static <K,V,A> IterableStoreBackedMap<K,V> createWeak(
+    public static <K,V,A> IterableStoreBackedSwappingHashMap<K,V> createWeak(
             int                   initialSize,
             StoreEntryMapper<K,V> mapper,
             IterableStore         store )
     {
-        return new IterableStoreBackedMap<K,V>( initialSize, mapper, store ) {
+        return new IterableStoreBackedSwappingHashMap<K,V>( initialSize, mapper, store ) {
                 protected Reference<V> createReference(
                         K key,
                         V value )
@@ -121,11 +121,11 @@ public abstract class IterableStoreBackedMap<K,V>
     /**
      * Constructor.
      * 
-     * @param initialSize the initial size of the <code>IterableStoreBackedMap</code>
+     * @param initialSize the initial size of the <code>IterableStoreBackedSwappingHashMap</code>
      * @param mapper the <code>StStoreEntryMappercode> to use
      * @param store the underlying <code>IterableStore</code>
      */
-    protected IterableStoreBackedMap(
+    protected IterableStoreBackedSwappingHashMap(
             int                   initialSize,
             StoreEntryMapper<K,V> mapper,
             IterableStore         store )
@@ -134,7 +134,7 @@ public abstract class IterableStoreBackedMap<K,V>
     }
 
     /**
-     * Obtain the <code>IterableStore</code> that backs this <code>IterableStoreBackedMap</code>.
+     * Obtain the <code>IterableStore</code> that backs this <code>IterableStoreBackedSwappingHashMap</code>.
      *
      * @return the IterableStore
      */
@@ -167,7 +167,7 @@ public abstract class IterableStoreBackedMap<K,V>
     /**
      * Returns <tt>true</tt> if this map contains no key-value mappings.
      *
-     * @return true if this StoreBackedMap is empty
+     * @return true if this StoreBackedSwappingHashMap is empty
      */
     @Override
     public boolean isEmpty()
@@ -212,7 +212,7 @@ public abstract class IterableStoreBackedMap<K,V>
     {
         IterableStoreCursor delegate = ((IterableStore)theStore).iterator();
         
-        CursorIterator<K> ret = new StoreBackedMapKeysIterator<K,V>( delegate, this, theMapper, keyArrayComponentType );
+        CursorIterator<K> ret = new StoreBackedSwappingHashMapKeysIterator<K,V>( delegate, this, theMapper, keyArrayComponentType );
         return ret;
     }
     
@@ -230,12 +230,12 @@ public abstract class IterableStoreBackedMap<K,V>
     {
         IterableStoreCursor delegate = ((IterableStore)theStore).iterator();
         
-        CursorIterator<V> ret = new StoreBackedMapValuesIterator<K,V>( delegate, this, theMapper, keyArrayComponentType, valueArrayComponentType );
+        CursorIterator<V> ret = new StoreBackedSwappingHashMapValuesIterator<K,V>( delegate, this, theMapper, keyArrayComponentType, valueArrayComponentType );
         return ret;
     }
 
     /**
-     * Set of keys in this IterableStoreBackedMap.
+     * Set of keys in this IterableStoreBackedSwappingHashMap.
      */
     protected MyKeySet<K,V> theKeySet;
     
@@ -255,7 +255,7 @@ public abstract class IterableStoreBackedMap<K,V>
          * @param map the underlying map
          */
         public MyKeySet(
-                IterableStoreBackedMap<K,V> map )
+                IterableStoreBackedSwappingHashMap<K,V> map  )
         {
             theDelegate = map;
         }
@@ -288,9 +288,9 @@ public abstract class IterableStoreBackedMap<K,V>
         }
 
         /**
-         * The underlying IterableStoreBackedMap.
+         * The underlying IterableStoreBackedSwappingHashMap.
          */
-        protected IterableStoreBackedMap<K,V> theDelegate;
+        protected IterableStoreBackedSwappingHashMap<K,V> theDelegate;
     }
 
     /**
@@ -309,7 +309,7 @@ public abstract class IterableStoreBackedMap<K,V>
          * @param map the SwappingHashMap over whose values we iterate
          */
         public MyKeyIterator(
-                IterableStoreBackedMap<K,V> map )
+                IterableStoreBackedSwappingHashMap<K,V> map  )
         {
             theMap      = map;
             theDelegate = theMap.getStore().iterator();
@@ -353,8 +353,8 @@ public abstract class IterableStoreBackedMap<K,V>
         protected IterableStoreCursor theDelegate;
 
         /**
-         * The underlying IterableStoreBackedMap.
+         * The underlying IterableStoreBackedSwappingHashMap.
          */
-        protected IterableStoreBackedMap<K,V> theMap;
+        protected IterableStoreBackedSwappingHashMap<K,V> theMap;
     }
 }

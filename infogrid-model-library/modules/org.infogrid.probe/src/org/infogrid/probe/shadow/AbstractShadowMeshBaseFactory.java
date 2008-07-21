@@ -15,17 +15,19 @@
 package org.infogrid.probe.shadow;
 
 import org.infogrid.context.Context;
-
+import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.modelbase.ModelBase;
-
 import org.infogrid.net.NetMessageEndpointFactory;
-
 import org.infogrid.probe.ProbeDirectory;
+import org.infogrid.util.AbstractFactory;
 
 /**
  * This type knows how to create ShadowMeshBases.
  */
 public abstract class AbstractShadowMeshBaseFactory
+        extends
+            AbstractFactory<NetMeshBaseIdentifier,ShadowMeshBase,CoherenceSpecification>
         implements
             ShadowMeshBaseFactory
 {

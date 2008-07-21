@@ -556,6 +556,9 @@ public abstract class HTTP
                 case '&':
                     ret.append( "%26" );
                     break;
+                case '?':
+                    ret.append( "%3f" );
+                    break;
                 default:
                     ret.append( c );
                     break;
@@ -574,21 +577,25 @@ public abstract class HTTP
     public static String descapeUrlArgument(
             String s )
     {
-        int           len = s.length();
-        StringBuilder ret = new StringBuilder( len );
+        String ret = s.replaceAll( "%26", "&" );
+        ret        = ret.replaceAll( "%3[Ff]", "?" );
         
-        int startAt = 0;
-        int foundAt;
-        while( ( foundAt = s.indexOf( "%26", startAt )) >= 0 ) {
-            String sub = s.substring( startAt, foundAt );
-            ret.append( sub );
-            ret.append( '#' );
-            foundAt += 3;
-        }
-        String sub = s.substring( startAt );
-        ret.append( sub );
-
-        return ret.toString();
+        return ret;
+//        int           len = s.length();
+//        StringBuilder ret = new StringBuilder( len );
+//        
+//        int startAt = 0;
+//        int foundAt;
+//        while( ( foundAt = s.indexOf( "%26", startAt )) >= 0 ) {
+//            String sub = s.substring( startAt, foundAt );
+//            ret.append( sub );
+//            ret.append( '#' );
+//            foundAt += 3;
+//        }
+//        String sub = s.substring( startAt );
+//        ret.append( sub );
+//
+//        return ret.toString();
     }
 
     /**

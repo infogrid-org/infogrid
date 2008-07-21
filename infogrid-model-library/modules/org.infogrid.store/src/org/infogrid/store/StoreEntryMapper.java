@@ -18,8 +18,8 @@ package org.infogrid.store;
  * Classes implementing this interface know how to map key-value pairs, of a
  * parameterized type, into and from a <code>Store</code>.
  * 
- * @param K the type of key
- * @param V the type of value
+ * @param <K> the type of key
+ * @param <V> the type of value
  */
 public interface StoreEntryMapper<K,V>
 {

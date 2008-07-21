@@ -16,7 +16,7 @@ package org.infogrid.jee.security;
 
 import org.infogrid.store.Store;
 import org.infogrid.store.StoreEntryMapper;
-import org.infogrid.store.util.StoreBackedMap;
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
 
 /**
  * A simple implementation of FormTokenService that stores its tokens in a Store.
@@ -35,7 +35,7 @@ public class StoreFormTokenService
             Store store )
     {
         StoreEntryMapper<String,StoredFormToken> mapper = StoredFormTokenMapper.create();
-        StoreBackedMap<String,StoredFormToken>   map    = StoreBackedMap.createWeak( mapper, store );
+        StoreBackedSwappingHashMap<String,StoredFormToken>   map    = StoreBackedSwappingHashMap.createWeak( mapper, store );
 
         StoreFormTokenService ret = new StoreFormTokenService( map );
         return ret;
@@ -47,7 +47,7 @@ public class StoreFormTokenService
      * @param map manages the storage of tokens
      */
     protected StoreFormTokenService(
-            StoreBackedMap<String,StoredFormToken> map )
+            StoreBackedSwappingHashMap<String,StoredFormToken> map )
     {
         theMap = map;
     }
@@ -90,5 +90,5 @@ public class StoreFormTokenService
     /**
      * The Map that delegates to the Store.
      */
-    protected StoreBackedMap<String,StoredFormToken> theMap;
+    protected StoreBackedSwappingHashMap<String,StoredFormToken> theMap;
 }

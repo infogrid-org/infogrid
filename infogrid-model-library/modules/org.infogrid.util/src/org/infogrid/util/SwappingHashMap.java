@@ -37,8 +37,8 @@ import java.util.Set;
  * In the comments to this class, and in some of the method calls, this other place
  * is called "storage".
  * 
- * @param K the type of key
- * @param V the type of value
+ * @param <K> the type of key
+ * @param <V> the type of value
  */
 public abstract class SwappingHashMap<K,V>
         extends
@@ -469,7 +469,7 @@ public abstract class SwappingHashMap<K,V>
     /**
      * Common for SoftEntryReference and WeakEntryReference.
      * 
-     * @param K the type of key
+     * @param <K> the type of key
      */
     static interface EntryReference<K>
     {
@@ -484,8 +484,8 @@ public abstract class SwappingHashMap<K,V>
     /**
      * Override SoftReference to also hold the key.
      * 
-     * @param K the type of key
-     * @param V the type of value
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     protected static class SoftEntryReference<K,V>
             extends
@@ -529,8 +529,8 @@ public abstract class SwappingHashMap<K,V>
     /**
      * Override WeakReference to also hold the key.
      * 
-     * @param K the type of key
-     * @param V the type of value
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     protected static class WeakEntryReference<K,V>
             extends
@@ -574,8 +574,8 @@ public abstract class SwappingHashMap<K,V>
     /**
      * This class is instantiated to create a "projection" of the values in the MyReferenceMap.
      * 
-     * @param K the type of key
-     * @param V the type of value
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     protected static class MyValueCollection<K,V>
             extends
@@ -621,8 +621,8 @@ public abstract class SwappingHashMap<K,V>
     /**
      * Iterator over the MyValueCollection.
      * 
-     * @param K the type of key
-     * @param V the type of value
+     * @param <K> the type of key
+     * @param <V> the type of value
      */
     static class MyValueIterator<K,V>
             implements

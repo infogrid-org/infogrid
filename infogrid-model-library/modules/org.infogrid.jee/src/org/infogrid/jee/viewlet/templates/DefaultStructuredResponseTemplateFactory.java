@@ -17,15 +17,15 @@ package org.infogrid.jee.viewlet.templates;
 import javax.servlet.RequestDispatcher;
 import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.rest.RestfulRequest;
-import org.infogrid.util.Factory;
+import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.FactoryException;
 
 /**
  * A default implementation for a StructuredResponseTemplateFactory.
  */
 public class DefaultStructuredResponseTemplateFactory
-        implements
-            Factory<RestfulRequest,StructuredResponseTemplate,StructuredResponse>
+        extends
+            AbstractFactory<RestfulRequest,StructuredResponseTemplate,StructuredResponse>
 {
     /**
      * Factory method.

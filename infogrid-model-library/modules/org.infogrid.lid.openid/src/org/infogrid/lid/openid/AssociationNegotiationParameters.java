@@ -19,12 +19,15 @@ import org.infogrid.crypto.diffiehellman.DiffieHellmanEndpoint;
 import java.math.BigInteger;
 
 /**
- *
+ * Collects the parameters conveyed by the RelyingParty to the IdentityProvider
+ * when attempting to negotiate an OpenID association.
  */
 public class AssociationNegotiationParameters
 {
     /**
-     * Factory
+     * Factory.
+     * 
+     * @return default AssociationNegotiationParameters
      */
     public static AssociationNegotiationParameters createWithDefaults()
     {
@@ -33,6 +36,10 @@ public class AssociationNegotiationParameters
 
     /**
      * Constructor.
+     * 
+     * @param wantedAssociationType the desired association type
+     * @param wantedSessionType the desired session type
+     * @param wantedDh the desired DiffieHellmanEndpoint
      */
     protected AssociationNegotiationParameters(
             String                wantedAssociationType,

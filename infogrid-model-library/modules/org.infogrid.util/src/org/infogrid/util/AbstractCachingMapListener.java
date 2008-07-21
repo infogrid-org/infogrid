@@ -27,7 +27,7 @@ public abstract class AbstractCachingMapListener
      *
      * @param event the event
      */
-    public void swappingHashMapElementAdded(
+    public void mapElementAdded(
             CachingMapEvent.Added event )
     {
         // no op
@@ -38,7 +38,7 @@ public abstract class AbstractCachingMapListener
      *
      * @param event the event
      */
-    public void swappingHashMapElementRemoved(
+    public void mapElementRemoved(
             CachingMapEvent.Removed event )
     {
         // no op
@@ -49,7 +49,7 @@ public abstract class AbstractCachingMapListener
      *
      * @param event the event
      */
-    public void swappingHashMapElementExpired(
+    public void mapElementExpired(
             CachingMapEvent.Expired event )
     {
         // no op

@@ -14,11 +14,11 @@
 
 package org.infogrid.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 import org.infogrid.util.logging.Log;
-
-import java.beans.*;
-import java.lang.ref.*;
-import java.util.*;
 
 /**
  * A simple {@link SmartFactory} implementation that stores the set of previously created
@@ -26,11 +26,13 @@ import java.util.*;
  * class assumes that object creation by the delegate {@link Factory} is fast. If it is not,
  * use {@link PatientSmartFactory PatientSmartFactory} instead of this class.
  * 
- * @param K the type of key
- * @param V the type of value
- * @param A the type of argument
+ * @param <K> the type of key
+ * @param <V> the type of value
+ * @param <A> the type of argument
  */
 public class MSmartFactory<K,V,A>
+        extends
+            AbstractFactory<K,V,A>
         implements
             SmartFactory<K,V,A>
 {
@@ -42,6 +44,9 @@ public class MSmartFactory<K,V,A>
      * @param delegateFactory the Factory that knows how to instantiate values
      * @param storage the storage to use
      * @return the created SmartFactory
+     * @param <K> the type of key
+     * @param <V> the type of value
+     * @param <A> the type of argument
      */
     public static <K,V,A> MSmartFactory<K, V, A> create(
             Factory<K,V,A>  delegateFactory,
@@ -55,6 +60,9 @@ public class MSmartFactory<K,V,A>
      *
      * @param delegateFactory the Factory that knows how to instantiate values
      * @return the created SmartFactory
+     * @param <K> the type of key
+     * @param <V> the type of value
+     * @param <A> the type of argument
      */
     public static <K,V,A> MSmartFactory<K, V, A> createDirect(
             Factory<K,V,A> delegateFactory )
@@ -68,6 +76,9 @@ public class MSmartFactory<K,V,A>
      *
      * @param delegateFactory the Factory that knows how to instantiate values
      * @return the created SmartFactory
+     * @param <K> the type of key
+     * @param <V> the type of value
+     * @param <A> the type of argument
      */
     public static <K,V,A> MSmartFactory<K, V, A> createSoftReference(
             Factory<K,V,A> delegateFactory )
@@ -81,6 +92,9 @@ public class MSmartFactory<K,V,A>
      *
      * @param delegateFactory the Factory that knows how to instantiate values
      * @return the created SmartFactory
+     * @param <K> the type of key
+     * @param <V> the type of value
+     * @param <A> the type of argument
      */
     public static <K,V,A> MSmartFactory<K, V, A> createWeakReference(
             Factory<K,V,A> delegateFactory )

@@ -52,59 +52,7 @@
             <username>OpenID Authentication Service (version 1)</username>
             <userdescription>This represents an OpenID Authentication Service (version 1)</userdescription>
             <supertype>http://openid.net/signon/</supertype>
-            <implementsMethod><![CDATA[
-    public String determineRedirectUrl(
-            MeshObject                   principal,
-            String                       here,
-            String                       trustRoot,
-            org.infogrid.context.Context context )
-        throws
-            org.infogrid.mesh.NotPermittedException,
-            org.infogrid.util.FactoryException
-    {
-        org.infogrid.mesh.set.MeshObjectSet endpoints = traverse(
-                org.infogrid.lid.yadis.YadisSubjectArea.SERVICE_ISPROVIDEDATENDPOINT_SITE.getSource() );
-        if( endpoints.isEmpty() ) {
-            throw new IllegalArgumentException( "no Endpoint found" );
-        }
-        // FIXME, should use more complex selection algorithm
-        MeshObject selectedEndpoint = endpoints.getMeshObjects()[0];
-        String     endpointUrl      = selectedEndpoint.getIdentifier().toExternalForm();
-        String     theDelegate      = getDelegate() != null ? getDelegate().value() : null;
-        String     theUrl           = principal.getIdentifier().toExternalForm();
-
-        if( trustRoot == null ) {
-            trustRoot = here;
-        }
-
-        StringBuffer ret = new StringBuffer();
-        ret.append( org.infogrid.util.http.HTTP.appendArgumentToUrl( endpointUrl, "openid.mode=checkid_setup" ));
-        if( theDelegate != null ) {
-            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theDelegate ));
-        } else {
-            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theUrl ));
-        }
-
-        // add a nonce to the return-to URL
-        String nonce = org.infogrid.lid.LidNonceGenerator.generateNewNonce();
-            
-        here = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-nonce=" + org.infogrid.util.http.HTTP.encodeUrl( nonce ));
-
-        ret.append( "&openid.return_to="  ).append( org.infogrid.util.http.HTTP.encodeUrl( here ));
-        ret.append( "&openid.trust_root=" ).append( org.infogrid.util.http.HTTP.encodeUrl( trustRoot ));
-
-        org.infogrid.lid.openid.RelyingPartySideAssociationManager assocMgr
-                = (org.infogrid.lid.openid.RelyingPartySideAssociationManager) context.findContextObject(
-                        org.infogrid.lid.openid.RelyingPartySideAssociationManager.class );
-        org.infogrid.lid.openid.RelyingPartySideAssociation association = assocMgr.obtainFor( endpointUrl );
-                // may throw exception
-
-        if( association != null ) {
-            ret.append( "&openid.assoc_handle=" ).append( org.infogrid.util.http.HTTP.encodeUrl( association.getAssociationHandle() ));
-        }
-        return ret.toString();
-    }        
-          ]]></implementsMethod>
+            <isabstract/>
         </entitytype>        
 
         <entitytype ID="http://openid.net/signon/1.0">
@@ -122,11 +70,20 @@
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.util.FactoryException
     {
+        org.infogrid.lid.openid.RelyingPartySideAssociationManager assocMgr
+                = (org.infogrid.lid.openid.RelyingPartySideAssociationManager) context.findContextObjectOrThrow(
+                        org.infogrid.lid.openid.RelyingPartySideAssociationManager.class );
+                        
+        org.infogrid.lid.LidNonceManager nonceMgr
+                = (org.infogrid.lid.LidNonceManager) context.findContextObjectOrThrow(
+                        org.infogrid.lid.LidNonceManager.class );
+
         org.infogrid.mesh.set.MeshObjectSet endpoints = traverse(
                 org.infogrid.lid.yadis.YadisSubjectArea.SERVICE_ISPROVIDEDATENDPOINT_SITE.getSource() );
         if( endpoints.isEmpty() ) {
-            throw new IllegalArgumentException( "no Endpoint found" );
+            return null;
         }
+
         // FIXME, should use more complex selection algorithm
         MeshObject selectedEndpoint = endpoints.getMeshObjects()[0];
         String     endpointUrl      = selectedEndpoint.getIdentifier().toExternalForm();
@@ -137,7 +94,7 @@
             trustRoot = here;
         }
 
-        StringBuffer ret = new StringBuffer();
+        StringBuilder ret = new StringBuilder();
         ret.append( org.infogrid.util.http.HTTP.appendArgumentToUrl( endpointUrl, "openid.mode=checkid_setup" ));
         if( theDelegate != null ) {
             ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theDelegate ));
@@ -146,16 +103,13 @@
         }
 
         // add a nonce to the return-to URL
-        String nonce = org.infogrid.lid.LidNonceGenerator.generateNewNonce();
+        String nonce = nonceMgr.generateNewNonce();
             
         here = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-nonce=" + org.infogrid.util.http.HTTP.encodeUrl( nonce ));
 
         ret.append( "&openid.return_to="  ).append( org.infogrid.util.http.HTTP.encodeUrl( here ));
         ret.append( "&openid.trust_root=" ).append( org.infogrid.util.http.HTTP.encodeUrl( trustRoot ));
 
-        org.infogrid.lid.openid.RelyingPartySideAssociationManager assocMgr
-                = (org.infogrid.lid.openid.RelyingPartySideAssociationManager) context.findContextObject(
-                        org.infogrid.lid.openid.RelyingPartySideAssociationManager.class );
         org.infogrid.lid.openid.RelyingPartySideAssociation association = assocMgr.obtainFor( endpointUrl );
                 // may throw exception
 
@@ -182,11 +136,20 @@
             org.infogrid.mesh.NotPermittedException,
             org.infogrid.util.FactoryException
     {
+        org.infogrid.lid.openid.RelyingPartySideAssociationManager assocMgr
+                = (org.infogrid.lid.openid.RelyingPartySideAssociationManager) context.findContextObjectOrThrow(
+                        org.infogrid.lid.openid.RelyingPartySideAssociationManager.class );
+                        
+        org.infogrid.lid.LidNonceManager nonceMgr
+                = (org.infogrid.lid.LidNonceManager) context.findContextObjectOrThrow(
+                        org.infogrid.lid.LidNonceManager.class );
+
         org.infogrid.mesh.set.MeshObjectSet endpoints = traverse(
                 org.infogrid.lid.yadis.YadisSubjectArea.SERVICE_ISPROVIDEDATENDPOINT_SITE.getSource() );
         if( endpoints.isEmpty() ) {
-            throw new IllegalArgumentException( "no Endpoint found" );
+            return null;
         }
+
         // FIXME, should use more complex selection algorithm
         MeshObject selectedEndpoint = endpoints.getMeshObjects()[0];
         String     endpointUrl      = selectedEndpoint.getIdentifier().toExternalForm();
@@ -197,37 +160,34 @@
             trustRoot = here;
         }
 
-        StringBuffer ret = new StringBuffer();
+        StringBuilder ret = new StringBuilder();
         ret.append( org.infogrid.util.http.HTTP.appendArgumentToUrl( endpointUrl, "openid.mode=checkid_setup" ));
         if( theDelegate != null ) {
-            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theDelegate ));
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.escapeUrlArgument( theDelegate ));
         } else {
-            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theUrl ));
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.escapeUrlArgument( theUrl ));
         }
 
         // add a nonce to the return-to URL
-        String nonce = org.infogrid.lid.LidNonceGenerator.generateNewNonce();
+        String nonce = nonceMgr.generateNewNonce();
             
-        here = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-nonce=" + org.infogrid.util.http.HTTP.encodeUrl( nonce ));
+        here = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-nonce=" + org.infogrid.util.http.HTTP.escapeUrlArgument( nonce ));
 
-        ret.append( "&openid.return_to="  ).append( org.infogrid.util.http.HTTP.encodeUrl( here ));
-        ret.append( "&openid.trust_root=" ).append( org.infogrid.util.http.HTTP.encodeUrl( trustRoot ));
+        ret.append( "&openid.return_to="  ).append( org.infogrid.util.http.HTTP.escapeUrlArgument( here ));
+        ret.append( "&openid.trust_root=" ).append( org.infogrid.util.http.HTTP.escapeUrlArgument( trustRoot ));
 
-        org.infogrid.lid.openid.RelyingPartySideAssociationManager assocMgr
-                = (org.infogrid.lid.openid.RelyingPartySideAssociationManager) context.findContextObject(
-                        org.infogrid.lid.openid.RelyingPartySideAssociationManager.class );
         org.infogrid.lid.openid.RelyingPartySideAssociation association = assocMgr.obtainFor( endpointUrl );
                 // may throw exception
 
         if( association != null ) {
-            ret.append( "&openid.assoc_handle=" ).append( org.infogrid.util.http.HTTP.encodeUrl( association.getAssociationHandle() ));
+            ret.append( "&openid.assoc_handle=" ).append( org.infogrid.util.http.HTTP.escapeUrlArgument( association.getAssociationHandle() ));
         }
         return ret.toString();
     }        
           ]]></implementsMethod>
         </entitytype>
 
-        <entitytype ID="http://openid.net/signon/2.0">
+        <entitytype ID="http://specs.openid.net/auth/2.0/signon">
             <name>Authentication2Service</name>
             <username>OpenID Authentication Service (version 2)</username>
             <userdescription>This represents an OpenID Authentication Service (version 2)</userdescription>

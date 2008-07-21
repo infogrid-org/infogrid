@@ -14,13 +14,18 @@
 
 package org.infogrid.meshbase.net.proxy;
 
+import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.util.AbstractFactory;
 
 /**
  * Factors out common functionality of ProxyFactories.
  */
 public abstract class AbstractProxyFactory
+        extends
+            AbstractFactory<NetMeshBaseIdentifier,Proxy,CoherenceSpecification>
         implements
             ProxyFactory
 {

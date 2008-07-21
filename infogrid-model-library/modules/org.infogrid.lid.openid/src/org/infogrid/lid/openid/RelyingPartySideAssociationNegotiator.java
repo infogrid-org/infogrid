@@ -14,13 +14,6 @@
 
 package org.infogrid.lid.openid;
 
-import org.infogrid.crypto.diffiehellman.DiffieHellmanEndpoint;
-import org.infogrid.util.Base64;
-import org.infogrid.util.Factory;
-import org.infogrid.util.FactoryException;
-import org.infogrid.util.http.HTTP;
-import org.infogrid.util.logging.Log;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -28,18 +21,26 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
+import org.infogrid.crypto.diffiehellman.DiffieHellmanEndpoint;
+import org.infogrid.util.AbstractFactory;
+import org.infogrid.util.Base64;
+import org.infogrid.util.FactoryException;
+import org.infogrid.util.http.HTTP;
+import org.infogrid.util.logging.Log;
 
 /**
  * Negotiates a new RelyingPartySideAssociation by acting as a Factory for RelyingPartySideAssociations.
  */
 public class RelyingPartySideAssociationNegotiator
-        implements
-            Factory<String,RelyingPartySideAssociation,AssociationNegotiationParameters>
+        extends
+            AbstractFactory<String,RelyingPartySideAssociation,AssociationNegotiationParameters>
 {
     private static final Log log = Log.getLogInstance( RelyingPartySideAssociationNegotiator.class ); // our own, private logger
 
     /**
      * Factory method.
+     * 
+     * @return the created RelyingPartySideAssociationNegotiator
      */
     public static RelyingPartySideAssociationNegotiator create()
     {
@@ -192,7 +193,6 @@ public class RelyingPartySideAssociationNegotiator
         ret.checkCompleteness();        
         return ret;
     }
-
 
     /**
      * The OpenID V1.0 timestamp format.

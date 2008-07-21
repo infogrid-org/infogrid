@@ -41,7 +41,7 @@ import org.infogrid.meshbase.sweeper.SweepStep;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.net.NetMessageEndpointFactory;
 import org.infogrid.store.IterableStore;
-import org.infogrid.store.util.IterableStoreBackedMap;
+import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.logging.Log;
 
@@ -165,8 +165,8 @@ public class IterableNetStoreMeshBase
         NetStoreMeshBaseEntryMapper objectMapper = new NetStoreMeshBaseEntryMapper();
         StoreProxyEntryMapper       proxyMapper  = new StoreProxyEntryMapper( proxyFactory );
         
-        IterableStoreBackedMap<MeshObjectIdentifier,MeshObject> objectStorage = IterableStoreBackedMap.createWeak( objectMapper, meshObjectStore );
-        IterableStoreBackedMap<NetMeshBaseIdentifier,Proxy>     proxyStorage  = IterableStoreBackedMap.createWeak( proxyMapper,  proxyStore );
+        IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = IterableStoreBackedSwappingHashMap.createWeak( objectMapper, meshObjectStore );
+        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy>     proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( proxyMapper,  proxyStore );
 
         NetMeshObjectIdentifierFactory identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( identifier );
         AnetMeshBaseLifecycleManager   life              = AnetMeshBaseLifecycleManager.create();
@@ -216,7 +216,7 @@ public class IterableNetStoreMeshBase
             ModelBase                                               modelBase,
             AnetMeshBaseLifecycleManager                            life,
             NetAccessManager                                        accessMgr,
-            IterableStoreBackedMap<MeshObjectIdentifier,MeshObject> cache,
+            IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> cache,
             StoreProxyManager                                       proxyManager,
             Context                                                 context )
     {
