@@ -21,7 +21,7 @@ import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.store.StoreShadowMeshBaseFactory;
 
 import org.infogrid.store.IterableStore;
-import org.infogrid.store.util.IterableStoreBackedMap;
+import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
 
 import org.infogrid.util.AbstractSwappingHashMapListener;
 import org.infogrid.util.SwappingHashMap;
@@ -45,7 +45,7 @@ public class StoreScheduledExecutorProbeManager
     {
         StoreProbeManagerMapper theMapper = new StoreProbeManagerMapper( delegate );
 
-        IterableStoreBackedMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = IterableStoreBackedMap.createWeak( theMapper, shadowStore );
+        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = IterableStoreBackedSwappingHashMap.createWeak( theMapper, shadowStore );
 
         StoreScheduledExecutorProbeManager ret = new StoreScheduledExecutorProbeManager( delegate, storage );
 
@@ -60,7 +60,7 @@ public class StoreScheduledExecutorProbeManager
      */
     protected StoreScheduledExecutorProbeManager(
             StoreShadowMeshBaseFactory                                   delegate,
-            IterableStoreBackedMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
+            IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
     {
         super( delegate, storage );
 

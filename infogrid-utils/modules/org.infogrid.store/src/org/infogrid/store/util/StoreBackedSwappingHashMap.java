@@ -37,22 +37,22 @@ import java.lang.ref.Reference;
  * @param <K> the type of key
  * @param <V> the type of value
  */
-public abstract class StoreBackedMap<K,V>
+public abstract class StoreBackedSwappingHashMap<K,V>
         extends
             SwappingHashMap<K,V>
 {
-    private static final Log log = Log.getLogInstance( StoreBackedMap.class );
+    private static final Log log = Log.getLogInstance( StoreBackedSwappingHashMap.class  );
 
     /**
-     * Create a <code>StoreBackedMap</code> that uses <code>SoftReferences</code>.
+     * Create a <code>StoreBackedSwappingHashMap</code> that uses <code>SoftReferences</code>.
      * 
      * @param mapper the <code>StoreEntryMapper</code> to use
      * @param store the underlying <code>Store</code>
-     * @return the created <code>StoreBackedMap</code>
+     * @return the created <code>StoreBackedSwappingHashMap</code>
      * @param <K> the type of key
      * @param <V> the type of value
      */
-    public static <K,V> StoreBackedMap<K,V> createSoft(
+    public static <K,V> StoreBackedSwappingHashMap<K,V> createSoft(
             StoreEntryMapper<K,V> mapper,
             Store                 store )
     {
@@ -60,21 +60,21 @@ public abstract class StoreBackedMap<K,V>
     }
     
     /**
-     * Create a <code>StoreBackedMap</code> that uses <code>SoftReferences</code>.
+     * Create a <code>StoreBackedSwappingHashMap</code> that uses <code>SoftReferences</code>.
      * 
-     * @param initialSize the initial size of the <code>StoreBackedMap</code>
+     * @param initialSize the initial size of the <code>StoreBackedSwappingHashMap</code>
      * @param mapper the <code>StoreEntryMapper</code> to use
      * @param store the underlying <code>Store</code>
-     * @return the created <code>StoreBackedMap</code>
+     * @return the created <code>StoreBackedSwappingHashMap</code>
      * @param <K> the type of key
      * @param <V> the type of value
      */
-    public static <K,V> StoreBackedMap<K,V> createSoft(
+    public static <K,V> StoreBackedSwappingHashMap<K,V> createSoft(
             int                   initialSize,
             StoreEntryMapper<K,V> mapper,
             Store                 store )
     {
-        return new StoreBackedMap<K,V>( initialSize, mapper, store ) {
+        return new StoreBackedSwappingHashMap<K,V>( initialSize, mapper, store ) {
                 protected Reference<V> createReference(
                         K key,
                         V value )
@@ -85,15 +85,15 @@ public abstract class StoreBackedMap<K,V>
     }
     
     /**
-     * Create a <code>StoreBackedMap</code> that uses <code>WeakReferences</code>.
+     * Create a <code>StoreBackedSwappingHashMap</code> that uses <code>WeakReferences</code>.
      * 
      * @param mapper the <code>StoreEntryMapper</code> to use
      * @param store the underlying <code>Store</code>
-     * @return the created <code>StoreBackedMap</code>
+     * @return the created <code>StoreBackedSwappingHashMap</code>
      * @param <K> the type of key
      * @param <V> the type of value
      */
-    public static <K,V> StoreBackedMap<K,V> createWeak(
+    public static <K,V> StoreBackedSwappingHashMap<K,V> createWeak(
             StoreEntryMapper<K,V> mapper,
             Store                 store )
     {
@@ -101,21 +101,21 @@ public abstract class StoreBackedMap<K,V>
     }
     
     /**
-     * Create a <code>StoreBackedMap</code> that uses <code>WeakReferences</code>.
+     * Create a <code>StoreBackedSwappingHashMap</code> that uses <code>WeakReferences</code>.
      * 
-     * @param initialSize the initial size of the <code>StoreBackedMap</code>
+     * @param initialSize the initial size of the <code>StoreBackedSwappingHashMap</code>
      * @param mapper the <code>StoreEntryMapper</code> to use
      * @param store the underlying <code>Store</code>
-     * @return the created <code>StoreBackedMap</code>
+     * @return the created <code>StoreBackedSwappingHashMap</code>
      * @param <K> the type of key
      * @param <V> the type of value
      */
-    public static <K,V> StoreBackedMap<K,V> createWeak(
+    public static <K,V> StoreBackedSwappingHashMap<K,V> createWeak(
             int                   initialSize,
             StoreEntryMapper<K,V> mapper,
             Store                 store )
     {
-        return new StoreBackedMap<K,V>( initialSize, mapper, store ) {
+        return new StoreBackedSwappingHashMap<K,V>( initialSize, mapper, store ) {
                 protected Reference<V> createReference(
                         K key,
                         V value )
@@ -128,11 +128,11 @@ public abstract class StoreBackedMap<K,V>
     /**
      * Constructor.
      * 
-     * @param initialSize the initial size of the <code>StoreBackedMap</code>
+     * @param initialSize the initial size of the <code>StoreBackedSwappingHashMap</code>
      * @param mapper the <code>StoreEntryMapper</code> to use
      * @param store the underlying <code>Store</code>
      */
-    protected StoreBackedMap(
+    protected StoreBackedSwappingHashMap(
             int                   initialSize,
             StoreEntryMapper<K,V> mapper,
             Store                 store )
@@ -144,7 +144,7 @@ public abstract class StoreBackedMap<K,V>
     }
     
     /**
-     * Obtain the <code>Store</code> that backs this <code>StoreBackedMap</code>.
+     * Obtain the <code>Store</code> that backs this <code>StoreBackedSwappingHashMap</code>.
      *
      * @return the Store
      */
@@ -241,7 +241,7 @@ public abstract class StoreBackedMap<K,V>
     /**
      * Returns <tt>true</tt> if this map contains no key-value mappings.
      *
-     * @return true if this StoreBackedMap is empty
+     * @return true if this StoreBackedSwappingHashMap is empty
      */
     @Override
     public boolean isEmpty()
@@ -385,7 +385,7 @@ public abstract class StoreBackedMap<K,V>
     }
 
     /**
-     * The <code>Store</code> by which this <code>StoreBackedMap</code> is backed.
+     * The <code>Store</code> by which this <code>StoreBackedSwappingHashMap</code> is backed.
      */
     protected Store theStore;
 

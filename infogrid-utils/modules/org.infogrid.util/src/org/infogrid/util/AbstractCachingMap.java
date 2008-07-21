@@ -17,8 +17,8 @@ package org.infogrid.util;
 /**
  * Factors out common functionality for {@link CachingMap} implementations.
  * 
- * @param K the type of key
- * @param V the type of value
+ * @param <K> the type of key
+ * @param <V> the type of value
  */
 public abstract class AbstractCachingMap<K,V>
         implements
@@ -135,19 +135,19 @@ public abstract class AbstractCachingMap<K,V>
                     protected void fireEventToListener(
                             CachingMapListener l,
                             CachingMapEvent    e,
-                            Integer              p )
+                            Integer            p )
                     {
                         switch( p.intValue() ) {
                             case 0:
-                                l.swappingHashMapElementAdded( (CachingMapEvent.Added) e );
+                                l.mapElementAdded( (CachingMapEvent.Added) e );
                                 break;
 
                             case 1:
-                                l.swappingHashMapElementRemoved( (CachingMapEvent.Removed) e );
+                                l.mapElementRemoved( (CachingMapEvent.Removed) e );
                                 break;
 
                             case 2:
-                                l.swappingHashMapElementExpired( (CachingMapEvent.Expired) e );
+                                l.mapElementExpired( (CachingMapEvent.Expired) e );
                                 break;
                         }
                     }

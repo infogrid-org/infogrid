@@ -17,9 +17,9 @@ package org.infogrid.util;
 /**
  * Defines the InfoGrid version of the factory pattern.
  * 
- * @param K the type of key
- * @param V the type of value
- * @param A the type of argument
+ * @param <K> the type of key
+ * @param <V> the type of value
+ * @param <A> the type of argument
  */
 public interface Factory<K,V,A>
 {
@@ -34,6 +34,18 @@ public interface Factory<K,V,A>
     public abstract V obtainFor(
             K key,
             A argument )
+        throws
+            FactoryException;
+
+    /**
+     * Factory method. This is equivalent to specifying a null argument.
+     *
+     * @param key the key information required for object creation, if any
+     * @return the created object
+     * @throws FactoryException catch-all Exception, consider its cause
+     */
+    public abstract V obtainFor(
+            K key )
         throws
             FactoryException;
 }

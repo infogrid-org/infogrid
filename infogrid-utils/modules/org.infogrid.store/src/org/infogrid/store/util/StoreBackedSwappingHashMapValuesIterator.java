@@ -23,12 +23,12 @@ import org.infogrid.util.CursorIterator;
 import java.util.NoSuchElementException;
 
 /**
- * Iterates over the values in a StoreBackedMap.
+ * Iterates over the values in a StoreBackedSwappingHashMap.
  * 
  * @param <K> the type of key
  * @param <V> the type of value
  */
-public class StoreBackedMapValuesIterator<K,V>
+public class StoreBackedSwappingHashMapValuesIterator<K,V>
         extends
             AbstractCursorIterator<V>
 {
@@ -41,24 +41,24 @@ public class StoreBackedMapValuesIterator<K,V>
      * @param keysArrayComponentClass the Class to use when returning arrays of keys
      * @param valuesArrayComponentClass the Class to use when returning arrays of values
      */
-    public StoreBackedMapValuesIterator(
+    public StoreBackedSwappingHashMapValuesIterator(
             IterableStoreCursor   delegate,
-            StoreBackedMap<K,V>   cache,
+            StoreBackedSwappingHashMap<K,V>   cache,
             StoreEntryMapper<K,V> mapper,
             Class<K>              keysArrayComponentClass,
             Class<V>              valuesArrayComponentClass )
     {
         super( valuesArrayComponentClass );
-        theKeysIterator = new StoreBackedMapKeysIterator<K,V>( delegate, cache, mapper, keysArrayComponentClass );
+        theKeysIterator = new StoreBackedSwappingHashMapKeysIterator<K,V>( delegate, cache, mapper, keysArrayComponentClass );
     }
 
     /**
      * Private copy-constructor.
      * 
-     * @param old the StoreBackedMapValuesIterator to clone
+     * @param old the StoreBackedSwappingHashMapValuesIterator to clone
      */
-    protected StoreBackedMapValuesIterator(
-            StoreBackedMapValuesIterator<K,V> old )
+    protected StoreBackedSwappingHashMapValuesIterator(
+            StoreBackedSwappingHashMapValuesIterator<K,V> old  )
     {
         super( old.theArrayComponentType );
 
@@ -181,7 +181,7 @@ public class StoreBackedMapValuesIterator<K,V>
         K [] keys = theKeysIterator.next( n );
         V [] ret = ArrayHelper.createArray( theArrayComponentType, keys.length );
 
-        StoreBackedMap<K,V> map = theKeysIterator.getMap();
+        StoreBackedSwappingHashMap<K,V> map = theKeysIterator.getMap();
         
         for( int i=0 ; i<keys.length ; ++i ) {
             ret[i] = map.get( keys[i] );
@@ -222,7 +222,7 @@ public class StoreBackedMapValuesIterator<K,V>
         K [] keys = theKeysIterator.previous( n );
         V [] ret = ArrayHelper.createArray( theArrayComponentType, keys.length );
 
-        StoreBackedMap<K,V> map = theKeysIterator.getMap();
+        StoreBackedSwappingHashMap<K,V> map = theKeysIterator.getMap();
         
         for( int i=0 ; i<keys.length ; ++i ) {
             ret[i] = map.get( keys[i] );
@@ -271,9 +271,9 @@ public class StoreBackedMapValuesIterator<K,V>
      *
      * @return identical new instance
      */
-    public StoreBackedMapValuesIterator<K,V> createCopy()
+    public StoreBackedSwappingHashMapValuesIterator<K,V> createCopy()
     {
-        StoreBackedMapValuesIterator<K,V> ret = new StoreBackedMapValuesIterator<K,V>( this );
+        StoreBackedSwappingHashMapValuesIterator<K,V> ret = new StoreBackedSwappingHashMapValuesIterator<K,V>( this );
 
         return ret;
     }
@@ -292,10 +292,10 @@ public class StoreBackedMapValuesIterator<K,V>
     {
         throw new UnsupportedOperationException(); // there is a funny typecast warning in the commented-out code which I
         // don't have time to investigate right now. FIXME.
-//        if( !( position instanceof StoreBackedMapValuesIterator )) {
+//        if( !( position instanceof StoreBackedSwappingHashMapValuesIterator )) {
 //            throw new IllegalArgumentException( "Wrong type of CursorIterator: " + position );
 //        }
-//        StoreBackedMapValuesIterator<K,V> realPosition = (StoreBackedMapValuesIterator<K,V>) position;
+//        StoreBackedSwappingHashMapValuesIterator<K,V> realPosition = (StoreBackedSwappingHashMapValuesIterator<K,V>) position;
 //
 //        theKeysIterator.setPositionTo( realPosition.theKeysIterator ); // this may throw
     }
@@ -329,5 +329,5 @@ public class StoreBackedMapValuesIterator<K,V>
     /**
      * The underlying keys iterator.
      */
-    protected StoreBackedMapKeysIterator<K,V> theKeysIterator;
+    protected StoreBackedSwappingHashMapKeysIterator<K,V> theKeysIterator;
 }

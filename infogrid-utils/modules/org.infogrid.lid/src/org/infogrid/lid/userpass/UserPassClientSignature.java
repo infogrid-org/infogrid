@@ -14,9 +14,8 @@
 
 package org.infogrid.lid.userpass;
 
-import org.infogrid.context.Context;
 import org.infogrid.lid.AbstractLidClientSignature;
-import org.infogrid.mesh.MeshObject;
+import org.infogrid.lid.LidNonceManager;
 
 import org.infogrid.util.http.SaneRequest;
 
@@ -29,18 +28,35 @@ public class UserPassClientSignature
 {
     /**
      * Constructor.
+     * 
+     * @param request the incoming request
+     * @param rpUrl the Relying Party's URL without identity parameters
+     * @param identifier the given username, if any
+     * @param credential the given password, if any
+     * @param lidCookieString the identifier held by the LID identifier cookie, if any
+     * @param sessionId the content of the LID session cookie, if any
+     * @param target the user's destination URL, if any
+     * @param realm the realm of the trust request, if any
+     * @param nonce the nonce in the request, if any
+     * @param nonceManager the LidNonceManager to use to validate the nonce
+     * @param passwordManager the PasswordManager to use to validate the password
      */
     public UserPassClientSignature(
-            SaneRequest request,
-            String     identifier,
-            String     credential,
-            String     lidCookieString,
-            String     sessionId,
-            String     target,
-            String     nonce,
-            Context    context )
+            SaneRequest        request,
+            String             rpUrl,
+            String             identifier,
+            String             credential,
+            String             lidCookieString,
+            String             sessionId,
+            String             target,
+            String             realm,
+            String             nonce,
+            LidNonceManager    nonceManager,
+            LidPasswordManager passwordManager )
     {
-        super( request, identifier, credential, lidCookieString, sessionId, target, nonce, context );
+        super( request, rpUrl, identifier, credential, lidCookieString, sessionId, target, realm, nonce, nonceManager );
+        
+        thePasswordManager = passwordManager;
     }
 
     /**
@@ -54,19 +70,33 @@ public class UserPassClientSignature
     }
 
     /**
-      * The internal method that determines whether or not a request was signed, and if so,
-      * whether the signature is any good.
-      *
-      * @return true if the request was signed validly
-      * @throws AbortProcessingException thrown if an error occurred
-      */
-    protected MeshObject determineSignedGoodRequest(
-            MeshObject persona )
+     * The internal method that determines whether or not a request was signed, and if so,
+     * whether the signature is any good.
+     *
+     * @return true if the Request is signed and the signature is good, false otherwise
+     */
+    protected boolean determineSignedGoodRequest()
     {
-        throw new UnsupportedOperationException();
+        boolean ret = thePasswordManager.isUserPass( theIdentifier, theCredential );
+        
+        return ret;
     }
 
+    /**
+     * Obtain the URL of the identity provider's endpoint.
+     * 
+     * @return the identifier of the identity provider's endpoint, if any
+     */
+    public String getIdpEndpointIdentifier()
+    {
+        return null;
+    }
 
+    /**
+     * The PasswordManager to use.
+     */
+    protected LidPasswordManager thePasswordManager;
+    
     /**
      * The name of the simple password credential type.
      */

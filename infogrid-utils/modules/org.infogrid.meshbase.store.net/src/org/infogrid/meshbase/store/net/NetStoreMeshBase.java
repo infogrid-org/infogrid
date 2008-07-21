@@ -36,8 +36,8 @@ import org.infogrid.modelbase.ModelBase;
 import org.infogrid.net.NetMessageEndpointFactory;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.Store;
-import org.infogrid.store.util.IterableStoreBackedMap;
-import org.infogrid.store.util.StoreBackedMap;
+import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -157,8 +157,8 @@ public class NetStoreMeshBase
         NetStoreMeshBaseEntryMapper objectMapper = new NetStoreMeshBaseEntryMapper();
         StoreProxyEntryMapper       proxyMapper  = new StoreProxyEntryMapper( proxyFactory );
         
-        StoreBackedMap<MeshObjectIdentifier,MeshObject>     objectStorage = StoreBackedMap.createWeak( objectMapper, meshObjectStore );
-        IterableStoreBackedMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedMap.createWeak( proxyMapper,  proxyStore );
+        StoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject>     objectStorage = StoreBackedSwappingHashMap.createWeak( objectMapper, meshObjectStore );
+        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( proxyMapper,  proxyStore );
 
         NetMeshObjectIdentifierFactory identifierFactory = DefaultAnetMeshObjectIdentifierFactory.create( identifier );
         AnetMeshBaseLifecycleManager   life              = AnetMeshBaseLifecycleManager.create();
@@ -208,7 +208,7 @@ public class NetStoreMeshBase
             ModelBase                                       modelBase,
             AnetMeshBaseLifecycleManager                    life,
             NetAccessManager                                accessMgr,
-            StoreBackedMap<MeshObjectIdentifier,MeshObject> cache,
+            StoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> cache,
             StoreProxyManager                               proxyManager,
             Context                                         context )
     {
@@ -246,9 +246,9 @@ public class NetStoreMeshBase
      * 
      * @return the right subtype of CachingMap
      */
-    protected IterableStoreBackedMap<MeshObjectIdentifier,MeshObject> getCachingMap()
+    protected IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> getCachingMap()
     {
-        return (IterableStoreBackedMap<MeshObjectIdentifier,MeshObject>) theCache;
+        return (IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject>) theCache;
     }
 
     /**

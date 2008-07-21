@@ -118,6 +118,8 @@ public class SaneServletRequest
         }
 
         addToArguments( queryString, false );
+        
+        theQueryString = queryString;
     }
 
     /**
@@ -352,6 +354,16 @@ public class SaneServletRequest
     }
 
     /**
+     * Obtain the query string, if any.
+     * 
+     * @return the query string
+     */
+    public String getQueryString()
+    {
+        return theQueryString;
+    }
+
+    /**
      * Obtain an Iterator over the user's Locale preferences, in order of preference.
      * This Iterator takes into account a Locale cookie that might be set by the application,
      * followed by the value of the Accept-Language header in the HTTP request and
@@ -509,6 +521,11 @@ public class SaneServletRequest
      * The http or https protocol.
      */
     protected String theProtocol;
+
+    /**
+     * The query String, if any.
+     */
+    protected String theQueryString;
 
     /**
      * The data that was posted, if any.

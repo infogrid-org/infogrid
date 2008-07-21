@@ -28,23 +28,38 @@ public class DefaultMeshObjectSorter
             MeshObjectSorter
 {
     /**
-     * Construct one.
-     *
+     * Factory method.
+     * 
      * @param c specify the comparison criteria as the Java collections API does
+     * @return the created DefaultMeshObjectSorter
      */
-    public DefaultMeshObjectSorter(
+    public static DefaultMeshObjectSorter create(
             Comparator<MeshObject> c )
     {
-        this( c, null );
+        return new DefaultMeshObjectSorter( c, null );
     }
 
     /**
-     * Construct one.
+     * Factory method.
+     * 
+     * @param c specify the comparison criteria as the Java collections API does
+     * @param userName localized user-visible name in the current locale
+     * @return the created DefaultMeshObjectSorter
+     */
+    public static DefaultMeshObjectSorter create(
+            Comparator<MeshObject> c,
+            String                 userName )
+    {
+        return new DefaultMeshObjectSorter( c, userName );
+    }
+
+    /**
+     * Constructor for subclasses only.
      *
      * @param c specify the comparison criteria as the Java collections API does
      * @param userName localized user-visible name in the current locale
      */
-    public DefaultMeshObjectSorter(
+    protected DefaultMeshObjectSorter(
             Comparator<MeshObject> c,
             String                 userName )
     {

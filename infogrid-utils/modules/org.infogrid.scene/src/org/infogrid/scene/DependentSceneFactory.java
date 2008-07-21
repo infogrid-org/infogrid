@@ -384,7 +384,7 @@ public abstract class DependentSceneFactory
         public void meshObjectAdded(
                 MeshObjectAddedEvent theEvent )
         {
-            MeshObject addedMeshObject = theEvent.getAddedMeshObject();
+            MeshObject addedMeshObject = theEvent.getDeltaValue();
 
             Scene addedScene = findOrCreateSceneFor(
                     theInputScene,
@@ -416,7 +416,7 @@ public abstract class DependentSceneFactory
         public void meshObjectRemoved(
                 MeshObjectRemovedEvent theEvent )
         {
-            MeshObject removedMeshObject = theEvent.getRemovedMeshObject();
+            MeshObject removedMeshObject = theEvent.getDeltaValue();
 
             breakpointHook();
 

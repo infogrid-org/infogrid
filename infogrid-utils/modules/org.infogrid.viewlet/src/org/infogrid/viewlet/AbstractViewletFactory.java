@@ -22,6 +22,7 @@ import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.model.Viewlet.ViewletSubjectArea;
+import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.logging.Log;
@@ -30,6 +31,8 @@ import org.infogrid.util.logging.Log;
  * Factors out functionality common to {@link ViewletFactory ViewletFactories}.
  */
 public abstract class AbstractViewletFactory
+        extends
+            AbstractFactory<MeshObjectsToView,Viewlet,Context>
         implements
             ViewletFactory
 {

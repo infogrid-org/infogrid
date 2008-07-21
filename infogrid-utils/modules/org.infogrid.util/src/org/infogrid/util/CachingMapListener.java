@@ -20,19 +20,19 @@ package org.infogrid.util;
 public interface CachingMapListener
 {
     /**
-     * An element was added to the SwappingHashMap.
+     * An element was added to the CachingMap.
      *
      * @param event the event
      */
-    public void swappingHashMapElementAdded(
+    public void mapElementAdded(
             CachingMapEvent.Added event );
 
     /**
-     * An element was removed from the SwappingHashMap.
+     * An element was removed from the CachingMap.
      *
      * @param event the event
      */
-    public void swappingHashMapElementRemoved(
+    public void mapElementRemoved(
             CachingMapEvent.Removed event );
     
     /**
@@ -40,6 +40,6 @@ public interface CachingMapListener
      *
      * @param event the event
      */
-    public void swappingHashMapElementExpired(
+    public void mapElementExpired(
             CachingMapEvent.Expired event );
 }

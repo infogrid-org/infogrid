@@ -49,8 +49,8 @@ import org.infogrid.probe.manager.store.StoreScheduledExecutorProbeManager;
 import org.infogrid.probe.shadow.store.StoreShadowMeshBaseFactory;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.prefixing.IterablePrefixingStore;
-import org.infogrid.store.util.IterableStoreBackedMap;
-import org.infogrid.store.util.StoreBackedMap;
+import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.logging.Log;
 
@@ -504,8 +504,8 @@ public class IterableLocalNetStoreMeshBase
         NetStoreMeshBaseEntryMapper objectMapper = new NetStoreMeshBaseEntryMapper();
         StoreProxyEntryMapper       proxyMapper  = new StoreProxyEntryMapper( proxyFactory );
         
-        IterableStoreBackedMap<MeshObjectIdentifier,MeshObject> objectStorage = IterableStoreBackedMap.createWeak( objectMapper, meshObjectStore );
-        IterableStoreBackedMap<NetMeshBaseIdentifier,Proxy>     proxyStorage  = IterableStoreBackedMap.createWeak( proxyMapper,  proxyStore );
+        IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = IterableStoreBackedSwappingHashMap.createWeak( objectMapper, meshObjectStore );
+        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy>     proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( proxyMapper,  proxyStore );
 
         final StoreProxyManager proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
 
@@ -558,7 +558,7 @@ public class IterableLocalNetStoreMeshBase
             ModelBase                                       modelBase,
             AnetMeshBaseLifecycleManager                    life,
             NetAccessManager                                accessMgr,
-            StoreBackedMap<MeshObjectIdentifier,MeshObject> cache,
+            StoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> cache,
             StoreProxyManager                               proxyManager,
             ProbeManager                                    probeManager,
             Context                                         context )
@@ -620,9 +620,9 @@ public class IterableLocalNetStoreMeshBase
      *
      * @return theCache, typecast
      */
-    protected StoreBackedMap<MeshObjectIdentifier,MeshObject> getCachingMap()
+    protected StoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> getCachingMap()
     {
-        return (StoreBackedMap<MeshObjectIdentifier,MeshObject>) theCache;
+        return (StoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject>) theCache;
     }
 
     /**

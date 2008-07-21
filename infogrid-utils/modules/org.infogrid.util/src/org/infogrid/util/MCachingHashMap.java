@@ -306,11 +306,11 @@ public class MCachingHashMap<K,V>
                     {
                         switch( p.intValue() ) {
                             case 0:
-                                l.swappingHashMapElementAdded( (CachingMapEvent.Added) e );
+                                l.mapElementAdded( (CachingMapEvent.Added) e );
                                 break;
 
                             case 1:
-                                l.swappingHashMapElementRemoved( (CachingMapEvent.Removed) e );
+                                l.mapElementRemoved( (CachingMapEvent.Removed) e );
                                 break;
                                 
                             // there is no Expired case, this map never expires anything
