@@ -129,7 +129,7 @@ public class HttpdPostTest2
             HashMap<String,String> pars = new HashMap<String,String>();
             pars.put( "abc", "def" );
 
-            int MAX = 100;
+            int MAX = 20;
 
             for( int i=0 ; i<MAX ; ++i ) {
                 log.info( "Performing test " + i );

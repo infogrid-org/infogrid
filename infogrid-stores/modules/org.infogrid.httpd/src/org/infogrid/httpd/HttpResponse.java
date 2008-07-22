@@ -230,9 +230,9 @@ public abstract class HttpResponse
 
                 theWriter.write( HttpResponseHeaderFields.SET_COOKIE_TAG );
                 theWriter.write( HttpResponseHeaderFields.SEPARATOR );
-                theWriter.write( HTTP.encodeUrl( name ) );
+                theWriter.write( HTTP.encodeToValidUrlArgument( name ) );
                 theWriter.write( HttpResponseHeaderFields.EQUALS );
-                theWriter.write( HTTP.encodeUrl( value ) );
+                theWriter.write( HTTP.encodeToValidUrlArgument( value ) );
 
                 if( expires != null ) {
                     theWriter.write( HttpResponseHeaderFields.SEMI_SEPARATOR );
