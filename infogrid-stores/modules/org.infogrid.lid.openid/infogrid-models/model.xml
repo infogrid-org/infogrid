@@ -97,24 +97,24 @@
         StringBuilder ret = new StringBuilder();
         ret.append( org.infogrid.util.http.HTTP.appendArgumentToUrl( endpointUrl, "openid.mode=checkid_setup" ));
         if( theDelegate != null ) {
-            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theDelegate ));
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeToValidUrlArgument( theDelegate ));
         } else {
-            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeUrl( theUrl ));
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeToValidUrlArgument( theUrl ));
         }
 
         // add a nonce to the return-to URL
         String nonce = nonceMgr.generateNewNonce();
             
-        here = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-nonce=" + org.infogrid.util.http.HTTP.encodeUrl( nonce ));
+        here = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-nonce=" + org.infogrid.util.http.HTTP.encodeToValidUrlArgument( nonce ));
 
-        ret.append( "&openid.return_to="  ).append( org.infogrid.util.http.HTTP.encodeUrl( here ));
-        ret.append( "&openid.trust_root=" ).append( org.infogrid.util.http.HTTP.encodeUrl( trustRoot ));
+        ret.append( "&openid.return_to="  ).append( org.infogrid.util.http.HTTP.encodeToValidUrlArgument( here ));
+        ret.append( "&openid.trust_root=" ).append( org.infogrid.util.http.HTTP.encodeToValidUrlArgument( trustRoot ));
 
         org.infogrid.lid.openid.RelyingPartySideAssociation association = assocMgr.obtainFor( endpointUrl );
                 // may throw exception
 
         if( association != null ) {
-            ret.append( "&openid.assoc_handle=" ).append( org.infogrid.util.http.HTTP.encodeUrl( association.getAssociationHandle() ));
+            ret.append( "&openid.assoc_handle=" ).append( org.infogrid.util.http.HTTP.encodeToValidUrlArgument( association.getAssociationHandle() ));
         }
         return ret.toString();
     }        
@@ -163,24 +163,24 @@
         StringBuilder ret = new StringBuilder();
         ret.append( org.infogrid.util.http.HTTP.appendArgumentToUrl( endpointUrl, "openid.mode=checkid_setup" ));
         if( theDelegate != null ) {
-            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.escapeUrlArgument( theDelegate ));
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeToValidUrlArgument( theDelegate ));
         } else {
-            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.escapeUrlArgument( theUrl ));
+            ret.append( "&openid.identity=" ).append( org.infogrid.util.http.HTTP.encodeToValidUrlArgument( theUrl ));
         }
 
         // add a nonce to the return-to URL
         String nonce = nonceMgr.generateNewNonce();
             
-        here = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-nonce=" + org.infogrid.util.http.HTTP.escapeUrlArgument( nonce ));
+        here = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-nonce=" + org.infogrid.util.http.HTTP.encodeToValidUrlArgument( nonce ));
 
-        ret.append( "&openid.return_to="  ).append( org.infogrid.util.http.HTTP.escapeUrlArgument( here ));
-        ret.append( "&openid.trust_root=" ).append( org.infogrid.util.http.HTTP.escapeUrlArgument( trustRoot ));
+        ret.append( "&openid.return_to="  ).append( org.infogrid.util.http.HTTP.encodeToValidUrlArgument( here ));
+        ret.append( "&openid.trust_root=" ).append( org.infogrid.util.http.HTTP.encodeToValidUrlArgument( trustRoot ));
 
         org.infogrid.lid.openid.RelyingPartySideAssociation association = assocMgr.obtainFor( endpointUrl );
                 // may throw exception
 
         if( association != null ) {
-            ret.append( "&openid.assoc_handle=" ).append( org.infogrid.util.http.HTTP.escapeUrlArgument( association.getAssociationHandle() ));
+            ret.append( "&openid.assoc_handle=" ).append( org.infogrid.util.http.HTTP.encodeToValidUrlArgument( association.getAssociationHandle() ));
         }
         return ret.toString();
     }        
