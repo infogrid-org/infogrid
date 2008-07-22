@@ -920,7 +920,7 @@ public abstract class InfoGridJspUtils
             char sep = '?';
             for( String key : args.keySet() ) {
                 String value = args.get( key );
-                ret.append( sep ).append( HTTP.encodeUrl( key ) ).append( '=' ).append( HTTP.encodeUrl( value ));
+                ret.append( sep ).append( HTTP.encodeToValidUrlArgument( key ) ).append( '=' ).append( HTTP.encodeToValidUrlArgument( value ));
                 sep = '&';
             }
             return ret.toString();
@@ -932,8 +932,8 @@ public abstract class InfoGridJspUtils
 
             for( String key : args.keySet() ) {
                 String value        = args.get( key );
-                String escapedKey   = HTTP.encodeUrl( key );
-                String escapedValue = HTTP.encodeUrl( value );
+                String escapedKey   = HTTP.encodeToValidUrlArgument( key );
+                String escapedValue = HTTP.encodeToValidUrlArgument( value );
 
                 String pattern = "&" + escapedKey + "=";
                 
@@ -1338,13 +1338,13 @@ public abstract class InfoGridJspUtils
                     name = pair.substring( 0, index );
                     String value = pair.substring( index+1 );
 
-                    String escapedName  = HTTP.encodeUrl( name );
-                    String escapedValue = HTTP.encodeUrl( value );
+                    String escapedName  = HTTP.encodeToValidUrlArgument( name );
+                    String escapedValue = HTTP.encodeToValidUrlArgument( value );
                     url.append( escapedName );
                     url.append( '=' );
                     url.append( escapedValue );
                 } else {
-                    String escapedName = HTTP.encodeUrl( pair );
+                    String escapedName = HTTP.encodeToValidUrlArgument( pair );
                     url.append( escapedName );
                 }
                 sep2 = "&";

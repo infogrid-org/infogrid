@@ -285,12 +285,12 @@ public class LidGpg
         }
 
         append.append( "lid=" );
-        append.append( HTTP.encodeUrl( lid ));
+        append.append( HTTP.encodeToValidUrlArgument( lid ));
         append.append( "&lid-credtype=gpg%20--clearsign" );
 
         String nonce = theNonceManager.generateNewNonce();
         append.append( "&lid-nonce=" );
-        append.append( HTTP.encodeUrl( nonce ));
+        append.append( HTTP.encodeToValidUrlArgument( nonce ));
 
         String command = theExecutable + " --clearsign -u =" + lid;
         StringBuffer output = new StringBuffer( 256 );
@@ -304,9 +304,9 @@ public class LidGpg
             String sig  = m.group( 3 );
 
             if( lidVersion.startsWith( "1." )) {
-                append.append( "&credential=" + HTTP.encodeUrl( hash + "\n" + sig ));
+                append.append( "&credential=" + HTTP.encodeToValidUrlArgument( hash + "\n" + sig ));
             } else {
-                append.append( "&lid-credential=" + HTTP.encodeUrl( hash + "\n" + sig ));
+                append.append( "&lid-credential=" + HTTP.encodeToValidUrlArgument( hash + "\n" + sig ));
             }
             return append.toString();
 

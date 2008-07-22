@@ -76,12 +76,12 @@ public class RelyingPartySideAssociationNegotiator
             dh = parameters.getWantedDiffieHellmanEndpoint();
 
             if( !AssociationNegotiationParameters.DEFAULT_P.equals( dh.getP() )) {
-                sentContentBuf.append( "&openid.modulus=" ).append( HTTP.encodeUrl( Base64.base64encodeNoCr( dh.getP().toByteArray() )));
+                sentContentBuf.append( "&openid.modulus=" ).append( HTTP.encodeToValidUrlArgument( Base64.base64encodeNoCr( dh.getP().toByteArray() )));
             }
             if( !AssociationNegotiationParameters.DEFAULT_G.equals( dh.getG() )) {
-                sentContentBuf.append( "&openid.dh_gen=" ).append( HTTP.encodeUrl( Base64.base64encodeNoCr( dh.getG().toByteArray() )));
+                sentContentBuf.append( "&openid.dh_gen=" ).append( HTTP.encodeToValidUrlArgument( Base64.base64encodeNoCr( dh.getG().toByteArray() )));
             }
-            sentContentBuf.append( "&openid.dh_consumer_public=" ).append( HTTP.encodeUrl( Base64.base64encodeNoCr( dh.getPublicKey().toByteArray() )));
+            sentContentBuf.append( "&openid.dh_consumer_public=" ).append( HTTP.encodeToValidUrlArgument( Base64.base64encodeNoCr( dh.getPublicKey().toByteArray() )));
         }
 
         HTTP.Response response    = null;
