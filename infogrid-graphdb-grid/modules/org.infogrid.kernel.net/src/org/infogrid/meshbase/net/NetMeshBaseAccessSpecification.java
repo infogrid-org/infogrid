@@ -129,10 +129,10 @@ public class NetMeshBaseAccessSpecification
         for( int i=0 ; i<pairs.length ; ++i ) {
             if( scopeString == null && pairs[i].startsWith( SCOPE_KEYWORD + "=" )) {
                 scopeString = pairs[i].substring( SCOPE_KEYWORD.length() + 1 );
-                scopeString = HTTP.descapeUrlArgument( scopeString );
+                scopeString = HTTP.decodeUrlArgument( scopeString );
             } else if( coherenceString == null && pairs[i].startsWith( COHERENCE_KEYWORD + "=" )) {
                 coherenceString = pairs[i].substring( COHERENCE_KEYWORD.length() + 1 );
-                coherenceString = HTTP.descapeUrlArgument( coherenceString );
+                coherenceString = HTTP.decodeUrlArgument( coherenceString );
             } else {
                 remainder.append( sep );
                 remainder.append( pairs[i] );
@@ -207,13 +207,13 @@ public class NetMeshBaseAccessSpecification
         if( theScopeSpecification != null ) {
             ret.append( sep );
             ret.append( SCOPE_KEYWORD ).append( "=" );
-            ret.append( HTTP.escapeUrlArgument( theScopeSpecification.toExternalForm() ));
+            ret.append( HTTP.encodeToValidUrlArgument( theScopeSpecification.toExternalForm() ));
             sep = '&';
         }
         if( theCoherenceSpecification != null ) {
             ret.append( sep );
             ret.append( COHERENCE_KEYWORD ).append( "=" );
-            ret.append( HTTP.escapeUrlArgument( theCoherenceSpecification.toExternalForm() ));
+            ret.append( HTTP.encodeToValidUrlArgument( theCoherenceSpecification.toExternalForm() ));
             sep = '&';
         }
         return ret.toString();

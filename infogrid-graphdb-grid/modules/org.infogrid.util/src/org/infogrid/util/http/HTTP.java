@@ -181,8 +181,8 @@ public abstract class HTTP
             while( iter.hasNext() ) {
                 String key   = iter.next();
                 String value = cookies.get( key );
-                cookieString.append( sep ).append( encodeUrl( key ));
-                cookieString.append( "=" ).append( encodeUrl( value ));
+                cookieString.append( sep ).append( encodeToValidUrl( key ));
+                cookieString.append( "=" ).append( encodeToValidUrl( value ));
                 sep = "; ";
             }
             conn.setRequestProperty( "Cookie", cookieString.toString() );
@@ -283,9 +283,9 @@ public abstract class HTTP
             String value = pars.get( key );
 
             parBuffer.append( sep );
-            parBuffer.append( encodeUrl( key ));
+            parBuffer.append( encodeToValidUrl( key ));
             parBuffer.append( "=" );
-            parBuffer.append( encodeUrl( value ));
+            parBuffer.append( encodeToValidUrl( value ));
             sep = "&";
         }
         return http_post( url, "application/x-www-form-urlencoded", parBuffer.toString().getBytes(), DEFAULT_VERSION, followRedirects );
@@ -460,21 +460,56 @@ public abstract class HTTP
      *
      * @param s the String
      * @return the escaped String
+     * @see AbstractMethodError#decodeUrl
      */
-    public static String encodeUrl(
+    public static String encodeToValidUrl(
             String s )
     {
         try {
-            String ret = URLEncoder.encode( s, "utf-8" );
-            
-            // Due to Tomcat 6 and http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450
-            // we have to send slashes in clear text
-            ret = ret.replaceAll( "%2[Ff]", "/" );
-            return ret;
+            StringBuilder ret = new StringBuilder( s.length() * 5 / 4 ); // fudge factor
 
+            for( int i=0 ; i<s.length() ; ++i ) {
+                char c = s.charAt( i );
+
+                if( Character.isLetterOrDigit( c )) {
+                    ret.append( c );
+                } else if(    c == '/'
+                           || c == '.'
+                           || c == '-'
+                           || c == '_' ) {
+                    ret.append( c );
+                            // Due to Tomcat 6 and http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450
+                            // we have to send slashes in clear text
+                            // ret = ret.replaceAll( "%2[Ff]", "/" );
+                } else {
+                    // FIXME there must be something more efficient than this
+                    byte [] utf8 = new String( new char[] { c } ).getBytes( "UTF-8" );
+                    for( int j=0 ; j<utf8.length ; ++j ) {
+                        ret.append( "%" );
+                        int positive = utf8[j] > 0 ? utf8[0] : ( 256 + utf8[j] );
+
+                        String hex = Integer.toHexString( positive ).toUpperCase();
+                        switch( hex.length() ) {
+                            case 0:
+                                ret.append( "00" );
+                                break;
+                            case 1:
+                                ret.append( "0" ).append( hex );
+                                break;
+                            case 2:
+                                ret.append( hex );
+                                break;
+                            case 3:
+                                log.error( "How did we get here? " + s );
+                                break;
+                        }
+                    }
+                }
+            }
+            return ret.toString();
         } catch( UnsupportedEncodingException ex ) {
             log.error( ex );
-            return null;
+            return s; // at least something
         }
     }
 
@@ -484,8 +519,52 @@ public abstract class HTTP
      *
      * @param s the escaped String
      * @return the original String
+     * @see #encodeToValidUrl
      */
     public static String decodeUrl(
+            String s )
+    {
+        try {
+            String ret = URLDecoder.decode( s, "utf-8" );
+            return ret;
+            
+        } catch( UnsupportedEncodingException ex ) {
+            log.error( ex );
+            return null;
+        }
+    }
+    
+    /**
+     * Helper method to escape a String suitably before it can be appended to the query parameters
+     * in a URL.
+     *
+     * @param s the String
+     * @return the escaped String
+     * @see #decodeUrlArgument
+     */
+    public static String encodeToValidUrlArgument(
+            String s )
+    {
+        try {
+            String ret = URLEncoder.encode( s, "utf-8" );
+            
+            return ret;
+
+        } catch( UnsupportedEncodingException ex ) {
+            log.error( ex );
+            return null;
+        }
+    }
+    
+    /**
+     * Helper method to descape a String suitable before it is extracted as one of the query parameters
+     * in a URL.
+     *
+     * @param s the String
+     * @return the descaped String
+     * @see #encodeToValidUrlArgument
+     */
+    public static String decodeUrlArgument(
             String s )
     {
         try {
@@ -538,67 +617,6 @@ public abstract class HTTP
     }
 
     /**
-     * Helper method to escape a String suitably before it can be appended to the query parameters
-     * in a URL.
-     *
-     * @param s the String
-     * @return the escaped String
-     */
-    public static String escapeUrlArgument(
-            String s )
-    {
-        int           len = s.length();
-        StringBuilder ret = new StringBuilder( len + 5 );
-        
-        for( int i=0 ; i<len ; ++i ) {
-            char c = s.charAt( i );
-            switch( c ) {
-                case '&':
-                    ret.append( "%26" );
-                    break;
-                case '?':
-                    ret.append( "%3f" );
-                    break;
-                default:
-                    ret.append( c );
-                    break;
-            }            
-        }
-        return ret.toString();
-    }
-    
-    /**
-     * Helper method to descape a String suitable before it is extracted as one of the query parameters
-     * in a URL.
-     *
-     * @param s the String
-     * @return the descaped String
-     */
-    public static String descapeUrlArgument(
-            String s )
-    {
-        String ret = s.replaceAll( "%26", "&" );
-        ret        = ret.replaceAll( "%3[Ff]", "?" );
-        
-        return ret;
-//        int           len = s.length();
-//        StringBuilder ret = new StringBuilder( len );
-//        
-//        int startAt = 0;
-//        int foundAt;
-//        while( ( foundAt = s.indexOf( "%26", startAt )) >= 0 ) {
-//            String sub = s.substring( startAt, foundAt );
-//            ret.append( sub );
-//            ret.append( '#' );
-//            foundAt += 3;
-//        }
-//        String sub = s.substring( startAt );
-//        ret.append( sub );
-//
-//        return ret.toString();
-    }
-
-    /**
      * Obtain a named argument from a URL.
      *
      * @param u the URL
@@ -621,9 +639,9 @@ public abstract class HTTP
             if( equals < 0 ) {
                 continue; // won't have a value
             }
-            String name = descapeUrlArgument( current.substring( 0, equals ));
+            String name = decodeUrlArgument( current.substring( 0, equals ));
             if( arg.equals( name )) {
-                String value = descapeUrlArgument( current.substring( equals+1 ));
+                String value = decodeUrlArgument( current.substring( equals+1 ));
                 return value;
             }
         }

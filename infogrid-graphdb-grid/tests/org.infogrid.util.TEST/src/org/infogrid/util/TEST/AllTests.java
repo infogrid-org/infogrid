@@ -55,6 +55,8 @@ public class AllTests
                 new TestSpec( DoubleStringifierTest1.class, subArgs ),
                 new TestSpec( CompoundStringifierTest1.class, subArgs ),
                 new TestSpec( ArrayStringifierTest1.class, subArgs ),
+                
+                new TestSpec( UrlEncodingTest1.class, subArgs ),
         };
 
         runTests( tests );
