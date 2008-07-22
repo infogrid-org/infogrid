@@ -170,14 +170,14 @@ public class HttpRequest
                 String value;
 
                 if( eq < 0 ) {
-                    name  = HTTP.decodeUrl( pair );
+                    name  = HTTP.decodeUrlArgument( pair );
                     value = null;
                 } else {
                     name  = pair.substring( 0, eq );
                     value = pair.substring( eq+1 );
 
-                    name  = HTTP.decodeUrl( name );
-                    value = HTTP.decodeUrl( value );
+                    name  = HTTP.decodeUrlArgument( name );
+                    value = HTTP.decodeUrlArgument( value );
                 }
                 theArguments.add( name, value );
             }
@@ -599,8 +599,8 @@ public class HttpRequest
                 name  = pair.substring( 0, equals );
                 value = pair.substring( equals+1 );
 
-                name  = HTTP.decodeUrl( name );
-                value = HTTP.decodeUrl( value );
+                name  = HTTP.decodeUrlArgument( name );
+                value = HTTP.decodeUrlArgument( value );
 
                 ret.add( new HttpCookie( name, value ));
             }
@@ -692,8 +692,8 @@ public class HttpRequest
                     String name  = next.substring( 0, equals );
                     String value = next.substring( equals+1 );
 
-                    name  = HTTP.decodeUrl( name );
-                    value = HTTP.decodeUrl( value );
+                    name  = HTTP.decodeUrlArgument( name );
+                    value = HTTP.decodeUrlArgument( value );
 
                     thePostParameters.put( name, value );
                 } else {
