@@ -176,7 +176,7 @@
         String target = org.infogrid.util.http.HTTP.appendArgumentToUrl( here, "lid-credtype=gpg%20--clearsign" );
 
         ret = org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "lid-action=sso-approve" );
-        ret = org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "lid-target=" + org.infogrid.util.http.HTTP.escapeUrlArgument( target.toString() ));
+        ret = org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "lid-target=" + org.infogrid.util.http.HTTP.encodeToValidUrlArgument( target.toString() ));
 
         return ret.toString();
     }

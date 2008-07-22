@@ -236,7 +236,7 @@ public class StringRepresentation
         protected String escape(
                 String s )
         {
-            String ret = HTTP.encodeUrl( s );
+            String ret = HTTP.encodeToValidUrlArgument( s );
             return ret;
         }
 
@@ -250,7 +250,7 @@ public class StringRepresentation
         protected String unescape(
                 String s )
         {
-            String ret = HTTP.decodeUrl( s );
+            String ret = HTTP.decodeUrlArgument( s );
             return ret;
         }        
     }
