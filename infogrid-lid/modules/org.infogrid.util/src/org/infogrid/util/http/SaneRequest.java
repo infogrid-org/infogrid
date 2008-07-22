@@ -274,9 +274,10 @@ public abstract class SaneRequest
             String name  = temp[0];
             String value = temp.length > 1 ? temp[1] : "";
 
-            name = HTTP.decodeUrl( name );
+            name = HTTP.decodeUrlArgument( name );
             if( argName.equals( name )) {
-                return HTTP.decodeUrl( value );
+                String ret = HTTP.decodeUrlArgument( value );
+                return ret;
             }
             pos = pos2;
         }
