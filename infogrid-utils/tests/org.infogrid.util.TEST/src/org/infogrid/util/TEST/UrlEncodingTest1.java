@@ -15,13 +15,13 @@
 package org.infogrid.util.TEST;
 
 import org.infogrid.testharness.AbstractTest;
-import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.http.HTTP;
 import org.infogrid.util.logging.Log;
 
 /**
- * Tests the ArrayHelper's determineDifference.
+ * Tests URL encoding via the HTTP class.
  */
-public class ArrayHelperTest1
+public class UrlEncodingTest1
         extends
             AbstractTest
 {
@@ -34,37 +34,46 @@ public class ArrayHelperTest1
         throws
             Exception
     {
-        String [] n = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-        String TWO = new String( "2" );
+        String [][] testCases = {
+            {
+                "abc def",
+                "abc%20def",
+                "abc+def"
+            },
+            {
+                "abc?def",
+                "abc%3Fdef",
+                "abc%3Fdef"
+            },
+            {
+                "abc/def",
+                "abc/def",
+                "abc%2Fdef"
+            },
+            {
+                "abc:def",
+                "abc%3Adef",
+                "abc%3Adef"
+            },
+            {
+                "abc#def",
+                "abc%23def",
+                "abc%23def"
+            },
+        };
 
-        String [] one  = new String[] { n[1], n[2],         n[3], n[4],       n[6], n[7]       };
-        String [] two  = new String[] { n[1], TWO /* !! */,             n[5],       n[7], n[8] };
-
-        //
-        
-        log.info( "Trying with String and equals" );
-        
-        String [] add1 = new String[] {                                 n[5],             n[8] };
-        String [] rem1 = new String[] {                     n[3], n[4],       n[6]             };
-        
-        ArrayHelper.Difference<String> diff1 = ArrayHelper.determineDifference( one, two, true, String.class );
-        
-        checkEqualsInSequence( diff1.getAdditions(), add1, "not the same additions" );
-        checkEqualsInSequence( diff1.getRemovals(),  rem1, "not the same removals" );
-
-        //
-        
-        log.info( "now with ==" );
-        
-        String [] add2 = new String[] {       n[2],                     n[5],             n[8] };
-        String [] rem2 = new String[] {       n[2],         n[3], n[4],       n[6]             };
-
-        ArrayHelper.Difference<String> diff2 = ArrayHelper.determineDifference( one, two, false, String.class );
-        
-        checkEqualsInSequence( diff2.getAdditions(), add2, "not the same additions" );
-        checkEqualsInSequence( diff2.getRemovals(),  rem2, "not the same removals" );
+        for( int i=0 ; i<testCases.length ; ++i ) {
+            log.debug( "Now testing " + i );
+            
+            String input = testCases[i][0];
+            String safeUrl      = HTTP.encodeToValidUrl( input );
+            String safeArgument = HTTP.encodeToValidUrlArgument( input );
+            
+            checkEquals( testCases[i][1], safeUrl,      "SafeURL encoding failed for test case \"" + input + "\" (" + i + ")" );
+            checkEquals( testCases[i][2], safeArgument, "SafeURLArgument encoding failed for test case \"" + input + "\" (" + i + ")" );
+        }
     }
-    
+
     /**
      * Main program.
      *
@@ -73,7 +82,7 @@ public class ArrayHelperTest1
     public static void main(
              String [] args )
     {
-        ArrayHelperTest1 test = null;
+        UrlEncodingTest1 test = null;
         try {
             if( false && args.length != 0 ){
                 System.err.println( "Synopsis: {no arguments}" );
@@ -81,7 +90,7 @@ public class ArrayHelperTest1
                 System.exit( 1 );
             }
 
-            test = new ArrayHelperTest1( args );
+            test = new UrlEncodingTest1( args );
             test.run();
 
         } catch( Throwable ex ) {
@@ -107,13 +116,13 @@ public class ArrayHelperTest1
      * @param args command-line arguments
      * @throws Exception all sorts of things may happen in a test
      */
-    public ArrayHelperTest1(
+    public UrlEncodingTest1(
             String [] args )
         throws
             Exception
     {
-        super( thisPackage( ArrayHelperTest1.class, "Log.properties" ));
+        super( thisPackage( UrlEncodingTest1.class, "Log.properties"  ));
     }
 
-    private static final Log log = Log.getLogInstance( ArrayHelperTest1.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance( UrlEncodingTest1.class  ); // our own, private logger
 }

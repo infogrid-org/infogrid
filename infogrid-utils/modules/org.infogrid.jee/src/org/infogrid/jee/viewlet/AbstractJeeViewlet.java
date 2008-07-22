@@ -291,21 +291,21 @@ public abstract class AbstractJeeViewlet
     {
         String relativePath  = theCurrentRequest.getDelegate().getRequestURI();
 
-        // we need to replace # -- FIXME, is this right? HTTP.encodeUrl does seem to do too much
-        String ret = relativePath.replace( "#", "%23" );
+        String ret = HTTP.encodeToValidUrl( relativePath );
         
         // append lid-xpath
         String xpath = theCurrentRequest.getDelegate().getParameter( "lid-xpath" );
         if( xpath != null ) {
-            ret = HTTP.appendArgumentToUrl( ret, "lid-xpath=" + HTTP.encodeUrl( xpath ));
+            ret = HTTP.appendArgumentToUrl( ret, "lid-xpath=" + HTTP.encodeToValidUrlArgument( xpath ));
         }
         // append lid-format
         String format = theCurrentRequest.getDelegate().getParameter( "lid-format" );
         if( format != null ) {
-            ret = HTTP.appendArgumentToUrl( ret, "lid-format=" + HTTP.encodeUrl( format ));
+            ret = HTTP.appendArgumentToUrl( ret, "lid-format=" + HTTP.encodeToValidUrlArgument( format ));
         }
         return ret;
     }
+
 
     /**
      * This method converts the name of a Class (subclass of this one) into the default request URL
