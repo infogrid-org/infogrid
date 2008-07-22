@@ -28,6 +28,7 @@ import java.io.OutputStream;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 import java.util.LinkedList;
@@ -147,6 +148,14 @@ public class HttpAcceptor
 
             } catch( SocketTimeoutException ex ) {
                 // that's fine, do nothing, go right back
+            } catch( SocketException ex ) {
+                // probably too much load, wait a tiny bit
+                try {
+                    Thread.sleep( 10L );
+                    System.gc();
+                } catch( Throwable t ) {
+                    ex.printStackTrace();
+                }
             } catch( IOException ex ) {
                 ex.printStackTrace();
             }
