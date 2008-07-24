@@ -260,7 +260,7 @@ public class LidGpg
 
         return ret;
     }
-
+    
     /**
      * Sign a URL.
      *
