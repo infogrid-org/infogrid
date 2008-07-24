@@ -62,12 +62,6 @@ public class StoreLidGpgPublicKeyManager
         super( delegateFactory, storage );
     }
     
-    
-    /**
-     * The Store to use.
-     */
-    protected Store theStore;
-    
     /**
      * The encoding to use.
      */
