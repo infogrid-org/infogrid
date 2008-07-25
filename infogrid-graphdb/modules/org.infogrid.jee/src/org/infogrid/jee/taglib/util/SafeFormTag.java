@@ -578,7 +578,7 @@ public class SafeFormTag
             String value = (String) pageContext.getAttribute( FORM_TOKEN_NAME );
             
             if( value == null ) {
-                FormTokenService service = InfoGridWebApp.getSingleton().getFormTokenService();
+                FormTokenService service = InfoGridWebApp.getSingleton().getApplicationContext().findContextObjectOrThrow( FormTokenService.class );
                 if( service != null ) {
                     // no service, no output
                     value = service.generateNewToken();

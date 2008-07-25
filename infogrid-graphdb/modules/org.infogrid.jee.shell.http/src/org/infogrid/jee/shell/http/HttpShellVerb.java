@@ -266,7 +266,8 @@ public enum HttpShellVerb
 
             InfoGridWebApp app = InfoGridWebApp.getSingleton();
 
-            NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = app.getMeshBaseNameServer();
+            @SuppressWarnings( "unchecked" )
+            NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = app.getApplicationContext().findContextObjectOrThrow( NameServer.class );
             MeshBaseIdentifier                      meshBaseName       = null;
 
             if( meshBaseString != null ) {
@@ -282,7 +283,7 @@ public enum HttpShellVerb
             if( meshBaseName != null ) {
                 meshBase = meshBaseNameServer.get( meshBaseName );
             } else {
-                meshBase = app.getDefaultMeshBase();
+                meshBase = app.getApplicationContext().findContextObjectOrThrow( MeshBase.class );
             }
 
             if( meshBase == null ) {
@@ -1146,7 +1147,8 @@ public enum HttpShellVerb
 
         InfoGridWebApp app = InfoGridWebApp.getSingleton();
         
-        NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = app.getMeshBaseNameServer();
+        @SuppressWarnings( "unchecked" )
+        NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = app.getApplicationContext().findContextObjectOrThrow( NameServer.class );
         MeshBaseIdentifier                      meshBaseName       = null;
 
         if( meshBaseString != null ) {
@@ -1162,7 +1164,7 @@ public enum HttpShellVerb
         if( meshBaseName != null ) {
             meshBase = meshBaseNameServer.get( meshBaseName );
         } else {
-            meshBase = app.getDefaultMeshBase();
+            meshBase = app.getApplicationContext().findContextObjectOrThrow( MeshBase.class );
         }
 
         if( meshBase == null ) {
