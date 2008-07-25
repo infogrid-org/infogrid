@@ -31,12 +31,14 @@ import org.infogrid.jee.rest.DefaultRestfulRequest;
 import org.infogrid.jee.rest.RestfulRequest;
 import org.infogrid.jee.sane.SaneServletRequest;
 import org.infogrid.jee.viewlet.JeeViewlet;
+import org.infogrid.jee.viewlet.templates.DefaultStructuredResponseTemplateFactory;
 import org.infogrid.jee.viewlet.templates.JspStructuredResponseTemplate;
 import org.infogrid.jee.viewlet.templates.StructuredResponse;
 import org.infogrid.jee.viewlet.templates.StructuredResponseTemplate;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.model.traversal.TraversalDictionary;
 import org.infogrid.model.traversal.TraversalSpecification;
@@ -44,6 +46,7 @@ import org.infogrid.util.FactoryException;
 import org.infogrid.util.logging.Log;
 import org.infogrid.viewlet.CannotViewException;
 import org.infogrid.viewlet.MeshObjectsToView;
+import org.infogrid.viewlet.ViewletFactory;
 
 /**
  * <p>Main JeeViewlet dispatcher to determine the REST subject, the best JeeViewlet, and
@@ -76,7 +79,10 @@ public class ViewletDispatcherServlet
         HttpServletRequest  realRequest    = (HttpServletRequest)  request;
         HttpServletResponse realResponse   = (HttpServletResponse) response;
         SaneServletRequest  saneRequest    = (SaneServletRequest)  request.getAttribute( SaneServletRequest.class.getName() );
-        RestfulRequest      restfulRequest = createRestfulRequest( saneRequest, realRequest.getContextPath(), app.getDefaultMeshBase().getIdentifier().toExternalForm() );
+        RestfulRequest      restfulRequest = createRestfulRequest(
+                saneRequest,
+                realRequest.getContextPath(),
+                app.getApplicationContext().findContextObjectOrThrow( MeshBase.class ).getIdentifier().toExternalForm() );
 
         realRequest.setAttribute( RestfulRequest.class.getName(), restfulRequest );
 
@@ -101,7 +107,9 @@ public class ViewletDispatcherServlet
         }
 
         try {
-            StructuredResponseTemplate template = app.getStructuredResponseTemplateFactory().obtainFor( restfulRequest, structured );
+            StructuredResponseTemplate template
+                    = app.getApplicationContext().findContextObjectOrThrow( DefaultStructuredResponseTemplateFactory.class ).obtainFor( restfulRequest, structured );
+
             template.doOutput( realResponse, structured );
 
         } catch( FactoryException ex ) {
@@ -136,7 +144,7 @@ public class ViewletDispatcherServlet
     {
         InfoGridWebApp    app     = InfoGridWebApp.getSingleton();
         MeshObject        subject = restful.determineRequestedMeshObject();
-        MeshObjectsToView toView  = createMeshObjectsToView( restful, app.getTraversalDictionary() );
+        MeshObjectsToView toView  = createMeshObjectsToView( restful, app.getApplicationContext().findContextObjectOrThrow( TraversalDictionary.class ));
 
         Context        c              = app.getApplicationContext();
         JeeViewlet     viewlet        = null;
@@ -145,7 +153,8 @@ public class ViewletDispatcherServlet
             restful.getDelegate().setAttribute( JeeViewlet.SUBJECT_ATTRIBUTE_NAME, subject );
 
             try {
-                viewlet = (JeeViewlet) app.getViewletFactory().obtainFor( toView, c );
+                ViewletFactory viewletFact = app.getApplicationContext().findContextObjectOrThrow( ViewletFactory.class );
+                viewlet = (JeeViewlet) viewletFact.obtainFor( toView, c );
 
             } catch( CannotViewException ex ) {
                 throw ex; // pass on

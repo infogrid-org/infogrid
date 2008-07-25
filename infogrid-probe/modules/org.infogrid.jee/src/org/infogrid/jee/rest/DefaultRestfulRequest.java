@@ -107,7 +107,9 @@ public class DefaultRestfulRequest
             }
             theRequestedMeshBaseIdentifier = MeshBaseIdentifier.create( meshBaseIdentifierString );
             
-            NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = InfoGridWebApp.getSingleton().getMeshBaseNameServer();
+            @SuppressWarnings( "unchecked" )
+            NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = InfoGridWebApp.getSingleton().getApplicationContext().findContextObjectOrThrow( 
+                    NameServer.class );
             
             MeshBase mb = meshBaseNameServer.get( theRequestedMeshBaseIdentifier );
 
