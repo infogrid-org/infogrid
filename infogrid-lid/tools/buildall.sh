@@ -15,6 +15,7 @@ ant -f apps/org.infogrid.meshworld.net/build.xml dist || exit 1;
 echo '*** Now building other modules not referenced so far ***'
 ant -f modules/org.infogrid.lid.store/build.xml jar || exit 1;
 ant -f modules/org.infogrid.lid.openid.store/build.xml jar || exit 1;
+ant -f modules/org.infogrid.jee.lid/build.xml jar || exit 1;
 ant -f modules/org.infogrid.store.jets3t/build.xml jar || exit 1;
 
 echo '**** Now running ALLTESTS ****'
