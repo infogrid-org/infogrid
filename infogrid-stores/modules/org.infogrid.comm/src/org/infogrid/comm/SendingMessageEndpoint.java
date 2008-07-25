@@ -15,16 +15,19 @@
 package org.infogrid.comm;
 
 /**
- * A message endpoint for bidirectional communications. The method 
+ * A message endpoint for sending messages. The method 
  * enqueueMessageForSend is used for asynchronous sending of messages.
- * Incoming responses are received by subscribed MessageEndpointListeners.
  * 
  * @param <T> the message type
  */
-public interface MessageEndpoint<T>
-        extends
-            SendingMessageEndpoint<T>,
-            ReceivingMessageEndpoint<T>
+public interface SendingMessageEndpoint<T>
 {
-    // nothing
+    /**
+     * Send a message.
+     *
+     * @param msg the Message to send.
+     */
+    public void enqueueMessageForSend(
+            T msg );
+
 }
