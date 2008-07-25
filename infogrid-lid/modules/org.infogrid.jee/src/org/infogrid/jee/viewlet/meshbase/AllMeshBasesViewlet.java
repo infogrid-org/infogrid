@@ -70,8 +70,10 @@ public class AllMeshBasesViewlet
      */
     public Iterator<MeshBase> iterator()
     {
-        InfoGridWebApp                          app = InfoGridWebApp.getSingleton();
-        NameServer<MeshBaseIdentifier,MeshBase> ns  = app.getMeshBaseNameServer();
+        InfoGridWebApp app = InfoGridWebApp.getSingleton();
+
+        @SuppressWarnings( "unchecked" )
+        NameServer<MeshBaseIdentifier,MeshBase> ns  = app.getApplicationContext().findContextObjectOrThrow( NameServer.class );
         
         Iterator<MeshBase> ret = ns.values().iterator();
         

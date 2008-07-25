@@ -62,7 +62,8 @@ public class SafeUnsafePostFilter
             ServletException
     {
         boolean isSafe = true;
-        FormTokenService theFormTokenService = InfoGridWebApp.getSingleton().getFormTokenService();
+        FormTokenService theFormTokenService = InfoGridWebApp.getSingleton().getApplicationContext().findContextObjectOrThrow( 
+                FormTokenService.class );
 
         if(    theFormTokenService != null // otherwise we always think it's safe
             && request instanceof HttpServletRequest )
