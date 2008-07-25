@@ -414,6 +414,17 @@ public abstract class PingPongMessageEndpoint<T>
     }
     
     /**
+     * Add a MessageEndpointListener.
+     *
+     * @param newListener the listener to add
+     */
+    public void addSoftMessageEndpointListener(
+            MessageEndpointListener<T> newListener )
+    {
+        theListeners.addSoft( newListener );
+    }
+    
+    /**
      * Remove a MessageEndpointListener.
      *
      * @param oldListener the listener to remove
