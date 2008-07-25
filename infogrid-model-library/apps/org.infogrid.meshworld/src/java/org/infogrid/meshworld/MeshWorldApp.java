@@ -24,9 +24,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import org.infogrid.context.SimpleContext;
 import org.infogrid.jee.app.InfoGridWebApp;
-import org.infogrid.jee.security.FormTokenService;
 import org.infogrid.jee.security.StoreFormTokenService;
-import org.infogrid.jee.viewlet.templates.DefaultStructuredResponseTemplateFactory;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.security.AccessManager;
@@ -40,7 +38,6 @@ import org.infogrid.module.SoftwareInstallation;
 import org.infogrid.module.servlet.ServletBootLoader;
 import org.infogrid.store.sql.SqlStore;
 import org.infogrid.util.MNameServer;
-import org.infogrid.util.NameServer;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.logging.log4j.Log4jLog;
@@ -140,7 +137,8 @@ public class MeshWorldApp
 
         // ModelBase
         ModelBase modelBase = ModelBaseSingleton.getSingleton();
-
+        rootContext.addContextObject( modelBase );
+        
         // Only one MeshBase
         MeshBaseIdentifier mbId;
         try {
@@ -154,39 +152,30 @@ public class MeshWorldApp
         AccessManager accessMgr = null;
 
         IterableStoreMeshBase meshBase = IterableStoreMeshBase.create( mbId, modelBase, accessMgr, meshStore, rootContext    );
+        rootContext.addContextObject( meshBase );
 
         // Name Server
         MNameServer<MeshBaseIdentifier,MeshBase> nameServer = MNameServer.create();
         nameServer.put( mbId, meshBase );
+        rootContext.addContextObject( nameServer );
 
         // FormTokenService
         StoreFormTokenService formTokenService = StoreFormTokenService.create( formTokenStore );
-
-        MeshWorldApp ret = new MeshWorldApp( meshBase, nameServer, formTokenService, rootContext );
+        rootContext.addContextObject( formTokenService );
+        
+        MeshWorldApp ret = new MeshWorldApp( rootContext );
         return ret;
     }
 
     /**
      * Constructor, to be invoked by factory method only.
      *
-     * @param mainMeshBase the main MeshBase of the application
-     * @param meshBaseNameServer the NameServer mapping MeshBaseIdentifiers to MeshBases
-     * @param formTokenService the FormTokenService to use
      * @param applicationContext the main application Context
      */
     protected MeshWorldApp(
-            IterableStoreMeshBase                   mainMeshBase,
-            NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer,
-            FormTokenService                        formTokenService,
-            SimpleContext                           applicationContext )
+            SimpleContext applicationContext )
     {
-        super(  mainMeshBase,
-                meshBaseNameServer,
-                new MeshWorldViewletFactory(),
-                null,
-                DefaultStructuredResponseTemplateFactory.create(),
-                formTokenService,
-                applicationContext );
+        super( applicationContext );
     }
 
     /**

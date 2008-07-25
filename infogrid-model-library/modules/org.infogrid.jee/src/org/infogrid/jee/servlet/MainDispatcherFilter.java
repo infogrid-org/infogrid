@@ -81,7 +81,8 @@ public class MainDispatcherFilter
     }
     
     /**
-     *
+     * Main filter method.
+     * 
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
      * @param chain The filter chain we are processing

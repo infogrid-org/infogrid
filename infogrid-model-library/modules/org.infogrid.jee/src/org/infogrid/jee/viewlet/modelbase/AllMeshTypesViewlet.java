@@ -40,7 +40,7 @@ public class AllMeshTypesViewlet
             Context c )
     {
         DefaultViewedMeshObjects viewed = new DefaultViewedMeshObjects();
-        AllMeshTypesViewlet     ret    = new AllMeshTypesViewlet( viewed, c );
+        AllMeshTypesViewlet      ret    = new AllMeshTypesViewlet( viewed, c );
 
         viewed.setViewlet( ret );
 
@@ -68,7 +68,7 @@ public class AllMeshTypesViewlet
     public Iterator<SubjectArea> getSubjectAreas()
     {
         InfoGridWebApp app = InfoGridWebApp.getSingleton();
-        ModelBase      mb  = app.getModelBase();
+        ModelBase      mb  = app.getApplicationContext().findContextObjectOrThrow( ModelBase.class );
         
         return mb.subjectAreaIterator();
     }
