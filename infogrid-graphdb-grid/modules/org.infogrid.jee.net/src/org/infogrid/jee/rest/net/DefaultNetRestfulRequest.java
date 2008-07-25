@@ -44,6 +44,11 @@ public class DefaultNetRestfulRequest
 
     /**
      * Factory method.
+     * 
+     * @param lidRequest the incoming request
+     * @param contextPath the application's JEE context path
+     * @param defaultMeshBaseIdentifier the identifier, in String form, of the default MeshBase
+     * @return the created DefaultNetRestfulRequest
      */
     public static DefaultNetRestfulRequest create(
             SaneServletRequest lidRequest,
@@ -55,6 +60,10 @@ public class DefaultNetRestfulRequest
 
     /**
      * Constructor.
+     * 
+     * @param lidRequest the incoming request
+     * @param contextPath the application's JEE context path
+     * @param defaultMeshBaseIdentifier the identifier, in String form, of the default MeshBase
      */
     protected DefaultNetRestfulRequest(
             SaneServletRequest lidRequest,
@@ -68,6 +77,10 @@ public class DefaultNetRestfulRequest
 
     /**
      * Internal method to calculate the data.
+     * 
+     * @throws MeshObjectAccessException thrown if a MeshObject could not be accessed
+     * @throws NotPermittedException thrown if the caller was not permitted to perform this operation
+     * @throws URISyntaxException thrown if the MeshBaseIdentifier passed into the constructor could not be parsed
      */
     protected void calculate()
             throws
@@ -106,7 +119,9 @@ public class DefaultNetRestfulRequest
             }
             theRequestedMeshBaseIdentifier = NetMeshBaseIdentifier.create( meshBaseIdentifierString );
 
-            NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = InfoGridWebApp.getSingleton().getMeshBaseNameServer();
+            @SuppressWarnings( "unchecked" )
+            NameServer<MeshBaseIdentifier,MeshBase> meshBaseNameServer = InfoGridWebApp.getSingleton().getApplicationContext().findContextObjectOrThrow( 
+                    NameServer.class );
 
             MeshBase mb = meshBaseNameServer.get( theRequestedMeshBaseIdentifier );
 
@@ -131,6 +146,9 @@ public class DefaultNetRestfulRequest
      * Determine the identifier of the requested Proxy, if any.
      * 
      * @return the NetMeshIdentifier
+     * @throws MeshObjectAccessException thrown if a MeshObject could not be accessed
+     * @throws NotPermittedException thrown if the caller was not permitted to perform this operation
+     * @throws URISyntaxException thrown if the MeshBaseIdentifier passed into the constructor could not be parsed
      */
     public NetMeshBaseIdentifier determineRequestedProxyIdentifier()
             throws
@@ -147,6 +165,9 @@ public class DefaultNetRestfulRequest
     /**
      * Determine the requested Proxy, if any.
      * 
+     * @throws MeshObjectAccessException thrown if a MeshObject could not be accessed
+     * @throws NotPermittedException thrown if the caller was not permitted to perform this operation
+     * @throws URISyntaxException thrown if the MeshBaseIdentifier passed into the constructor could not be parsed
      * @return the Proxy
      */
     public Proxy determineRequestedProxy()

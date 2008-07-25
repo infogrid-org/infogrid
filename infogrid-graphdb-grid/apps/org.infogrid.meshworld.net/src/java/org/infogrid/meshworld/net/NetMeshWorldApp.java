@@ -26,9 +26,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import org.infogrid.context.SimpleContext;
 import org.infogrid.jee.app.InfoGridWebApp;
-import org.infogrid.jee.security.FormTokenService;
 import org.infogrid.jee.security.StoreFormTokenService;
-import org.infogrid.jee.viewlet.templates.DefaultStructuredResponseTemplateFactory;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
@@ -175,38 +173,29 @@ public class NetMeshWorldApp
                 exec,
                 theResourceHelper.getResourceLongOrDefault( "TimeShadowNotNeededTillExpires", 120000L ), // 2 min 
                 rootContext );
+        rootContext.addContextObject( meshBase );
 
         NameServer<NetMeshBaseIdentifier,NetMeshBase> nameServer = meshBase.getLocalNameServer();
+        rootContext.addContextObject( nameServer );
         
         // FormTokenService
         StoreFormTokenService formTokenService = StoreFormTokenService.create( formTokenStore );
+        rootContext.addContextObject( formTokenService );
 
-        NetMeshWorldApp ret = new NetMeshWorldApp( meshBase, nameServer, formTokenService, rootContext );
+        NetMeshWorldApp ret = new NetMeshWorldApp( rootContext );
         return ret;
     }
 
     /**
      * Constructor, to be invoked by factory method only.
      *
-     * @param mainMeshBase the main MeshBase of the application
-     * @param meshBaseNameServer the NameServer mapping NetMeshBaseIdentifiers to NetMeshBases, such as ShadowMeshBases
-     * @param formTokenService the FormTokenService to use
      * @param applicationContext the main application Context
      */
     @SuppressWarnings(value={"unchecked"})
     protected NetMeshWorldApp(
-            NetMeshBase                                   mainMeshBase,
-            NameServer<NetMeshBaseIdentifier,NetMeshBase> meshBaseNameServer,
-            FormTokenService                              formTokenService,
-            SimpleContext                                 applicationContext )
+            SimpleContext applicationContext )
     {
-        super(  mainMeshBase,
-                (NameServer) meshBaseNameServer,
-                new NetMeshWorldViewletFactory(),
-                null,
-                DefaultStructuredResponseTemplateFactory.create(),
-                formTokenService,
-                applicationContext );
+        super( applicationContext );
     }
 
     /**
@@ -223,16 +212,5 @@ public class NetMeshWorldApp
     {
         NetMeshBaseIdentifier ret = NetMeshBaseIdentifier.create( stringForm );
         return ret;
-    }
-
-    /**
-     * Obtain the default MeshBase.
-     * 
-     * @return the default MeshBase
-     */
-    @Override
-    public IterableLocalNetStoreMeshBase getDefaultMeshBase()
-    {
-        return (IterableLocalNetStoreMeshBase) super.getDefaultMeshBase();
     }
 }
