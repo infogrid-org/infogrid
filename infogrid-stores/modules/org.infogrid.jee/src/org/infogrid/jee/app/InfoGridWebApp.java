@@ -23,18 +23,7 @@ import java.util.Locale;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import org.infogrid.context.Context;
-import org.infogrid.jee.rest.RestfulRequest;
-import org.infogrid.jee.security.FormTokenService;
-import org.infogrid.jee.viewlet.templates.StructuredResponse;
-import org.infogrid.jee.viewlet.templates.StructuredResponseTemplate;
-import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
-import org.infogrid.model.traversal.TraversalDictionary;
-import org.infogrid.modelbase.ModelBase;
-import org.infogrid.modelbase.ModelBaseSingleton;
-import org.infogrid.util.Factory;
-import org.infogrid.util.NameServer;
-import org.infogrid.viewlet.ViewletFactory;
 
 /**
  * <p>An InfoGrid web application. This needs to be subclassed.</p>
@@ -79,63 +68,13 @@ public abstract class InfoGridWebApp
     /**
      * Constructor, for subclasses.
      *
-     * @param mainMeshBase the main MeshBase of the application
-     * @param meshBaseNameServer the NameServer that maps MeshBaseIdentifiers to the MeshBases in the application
-     * @param viewletFactory the ViewletFactory of the application
-     * @param traversalDictionary the TraversalDictionary of the application
-     * @param structuredResponseTemplateFactory factory for StructuredResponseTemplates
-     *             that determine the graphical appearance of the application
-     * @param formTokenService the FormTokenService that allows the insertion and validation of form tokens in HTML forms
-     * @param applicationContext the main application Context
+     * @param applicationContext the main application Context. THis context holds all the
+     *        well-known objects needed by the application
      */
     protected InfoGridWebApp(
-            MeshBase                                                              mainMeshBase,
-            NameServer<MeshBaseIdentifier,MeshBase>                               meshBaseNameServer,
-            ViewletFactory                                                        viewletFactory,
-            TraversalDictionary                                                   traversalDictionary,
-            Factory<RestfulRequest,StructuredResponseTemplate,StructuredResponse> structuredResponseTemplateFactory,
-            FormTokenService                                                      formTokenService,
-            Context                                                               applicationContext )
+            Context applicationContext )
     {        
-        theMainMeshBase                      = mainMeshBase;
-        theMeshBaseNameServer                = meshBaseNameServer;
-        theViewletFactory                    = viewletFactory;
-        theTraversalDictionary               = traversalDictionary;
-        theApplicationContext                = applicationContext;
-        theFormTokenService                  = formTokenService;
-        theStructuredResponseTemplateFactory = structuredResponseTemplateFactory;
-        
-        theApplicationContext.addContextObject( theViewletFactory );
-    }
-
-    /**
-     * Obtain the MeshBase name server for this application.
-     *
-     * @return the MeshBase name server
-     */
-    public NameServer<MeshBaseIdentifier,MeshBase> getMeshBaseNameServer()
-    {
-        return theMeshBaseNameServer;
-    }
-
-    /**
-     * Obtain the ModelBase for this application.
-     *
-     * @return the ModelBase
-     */
-    public final ModelBase getModelBase()
-    {
-        return ModelBaseSingleton.getSingleton();
-    }
-
-    /**
-     * Obtain the ViewletFactory for this application.
-     *
-     * @return the ViewletFactory
-     */
-    public ViewletFactory getViewletFactory()
-    {
-        return theViewletFactory;
+        theApplicationContext = applicationContext;
     }
 
     /**
@@ -321,16 +260,6 @@ public abstract class InfoGridWebApp
     }
 
     /**
-     * Obtain the TraversalDictionary for this application.
-     *
-     * @return the TraversalDictionary
-     */
-    public TraversalDictionary getTraversalDictionary()
-    {
-        return theTraversalDictionary;
-    }
-
-    /**
      *  Factory method to create the right subtype MeshBaseIdentifier.
      * 
      * @param stringForm the String representation of the MeshBaseIdentifier
@@ -343,51 +272,6 @@ public abstract class InfoGridWebApp
             URISyntaxException;
 
     /**
-     * Obtain the default MeshBase.
-     * 
-     * @return the default MeshBase
-     */
-    public MeshBase getDefaultMeshBase()
-    {
-        return theMainMeshBase;
-    }
-
-    /**
-     * Obtain a factory for StructuredResponseTemplates.
-     * 
-     * @return the Factory
-     */
-    public Factory<RestfulRequest,StructuredResponseTemplate,StructuredResponse> getStructuredResponseTemplateFactory()
-    {
-        return theStructuredResponseTemplateFactory;
-    }
-
-    /**
-     * Obtain a FormTokenService.
-     * 
-     * @return the FormTokenService
-     */
-    public FormTokenService getFormTokenService()
-    {
-        return theFormTokenService;
-    }
-
-    /**
-     * The NameServer that knows the Meshbase(s) in this application.
-     */
-    protected NameServer<MeshBaseIdentifier,MeshBase> theMeshBaseNameServer;
-    
-    /**
-     * The ViewletFactory for this application.
-     */
-    protected ViewletFactory theViewletFactory;
-
-    /**
-     * The FormTokenService to use.
-     */
-    protected FormTokenService theFormTokenService;
-
-    /**
      * The application context.
      */
     protected Context theApplicationContext;
@@ -395,20 +279,5 @@ public abstract class InfoGridWebApp
     /**
      * The singleton instance of this class.
      */
-    private static InfoGridWebApp theSingleton;
-    
-    /**
-     * The TraversalDictionary for this application, if one was given.
-     */
-    protected TraversalDictionary theTraversalDictionary;
-        
-    /**
-     * The main MeshBase.
-     */
-    protected MeshBase theMainMeshBase;
-    
-    /**
-     * The factory that determines the structure of our responses.
-     */
-    protected Factory<RestfulRequest,StructuredResponseTemplate,StructuredResponse> theStructuredResponseTemplateFactory;
+    private static InfoGridWebApp theSingleton;    
 }

@@ -222,7 +222,7 @@ public abstract class AbstractRelatedTag
             if( theTraversalSpecificationName != null ) {
                 throw new JspException( "Must not specify both traversalSpecification and traversalSpecificationName" );
             } else {
-                TraversalDictionary dict = InfoGridWebApp.getSingleton().getTraversalDictionary();
+                TraversalDictionary dict = InfoGridWebApp.getSingleton().getApplicationContext().findContextObjectOrThrow( TraversalDictionary.class );
                 spec = dict.translate( obj, theTraversalSpecification );
             }
             
