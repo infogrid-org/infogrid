@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Makes implementing MessageEndpointListeners easier.
  * 
- * @param T the message type
+ * @param <T> the message type
  */
 public abstract class AbstractMessageEndpointListener<T>
         implements
@@ -32,8 +32,8 @@ public abstract class AbstractMessageEndpointListener<T>
      * @param msg the received message
      */
     public void messageReceived(
-            MessageEndpoint<T> endpoint,
-            T                  msg )
+            ReceivingMessageEndpoint<T> endpoint,
+            T                           msg )
     {
         // no op
     }
@@ -45,21 +45,21 @@ public abstract class AbstractMessageEndpointListener<T>
      * @param msg the sent message
      */
     public void messageSent(
-            MessageEndpoint<T> endpoint,
-            T                  msg )
+            SendingMessageEndpoint<T> endpoint,
+            T                         msg )
     {
         // no op
     }
     
     /**
-     * Called when an outgoing message has enqueued for sending.
+     * Called when an outgoing message has been enqueued for sending.
      *
      * @param endpoint the MessageEndpoint that sent this event
      * @param msg the enqueued message
      */
     public void messageEnqueued(
-            MessageEndpoint<T> endpoint,
-            T                  msg )
+            SendingMessageEndpoint<T> endpoint,
+            T                         msg )
     {
         // no op
     }
@@ -71,8 +71,8 @@ public abstract class AbstractMessageEndpointListener<T>
      * @param msg the outgoing messages, in order
      */
     public void messageSendingFailed(
-            MessageEndpoint<T> endpoint,
-            List<T>            msg )
+            SendingMessageEndpoint<T> endpoint,
+            T                         msg )
     {
         // no op
     }

@@ -15,7 +15,6 @@
 package org.infogrid.meshbase.net.proxy;
 
 import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.util.logging.Log;
 
 /**
  * A ProxyPolicy that generally does what it is being asked for and tries to
@@ -26,8 +25,6 @@ public class NiceAndTrustingProxyPolicy
         extends
             AbstractProxyPolicy
 {
-    private static final Log log = Log.getLogInstance( NiceAndTrustingProxyPolicy.class ); // our own, private logger
-
     /**
      * Factory method.
      * 

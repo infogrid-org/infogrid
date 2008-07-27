@@ -14,7 +14,8 @@
 
 package org.infogrid.comm.pingpong.TEST;
 
-import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.BidirectionalMessageEndpoint;
+import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
 import org.infogrid.comm.pingpong.m.MPingPongMessageEndpoint;
 
@@ -31,7 +32,7 @@ public class PingPongRpcTest2
     /**
      * Test run.
      *
-     * @throws Exception this code may throw any Exception
+     * @throws Throwable this code may throw any Exception
      */
     public void run()
             throws
@@ -135,7 +136,7 @@ public class PingPongRpcTest2
          * @param end the endpoint to which this listener listenes
          */
         public MyListener(
-                MessageEndpoint<PingPongRpcTestMessage> end )
+                BidirectionalMessageEndpoint<PingPongRpcTestMessage> end )
         {
             super( end );
         }
@@ -147,8 +148,8 @@ public class PingPongRpcTest2
          * @param msg the received message
          */
         public void messageReceived(
-                MessageEndpoint<PingPongRpcTestMessage> endpoint,
-                final PingPongRpcTestMessage            msg )
+                ReceivingMessageEndpoint<PingPongRpcTestMessage> endpoint,
+                final PingPongRpcTestMessage                     msg )
         {
             if( theOldMessage != null ) {
                 long ret = theOldMessage.getPayload();

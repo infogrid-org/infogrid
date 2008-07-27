@@ -17,7 +17,7 @@ package org.infogrid.meshbase.net.proxy;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.util.AbstractFactory;
 
 /**
@@ -32,11 +32,11 @@ public abstract class AbstractProxyFactory
     /**
      * Constructor.
      * 
-     * @param endpointFactory the NetMessageEndpointFactory to use to communicate
+     * @param endpointFactory the ProxyMessageEndpointFactory to use to communicate
      * @param proxyPolicyFactory the factory for ProxyPolicies for communications with other NetMeshBases
      */
     protected AbstractProxyFactory(
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProxyPolicyFactory        proxyPolicyFactory )
     {
         theEndpointFactory    = endpointFactory;
@@ -72,7 +72,7 @@ public abstract class AbstractProxyFactory
     /**
      * Factory for endpoints.
      */
-    protected NetMessageEndpointFactory theEndpointFactory;
+    protected ProxyMessageEndpointFactory theEndpointFactory;
     
     /**
      * Factory for ProxyPolicies.

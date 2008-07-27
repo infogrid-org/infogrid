@@ -14,16 +14,16 @@
 
 package org.infogrid.comm.pingpong.TEST;
 
-import org.infogrid.testharness.AbstractTest;
-
-import org.infogrid.comm.MessageEndpoint;
-import org.infogrid.comm.MessageEndpointListener;
-import org.infogrid.comm.pingpong.m.MPingPongMessageEndpoint;
-
-import org.infogrid.util.logging.Log;
-
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.MessageEndpointListener;
+import org.infogrid.comm.ReceivingMessageEndpoint;
+import org.infogrid.comm.SendingMessageEndpoint;
+import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
+import org.infogrid.comm.pingpong.m.MPingPongMessageEndpoint;
+import org.infogrid.testharness.AbstractTest;
+import org.infogrid.util.logging.Log;
 
 /**
  * Tests the passing of messages between the endpoints.
@@ -151,8 +151,8 @@ public class PingPongTest2
                 MessageEndpointListener<String>
     {
         public MyListener(
-                MessageEndpoint<String> end,
-                String                  prefix )
+                PingPongMessageEndpoint<String> end,
+                String                          prefix )
         {
             theEndpoint = end;
             thePrefix   = prefix;
@@ -161,11 +161,12 @@ public class PingPongTest2
         /**
          * Called when an incoming message has arrived.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the received message
          */
         public void messageReceived(
-                MessageEndpoint<String> endpoint,
-                String                  msg )
+                ReceivingMessageEndpoint<String> endpoint,
+                String                           msg )
         {
             log.debug( this + " received message " + msg );
             lastMessageReceived = msg;
@@ -179,8 +180,8 @@ public class PingPongTest2
          * @param msg the sent message
          */
         public void messageSent(
-                MessageEndpoint<String> sender,
-                String                  msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             log.debug( this + " sent message " + msg );
         }
@@ -192,8 +193,8 @@ public class PingPongTest2
          * @param msg the enqueued message
          */
         public void messageEnqueued(
-                MessageEndpoint<String> sender,
-                String                  msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             log.debug( this + " enqueued message " + msg );
         }
@@ -201,11 +202,12 @@ public class PingPongTest2
         /**
          * Called when an outoing message failed to be sent.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the outgoing message
          */
         public void messageSendingFailed(
-                MessageEndpoint<String> endpoint,
-                List<String>            msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             reportError( "Message sending failed: " + msg );
         }
@@ -213,7 +215,9 @@ public class PingPongTest2
         /**
          * Called when the receiving endpoint threw the EndpointIsDeadException.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the status of the outgoing queue
+         * @param t the error
          */
         public void disablingError(
                 MessageEndpoint<String> endpoint,
@@ -231,9 +235,9 @@ public class PingPongTest2
             sent     = 0;
         }
 
-        MessageEndpoint<String> theEndpoint;
-        String                  thePrefix;
-        String                  lastMessageReceived;
+        PingPongMessageEndpoint<String> theEndpoint;
+        String                          thePrefix;
+        String                          lastMessageReceived;
         
         int received;
         int sent;

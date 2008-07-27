@@ -38,6 +38,7 @@ public class AllTests
                 new TestSpec( PingPongTest2.class, subArgs ),
                 new TestSpec( PingPongTest3.class, subArgs ),
                 new TestSpec( PingPongTest4.class, subArgs ),
+                new TestSpec( PingPongTest5.class, subArgs ),
 
                 new TestSpec( PingPongRpcTest1.class, subArgs ),
                 new TestSpec( PingPongRpcTest2.class, subArgs ),

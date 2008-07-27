@@ -23,7 +23,7 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.transaction.Transaction;
-import org.infogrid.net.NetMessageEndpoint;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
 import org.infogrid.util.FactoryCreatedObject;
 import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.text.StringRepresentation;
@@ -34,7 +34,7 @@ import org.infogrid.util.text.StringRepresentation;
  * NetMeshBase B on behalf of A; the other owned by and collocated with NetMeshBase B,
  * interacting with NetMeshBase A on behalf of A.</p>
  * 
- * <p>The implementation class of NetMessageEndpoint determines how to perform
+ * <p>The implementation class of ProxyMessageEndpoint determines how to perform
  * the actual communication.</p>
  */
 public interface Proxy
@@ -57,11 +57,11 @@ public interface Proxy
     public abstract NetMeshBaseIdentifier getPartnerMeshBaseIdentifier();
 
     /**
-     * Obtain the NetMessageEndpoint associated with this Proxy.
+     * Obtain the ProxyMessageEndpoint associated with this Proxy.
      *
-     * @return the NetMessageEndpoint
+     * @return the ProxyMessageEndpoint
      */
-    public abstract NetMessageEndpoint getMessageEndpoint();
+    public abstract ProxyMessageEndpoint getMessageEndpoint();
 
     /**
      * Obtain the CoherenceSpecification currently in effect.

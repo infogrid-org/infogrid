@@ -15,7 +15,7 @@
 package org.infogrid.comm.pingpong.TEST;
 
 import org.infogrid.comm.CarriesInvocationId;
-import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.BidirectionalMessageEndpoint;
 import org.infogrid.comm.RpcClientEndpoint;
 
 import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
@@ -25,6 +25,8 @@ import org.infogrid.testharness.AbstractTest;
 
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.SendingMessageEndpoint;
 
 /**
  * Factors out common functionality needed by RpcTests.
@@ -162,7 +164,7 @@ public abstract class AbstractPingPongRpcTest
          * @param end the endpoint where this listener listens
          */
         public AbstractPingPongRpcListener(
-                MessageEndpoint<PingPongRpcTestMessage> end )
+                BidirectionalMessageEndpoint<PingPongRpcTestMessage> end )
         {
             theEndpoint = end;
         }
@@ -174,8 +176,8 @@ public abstract class AbstractPingPongRpcTest
          * @param msg the sent message
          */
         public void messageSent(
-                MessageEndpoint<PingPongRpcTestMessage> sender,
-                PingPongRpcTestMessage                  msg )
+                SendingMessageEndpoint<PingPongRpcTestMessage> endpoint,
+                PingPongRpcTestMessage                         msg )
         {
             getLog().debug( this + " sent message " + msg );
         }
@@ -187,8 +189,8 @@ public abstract class AbstractPingPongRpcTest
          * @param msg the enqueued message
          */
         public void messageEnqueued(
-                MessageEndpoint<PingPongRpcTestMessage> sender,
-                PingPongRpcTestMessage                  msg )
+                SendingMessageEndpoint<PingPongRpcTestMessage> endpoint,
+                PingPongRpcTestMessage                         msg )
         {
             getLog().debug( this + " enqueued message " + msg );
         }
@@ -196,12 +198,12 @@ public abstract class AbstractPingPongRpcTest
         /**
          * Called when an outoing message failed to be sent.
          *
-         * @param endpoint the PingPongMessageEndpoint that sent this event
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the outgoing message
          */
         public void messageSendingFailed(
-                MessageEndpoint<PingPongRpcTestMessage> endpoint,
-                List<PingPongRpcTestMessage>            msg )
+                SendingMessageEndpoint<PingPongRpcTestMessage> endpoint,
+                PingPongRpcTestMessage                         msg )
         {
             reportError( "Message sending failed: " + msg );
         }
@@ -209,7 +211,7 @@ public abstract class AbstractPingPongRpcTest
         /**
          * Called when the receiving endpoint threw the EndpointIsDeadException.
          *
-         * @param endpoint the PingPongMessageEndpoint that sent this event
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the status of the outgoing queue
          * @param t the disabling error
          */
@@ -226,7 +228,7 @@ public abstract class AbstractPingPongRpcTest
         /**
          * Called when the token has been sent.
          *
-         * @param endpoint the PingPongMessageEndpoint that sent this event
+         * @param endpoint the MessageEndpoint that sent this event
          * @param token the sent token
          */
         public void tokenSent(
@@ -239,7 +241,7 @@ public abstract class AbstractPingPongRpcTest
         /**
          * The endpoint to which this listener listens.
          */
-        MessageEndpoint<PingPongRpcTestMessage> theEndpoint;
+        BidirectionalMessageEndpoint<PingPongRpcTestMessage> theEndpoint;
     }
     
     /**
@@ -255,7 +257,7 @@ public abstract class AbstractPingPongRpcTest
          * @param ep the underlying MessageEndPoint
          */
         public PingPongRpcClientEndpoint(
-                MessageEndpoint<PingPongRpcTestMessage> ep )
+                BidirectionalMessageEndpoint<PingPongRpcTestMessage> ep )
         {
             super( ep );
         }

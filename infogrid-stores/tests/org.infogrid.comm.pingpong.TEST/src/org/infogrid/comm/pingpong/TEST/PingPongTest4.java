@@ -16,7 +16,7 @@ package org.infogrid.comm.pingpong.TEST;
 
 import org.infogrid.testharness.AbstractTest;
 
-import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.BidirectionalMessageEndpoint;
 import org.infogrid.comm.MessageEndpointListener;
 import org.infogrid.comm.pingpong.m.MPingPongMessageEndpoint;
 
@@ -25,6 +25,9 @@ import org.infogrid.util.logging.Log;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.ReceivingMessageEndpoint;
+import org.infogrid.comm.SendingMessageEndpoint;
 
 /**
  * Tests that ping-ponging endpoints gracefully die.
@@ -167,7 +170,7 @@ public class PingPongTest4
                 MessageEndpointListener<String>
     {
         public MyListener(
-                MessageEndpoint<String> end,
+                BidirectionalMessageEndpoint<String> end,
                 String                  prefix )
         {
             theEndpoint = end;
@@ -177,11 +180,12 @@ public class PingPongTest4
         /**
          * Called when an incoming message has arrived.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the received message
          */
         public void messageReceived(
-                MessageEndpoint<String> endpoint,
-                String                  msg )
+                ReceivingMessageEndpoint<String> endpoint,
+                String                           msg )
         {
             messages.add( msg );
             theEndpoint.enqueueMessageForSend( thePrefix + ": responding to messageReceived" );
@@ -194,8 +198,8 @@ public class PingPongTest4
          * @param msg the sent message
          */
         public void messageSent(
-                MessageEndpoint<String> sender,
-                String                  msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             log.debug( this + " sent message " + msg );
         }
@@ -207,8 +211,8 @@ public class PingPongTest4
          * @param msg the enqueued message
          */
         public void messageEnqueued(
-                MessageEndpoint<String> sender,
-                String                  msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             log.debug( this + " enqueued message " + msg );
         }
@@ -220,8 +224,8 @@ public class PingPongTest4
          * @param msg the outgoing message
          */
         public void messageSendingFailed(
-                MessageEndpoint<String> endpoint,
-                List<String>            msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             reportError( "Message sending failed: " + msg );
         }
@@ -262,7 +266,7 @@ public class PingPongTest4
             return "Listener (prefix: " + thePrefix + "): ";
         }
 
-        MessageEndpoint<String> theEndpoint;
+        BidirectionalMessageEndpoint<String> theEndpoint;
         String                  thePrefix;
         ArrayList<String>       messages = new ArrayList<String>();
     }

@@ -24,7 +24,7 @@ import org.infogrid.meshbase.store.net.NetStoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.model.primitives.StringValue;
-import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.store.prefixing.IterablePrefixingStore;
 import org.infogrid.util.MNameServer;
 import org.infogrid.util.WritableNameServer;
