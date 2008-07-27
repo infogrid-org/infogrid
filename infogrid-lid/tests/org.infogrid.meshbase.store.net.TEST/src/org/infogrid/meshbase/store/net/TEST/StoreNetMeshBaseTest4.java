@@ -25,7 +25,7 @@ import org.infogrid.meshbase.net.externalized.xml.ExternalizedProxyXmlEncoder;
 import org.infogrid.meshbase.store.net.NetStoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
-import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.store.StoreValue;
 import org.infogrid.store.m.MStore;
 import org.infogrid.util.MNameServer;

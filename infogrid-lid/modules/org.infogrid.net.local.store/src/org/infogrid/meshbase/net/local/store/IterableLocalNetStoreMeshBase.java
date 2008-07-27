@@ -41,8 +41,8 @@ import org.infogrid.meshbase.store.net.StoreProxyEntryMapper;
 import org.infogrid.meshbase.store.net.StoreProxyManager;
 import org.infogrid.meshbase.sweeper.SweepStep;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.net.NetMessageEndpointFactory;
-import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.manager.ProbeManager;
 import org.infogrid.probe.manager.store.StoreScheduledExecutorProbeManager;
@@ -452,7 +452,7 @@ public class IterableLocalNetStoreMeshBase
             IterableStore             meshObjectStore,
             IterableStore             proxyStore,
             ProbeManager              probeManager,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             Context                   context )
     {
         ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
@@ -496,7 +496,7 @@ public class IterableLocalNetStoreMeshBase
             IterableStore             meshObjectStore,
             IterableStore             proxyStore,
             ProbeManager              probeManager,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             Context                   context )
     {
         DefaultProxyFactory proxyFactory = DefaultProxyFactory.create( endpointFactory, proxyPolicyFactory );

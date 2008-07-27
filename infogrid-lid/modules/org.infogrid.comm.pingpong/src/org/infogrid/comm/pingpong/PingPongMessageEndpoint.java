@@ -14,20 +14,18 @@
 
 package org.infogrid.comm.pingpong;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import org.infogrid.comm.AbstractSendingMessageEndpoint;
+import org.infogrid.comm.BidirectionalMessageEndpoint;
 import org.infogrid.comm.MessageEndpoint;
 import org.infogrid.comm.MessageEndpointIsDeadException;
 import org.infogrid.comm.MessageEndpointListener;
 import org.infogrid.comm.MessageSendException;
-import org.infogrid.util.AbstractListenerSet;
-import org.infogrid.util.FlexibleListenerSet;
 import org.infogrid.util.StringHelper;
 import org.infogrid.util.logging.Log;
 
@@ -42,8 +40,10 @@ import org.infogrid.util.logging.Log;
  * @param <T> the message type
  */
 public abstract class PingPongMessageEndpoint<T>
+        extends
+            AbstractSendingMessageEndpoint<T>
         implements
-            MessageEndpoint<T>
+            BidirectionalMessageEndpoint<T>
 {
     private static final Log logHigh = Log.getLogInstance( PingPongMessageEndpoint.class ); // our own, private logger for high-level events
     private static final Log logLow  = Log.getLogInstance( PingPongMessageEndpoint.class.getName() + "-lowlevel" ); // our own, private logger for low-level events
@@ -51,17 +51,17 @@ public abstract class PingPongMessageEndpoint<T>
     /**
      * Constructor for subclasses only.
      *
-     * @param name the name of the PingPongMessageEndpoint (for debugging only)
+     * @param name the name of the MessageEndpoint (for debugging only)
      * @param deltaRespond the number of milliseconds until this PingPongMessageEndpoint returns the token
      * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
      * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
      *                     was not received by the partner PingPongMessageEndpoint, and resends
      * @param randomVariation the random component to add to the various times
      * @param exec the ScheduledExecutorService to schedule timed tasks
-     * @param lastSentToken the last token sent in a previous instantiation of this MessageEndpoint
-     * @param lastReceivedToken the last token received in a previous instantiation of this MessageEndpoint
-     * @param messagesSentLast the last set of Messages sent in a previous instantiation of this MessageEndpoint
-     * @param messagesToBeSent the Messages to be sent as soon as possible
+     * @param lastSentToken the last token sent in a previous instantiation of this BidirectionalMessageEndpoint
+     * @param lastReceivedToken the last token received in a previous instantiation of this BidirectionalMessageEndpoint
+     * @param messagesSentLast the last set of Messages sent in a previous instantiation of this BidirectionalMessageEndpoint
+     * @param messagesToBeSent outgoing message queue (may or may not be empty)
      */
     protected PingPongMessageEndpoint(
             String                   name,
@@ -75,36 +75,15 @@ public abstract class PingPongMessageEndpoint<T>
             List<T>                  messagesSentLast,
             List<T>                  messagesToBeSent )
     {
-        theName            = name;
+        super( name, randomVariation, exec, messagesToBeSent );
+
         theDeltaRespond    = deltaRespond;
         theDeltaResend     = deltaResend;
         theDeltaRecover    = deltaRecover;
-        theRandomVariation = randomVariation;
-
-        theExecutorService = exec;
 
         theLastSentToken     = lastSentToken;
         theLastReceivedToken = lastReceivedToken;
         theMessagesSentLast  = messagesSentLast;
-        theMessagesToBeSent  = messagesToBeSent != null ? messagesToBeSent : new ArrayList<T>();
-    }
-
-    /**
-     * Send a message via the next ping or pong.
-     *
-     * @param msg the Message to send.
-     */
-    public void enqueueMessageForSend(
-            T msg )
-    {
-        if( logHigh.isDebugEnabled() ) {
-            logHigh.debug( this + ".enqueueMessageForSend( " + msg + " )" );
-        }
-        
-        synchronized( theMessagesToBeSent ) {
-            theMessagesToBeSent.add( msg );
-        }
-        theListeners.fireEvent( msg, EventType.MESSAGE_ENQUEUED );
     }
 
     /**
@@ -113,7 +92,7 @@ public abstract class PingPongMessageEndpoint<T>
     public void startCommunicating()
     {
         if( theFuture == null ) {
-            doAction( "first" );
+            doAction( null ); // null indicates startCommunicating()
         }
     }
 
@@ -130,49 +109,15 @@ public abstract class PingPongMessageEndpoint<T>
     }
 
     /**
-     * Calculate the next time of something, given a base and the random variation.
-     *
-     * @param base the base value of the property, e.g. theDeltaRespond
-     * @return the next time
-     */
-    protected long calculateFuture(
-            long base )
-    {
-        double almost = ( ( Math.random() - 0.5f ) * theRandomVariation + 1. ) * base;
-        long   ret    = (long) almost;
-        
-        return ret;
-    }
-
-    /**
-     * Schedule a future task.
-     *
-     * @param tag identify the kind of task, for debugging (only)
-     * @param base the base value of the time delay, e.g. theDeltaRespond
-     */
-    protected void schedule(
-            String tag,
-            long   base )
-    {
-        long actual = calculateFuture( base );
-
-        if( logLow.isDebugEnabled() ) {
-            logLow.debug( this + ".schedule( " + tag + ", " + base + " ) in " + actual + " msec" );
-        }
-
-        theFuture = theExecutorService.schedule( new TimedTask( this, tag ), actual, TimeUnit.MILLISECONDS );
-    }
-    
-    /**
      * Invoked when the timer triggers.
      *
-     * @param tag the tag, for debugging
+     * @param task the TimedTask that invokes this handler
      */
-    protected void doAction(
-            String tag )
+    protected synchronized void doAction(
+            TimedTask task )
     {
         if( logLow.isDebugEnabled() ) {
-            logLow.debug( this + ".doAction( " + tag + " ): queue has length " + theMessagesToBeSent.size() );
+            logLow.debug( this + ".doAction( " + task + " ): queue has length " + theMessagesToBeSent.size() );
         }        
 
         // determine whether this is a regular response, a resend, or a recover. Resend and regular
@@ -227,7 +172,7 @@ public abstract class PingPongMessageEndpoint<T>
             logLow.debug( this + " doRespond: about to send message( " + toBeSent + " )" );
         }        
         try {
-            schedule( "recover", theDeltaRecover );
+            schedule( new RecoverTask( this ), theDeltaRecover );
                 // schedule a recover event prior to sending and firing events to listeners:
                 // if the sending takes a long time, we don't want to block
 
@@ -257,10 +202,10 @@ public abstract class PingPongMessageEndpoint<T>
                 logHigh.debug( this + " sent message (" + tokenToSend + ") successfully: " + ( toBeSent != null ? toBeSent : "<empty>" ));
             }
 
-            theListeners.fireEvent( tokenToSend, EventType.TOKEN_SENT );
+            theListeners.fireEvent( tokenToSend, TOKEN_SENT );
             if( toBeSent != null ) {
                 for( T current : toBeSent ) {
-                    theListeners.fireEvent( current, EventType.MESSAGE_SENT );
+                    theListeners.fireEvent( current, MESSAGE_SENT );
                 }
             }
             
@@ -295,10 +240,12 @@ public abstract class PingPongMessageEndpoint<T>
                 theFuture.cancel( false );
             }
 
-            schedule( "resend", theDeltaResend );
+            schedule( new ResendTask( this ), theDeltaResend );
                 // schedule a resend event prior to firing events to listeners
 
-            theListeners.fireEvent( toBeSent, EventType.MESSAGE_SENDING_FAILED );
+            for( T t : toBeSent ) {
+                theListeners.fireEvent( t, MESSAGE_SENDING_FAILED );
+            }
 
         } catch( Throwable t ) {
             // catch-all
@@ -325,12 +272,14 @@ public abstract class PingPongMessageEndpoint<T>
      * @param token the integer representing the token
      * @param content the content of a received message
      * @throws MessageEndpointIsDeadException thrown if the MessageEndpoint is dead
+     * @throws MessageSendException thrown if the message could not be sent
      */
     protected void incomingMessage(
             long    token,
             List<T> content )
         throws
-            MessageEndpointIsDeadException
+            MessageEndpointIsDeadException,
+            MessageSendException
     {
         try {
             if( content != null && ! content.isEmpty() ) {
@@ -357,17 +306,17 @@ public abstract class PingPongMessageEndpoint<T>
             }
             theLastReceivedToken = token;
 
-            theListeners.fireEvent( token, EventType.TOKEN_RECEIVED );
+            theListeners.fireEvent( token, TOKEN_RECEIVED );
             if( content != null ) {
                 for( T current : content ) {
-                    theListeners.fireEvent( current, EventType.MESSAGE_RECEIVED );
+                    theListeners.fireEvent( current, MESSAGE_RECEIVED );
                 }
             }
         } catch( Throwable t ) {
             logHigh.error( t );
 
         } finally {
-            schedule( "respond", theDeltaRespond );
+            schedule( new RespondTask( this ), theDeltaRespond );
         }
     }
 
@@ -389,50 +338,6 @@ public abstract class PingPongMessageEndpoint<T>
     public long getLastReceivedToken()
     {
         return theLastReceivedToken;
-    }
-    
-    /**
-     * Add a MessageEndpointListener.
-     *
-     * @param newListener the listener to add
-     */
-    public void addDirectMessageEndpointListener(
-            MessageEndpointListener<T> newListener )
-    {
-        theListeners.addDirect( newListener );
-    }
-    
-    /**
-     * Add a MessageEndpointListener.
-     *
-     * @param newListener the listener to add
-     */
-    public void addWeakMessageEndpointListener(
-            MessageEndpointListener<T> newListener )
-    {
-        theListeners.addWeak( newListener );
-    }
-    
-    /**
-     * Add a MessageEndpointListener.
-     *
-     * @param newListener the listener to add
-     */
-    public void addSoftMessageEndpointListener(
-            MessageEndpointListener<T> newListener )
-    {
-        theListeners.addSoft( newListener );
-    }
-    
-    /**
-     * Remove a MessageEndpointListener.
-     *
-     * @param oldListener the listener to remove
-     */
-    public void removeMessageEndpointListener(
-            MessageEndpointListener<T> oldListener )
-    {
-        theListeners.remove( oldListener );
     }
     
     /**
@@ -462,11 +367,6 @@ public abstract class PingPongMessageEndpoint<T>
     }
 
     /**
-     * Name of the endpoint (for debugging).
-     */
-    protected String theName;
-    
-    /**
      * The time until we respond with a ping to an incoming pong.
      */
     protected long theDeltaRespond;
@@ -480,17 +380,6 @@ public abstract class PingPongMessageEndpoint<T>
      * The time util we attempt to recover after having sent a ping whose pong did not arrive.
      */
     protected long theDeltaRecover;
-    
-    /**
-     * Percentage of random variation on theDeltaResponse and theDeltaRecover, in order to avoid
-     * having repeated "collisions".
-     */
-    protected double theRandomVariation;
-    
-    /**
-     * The outgoing queue of Messages to send.
-     */
-    protected List<T> theMessagesToBeSent;
     
     /**
      * Cached content of the last sent message, in order to be able to resend it upon
@@ -509,185 +398,95 @@ public abstract class PingPongMessageEndpoint<T>
     protected long theLastReceivedToken;
 
     /**
-     * The means by which to execute tasks.
+     * Indicates that a token was sent.
      */
-    protected ScheduledExecutorService theExecutorService;
-    
-    /**
-     * The Future representing the TimedTask.
-     */
-    protected ScheduledFuture<?> theFuture;
-    
-    /**
-     * Captures the types of events that can be sent to the listeners.
-     */
-    @SuppressWarnings(value={"unchecked"})
-    static enum EventType {
-        
-        MESSAGE_SENT {
-            public <T> void fireEvent(
-                    PingPongMessageEndpoint<T> sender,
-                    MessageEndpointListener<T> listener,
-                    Object                     event )
-            {
-                listener.messageSent( sender, (T) event );
-            }
-        },
-        MESSAGE_RECEIVED {
-            public <T> void fireEvent(
-                    PingPongMessageEndpoint<T> sender,
-                    MessageEndpointListener<T> listener,
-                    Object                     event )
-            {
-                listener.messageReceived( sender, (T) event );
-            }
-        },
-        MESSAGE_ENQUEUED {
-            public <T> void fireEvent(
-                    PingPongMessageEndpoint<T> sender,
-                    MessageEndpointListener<T> listener,
-                    Object                     event )
-            {
-                listener.messageEnqueued( sender, (T) event );
-            }
-        },
-        TOKEN_SENT {
-            public <T> void fireEvent(
-                    PingPongMessageEndpoint<T> sender,
+    protected final EventType<T> TOKEN_SENT = new EventType<T>() {
+            @SuppressWarnings( "unchecked" )
+            public void fireEvent(
+                    MessageEndpoint<T>         sender,
                     MessageEndpointListener<T> listener,
                     Object                     event )
             {
                 if( listener instanceof PingPongMessageEndpointListener ) {
                     PingPongMessageEndpointListener realListener = (PingPongMessageEndpointListener) listener;
-                    realListener.tokenSent( sender, (Long) event );
+                    PingPongMessageEndpoint<T>      realSender   = (PingPongMessageEndpoint<T>) sender;
+                    realListener.tokenSent( realSender, (Long) event );
                 }
             }
-        },
-        TOKEN_RECEIVED {
-            public <T> void fireEvent(
-                    PingPongMessageEndpoint<T> sender,
-                    MessageEndpointListener<T> listener,
-                    Object                     event )
-            {
-                if( listener instanceof PingPongMessageEndpointListener ) {
-                    PingPongMessageEndpointListener realListener = (PingPongMessageEndpointListener) listener;
-                    realListener.tokenReceived( sender, (Long) event );
-                }
-            }
-        },
-        MESSAGE_SENDING_FAILED {
-            public <T> void fireEvent(
-                    PingPongMessageEndpoint<T> sender,
-                    MessageEndpointListener<T> listener,
-                    Object                     event )
-            {
-                listener.messageSendingFailed( sender, (List<T>) event );
-            }
-        };
-        
-        /**
-         * Send the event.
-         * 
-         * @param sender the endpoint that sent the event
-         * @param listener the listener to which the event should be sent
-         * @param event the event Object itself
-         * @param <T> the message type
-         */
-        abstract public <T> void fireEvent(
-                PingPongMessageEndpoint<T> sender,
-                MessageEndpointListener<T> listener,
-                Object                     event );
-    }
-
-    /**
-     * The current set of MessageEndpointListeners.
-     */
-    protected AbstractListenerSet<MessageEndpointListener<T>,Object,Object> theListeners
-            = new FlexibleListenerSet<MessageEndpointListener<T>,Object,Object>()
-    {
-        /**
-         * Fire the event to one contained object.
-         *
-         * @param listener the receiver of this event
-         * @param event the sent event
-         * @param parameter dispatch parameter
-         */
-        @SuppressWarnings(value={"unchecked"})
-        protected void fireEventToListener(
-                MessageEndpointListener<T> listener,
-                Object                     event,
-                Object                     parameter )
-        {
-            try {
-                if( parameter instanceof EventType ) {
-                    EventType realParameter = (EventType) parameter;
-                    
-                    realParameter.fireEvent( PingPongMessageEndpoint.this, listener, event );
-
-                } else if( parameter == null || parameter instanceof Throwable ) {
-                    listener.disablingError( PingPongMessageEndpoint.this, (List<T>) event, (Throwable) parameter );
-
-                } else {
-                    logLow.error( "unknown parameter: " + parameter );
-                }
-            } catch( Throwable t ) {
-                logLow.error( t );
-            }
-        }
     };
     
     /**
-     * The task to respond.
-     */    
-    static class TimedTask
-            implements
-                Runnable
+     * Indicates that a token was received.
+     */
+    protected final EventType<T> TOKEN_RECEIVED = new EventType<T>() {
+            @SuppressWarnings( "unchecked" )
+            public void fireEvent(
+                    MessageEndpoint<T>         sender,
+                    MessageEndpointListener<T> listener,
+                    Object                     event )
+            {
+                if( listener instanceof PingPongMessageEndpointListener ) {
+                    PingPongMessageEndpointListener realListener = (PingPongMessageEndpointListener) listener;
+                    PingPongMessageEndpoint<T>      realSender   = (PingPongMessageEndpoint<T>) sender;
+                    realListener.tokenReceived( realSender, (Long) event );
+                }
+            }
+    };
+    
+    /**
+     * The recover task.
+     */
+    protected static class RecoverTask
+            extends
+                TimedTask
     {
         /**
          * Constructor.
          *
-         * @param ep the endpoint that is supposed to respond. This is kept internally as a WeakReference
-         * @param tag for debugging
+         * @param ep the endpoint that is supposed to respond
          */
-        public TimedTask(
-                PingPongMessageEndpoint ep,
-                String                  tag )
+        public RecoverTask(
+                PingPongMessageEndpoint ep )
         {
-            theEndpointRef = new WeakReference<PingPongMessageEndpoint>( ep );
-            theTag         = tag;
-        }
-
+            super( ep );
+        }        
+    }
+    
+    /**
+     * The resend task.
+     */
+    protected static class ResendTask
+            extends
+                TimedTask
+    {
         /**
-         * Run the task.
+         * Constructor.
+         *
+         * @param ep the endpoint that is supposed to respond
          */
-        public void run()
+        public ResendTask(
+                PingPongMessageEndpoint ep )
         {
-            PingPongMessageEndpoint ep = theEndpointRef.get();
-            
-            if( ep != null ) {
-                if( logLow.isDebugEnabled() ) {
-                    logLow.debug( "TimedTask about to invoke " + ep );
-                }
-                try {
-                    ep.doAction( theTag );
-
-                } catch( Throwable t ) {
-                    logLow.error( t );
-                }
-            } else {
-                logLow.debug( "TimedTask cannot execute, PingPongMessageEndpoint has gone away" );
-            }
-        }
-        
+            super( ep );
+        }        
+    }
+    
+    /**
+     * The respond task.
+     */
+    protected static class RespondTask
+            extends
+                TimedTask
+    {
         /**
-         * Reference to the endpoint. This is a WeakReference as we don't want to get in
-         * the way of the endpoint being garbage collected.
+         * Constructor.
+         *
+         * @param ep the endpoint that is supposed to respond
          */
-        protected WeakReference<PingPongMessageEndpoint> theEndpointRef;
-
-        /**
-         * The tag, for debugging.
-         */
-        protected String theTag;
+        public RespondTask(
+                PingPongMessageEndpoint ep )
+        {
+            super( ep );
+        }        
     }
 }

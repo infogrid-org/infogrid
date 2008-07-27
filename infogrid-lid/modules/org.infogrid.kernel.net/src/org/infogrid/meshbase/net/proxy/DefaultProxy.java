@@ -14,10 +14,10 @@
 
 package org.infogrid.meshbase.net.proxy;
 
-import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-import org.infogrid.net.NetMessageEndpoint;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -38,7 +38,7 @@ public class DefaultProxy
      * @return the created DefaultProxy
      */
     public static DefaultProxy create(
-            NetMessageEndpoint ep,
+            ProxyMessageEndpoint ep,
             NetMeshBase        mb,
             ProxyPolicy        policy )
     {
@@ -63,7 +63,7 @@ public class DefaultProxy
      * @return the restored DefaultProxy
      */
     public static DefaultProxy restoreProxy(
-            NetMessageEndpoint ep,
+            ProxyMessageEndpoint ep,
             NetMeshBase        mb,
             ProxyPolicy        policy,
             long               timeCreated,
@@ -87,7 +87,7 @@ public class DefaultProxy
      * @param policy the ProxyPolicy to use
      */
     protected DefaultProxy(
-            NetMessageEndpoint ep,
+            ProxyMessageEndpoint ep,
             NetMeshBase        mb,
             ProxyPolicy        policy )
     {
@@ -106,7 +106,7 @@ public class DefaultProxy
      * @param timeExpires the timeExpires to use
      */
     protected DefaultProxy(
-            NetMessageEndpoint ep,
+            ProxyMessageEndpoint ep,
             NetMeshBase        mb,
             ProxyPolicy        policy,
             long               timeCreated,
@@ -126,13 +126,13 @@ public class DefaultProxy
      * Internal implementation method for messageReceived. Overriding this makes
      * debugging easier as we only get breakpoints from instances of this class.
      *
-     * @param endpoint the MessageEndpoint through which the message arrived
+     * @param endpoint the MessageEndpoint sending this event
      * @param incoming the incoming message
      */
     @Override
     protected void internalMessageReceived(
-            MessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                  incoming )
+            ReceivingMessageEndpoint<XprisoMessage> endpoint,
+            XprisoMessage                           incoming )
     {
         super.internalMessageReceived( endpoint, incoming );
     }

@@ -17,8 +17,8 @@ package org.infogrid.meshbase.net.proxy;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
-import org.infogrid.net.NetMessageEndpoint;
-import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.util.FactoryException;
 
 /**
@@ -31,12 +31,12 @@ public class DefaultProxyFactory
     /** 
      * Factory method.
      *
-     * @param endpointFactory the NetMessageEndpointFactory to use to communicate
+     * @param endpointFactory the ProxyMessageEndpointFactory to use to communicate
      * @param proxyPolicyFactory the factory for ProxyPolicies for communications with other NetMeshBases
      * @return the created DefaultProxyFactory.
      */
     public static DefaultProxyFactory create(
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProxyPolicyFactory        proxyPolicyFactory )
     {
         DefaultProxyFactory ret = new DefaultProxyFactory( endpointFactory, proxyPolicyFactory );
@@ -47,11 +47,11 @@ public class DefaultProxyFactory
     /**
      * Constructor.
      * 
-     * @param endpointFactory the NetMessageEndpointFactory to use to communicate
+     * @param endpointFactory the ProxyMessageEndpointFactory to use to communicate
      * @param proxyPolicyFactory the factory for ProxyPolicies for communications with other NetMeshBases
      */
     protected DefaultProxyFactory(
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProxyPolicyFactory        proxyPolicyFactory )
     {
         super( endpointFactory, proxyPolicyFactory );
@@ -71,14 +71,14 @@ public class DefaultProxyFactory
         throws
             FactoryException
     {
-        NetMessageEndpoint endpoint = theEndpointFactory.obtainFor( partnerMeshBaseIdentifier, theNetMeshBase.getIdentifier() );
+        ProxyMessageEndpoint endpoint = theEndpointFactory.obtainFor( partnerMeshBaseIdentifier, theNetMeshBase.getIdentifier() );
         ProxyPolicy        policy   = theProxyPolicyFactory.obtainFor( partnerMeshBaseIdentifier, arg );// in the future, this should become configurable
 
         Proxy ret = DefaultProxy.create( endpoint, theNetMeshBase, policy );
         ret.setFactory( this );
 
         // we don't need to start communicating here yet -- it suffices that we start
-        // when the first message is handed to the NetMessageEndpoint
+        // when the first message is handed to the ProxyMessageEndpoint
 
         return ret;
     } 
@@ -95,7 +95,7 @@ public class DefaultProxyFactory
         throws
             FactoryException
     {
-        NetMessageEndpoint ep = theEndpointFactory.restoreNetMessageEndpoint(
+        ProxyMessageEndpoint ep = theEndpointFactory.restoreNetMessageEndpoint(
                 externalized.getNetworkIdentifierOfPartner(),
                 externalized.getNetworkIdentifier(),
                 externalized.getLastSentToken(),
