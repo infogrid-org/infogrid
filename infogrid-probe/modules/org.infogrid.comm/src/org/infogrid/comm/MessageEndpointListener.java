@@ -17,9 +17,9 @@ package org.infogrid.comm;
 import java.util.List;
 
 /**
- * Listener interface for events emitted by a MessageEndpoint.
+ * Listener interface for events emitted by a BidirectionalMessageEndpoint.
  * 
- * @param T the message type
+ * @param <T> the message type
  */
 public interface MessageEndpointListener<T>
 {
@@ -30,8 +30,8 @@ public interface MessageEndpointListener<T>
      * @param msg the received message
      */
     public void messageReceived(
-            MessageEndpoint<T> endpoint,
-            T                  msg );
+            ReceivingMessageEndpoint<T> endpoint,
+            T                           msg );
     
     /**
      * Called when an outgoing message has been sent.
@@ -40,8 +40,8 @@ public interface MessageEndpointListener<T>
      * @param msg the sent message
      */
     public void messageSent(
-            MessageEndpoint<T> endpoint,
-            T                  msg );
+            SendingMessageEndpoint<T> endpoint,
+            T                         msg );
     
     /**
      * Called when an outgoing message has enqueued for sending.
@@ -50,18 +50,18 @@ public interface MessageEndpointListener<T>
      * @param msg the enqueued message
      */
     public void messageEnqueued(
-            MessageEndpoint<T> endpoint,
-            T                  msg );
+            SendingMessageEndpoint<T> endpoint,
+            T                         msg );
     
     /**
      * Called when an outoing message failed to be sent.
      *
      * @param endpoint the MessageEndpoint that sent this event
-     * @param msg the outgoing messages, in order
+     * @param msg the outgoing message
      */
     public void messageSendingFailed(
-            MessageEndpoint<T> endpoint,
-            List<T>            msg );
+            SendingMessageEndpoint<T> endpoint,
+            T                         msg );
 
     /**
      * Called when an error was severe enough that continuing as a MessageEndPoint makes

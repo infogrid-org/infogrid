@@ -16,7 +16,6 @@ package org.infogrid.comm.pingpong.TEST;
 
 import org.infogrid.testharness.AbstractTest;
 
-import org.infogrid.comm.MessageEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpointListener;
 import org.infogrid.comm.pingpong.m.MPingPongMessageEndpoint;
@@ -25,6 +24,9 @@ import org.infogrid.util.logging.Log;
 
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.ReceivingMessageEndpoint;
+import org.infogrid.comm.SendingMessageEndpoint;
 
 /**
  * Tests the exchange of the token back and forth between the endpoints.
@@ -113,8 +115,6 @@ public class PingPongTest1
             Exception
     {
         super( thisPackage( PingPongTest1.class, "Log.properties" ));
-
-        log = Log.getLogInstance( getClass() );
     }
 
     /**
@@ -165,11 +165,12 @@ public class PingPongTest1
        /**
          * Called when an incoming message has arrived.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the received message
          */
         public void messageReceived(
-                MessageEndpoint<String> sender,
-                String                  msg )
+                ReceivingMessageEndpoint<String> endpoint,
+                String                           msg )
         {
             log.debug( this + " received message " + msg );
         }
@@ -181,8 +182,8 @@ public class PingPongTest1
          * @param msg the sent message
          */
         public void messageSent(
-                MessageEndpoint<String> sender,
-                String                  msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             log.debug( this + " sent message " + msg );
         }
@@ -194,8 +195,8 @@ public class PingPongTest1
          * @param msg the enqueued message
          */
         public void messageEnqueued(
-                MessageEndpoint<String> sender,
-                String                  msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             log.debug( this + " enqueued message " + msg );
         }
@@ -203,11 +204,12 @@ public class PingPongTest1
        /**
          * Called when an outoing message failed to be sent.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the outgoing message
          */
         public void messageSendingFailed(
-                MessageEndpoint<String> sender,
-                List<String>            msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             log.debug( this + " failed to send message " + msg );
         }
@@ -215,10 +217,11 @@ public class PingPongTest1
         /**
          * Called when the token has been received.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param token the received token
          */
         public void tokenReceived(
-                PingPongMessageEndpoint<String> sender,
+                PingPongMessageEndpoint<String> endpoint,
                 long                            token )
         {
             log.debug( "Listener " + theName + " received token: " + token );
@@ -229,10 +232,11 @@ public class PingPongTest1
         /**
          * Called when the token has been sent.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param token the sent token
          */
         public void tokenSent(
-                PingPongMessageEndpoint<String> sender,
+                PingPongMessageEndpoint<String> endpoint,
                 long                            token )
         {
             log.debug( "Listener " + theName + " sent token: " + token );
@@ -242,10 +246,12 @@ public class PingPongTest1
         /**
          * Called when the receiving endpoint threw the EndpointIsDeadException.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the status of the outgoing queue
+         * @param t the error
          */
         public void disablingError(
-                MessageEndpoint<String> sender,
+                MessageEndpoint<String> endpoint,
                 List<String>            msg,
                 Throwable               t )
         {

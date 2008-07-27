@@ -20,7 +20,7 @@ import org.infogrid.comm.MessageEndpointListener;
  * Adds more detail to MessageEndpointListener if it is known that
  * the ping-pong protocol is being used.
  * 
- * @param T the message type
+ * @param <T> the message type
  */
 public interface PingPongMessageEndpointListener<T>
         extends

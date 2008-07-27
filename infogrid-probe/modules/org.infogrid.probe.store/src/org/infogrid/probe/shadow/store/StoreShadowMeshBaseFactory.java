@@ -27,7 +27,7 @@ import org.infogrid.meshbase.net.a.DefaultAnetMeshObjectIdentifierFactory;
 import org.infogrid.modelbase.MeshTypeIdentifierFactory;
 import org.infogrid.modelbase.ModelBase;
 
-import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.shadow.AbstractShadowMeshBaseFactory;
@@ -55,7 +55,7 @@ public class StoreShadowMeshBaseFactory
      */
     public static StoreShadowMeshBaseFactory create(
             ModelBase                 modelBase,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProbeDirectory            probeDirectory,
             IterableStore             shadowStore,
             IterableStore             shadowProxyStore,
@@ -70,7 +70,7 @@ public class StoreShadowMeshBaseFactory
      */
     protected StoreShadowMeshBaseFactory(
             ModelBase                 modelBase,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProbeDirectory            probeDirectory,
             IterableStore             shadowStore,
             IterableStore             shadowProxyStore,

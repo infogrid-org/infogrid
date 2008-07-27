@@ -16,7 +16,7 @@ package org.infogrid.meshbase.net.proxy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
@@ -48,7 +48,6 @@ import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.meshbase.transaction.Change;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.FactoryException;
 import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
@@ -526,10 +525,10 @@ public abstract class AbstractProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForIncomingMessage(
-            MessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                  incoming,
-            boolean                        isResponseToOngoingQuery,
-            Proxy                          proxy )
+            ReceivingMessageEndpoint<XprisoMessage> endpoint,
+            XprisoMessage                           incoming,
+            boolean                                 isResponseToOngoingQuery,
+            Proxy                                   proxy )
     {
         NetMeshBase theMeshBase = proxy.getNetMeshBase();
         

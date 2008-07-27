@@ -18,6 +18,7 @@
  <username>Tests the PingPong Module</username>
  <runclass>org.infogrid.comm.pingpong.TEST.AllTests</runclass>
  <dependencies>
+  <requires name="org.infogrid.util.logging.log4j"/>
   <requires name="org.infogrid.comm.pingpong"/>
   <requires name="org.infogrid.testharness"/>
   <requires name="org.infogrid.util"/>

@@ -19,7 +19,7 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.net.proxy.AbstractProxyFactory;
 import org.infogrid.meshbase.net.proxy.Proxy;
-import org.infogrid.net.NetMessageEndpoint;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowProxy;
 import org.infogrid.util.FactoryException;
 
@@ -96,7 +96,7 @@ public class PlaceholderShadowProxyFactory
                     externalized.getTimeExpires() );
 
         } else {        
-            NetMessageEndpoint ep = theEndpointFactory.restoreNetMessageEndpoint(
+            ProxyMessageEndpoint ep = theEndpointFactory.restoreNetMessageEndpoint(
                     externalized.getNetworkIdentifierOfPartner(),
                     externalized.getNetworkIdentifier(),
                     externalized.getLastSentToken(),
