@@ -18,7 +18,7 @@ import org.infogrid.context.Context;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.util.AbstractFactory;
 
@@ -42,7 +42,7 @@ public abstract class AbstractShadowMeshBaseFactory
      */
     protected AbstractShadowMeshBaseFactory(
             ModelBase                 modelBase,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProbeDirectory            probeDirectory,
             long                      timeNotNeededTillExpires,
             Context                   c )
@@ -57,7 +57,7 @@ public abstract class AbstractShadowMeshBaseFactory
     /**
      * Factory for NetMessageEndpoints. This is shared by all created ShadowMeshBases.
      */
-    protected NetMessageEndpointFactory theEndpointFactory;
+    protected ProxyMessageEndpointFactory theEndpointFactory;
 
     /**
      * The ModelBase which the created MeshBases will use.

@@ -14,25 +14,22 @@
 
 package org.infogrid.comm.pingpong.m;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.comm.MessageEndpointIsDeadException;
 import org.infogrid.comm.MessageSendException;
 import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
-
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
-
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * In-memory implementation of PingPongMessageEndpoint. This implementation supports
  * the on-disk storage of a snapshot of this PingPongMessageEndpoint, and its recovery
  * later, with a special factory method for that purpose.
  * 
- * @param T the message type
+ * @param <T> the message type
  */
 public class MPingPongMessageEndpoint<T>
         extends
@@ -45,6 +42,7 @@ public class MPingPongMessageEndpoint<T>
      * 
      * @param exec the ScheduledExecutorService to schedule timed tasks
      * @return the created MPingPongMessageEndpoint
+     * @param <T> the message type
      */
     public static <T> MPingPongMessageEndpoint<T> create(
             ScheduledExecutorService exec )
@@ -54,7 +52,9 @@ public class MPingPongMessageEndpoint<T>
         long   deltaResend     = theResourceHelper.getResourceLongOrDefault(   "DeltaResend",     500L );
         long   deltaRecover    = theResourceHelper.getResourceLongOrDefault(   "DeltaRecover",   5000L );
         double randomVariation = theResourceHelper.getResourceDoubleOrDefault( "RandomVariation", 0.02 ); // 2%
-        
+
+        List<T> messagesToBeSent = new ArrayList<T>();
+
         // it is advantageous if the recover time is larger than 4 times the respond time: that way, a
         // second RPC call can be successfully completed before returning to the parent RPC caller.
         
@@ -68,7 +68,7 @@ public class MPingPongMessageEndpoint<T>
                 -1,
                 -1,
                 null,
-                null );
+                messagesToBeSent );
         return ret;
     }
 
@@ -83,6 +83,7 @@ public class MPingPongMessageEndpoint<T>
      * @param randomVariation the random component to add to the various times
      * @param exec the ScheduledExecutorService to schedule timed tasks
      * @return the created MPingPongMessageEndpoint
+     * @param <T> the message type
      */
     public static <T> MPingPongMessageEndpoint<T> create(
             String                   name,
@@ -92,6 +93,8 @@ public class MPingPongMessageEndpoint<T>
             double                   randomVariation,
             ScheduledExecutorService exec )
     {
+        List<T> messagesToBeSent = new ArrayList<T>();
+
         MPingPongMessageEndpoint<T> ret = new MPingPongMessageEndpoint<T>(
                 name,
                 deltaRespond,
@@ -102,7 +105,7 @@ public class MPingPongMessageEndpoint<T>
                 -1,
                 -1,
                 null,
-                null );
+                messagesToBeSent );
         return ret;
     }
 
@@ -121,6 +124,7 @@ public class MPingPongMessageEndpoint<T>
      * @param messagesSentLast the last set of Messages sent in a previous instantiation of this MessageEndpoint
      * @param messagesToBeSent the Messages to be sent from a previous instantiation of this MessageEndpoint
      * @return the created MPingPongMessageEndpoint
+     * @param <T> the message type
      */
     public static <T> MPingPongMessageEndpoint<T> restore(
             String                   name,
@@ -161,7 +165,7 @@ public class MPingPongMessageEndpoint<T>
      * @param lastSentToken the last token sent in a previous instantiation of this MessageEndpoint
      * @param lastReceivedToken the last token received in a previous instantiation of this MessageEndpoint
      * @param messagesSentLast the last set of Messages sent in a previous instantiation of this MessageEndpoint
-     * @param messagesToBeSent the Messages to be sent from a previous instantiation of this MessageEndpoint
+     * @param messagesToBeSent outgoing message queue (may or may not be empty)
      */
     protected MPingPongMessageEndpoint(
             String                   name,
@@ -250,13 +254,15 @@ public class MPingPongMessageEndpoint<T>
      * @param token the integer representing the token
      * @param content the content of a received message
      * @throws MessageEndpointIsDeadException thrown if the MessageEndpoint is dead
+     * @throws MessageSendException thrown if the message could not be sent
      */
     @Override
     protected void incomingMessage(
             long    token,
             List<T> content )
         throws
-            MessageEndpointIsDeadException
+            MessageEndpointIsDeadException,
+            MessageSendException
     {
         if( isGracefullyDead ) {
             throw new MessageEndpointIsDeadException();
@@ -271,22 +277,6 @@ public class MPingPongMessageEndpoint<T>
         }
     }
 
-    /**
-     * Obtain the messages still to be sent.
-     *
-     * @return the List
-     */    
-    @SuppressWarnings(value={"unchecked"})
-    public synchronized List<T> messagesToBeSent()
-    {
-        ArrayList<T> ret = new ArrayList<T>( theMessagesToBeSent != null ? theMessagesToBeSent.size() : 1 );
-
-        if( theMessagesToBeSent != null && !theMessagesToBeSent.isEmpty() ) {
-            ret.addAll( theMessagesToBeSent );
-        }
-        return ret;
-    }
-    
     /**
      * Obtain the messages that were sent most recently.
      *
