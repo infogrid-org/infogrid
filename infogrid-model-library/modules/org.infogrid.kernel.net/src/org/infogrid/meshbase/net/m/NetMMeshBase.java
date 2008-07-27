@@ -33,7 +33,7 @@ import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.MCachingHashMap;
 import org.infogrid.util.logging.Log;
@@ -59,7 +59,7 @@ public class NetMMeshBase
       */
     public static NetMMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ModelBase                 modelBase,
             NetAccessManager          accessMgr,
             Context                   context )
@@ -92,7 +92,7 @@ public class NetMMeshBase
       */
     public static NetMMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProxyPolicyFactory        proxyPolicyFactory,
             ModelBase                 modelBase,
             NetAccessManager          accessMgr,
@@ -126,7 +126,7 @@ public class NetMMeshBase
      */
     public static NetMMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProxyPolicyFactory        proxyPolicyFactory,
             MeshObjectSetFactory      setFactory,
             ModelBase                 modelBase,

@@ -39,7 +39,7 @@ import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.sweeper.SweepStep;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
 import org.infogrid.util.CursorIterator;
@@ -71,7 +71,7 @@ public class IterableNetStoreMeshBase
      */
     public static IterableNetStoreMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ModelBase                 modelBase,
             NetAccessManager          accessMgr,
             IterableStore             meshObjectStore,
@@ -111,7 +111,7 @@ public class IterableNetStoreMeshBase
      */
     public static IterableNetStoreMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProxyPolicyFactory        proxyPolicyFactory,
             ModelBase                 modelBase,
             NetAccessManager          accessMgr,
@@ -151,7 +151,7 @@ public class IterableNetStoreMeshBase
      */
     public static IterableNetStoreMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProxyPolicyFactory        proxyPolicyFactory,
             MeshObjectSetFactory      setFactory,
             ModelBase                 modelBase,

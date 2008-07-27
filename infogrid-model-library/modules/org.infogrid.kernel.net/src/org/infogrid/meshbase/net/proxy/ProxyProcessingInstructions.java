@@ -15,7 +15,8 @@
 package org.infogrid.meshbase.net.proxy;
 
 import java.util.ArrayList;
-import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.BidirectionalMessageEndpoint;
+import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
@@ -292,11 +293,11 @@ public class ProxyProcessingInstructions
     }
     
     public void setIncomingXprisoMessageEndpoint(
-            MessageEndpoint<XprisoMessage> newValue )
+            ReceivingMessageEndpoint<XprisoMessage> newValue )
     {
         theIncomingXprisoMessageEndpoint = newValue;
     }
-    public MessageEndpoint<XprisoMessage> getIncomingXprisoMessageEndpoint()
+    public ReceivingMessageEndpoint<XprisoMessage> getIncomingXprisoMessageEndpoint()
     {
         return theIncomingXprisoMessageEndpoint;
     }
@@ -664,7 +665,7 @@ public class ProxyProcessingInstructions
 
     protected XprisoMessage theIncomingXprisoMessage;
     
-    protected MessageEndpoint<XprisoMessage> theIncomingXprisoMessageEndpoint;
+    protected ReceivingMessageEndpoint<XprisoMessage> theIncomingXprisoMessageEndpoint;
 
     protected XprisoMessage theSendViaWaitForReplicaResponseEndpoint = null;
     protected XprisoMessage theSendViaWaitForLockResponseEndpoint = null;

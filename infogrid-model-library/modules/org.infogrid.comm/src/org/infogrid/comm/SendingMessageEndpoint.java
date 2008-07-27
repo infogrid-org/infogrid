@@ -14,6 +14,8 @@
 
 package org.infogrid.comm;
 
+import java.util.List;
+
 /**
  * A message endpoint for sending messages. The method 
  * enqueueMessageForSend is used for asynchronous sending of messages.
@@ -21,6 +23,8 @@ package org.infogrid.comm;
  * @param <T> the message type
  */
 public interface SendingMessageEndpoint<T>
+        extends
+            MessageEndpoint<T>
 {
     /**
      * Send a message.
@@ -30,4 +34,10 @@ public interface SendingMessageEndpoint<T>
     public void enqueueMessageForSend(
             T msg );
 
+    /**
+     * Obtain the Messages still to be sent.
+     *
+     * @return the messages
+     */
+    public abstract List<T> messagesToBeSent();    
 }

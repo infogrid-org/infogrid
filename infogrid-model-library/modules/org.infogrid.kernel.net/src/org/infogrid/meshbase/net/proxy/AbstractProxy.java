@@ -15,8 +15,11 @@
 package org.infogrid.meshbase.net.proxy;
 
 import java.util.List;
+import org.infogrid.comm.BidirectionalMessageEndpoint;
 import org.infogrid.comm.MessageEndpoint;
 import org.infogrid.comm.MessageEndpointIsDeadException;
+import org.infogrid.comm.ReceivingMessageEndpoint;
+import org.infogrid.comm.SendingMessageEndpoint;
 import org.infogrid.comm.WaitForResponseEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpointListener;
@@ -48,7 +51,7 @@ import org.infogrid.meshbase.security.IdentityChangeException;
 import org.infogrid.meshbase.transaction.CannotApplyChangeException;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
-import org.infogrid.net.NetMessageEndpoint;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
 import org.infogrid.util.Factory;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.FlexibleListenerSet;
@@ -77,12 +80,12 @@ public abstract class AbstractProxy
     /**
      * Constructor.
      *
-     * @param ep the NetMessageEndpoint to use by this Proxy
+     * @param ep the ProxyMessageEndpoint to use by this Proxy
      * @param mb the NetMeshBase that this Proxy belongs to
      * @param policy the ProxyPolicy to use
      */
     protected AbstractProxy(
-            NetMessageEndpoint ep,
+            ProxyMessageEndpoint ep,
             NetMeshBase        mb,
             ProxyPolicy        policy )
     {
@@ -182,11 +185,11 @@ public abstract class AbstractProxy
     }
     
     /**
-     * Obtain the MessageEndpoint associated with this Proxy.
+     * Obtain the BidirectionalMessageEndpoint associated with this Proxy.
      *
-     * @return the MessageEndpoint
+     * @return the BidirectionalMessageEndpoint
      */
-    public final NetMessageEndpoint getMessageEndpoint()
+    public final ProxyMessageEndpoint getMessageEndpoint()
     {
         return theEndpoint;
     }
@@ -444,11 +447,12 @@ public abstract class AbstractProxy
     /**
      * Called when an incoming message has arrived.
      *
+     * @param endpoint the MessageEndpoint sending this event
      * @param incoming the incoming message
      */
     public final void messageReceived(
-            MessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                  incoming )
+            ReceivingMessageEndpoint<XprisoMessage> endpoint,
+            XprisoMessage                           incoming )
     {
         if( log.isDebugEnabled() ) {
             log.debug( this + ".messageReceived( " + incoming + " )" );
@@ -471,12 +475,12 @@ public abstract class AbstractProxy
      * Internal implementation method for messageReceived. This makes catching exceptions
      * easier.
      *
-     * @param endpoint the MessageEndpoint through which the message arrived
+     * @param endpoint the MessageEndpoint sending this event
      * @param incoming the incoming message
      */
     protected void internalMessageReceived(
-            MessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                  incoming )
+            ReceivingMessageEndpoint<XprisoMessage> endpoint,
+            XprisoMessage                           incoming )
     {
         long    responseId    = incoming.getResponseId();
         boolean callIsWaiting = theWaitForHomeResponseEndpoint.isCallWaitingFor( responseId );
@@ -803,12 +807,12 @@ public abstract class AbstractProxy
     /**
      * Called when an outgoing message has been sent.
      *
-     * @param endpoint the MessageEndpoint that sent this event
+     * @param endpoint the MessageEndpoint sending this event
      * @param msg the sent message
      */
     public void messageSent(
-            MessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                  msg )
+            SendingMessageEndpoint<XprisoMessage> endpoint,
+            XprisoMessage                         msg )
     {
         proxyUpdated();
     }
@@ -816,12 +820,12 @@ public abstract class AbstractProxy
     /**
      * Called when an outgoing message has enqueued for sending.
      *
-     * @param endpoint the MessageEndpoint that sent this event
+     * @param endpoint the MessageEndpoint sending this event
      * @param msg the enqueued message
      */
     public void messageEnqueued(
-            MessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                  msg )
+            SendingMessageEndpoint<XprisoMessage> endpoint,
+            XprisoMessage                         msg )
     {
         proxyUpdated();
     }
@@ -829,11 +833,12 @@ public abstract class AbstractProxy
     /**
      * Called when an outoing message failed to be sent.
      *
-     * @param msg the outgoing messages
+     * @param endpoint the MessageEndpoint sending this event
+     * @param msg the outgoing message
      */
     public void messageSendingFailed(
-            MessageEndpoint<XprisoMessage> endpoint,
-            List<XprisoMessage>            msg )
+            SendingMessageEndpoint<XprisoMessage> endpoint,
+            XprisoMessage                         msg )
     {
         proxyUpdated();
     }
@@ -841,6 +846,7 @@ public abstract class AbstractProxy
     /**
      * Called when the token has been received.
      *
+     * @param endpoint the MessageEndpoint sending this event
      * @param token the received token
      */
     public final void tokenReceived(
@@ -853,6 +859,7 @@ public abstract class AbstractProxy
     /**
      * Called when the token has been sent.
      *
+     * @param endpoint the MessageEndpoint sending this event
      * @param token the sent token
      */
     public final void tokenSent(
@@ -865,7 +872,9 @@ public abstract class AbstractProxy
     /**
      * Called when the receiving endpoint threw the EndpointIsDeadException.
      *
+     * @param endpoint the MessageEndpoint sending this event
      * @param msg the status of the outgoing queue
+     * @param t the error
      */
     public void disablingError(
             MessageEndpoint<XprisoMessage> endpoint,
@@ -1101,9 +1110,9 @@ public abstract class AbstractProxy
     }
 
     /**
-     * The MessageEndpoint to use to talk to our partner NetMeshBase's Proxy.
+     * The BidirectionalMessageEndpoint to use to talk to our partner NetMeshBase's Proxy.
      */
-    protected NetMessageEndpoint theEndpoint;
+    protected ProxyMessageEndpoint theEndpoint;
 
     /**
      * The WaitForResponseEndpoint that makes waiting for responses to lock requests much easier.
@@ -1229,10 +1238,10 @@ public abstract class AbstractProxy
         /**
          *  Constructor.
          * 
-         * @param ep the MessageEndpoint to use
+         * @param ep the BidirectionalMessageEndpoint to use
          */
         public MyWaitForLockResponseEndpoint(
-                MessageEndpoint<XprisoMessage> ep )
+                BidirectionalMessageEndpoint<XprisoMessage> ep )
         {
             super( ep );
         }
@@ -1248,10 +1257,10 @@ public abstract class AbstractProxy
         /**
          *  Constructor.
          * 
-         * @param ep the MessageEndpoint to use
+         * @param ep the BidirectionalMessageEndpoint to use
          */
         public MyWaitForHomeReplicaResponseEndpoint(
-                MessageEndpoint<XprisoMessage> ep )
+                BidirectionalMessageEndpoint<XprisoMessage> ep )
         {
             super( ep );
         }
@@ -1267,10 +1276,10 @@ public abstract class AbstractProxy
         /**
          *  Constructor.
          * 
-         * @param ep the MessageEndpoint to use
+         * @param ep the BidirectionalMessageEndpoint to use
          */
         public MyWaitForReplicaResponseEndpoint(
-                MessageEndpoint<XprisoMessage> ep )
+                BidirectionalMessageEndpoint<XprisoMessage> ep )
         {
             super( ep );
         }
