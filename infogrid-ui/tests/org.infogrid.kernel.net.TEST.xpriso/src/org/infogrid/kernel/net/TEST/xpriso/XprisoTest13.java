@@ -26,7 +26,7 @@ import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.security.PermitAllAccessManager;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
-import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.util.logging.Log;
 
 import java.util.concurrent.ScheduledExecutorService;

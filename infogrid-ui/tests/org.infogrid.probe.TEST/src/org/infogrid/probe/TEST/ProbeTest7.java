@@ -20,6 +20,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.comm.AbstractMessageEndpointListener;
 import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.SendingMessageEndpoint;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
@@ -36,8 +37,8 @@ import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-import org.infogrid.net.m.MPingPongNetMessageEndpoint;
-import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpoint;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.probe.ApiProbe;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.StagingMeshBase;
@@ -284,8 +285,8 @@ public class ProbeTest7
          */
         @Override
         public void messageSendingFailed(
-                MessageEndpoint<XprisoMessage> endpoint,
-                List<XprisoMessage>            msg )
+                SendingMessageEndpoint<XprisoMessage> endpoint,
+                XprisoMessage                         msg )
         {
             log.debug( "Outgoing message sending failed: " + endpoint );
             

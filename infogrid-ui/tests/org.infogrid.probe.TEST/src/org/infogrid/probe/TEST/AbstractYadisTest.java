@@ -33,8 +33,8 @@ import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.MeshType;
 import org.infogrid.model.Probe.ProbeSubjectArea;
 import org.infogrid.modelbase.MeshTypeNotFoundException;
-import org.infogrid.net.NetMessageEndpointFactory;
-import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.manager.PassiveProbeManager;
 import org.infogrid.probe.manager.m.MPassiveProbeManager;
@@ -71,7 +71,7 @@ public abstract class AbstractYadisTest
         // start the server
         theServer.start();
 
-        NetMessageEndpointFactory endpointsFactory = MPingPongNetMessageEndpointFactory.create( exec );
+        ProxyMessageEndpointFactory endpointsFactory = MPingPongNetMessageEndpointFactory.create( exec );
         
         ShadowMeshBaseFactory theShadowFactory
                 = MShadowMeshBaseFactory.create( theModelBase, endpointsFactory, theProbeDirectory, -1L, rootContext );

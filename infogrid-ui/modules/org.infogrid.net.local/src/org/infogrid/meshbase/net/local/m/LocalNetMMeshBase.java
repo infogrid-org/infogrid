@@ -35,8 +35,8 @@ import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.net.NetMessageEndpointFactory;
-import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.manager.ProbeManager;
 import org.infogrid.probe.manager.ScheduledExecutorProbeManager;
@@ -281,7 +281,7 @@ public class LocalNetMMeshBase
      */
     public static LocalNetMMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProxyPolicyFactory        proxyPolicyFactory,
             ModelBase                 modelBase,
             NetAccessManager          accessMgr,
@@ -318,7 +318,7 @@ public class LocalNetMMeshBase
      */
     public static LocalNetMMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProxyPolicyFactory        proxyPolicyFactory,
             MeshObjectSetFactory      setFactory,
             ModelBase                 modelBase,

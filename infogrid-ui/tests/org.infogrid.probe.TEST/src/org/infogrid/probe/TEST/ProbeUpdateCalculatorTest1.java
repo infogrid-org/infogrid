@@ -24,7 +24,7 @@ import org.infogrid.model.Probe.ProbeSubjectArea;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.FloatValue;
-import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.probe.ApiProbe;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.StagingMeshBase;
