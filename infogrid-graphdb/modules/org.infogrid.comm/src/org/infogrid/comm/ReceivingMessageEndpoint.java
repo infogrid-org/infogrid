@@ -21,37 +21,8 @@ package org.infogrid.comm;
  * @param <T> the message type
  */
 public interface ReceivingMessageEndpoint<T>
+        extends
+            MessageEndpoint<T>
 {
-    /**
-     * Add a MessageEndpointListener as a listener.
-     *
-     * @param newListener the listener to add
-     */
-    public void addDirectMessageEndpointListener(
-            MessageEndpointListener<T> newListener );
-    
-    /**
-     * Add a WeakReference to a MessageEndpointListener as a listener.
-     *
-     * @param newListener the listener to add
-     */
-    public void addWeakMessageEndpointListener(
-            MessageEndpointListener<T> newListener );
-    
-    /**
-     * Add a SoftReference to a MessageEndpointListener as a listener.
-     *
-     * @param newListener the listener to add
-     */
-    public void addSoftMessageEndpointListener(
-            MessageEndpointListener<T> newListener );
-    
-    /**
-     * Remove a MessageEndpointListener.
-     *
-     * @param oldListener the listener to remove
-     */
-    public void removeMessageEndpointListener(
-            MessageEndpointListener<T> oldListener );
-
+    // nothing
 }

@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * An MessageEndpoint that suspents the thread sending a message until a
+ * An BidirectionalMessageEndpoint that suspents the thread sending a message until a
  * response has arrived. This is useful to implement RPC-style communications
  * on top of the ping-pong framework.
  * 
@@ -42,11 +42,11 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
      * Factory method.
      *
      * @param <T> the message type
-     * @param messageEndpoint the MessageEndpoint to use as communications endpoint
+     * @param messageEndpoint the BidirectionalMessageEndpoint to use as communications endpoint
      * @return the created WaitForResponseEndpoint
      */
     public static <T extends CarriesInvocationId> WaitForResponseEndpoint<T> create(
-            MessageEndpoint<T> messageEndpoint )
+            BidirectionalMessageEndpoint<T> messageEndpoint )
     {
         WaitForResponseEndpoint<T> ret = new WaitForResponseEndpoint<T>( messageEndpoint );
 
@@ -57,20 +57,20 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
     /**
      * Constructor.
      * 
-     * @param messageEndpoint the MessageEndpoint to use as communications endpoint
+     * @param messageEndpoint the BidirectionalMessageEndpoint to use as communications endpoint
      */
     protected WaitForResponseEndpoint(
-            MessageEndpoint<T> messageEndpoint )
+            BidirectionalMessageEndpoint<T> messageEndpoint )
     {
         theMessageEndpoint = messageEndpoint;
     }
     
     /**
-     * Obtain the MessageEndpoint through which the RPC Messages are sent.
+     * Obtain the BidirectionalMessageEndpoint through which the RPC Messages are sent.
      *
-     * @return the MessageEndpoint
+     * @return the BidirectionalMessageEndpoint
      */
-    public final MessageEndpoint<T> getMessageEndpoint()
+    public final BidirectionalMessageEndpoint<T> getMessageEndpoint()
     {
         return theMessageEndpoint;
     }
@@ -183,12 +183,12 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
     /**
      * Called when an incoming message has arrived.
      *
-     * @param endpoint the MessageEndpoint that received the message
+     * @param endpoint the BidirectionalMessageEndpoint that received the message
      * @param msg the received message
      */
     public void messageReceived(
-            MessageEndpoint<T> endpoint,
-            T                  msg )
+            ReceivingMessageEndpoint<T> endpoint,
+            T                           msg )
     {
         long responseId = msg.getResponseId();
         
@@ -216,12 +216,12 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
     /**
      * Called when an outgoing message has been sent.
      *
-     * @param endpoint the MessageEndpoint that sent this event
+     * @param endpoint the BidirectionalMessageEndpoint that sent this event
      * @param msg the sent message
      */
     public void messageSent(
-            MessageEndpoint<T> endpoint,
-            T                  msg )
+            SendingMessageEndpoint<T> endpoint,
+            T                         msg )
     {
         // do nothing
     }
@@ -229,12 +229,12 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
     /**
      * Called when an outgoing message has enqueued for sending.
      *
-     * @param endpoint the MessageEndpoint that sent this event
+     * @param endpoint the BidirectionalMessageEndpoint that sent this event
      * @param msg the enqueued message
      */
     public void messageEnqueued(
-            MessageEndpoint<T> endpoint,
-            T                  msg )
+            SendingMessageEndpoint<T> endpoint,
+            T                         msg )
     {
         // do nothing
     }
@@ -242,12 +242,12 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
     /**
      * Invoked only for those messages that are not processed as a response.
      *
-     * @param endpoint the MessageEndpoint that sent this event
+     * @param endpoint the BidirectionalMessageEndpoint that sent this event
      * @param msg the received message that was not processed before
      */
     protected void otherMessageReceived(
-            MessageEndpoint<T> endpoint,
-            T                  msg )
+            ReceivingMessageEndpoint<T> endpoint,
+            T                           msg )
     {
         // noop on this level
     }
@@ -255,12 +255,12 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
     /**
      * Called when an outoing message failed to be sent.
      *
-     * @param endpoint the MessageEndpoint that sent this event
+     * @param endpoint the BidirectionalMessageEndpoint that sent this event
      * @param msg the outgoing message
      */
     public void messageSendingFailed(
-            MessageEndpoint<T> endpoint,
-            List<T>            msg )
+            SendingMessageEndpoint<T> endpoint,
+            T                         msg )
     {
         // no op
     }
@@ -268,7 +268,7 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
     /**
      * Called when the receiving endpoint threw the EndpointIsDeadException.
      *
-     * @param endpoint the MessageEndpoint that sent this event
+     * @param endpoint the BidirectionalMessageEndpoint that sent this event
      * @param msg the status of the outgoing queue
      * @param t the Throwable that caused this error, if any
      */
@@ -329,9 +329,9 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
     }
 
     /**
-     * The underlying MessageEndpoint.
+     * The underlying BidirectionalMessageEndpoint.
      */
-    protected MessageEndpoint<T> theMessageEndpoint;
+    protected BidirectionalMessageEndpoint<T> theMessageEndpoint;
     
     /**
      * The ongoing invocations.

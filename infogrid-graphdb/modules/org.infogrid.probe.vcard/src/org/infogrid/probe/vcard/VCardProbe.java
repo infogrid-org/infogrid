@@ -505,8 +505,9 @@ public class VCardProbe
                         break;
 
                     case '.':
-                        if( dotIndex == -1 )
+                        if( dotIndex == -1 ) {
                             dotIndex = i;
+                        }
                         break;
                 }
             }

@@ -34,7 +34,7 @@ import org.infogrid.meshbase.store.net.StoreProxyManager;
 
 import org.infogrid.modelbase.ModelBase;
 
-import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.shadow.proxy.DefaultShadowProxyFactory;
@@ -80,7 +80,7 @@ public class StoreShadowMeshBase
      */
     public static StoreShadowMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ModelBase                 modelBase,
             NetAccessManager          accessMgr,
             ProbeDirectory            directory,
@@ -122,7 +122,7 @@ public class StoreShadowMeshBase
      */
     public static StoreShadowMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProxyPolicyFactory        proxyPolicyFactory,
             ModelBase                 modelBase,
             NetAccessManager          accessMgr,
@@ -176,7 +176,7 @@ public class StoreShadowMeshBase
     public static StoreShadowMeshBase restore(
             NetMeshBaseIdentifier      identifier,
             ExternalizedShadowMeshBase externalized,
-            NetMessageEndpointFactory  endpointFactory,
+            ProxyMessageEndpointFactory  endpointFactory,
             ProxyPolicyFactory         proxyPolicyFactory,
             ModelBase                  modelBase,
             NetAccessManager           accessMgr,

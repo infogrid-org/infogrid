@@ -29,7 +29,7 @@ import org.infogrid.meshbase.net.a.DefaultAnetMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.shadow.proxy.DefaultShadowProxyFactory;
 import org.infogrid.probe.shadow.proxy.DefaultShadowProxyPolicyFactory;
@@ -66,7 +66,7 @@ public class MShadowMeshBase
      */
     public static MShadowMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ModelBase                 modelBase,
             NetAccessManager          accessMgr,
             ProbeDirectory            directory,
@@ -106,7 +106,7 @@ public class MShadowMeshBase
      */
     public static MShadowMeshBase create(
             NetMeshBaseIdentifier     identifier,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProxyPolicyFactory        proxyPolicyFactory,
             ModelBase                 modelBase,
             NetAccessManager          accessMgr,

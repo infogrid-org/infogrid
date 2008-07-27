@@ -33,7 +33,7 @@ import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.Store;
 import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
@@ -68,7 +68,7 @@ public class NetStoreMeshBase
             NetAccessManager          accessMgr,
             Store                     meshObjectStore,
             IterableStore             proxyStore,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             Context                   context )
     {
         ImmutableMMeshObjectSetFactory    setFactory         = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
@@ -108,7 +108,7 @@ public class NetStoreMeshBase
             NetAccessManager          accessMgr,
             Store                     meshObjectStore,
             IterableStore             proxyStore,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             Context                   context )
     {
         ImmutableMMeshObjectSetFactory setFactory = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
@@ -149,7 +149,7 @@ public class NetStoreMeshBase
             NetAccessManager          accessMgr,
             Store                     meshObjectStore,
             IterableStore             proxyStore,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             Context                   context )
     {
         DefaultProxyFactory proxyFactory = DefaultProxyFactory.create( endpointFactory, proxyPolicyFactory );

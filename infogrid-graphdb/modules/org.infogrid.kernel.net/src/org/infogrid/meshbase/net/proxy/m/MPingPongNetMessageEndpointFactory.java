@@ -12,15 +12,15 @@
 // All rights reserved.
 //
 
-package org.infogrid.net.m;
+package org.infogrid.meshbase.net.proxy.m;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.List;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-import org.infogrid.net.NetMessageEndpoint;
-import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.NameServer;
@@ -31,9 +31,9 @@ import org.infogrid.util.ResourceHelper;
  */
 public class MPingPongNetMessageEndpointFactory
         extends
-            AbstractFactory<NetMeshBaseIdentifier,NetMessageEndpoint,NetMeshBaseIdentifier>
+            AbstractFactory<NetMeshBaseIdentifier,ProxyMessageEndpoint,NetMeshBaseIdentifier>
         implements
-            NetMessageEndpointFactory
+            ProxyMessageEndpointFactory
 {
     /**
      * Factory method.
@@ -50,7 +50,6 @@ public class MPingPongNetMessageEndpointFactory
     /**
      * Constructor.
      *
-     * @param nameServer the NameServer
      * @param exec the ScheduledExecutorService to schedule communication-related events
      */
     protected MPingPongNetMessageEndpointFactory(
@@ -101,9 +100,11 @@ public class MPingPongNetMessageEndpointFactory
     }
     
     /**
-     * Restore a NetMessageEndpoint from storage.
+     * Restore a ProxyMessageEndpoint from storage.
+     * 
+     * @throws FactoryException catch-all Exception, consider its cause
      */
-    public NetMessageEndpoint restoreNetMessageEndpoint(
+    public ProxyMessageEndpoint restoreNetMessageEndpoint(
             NetMeshBaseIdentifier   partnerIdentifier,
             NetMeshBaseIdentifier   myIdentifier,
             long                lastTokenSent,
