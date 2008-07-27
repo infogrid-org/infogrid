@@ -12,8 +12,9 @@
 // All rights reserved.
 //
 
-package org.infogrid.net;
+package org.infogrid.meshbase.net.proxy;
 
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 
@@ -26,23 +27,23 @@ import java.util.List;
  * Manufactures MessageEndpoints for a given ordered pair of local NetMeshBaseIdentifier
  * and remote NetMeshBaseIdentifier.
  */
-public interface NetMessageEndpointFactory
+public interface ProxyMessageEndpointFactory
         extends
-            Factory<NetMeshBaseIdentifier,NetMessageEndpoint,NetMeshBaseIdentifier>
+            Factory<NetMeshBaseIdentifier,ProxyMessageEndpoint,NetMeshBaseIdentifier>
 {
     /**
-     * Restore a NetMessageEndpoint from storage.
+     * Restore a ProxyMessageEndpoint from storage.
      * 
      * @param partnerIdentifier the NetMeshBaseIdentifier of the NetMeshBase to communicate with
-     * @param myIdentifier      the NetMeshBaseIdentifier of the NetMeshBase on whose behalf the restored NetMessageEndpoint will communicate
-     * @param lastTokenSent     the last token sent by this NetMessageEndpoint prior to being saved to storage
-     * @param lastTokenReceived the last token received by this NetMessageEndpoint prior to being saved to storage
+     * @param myIdentifier      the NetMeshBaseIdentifier of the NetMeshBase on whose behalf the restored ProxyMessageEndpoint will communicate
+     * @param lastTokenSent     the last token sent by this ProxyMessageEndpoint prior to being saved to storage
+     * @param lastTokenReceived the last token received by this ProxyMessageEndpoint prior to being saved to storage
      * @param lastMessagesSent  the last messages sent whose receipt had not been acknowledged yet at the time of being saved to storage
      * @param messagesToBeSent  the messages still to be sent at the time of being saved to storage
-     * @return the restured NetMessageEndpoint
-     * @throws FactoryException thrown if the NetMessageEndpoint could not be recreated
+     * @return the restured ProxyMessageEndpoint
+     * @throws FactoryException thrown if the ProxyMessageEndpoint could not be recreated
      */
-    public NetMessageEndpoint restoreNetMessageEndpoint(
+    public ProxyMessageEndpoint restoreNetMessageEndpoint(
             NetMeshBaseIdentifier partnerIdentifier,
             NetMeshBaseIdentifier myIdentifier,
             long                  lastTokenSent,

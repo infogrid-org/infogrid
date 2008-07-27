@@ -20,7 +20,7 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 
 import org.infogrid.modelbase.ModelBase;
 
-import org.infogrid.net.NetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.shadow.AbstractShadowMeshBaseFactory;
@@ -50,7 +50,7 @@ public class MShadowMeshBaseFactory
      */
     public static MShadowMeshBaseFactory create(
             ModelBase                 modelBase,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProbeDirectory            probeDirectory,
             long                      timeNotNeededTillExpires,
             Context                   context )
@@ -72,7 +72,7 @@ public class MShadowMeshBaseFactory
      */
     protected MShadowMeshBaseFactory(
             ModelBase                 modelBase,
-            NetMessageEndpointFactory endpointFactory,
+            ProxyMessageEndpointFactory endpointFactory,
             ProbeDirectory            probeDirectory,
             long                      timeNotNeededTillExpires,
             Context                   context )

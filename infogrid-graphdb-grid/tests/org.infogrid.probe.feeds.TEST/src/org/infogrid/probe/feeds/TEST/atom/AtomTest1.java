@@ -21,7 +21,7 @@ import org.infogrid.model.Feeds.FeedsSubjectArea;
 import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.Probe.ProbeSubjectArea;
-import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.feeds.TEST.AbstractFeedTest;
 import org.infogrid.probe.feeds.atom.AtomProbe;

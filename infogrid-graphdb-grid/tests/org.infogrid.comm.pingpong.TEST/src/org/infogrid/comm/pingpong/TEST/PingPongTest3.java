@@ -16,7 +16,6 @@ package org.infogrid.comm.pingpong.TEST;
 
 import org.infogrid.testharness.AbstractTest;
 
-import org.infogrid.comm.MessageEndpoint;
 import org.infogrid.comm.MessageEndpointListener;
 import org.infogrid.comm.pingpong.m.MPingPongMessageEndpoint;
 
@@ -25,6 +24,10 @@ import org.infogrid.util.logging.Log;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.ReceivingMessageEndpoint;
+import org.infogrid.comm.SendingMessageEndpoint;
+import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
 
 /**
  * Tests what happens if one side is very slow in processing.
@@ -164,9 +167,9 @@ public class PingPongTest3
                 MessageEndpointListener<String>
     {
         public MyListener(
-                MessageEndpoint<String> end,
-                String                  prefix,
-                long                    delay )
+                PingPongMessageEndpoint<String> end,
+                String                          prefix,
+                long                            delay )
         {
             theEndpoint = end;
             thePrefix   = prefix;
@@ -176,11 +179,12 @@ public class PingPongTest3
         /**
          * Called when an incoming message has arrived.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the received message
          */
         public void messageReceived(
-                MessageEndpoint<String> endpoint,
-                String                  msg )
+                ReceivingMessageEndpoint<String> endpoint,
+                String                           msg )
         {
             log.debug( this + " received message " + msg );
             
@@ -216,8 +220,8 @@ public class PingPongTest3
          * @param msg the sent message
          */
         public void messageSent(
-                MessageEndpoint<String> sender,
-                String                  msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             log.debug( this + " sent message " + msg );
         }
@@ -229,8 +233,8 @@ public class PingPongTest3
          * @param msg the enqueued message
          */
         public void messageEnqueued(
-                MessageEndpoint<String> sender,
-                String                  msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             log.debug( this + " enqueued message " + msg );
         }
@@ -238,11 +242,12 @@ public class PingPongTest3
         /**
          * Called when an outoing message failed to be sent.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the outgoing message
          */
         public void messageSendingFailed(
-                MessageEndpoint<String> endpoint,
-                List<String>            msg )
+                SendingMessageEndpoint<String> endpoint,
+                String                         msg )
         {
             reportError( "Message sending failed: " + msg );
         }
@@ -250,7 +255,9 @@ public class PingPongTest3
         /**
          * Called when the receiving endpoint threw the EndpointIsDeadException.
          *
+         * @param endpoint the MessageEndpoint that sent this event
          * @param msg the status of the outgoing queue
+         * @param t the error
          */
         public void disablingError(
                 MessageEndpoint<String> endpoint,
@@ -274,9 +281,9 @@ public class PingPongTest3
             return "Listener (prefix: " + thePrefix + "): ";
         }
 
-        MessageEndpoint<String> theEndpoint;
-        String                  thePrefix;
-        String                  firstNonNullMessageReceived;
+        PingPongMessageEndpoint<String> theEndpoint;
+        String                          thePrefix;
+        String                          firstNonNullMessageReceived;
         
         HashMap<String,Integer> receivedMessages = new HashMap<String,Integer>();
         

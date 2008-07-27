@@ -12,9 +12,9 @@
 // All rights reserved.
 //
 
-package org.infogrid.net;
+package org.infogrid.meshbase.net.proxy;
 
-import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.BidirectionalMessageEndpoint;
 
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 
@@ -24,9 +24,9 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 /**
  *
  */
-public interface NetMessageEndpoint
+public interface ProxyMessageEndpoint
         extends
-            MessageEndpoint<XprisoMessage>
+            BidirectionalMessageEndpoint<XprisoMessage>
 {
     /**
      * Determine the NetMeshBaseIdentifier of the partner MeshBase.
@@ -50,16 +50,16 @@ public interface NetMessageEndpoint
     public abstract long getLastReceivedToken();
     
     /**
-     * Obtain an Iterator over the XprisoMessages still to be sent.
+     * Obtain the XprisoMessages still to be sent.
      *
-     * @return the Iterator
+     * @return the messages
      */
     public abstract List<XprisoMessage> messagesToBeSent();
     
     /**
-     * Obtain an Iterator over the XprisoMessages that were sent most recently.
+     * Obtain the XprisoMessages that were sent most recently.
      *
-     * @return the Iterator
+     * @return the messages
      */
     public abstract List<XprisoMessage> messagesLastSent();
 

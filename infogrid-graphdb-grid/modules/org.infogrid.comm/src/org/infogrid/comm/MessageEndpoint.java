@@ -15,16 +15,42 @@
 package org.infogrid.comm;
 
 /**
- * A message endpoint for bidirectional communications. The method 
- * enqueueMessageForSend is used for asynchronous sending of messages.
- * Incoming responses are received by subscribed MessageEndpointListeners.
+ * A message endpoint that does not specify whether it can send or receive messages
+ * or both. Subtypes define those roles.
  * 
  * @param <T> the message type
  */
 public interface MessageEndpoint<T>
-        extends
-            SendingMessageEndpoint<T>,
-            ReceivingMessageEndpoint<T>
 {
-    // nothing
+    /**
+     * Add a MessageEndpointListener as a listener.
+     *
+     * @param newListener the listener to add
+     */
+    public void addDirectMessageEndpointListener(
+            MessageEndpointListener<T> newListener );
+    
+    /**
+     * Add a WeakReference to a MessageEndpointListener as a listener.
+     *
+     * @param newListener the listener to add
+     */
+    public void addWeakMessageEndpointListener(
+            MessageEndpointListener<T> newListener );
+    
+    /**
+     * Add a SoftReference to a MessageEndpointListener as a listener.
+     *
+     * @param newListener the listener to add
+     */
+    public void addSoftMessageEndpointListener(
+            MessageEndpointListener<T> newListener );
+    
+    /**
+     * Remove a MessageEndpointListener.
+     *
+     * @param oldListener the listener to remove
+     */
+    public void removeMessageEndpointListener(
+            MessageEndpointListener<T> oldListener );
 }

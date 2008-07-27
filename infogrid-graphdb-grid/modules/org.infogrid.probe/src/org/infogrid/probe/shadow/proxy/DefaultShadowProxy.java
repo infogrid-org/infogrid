@@ -14,19 +14,15 @@
 
 package org.infogrid.probe.shadow.proxy;
 
-import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBase;
-import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.net.proxy.AbstractProxy;
 import org.infogrid.meshbase.net.proxy.ProxyPolicy;
-import org.infogrid.meshbase.net.proxy.ProxyProcessingInstructions;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-import org.infogrid.meshbase.transaction.ChangeSet;
 import org.infogrid.meshbase.transaction.Transaction;
-import org.infogrid.net.NetMessageEndpoint;
+import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
 import org.infogrid.probe.StagingMeshBase;
-import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -46,7 +42,7 @@ public class DefaultShadowProxy
      * @return the created DefaultShadowProxy
      */
     public static DefaultShadowProxy create(
-            NetMessageEndpoint ep,
+            ProxyMessageEndpoint ep,
             NetMeshBase        mb )
     {
         DefaultShadowProxyPolicy policy = DefaultShadowProxyPolicy.create(); // in the future, this should become configurable
@@ -71,7 +67,7 @@ public class DefaultShadowProxy
      * @return the created DefaultShadowProxy
      */
     public static DefaultShadowProxy restoreProxy(
-            NetMessageEndpoint ep,
+            ProxyMessageEndpoint ep,
             NetMeshBase        mb,
             boolean            isPlaceholder,
             long               timeCreated,
@@ -96,7 +92,7 @@ public class DefaultShadowProxy
      * @param policy the ProxyPolicy to use
      */
     protected DefaultShadowProxy(
-            NetMessageEndpoint ep,
+            ProxyMessageEndpoint ep,
             NetMeshBase        mb,
             ProxyPolicy        policy )
     {
@@ -118,7 +114,7 @@ public class DefaultShadowProxy
      * @param timeExpires the timeExpires to use
      */
     protected DefaultShadowProxy(
-            NetMessageEndpoint ep,
+            ProxyMessageEndpoint ep,
             NetMeshBase        mb,
             ProxyPolicy        policy,
             boolean            isPlaceholder,
@@ -146,8 +142,8 @@ public class DefaultShadowProxy
      */
     @Override
     protected void internalMessageReceived(
-            MessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                  incoming )
+            ReceivingMessageEndpoint<XprisoMessage> endpoint,
+            XprisoMessage                           incoming )
     {
         theMeshBaseIsDirty = false;
 

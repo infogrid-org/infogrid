@@ -24,7 +24,7 @@ import org.infogrid.meshbase.net.sweeper.UnnecessaryReplicasSweeper;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.model.primitives.StringValue;
-import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.util.logging.Log;
 
 import java.util.concurrent.ScheduledExecutorService;

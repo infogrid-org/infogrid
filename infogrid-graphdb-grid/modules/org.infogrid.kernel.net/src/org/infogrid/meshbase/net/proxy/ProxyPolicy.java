@@ -14,7 +14,7 @@
 
 package org.infogrid.meshbase.net.proxy;
 
-import org.infogrid.comm.MessageEndpoint;
+import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.CoherenceSpecification;
@@ -174,7 +174,7 @@ public interface ProxyPolicy
      * Determine the necessary operations that need to be performed to process
      * this incoming message according to this ProxyPolicy.
      * 
-     * @param endpoint the MessageEndpoint through which the message arrived
+     * @param endpoint the MessageEndpoint sending this event
      * @param incoming the incoming XprisoMessage
      * @param isResponseToOngoingQuery if true, this message is known to be a response to a still-ongoing
      *        query
@@ -182,8 +182,8 @@ public interface ProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForIncomingMessage(
-            MessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                  incoming,
-            boolean                        isResponseToOngoingQuery,
-            Proxy                          proxy );
+            ReceivingMessageEndpoint<XprisoMessage> endpoint,
+            XprisoMessage                           incoming,
+            boolean                                 isResponseToOngoingQuery,
+            Proxy                                   proxy );
 }

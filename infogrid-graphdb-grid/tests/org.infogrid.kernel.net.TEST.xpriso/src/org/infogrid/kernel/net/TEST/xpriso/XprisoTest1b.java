@@ -20,7 +20,7 @@ import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.m.NetMMeshBase;
-import org.infogrid.net.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.util.logging.Log;
 
 import java.util.concurrent.ScheduledExecutorService;
