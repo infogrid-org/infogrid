@@ -14,26 +14,23 @@
 
 package org.infogrid.meshbase.net.proxy.m;
 
+import java.lang.ref.WeakReference;
+import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.comm.MessageSendException;
 import org.infogrid.comm.pingpong.m.MPingPongMessageEndpoint;
-
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.proxy.Proxy;
-import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-
 import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
-
+import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.NameServer;
 import org.infogrid.util.logging.Log;
 
-import java.lang.ref.WeakReference;
-import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-    
 /**
- * Subclass of MPingPongMessageEndpoint to be used as the result of the factory method.
+ * Subclass of MPingPongMessageEndpoint to be used for Proxy communication that
+ * does not persist its own data and communicates via the ping-pong protocol.
  */
 public class MPingPongNetMessageEndpoint
         extends
@@ -45,27 +42,39 @@ public class MPingPongNetMessageEndpoint
 
     /**
      * Factory method.
+     * 
+     * @param name the name of the PingPongMessageEndpoint (for debugging only)
+     * @param partnerIdentifier identifier of the partner NetMeshBase
+     * @param myIdentifier identifier of the NetMeshBase on whose behalf this endpoint communicates
+     * @param nameServer the NameServer to use to to resolve identifiers
+     * @param deltaRespond the number of milliseconds until this PingPongMessageEndpoint returns the token
+     * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
+     * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
+     *                     was not received by the partner PingPongMessageEndpoint, and resends
+     * @param randomVariation the random component to add to the various times
+     * @param exec the ScheduledExecutorService to schedule timed tasks
+     * @return the created MPingPongNetMessageEndpoint
      */
     public static MPingPongNetMessageEndpoint create(
             String                                                  name,
             NetMeshBaseIdentifier                                   partnerIdentifier,
             NetMeshBaseIdentifier                                   myIdentifier,
+            NameServer<NetMeshBaseIdentifier,? extends NetMeshBase> nameServer,
             long                                                    deltaRespond,
             long                                                    deltaResend,
             long                                                    deltaRecover,
             double                                                  randomVariation,
-            NameServer<NetMeshBaseIdentifier,? extends NetMeshBase> nameServer,
             ScheduledExecutorService                                exec )
     {
         MPingPongNetMessageEndpoint ret = new MPingPongNetMessageEndpoint(
                 name,
                 partnerIdentifier,
                 myIdentifier,
+                nameServer,
                 deltaRespond,
                 deltaResend,
                 deltaRecover,
                 randomVariation,
-                nameServer,
                 exec,
                 -1,
                 -1,
@@ -80,16 +89,32 @@ public class MPingPongNetMessageEndpoint
     
     /**
      * Factory method.
+     * 
+     * @param name the name of the PingPongMessageEndpoint (for debugging only)
+     * @param partnerIdentifier identifier of the partner NetMeshBase
+     * @param myIdentifier identifier of the NetMeshBase on whose behalf this endpoint communicates
+     * @param nameServer the NameServer to use to to resolve identifiers
+     * @param deltaRespond the number of milliseconds until this PingPongMessageEndpoint returns the token
+     * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
+     * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
+     *                     was not received by the partner PingPongMessageEndpoint, and resends
+     * @param randomVariation the random component to add to the various times
+     * @param exec the ScheduledExecutorService to schedule timed tasks
+     * @param lastSentToken the last token sent in a previous instantiation of this MessageEndpoint
+     * @param lastReceivedToken the last token received in a previous instantiation of this MessageEndpoint
+     * @param messagesSentLast the last set of Messages sent in a previous instantiation of this MessageEndpoint
+     * @param messagesToBeSent outgoing message queue (may or may not be empty)
+     * @return the created MPingPongNetMessageEndpoint
      */
     public static MPingPongNetMessageEndpoint restore(
             String                                                  name,
             NetMeshBaseIdentifier                                   partnerIdentifier,
             NetMeshBaseIdentifier                                   myIdentifier,
+            NameServer<NetMeshBaseIdentifier,? extends NetMeshBase> nameServer,
             long                                                    deltaRespond,
             long                                                    deltaResend,
             long                                                    deltaRecover,
             double                                                  randomVariation,
-            NameServer<NetMeshBaseIdentifier,? extends NetMeshBase> nameServer,
             ScheduledExecutorService                                exec,
             long                                                    lastSentToken,
             long                                                    lastReceivedToken,
@@ -100,11 +125,11 @@ public class MPingPongNetMessageEndpoint
                 name,
                 partnerIdentifier,
                 myIdentifier,
+                nameServer,
                 deltaRespond,
                 deltaResend,
                 deltaRecover,
                 randomVariation,
-                nameServer,
                 exec,
                 lastSentToken,
                 lastReceivedToken,
@@ -121,25 +146,29 @@ public class MPingPongNetMessageEndpoint
      * Constructor.
      *
      * @param name the name of the PingPongMessageEndpoint (for debugging only)
+     * @param partnerIdentifier identifier of the partner NetMeshBase
+     * @param myIdentifier identifier of the NetMeshBase on whose behalf this endpoint communicates
+     * @param nameServer the NameServer to use to to resolve identifiers
      * @param deltaRespond the number of milliseconds until this PingPongMessageEndpoint returns the token
      * @param deltaResend  the number of milliseconds until this PingPongMessageEndpoint resends the token if sending the token failed
      * @param deltaRecover the number of milliseconds until this PingPongMessageEndpoint decides that the token
      *                     was not received by the partner PingPongMessageEndpoint, and resends
-     * @param exec the ScheduledExecutorService to use for threading
+     * @param randomVariation the random component to add to the various times
+     * @param exec the ScheduledExecutorService to schedule timed tasks
      * @param lastSentToken the last token sent in a previous instantiation of this MessageEndpoint
      * @param lastReceivedToken the last token received in a previous instantiation of this MessageEndpoint
      * @param messagesSentLast the last set of Messages sent in a previous instantiation of this MessageEndpoint
-     * @param messageToBeSent the Messages to be sent as soon as possible
+     * @param messagesToBeSent outgoing message queue (may or may not be empty)
      */
     protected MPingPongNetMessageEndpoint(
             String                                                  name,
             NetMeshBaseIdentifier                                   partnerIdentifier,
             NetMeshBaseIdentifier                                   myIdentifier,
+            NameServer<NetMeshBaseIdentifier,? extends NetMeshBase> nameServer,
             long                                                    deltaRespond,
             long                                                    deltaResend,
             long                                                    deltaRecover,
             double                                                  randomVariation,
-            NameServer<NetMeshBaseIdentifier,? extends NetMeshBase> nameServer,
             ScheduledExecutorService                                exec,
             long                                                    lastSentToken,
             long                                                    lastReceivedToken,
@@ -179,8 +208,9 @@ public class MPingPongNetMessageEndpoint
     /**
      * Do the message send.
      *
-     * @param token the token for the message
+     * @param token the token of the message
      * @param content the content to send.
+     * @throws MessageSendException thrown if the message could not be sent
      */
     @Override
     protected void sendMessage(
