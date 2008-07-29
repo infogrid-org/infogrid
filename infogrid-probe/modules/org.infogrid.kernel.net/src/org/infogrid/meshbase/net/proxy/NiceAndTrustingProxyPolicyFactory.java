@@ -21,7 +21,8 @@ import org.infogrid.util.FactoryException;
 
 /**
  * A ProxyPolicyFactory that generates nice and trusting ProxyPolicies. This may not
- * be too wise in a production environment that isn't otherwise tightly controlled.
+ * be too wise in a production environment that isn't otherwise tightly controlled
+ * or secured.
  */
 public class NiceAndTrustingProxyPolicyFactory
         extends

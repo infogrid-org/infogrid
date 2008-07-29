@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.jee.viewlet.wikiobject</name>
- <username>A Wiki Viewlet</username>
+ <username>Wiki Viewlets</username>
+ <userdescription>Contains viewlets that render and edit Wiki content.</userdescription>
  <provides> 
   <jar>org.infogrid.jee.viewlet.wikiobject.jar</jar> 
  </provides>

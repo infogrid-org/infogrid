@@ -21,7 +21,6 @@ import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
-//import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
@@ -34,7 +33,8 @@ import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeRemovedEvent;
 
 /**
- * An XprisoMessage. For efficiency reasons, this provides multiple implementing classes.
+ * An XprisoMessage that captures the information exchanged between Proxies.
+ * For efficiency reasons, this provides multiple implementing classes.
  */
 public interface XprisoMessage
         extends

@@ -16,6 +16,7 @@
 <standardmodule>
  <name>org.infogrid.lid.store</name>
  <username>Store support for the InfoGrid LID implementation</username>
+ <userdescription>Enables LID information to be stored via any InfoGrid Store.</userdescription>
  <provides> 
   <jar>org.infogrid.lid.store.jar</jar> 
  </provides>

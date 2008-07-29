@@ -15,7 +15,9 @@
 
 <standardmodule>
  <name>org.infogrid.kernel.net</name>
- <username>Network support for the InfoGrid Kernel</username>
+ <username>InfoGrid Net Kernel</username>
+ <userdescription>Provides MeshBase-to-MeshBase communications concepts that enable MeshBases
+   to replicate information to and from each other.</userdescription>
  <provides> 
   <jar>org.infogrid.kernel.net.jar</jar> 
  </provides>

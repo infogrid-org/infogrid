@@ -15,7 +15,7 @@
 
 <standardmodule>
  <name>org.infogrid.store.jets3t</name>
- <username>S3-based Store</username>
+ <username>S3-based Store Module</username>
  <userdescription>Implements the Store abstraction using Amazon S3</userdescription>
  <provides>
   <jar>org.infogrid.store.jets3t.jar</jar>

@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.kernel.active</name>
- <username>Active Set features for the InfoGrid kernel</username>
+ <username>Active InfoGrid kernel</username>
+ <userdescription>Defines ActiveSets and related concepts.</userdescription>
  <provides> 
   <jar>org.infogrid.kernel.active.jar</jar> 
  </provides>

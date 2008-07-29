@@ -14,18 +14,23 @@
 
 package org.infogrid.meshbase.net.proxy;
 
-import org.infogrid.meshbase.net.*;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 
 /**
- * Keeps information about to-be-locally-instantiated or to-be-resynchronized
- * NetMeshObjects together.
+ * An instruction that keeps information about a to-be-locally-instantiated or to-be-resynchronized
+ * NetMeshObject together. It is used for both, as the instruction is structurally the same.
  */
 public class InstantiateOrResynchronizeInstruction
 {
     /**
      * Factory method.
      * 
+     * @param externalizedNetMeshObject the external representation of the NetMeshObject
+     * @param proxyTowardsHome the correct proxyTowardsHome for the NetMeshObject
+     * @param proxyTowardsLock the correct proxyTowardsLock for the NetMeshObject
+     * @param giveUpHome if true, the NetMeshObject is supposed to give up home replica status when asked
+     * @param giveUpLock if true, the NetMeshObject is supposed to give up its update rights when asked
+     * @return the created InstantiateOrResynchronizeInstruction
      */
     public static InstantiateOrResynchronizeInstruction create(
             ExternalizedNetMeshObject externalizedNetMeshObject,
@@ -44,6 +49,12 @@ public class InstantiateOrResynchronizeInstruction
 
     /**
      * Constructor.
+     * 
+     * @param externalizedNetMeshObject the external representation of the NetMeshObject
+     * @param proxyTowardsHome the correct proxyTowardsHome for the NetMeshObject
+     * @param proxyTowardsLock the correct proxyTowardsLock for the NetMeshObject
+     * @param giveUpHome if true, the NetMeshObject is supposed to give up home replica status when asked
+     * @param giveUpLock if true, the NetMeshObject is supposed to give up its update rights when asked
      */
     protected InstantiateOrResynchronizeInstruction(
             ExternalizedNetMeshObject externalizedNetMeshObject,

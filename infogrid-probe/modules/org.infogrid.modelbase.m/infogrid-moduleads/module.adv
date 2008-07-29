@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.modelbase.m</name>
- <username>The InfoGrid ModelBase in an in-memory-only implementation</username>
+ <username>In-memory ModelBase module</username>
+ <userdescription>The InfoGrid ModelBase in an in-memory-only implementation</userdescription>
  <activationclass>org.infogrid.modelbase.m.Init</activationclass>
  <provides> 
   <jar>org.infogrid.modelbase.m.jar</jar> 

@@ -15,7 +15,9 @@
 
 <standardmodule>
  <name>org.infogrid.probe.store</name>
- <username>The InfoGrid Probe framework on top of the Store interface</username>
+ <username>Store Probe framework Module</username>
+ <userdescription>Enables the information held by the InfoGrid Probe framework to be persistent using
+   any InfoGrid Store</userdescription>
  <provides> 
   <jar>org.infogrid.probe.store.jar</jar> 
  </provides>
