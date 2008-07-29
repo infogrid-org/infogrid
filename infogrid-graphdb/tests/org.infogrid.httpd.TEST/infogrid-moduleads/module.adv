@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.httpd.TEST</name>
- <username>Testing the minimalistic HTTP server</username>
+ <username>HTTPD test Module</username>
+ <userdescription>Testing the minimalistic HTTP server</userdescription>
  <runclass>org.infogrid.httpd.TEST.AllTests</runclass>
  <dependencies>
   <requires name="org.infogrid.httpd"/>

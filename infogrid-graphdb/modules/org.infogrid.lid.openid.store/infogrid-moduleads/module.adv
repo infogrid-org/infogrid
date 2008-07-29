@@ -16,6 +16,7 @@
 <standardmodule>
  <name>org.infogrid.lid.openid.store</name>
  <username>Store support for the InfoGrid OpenID implementation</username>
+ <userdescription>Enables OpenID information to be stored via any InfoGrid Store.</userdescription>
  <provides> 
   <jar>org.infogrid.lid.openid.store.jar</jar> 
  </provides>

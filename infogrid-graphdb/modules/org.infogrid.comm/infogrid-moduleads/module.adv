@@ -16,9 +16,9 @@
 <standardmodule>
  <name>org.infogrid.comm</name>
  <username>Abstract Communications Module</username>
- <userdescription>The Communications Module provides an abstract
-   peer-to-peer, symmetric communications framework in which endpoints can send messages
-   to each other. It also implements RPC-style call-response patterns on top.</userdescription>
+ <userdescription>The Communications Module provides the abstract notions of
+   communications endpoints that can send messages to each other.
+   It also implements RPC-style call-response patterns on top.</userdescription>
  <dependencies>
   <requires name="org.infogrid.util"/>
  </dependencies>

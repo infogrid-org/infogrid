@@ -15,19 +15,16 @@
 package org.infogrid.meshbase.net.externalized;
 
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObjectFactory;
-
+import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
 import org.infogrid.model.primitives.externalized.DecodingException;
 import org.infogrid.model.primitives.externalized.EncodingException;
-
 import org.infogrid.modelbase.MeshTypeIdentifierFactory;
-import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Known how to serialize and deserialize a Proxy.
+ * Knows how to serialize and deserialize a Proxy.
  */
 public interface ExternalizedProxyEncoder
 {
@@ -47,15 +44,18 @@ public interface ExternalizedProxyEncoder
             IOException;
 
     /**
-     * Deserialize an ExternalizedProxy from a byte stream.
-     *
-     * @param s the InputStream from which to read
-     * @return the decoded ExternalizedProxy
+     * Deserialize a ExternalizedProxy from a stream.
+     * 
+     * @param contentAsStream the byte [] stream in which the ExternalizedProxy is encoded
+     * @param externalizedMeshObjectFactory the factory to use for ExternalizedMeshObjects
+     * @param meshObjectIdentifierFactory the factory to use for MeshObjectIdentifier
+     * @param meshTypeIdentifierFactory the factory to use for MeshTypes
+     * @return return the just-instantiated ExternalizedProxy
      * @throws DecodingException thrown if a problem occurred during decoding
      * @throws IOException thrown if an I/O error occurred
      */
     public abstract ExternalizedProxy decodeExternalizedProxy(
-            InputStream                                    s,
+            InputStream                                    contentAsStream,
             ParserFriendlyExternalizedNetMeshObjectFactory externalizedMeshObjectFactory,
             NetMeshObjectIdentifierFactory                 meshObjectIdentifierFactory,
             MeshTypeIdentifierFactory                      meshTypeIdentifierFactory )
@@ -64,7 +64,7 @@ public interface ExternalizedProxyEncoder
             IOException;
 
     /**
-     * Obtain an encodingId that reflects this ExternalizedProxyXmlEncoder.
+     * Obtain an encodingId that reflects this ExternalizedProxyEncoder.
      * 
      * @return the encodingId.
      */

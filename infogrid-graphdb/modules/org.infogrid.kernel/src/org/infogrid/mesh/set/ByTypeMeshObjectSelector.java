@@ -31,6 +31,7 @@ public class ByTypeMeshObjectSelector
      * Factory method.
      *
      * @param filterType the type whose instances we accept, including subtypes
+     * @return the created ByTypeMeshObjectSelector
      */
     public static ByTypeMeshObjectSelector create(
             EntityType filterType )
@@ -43,6 +44,7 @@ public class ByTypeMeshObjectSelector
      *
      * @param filterType the type whose instances we accept
      * @param subtypeAllowed  if true, we also accept instances of a subtype
+     * @return the created ByTypeMeshObjectSelector
      */
     public static ByTypeMeshObjectSelector create(
             EntityType filterType,

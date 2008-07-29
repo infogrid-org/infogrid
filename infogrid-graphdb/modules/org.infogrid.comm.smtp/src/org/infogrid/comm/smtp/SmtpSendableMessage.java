@@ -15,7 +15,7 @@
 package org.infogrid.comm.smtp;
 
 /**
- * Captures ther characteristics of a message that can be sent via SMTP.
+ * Captures the characteristics of a message that can be sent via SMTP.
  */
 public interface SmtpSendableMessage
 {

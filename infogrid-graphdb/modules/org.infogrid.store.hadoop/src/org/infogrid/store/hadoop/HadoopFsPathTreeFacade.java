@@ -24,7 +24,7 @@ import org.infogrid.util.tree.TreeFacade;
 import org.infogrid.util.tree.TreeFacadeCursorIterator;
 
 /**
- * Implements {@link TreeFacade} for files stored by Hadoop.
+ * Implements <code>TreeFacade</code> for files stored by Hadoop.
  */
 public class HadoopFsPathTreeFacade
         implements

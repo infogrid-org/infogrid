@@ -17,13 +17,11 @@ package org.infogrid.meshbase.net.proxy;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.meshbase.net.proxy.ProxyListener;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.transaction.Transaction;
-import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
 import org.infogrid.util.FactoryCreatedObject;
 import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.text.StringRepresentation;
@@ -222,7 +220,7 @@ public interface Proxy
 
     /**
      * Tell this Proxy that it is not needed any more. This will invoke
-     * {@link #initiateCaseCommunications} if and only if
+     * {@link #initiateCeaseCommunications} if and only if
      * isPermanent is true.
      * 
      * @param isPermanent if true, this Proxy will go away permanently; if false,

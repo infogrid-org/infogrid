@@ -14,18 +14,16 @@
 
 package org.infogrid.store.hadoop;
 
+import java.util.NoSuchElementException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.infogrid.store.IterableStoreCursor;
-import org.infogrid.store.StoreValue;
-
-import org.infogrid.util.CursorIterator;
-import org.infogrid.util.logging.Log;
-
-import java.util.NoSuchElementException;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.infogrid.store.IterableStoreCursor;
+import org.infogrid.store.StoreValue;
+import org.infogrid.util.CursorIterator;
 import org.infogrid.util.FilteringCursorIterator;
+import org.infogrid.util.logging.Log;
 import org.infogrid.util.tree.TreeFacade;
 import org.infogrid.util.tree.TreeFacadeCursorIterator;
 
@@ -75,7 +73,7 @@ public class HadoopStoreIterator
      * Obtain the next element, without iterating forward.
      *
      * @return the next element
-     * @throw NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+     * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
     public StoreValue peekNext()
     {
@@ -97,7 +95,7 @@ public class HadoopStoreIterator
      * Obtain the previous element, without iterating backwards.
      *
      * @return the previous element
-     * @throw NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+     * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
     public StoreValue peekPrevious()
     {
