@@ -15,6 +15,9 @@
 
 <standardmodule>
  <name>org.infogrid.probe.store.TEST</name>
+ <username>Store Probe test Module</username>
+ <userdescription>Tests the persisting of Probe framework information via the InfoGrid Store
+   abstraction.</userdescription>
  <runclass>org.infogrid.probe.store.TEST.AllTests</runclass>
  <provides>
   <jar>org.infogrid.probe.store.TEST.jar</jar>

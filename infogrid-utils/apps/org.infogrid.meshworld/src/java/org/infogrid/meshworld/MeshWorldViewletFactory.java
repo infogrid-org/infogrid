@@ -14,15 +14,7 @@
 
 package org.infogrid.meshworld;
 
-import org.infogrid.mesh.MeshObject;
-
-import org.infogrid.model.Wiki.WikiSubjectArea;
-
-import org.infogrid.viewlet.AbstractViewletFactory;
-import org.infogrid.viewlet.DefaultViewletFactoryChoice;
-import org.infogrid.viewlet.MeshObjectsToView;
-import org.infogrid.viewlet.ViewletFactoryChoice;
-
+import java.util.ArrayList;
 import org.infogrid.jee.viewlet.JeeViewlet;
 import org.infogrid.jee.viewlet.PseudoJspViewletFactoryChoice;
 import org.infogrid.jee.viewlet.bulk.BulkLoaderViewlet;
@@ -30,13 +22,16 @@ import org.infogrid.jee.viewlet.meshbase.AllMeshObjectsViewlet;
 import org.infogrid.jee.viewlet.modelbase.AllMeshTypesViewlet;
 import org.infogrid.jee.viewlet.wikiobject.WikiObjectDisplayViewlet;
 import org.infogrid.jee.viewlet.wikiobject.WikiObjectEditViewlet;
-
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.model.Wiki.WikiSubjectArea;
+import org.infogrid.viewlet.AbstractViewletFactory;
+import org.infogrid.viewlet.DefaultViewletFactoryChoice;
+import org.infogrid.viewlet.MeshObjectsToView;
+import org.infogrid.viewlet.ViewletFactoryChoice;
 import org.infogrid.util.ArrayHelper;
 
-import java.util.ArrayList;
-
 /**
- * ViewletFactory for the MeshWorld.
+ * ViewletFactory for the MeshWorld application
  */
 public class MeshWorldViewletFactory
         extends
@@ -70,7 +65,7 @@ public class MeshWorldViewletFactory
         }
         if( subject.isBlessedBy( WikiSubjectArea.WIKIOBJECT )) {
             ret.add( DefaultViewletFactoryChoice.create( WikiObjectDisplayViewlet.class, ViewletFactoryChoice.GOOD_MATCH_QUALITY ));
-            ret.add( DefaultViewletFactoryChoice.create( WikiObjectEditViewlet.class, ViewletFactoryChoice.GOOD_MATCH_QUALITY+1.0f ));
+            ret.add( DefaultViewletFactoryChoice.create( WikiObjectEditViewlet.class,    ViewletFactoryChoice.GOOD_MATCH_QUALITY+1.0f ));
         }
         ret.add( PseudoJspViewletFactoryChoice.create( "org.infogrid.jee.viewlet.propertysheet.PropertySheetViewlet", ViewletFactoryChoice.BAD_MATCH_QUALITY ));
         ret.add( PseudoJspViewletFactoryChoice.create( "org.infogrid.jee.viewlet.objectset.ObjectSetViewlet", ViewletFactoryChoice.BAD_MATCH_QUALITY ));

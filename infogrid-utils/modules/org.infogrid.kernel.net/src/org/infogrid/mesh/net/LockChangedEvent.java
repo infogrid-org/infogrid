@@ -24,7 +24,7 @@ import org.infogrid.util.event.SourceUnresolvedException;
 
 /**
  * This event indicates the transfer of update rights from one replica in
- * one NetMeshBase to a replica of the same MeshObject in a second NetMeshBase.
+ * one NetMeshBase to a replica of the same NetMeshObject in a second NetMeshBase.
  * Inner classes represent the specific event.
  */
 public abstract class LockChangedEvent

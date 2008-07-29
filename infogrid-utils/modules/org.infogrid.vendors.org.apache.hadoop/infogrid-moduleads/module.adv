@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.vendors.org.apache.hadoop</name>
- <username>Hadoop module</username>
+ <username>Hadoop Module</username>
+ <userdescription>Wraps the Hadoop libraries as an InfoGrid Module</userdescription>
  <provides>
   <jar>hadoop-core.jar</jar>
   <jar>commons-logging-api.jar</jar>

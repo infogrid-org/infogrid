@@ -15,7 +15,9 @@
 
 <standardmodule>
  <name>org.infogrid.net.local</name>
- <username>Same-address-space Network support for the NetMesh InfoGrid Kernel</username>
+ <username>Probe-integrated NetMeshBase Module</username>
+ <userdescription>Assembles a NetMeshBase that automatically creates and manages Probes for
+   external data sources.</userdescription>
  <provides> 
   <jar>org.infogrid.net.local.jar</jar> 
  </provides>

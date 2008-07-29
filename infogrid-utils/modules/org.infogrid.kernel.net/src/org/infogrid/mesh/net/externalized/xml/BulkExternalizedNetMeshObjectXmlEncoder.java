@@ -14,23 +14,6 @@
 
 package org.infogrid.mesh.net.externalized.xml;
 
-import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.externalized.ExternalizedMeshObject;
-import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObject;
-import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObjectFactory;
-
-import org.infogrid.meshbase.BulkLoadException;
-import org.infogrid.meshbase.BulkLoader;
-import org.infogrid.meshbase.MeshObjectIdentifierFactory;
-
-import org.infogrid.model.primitives.externalized.EncodingException;
-import org.infogrid.modelbase.MeshTypeIdentifierFactory;
-
-import org.infogrid.util.logging.Log;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,6 +21,18 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.externalized.ExternalizedMeshObject;
+import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObject;
+import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObjectFactory;
+import org.infogrid.meshbase.BulkLoadException;
+import org.infogrid.meshbase.BulkLoader;
+import org.infogrid.meshbase.MeshObjectIdentifierFactory;
+import org.infogrid.model.primitives.externalized.EncodingException;
+import org.infogrid.modelbase.MeshTypeIdentifierFactory;
+import org.infogrid.util.logging.Log;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * Parses a stream of AnetMeshObjects.

@@ -21,7 +21,7 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 
 /**
- *
+ * Factors out functionality common to ExternalizedProxy implementations.
  */
 public abstract class AbstractExternalizedProxy
         implements
@@ -32,6 +32,7 @@ public abstract class AbstractExternalizedProxy
      */
     protected AbstractExternalizedProxy()
     {
+        // no op
     }
 
     /**

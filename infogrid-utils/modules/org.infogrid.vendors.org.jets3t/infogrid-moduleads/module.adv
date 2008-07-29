@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.vendors.org.jets3t</name>
- <username>Jets3t module</username>
+ <username>JetS3t module</username>
+ <userdescription>Wraps the JetS3t libraries as an InfoGrid Module.</userdescription>
  <provides>
   <jar>jets3t.jar</jar>
  </provides>

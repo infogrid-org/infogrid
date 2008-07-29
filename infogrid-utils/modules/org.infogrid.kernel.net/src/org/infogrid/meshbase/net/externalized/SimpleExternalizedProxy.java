@@ -21,7 +21,8 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import java.util.List;
 
 /**
- *
+ * This implementation of ExternalizedProxy is fully initialized in the
+ * factory method.
  */
 public class SimpleExternalizedProxy
         extends
@@ -52,6 +53,18 @@ public class SimpleExternalizedProxy
 
     /**
      * Constructor.
+     * 
+     * @param timeCreated the time at which this Proxy was created
+     * @param timeUpdated the time at which this Proxy was last updated
+     * @param timeRead the time at which this Proxy was last read
+     * @param timeExpires the time at which this Proxy will expire
+     * @param lastSentToken the token sent last
+     * @param lastReceivedToken the token received last
+     * @param networkIdentifier the NetMeshBaseIdentifier of the NetMeshBase to which this Proxy belongs
+     * @param networkIdentifierOfPartner the NetMeshBaseIdentifier of the NetMeshBase with which this Proxy communicates
+     * @param coherenceSpecification the CoherenceSpecification used by this Proxy
+     * @param messagesToSend the messages to be sent
+     * @param messagesLastSent the message sent most recently
      */
     protected SimpleExternalizedProxy(
             long                    timeCreated,
