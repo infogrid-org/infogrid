@@ -19,9 +19,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
-import org.infogrid.comm.AbstractSendingMessageEndpoint;
+import org.infogrid.comm.AbstractFireAndForgetSendingMessageEndpoint;
 import org.infogrid.util.ResourceHelper;
-import org.infogrid.util.logging.Log;
 import sun.net.smtp.SmtpClient;
 
 /**
@@ -32,10 +31,8 @@ import sun.net.smtp.SmtpClient;
  */
 public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
         extends
-            AbstractSendingMessageEndpoint<T>
+            AbstractFireAndForgetSendingMessageEndpoint<T>
 {
-    private static final Log log = Log.getLogInstance( SmtpSendingMessageEndpoint.class ); // my own, private logger
-
     /**
      * Factory method.
      *
@@ -144,68 +141,7 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
     }
 
     /**
-     * Send a message.
-     *
-     * @param msg the Message to send.
-     */
-    @Override
-    public void enqueueMessageForSend(
-            T msg )
-    {
-        super.enqueueMessageForSend( msg );
-        
-        synchronized( this ) {
-            if( theFuture != null ) {
-                theFuture.cancel( false ); // This is pessimistic if enqueueMessageForSend is invoked N times very rapidly
-            }
-            super.schedule( new SendTask( this ), 0 ); // immediately
-        }
-    }
-
-    /**
-     * Invoked when the timer triggers.
-     *
-     * @param task the TimedTask that invokes this method
-     */
-    protected void doAction(
-            TimedTask task )
-    {
-        List<T> toSend = new ArrayList<T>();
-        
-        synchronized( this ) {
-            toSend.addAll( theMessagesToBeSent );
-            theMessagesToBeSent.clear();
-        }
-
-        // we can send messages out of order with SMTP
-        List<T> failed = new ArrayList<T>();
-        for( T current : toSend ) {
-
-            try {
-                attemptSend( current );
-
-            } catch( IOException ex ) {
-                failed.add( current );
-                
-                if( log.isInfoEnabled() ) {
-                    log.info( "Could not send message " + current );
-                }
-            }
-        }
-        
-        if( !failed.isEmpty() ) {
-            synchronized( this ) {
-                theMessagesToBeSent.addAll( failed ); // appending at the end -- good idea? FIXME?
-        
-                if( theFuture == null || theFuture.isCancelled() ) {
-                    schedule( new ResendTask( this ), 0 );
-                }
-            }
-        }
-    }
-
-    /**
-     * Internal helper to attempt send one message.
+     * Attempt to send one message.
      * 
      * @param msg the Message to send.
      * @throws IOException the message send failed
@@ -258,42 +194,4 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
      * Our ResourceHelper.
      */
     private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( SmtpSendingMessageEndpoint.class );
-    
-    /**
-     * The send task.
-     */
-    protected static class SendTask
-            extends
-                TimedTask
-    {
-        /**
-         * Constructor.
-         *
-         * @param ep the endpoint that is supposed to respond
-         */
-        public SendTask(
-                SmtpSendingMessageEndpoint ep )
-        {
-            super( ep );
-        }        
-    }
-    
-    /**
-     * The resend task.
-     */
-    protected static class ResendTask
-            extends
-                TimedTask
-    {
-        /**
-         * Constructor.
-         *
-         * @param ep the endpoint that is supposed to respond
-         */
-        public ResendTask(
-                SmtpSendingMessageEndpoint ep )
-        {
-            super( ep );
-        }        
-    }
 }
