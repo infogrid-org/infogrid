@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.testharness</name>
- <username>The InfoGrid Test Harness</username>
+ <username>Test Harness Module</username>
+ <userdescription>Contains the test harness for InfoGrid tests.</userdescription>
  <activationclass>org.infogrid.testharness.ModuleRegistryContext</activationclass>
  <provides> 
   <jar>org.infogrid.testharness.jar</jar> 

@@ -17,14 +17,12 @@ package org.infogrid.meshbase.net.security;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
-
 import org.infogrid.mesh.net.security.AccessLocallyNotPermittedException;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.security.IdentityChangeException;
 import org.infogrid.meshbase.transaction.TransactionException;
-
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;

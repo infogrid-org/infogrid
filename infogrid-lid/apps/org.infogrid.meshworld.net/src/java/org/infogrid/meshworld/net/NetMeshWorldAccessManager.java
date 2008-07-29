@@ -16,7 +16,6 @@ package org.infogrid.meshworld.net;
 
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.net.security.DelegatingNetAccessManager;
-
 import org.infogrid.model.AclBasedSecurity.accessmanager.AclBasedAccessManager;
 
 /**

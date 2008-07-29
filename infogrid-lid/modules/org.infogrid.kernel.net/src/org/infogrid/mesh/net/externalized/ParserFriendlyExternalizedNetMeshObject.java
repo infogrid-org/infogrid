@@ -72,7 +72,6 @@ public class ParserFriendlyExternalizedNetMeshObject
      * Obtain the Identifiers of the neighbors of this MeshObject.
      * 
      * @return the Identifiers of the neighbors
-     * @see #getTypes
      */
     @Override
     public NetMeshObjectIdentifier [] getNeighbors()

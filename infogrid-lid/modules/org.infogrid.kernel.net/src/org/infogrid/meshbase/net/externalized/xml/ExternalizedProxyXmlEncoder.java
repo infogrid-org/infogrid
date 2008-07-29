@@ -14,37 +14,28 @@
 
 package org.infogrid.meshbase.net.externalized.xml;
 
-import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObjectFactory;
-
-import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
-import org.infogrid.meshbase.net.externalized.ExternalizedProxyEncoder;
-import org.infogrid.meshbase.net.externalized.ParserFriendlyExternalizedProxy;
-
-import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-import org.infogrid.meshbase.net.xpriso.xml.XprisoMessageXmlEncoder;
-
-import org.infogrid.model.primitives.externalized.DecodingException;
-import org.infogrid.model.primitives.externalized.EncodingException;
-
-import org.infogrid.modelbase.MeshTypeIdentifierFactory;
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-
-import org.infogrid.util.logging.Log;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-
 import java.net.URISyntaxException;
-
 import java.util.ArrayList;
 import java.util.Iterator;
+import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObjectFactory;
 import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
+import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
+import org.infogrid.meshbase.net.externalized.ExternalizedProxyEncoder;
+import org.infogrid.meshbase.net.externalized.ParserFriendlyExternalizedProxy;
+import org.infogrid.meshbase.net.xpriso.XprisoMessage;
+import org.infogrid.meshbase.net.xpriso.xml.XprisoMessageXmlEncoder;
+import org.infogrid.model.primitives.externalized.DecodingException;
+import org.infogrid.model.primitives.externalized.EncodingException;
+import org.infogrid.modelbase.MeshTypeIdentifierFactory;
+import org.infogrid.util.logging.Log;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * Utility methods to encode/decode Proxies to/from XML. Implements the SAX interface.

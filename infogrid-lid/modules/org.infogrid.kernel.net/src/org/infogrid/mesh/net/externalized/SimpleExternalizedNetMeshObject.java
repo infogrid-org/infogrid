@@ -221,7 +221,6 @@ public class SimpleExternalizedNetMeshObject
      * Obtain the NetMeshObjectIdentifiers of the neighbors of this NetMeshObject.
      *
      * @return the NetMeshObjectIdentifiers of the neighbors
-     * @see #getRoleTypes
      */
     @Override
     public NetMeshObjectIdentifier [] getNeighbors()

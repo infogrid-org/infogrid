@@ -24,7 +24,7 @@ import org.infogrid.util.FactoryException;
 import java.util.List;
 
 /**
- * Manufactures MessageEndpoints for a given ordered pair of local NetMeshBaseIdentifier
+ * Manufactures ProxyMessageEndpoints for a given ordered pair of local NetMeshBaseIdentifier
  * and remote NetMeshBaseIdentifier.
  */
 public interface ProxyMessageEndpointFactory

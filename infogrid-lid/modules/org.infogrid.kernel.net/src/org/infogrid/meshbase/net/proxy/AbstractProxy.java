@@ -51,7 +51,6 @@ import org.infogrid.meshbase.security.IdentityChangeException;
 import org.infogrid.meshbase.transaction.CannotApplyChangeException;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
-import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
 import org.infogrid.util.Factory;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.FlexibleListenerSet;
@@ -86,8 +85,8 @@ public abstract class AbstractProxy
      */
     protected AbstractProxy(
             ProxyMessageEndpoint ep,
-            NetMeshBase        mb,
-            ProxyPolicy        policy )
+            NetMeshBase          mb,
+            ProxyPolicy          policy )
     {
         theEndpoint    = ep;
         theMeshBase    = mb;
@@ -401,7 +400,7 @@ public abstract class AbstractProxy
 
     /**
      * Tell this Proxy that it is not needed any more. This will invoke
-     * {@link #initiateCaseCommunications} if and only if
+     * {@link #initiateCeaseCommunications} if and only if
      * isPermanent is true.
      * 
      * @param isPermanent if true, this Proxy will go away permanently; if false,
@@ -523,7 +522,7 @@ public abstract class AbstractProxy
             theWaitForLockResponseEndpoint.messageReceived( instructions.getIncomingXprisoMessageEndpoint(), incoming );
             theWaitForHomeResponseEndpoint.messageReceived( instructions.getIncomingXprisoMessageEndpoint(), incoming );
         }
-    //
+
         
         NetMeshBaseLifecycleManager life   = theMeshBase.getMeshBaseLifecycleManager();
         NetAccessManager            access = theMeshBase.getAccessManager();

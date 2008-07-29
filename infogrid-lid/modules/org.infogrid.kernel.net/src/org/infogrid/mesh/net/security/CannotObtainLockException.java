@@ -15,7 +15,6 @@
 package org.infogrid.mesh.net.security;
 
 import org.infogrid.mesh.NotPermittedException;
-
 import org.infogrid.mesh.net.NetMeshObject;
 
 /**

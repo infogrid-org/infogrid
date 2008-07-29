@@ -24,8 +24,8 @@ import org.infogrid.meshbase.transaction.Transaction;
 
 /**
  * <p>Factors out the communications policies of a Proxy. When faced with a request
- * or an event, a Proxy asks its ProxyPolicy for ProxyProcessingInstructions,
- * which it then performs.</p>
+ *    or an event, a Proxy asks its ProxyPolicy for ProxyProcessingInstructions,
+ *    which it then performs.</p>
  * <p>Through this design, the communications policies of a Proxy become pluggable.</p>
  */
 public interface ProxyPolicy

@@ -19,7 +19,7 @@ import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 
 /**
- * Indicates that accessLocally() access was not permitted.
+ * Indicates that accessLocally() was not permitted.
  */
 public class AccessLocallyNotPermittedException
         extends

@@ -14,14 +14,11 @@
 
 package org.infogrid.mesh.net.a;
 
-import org.infogrid.mesh.a.DefaultAMeshObjectIdentifier;
-
-import org.infogrid.util.text.StringRepresentation;
-
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-
 import java.net.URISyntaxException;
+import org.infogrid.mesh.a.DefaultAMeshObjectIdentifier;
+import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.util.text.StringRepresentation;
 
 /**
  * Implements NetMeshObjectIdentifier for the Anet implementation.

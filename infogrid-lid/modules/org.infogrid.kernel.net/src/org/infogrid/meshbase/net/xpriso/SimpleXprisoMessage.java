@@ -32,7 +32,8 @@ import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeRemovedEvent;
 import org.infogrid.util.StringHelper;
 
 /**
- * This captures the information exchanged between Proxies.
+ * This implementation of XprisoMessage is fully initialized in the
+ * factory method.
  */
 public class SimpleXprisoMessage
         extends

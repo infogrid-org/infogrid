@@ -37,7 +37,8 @@ import org.infogrid.model.primitives.RoleType;
 
 /**
  * The methods exposed by NetMeshObject towards the Proxy. These methods should
- * never be invoked by the application programmer.
+ * never be invoked by anybody other than the Proxy. In particular, they should never
+ * be invoked by the application programmer.
  */
 public interface ReplicaProxyInterface
 {

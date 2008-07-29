@@ -17,12 +17,10 @@ package org.infogrid.meshbase.net.transaction;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
-
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.proxy.Proxy;
-
 import org.infogrid.meshbase.transaction.CannotApplyChangeException;
 import org.infogrid.meshbase.transaction.MeshObjectBecameDeadStateEvent;
 import org.infogrid.meshbase.transaction.MeshObjectStateEvent;
