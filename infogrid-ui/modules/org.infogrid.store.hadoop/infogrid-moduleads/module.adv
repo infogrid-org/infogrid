@@ -15,7 +15,7 @@
 
 <standardmodule>
  <name>org.infogrid.store.hadoop</name>
- <username>Hadoop-based Store</username>
+ <username>Hadoop-based Store Module</username>
  <userdescription>Implements the Store abstraction using Hadoop</userdescription>
  <provides>
   <jar>org.infogrid.store.hadoop.jar</jar>

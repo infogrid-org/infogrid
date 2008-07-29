@@ -16,17 +16,15 @@ package org.infogrid.meshbase.net.sweeper;
 
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.security.MustNotDeleteHomeObjectException;
-
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetSweeper;
 import org.infogrid.meshbase.sweeper.AbstractSweeper;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
-
 import org.infogrid.util.logging.Log;
 
 /**
- * Adds methods specific to NetMeshObjects and NetMeshBases.
+ * Adds sweeping methods specific to NetMeshObjects and NetMeshBases.
  */
 public abstract class AbstractNetSweeper
         extends

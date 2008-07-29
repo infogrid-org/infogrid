@@ -20,31 +20,72 @@ import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.StringHelper;
 
 /**
- *
+ * <p>Captures a set of instructions to cancel leases of specified NetMeshObjects that were
+ * obtained via another, local Proxy.</p>
+ * <p>This collects all instructions related to the same Proxy. A different instance of this
+ * object must be used for canceling leases of NetMeshObjects from another Proxy.</p>
  */
 public class CancelInstructions
 {
+    /**
+     * Factory method.
+     * 
+     * @param proxy the Proxy through which the leases were obtained
+     */
+    public static CancelInstructions create(
+            Proxy proxy )
+    {
+        CancelInstructions ret = new CancelInstructions( proxy );
+        return ret;
+    }
+
+    /**
+     * Private constructor for subclasses only, use factory method.
+     * 
+     * @param proxy the Proxy through which the leases were obtained
+     */
+    protected CancelInstructions(
+            Proxy proxy )
+    {
+        theProxy = proxy;
+    }
+
+    /**
+     * Add a NetMeshObject whose lease shall be canceled.
+     * 
+     * @param toAdd the NetMeshObject
+     */
     public void addNetMeshObject(
             NetMeshObject toAdd )
     {
         theNetMeshObjects.add( toAdd );
     }
     
+    /**
+     * Obtain the NetMeshObjects whose lease shall be canceled.
+     * 
+     * @return return the NetMeshObjects
+     */
     public NetMeshObject [] getNetMeshObjects()
     {
         return ArrayHelper.copyIntoNewArray( theNetMeshObjects, NetMeshObject.class );
     }
     
-    public void setProxy(
-            Proxy newValue )
-    {
-        theProxy = newValue;
-    }
+    /**
+     * Obtain the Proxy via which the leases were obtained.
+     * 
+     * @return the Proxy
+     */
     public Proxy getProxy()
     {
         return theProxy;
     }
     
+    /**
+     * Obtain as String representation, for debugging.
+     * 
+     * @return String representation
+     */
     @Override
     public String toString()
     {
@@ -60,8 +101,14 @@ public class CancelInstructions
                 },
                 StringHelper.LOG_FLAGS.SHOW_ALL);
     }
-            
-    protected ArrayList<NetMeshObject> theNetMeshObjects = new ArrayList<NetMeshObject>();;
+    
+    /**
+     * The NetMeshObjects whose leases shall be canceled.
+     */
+    protected ArrayList<NetMeshObject> theNetMeshObjects = new ArrayList<NetMeshObject>();
+    
+    /**
+     * The Proxy via which the leases were obtained.
+     */
     protected Proxy theProxy;
 }
-

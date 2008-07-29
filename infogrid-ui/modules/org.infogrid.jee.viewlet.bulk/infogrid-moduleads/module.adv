@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.jee.viewlet.bulk</name>
- <username>A bulk-loader Viewlet</username>
+ <username>Bulk-loader Viewlet</username>
+ <userdescription>A Viewlet that enables the user to bulk-load InfoGrid data.</userdescription>
  <provides> 
   <jar>org.infogrid.jee.viewlet.bulk.jar</jar> 
  </provides>

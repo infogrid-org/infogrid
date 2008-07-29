@@ -21,31 +21,73 @@ import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.StringHelper;
 
 /**
- *
+ * <p>Captures a set of instructions to resynchronize leases of specified NetMeshObjects
+ *    via another, local Proxy. The Proxy is represented via the NetMeshBaseIdentifier
+ *    of the NetMeshBase with which it communicates.</p>
+ * <p>This collects all instructions related to the same Proxy. A different instance of this
+ *    object must be used for canceling leases of NetMeshObjects from another Proxy.</p>
  */
 public class ResynchronizeInstructions
 {
+    /**
+     * Factory method.
+     * 
+     * @param proxyIdentifier the NetMeshBaseIdentifier of the Proxy's partner NetMeshBase
+     */
+    public static ResynchronizeInstructions create(
+            NetMeshBaseIdentifier proxyIdentifier )
+    {
+        ResynchronizeInstructions ret = new ResynchronizeInstructions( proxyIdentifier );
+        return ret;
+    }
+
+    /**
+     * Private constructor for subclasses only, use factory method.
+     * 
+     * @param proxyIdentifier the NetMeshBaseIdentifier of the Proxy's partner NetMeshBase
+     */
+    protected ResynchronizeInstructions(
+            NetMeshBaseIdentifier proxyIdentifier )
+    {
+        theProxyIdentifier = proxyIdentifier;
+    }
+
+    /**
+     * Add the identifier of another NetMeshObject that shall be resynchronized via this Proxy.
+     * 
+     * @param toAdd identifier of the NetMeshObject
+     */
     public void addNetMeshObjectIdentifier(
             NetMeshObjectIdentifier toAdd )
     {
         theNetMeshObjectIdentifiers.add( toAdd );
     }
     
+    /**
+     * Obtain the identifiers of the NetMeshObjects that shall be resynchronized via this Proxy.
+     * 
+     * @return the identifiers
+     */
     public NetMeshObjectIdentifier [] getNetMeshObjectIdentifiers()
     {
         return ArrayHelper.copyIntoNewArray( theNetMeshObjectIdentifiers, NetMeshObjectIdentifier.class );
     }
-    
-    public void setProxyIdentifier(
-            NetMeshBaseIdentifier newValue )
-    {
-        theProxyIdentifier = newValue;
-    }
+
+    /**
+     * Obtain the NetMeshBaseIdentifier of the Proxy's partner NetMeshBase.
+     * 
+     * @return the NetMeshBaseIdentifier
+     */
     public NetMeshBaseIdentifier getProxyIdentifier()
     {
         return theProxyIdentifier;
     }
     
+    /**
+     * Convert to String representation, for debugging only.
+     * 
+     * @return String representation
+     */
     @Override
     public String toString()
     {
@@ -61,8 +103,15 @@ public class ResynchronizeInstructions
                 },
                 StringHelper.LOG_FLAGS.SHOW_ALL);
     }
-            
+    
+    /**
+     * The identifiers of the NetMeshObjects that shall be resynchronized via this Proxy.
+     */
     protected ArrayList<NetMeshObjectIdentifier> theNetMeshObjectIdentifiers = new ArrayList<NetMeshObjectIdentifier>();
+    
+    /**
+     * The identifier of the partner NetMeshBase of the Proxy.
+     */
     protected NetMeshBaseIdentifier theProxyIdentifier;
 }
 
