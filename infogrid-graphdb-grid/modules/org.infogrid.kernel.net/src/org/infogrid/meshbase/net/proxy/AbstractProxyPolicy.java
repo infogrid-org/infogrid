@@ -92,7 +92,6 @@ public abstract class AbstractProxyPolicy
      * NetMeshBase has obtained its own Replicas (if it has)
      *
      * @return true if Replicas are supposed to become Replicas of locally held Replicas
-     * @see #setDefaultPointsReplicasToItself
      */
     public boolean getPointsReplicasToItself()
     {
@@ -119,7 +118,7 @@ public abstract class AbstractProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForCeaseCommunications(
-            Proxy            proxy )
+            Proxy proxy )
     {
         ProxyProcessingInstructions ret = createInstructions();
         
@@ -827,8 +826,7 @@ public abstract class AbstractProxyPolicy
         if( arrayHasContent( incoming.getConveyedMeshObjects())) {
             for( ExternalizedNetMeshObject current : incoming.getConveyedMeshObjects() ) {
 
-                RippleInstructions ripple = new RippleInstructions();
-                ripple.setExternalizedNetMeshObject(  current );
+                RippleInstructions ripple = RippleInstructions.create( current );
                 ripple.setProxies( new Proxy[] { proxy } );
                 ripple.setProxyTowardsHomeIndex( 0 );
                 ripple.setProxyTowardsLockIndex( 0 );

@@ -37,7 +37,7 @@ public abstract class AbstractProxyFactory
      */
     protected AbstractProxyFactory(
             ProxyMessageEndpointFactory endpointFactory,
-            ProxyPolicyFactory        proxyPolicyFactory )
+            ProxyPolicyFactory          proxyPolicyFactory )
     {
         theEndpointFactory    = endpointFactory;
         theProxyPolicyFactory = proxyPolicyFactory;
@@ -62,6 +62,16 @@ public abstract class AbstractProxyFactory
     public NetMeshBase getNetMeshBase()
     {
         return theNetMeshBase;
+    }
+
+    /**
+     * Obtain the ProxyPolicyFactory used.
+     * 
+     * @return the ProxyPolicyFactory
+     */
+    public ProxyPolicyFactory getProxyPolicyFactory()
+    {
+        return theProxyPolicyFactory;
     }
 
     /**

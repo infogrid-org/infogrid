@@ -15,6 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.probe.feeds.TEST</name>
+ <username>Feeds test Module</username>
+ <userdescription>Tests the Atom and RSS Probes.</userdescription>
  <runclass>org.infogrid.probe.feeds.TEST.AllTests</runclass>
  <provides>
   <jar>org.infogrid.probe.feeds.TEST.jar</jar>

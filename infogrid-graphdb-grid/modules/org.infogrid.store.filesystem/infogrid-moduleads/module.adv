@@ -15,7 +15,7 @@
 
 <standardmodule>
  <name>org.infogrid.store.filesystem</name>
- <username>Filesystem-based Store</username>
+ <username>Filesystem-based Store Module</username>
  <userdescription>Implements the Store abstraction using the local file system.</userdescription>
  <provides>
   <jar>org.infogrid.store.filesystem.jar</jar>

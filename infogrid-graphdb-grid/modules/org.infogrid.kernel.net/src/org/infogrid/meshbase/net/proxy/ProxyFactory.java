@@ -22,7 +22,7 @@ import org.infogrid.util.Factory;
 import org.infogrid.util.FactoryException;
 
 /**
- * Knows how to construct Proxies.
+ * A factory that knows how to construct Proxies.
  */
 public interface ProxyFactory
         extends

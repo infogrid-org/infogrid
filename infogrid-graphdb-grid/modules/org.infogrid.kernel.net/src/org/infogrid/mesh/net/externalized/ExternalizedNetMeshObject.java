@@ -15,10 +15,8 @@
 package org.infogrid.mesh.net.externalized;
 
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
-
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 
 /**
  * Adds Net information to ExternalizedMeshObject.
@@ -38,7 +36,6 @@ public interface ExternalizedNetMeshObject
      * Obtain the NetMeshObjectIdentifiers of the neighbors of this NetMeshObject.
      *
      * @return the NetMeshObjectIdentifiers of the neighbors
-     * @see #getRoleTypes
      */
     public abstract NetMeshObjectIdentifier [] getNeighbors();
 

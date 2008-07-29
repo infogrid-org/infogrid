@@ -20,7 +20,7 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 
 /**
- *
+ * A temporary buffer for a to-be-deserialized Proxy.
  */
 public class ParserFriendlyExternalizedProxy
         extends
@@ -126,7 +126,7 @@ public class ParserFriendlyExternalizedProxy
     }
     
     /**
-     * Set the Messages to be sent
+     * Set the Messages to be sent.
      *
      * @param newValue the new value
      */

@@ -15,6 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.meshbase.store</name>
+ <username>Store MeshBase module</username>
+ <userdescription>Enables the content of a MeshBase to be persisted in any InfoGrid Store.</userdescription>
  <provides>
   <jar>org.infogrid.meshbase.store.jar</jar>
  </provides>

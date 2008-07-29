@@ -14,28 +14,23 @@
 
 package org.infogrid.mesh.net.externalized.xml;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.externalized.xml.ExternalizedMeshObjectXmlEncoder;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObjectEncoder;
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObjectFactory;
-
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-
 import org.infogrid.model.primitives.externalized.DecodingException;
 import org.infogrid.modelbase.MeshTypeIdentifierFactory;
-
 import org.infogrid.util.logging.Log;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
 
 /**
  * Utility methods to encode/decode an ExternalizedNetMeshObject to/from XML. Implements the SAX interface.

@@ -20,7 +20,7 @@ import org.infogrid.util.event.SourceUnresolvedException;
 import org.infogrid.util.event.ValueUnresolvedException;
 
 /**
- * Abstract superclass for events affecting a Proxy. This uses AbstractExternalizableEvent
+ * Abstract superclass for events emitted by a Proxy. This uses AbstractExternalizableEvent
  * in order to avoid EventObject's serialization problems, but does not attempt to
  * resolve Proxies.
  */

@@ -16,6 +16,7 @@
 <standardmodule>
  <name>org.infogrid.kernel</name>
  <username>The InfoGrid kernel</username>
+ <userdescription>Contains all foundation InfoGrid frameworks and concepts and simple implementations.</userdescription>
  <provides> 
   <jar>org.infogrid.kernel.jar</jar> 
  </provides>
