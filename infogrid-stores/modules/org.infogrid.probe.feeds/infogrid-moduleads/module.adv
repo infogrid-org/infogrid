@@ -16,6 +16,7 @@
 <standardmodule>
  <name>org.infogrid.probe.feeds</name>
  <username>Feeds Probes</username>
+ <userdescription>Contains Probes for Atom and RSS. Supports InfoGrid extensions.</userdescription>
  <provides>
   <jar>org.infogrid.probe.feeds.jar</jar>
  </provides>

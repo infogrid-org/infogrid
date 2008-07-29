@@ -21,7 +21,7 @@ import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.transaction.MeshObjectEquivalentsChangeEvent;
 
 /**
- *
+ * Indicates that the set of equivalents of a NETMeshObject changed.
  */
 public interface NetMeshObjectEquivalentsChangeEvent
         extends

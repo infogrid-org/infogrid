@@ -25,7 +25,7 @@ import org.infogrid.util.FlexibleListenerSet;
 import org.infogrid.util.logging.Log;
 
 /**
- * Factors out functionality common to many SendingMessageEndpoint implementation.
+ * Factors out functionality common to many SendingMessageEndpoint implementations.
  * 
  * @param <T> the message type
  */

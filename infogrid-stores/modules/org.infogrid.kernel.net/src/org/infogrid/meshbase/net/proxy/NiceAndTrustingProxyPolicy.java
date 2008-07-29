@@ -18,8 +18,8 @@ import org.infogrid.meshbase.net.CoherenceSpecification;
 
 /**
  * A ProxyPolicy that generally does what it is being asked for and tries to
- * be nice to others. This may not
- * be too wise in a production environment that isn't otherwise tightly controlled.
+ * be nice to others. This may not be too wise in a production environment that
+ * isn't otherwise tightly controlled or secured.
  */
 public class NiceAndTrustingProxyPolicy
         extends

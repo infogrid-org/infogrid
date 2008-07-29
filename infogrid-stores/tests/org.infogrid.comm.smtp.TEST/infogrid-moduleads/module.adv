@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.comm.smtp.TEST</name>
- <username>Tests the SMTP Communications Module</username>
+ <username>SMTP Test Module</username>
+ <userdescription>Tests the SMTP Communications Module</userdescription>
  <runclass>org.infogrid.comm.smtp.TEST.AllTests</runclass>
  <dependencies>
   <requires name="org.infogrid.util.logging.log4j"/>

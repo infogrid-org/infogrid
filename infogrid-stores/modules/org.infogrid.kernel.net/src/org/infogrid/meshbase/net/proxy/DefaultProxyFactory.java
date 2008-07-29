@@ -17,12 +17,10 @@ package org.infogrid.meshbase.net.proxy;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
-import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
-import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.util.FactoryException;
 
 /**
- * Factory of DefaultProxies.
+ * ProxyFactory that manufactures DefaultProxies.
  */
 public class DefaultProxyFactory
         extends

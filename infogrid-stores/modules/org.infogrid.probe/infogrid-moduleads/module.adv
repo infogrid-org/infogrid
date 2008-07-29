@@ -15,7 +15,9 @@
 
 <standardmodule>
  <name>org.infogrid.probe</name>
- <username>The InfoGrid Probe framework</username>
+ <username>InfoGrid Probe framework module</username>
+ <userdescription>Enables InfoGrid to access and keep consistent with external data feeds
+   of any format.</userdescription>
  <provides> 
   <jar>org.infogrid.probe.jar</jar> 
  </provides>

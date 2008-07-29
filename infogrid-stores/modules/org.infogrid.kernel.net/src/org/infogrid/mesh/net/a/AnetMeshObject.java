@@ -75,7 +75,8 @@ import org.infogrid.util.logging.Log;
 import org.infogrid.util.text.StringRepresentation;
 
 /**
- * <p>Subclasses AMeshObject to add information necessary for NetMeshBases.</p>
+ * <p>Subclasses AMeshObject to add information necessary for NetMeshBases according
+ * to the NetMeshObject interface.</p>
  * 
  * <p>To save memory, lock operations are synchronized on theIdentifier instead of a
  * (cleaner) additional object; they cannot be synchronized on the AnetMeshObject itself

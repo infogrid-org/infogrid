@@ -15,6 +15,7 @@
 
 <standardmodule>
  <name>org.infogrid.meshworld.net</name>
+ <userdescription>The NetMeshWorld example application.</userdescription>
  <provides>
   <jar>org.infogrid.meshworld.net.jar</jar>
  </provides>

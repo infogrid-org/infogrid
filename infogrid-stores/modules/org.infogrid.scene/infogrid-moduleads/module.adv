@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.scene</name>
- <username>InfoGrid Scenes</username>
+ <username>InfoGrid Scenes Module</username>
+ <userdescription>Defines the concept of an InfoGrid Scene.</userdescription>
  <provides> 
   <jar>org.infogrid.scene.jar</jar> 
  </provides>
