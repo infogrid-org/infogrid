@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.probe.vcard</name>
- <username>The InfoGrid VCard Probe</username>
+ <username>VCard Probe Module</username>
+ <userdescription>Contains a Probe that can read VCards.</userdescription>
  <provides>
   <jar>org.infogrid.probe.vcard.jar</jar>
  </provides>

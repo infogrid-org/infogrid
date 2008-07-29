@@ -15,6 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.probe.TEST</name>
+ <username>Probe test Module</username>
+ <userdescription>Tests the InfoGrid Probe framework.</userdescription>
  <runclass>org.infogrid.probe.TEST.AllTests</runclass>
  <provides>
   <jar>org.infogrid.probe.TEST.jar</jar>

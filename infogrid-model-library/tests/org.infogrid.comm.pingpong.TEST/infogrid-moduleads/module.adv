@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.comm.pingpong.TEST</name>
- <username>Tests the PingPong Module</username>
+ <username>PingPong testing Module</username>
+ <userdescription>Tests the PingPong communications framework.</userdescription>
  <runclass>org.infogrid.comm.pingpong.TEST.AllTests</runclass>
  <dependencies>
   <requires name="org.infogrid.util.logging.log4j"/>

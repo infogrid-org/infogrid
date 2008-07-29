@@ -17,7 +17,6 @@ package org.infogrid.meshbase.net.proxy;
 import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
-import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -39,8 +38,8 @@ public class DefaultProxy
      */
     public static DefaultProxy create(
             ProxyMessageEndpoint ep,
-            NetMeshBase        mb,
-            ProxyPolicy        policy )
+            NetMeshBase          mb,
+            ProxyPolicy          policy )
     {
         DefaultProxy ret = new DefaultProxy( ep, mb, policy );
 
@@ -64,12 +63,12 @@ public class DefaultProxy
      */
     public static DefaultProxy restoreProxy(
             ProxyMessageEndpoint ep,
-            NetMeshBase        mb,
-            ProxyPolicy        policy,
-            long               timeCreated,
-            long               timeUpdated,
-            long               timeRead,
-            long               timeExpires )
+            NetMeshBase          mb,
+            ProxyPolicy          policy,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
     {
         DefaultProxy ret = new DefaultProxy( ep, mb, policy, timeCreated, timeUpdated, timeRead, timeExpires );
 
@@ -88,8 +87,8 @@ public class DefaultProxy
      */
     protected DefaultProxy(
             ProxyMessageEndpoint ep,
-            NetMeshBase        mb,
-            ProxyPolicy        policy )
+            NetMeshBase          mb,
+            ProxyPolicy          policy )
     {
         super( ep, mb, policy );
     }
@@ -107,12 +106,12 @@ public class DefaultProxy
      */
     protected DefaultProxy(
             ProxyMessageEndpoint ep,
-            NetMeshBase        mb,
-            ProxyPolicy        policy,
-            long               timeCreated,
-            long               timeUpdated,
-            long               timeRead,
-            long               timeExpires )
+            NetMeshBase          mb,
+            ProxyPolicy          policy,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
     {
         super( ep, mb, policy );
         

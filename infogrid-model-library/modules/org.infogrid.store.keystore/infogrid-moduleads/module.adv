@@ -15,7 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.store.keystore</name>
- <userdescription>A Java KeyStore mapped onto InfoGrid Store</userdescription>
+ <username>Store-based Java KeyStore Module</username>
+ <userdescription>Maps a Java KeyStore onto the InfoGrid Store abstraction.</userdescription>
  <provides>
   <jar>org.infogrid.store.keystore.jar</jar>
  </provides>

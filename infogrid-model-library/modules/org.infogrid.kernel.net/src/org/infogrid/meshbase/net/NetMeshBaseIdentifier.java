@@ -14,12 +14,6 @@
 
 package org.infogrid.meshbase.net;
 
-import org.infogrid.meshbase.MeshBaseIdentifier;
-
-import org.infogrid.util.Identifier;
-import org.infogrid.util.ResourceHelper;
-import org.infogrid.util.StringHelper;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -27,6 +21,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.util.Identifier;
+import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.StringHelper;
 
 /**
  * A network identifier, such as a URI, XRI or URL. It has two components

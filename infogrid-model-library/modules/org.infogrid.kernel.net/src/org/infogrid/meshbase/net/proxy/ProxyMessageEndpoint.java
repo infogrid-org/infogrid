@@ -14,15 +14,14 @@
 
 package org.infogrid.meshbase.net.proxy;
 
+import java.util.List;
 import org.infogrid.comm.BidirectionalMessageEndpoint;
-
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 
-import java.util.List;
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-
 /**
- *
+ * Captures the requirements for BidirectionalMessageEndpoints that can be used for
+ * Proxy communications.
  */
 public interface ProxyMessageEndpoint
         extends

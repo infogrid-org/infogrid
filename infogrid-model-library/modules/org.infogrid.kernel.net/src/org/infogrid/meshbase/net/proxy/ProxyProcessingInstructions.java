@@ -15,7 +15,6 @@
 package org.infogrid.meshbase.net.proxy;
 
 import java.util.ArrayList;
-import org.infogrid.comm.BidirectionalMessageEndpoint;
 import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
@@ -37,16 +36,15 @@ import org.infogrid.util.StringHelper;
 import org.infogrid.util.logging.Log;
 
 /**
- * Instructions for processing, as determined by the ProxyPolicy.
- * 
- * FIXME: make sure we can't set the same value twice
+ * Instructions to a Proxy for processing of an incoming XprisoMessage or internal
+ * event, as determined by the ProxyPolicy.
  */
 public class ProxyProcessingInstructions
 {
     private static final Log log = Log.getLogInstance( ProxyProcessingInstructions.class ); // our own, private logger
 
     /**
-     * Factory.
+     * Factory method.
      * 
      * @return the DefaultProxyProcessingInstructions
      */
@@ -58,15 +56,11 @@ public class ProxyProcessingInstructions
     }
     
     /**
-     * Constructor.
+     * Private constructor, for subclasses only. Use factory method.
      */
     protected ProxyProcessingInstructions()
     {
-    }
-
-    public void check()
-    {
-        // FIXME: Make internal consistency check
+        // no op
     }
 
     /**
@@ -90,11 +84,22 @@ public class ProxyProcessingInstructions
         return theCeaseCommunications;
     }
 
+    /**
+     * Set whether the Proxy should start communicating.
+     * 
+     * @param newValue true if the Proxy should start communicating
+     */
     public void setStartCommunicating(
             boolean newValue )
     {
         theStartCommunicating = newValue;
     }
+    
+    /**
+     * Determine whether the Proxy should start communicating.
+     * 
+     * @return returns true of the Proxy should start communicating
+     */
     public boolean getStartCommunicating()
     {
         return theStartCommunicating;
@@ -119,7 +124,7 @@ public class ProxyProcessingInstructions
     /**
      * Obtain the XprisoMessage to be sent via the WaitForReplicaResponseEndpoint.
      * 
-     * @return the outgoing XprisoMessage
+     * @return the outgoing XprisoMessage, if any
      */
     public XprisoMessage getSendViaWaitForReplicaResponseEndpoint()
     {
@@ -166,7 +171,7 @@ public class ProxyProcessingInstructions
     /**
      * Obtain the XprisoMessage to be sent via the WaitForLockResponseEndpoint.
      * 
-     * @return the outgoing XprisoMessage
+     * @return the outgoing XprisoMessage, if any
      */
     public XprisoMessage getSendViaWaitForLockResponseEndpoint()
     {
@@ -213,7 +218,7 @@ public class ProxyProcessingInstructions
     /**
      * Obtain the XprisoMessage to be sent via the WaitForHomeResponseEndpoint.
      * 
-     * @return the outgoing XprisoMessage
+     * @return the outgoing XprisoMessage, if any
      */
     public XprisoMessage getSendViaWaitForHomeResponseEndpoint()
     {
@@ -243,6 +248,11 @@ public class ProxyProcessingInstructions
     
 //
     
+    /**
+     * Set the XprisoMessage to be sent via the regular communications endpoint.
+     * 
+     * @param outgoing the outgoing XprisoMessage
+     */
     public void setSendViaEndpoint(
             XprisoMessage outgoing )
     {
@@ -251,13 +261,18 @@ public class ProxyProcessingInstructions
         }
         theSendViaEndpoint = outgoing;
     }
+    
+    /**
+     * Obtain the XprisoMessage to be sent via the regular communications endpoint.
+     * 
+     * @return the outgoing XprisoMessage, if any
+     */
     public XprisoMessage getSendViaEndpoint()
     {
         return theSendViaEndpoint;
     }
 
 //
-    
     
     /**
      * Set the paths of NetMeshObjects requested for the first time.
@@ -267,6 +282,9 @@ public class ProxyProcessingInstructions
     public void setRequestedFirstTimePaths(
             NetMeshObjectAccessSpecification [] newValue )
     {
+        if( theRequestedFirstTimePaths != null ) {
+            throw new IllegalStateException( "Invoked a second time" );
+        }
         theRequestedFirstTimePaths = newValue;
     }
     
@@ -282,56 +300,119 @@ public class ProxyProcessingInstructions
 
 //
 
+    /**
+     * Set the incoming XprisoMessage.
+     * 
+     * @param newValue the incoming XprisoMessage
+     */
     public void setIncomingXprisoMessage(
             XprisoMessage newValue )
     {
         theIncomingXprisoMessage = newValue;
     }
+    
+    /**
+     * Obtain the incoming XprisoMessage.
+     * 
+     * @return the incoming XprisoMessage
+     */
     public XprisoMessage getIncomingXprisoMessage()
     {
         return theIncomingXprisoMessage;
     }
     
+    /**
+     * Set the MessageEndpoint through which the incoming XprisoMessage was obtained.
+     * 
+     * @param newValue the MessageEndpoint
+     */
     public void setIncomingXprisoMessageEndpoint(
             ReceivingMessageEndpoint<XprisoMessage> newValue )
     {
         theIncomingXprisoMessageEndpoint = newValue;
     }
+    
+    /**
+     * Obtain the MessageEndpoint through which the incoming XprisoMessage was obtained.
+     * 
+     * @return the MessageEndpoint
+     */
     public ReceivingMessageEndpoint<XprisoMessage> getIncomingXprisoMessageEndpoint()
     {
         return theIncomingXprisoMessageEndpoint;
     }
     
+    /**
+     * Add a Proxy in the NetMeshObject to this Proxy because a replica of it was just issued
+     * by this Proxy to its partner.
+     * 
+     * @param toAdd the NetMeshObject in which to add the Proxy
+     */
     public void addRegisterReplicationIfNotAlready(
             NetMeshObject toAdd )
     {
         theRegisterReplicationsIfNotAlready.add( toAdd );
     }
+    
+    /**
+     * Obtain the NetMeshObjects to which this Proxy shall be added because a replica
+     * of each was just issued by this Proxy to this partner.
+     * 
+     * @return the NetMeshObjects in which to add the Proxy
+     */
     public NetMeshObject [] getRegisterReplicationsIfNotAlready()
     {
         return ArrayHelper.copyIntoNewArray( theRegisterReplicationsIfNotAlready, NetMeshObject.class  );
     }
 
+    /**
+     * Add an instruction to ripple-create a NetMeshObject.
+     * 
+     * @param toAdd the instructions
+     */
     public void addRippleCreate(
             RippleInstructions toAdd )
     {
         theRippleCreates.add( toAdd );
     }
+    
+    /**
+     * Obtain the instructions to ripple-create a NetMeshObject.
+     * 
+     * @return the instructions
+     */
     public RippleInstructions [] getRippleCreates()
     {
         return ArrayHelper.copyIntoNewArray( theRippleCreates, RippleInstructions.class );
     }
     
+    /**
+     * Add an instruction to ripple-resynchronize a NetMeshObject.
+     * 
+     * @param toAdd the instructions
+     */
     public void addRippleResynchronize(
             RippleInstructions toAdd )
     {
         theRippleResynchronizes.add( toAdd );
     }
+    
+    /**
+     * Obtain the instructions to ripple-resynchronize a NetMeshObject.
+     * 
+     * @return the instructions
+     */
     public RippleInstructions [] getRippleResynchronizes()
     {
         return ArrayHelper.copyIntoNewArray( theRippleResynchronizes, RippleInstructions.class );
     }
     
+    /**
+     * Add resynchronize instructions.
+     * 
+     * @param identifierToAdd the identifier of the NetMeshObject to resynchronize
+     * @param proxyIdentifierToAdd the identifier of the Proxy through which to resynchronize
+     */
     public void addToResynchronizeInstructions(
             NetMeshObjectIdentifier identifierToAdd,
             NetMeshBaseIdentifier   proxyIdentifierToAdd )
@@ -346,18 +427,28 @@ public class ProxyProcessingInstructions
         if( found != null ) {
             found.addNetMeshObjectIdentifier( identifierToAdd );
         } else {
-            ResynchronizeInstructions toAdd = new ResynchronizeInstructions();
+            ResynchronizeInstructions toAdd = ResynchronizeInstructions.create( proxyIdentifierToAdd );
             toAdd.addNetMeshObjectIdentifier( identifierToAdd );
-            toAdd.setProxyIdentifier( proxyIdentifierToAdd );
             theResynchronizeInstructions.add( toAdd );
         }
     }
     
+    /**
+     * Obtain the resynchronize instructions.
+     * 
+     * @return the instructions
+     */
     public ResynchronizeInstructions [] getResynchronizeInstructions()
     {
         return ArrayHelper.copyIntoNewArray( theResynchronizeInstructions, ResynchronizeInstructions.class );
     }
     
+    /**
+     * Add cancel instructions.
+     * 
+     * @param objectToAdd the NetMeshObject whose lease shall be canceled
+     * @param proxyToAdd the Proxy through which the lease shall be canceled
+     */
     public void addToCancelInstructions(
             NetMeshObject objectToAdd,
             Proxy         proxyToAdd )
@@ -372,52 +463,90 @@ public class ProxyProcessingInstructions
         if( found != null ) {
             found.addNetMeshObject( objectToAdd );
         } else {
-            CancelInstructions toAdd = new CancelInstructions();
+            CancelInstructions toAdd = CancelInstructions.create( proxyToAdd );
             toAdd.addNetMeshObject( objectToAdd );
-            toAdd.setProxy( proxyToAdd );
             theCancelInstructions.add( toAdd );
         }
     }
     
+    /**
+     * Obtain the cancel instructions.
+     * 
+     * @return the instructions
+     */
     public CancelInstructions [] getCancelInstructions()
     {
         return ArrayHelper.copyIntoNewArray( theCancelInstructions, CancelInstructions.class );
     }
     
-
-        
-    
+    /**
+     * Add a NetMeshObject whose lock shall be surrendered.
+     * 
+     * @param toAdd the NetMeshObject
+     */
     public void addSurrenderLock(
             NetMeshObject toAdd )
     {
         theSurrenderLocks.add( toAdd );
     }
+    
+    /**
+     * Obtain the NetMeshObjects whose locks shall be surrendered.
+     * 
+     * @return the NetMeshObjects
+     */
     public NetMeshObject [] getSurrenderLocks()
     {
         return ArrayHelper.copyIntoNewArray(  theSurrenderLocks, NetMeshObject.class );
     }
 
+    /**
+     * Add a NetMeshObject whose home replica status shall be surrendered.
+     * 
+     * @param toAdd the NetMeshObject
+     */
     public void addSurrenderHome(
             NetMeshObject toAdd )
     {
         theSurrenderHomes.add( toAdd );
     }
+    
+    /**
+     * Obtain the NetMeshObjects whose home replica status shall be surrendered.
+     * 
+     * @return the NetMeshObjects
+     */
     public NetMeshObject [] getSurrenderHomes()
     {
         return ArrayHelper.copyIntoNewArray(  theSurrenderHomes, NetMeshObject.class );
     }
 
-   
+    /**
+     * Add a NetMeshObject whose lease shall be canceled.
+     * 
+     * @param toAdd the NetMeshObject
+     */
     public void addCancel(
             NetMeshObject toAdd )
     {
         theCancels.add( toAdd );
     }
+    
+    /**
+     * The NetMeshObjects whose lease shall be canceled.
+     * 
+     * @return the NetMeshObjects
+     */
     public NetMeshObject [] getCancels()
     {
         return ArrayHelper.copyIntoNewArray( theCancels, NetMeshObject.class );
     }
     
+    /**
+     * Set the PropertyChangeEvents that shall be rippled.
+     * 
+     * @param newValue the PropertyChangeEvents
+     */
     public void setPropertyChanges(
             NetMeshObjectPropertyChangeEvent [] newValue )
     {
@@ -428,106 +557,224 @@ public class ProxyProcessingInstructions
         }
     }
     
+    /**
+     * Obtain the PropertyChangeEvents that shall be rippled.
+     * 
+     * @return the PropertyChangeEvents
+     */
     public NetMeshObjectPropertyChangeEvent [] getPropertyChanges()
     {
         return thePropertyChanges;
     }
     
+    /**
+     * Add a TypeAddedEvent that shall be ripplied.
+     * 
+     * @param newValue the TypeAddedEvents
+     */
     public void setTypeAdditions(
             NetMeshObjectTypeAddedEvent [] newValue )
     {
         theTypeAdditions = newValue;
     }
+    
+    /**
+     * Obtain the TypeAddedEvents that shall be rippled.
+     * 
+     * @return the TypeAddedEvents
+     */
     public NetMeshObjectTypeAddedEvent [] getTypeAdditions()
     {
         return theTypeAdditions;
     }
 
+    /**
+     * Add a TypeRemovedEvent that shall be rippled.
+     * 
+     * @param newValue the TypeRemovedEvent
+     */
     public void setTypeRemovals(
             NetMeshObjectTypeRemovedEvent [] newValue )
     {
         theTypeRemovals = newValue;
     }
+    
+    /**
+     * Obtain the TypeRemovedEvents that shall be ripplied.
+     * 
+     * @return the TypeRemovedEvents
+     */
     public NetMeshObjectTypeRemovedEvent [] getTypeRemovals()
     {
         return theTypeRemovals;
     }
     
+    /**
+     * Add an EquivalentsAddedEvent that shall be rippled.
+     * 
+     * @param toAdd the EquivalentsAddedEvent
+     */
     public void addEquivalentsAddition(
             NetMeshObjectEquivalentsAddedEvent toAdd )
     {
         theEquivalentsAdditions.add( toAdd );
     }
+    
+    /**
+     * Obtain the EquivalentsAddedEvents that shall be rippled.
+     * 
+     * @return the EquivalentsAddedEvents
+     */
     public NetMeshObjectEquivalentsAddedEvent [] getEquivalentsAdditions()
     {
         return ArrayHelper.copyIntoNewArray( theEquivalentsAdditions, NetMeshObjectEquivalentsAddedEvent.class );
     }
 
+    /**
+     * Add an EquivalentsRemovedEvent that shall be rippled.
+     * 
+     * @param toAdd the EquivalentsRemovedEvent
+     */
     public void addEquivalentsRemoval(
             NetMeshObjectEquivalentsRemovedEvent toAdd )
     {
         theEquivalentsRemovals.add( toAdd );
     }
+    
+    /**
+     * Obtain the EquivalentsRemovedEvents that shall be rippled.
+     * 
+     * @return the EquivalentsRemovedEvents
+     */
     public NetMeshObjectEquivalentsRemovedEvent [] getEquivalentsRemovals()
     {
         return ArrayHelper.copyIntoNewArray( theEquivalentsRemovals, NetMeshObjectEquivalentsRemovedEvent.class );
     }
     
+    /**
+     * Add a NeighborAddedEvent that shall be rippled.
+     * 
+     * @param toAdd the NeighborAddedEvent
+     */
     public void addNeighborAddition(
             NetMeshObjectNeighborAddedEvent toAdd )
     {
         theNeighborAdditions.add( toAdd );
     }
+    
+    /**
+     * Obtain the NeighborAddedEvents that shall be rippled.
+     * 
+     * @return the NeighborAddedEvents
+     */
     public NetMeshObjectNeighborAddedEvent [] getNeighborAdditions()
     {
         return ArrayHelper.copyIntoNewArray( theNeighborAdditions, NetMeshObjectNeighborAddedEvent.class );
     }
 
+    /**
+     * Add a NeighborRemovedEvent that shall be rippled.
+     * 
+     * @param toAdd the NeighborRemovedEvent
+     */
     public void addNeighborRemoval(
             NetMeshObjectNeighborRemovedEvent toAdd )
     {
         theNeighborRemovals.add( toAdd );
     }
+    
+    /**
+     * Obtain the NeighborRemovedEvents that shall be rippled.
+     * 
+     * @return the NeighborRemovedEvents
+     */
     public NetMeshObjectNeighborRemovedEvent [] getNeighborRemovals()
     {
         return ArrayHelper.copyIntoNewArray( theNeighborRemovals, NetMeshObjectNeighborRemovedEvent.class );
     }
 
+    /**
+     * Add a RoleAddedEvent that shall be rippled.
+     * 
+     * @param toAdd the RoleAddedEvent
+     */
     public void addRoleAddition(
             NetMeshObjectRoleAddedEvent toAdd )
     {
         theRoleAdditions.add( toAdd );
     }
+    
+    /**
+     * Obtain the RoleAddedEvents that shall be rippled.
+     * 
+     * @return the RoleAddedEvents
+     */
     public NetMeshObjectRoleAddedEvent [] getRoleAdditions()
     {
         return ArrayHelper.copyIntoNewArray( theRoleAdditions, NetMeshObjectRoleAddedEvent.class );
     }
     
+    /**
+     * Add a RoleRemovedEvent that shall be rippled.
+     * 
+     * @param toAdd the RoleRemovedEvent
+     */
     public void addRoleRemoval(
             NetMeshObjectRoleRemovedEvent toAdd )
     {
         theRoleRemovals.add( toAdd );
     }
+    
+    /**
+     * Obtain the RoleRemovedEvents that shall be rippled.
+     * 
+     * @return the RoleRemovedEvents
+     */
     public NetMeshObjectRoleRemovedEvent [] getRoleRemovals()
     {
         return ArrayHelper.copyIntoNewArray( theRoleRemovals, NetMeshObjectRoleRemovedEvent.class );
     }
     
+    /**
+     * Set the time we wait to obtain replicas.
+     * 
+     * @param newValue the wait, in milliseconds
+     */
     public void setExpectectedObtainReplicasWait(
             long newValue )
     {
         theExpectectedObtainReplicasWait = newValue;
     }
+    
+    /**
+     * Obtain the time to wait to obtain replicas.
+     * 
+     * @return the time, in milliseconds
+     */
     public long getExpectedObtainReplicasWait()
     {
         return theExpectectedObtainReplicasWait;
     }
 
+    /**
+     * Set the DeletedEvents that shall be rippled.
+     * 
+     * @param deletions the DeletedEvents
+     */
     public void setDeletions(
             NetMeshObjectDeletedEvent [] deletions )
     {
+        if( theDeletions != null && theDeletions.length > 0 ) {
+            throw new IllegalStateException( "Invoked a second time" );
+        }
         theDeletions = deletions;
     }
+    
+    /**
+     * Obtain the DeletedEvents that shall be rippled.
+     * 
+     * @return the DeletedEvents
+     */
     public NetMeshObjectDeletedEvent [] getDeletions()
     {
         return theDeletions;
@@ -585,6 +832,18 @@ public class ProxyProcessingInstructions
             return false;
         }
         return true;
+    }
+
+    /**
+     * Internal consistency check.
+     * 
+     * @throws IllegalStateException thrown if the instructions are internally inconsistent.
+     */
+    public void check()
+            throws
+                IllegalStateException
+    {
+        // FIXME: Make internal consistency check
     }
 
     /**
@@ -653,6 +912,9 @@ public class ProxyProcessingInstructions
                 StringHelper.LOG_FLAGS.SHOW_NON_NULL | StringHelper.LOG_FLAGS.SHOW_NON_ZERO );
     }
     
+    /**
+     * Should the Proxy start communicating.
+     */
     protected boolean theStartCommunicating = false; // default
 
     /**
@@ -660,48 +922,148 @@ public class ProxyProcessingInstructions
      */
     protected boolean theCeaseCommunications = false; // default
     
-    
+    /**
+     * Which NetMeshObjects are requested for the first time.
+     */
     protected NetMeshObjectAccessSpecification [] theRequestedFirstTimePaths;
 
+    /**
+     * The incoming XprisoMessage, if any.
+     */
     protected XprisoMessage theIncomingXprisoMessage;
     
+    /**
+     * The endpoint through which the incoming XprisoMessage arrived.
+     */
     protected ReceivingMessageEndpoint<XprisoMessage> theIncomingXprisoMessageEndpoint;
 
+    /**
+     * The XprisoMessage, if any, that needs to be emitted through the
+     * WaitForReplicasResponseEndpoint as a result of processing these instructions.
+     */
     protected XprisoMessage theSendViaWaitForReplicaResponseEndpoint = null;
+
+    /**
+     * The XprisoMessage, if any, that needs to be emitted through the
+     * WaitForLockResponseEndpoint as a result of processing these instructions.
+     */
     protected XprisoMessage theSendViaWaitForLockResponseEndpoint = null;
+
+    /**
+     * The XprisoMessage, if any, that needs to be emitted through the
+     * WaitForHomeResponseEndpoint as a result of processing these instructions.
+     */
     protected XprisoMessage theSendViaWaitForHomeResponseEndpoint = null;
+
+    /**
+     * The XprisoMessage, if any, that needs to be emitted through the
+     * regular communications endpoint as a result of processing these instructions.
+     */
     protected XprisoMessage theSendViaEndpoint = null;
-    
+
+    /**
+     * The timeout, in milliseconds, to use for the WaitForReplicaResponse endpoint.
+     */
     protected long theWaitForReplicaResponseEndpointTimeout;
+    
+    /**
+     * The timeout, in milliseconds, to use for the WaitForLockResponse endpoint.
+     */
     protected long theWaitForLockResponseEndpointTimeout;
+    
+    /**
+     * The timeout, in milliseconds, to use for the WaitForHomeResponse endpoint.
+     */
     protected long theWaitForHomeResponseEndpointTimeout;
 
-
-    
+    /**
+     * NetMeshObjects that need to register an additional replication relationship.
+     */
     protected ArrayList<NetMeshObject> theRegisterReplicationsIfNotAlready = new ArrayList<NetMeshObject>();
     
+    /**
+     * Instructions to ripple-create.
+     */
     protected ArrayList<RippleInstructions> theRippleCreates = new ArrayList<RippleInstructions>();
+    
+    /**
+     * Instructions to ripple-resynchronize.
+     */
     protected ArrayList<RippleInstructions> theRippleResynchronizes = new ArrayList<RippleInstructions>();
+    
+    /**
+     * Instructions to resynchronize NetMeshObjects.
+     */
     protected ArrayList<ResynchronizeInstructions> theResynchronizeInstructions = new ArrayList<ResynchronizeInstructions>();
+    
+    /**
+     * Instructions to cancel leases.
+     */
     protected ArrayList<CancelInstructions> theCancelInstructions = new ArrayList<CancelInstructions>();
     
+    /**
+     * THe NetMeshObjects that are supposed to surrender their update rights.
+     */
     protected ArrayList<NetMeshObject> theSurrenderLocks = new ArrayList<NetMeshObject>();
-    protected ArrayList<NetMeshObject> theSurrenderHomes = new ArrayList<NetMeshObject>();
     
+    /**
+     * The NetMeshObjects that are supposed to surrender their home replica status.
+     */
+    protected ArrayList<NetMeshObject> theSurrenderHomes = new ArrayList<NetMeshObject>();
+
+    /**
+     * THe NetMeshObjects whose lease is to be canceled.
+     */
     protected ArrayList<NetMeshObject> theCancels = new ArrayList<NetMeshObject>();
     
-    
+    /**
+     * The PropertyChangeEvents to ripple.
+     */
     protected NetMeshObjectPropertyChangeEvent [] thePropertyChanges = {};
 
+    /**
+     * The TypeAddedEvents to ripple.
+     */
     protected NetMeshObjectTypeAddedEvent [] theTypeAdditions = {};
+    
+    /**
+     * The TypeRemovedEvents to ripple.
+     */
     protected NetMeshObjectTypeRemovedEvent [] theTypeRemovals = {};
 
+    /**
+     * The EquivalentsAddedEvents to ripple.
+     */
     protected ArrayList<NetMeshObjectEquivalentsAddedEvent> theEquivalentsAdditions = new ArrayList<NetMeshObjectEquivalentsAddedEvent>();
+    
+    /**
+     * The EquivalentsRemovedEvents to ripple.
+     */
     protected ArrayList<NetMeshObjectEquivalentsRemovedEvent> theEquivalentsRemovals = new ArrayList<NetMeshObjectEquivalentsRemovedEvent>();
+    
+    /**
+     * The NeighborAddedEvents to ripple.
+     */
     protected ArrayList<NetMeshObjectNeighborAddedEvent> theNeighborAdditions = new ArrayList<NetMeshObjectNeighborAddedEvent>();
+    
+    /**
+     * The NeighborRemovedEvents to ripple.
+     */
     protected ArrayList<NetMeshObjectNeighborRemovedEvent> theNeighborRemovals = new ArrayList<NetMeshObjectNeighborRemovedEvent>();
+    
+    /**
+     * The RoleAddedEvents to ripple.
+     */
     protected ArrayList<NetMeshObjectRoleAddedEvent> theRoleAdditions = new ArrayList<NetMeshObjectRoleAddedEvent>();
+    
+    /**
+     * The RoleRemovedEvents to ripple.
+     */
     protected ArrayList<NetMeshObjectRoleRemovedEvent> theRoleRemovals = new ArrayList<NetMeshObjectRoleRemovedEvent>();
+    
+    /**
+     * The object deletions to ripple.
+     */
     protected NetMeshObjectDeletedEvent [] theDeletions = {};
     
     protected long theExpectectedObtainReplicasWait = 2000L; // default. FIXME?

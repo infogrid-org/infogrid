@@ -15,6 +15,8 @@
 
 <standardmodule>
  <name>org.infogrid.net.local.store</name>
+ <username>Store for Probe-integrated NetMeshBases Module</username>
+ <userdescription>Enables a Probe-integrated NetMeshBase to persist its content in any InfoGrid Store.</userdescription>
  <provides>
   <jar>org.infogrid.net.local.store.jar</jar>
  </provides>
