@@ -27,7 +27,8 @@ import org.infogrid.util.NameServer;
 import org.infogrid.util.ResourceHelper;
 
 /**
- *
+ * Manufactures MessageEndpoints that do not persist their data themselves, and that
+ * communicate via the ping-pon protocol.
  */
 public class MPingPongNetMessageEndpointFactory
         extends
@@ -89,11 +90,11 @@ public class MPingPongNetMessageEndpointFactory
                 "Endpoint " + myIdentifier.toExternalForm() + " -> " + partnerIdentifier.toExternalForm(),
                 partnerIdentifier,
                 myIdentifier,
+                theNameServer,
                 deltaRespond,
                 deltaResend,
                 deltaRecover,
                 randomVariation,
-                theNameServer,
                 theExecService );
 
         return ret;
@@ -118,11 +119,11 @@ public class MPingPongNetMessageEndpointFactory
                 "Endpoint " + myIdentifier.toExternalForm() + " -> " + partnerIdentifier.toExternalForm(),
                 partnerIdentifier,
                 myIdentifier,
+                theNameServer,
                 deltaRespond,
                 deltaResend,
                 deltaRecover,
                 randomVariation,
-                theNameServer,
                 theExecService,
                 lastTokenSent,
                 lastTokenReceived,
