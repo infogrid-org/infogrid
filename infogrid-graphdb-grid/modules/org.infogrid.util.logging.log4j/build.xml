@@ -15,12 +15,12 @@
 
 <project name="org.infogrid.util.logging.log4j" default="default" basedir=".">
     <description>Builds, tests, and runs the project org.infogrid.util.logging.log4j.</description>
-    <import file="nbproject/build-impl.xml"/>
     <import file="../../tools/infogrid-ant-library.xml"/>
+    <import file="nbproject/build-impl.xml"/>
 
     <target name="-pre-compile" depends="-module-setup"/>
 
     <target name="-post-jar">
-        <copy file="../../vendors/logging.apache.org/apache-log4j-1.2.15/log4j-1.2.15.jar" todir="dist"/>
+        <copy file="../../vendors/logging.apache.org/apache-log4j/log4j.jar" todir="dist"/>
     </target>
 </project>
