@@ -235,8 +235,7 @@ public class DefaultShadowProxyPolicy
                 
                 // now do the right thing
                 if( wantIt ) {
-                    RippleInstructions ripple = new RippleInstructions();
-                    ripple.setExternalizedNetMeshObject(  current );
+                    RippleInstructions ripple = RippleInstructions.create( current );
                     ripple.setProxies( new Proxy[] { proxy } );
                     ripple.setProxyTowardsHomeIndex( gotHome ? -1 : 0 );
                     ripple.setProxyTowardsLockIndex( gotLock ? -1 : 0 );

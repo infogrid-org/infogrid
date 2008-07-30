@@ -89,7 +89,7 @@ public abstract class AbstractTest
             Log4jLog.configure( logProperties );
             // which logger is being used is defined in the module dependency declaration through parameters
 
-        } catch( Exception ex ) {
+        } catch( Throwable ex ) {
             System.err.println( "Unexpected Exception attempting to load " + nameOfLog4jConfigFile );
             ex.printStackTrace( System.err );
         }
