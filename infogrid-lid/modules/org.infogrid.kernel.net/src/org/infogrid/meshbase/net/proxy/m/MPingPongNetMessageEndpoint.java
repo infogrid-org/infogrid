@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.net.proxy.m;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.comm.MessageSendException;
@@ -79,7 +80,7 @@ public class MPingPongNetMessageEndpoint
                 -1,
                 -1,
                 null,
-                null );
+                new ArrayList<XprisoMessage>() );
     
         if( log.isDebugEnabled() ) {
             log.debug( "Created " + ret, new RuntimeException( "marker" ));
