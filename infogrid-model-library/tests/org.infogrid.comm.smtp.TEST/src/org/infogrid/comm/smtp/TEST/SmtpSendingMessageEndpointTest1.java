@@ -56,7 +56,7 @@ public class SmtpSendingMessageEndpointTest1
             endpoint.enqueueMessageForSend( testMessages[i] );
         }
         
-        Thread.sleep( 500000L );
+        Thread.sleep( 5000L );
         
         List<SimpleSmtpSendableMessage> leftover = endpoint.messagesToBeSent();
         checkEquals( leftover.size(), 0, "still messages left to send" );
