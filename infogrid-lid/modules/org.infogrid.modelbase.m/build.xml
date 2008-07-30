@@ -15,8 +15,8 @@
 
 <project name="org.infogrid.modelbase.m" default="default" basedir=".">
     <description>Builds, tests, and runs the project org.infogrid.modelbase.m.</description>
-    <import file="nbproject/build-impl.xml"/>
     <import file="../../tools/infogrid-ant-library.xml"/>
+    <import file="nbproject/build-impl.xml"/>
 
     <target name="-pre-compile" depends="-module-setup"/>
 </project>
