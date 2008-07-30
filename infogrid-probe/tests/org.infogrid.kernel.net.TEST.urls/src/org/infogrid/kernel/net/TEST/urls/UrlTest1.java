@@ -129,10 +129,11 @@ public class UrlTest1
     }
 
     /**
-      * Constructor.
-      *
-      * @param args command-line arguments
-      */
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception all kinds of things may happen during tests
+     */
     public UrlTest1(
             String [] args )
         throws

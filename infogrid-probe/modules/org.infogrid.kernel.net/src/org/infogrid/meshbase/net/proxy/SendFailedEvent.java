@@ -16,6 +16,7 @@
 package org.infogrid.meshbase.net.proxy;
 
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
+import org.infogrid.util.StringHelper;
 
 /**
  * Indicates that an attempt to send a message failed.
@@ -60,6 +61,34 @@ public abstract class SendFailedEvent
     public Throwable getCause()
     {
         return theCause;
+    }
+
+    /**
+     * Return in string form, for debugging.
+     *
+     * @return this instance in string form
+     */
+    @Override
+    public String toString()
+    {
+        return StringHelper.objectLogString(
+                this,
+                new String[] {
+                    "theSourceIdentifier",
+                    "theDeltaValueIdentifier",
+                    "theTimeEventOccurred",
+                    "theMessage",
+                    "theCause",
+                    "theCause.getStackTrace()"
+                },
+                new Object[] {
+                    getSourceIdentifier(),
+                    getDeltaValueIdentifier(),
+                    getTimeEventOccurred(),
+                    theMessage,
+                    theCause,
+                    theCause != null ? theCause.getStackTrace() : null
+                });
     }
 
     /**
