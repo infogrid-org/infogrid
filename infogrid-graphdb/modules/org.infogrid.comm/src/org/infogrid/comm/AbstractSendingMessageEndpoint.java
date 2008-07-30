@@ -53,6 +53,10 @@ public abstract class AbstractSendingMessageEndpoint<T>
         theRandomVariation  = randomVariation;
         theExecutorService  = exec;
         theMessagesToBeSent = messagesToBeSent;
+
+        if( messagesToBeSent == null ) {
+            throw new NullPointerException( "Must not provide null messagesToBeSent" );
+        }
     }
 
     /**
@@ -80,11 +84,9 @@ public abstract class AbstractSendingMessageEndpoint<T>
      */
     public List<T> messagesToBeSent()
     {
-        ArrayList<T> ret = new ArrayList<T>( theMessagesToBeSent != null ? theMessagesToBeSent.size() : 1 );
+        ArrayList<T> ret = new ArrayList<T>( theMessagesToBeSent.size());
+        ret.addAll( theMessagesToBeSent );
 
-        if( theMessagesToBeSent != null && !theMessagesToBeSent.isEmpty() ) {
-            ret.addAll( theMessagesToBeSent );
-        }
         return ret;
     }
     
