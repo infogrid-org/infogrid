@@ -23,7 +23,7 @@
  </dependencies>
  <provides>
   <jar>org.infogrid.util.logging.log4j.jar</jar>
-  <jar>log4j-1.2.15.jar</jar>
+  <jar>log4j.jar</jar>
  </provides>
 </standardmodule>
 

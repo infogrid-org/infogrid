@@ -21,8 +21,8 @@
          xmlns:j2seproject1="http://www.netbeans.org/ns/j2se-project/1"
          xmlns:jaxws="http://www.netbeans.org/ns/jax-ws/1">
     <description>Builds, tests, and runs the project org.infogrid.test.store.sql.TEST.</description>
-    <import file="nbproject/build-impl.xml"/>
     <import file="../../tools/infogrid-ant-library.xml"/>
+    <import file="nbproject/build-impl.xml"/>
 
     <target name="-pre-compile" depends="-module-setup"/>
 

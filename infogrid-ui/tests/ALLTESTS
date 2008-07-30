@@ -1,0 +1,24 @@
+org.infogrid.testharness [norun]
+org.infogrid.util.TEST
+org.infogrid.comm.pingpong.TEST
+org.infogrid.comm.smtp.TEST
+org.infogrid.httpd.TEST
+org.infogrid.store.TEST
+org.infogrid.store.filesystem.TEST
+org.infogrid.store.sql.TEST
+# org.infogrid.store.hadoop.TEST
+org.infogrid.kernel.TEST.modelbase
+org.infogrid.kernel.TEST.meshbase.m
+org.infogrid.kernel.TEST.meshbase.m.security
+org.infogrid.kernel.TEST.mesh.externalized
+org.infogrid.kernel.TEST.differencer
+org.infogrid.meshbase.store.TEST
+org.infogrid.kernel.net.TEST.urls
+org.infogrid.kernel.net.TEST.xpriso
+org.infogrid.meshbase.store.net.TEST
+org.infogrid.probe.TEST
+org.infogrid.probe.feeds.TEST
+org.infogrid.probe.vcard.TEST
+org.infogrid.probe.store.TEST
+org.infogrid.kernel.active.TEST
+# org.infogrid.probe.TEST.active -- currently broken
