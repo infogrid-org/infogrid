@@ -14,10 +14,11 @@
 
 package org.infogrid.module;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
-import java.util.*;
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A software Module in the Module Framework. More concrete suclasses
@@ -403,6 +404,8 @@ public abstract class Module
      * @param overrides the content of this Map overrides everything else
      * @param defaults the content of this Map is used if nothing else matches
      * @return the merged Map
+     * @param <T1> key type of the Map
+     * @param <T2> value type of the Map
      */
     private static <T1,T2> Map<T1,? extends T2> merge(
             Map<T1,? extends T2> parent,

@@ -16,7 +16,7 @@
 <standardmodule>
  <name>org.infogrid.store.hadoop.TEST</name>
  <username>Hadoop-based Store test Module</username>
- <userdescription>Tests the Hadoop-based Store implementation.</username>
+ <userdescription>Tests the Hadoop-based Store implementation.</userdescription>
  <runclass>org.infogrid.store.hadoop.TEST.AllTests</runclass>
  <provides>
   <jar>org.infogrid.store.hadoop.TEST.jar</jar>

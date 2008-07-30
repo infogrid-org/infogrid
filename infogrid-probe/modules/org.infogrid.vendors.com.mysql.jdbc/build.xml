@@ -14,12 +14,12 @@
 -->
 
 <project name="com.mysql.jdbc" default="default" basedir=".">
-    <import file="nbproject/build-impl.xml"/>
     <import file="../../tools/infogrid-ant-library.xml"/>
+    <import file="nbproject/build-impl.xml"/>
 
     <target name="-pre-compile" depends="-module-setup"/>
 
     <target name="-post-jar">
-        <copy file="../../vendors/dev.mysql.com/mysql-connector-java-5.1.6/mysql-connector-java-5.1.6-bin.jar" todir="dist"/>
+        <copy file="../../vendors/dev.mysql.com/mysql-connector-java/mysql-connector-java-bin.jar" todir="dist"/>
     </target>
 </project>
