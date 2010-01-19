@@ -63,6 +63,8 @@ public abstract class AbstractYadisPipelineProcessingStage
             || ( acceptHeader != null && acceptHeader.indexOf( XRDS_MIME_TYPE ) >= 0 ))
         {
             processYadisRequest( lidRequest, resource );
+        } else {
+            addYadisHeader( lidRequest, resource );
         }
     }
 
@@ -78,4 +80,15 @@ public abstract class AbstractYadisPipelineProcessingStage
             HasIdentifier      resource )
         throws
             LidAbortProcessingPipelineException;
+
+    /**
+     * Add a suitable Yadis HTTP header. This method does this by putting an attribute
+     * into the incoming request, which needs to be processed by the calling logic.
+     *
+     * @param lidRequest the incoming request
+     * @param resource the resource to which the request refers, if any
+     */
+    protected abstract void addYadisHeader(
+            SaneRequest        lidRequest,
+            HasIdentifier      resource );
 }

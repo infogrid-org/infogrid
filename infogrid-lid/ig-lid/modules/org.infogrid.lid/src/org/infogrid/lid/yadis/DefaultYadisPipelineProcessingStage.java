@@ -21,6 +21,7 @@ import org.infogrid.lid.LidAbortProcessingPipelineWithContentException;
 import org.infogrid.lid.LidAbortProcessingPipelineWithErrorException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.context.Context;
+import org.infogrid.util.http.HTTP;
 import org.infogrid.util.http.SaneRequest;
 
 /**
@@ -96,6 +97,27 @@ public class DefaultYadisPipelineProcessingStage
 
         } else {
             throw new LidAbortProcessingPipelineWithErrorException( 404, this );
+        }
+    }
+
+    /**
+     * Add a suitable Yadis HTTP header. This method does this by putting an attribute
+     * into the incoming request, which needs to be processed by the calling logic.
+     *
+     * @param lidRequest the incoming request
+     * @param resource the resource to which the request refers, if any
+     */
+    protected void addYadisHeader(
+            SaneRequest        lidRequest,
+            HasIdentifier      resource )
+    {
+        if( resource != null ) {
+            lidRequest.setAttribute(
+                    YADIS_HTTP_HEADER_REQUEST_ATTRIBUTE_NAME,
+                    HTTP.appendArgumentToUrl(
+                            lidRequest.getOriginalSaneRequest().getAbsoluteBaseUri(),
+                            "lid-meta",
+                            "capabilities" ));
         }
     }
 }

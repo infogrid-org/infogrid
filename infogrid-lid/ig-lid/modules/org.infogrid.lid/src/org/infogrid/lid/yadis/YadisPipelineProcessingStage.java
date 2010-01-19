@@ -41,7 +41,6 @@ public interface YadisPipelineProcessingStage
         throws
             LidAbortProcessingPipelineException;
 
-
     /**
      * Name of the Yadis HTTP header.
      */
@@ -51,4 +50,9 @@ public interface YadisPipelineProcessingStage
      * Yadis MIME type.
      */
     public static final String XRDS_MIME_TYPE = "application/xrds+xml";
+
+    /**
+     * Name of the request attribute that contains the Yadis header, if any.
+     */
+    public static final String YADIS_HTTP_HEADER_REQUEST_ATTRIBUTE_NAME = "yadis-header";
 }
