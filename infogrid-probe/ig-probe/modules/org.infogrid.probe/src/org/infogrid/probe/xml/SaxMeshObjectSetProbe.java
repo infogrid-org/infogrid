@@ -249,7 +249,7 @@ public class SaxMeshObjectSetProbe
         try {
             if( length > 0 ) {
                 if( theCharacters == null ) {
-                    theCharacters = new StringBuffer();
+                    theCharacters = new StringBuilder();
                 }
                 theCharacters.append( ch, start, length );
             }
@@ -607,7 +607,7 @@ public class SaxMeshObjectSetProbe
     /**
      * The character String that is currently being parsed, if any.
      */
-    protected StringBuffer theCharacters = null;
+    protected StringBuilder theCharacters = null;
 
     /**
      * The set of MeshObjects being read in.

@@ -114,7 +114,7 @@ public abstract class AbstractProbeTest
             Exception
     {
         if( mylog.isDebugEnabled() ) {
-            StringBuffer buf = new StringBuffer( prefix );
+            StringBuilder buf = new StringBuilder( prefix );
             for( MeshObject current : mb ) {
                 buf.append( "\n  " );
                 buf.append( current.getIdentifier() );

@@ -793,7 +793,7 @@ public class VCardProbe
             throws
                 IOException
         {
-            StringBuffer msg = new StringBuffer();
+            StringBuilder msg = new StringBuilder();
             msg.append( prefix );
 
             boolean doComma = false;

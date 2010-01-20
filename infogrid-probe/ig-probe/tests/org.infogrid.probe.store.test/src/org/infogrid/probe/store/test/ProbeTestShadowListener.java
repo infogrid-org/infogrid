@@ -122,7 +122,7 @@ public class ProbeTestShadowListener
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append( "ProbeTestShadowListener: " );
         buf.append( identifier );
         for( String current : eventQueue ) {

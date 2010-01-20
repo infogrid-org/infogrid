@@ -54,7 +54,7 @@ public class ProbeTest4
 
         log.info( "finding all objects -- some multiple times" );
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         
         MeshObjectBreadthFirstIterator iter =  MeshObjectBreadthFirstIterator.create( top, 100 );
         for( int i=0 ; iter.hasNext() ; ++i ) {
@@ -86,7 +86,7 @@ public class ProbeTest4
             MeshObject obj )
     {
         if( log.isInfoEnabled() ) {
-            StringBuffer line = new StringBuffer( 64 );
+            StringBuilder line = new StringBuilder( 64 );
             if( prefix != null ) {
                 line.append( prefix ).append( ": " );
             }

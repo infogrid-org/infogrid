@@ -283,7 +283,7 @@ public class XrdsProbe
             Node infoNode = infoList.item( k );
             if( XRD_XML_NAMESPACE.equals( infoNode.getNamespaceURI() ) && "Type".equals( infoNode.getLocalName() )) {
                 NodeList     childList = infoNode.getChildNodes();
-                StringBuffer found     = new StringBuffer();
+                StringBuilder found     = new StringBuilder();
                 for( int l=0 ; l<childList.getLength() ; ++l ) {
                     Node child = childList.item( l );
                     if( child instanceof Text ) {
@@ -323,7 +323,7 @@ public class XrdsProbe
                 
             } else if( XRD_XML_NAMESPACE.equals( infoNode.getNamespaceURI() ) && "URI".equals( infoNode.getLocalName() )) {
                 NodeList     childList = infoNode.getChildNodes();
-                StringBuffer found     = new StringBuffer();
+                StringBuilder found     = new StringBuilder();
                 for( int l=0 ; l<childList.getLength() ; ++l ) {
                     Node child = childList.item( l );
                     if( child instanceof Text ) {

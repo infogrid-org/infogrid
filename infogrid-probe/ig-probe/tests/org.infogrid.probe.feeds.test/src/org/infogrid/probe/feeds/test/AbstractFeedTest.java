@@ -105,7 +105,7 @@ public abstract class AbstractFeedTest
             Exception
     {
         if( mylog.isDebugEnabled() ) {
-            StringBuffer buf = new StringBuffer( prefix );
+            StringBuilder buf = new StringBuilder( prefix );
             for( MeshObject current : mb ) {
                 buf.append( "\n  " );
                 buf.append( current.getIdentifier() );

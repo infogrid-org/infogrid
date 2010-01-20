@@ -46,7 +46,7 @@ public abstract class MeshObjectSetProbeUtils
     static String descape(
             String enc )
     {
-        StringBuffer ret = new StringBuffer( enc.length() ); // same length
+        StringBuilder ret = new StringBuilder( enc.length() ); // same length
 
         for( int i=0 ; i<enc.length() ; ++i ) {
             char c = enc.charAt( i );
