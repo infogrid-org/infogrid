@@ -283,7 +283,7 @@ public class DefaultAnetMeshObjectIdentifier
             meshBaseExternalForm   = meshBase.getIdentifier().toExternalForm();
             meshObjectExternalForm = toLocalExternalForm(); // only escape localIds
 
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
 
             if( !getNetMeshBaseIdentifier().equals( meshBase.getIdentifier() )) {
                 String there = getNetMeshBaseIdentifier().toExternalForm();

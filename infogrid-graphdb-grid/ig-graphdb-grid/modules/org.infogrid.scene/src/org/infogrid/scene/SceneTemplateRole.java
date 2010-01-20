@@ -113,7 +113,7 @@ public abstract class SceneTemplateRole
         @Override
         public String toString()
         {
-            StringBuffer buf = new StringBuffer( 100 );
+            StringBuilder buf = new StringBuilder( 100 );
             buf.append( super.toString() );
             buf.append( "{ name: " );
             buf.append( theName );
@@ -187,7 +187,7 @@ public abstract class SceneTemplateRole
         @Override
         public String toString()
         {
-            StringBuffer buf = new StringBuffer( 100 );
+            StringBuilder buf = new StringBuilder( 100 );
             buf.append( super.toString() );
             buf.append( "{ name: " );
             buf.append( theName );
