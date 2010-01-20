@@ -92,7 +92,7 @@ public abstract class LidGpg
         int    crIndex             = credential.indexOf( '\n' );
         String credentialFirstLine = crIndex > 0 ? credential.substring( 0, crIndex ) : credential;
 
-        StringBuffer signedText = new StringBuffer( 256 );
+        StringBuilder signedText = new StringBuilder( 256 );
         signedText.append( "-----BEGIN PGP SIGNED MESSAGE-----\n" );
         signedText.append( "Hash: " ).append( credentialFirstLine ).append( "\n" );
         signedText.append( "\n" );

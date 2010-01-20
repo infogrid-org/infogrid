@@ -104,7 +104,7 @@ public abstract class AbstractOpenIdIdpSideAssociationManager
     protected String createNewAssociationHandle(
             String seed )
     {
-        StringBuffer associationHandleBuf = new StringBuffer( 64 );
+        StringBuilder associationHandleBuf = new StringBuilder( 64 );
         associationHandleBuf.append( theAssociationHandlePrefix );
         associationHandleBuf.append( seed );
 

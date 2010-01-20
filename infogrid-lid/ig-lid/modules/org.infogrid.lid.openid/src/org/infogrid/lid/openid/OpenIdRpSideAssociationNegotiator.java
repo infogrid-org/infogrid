@@ -97,7 +97,7 @@ public class OpenIdRpSideAssociationNegotiator
         if( parameters == null ) {
             parameters = OpenIdRpSideAssociationNegotiationParameters.createWithDefaults();
         }
-        StringBuffer sentContentBuf = new StringBuffer( 512 );
+        StringBuilder sentContentBuf = new StringBuilder( 512 );
 
         DiffieHellmanEndpoint localDh = DiffieHellmanEndpoint.create( theDhP, theDhG );
         

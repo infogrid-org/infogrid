@@ -212,7 +212,7 @@ public abstract class CryptUtils
     public static String hex(
             byte [] data )
     {
-        StringBuffer ret = new StringBuffer( data.length*2 );
+        StringBuilder ret = new StringBuilder( data.length*2 );
         for( int i=0 ; i<data.length ; ++i ) {
             char chigh;
             char clow;

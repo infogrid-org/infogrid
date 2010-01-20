@@ -115,7 +115,7 @@ public abstract class AbstractOpenIdCredentialType
         @SuppressWarnings("unchecked")
         HashSet<String> mandatory = mandatoryFields != null ? (HashSet<String>) mandatoryFields.clone() : null;
 
-        StringBuffer toSign1 = new StringBuffer( 256 );
+        StringBuilder toSign1 = new StringBuilder( 256 );
 
         StringTokenizer tokenizer = new StringTokenizer( signed, "," );
         while( tokenizer.hasMoreTokens() ) {

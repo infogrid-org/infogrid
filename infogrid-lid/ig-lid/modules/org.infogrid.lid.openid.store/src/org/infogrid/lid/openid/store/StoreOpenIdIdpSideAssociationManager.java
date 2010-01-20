@@ -110,7 +110,7 @@ public class StoreOpenIdIdpSideAssociationManager
     protected static String getDefaultPrefix(
             String modifier )
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append( "infogrid.org-" );
         try {
             buf.append( Inet4Address.getLocalHost().getHostAddress() );

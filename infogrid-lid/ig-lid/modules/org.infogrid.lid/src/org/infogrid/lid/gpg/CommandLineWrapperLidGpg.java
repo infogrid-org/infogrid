@@ -116,13 +116,13 @@ public class CommandLineWrapperLidGpg
 
                 // now construct return values
 
-                StringBuffer output = new StringBuffer();
+                StringBuilder output = new StringBuilder();
                 command = theFullExecutable + " --export --armor =" + key;
                 execute( command, null, output, null );
 
                 String publicKey = output.toString();
 
-                output = new StringBuffer();
+                output = new StringBuilder();
                 command = theFullExecutable + " --export-secret-keys --armor =" + key;
                 execute( command, null, output, null );
 
@@ -164,7 +164,7 @@ public class CommandLineWrapperLidGpg
 
                 execute( command, publicKey, null, null );
 
-                StringBuffer output = new StringBuffer();
+                StringBuilder output = new StringBuilder();
 
                 command = theFullExecutable + " --verify";
 
@@ -231,11 +231,11 @@ public class CommandLineWrapperLidGpg
                 // amazingly enough, there does not seem to be a difference between importing
                 // public and private keys in GPG.
                 String command = theFullExecutable + " --import";
-                StringBuffer errorData = new StringBuffer();
+                StringBuilder errorData = new StringBuilder();
 
                 execute( command, privateKey, null, errorData );
 
-                StringBuffer append = new StringBuffer();
+                StringBuilder append = new StringBuilder();
                 if( url.indexOf( '?' ) >= 0 ) {
                     append.append( '&' );
                 } else {
@@ -251,7 +251,7 @@ public class CommandLineWrapperLidGpg
                 append.append( HTTP.encodeToValidUrlArgument( nonce ));
 
                 command = theFullExecutable + " --clearsign -u =" + lid;
-                StringBuffer output = new StringBuffer( 256 );
+                StringBuilder output = new StringBuilder( 256 );
                 execute( command, url + append, output, null );
 
                 String outputString = output.toString();
@@ -327,8 +327,8 @@ public class CommandLineWrapperLidGpg
     protected static int execute(
             String             command,
             final String       inputData,
-            final StringBuffer outputData,
-            final StringBuffer errorData )
+            final StringBuilder outputData,
+            final StringBuilder errorData )
         throws
             IOException
     {
@@ -400,13 +400,13 @@ public class CommandLineWrapperLidGpg
                         try {
                             int cc = 0;
                             InputStreamReader errorReader = new InputStreamReader( p.getErrorStream());
-                            StringBuffer buf = new StringBuffer();
+                            StringBuilder buf = new StringBuilder();
                             while( ( cc = errorReader.read()) >= 0  ) {
                                 char c = (char) cc;
                                 buf.append( c );
                                 if( c == '\n' ) {
                                     log.debug( "Process reported: " + buf );
-                                    buf = new StringBuffer();
+                                    buf = new StringBuilder();
                                 }
                             }
                             if( buf.length() > 0 ) {
