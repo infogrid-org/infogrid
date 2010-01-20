@@ -38,7 +38,7 @@ public abstract class XmlUtils
     public static final String escape(
             String org )
     {
-        StringBuffer ret = new StringBuffer( org.length() + org.length()/5 ); // make a little larger
+        StringBuilder ret = new StringBuilder( org.length() + org.length()/5 ); // make a little larger
         for( int i=0 ; i<org.length() ; ++i ) {
             char c = org.charAt( i );
             boolean escape = false;
@@ -93,7 +93,7 @@ public abstract class XmlUtils
     public static final String descape(
             String enc )
     {
-        StringBuffer ret = new StringBuffer( enc.length() ); // same length
+        StringBuilder ret = new StringBuilder( enc.length() ); // same length
 
         for( int i=0 ; i<enc.length() ; ++i ) {
             char c = enc.charAt( i );
@@ -135,7 +135,7 @@ public abstract class XmlUtils
 //        final String escaped  = "&#93;&#93;&gt;"; // Exact char sequence required, see cdataEscape
 //        final String toEscape = "]]>";
 //
-//        StringBuffer ret = new StringBuffer( enc.length()); // no need to make longer, needing to escape is very unusual
+//        StringBuilder ret = new StringBuilder( enc.length()); // no need to make longer, needing to escape is very unusual
 //        int start = 0;
 //        int end;
 //        while( ( end = enc.indexOf( escaped, start )) >= 0 ) {
@@ -166,7 +166,7 @@ public abstract class XmlUtils
 //        final String toEscape = "]]>";
 //        final String escaped  = "&#93;&#93;&gt;"; // Exact char sequence required, see cdataDescape
 //        
-//        StringBuffer ret = new StringBuffer( org.length()); // no need to make longer, needing to escape is very unusual
+//        StringBuilder ret = new StringBuilder( org.length()); // no need to make longer, needing to escape is very unusual
 //        int start = 0;
 //        int end;
 //        while( ( end = org.indexOf( toEscape, start )) >= 0 ) {

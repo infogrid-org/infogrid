@@ -332,7 +332,7 @@ public abstract class StreamUtils
             String             inputString,
             Map<String,String> tokenMap )
     {
-        StringBuffer     ret  = new StringBuffer( inputString.length() + 10 );
+        StringBuilder     ret  = new StringBuilder( inputString.length() + 10 );
         Iterator<String> iter = tokenMap.keySet().iterator();
 
         ret.append( inputString );

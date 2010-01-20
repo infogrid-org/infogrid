@@ -130,7 +130,7 @@ public abstract class AbstractHttpdTest
                 Iterator iter     = postPars.keySet().iterator();
 
                 String sep = "";
-                final StringBuffer responseContent = new StringBuffer();
+                final StringBuilder responseContent = new StringBuilder();
                 while( iter.hasNext() ) {
                     String key   = (String) iter.next();
                     String value = (String) postPars.get( key );

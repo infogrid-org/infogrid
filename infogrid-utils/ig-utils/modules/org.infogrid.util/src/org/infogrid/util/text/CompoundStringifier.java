@@ -86,7 +86,7 @@ public abstract class CompoundStringifier
         throws
             StringifierException
     {
-        StringBuffer ret = new StringBuffer();
+        StringBuilder ret = new StringBuilder();
         for( int i=0 ; i<theComponents.length ; ++i ) {
             CompoundStringifierComponent current = theComponents[i];
             

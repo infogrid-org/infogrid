@@ -352,7 +352,7 @@ public class StandardModuleAdvertisement
      */
     String getActivateConfigRunAsXml()
     {
-        StringBuffer buf = new StringBuffer( 64 ); // fudge
+        StringBuilder buf = new StringBuilder( 64 ); // fudge
         if( theActivationClassName != null && theActivationClassName.length() > 0 ) {
             buf.append( "<activationclass>" );
             buf.append( theActivationClassName );
@@ -385,7 +385,7 @@ public class StandardModuleAdvertisement
     String getSupportedCapabilitiesAsXml()
     {
         if( theSupportedCapabilities != null ) {
-            StringBuffer buf = new StringBuffer( theSupportedCapabilities.length * 64 ); // fudge
+            StringBuilder buf = new StringBuilder( theSupportedCapabilities.length * 64 ); // fudge
 
             for( int i=0 ; i<theSupportedCapabilities.length ; ++i ) {
                 buf.append( " <capability>" );
@@ -430,7 +430,7 @@ public class StandardModuleAdvertisement
     @Override
     public String toString()
     {
-        StringBuffer ret = new StringBuffer( 100 );
+        StringBuilder ret = new StringBuilder( 100 );
         ret.append( "<" );
         ret.append( super.toString() );
         ret.append( "{ name: ");
@@ -469,7 +469,7 @@ public class StandardModuleAdvertisement
     @Override
     public String contentToString()
     {
-        StringBuffer buf = new StringBuffer( 100 );
+        StringBuilder buf = new StringBuilder( 100 );
         buf.append( super.contentToString() );
 
         for( int i=0 ; i<theSupportedCapabilities.length ; ++i ) {
@@ -495,7 +495,7 @@ public class StandardModuleAdvertisement
     public String getJavaConstructorString(
             int tabs )
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append( "StandardModuleAdvertisement.create1(\n" );
         buf.append( tabs( tabs+1 ));
         buf.append( super.getJavaConstructorStringCommons( tabs+1 ) );

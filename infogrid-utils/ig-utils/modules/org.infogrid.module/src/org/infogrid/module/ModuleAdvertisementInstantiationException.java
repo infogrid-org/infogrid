@@ -46,7 +46,7 @@ public class ModuleAdvertisementInstantiationException
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer( 100 ); // fudge
+        StringBuilder buf = new StringBuilder( 100 ); // fudge
         buf.append( "ModuleAdvertisementInstantiationException: could not instantiate through " );
         buf.append( theInstantiator );
 

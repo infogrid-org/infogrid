@@ -192,7 +192,7 @@ public class HttpRequest
         throws
             IOException
     {
-        StringBuffer ret = new StringBuffer( 80 );
+        StringBuilder ret = new StringBuilder( 80 );
 
         boolean marked = false;
         int c;
@@ -230,7 +230,7 @@ public class HttpRequest
     public String getRootUri()
     {
         if( theRootUri == null ) {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append( theProtocol );
             buf.append( "://" );
             buf.append( getHttpHostOnly() );

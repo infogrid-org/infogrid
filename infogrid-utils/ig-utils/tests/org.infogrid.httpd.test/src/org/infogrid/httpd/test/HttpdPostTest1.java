@@ -55,7 +55,7 @@ public class HttpdPostTest1
                 checkEquals( r.getLocation(),     null,                "Wrong Location header" );
                 checkEquals( r.getContentType(),  "text/plain",        "Wrong MIME type" );
 
-                StringBuffer correctResponse = new StringBuffer();
+                StringBuilder correctResponse = new StringBuilder();
                 String   sep = "";
                 Iterator<String> iter = pars.keySet().iterator();
                 while( iter.hasNext() ) {

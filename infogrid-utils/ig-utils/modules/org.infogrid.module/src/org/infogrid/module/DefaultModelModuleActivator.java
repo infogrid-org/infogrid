@@ -54,7 +54,7 @@ public class DefaultModelModuleActivator
         try {
             ModuleErrorHandler.informModuleActivateStart( theModule );
 
-            StringBuffer buf = new StringBuffer( 128 );
+            StringBuilder buf = new StringBuilder( 128 );
             buf.append( theModule.getModuleName() );
             buf.append( ".V" );
             String version = theModule.getModuleVersion();
@@ -83,7 +83,7 @@ public class DefaultModelModuleActivator
         try {
             ModuleErrorHandler.informModuleActivateStart( theModule );
 
-            StringBuffer modelResource = new StringBuffer();
+            StringBuilder modelResource = new StringBuilder();
             modelResource.append( "infogrid-models/" );
             modelResource.append( theModule.getModuleName() );
             modelResource.append( ".V" );

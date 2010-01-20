@@ -87,7 +87,7 @@ public abstract class AbstractSaneRequest
     public String getRootUri()
     {
         if( theRootUri == null ) {
-            StringBuffer buf = new StringBuffer( 64 );
+            StringBuilder buf = new StringBuilder( 64 );
             buf.append( getProtocol());
             buf.append( "://" );
             buf.append( getHttpHost());

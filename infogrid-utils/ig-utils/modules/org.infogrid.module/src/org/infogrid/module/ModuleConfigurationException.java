@@ -74,7 +74,7 @@ public class ModuleConfigurationException
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer( 100 ); // fudge
+        StringBuilder buf = new StringBuilder( 100 ); // fudge
         buf.append( "ModuleConfigurationException: could not configure Module " );
         if( theModuleAdvertisement != null ) {
             buf.append( theModuleAdvertisement.getModuleName() );

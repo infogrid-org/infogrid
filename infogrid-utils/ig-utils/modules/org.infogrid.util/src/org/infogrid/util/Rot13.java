@@ -36,7 +36,7 @@ public abstract class Rot13
     public static String rot(
             String in )
     {
-        StringBuffer tempReturn = new StringBuffer();
+        StringBuilder tempReturn = new StringBuilder();
         int abyte = 0;
         for (int i = 0; i < in.length(); i++) {
             abyte = in.charAt(i);

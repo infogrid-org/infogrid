@@ -295,7 +295,7 @@ public abstract class HTTP
         }
 
         if( cookies != null && !cookies.isEmpty() ) {
-            StringBuffer cookieString = new StringBuffer();
+            StringBuilder cookieString = new StringBuilder();
             String       sep = "";
 
             Iterator<String> iter = cookies.keySet().iterator();
@@ -390,7 +390,7 @@ public abstract class HTTP
            IOException
     {
         String           sep       = "";
-        StringBuffer     parBuffer = new StringBuffer();
+        StringBuilder     parBuffer = new StringBuilder();
         Iterator<String> iter      = pars.keySet().iterator();
 
         while( iter.hasNext() ) {

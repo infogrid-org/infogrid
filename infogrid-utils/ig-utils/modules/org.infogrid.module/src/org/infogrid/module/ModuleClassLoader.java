@@ -264,7 +264,7 @@ public class ModuleClassLoader
             return null;
         }
         try {
-            StringBuffer urlSpec = new StringBuffer();
+            StringBuilder urlSpec = new StringBuilder();
             urlSpec.append( "jar:" );
             urlSpec.append( foundFile.toURI().toURL() );
             urlSpec.append( "!/" );
@@ -379,7 +379,7 @@ public class ModuleClassLoader
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer( 100 ); // fudge
+        StringBuilder buf = new StringBuilder( 100 ); // fudge
         buf.append( "<" );
         buf.append( super.toString() );
         buf.append( "{ modulename: " );

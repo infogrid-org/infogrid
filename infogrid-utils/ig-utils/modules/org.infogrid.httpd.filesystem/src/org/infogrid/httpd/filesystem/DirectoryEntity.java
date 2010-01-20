@@ -100,7 +100,7 @@ public class DirectoryEntity
         throws
             IOException
     {
-        StringBuffer data = new StringBuffer( 1024 );
+        StringBuilder data = new StringBuilder( 1024 );
 
         Object [] outerPars = new Object[] { theFile.getAbsolutePath(), theUri, theFile.getName() };
 

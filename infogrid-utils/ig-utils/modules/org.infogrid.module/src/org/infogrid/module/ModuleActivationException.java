@@ -61,7 +61,7 @@ public class ModuleActivationException
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer( 100 ); // fudge
+        StringBuilder buf = new StringBuilder( 100 ); // fudge
         buf.append( "ModuleActivationException: could not activate Module " );
         if( theModuleAdvertisement != null ) {
             buf.append( theModuleAdvertisement.getModuleName() );

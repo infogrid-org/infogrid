@@ -172,7 +172,7 @@ public class ModuleRequirement
     public String getJavaConstructorString(
             int tabs )
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append( "ModuleRequirement.create1(\n" );
         buf.append( ModuleAdvertisement.tabs( tabs+1 ));
         buf.append( "\"" );
@@ -206,7 +206,7 @@ public class ModuleRequirement
     public String getAsXml(
             String mode )
     {
-        StringBuffer buf = new StringBuffer( 128 );
+        StringBuilder buf = new StringBuilder( 128 );
         buf.append( "  <requires name=\"" );
         buf.append( getRequiredModuleName() );
         if( getRequiredModuleVersion() != null && getRequiredModuleVersion().length() > 0 ) {

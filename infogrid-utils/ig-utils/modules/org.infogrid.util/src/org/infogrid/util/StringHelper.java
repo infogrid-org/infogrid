@@ -80,7 +80,7 @@ public abstract class StringHelper
             int to;
             boolean escapeOn = false;
             boolean quoteOn  = false;
-            StringBuffer buf = new StringBuffer( raw.length() );
+            StringBuilder buf = new StringBuilder( raw.length() );
 
             for( to = from; to < raw.length() ; ++to ) {
                 char c = raw.charAt( to );
@@ -287,7 +287,7 @@ public abstract class StringHelper
             return blank;
         }
         
-        StringBuffer ret = new StringBuffer( blank.length() * n );
+        StringBuilder ret = new StringBuilder( blank.length() * n );
         for( int i=0 ; i<n ; ++i ) {
             ret.append( blank );
         }

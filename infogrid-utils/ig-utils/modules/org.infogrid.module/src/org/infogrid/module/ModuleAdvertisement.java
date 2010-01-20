@@ -341,7 +341,7 @@ public abstract class ModuleAdvertisement
      */
     public String contentToString()
     {
-        StringBuffer buf = new StringBuffer( 32 );
+        StringBuilder buf = new StringBuilder( 32 );
         buf.append( getClass().getName() );
         buf.append( " " );
         buf.append( getModuleName() );
@@ -384,7 +384,7 @@ public abstract class ModuleAdvertisement
     protected String getJavaConstructorStringCommons(
             int tabs )
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append( getJavaConstructorStringString( tabs, getModuleName() ));
         buf.append( ",\n" );
         buf.append( tabs( tabs ));
@@ -447,7 +447,7 @@ public abstract class ModuleAdvertisement
             int                  tabs,
             ModuleRequirement [] reqs )
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if( reqs == null ) {
             buf.append( "null" );
         } else {
@@ -479,7 +479,7 @@ public abstract class ModuleAdvertisement
             int                           tabs,
             Map<String, ? extends Object> m )
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if( m != null ) {
             Iterator<String> iter = m.keySet().iterator();
             if( iter.hasNext() ) {
@@ -537,7 +537,7 @@ public abstract class ModuleAdvertisement
             int    tabs,
             String input )
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if( input == null ) {
             buf.append( "null" );
         } else {
@@ -768,13 +768,13 @@ public abstract class ModuleAdvertisement
      * Helper method to construct N tabs.
      *
      * @param n the number of tabs to construct
-     * @return StringBuffer with the tabs
+     * @return StringBuilder with the tabs
      */
-    protected static StringBuffer tabs(
+    protected static StringBuilder tabs(
             int n )
     {
         final String oneTab = "        ";
-        StringBuffer ret = new StringBuffer( n*oneTab.length() );
+        StringBuilder ret = new StringBuilder( n*oneTab.length() );
         for( int i=0 ; i<n ; ++i ) {
             ret.append( oneTab );
         }

@@ -49,7 +49,7 @@ public class ModuleResolutionCandidateNotUniqueException
     @Override
     public String getMessage()
     {
-        StringBuffer buf = new StringBuffer( 100 ); // fudge
+        StringBuilder buf = new StringBuilder( 100 ); // fudge
         buf.append( "Could not resolve ModuleRequirement " );
         if( theRequirement != null ) {
             buf.append( theRequirement.getRequiredModuleName() );

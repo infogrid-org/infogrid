@@ -752,7 +752,7 @@ public final class ResourceHelper
                 bundle = null;
             }
 
-            StringBuffer msg = new StringBuffer( 200 ); // fudge
+            StringBuilder msg = new StringBuilder( 200 ); // fudge
             msg.append( "ResourceHelper cannot find resource \"" );
             msg.append( theName );
             msg.append( "\" ! \"" );

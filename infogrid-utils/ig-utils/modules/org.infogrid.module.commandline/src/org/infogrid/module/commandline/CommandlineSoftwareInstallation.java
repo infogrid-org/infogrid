@@ -431,7 +431,7 @@ public class CommandlineSoftwareInstallation
     protected static void usageCommandLine(
             String msg )
     {
-        StringBuffer fullMsg = new StringBuffer( 512 );
+        StringBuilder fullMsg = new StringBuilder( 512 );
         fullMsg.append( "Command line: " );
 
         if( msg != null ) {
@@ -513,7 +513,7 @@ public class CommandlineSoftwareInstallation
         } else if( getPlatform().equals( WINDOWS_PLATFORM )) {
             // we are on the PC.
 
-            StringBuffer cmd = new StringBuffer();
+            StringBuilder cmd = new StringBuilder();
             cmd.append("cmd /c start ");
 
             cmd.append( u.toString() );
@@ -535,7 +535,7 @@ public class CommandlineSoftwareInstallation
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append( super.toString() );
         buf.append( "{\n" );
         buf.append( "    thePlatform:              " ).append( thePlatform ).append( "\n" );

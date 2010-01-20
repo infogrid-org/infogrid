@@ -72,7 +72,7 @@ public abstract class Base64
             byte [] data )
     {
         String       encoded = base64encode( data );
-        StringBuffer buf     = new StringBuffer( encoded.length() );
+        StringBuilder buf     = new StringBuilder( encoded.length() );
 
         // remove
         int cr1 = 0;

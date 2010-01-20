@@ -1292,7 +1292,7 @@ public abstract class ArrayHelper
         if( array.length == 0 ) {
             return array.toString();
         }
-        StringBuffer ret = new StringBuffer( "{ " );
+        StringBuilder ret = new StringBuilder( "{ " );
         if( array[0] instanceof Object[] ) {
             ret.append( ArrayHelper.arrayToString( (Object []) array[0] ));
         } else {
@@ -1341,7 +1341,7 @@ public abstract class ArrayHelper
         if( array.length == 0 ) {
             return array.toString();
         }
-        StringBuffer ret = new StringBuffer( "{ " );
+        StringBuilder ret = new StringBuilder( "{ " );
         ret.append( array[0] );
         for( int i=1 ; i<array.length ; ++i ) {
             ret.append( separator );
@@ -1385,7 +1385,7 @@ public abstract class ArrayHelper
 
             Iterator theIter = coll.iterator();
 
-            StringBuffer ret = new StringBuffer( "{ " );
+            StringBuilder ret = new StringBuilder( "{ " );
             ret.append( theIter.next() );
 
             while( theIter.hasNext() ) {
@@ -1482,7 +1482,7 @@ public abstract class ArrayHelper
 
             Iterator theIter = map.keySet().iterator();
 
-            StringBuffer ret = new StringBuffer( "{ " );
+            StringBuilder ret = new StringBuilder( "{ " );
             Object       key = theIter.next();
             Object       val = map.get( key );
                     
@@ -1551,7 +1551,7 @@ public abstract class ArrayHelper
             return ifNull;
         }
         String       sep = "";
-        StringBuffer ret = new StringBuffer();
+        StringBuilder ret = new StringBuilder();
 
         ret.append( prefix );
         for( int i=0 ; i<data.length ; ++i ) {
@@ -1610,7 +1610,7 @@ public abstract class ArrayHelper
             return ifNull;
         }
         String       sep = "";
-        StringBuffer ret = new StringBuffer();
+        StringBuilder ret = new StringBuilder();
 
         ret.append( prefix );
         for( int i=0 ; i<data.length ; ++i ) {

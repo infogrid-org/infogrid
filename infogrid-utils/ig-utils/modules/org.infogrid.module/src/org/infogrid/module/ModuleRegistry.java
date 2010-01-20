@@ -511,7 +511,7 @@ public abstract class ModuleRegistry
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer( 200 );
+        StringBuilder buf = new StringBuilder( 200 );
         buf.append( "<" );
         buf.append( super.toString() );
         buf.append( "{ #moduleAdv: " );
@@ -532,7 +532,7 @@ public abstract class ModuleRegistry
      */
     public String contentToString()
     {
-        StringBuffer buf = new StringBuffer( 100 );
+        StringBuilder buf = new StringBuilder( 100 );
 
         Iterator theIter = advertisementIterator();
         int count = 0;

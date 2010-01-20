@@ -115,7 +115,7 @@ public class ModuleCapability
     @Override
     public String toString()
     {
-        StringBuffer ret = new StringBuffer( 100 );
+        StringBuilder ret = new StringBuilder( 100 );
         ret.append( "<" );
         ret.append( super.toString() );
         ret.append( "{ intfcs: { "); // do not use ArrayHelper, not in the bootloader
@@ -156,7 +156,7 @@ public class ModuleCapability
     public String getJavaConstructorString(
             int tabs )
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append( "ModuleCapability.create1(\n" );
         buf.append( ModuleAdvertisement.tabs( tabs+1 ));
         if( theInterfaceNames == null ) {

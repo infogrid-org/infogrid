@@ -177,7 +177,7 @@ public class ModelModuleAdvertisement
     @Override
     public String toString()
     {
-        StringBuffer ret = new StringBuffer( 100 );
+        StringBuilder ret = new StringBuilder( 100 );
         ret.append( "<" );
         ret.append( super.toString() );
         ret.append( "{ name: ");
@@ -196,7 +196,7 @@ public class ModelModuleAdvertisement
     public String getJavaConstructorString(
             int tabs )
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append( "ModelModuleAdvertisement.create1(\n" );
         buf.append( tabs( tabs+1 ));
         buf.append( super.getJavaConstructorStringCommons( tabs+1 ) );

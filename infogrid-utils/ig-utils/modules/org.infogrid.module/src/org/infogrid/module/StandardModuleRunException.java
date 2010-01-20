@@ -52,7 +52,7 @@ public class StandardModuleRunException
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer( 100 );
+        StringBuilder buf = new StringBuilder( 100 );
         buf.append( "StandardModuleRunException: Module: " );
         if( theModuleAdvertisement != null ) {
             buf.append( theModuleAdvertisement.getModuleName() );

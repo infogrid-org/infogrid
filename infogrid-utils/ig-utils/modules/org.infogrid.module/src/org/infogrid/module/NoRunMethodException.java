@@ -52,7 +52,7 @@ public class NoRunMethodException
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer( 100 );
+        StringBuilder buf = new StringBuilder( 100 );
         buf.append( "NoRunMethodException: Module: " );
         if( theModuleAdvertisement != null ) {
             buf.append( theModuleAdvertisement.getModuleName() );

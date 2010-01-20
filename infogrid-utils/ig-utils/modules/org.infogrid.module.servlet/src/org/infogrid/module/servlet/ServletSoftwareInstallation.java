@@ -276,7 +276,7 @@ public class ServletSoftwareInstallation
     protected static void usageJspThrow(
             String msg )
     {
-        StringBuffer fullMsg = new StringBuffer( 256 );
+        StringBuilder fullMsg = new StringBuilder( 256 );
 
         if( msg != null ) {
             fullMsg.append( msg ).append( '\n' );

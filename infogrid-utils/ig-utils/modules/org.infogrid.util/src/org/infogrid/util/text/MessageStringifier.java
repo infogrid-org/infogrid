@@ -78,7 +78,7 @@ public abstract class MessageStringifier
         
         int           len           = theFormatString.length();
         int           bracketCount  = 0;
-        StringBuffer  currentBuffer = new StringBuffer();
+        StringBuilder  currentBuffer = new StringBuilder();
         boolean       isEscape      = false;
 
         for( int i=0 ; i<len ; ++i ) {
@@ -97,7 +97,7 @@ public abstract class MessageStringifier
                     if( bracketCount == 0 ) {
                         if( currentBuffer.length() > 0 ) {
                             ret.add( new ConstantStringifierComponent( currentBuffer.toString() ));
-                            currentBuffer = new StringBuffer();
+                            currentBuffer = new StringBuilder();
                         }
                     } else {
                         currentBuffer.append( c );
@@ -109,7 +109,7 @@ public abstract class MessageStringifier
                     --bracketCount;
                     if( bracketCount == 0 ) {
                         ret.add( expressionToComponent( currentBuffer.toString() ));
-                        currentBuffer = new StringBuffer();
+                        currentBuffer = new StringBuilder();
                     } else if( bracketCount < 0 ) {
                         throw new CompoundStringifierCompileException.UnbalancedBrackets( this, theFormatString );
                     } else {

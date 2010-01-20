@@ -47,7 +47,7 @@ public class ModuleNotFoundException
     @Override
     public String toString()
     {
-        StringBuffer buf = new StringBuffer( 100 ); // fudge
+        StringBuilder buf = new StringBuilder( 100 ); // fudge
         buf.append( "ModuleNotFoundException: could not resolve Module " );
 
         buf.append( theModuleAdvertisement.getModuleName() );
