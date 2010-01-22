@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -63,7 +63,8 @@ public class DefaultNetMeshBaseAccessSpecificationFactory
         return new DefaultNetMeshBaseAccessSpecification(
                 identifier,
                 NetMeshBaseAccessSpecification.DEFAULT_SCOPE,
-                NetMeshBaseAccessSpecification.DEFAULT_COHERENCE );
+                NetMeshBaseAccessSpecification.DEFAULT_COHERENCE,
+                identifier.getAsEntered() );
     }
 
     /**
@@ -80,8 +81,9 @@ public class DefaultNetMeshBaseAccessSpecificationFactory
         return new DefaultNetMeshBaseAccessSpecification(
                 identifier,
                 NetMeshBaseAccessSpecification.DEFAULT_SCOPE,
-                coherence );
-    }
+                coherence,
+                identifier.getAsEntered() );
+   }
 
     /**
      * Factory method.
@@ -97,7 +99,8 @@ public class DefaultNetMeshBaseAccessSpecificationFactory
         return new DefaultNetMeshBaseAccessSpecification(
                 identifier,
                 scope,
-                NetMeshBaseAccessSpecification.DEFAULT_COHERENCE );
+                NetMeshBaseAccessSpecification.DEFAULT_COHERENCE,
+                identifier.getAsEntered() );
     }
 
     /**
@@ -116,7 +119,8 @@ public class DefaultNetMeshBaseAccessSpecificationFactory
         return new DefaultNetMeshBaseAccessSpecification(
                 identifier,
                 scope,
-                coherence );
+                coherence,
+                identifier.getAsEntered() );
     }
 
     /**
@@ -137,7 +141,8 @@ public class DefaultNetMeshBaseAccessSpecificationFactory
             return new DefaultNetMeshBaseAccessSpecification(
                     netMeshBase,
                     NetMeshBaseAccessSpecification.DEFAULT_SCOPE,
-                    NetMeshBaseAccessSpecification.DEFAULT_COHERENCE );
+                    NetMeshBaseAccessSpecification.DEFAULT_COHERENCE,
+                    raw );
         }
         // we need to comb through the URL
         String [] pairs           = raw.substring( q+1 ).split( "&" );
@@ -167,7 +172,8 @@ public class DefaultNetMeshBaseAccessSpecificationFactory
         return new DefaultNetMeshBaseAccessSpecification(
                 theMeshBaseIdentifierFactory.fromExternalForm( remainder.toString() ),
                 scopeString     != null ? ScopeSpecification.fromExternalForm(     scopeString     ) : NetMeshBaseAccessSpecification.DEFAULT_SCOPE,
-                coherenceString != null ? CoherenceSpecification.fromExternalForm( coherenceString ) : NetMeshBaseAccessSpecification.DEFAULT_COHERENCE );
+                coherenceString != null ? CoherenceSpecification.fromExternalForm( coherenceString ) : NetMeshBaseAccessSpecification.DEFAULT_COHERENCE,
+                raw );
     }
 
     /**

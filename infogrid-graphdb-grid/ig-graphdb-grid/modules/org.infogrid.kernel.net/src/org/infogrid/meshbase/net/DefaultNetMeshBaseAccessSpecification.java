@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -40,12 +40,16 @@ public class DefaultNetMeshBaseAccessSpecification
      * @param netMeshBase identifies the NetMeshBase to access
      * @param coherence the CoherenceSpecification for the access
      * @param scopeSpecification the ScopeSpecification for the access
+     * @param asEnteredByUser String form as entered by the user, if any. This helps with error messages.
      */
     protected DefaultNetMeshBaseAccessSpecification(
             NetMeshBaseIdentifier  netMeshBase,
             ScopeSpecification     scopeSpecification,
-            CoherenceSpecification coherence )
+            CoherenceSpecification coherence,
+            String                 asEnteredByUser )
     {
+        super( asEnteredByUser );
+        
         theNetMeshBaseIdentifier  = netMeshBase;
         theScopeSpecification     = scopeSpecification;
         theCoherenceSpecification = coherence;
@@ -88,6 +92,9 @@ public class DefaultNetMeshBaseAccessSpecification
      */
     public String toExternalForm()
     {
+        if( theNetMeshBaseIdentifier == null ) {
+            return "<not initialized yet>"; // can happen in the debugger
+        }
         StringBuilder ret = new StringBuilder();
         ret.append( theNetMeshBaseIdentifier.toExternalForm() );
 
@@ -203,6 +210,7 @@ public class DefaultNetMeshBaseAccessSpecification
      * Determine equality.
      *
      * @param other the Object to compare against
+     * @return true if the objects are equal
      */
     @Override
     public boolean equals(

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -121,45 +121,48 @@ public class DefaultNetMeshBaseIdentifierFactory
             throw new NullPointerException();
         }
         string = string.trim();
-        if( string != null ) {
-            Matcher m = thePort80Pattern.matcher( string );
+
+        String canonical = string;
+
+        if( canonical != null ) {
+            Matcher m = thePort80Pattern.matcher( canonical );
             if( m.matches() ) {
                 String zapped = m.group( 1 ) + m.group( 2 );
 
-                string = zapped;
+                canonical = zapped;
             } else {
-                m = thePort443Pattern.matcher( string );
+                m = thePort443Pattern.matcher( canonical );
                 if( m.matches() ) {
                     String zapped = m.group( 1 ) + m.group( 2 );
 
-                    string = zapped;
+                    canonical = zapped;
                 }
             }
         }
 
-        if( string.length() == 0 ) {
-            throw new StringRepresentationParseException( string, null, null );
+        if( canonical.length() == 0 ) {
+            throw new StringRepresentationParseException( canonical, null, null );
         }
 
-        if( isXriGlobalContextSymbol( string.charAt( 0 ))) {
+        if( isXriGlobalContextSymbol( canonical.charAt( 0 ))) {
             try {
-                return new NetMeshBaseIdentifier( this, string, new URI( theXriResolverPrefix + string ), true );
+                return new NetMeshBaseIdentifier( this, canonical, new URI( theXriResolverPrefix + canonical ), string, true );
                 
             } catch( URISyntaxException ex ) {
-                throw new StringRepresentationParseException( string, null, ex );
+                throw new StringRepresentationParseException( canonical, null, ex );
             }
         }
-        if( string.startsWith( theXriResolverPrefix )) {
-            string = string.substring( theXriResolverPrefix.length() );
+        if( canonical.startsWith( theXriResolverPrefix )) {
+            canonical = canonical.substring( theXriResolverPrefix.length() );
             try {
-                return new NetMeshBaseIdentifier( this, string, new URI( theXriResolverPrefix + string ), true );
+                return new NetMeshBaseIdentifier( this, canonical, new URI( theXriResolverPrefix + canonical ), string, true );
 
             } catch( URISyntaxException ex ) {
-                throw new StringRepresentationParseException( string, null, ex );
+                throw new StringRepresentationParseException( canonical, null, ex );
             }
         }
 
-        String lower = string.toLowerCase();
+        String lower = canonical.toLowerCase();
         
         if( guess ) {
             if( lower.indexOf( "://" ) < 0 ) {
@@ -172,29 +175,29 @@ public class DefaultNetMeshBaseIdentifierFactory
                     }
                 }
                 if( prefix != null ) {
-                    string = prefix + "/" + string;
-                } else if( string.contains( "/" )) {
-                    string = "http://" + string;
+                    canonical = prefix + "/" + canonical;
+                } else if( canonical.contains( "/" )) {
+                    canonical = "http://" + canonical;
                 } else {
-                    string = "http://" + string + "/"; // example "cnn.com" without trailing slash
+                    canonical = "http://" + canonical + "/"; // example "cnn.com" without trailing slash
                 }
 
-                lower = string.toLowerCase();
+                lower = canonical.toLowerCase();
             }
         }
         
         for( Protocol p : theSupportedProtocols ) {
             if( lower.startsWith( p.getName() + ":" )) {
                 try {
-                    return new NetMeshBaseIdentifier( this, string, new URI( string ), p.getIsRestfullyResolvable() );
+                    return new NetMeshBaseIdentifier( this, canonical, new URI( canonical ), string, p.getIsRestfullyResolvable() );
 
                 } catch( URISyntaxException ex ) {
-                    throw new StringRepresentationParseException( string, null, ex );
+                    throw new StringRepresentationParseException( canonical, null, ex );
                 }
             }
         }
         throw new StringRepresentationParseException(
-                string,
+                canonical,
                 null,
                 new IllegalArgumentException(
                         "canonical identifier uses unknown protocol (need one of "

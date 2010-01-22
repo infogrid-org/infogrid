@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -88,7 +88,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
         return new DefaultNetMeshObjectAccessSpecification(
                 this,
                 new NetMeshBaseAccessSpecification[0],
-                remoteIdentifier );
+                remoteIdentifier,
+                remoteIdentifier.getAsEntered() );
     }
 
     /**
@@ -107,7 +108,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                     new NetMeshBaseAccessSpecification[] {
                             theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName ),
                     },
-                    theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ) );
+                    theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ),
+                oneElementName.getAsEntered() );
 
         } catch( StringRepresentationParseException ex ) {
             log.error( ex );
@@ -131,7 +133,12 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                 this,
                 new NetMeshBaseAccessSpecification[] {
                         theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName ) },
-                remoteIdentifier );
+                remoteIdentifier,
+                (                  oneElementName != null
+                                && remoteIdentifier != null
+                                && oneElementName.equals( remoteIdentifier.getNetMeshBaseIdentifier() ))
+                        ? remoteIdentifier.getAsEntered()
+                        : null );
     }
 
     /**
@@ -152,7 +159,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                     this,
                     new NetMeshBaseAccessSpecification[] {
                             theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, scope ) },
-                    theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ));
+                    theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ),
+                    oneElementName.getAsEntered() );
 
         } catch( StringRepresentationParseException ex ) {
             log.error( ex );
@@ -178,7 +186,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                     this,
                     new NetMeshBaseAccessSpecification[] {
                             theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, coherence ) },
-                    theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ));
+                    theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ),
+                    oneElementName.getAsEntered() );
 
         } catch( StringRepresentationParseException ex ) {
             log.error( ex );
@@ -205,7 +214,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                 this,
                 new NetMeshBaseAccessSpecification[] {
                         theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, scope ) },
-                remoteIdentifier );
+                remoteIdentifier,
+                null );
     }
 
     /**
@@ -227,7 +237,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                 this,
                 new NetMeshBaseAccessSpecification[] {
                         theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, coherence ) },
-                remoteIdentifier );
+                remoteIdentifier,
+                null );
     }
 
     /**
@@ -250,7 +261,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                     this,
                     new NetMeshBaseAccessSpecification[] {
                             theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, scope, coherence ) },
-                    theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ));
+                    theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ),
+                    oneElementName.getAsEntered() );
 
         } catch( StringRepresentationParseException ex ) {
             log.error( ex );
@@ -279,7 +291,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                 this,
                 new NetMeshBaseAccessSpecification[] {
                         theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, scope, coherence ) },
-                remoteIdentifier );
+                remoteIdentifier,
+                null );
     }
 
     /**
@@ -296,7 +309,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
             return new DefaultNetMeshObjectAccessSpecification(
                     this,
                     elements,
-                    theMeshObjectIdentifierFactory.fromExternalForm( elements[ elements.length-1 ].getNetMeshBaseIdentifier(), null ));
+                    theMeshObjectIdentifierFactory.fromExternalForm( elements[ elements.length-1 ].getNetMeshBaseIdentifier(), null ),
+                    elements.length != 1 ? null : elements[0].getAsEntered() );
 
         } catch( StringRepresentationParseException ex ) {
             log.error( ex );
@@ -320,7 +334,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
         return new DefaultNetMeshObjectAccessSpecification(
                 this,
                 elements,
-                remoteIdentifier );
+                remoteIdentifier,
+                remoteIdentifier.getAsEntered());
     }
 
     /**
@@ -337,7 +352,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
             return new DefaultNetMeshObjectAccessSpecification(
                     this,
                     createSeveral( elements ),
-                    theMeshObjectIdentifierFactory.fromExternalForm( elements[ elements.length-1 ], null ));
+                    theMeshObjectIdentifierFactory.fromExternalForm( elements[ elements.length-1 ], null ),
+                    elements.length != 1 ? null : elements[0].getAsEntered() );
 
         } catch( StringRepresentationParseException ex ) {
             log.error( ex );
@@ -368,7 +384,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
             return new DefaultNetMeshObjectAccessSpecification(
                     this,
                     createSeveral( elements ),
-                    remoteIdentifier );
+                    remoteIdentifier,
+                    null );
         }
     }
     
@@ -521,7 +538,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
         NetMeshObjectAccessSpecification ret = new DefaultNetMeshObjectAccessSpecification(
                 this,
                 pathElements,
-                object );
+                object,
+                raw );
         return ret;
     }
 

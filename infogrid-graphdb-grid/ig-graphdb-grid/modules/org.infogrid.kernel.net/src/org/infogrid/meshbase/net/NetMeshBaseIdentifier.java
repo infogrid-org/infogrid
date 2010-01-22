@@ -39,15 +39,17 @@ public class NetMeshBaseIdentifier
      * @param fact the NetMeshBaseIdentifierFactory with which this NetMeshBaseIdentifier was created
      * @param canonicalForm the canonical representation of this identifier
      * @param uri URI representation of this identifier
+     * @param asEnteredByUser String form as entered by the user, if any. This helps with error messages.
      * @param isRestful if true, this identifier is REST-fully resolvable
      */
     protected NetMeshBaseIdentifier(
             NetMeshBaseIdentifierFactory fact,
             String                       canonicalForm,
             URI                          uri,
-            boolean                      isRestful  )
+            String                       asEnteredByUser,
+            boolean                      isRestful )
     {
-        super( fact, canonicalForm );
+        super( fact, canonicalForm, asEnteredByUser );
 
         theUri       = uri;
         theUriString = theUri.toString(); // do this here, much better for debugging

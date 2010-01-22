@@ -213,7 +213,7 @@ public abstract class AnetMeshBase
      */
     @Override
     public NetMeshObject [] findMeshObjectsByIdentifierOrThrow(
-            MeshObjectIdentifier[] identifiers )
+            MeshObjectIdentifier [] identifiers )
         throws
             MeshObjectsNotFoundException
     {
@@ -258,7 +258,7 @@ public abstract class AnetMeshBase
                 new NetMeshObjectIdentifier[] {
                         (NetMeshObjectIdentifier) identifier
                 } );
-        
+
         return found[0];
     }
 

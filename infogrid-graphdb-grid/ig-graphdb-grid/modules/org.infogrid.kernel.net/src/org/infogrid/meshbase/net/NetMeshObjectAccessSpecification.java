@@ -8,19 +8,22 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net;
 
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.util.AsEntered;
 
 /**
  * <p>A path to a remote NetMeshObject, comprised of zero or more NetMeshBaseIdentifiers.
  * It can be roughly compared to a UUCP path, or a server trace in a mail message.</p>
  */
 public interface NetMeshObjectAccessSpecification
+        extends
+            AsEntered
 {
     /**
      * Obtain the factory that created this object.

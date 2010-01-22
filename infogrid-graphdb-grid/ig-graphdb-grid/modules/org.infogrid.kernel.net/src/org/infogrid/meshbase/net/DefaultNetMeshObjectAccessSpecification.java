@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -34,15 +34,18 @@ public class DefaultNetMeshObjectAccessSpecification
      * @param factory the factory that created this object
      * @param accessPath the sequence of network locations to traverse to find one where we can access the MeshObject
      * @param remoteIdentifier the identifier of the MeshObject there, if different from the default
+     * @param asEnteredByUser String form as entered by the user, if any. This helps with error messages.
      */
     protected DefaultNetMeshObjectAccessSpecification(
             NetMeshObjectAccessSpecificationFactory factory,
             NetMeshBaseAccessSpecification []       accessPath,
-            NetMeshObjectIdentifier                 remoteIdentifier )
+            NetMeshObjectIdentifier                 remoteIdentifier,
+            String                                  asEnteredByUser )
     {
         theFactory          = factory;
         theAccessPath       = accessPath != null ? accessPath : new NetMeshBaseAccessSpecification[0];
         theRemoteIdentifier = remoteIdentifier;
+        theAsEntered        = asEnteredByUser;
         
         for( int i=0 ; i<theAccessPath.length ; ++i ) {
             if( theAccessPath[i] == null ) {
@@ -83,6 +86,17 @@ public class DefaultNetMeshObjectAccessSpecification
     public NetMeshObjectIdentifier getNetMeshObjectIdentifier()
     {
         return theRemoteIdentifier;
+    }
+
+    /**
+     * Determine the String form of this object as entered by the user, if any.
+     * This may be null if the user did not enter anything, or it is not known.
+     *
+     * @return String form, as entered by the user, if any
+     */
+    public String getAsEntered()
+    {
+        return theAsEntered;
     }
 
     /**
@@ -163,6 +177,7 @@ public class DefaultNetMeshObjectAccessSpecification
      * Determine equality.
      *
      * @param other the Object to compare against
+     * @return true if the objects are equal
      */
     @Override
     public boolean equals(
@@ -255,6 +270,11 @@ public class DefaultNetMeshObjectAccessSpecification
      */
     protected NetMeshObjectIdentifier theRemoteIdentifier;
 
+    /**
+     * String form as entered by the user.
+     */
+    protected String theAsEntered;
+    
     /**
      * The escaped hash sign.
      */

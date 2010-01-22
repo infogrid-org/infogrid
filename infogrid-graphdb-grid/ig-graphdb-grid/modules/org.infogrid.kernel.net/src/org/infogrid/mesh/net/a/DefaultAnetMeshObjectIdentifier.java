@@ -42,13 +42,15 @@ public class DefaultAnetMeshObjectIdentifier
      * @param factory the DefaultAnetMeshObjectIdentifierFactory that created this identifier
      * @param baseIdentifier identifier of the NetMeshBase relative to which a localId is specified
      * @param localId the localId of the to-be-created DefaultAnetMeshObjectIdentifier
+     * @param asEnteredByUser String form of this Identifier as entered by the user, if any. This helps with error messages.
      * @return the created DefaultAnetMeshObjectIdentifier
      * @throws IllegalArgumentException thrown if a non-null localId contains a period.
      */
     public static DefaultAnetMeshObjectIdentifier create(
             DefaultAnetMeshObjectIdentifierFactory factory,
             NetMeshBaseIdentifier                  baseIdentifier,
-            String                                 localId )
+            String                                 localId,
+            String                                 asEnteredByUser )
     {
         if( baseIdentifier == null ) {
             throw new NullPointerException();
@@ -62,7 +64,7 @@ public class DefaultAnetMeshObjectIdentifier
             localId = null;
         }
         
-        return new DefaultAnetMeshObjectIdentifier( factory, baseIdentifier, localId );
+        return new DefaultAnetMeshObjectIdentifier( factory, baseIdentifier, localId, asEnteredByUser );
     }
 
     /**
@@ -71,13 +73,15 @@ public class DefaultAnetMeshObjectIdentifier
      * @param factory the DefaultAnetMeshObjectIdentifierFactory that created this identifier
      * @param baseIdentifier identifier of the NetMeshBase relative to which a localId is specified
      * @param localId the localId of the to-be-created MeshObjectIdentifier
+     * @param asEnteredByUser String form of this Identifier as entered by the user, if any. This helps with error messages.
      */
     protected DefaultAnetMeshObjectIdentifier(
             DefaultAnetMeshObjectIdentifierFactory factory,
             NetMeshBaseIdentifier                  baseIdentifier,
-            String                                 localId )
+            String                                 localId,
+            String                                 asEnteredByUser )
     {
-        super( factory, localId );
+        super( factory, localId, asEnteredByUser );
 
         theNetMeshBaseIdentifier = baseIdentifier;
     }
@@ -217,7 +221,8 @@ public class DefaultAnetMeshObjectIdentifier
                 pars,
                 meshObjectExternalForm,
                 contextPath,
-                meshBaseExternalForm );
+                meshBaseExternalForm,
+                theAsEntered );
 
         return ret;
     }
@@ -342,7 +347,8 @@ public class DefaultAnetMeshObjectIdentifier
         /* 2 */ meshBaseExternalForm,
         /* 3 */ additionalArguments,
         /* 4 */ target,
-        /* 5 */ title );
+        /* 5 */ title,
+        /* 6 */ theAsEntered );
 
         return ret;
     }
@@ -408,7 +414,8 @@ public class DefaultAnetMeshObjectIdentifier
                 null,
                 meshObjectExternalForm,
                 contextPath,
-                meshBaseExternalForm );
+                meshBaseExternalForm,
+                theAsEntered );
 
         return ret;
     }
