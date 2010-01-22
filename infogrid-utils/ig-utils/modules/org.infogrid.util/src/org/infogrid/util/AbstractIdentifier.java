@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -22,6 +22,28 @@ public abstract class AbstractIdentifier
         Identifier
 {
     /**
+     * Constructor, for subclasses only.
+     *
+     * @param asEntered the String that the user entered, if any
+     */
+    protected AbstractIdentifier(
+            String asEntered )
+    {
+        theAsEntered = asEntered;
+    }
+
+    /**
+     * Determine the String form of this object as entered by the user, if any.
+     * This may be null if the user did not enter anything, or it is not known.
+     *
+     * @return String form, as entered by the user, if any
+     */
+    public String getAsEntered()
+    {
+        return theAsEntered;
+    }
+
+    /**
      * Obtain an external form for this Identifier, similar to
      * <code>java.net.URL.toExternalForm()</code>. This is provided
      * to make invocation from JSPs easier.
@@ -32,4 +54,9 @@ public abstract class AbstractIdentifier
     {
         return toExternalForm();
     }
+
+    /**
+     * The String entered by the user, if any
+     */
+    protected String theAsEntered;
 }

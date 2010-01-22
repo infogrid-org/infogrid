@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -147,6 +147,15 @@ public class StringRepresentationDirectorySingleton
 
         plainMap.put(   "htmlescaped",    HtmlStringStringifier.create() );
         plainMap.put(   "javascriptescaped", JavaScriptStringStringifier.create() );
+
+        plainMap.put(   "as-entered",     AsEnteredStringifier.create() );
+        // html: same as plain
+        // url:  same as plain
+
+        plainMap.put(   "as-entered-array",  ArrayStringifier.create( AsEnteredStringifier.create(), ", " ));
+        // html: same as plain
+        // url:  same as plain
+        
 
         theSingleton = new StringRepresentationDirectorySingleton(); // not the factory method here
 

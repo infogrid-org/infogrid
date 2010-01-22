@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -37,17 +37,21 @@ public class SimpleStringIdentifier
     public static SimpleStringIdentifier create(
             String s )
     {
-        return new SimpleStringIdentifier( s );
+        return new SimpleStringIdentifier( s, s );
     }
 
     /**
      * Constructor, use factory method instead.
      *
      * @param s the underlying string
+     * @param asEnteredByUser String form as entered by the user, if any. This helps with error messages.
      */
     protected SimpleStringIdentifier(
-            String s )
+            String s,
+            String asEnteredByUser )
     {
+        super( asEnteredByUser );
+
         theString = s;
     }
 
