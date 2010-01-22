@@ -1,3 +1,2 @@
 modules [no-run]
 tests [no-dist]
-apps [no-run][no-dist]
