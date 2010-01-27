@@ -8,13 +8,14 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.probe.test;
 
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
 import org.infogrid.mesh.EntityNotBlessedException;
 import org.infogrid.mesh.IllegalPropertyTypeException;
@@ -38,7 +39,6 @@ import org.infogrid.probe.ApiProbe;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * Tests a multi-step TraversalSpecification with a Shadow. Was reported as a bug.
@@ -196,7 +196,7 @@ public class ShadowTest8
                 TransactionException,
                 TransactionException,
                 URISyntaxException,
-                StringRepresentationParseException
+                ParseException
         {
             MeshBaseLifecycleManager    life   = mb.getMeshBaseLifecycleManager();
             MeshObjectIdentifierFactory idfact = mb.getMeshObjectIdentifierFactory();

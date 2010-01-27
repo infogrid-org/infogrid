@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
@@ -49,7 +50,6 @@ import org.infogrid.util.StringHelper;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * This Probe knows how to read VCards (RFC 2426). It instantiates VCard, subtypes of
@@ -114,7 +114,7 @@ public class VCardProbe
      *         RelationshipType, in the same direction. Throwing this typically indicates a programming error.
      * @throws TransactionException a Transaction problem occurred. Throwing this typically indicates a programming error.
      * @throws URISyntaxException thrown if a URI was constructed in an invalid way
-     * @throws StringRepresentationParseException a StringRepresentation could not be parsed
+     * @throws ParseException thrown if parsing failed
      */
     @SuppressWarnings( "fallthrough" )
     public void readFromStream(
@@ -139,7 +139,7 @@ public class VCardProbe
             IOException,
             ModuleException,
             URISyntaxException,
-            StringRepresentationParseException
+            ParseException
     {
         MeshObject home = freshMeshBase.getHomeObject();
         home.bless( VCardSubjectArea.VCARD );

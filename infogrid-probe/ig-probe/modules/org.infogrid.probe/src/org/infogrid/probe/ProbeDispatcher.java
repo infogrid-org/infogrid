@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,7 +87,6 @@ import org.infogrid.util.ReturnSynchronizerException;
 import org.infogrid.util.StreamUtils;
 import org.infogrid.util.http.HTTP;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.SAXException;
@@ -214,7 +214,7 @@ public class ProbeDispatcher
                 problem = ex;
                 throw new ProbeException.Other( sourceIdentifier, ex ); // should never happen
 
-            } catch( StringRepresentationParseException ex ) {
+            } catch( ParseException ex ) {
                 problem = ex;
                 throw new ProbeException.SyntaxError( sourceIdentifier, ex );
 
@@ -456,7 +456,7 @@ public class ProbeDispatcher
      * @return the ProbeResult
      * @throws ProbeException thrown if unable to compute a result
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
-     * @throws StringRepresentationParseException thrown if a URI could not be parsed
+     * @throws ParseException thrown if a URI could not be parsed
      * @throws IOException thrown if an I/O error occurred
      */
     protected ProbeResult handleStream(
@@ -466,7 +466,7 @@ public class ProbeDispatcher
         throws
             ProbeException,
             TransactionException,
-            StringRepresentationParseException,
+            ParseException,
             IOException
     {
         boolean               updated          = false;
@@ -820,7 +820,7 @@ public class ProbeDispatcher
             } catch( URISyntaxException ex ) {
                 throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, foundClass );
 
-            } catch( StringRepresentationParseException ex ) {
+            } catch( ParseException ex ) {
                 throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, foundClass );
 
             } catch( ModuleException ex ) {
@@ -1044,7 +1044,7 @@ public class ProbeDispatcher
             } catch( URISyntaxException ex ) {
                 throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, foundClass );
 
-            } catch( StringRepresentationParseException ex ) {
+            } catch( ParseException ex ) {
                 throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, foundClass );
 
             } catch( ModuleException ex ) {
@@ -1211,7 +1211,7 @@ public class ProbeDispatcher
             } catch( URISyntaxException ex ) {
                 throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, foundClass );
 
-            } catch( StringRepresentationParseException ex ) {
+            } catch( ParseException ex ) {
                 throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, foundClass );
 
             } catch( ModuleException ex ) {

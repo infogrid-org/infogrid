@@ -16,6 +16,7 @@ package org.infogrid.probe.shadow.store;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxyEncoder;
@@ -30,7 +31,6 @@ import org.infogrid.store.StoreValueDecodingException;
 import org.infogrid.store.StoreValueEncodingException;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * A StoreEntryMapper for Proxies that supports the distinction between placeholder Proxies and regular Proxies for
@@ -82,12 +82,12 @@ public class ShadowStoreProxyEntryMapper
      *
      * @param stringKey the key in String form
      * @return the corresponding key object
-     * @throws StringRepresentationParseException thrown if a stringKey could not be converted into a valid Identifier
+     * @throws ParseException thrown if a stringKey could not be converted into a valid Identifier
      */
     public NetMeshBaseIdentifier stringToKey(
             String stringKey )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         NetMeshBaseIdentifier ret = theMeshBase.getMeshBaseIdentifierFactory().fromExternalForm( stringKey );
         return ret;

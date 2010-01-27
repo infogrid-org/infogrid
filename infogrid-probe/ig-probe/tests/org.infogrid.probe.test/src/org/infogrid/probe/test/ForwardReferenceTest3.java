@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,6 +16,7 @@ package org.infogrid.probe.test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
 import org.infogrid.mesh.EntityNotBlessedException;
@@ -46,7 +47,6 @@ import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.StagingMeshBaseLifecycleManager;
 import org.infogrid.testharness.util.IteratorElementCounter;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * Tests that unresolvable ForwardReferences behave. Very similar to ForwardReferenceTest2.
@@ -178,7 +178,7 @@ public class ForwardReferenceTest3
         try {
             temp = theMeshBaseIdentifierFactory.fromExternalForm( PROTOCOL_NAME + "://some.example.com/outer" );
 
-        } catch( StringRepresentationParseException ex ) {
+        } catch( ParseException ex ) {
             log.error( ex );
         }
         OUTER_URL = temp;
@@ -193,7 +193,7 @@ public class ForwardReferenceTest3
         try {
             temp = theMeshBaseIdentifierFactory.fromExternalForm( PROTOCOL_NAME + "://some.example.com/inner" );
 
-        } catch( StringRepresentationParseException ex ) {
+        } catch( ParseException ex ) {
             log.error( ex );
         }
         INNER_URL = temp;

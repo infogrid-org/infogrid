@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -17,6 +17,7 @@ package org.infogrid.probe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
 import org.infogrid.mesh.EntityNotBlessedException;
 import org.infogrid.mesh.IllegalPropertyTypeException;
@@ -31,7 +32,6 @@ import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.module.ModuleException;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * <p>This interface is supported by all Probes that can
@@ -105,7 +105,7 @@ public interface NonXmlStreamProbe
      *         RelationshipType, in the same direction. Throwing this typically indicates a programming error.
      * @throws TransactionException a Transaction problem occurred. Throwing this typically indicates a programming error.
      * @throws URISyntaxException thrown if a URI was constructed in an invalid way
-     * @throws StringRepresentationParseException a StringRepresentation could not be parsed
+     * @throws ParseException thrown if parsing failed
      */
     public void readFromStream(
             NetMeshBaseIdentifier  dataSourceIdentifier,
@@ -129,5 +129,5 @@ public interface NonXmlStreamProbe
             RoleTypeBlessedAlreadyException,
             TransactionException,
             URISyntaxException,
-            StringRepresentationParseException;
+            ParseException;
 }

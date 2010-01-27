@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,6 +16,7 @@ package org.infogrid.probe.feeds.rss;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
 import org.infogrid.mesh.EntityNotBlessedException;
 import org.infogrid.mesh.IllegalPropertyTypeException;
@@ -36,7 +37,6 @@ import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.feeds.AbstractFeedProbe;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -104,7 +104,7 @@ public class RssProbe
      *         RelationshipType, in the same direction. Throwing this typically indicates a programming error.
      * @throws TransactionException a Transaction problem occurred. Throwing this typically indicates a programming error.
      * @throws URISyntaxException thrown if a URI was constructed in an invalid way
-     * @throws StringRepresentationParseException a StringRepresentation could not be parsed
+     * @throws ParseException thrown if parsing failed
      */
     public void parseDocument(
             NetMeshBaseIdentifier  dataSourceIdentifier,
@@ -127,7 +127,7 @@ public class RssProbe
             RoleTypeBlessedAlreadyException,
             TransactionException,
             URISyntaxException,
-            StringRepresentationParseException
+            ParseException
     {
         Element rssNode = theDocument.getDocumentElement();
         if ( !"rss".equals( rssNode.getLocalName())) {

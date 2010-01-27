@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -62,7 +62,6 @@ import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.StagingMeshBaseLifecycleManager;
 import org.infogrid.util.Base64;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -542,7 +541,7 @@ public class DomMeshObjectSetProbe
             }
             return ret;
 
-        } catch( StringRepresentationParseException ex ) {
+        } catch( ParseException ex ) {
             throw new ProbeException.SyntaxError( dataSourceIdentifier, ex );
         }
     }
@@ -571,7 +570,7 @@ public class DomMeshObjectSetProbe
             
             return ret;
 
-        } catch( StringRepresentationParseException ex ) {
+        } catch( ParseException ex ) {
             throw new ProbeException.SyntaxError( dataSourceIdentifier, ex );
         }
     }

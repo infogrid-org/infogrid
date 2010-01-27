@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -55,7 +55,6 @@ import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.xml.MeshObjectSetProbeTags;
 import org.infogrid.probe.xml.XmlDOMProbe;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -88,7 +87,7 @@ public abstract class AbstractFeedProbe
      * @throws TransactionException should never be thrown
      * @throws NotPermittedException should never be thrown
      * @throws org.infogrid.probe.ProbeException.SyntaxError a syntax error was found
-     * @throws StringRepresentationParseException an identifier had illegal syntax
+     * @throws ParseException thrown if parsing failed
      * @throws IsAbstractException a MeshType was agstract and could not be instantiated
      * @throws EntityBlessedAlreadyException thrown if a NetMeshObject was blessed with an EntityType already
      * @throws EntityNotBlessedException thrown if a NetMeshObject needed to be blessed with an EntityType but was not
@@ -107,7 +106,7 @@ public abstract class AbstractFeedProbe
             TransactionException,
             NotPermittedException,
             ProbeException.SyntaxError,
-            StringRepresentationParseException,
+            ParseException,
             IsAbstractException,
             EntityBlessedAlreadyException,
             EntityNotBlessedException,
@@ -207,7 +206,7 @@ public abstract class AbstractFeedProbe
      * @throws NotPermittedException should never be thrown
      * @throws MeshObjectIdentifierNotUniqueException thrown if the identifier for the new NetMeshObject was not unique
      * @throws org.infogrid.probe.ProbeException.SyntaxError a syntax error was found
-     * @throws StringRepresentationParseException an identifier had illegal syntax
+     * @throws ParseException thrown if parsing failed
      * @throws IsAbstractException a MeshType was agstract and could not be instantiated
      * @throws EntityBlessedAlreadyException thrown if a NetMeshObject was blessed with an EntityType already
      * @throws EntityNotBlessedException thrown if a NetMeshObject needed to be blessed with an EntityType but was not
@@ -233,7 +232,7 @@ public abstract class AbstractFeedProbe
             NotPermittedException,
             MeshObjectIdentifierNotUniqueException,
             ProbeException.SyntaxError,
-            StringRepresentationParseException,
+            ParseException,
             IsAbstractException,
             EntityBlessedAlreadyException,
             IllegalPropertyTypeException,
@@ -458,7 +457,7 @@ public abstract class AbstractFeedProbe
      * @param partnerId String form of the Identifier for the partner NetMeshObject
      * @param here the XML DOM element containing the description of the relationship
      * @throws TransactionException should never be thrown
-     * @throws StringRepresentationParseException an dataSourceIdentifier was misformed
+     * @throws ParseException thrown if parsing failed
      * @throws RelatedAlreadyException thrown if the two NetMeshObjects were related already
      * @throws RoleTypeBlessedAlreadyException thrown if the relationship between the two NetMeshObject was already blessed with this RoleType
      * @throws EntityNotBlessedException thrown if the relationship cannot be blessed with a RoleType
@@ -473,7 +472,7 @@ public abstract class AbstractFeedProbe
             Element       here )
         throws
             TransactionException,
-            StringRepresentationParseException,
+            ParseException,
             RelatedAlreadyException,
             RoleTypeBlessedAlreadyException,
             EntityNotBlessedException,

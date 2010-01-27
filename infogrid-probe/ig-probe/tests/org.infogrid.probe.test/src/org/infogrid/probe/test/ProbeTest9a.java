@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,6 +16,7 @@ package org.infogrid.probe.test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
@@ -31,7 +32,6 @@ import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.StagingMeshBaseLifecycleManager;
 import org.infogrid.util.instrument.InstrumentedThread;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * Tests concurrent access to the same Probe.
@@ -225,7 +225,7 @@ public class ProbeTest9a
                 IOException,
                 ModuleException,
                 URISyntaxException,
-                StringRepresentationParseException
+                ParseException
         {
             log.debug( getClass().getName() + ".readFromApi()" );
 

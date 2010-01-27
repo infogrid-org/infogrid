@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -62,11 +62,8 @@ public abstract class AbstractShadowEventTest
      * Factory for NetMeshBaseIdentifiers.
      */
     protected static NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
-            new DefaultNetMeshBaseIdentifierFactory.Protocol[] {
-                    new DefaultNetMeshBaseIdentifierFactory.Protocol( "http",        true ),
-                    new DefaultNetMeshBaseIdentifierFactory.Protocol( "file",        true ),
-                    new DefaultNetMeshBaseIdentifierFactory.Protocol( PROTOCOL_NAME, false )
-            } );
+            new String[] { "http", "file" },
+            new String[] { PROTOCOL_NAME } );
 
     /**
      * Expected duration within which at least one ping-pong round trip can be completed.

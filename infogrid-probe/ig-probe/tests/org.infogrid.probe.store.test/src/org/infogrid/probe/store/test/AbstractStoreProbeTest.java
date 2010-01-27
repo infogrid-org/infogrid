@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -169,11 +169,8 @@ public abstract class AbstractStoreProbeTest
      * The factory for NetMeshBaseIdentifiers.
      */
     protected static NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
-            new DefaultNetMeshBaseIdentifierFactory.Protocol [] {
-                new DefaultNetMeshBaseIdentifierFactory.Protocol( "test", false ),
-                new DefaultNetMeshBaseIdentifierFactory.Protocol( "http", true ),
-                new DefaultNetMeshBaseIdentifierFactory.Protocol( "file", true ),
-            });
+            new String[] { "http", "file" },
+            new String[] { "test" } );
     
     /**
      * The name of the database that we use to store test data.

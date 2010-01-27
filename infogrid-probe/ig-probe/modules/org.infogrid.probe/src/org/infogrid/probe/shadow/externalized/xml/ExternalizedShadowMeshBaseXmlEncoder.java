@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.text.ParseException;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
@@ -30,7 +31,6 @@ import org.infogrid.probe.shadow.externalized.ExternalizedShadowProxy;
 import org.infogrid.probe.shadow.externalized.ParserFriendlyExternalizedShadowMeshBase;
 import org.infogrid.probe.shadow.externalized.ParserFriendlyExternalizedShadowProxy;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -195,7 +195,7 @@ public class ExternalizedShadowMeshBaseXmlEncoder
                 try {
                     theParsedShadowMeshBase.setNetworkIdentifier( ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().fromExternalForm( id ));
 
-                } catch( StringRepresentationParseException ex ) {
+                } catch( ParseException ex ) {
                     error( ex );
                 }
             }

@@ -16,6 +16,7 @@ package org.infogrid.probe.test.active;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
 import org.infogrid.mesh.EntityNotBlessedException;
@@ -52,7 +53,6 @@ import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * Tests that an ActiveMeshObjectSet gets updated correctly based on changes in data source read by a Probe.
@@ -284,7 +284,7 @@ public class ShadowEventTest1
                 RoleTypeBlessedAlreadyException,
                 TransactionException,
                 URISyntaxException,
-                StringRepresentationParseException
+                ParseException
         {
             log.debug( "Running probe for " + probeRunCounter );
 

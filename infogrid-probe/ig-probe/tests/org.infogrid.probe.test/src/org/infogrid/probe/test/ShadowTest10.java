@@ -15,6 +15,7 @@
 package org.infogrid.probe.test;
 
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
 import org.infogrid.mesh.EntityNotBlessedException;
 import org.infogrid.mesh.IllegalPropertyTypeException;
@@ -38,7 +39,6 @@ import org.infogrid.probe.ApiProbe;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * Tests that NetMeshBase.freshenNow works.
@@ -245,7 +245,7 @@ public class ShadowTest10
                 TransactionException,
                 TransactionException,
                 URISyntaxException,
-                StringRepresentationParseException
+                ParseException
         {
             MeshBaseLifecycleManager life = mb.getMeshBaseLifecycleManager();
 
