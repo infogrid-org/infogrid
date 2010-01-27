@@ -18,10 +18,14 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.InvalidObjectNumberFoundParseException;
+import org.infogrid.util.InvalidObjectTypeFoundParseException;
 import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.StringTooShortParseException;
 import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationParseException;
 
@@ -39,32 +43,41 @@ public class DefaultNetMeshBaseIdentifierFactory
      */
     public static DefaultNetMeshBaseIdentifierFactory create()
     {
-        DefaultNetMeshBaseIdentifierFactory ret = new DefaultNetMeshBaseIdentifierFactory( DEFAULT_PROTOCOLS );
+        DefaultNetMeshBaseIdentifierFactory ret = new DefaultNetMeshBaseIdentifierFactory(
+                DEFAULT_RESTFUL_PROTOCOL_NAMES,
+                DEFAULT_NON_RESTFUL_PROTOCOL_NAMES );
         return ret;
     }
     
     /**
      * Factory method for a specified set of protocols.
      * 
-     * @param protocols the supported protocols
+     * @param restfulProtocols the supported REST-ful protocols
+     * @param nonRestfulProtocols the supported non-REST-ful protocols
      * @return the created DefaultNetMeshBaseIdentifierFactory
      */
     public static DefaultNetMeshBaseIdentifierFactory create(
-            Protocol [] protocols )
+            String [] restfulProtocols,
+            String [] nonRestfulProtocols )
     {
-        DefaultNetMeshBaseIdentifierFactory ret = new DefaultNetMeshBaseIdentifierFactory( protocols );
+        DefaultNetMeshBaseIdentifierFactory ret = new DefaultNetMeshBaseIdentifierFactory(
+                restfulProtocols,
+                nonRestfulProtocols );
         return ret;
     }
     
     /**
      * Constructor.
      * 
-     * @param protocols the supported protocols
+     * @param restfulProtocols the supported REST-ful protocols
+     * @param nonRestfulProtocols the supported non-REST-ful protocols
      */
     protected DefaultNetMeshBaseIdentifierFactory(
-            Protocol [] protocols )
+            String [] restfulProtocols,
+            String [] nonRestfulProtocols )
     {
-        theSupportedProtocols = protocols;
+        theRestfulProtocols    = restfulProtocols;
+        theNonRestfulProtocols = nonRestfulProtocols;
     }
 
     /**
@@ -73,12 +86,12 @@ public class DefaultNetMeshBaseIdentifierFactory
      * 
      * @param string the (potentially incomplete) String form of this NetMeshBaseIdentifier
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if the syntax could not be parsed
      */
     public NetMeshBaseIdentifier guessFromExternalForm(
             String string )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( null, string, true );
     }
@@ -90,13 +103,13 @@ public class DefaultNetMeshBaseIdentifierFactory
      * @param context the NetMeshBaseIdentifier that forms the context
      * @param string the (potentially incomplete) String form of this NetMeshBaseIdentifier
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if the syntax could not be parsed
      */
     public NetMeshBaseIdentifier guessFromExternalForm(
             NetMeshBaseIdentifier context,
             String                string )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( context, string, true );
     }
@@ -108,14 +121,14 @@ public class DefaultNetMeshBaseIdentifierFactory
      * @param string the (potentially incomplete) String form of this NetMeshBaseIdentifier
      * @param guess if true, attempt to guess the protocol if none was given
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if the syntax could not be parsed
      */
     protected NetMeshBaseIdentifier obtain(
             NetMeshBaseIdentifier context,
             String                string,
             boolean               guess )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         if( string == null ) {
             throw new NullPointerException();
@@ -141,7 +154,7 @@ public class DefaultNetMeshBaseIdentifierFactory
         }
 
         if( canonical.length() == 0 ) {
-            throw new StringRepresentationParseException( canonical, null, null );
+            throw new StringTooShortParseException( canonical, null, 1 );
         }
 
         if( isXriGlobalContextSymbol( canonical.charAt( 0 ))) {
@@ -186,23 +199,32 @@ public class DefaultNetMeshBaseIdentifierFactory
             }
         }
         
-        for( Protocol p : theSupportedProtocols ) {
-            if( lower.startsWith( p.getName() + ":" )) {
+        for( String p : theRestfulProtocols ) {
+            if( lower.startsWith( p + ":" )) {
                 try {
-                    return new NetMeshBaseIdentifier( this, canonical, new URI( canonical ), string, p.getIsRestfullyResolvable() );
+                    return new NetMeshBaseIdentifier( this, canonical, new URI( canonical ), string, true );
 
                 } catch( URISyntaxException ex ) {
                     throw new StringRepresentationParseException( canonical, null, ex );
                 }
             }
         }
-        throw new StringRepresentationParseException(
+        for( String p : theNonRestfulProtocols ) {
+            if( lower.startsWith( p + ":" )) {
+                try {
+                    return new NetMeshBaseIdentifier( this, canonical, new URI( canonical ), string, false );
+
+                } catch( URISyntaxException ex ) {
+                    throw new StringRepresentationParseException( canonical, null, ex );
+                }
+            }
+        }
+
+        throw new UnknownProtocolParseException(
                 canonical,
-                null,
-                new IllegalArgumentException(
-                        "canonical identifier uses unknown protocol (need one of "
-                        + ArrayHelper.join( theSupportedProtocols )
-                        + ")" ));
+                -1,
+                lower,
+                ArrayHelper.append( theRestfulProtocols, theNonRestfulProtocols, String.class ) );
     }
 
     /**
@@ -210,12 +232,12 @@ public class DefaultNetMeshBaseIdentifierFactory
      * 
      * @param file the local File whose NetMeshBaseIdentifier we obtain
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if the syntax could not be parsed
      */
     public NetMeshBaseIdentifier obtain(
             File file )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( file.toURI() );
     }
@@ -225,12 +247,12 @@ public class DefaultNetMeshBaseIdentifierFactory
      * 
      * @param url the URL whose NetMeshBaseIdentifier we obtain
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if the syntax could not be parsed
      */
     public NetMeshBaseIdentifier obtain(
             URL url )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( null, url.toExternalForm(), false );
     }
@@ -240,12 +262,12 @@ public class DefaultNetMeshBaseIdentifierFactory
      * 
      * @param uri the URI whose NetMeshBaseIdentifier we obtain
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if the syntax could not be parsed
      */
     public NetMeshBaseIdentifier obtain(
             URI uri )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( null, uri.toASCIIString(), false );
     }
@@ -255,12 +277,12 @@ public class DefaultNetMeshBaseIdentifierFactory
      *
      * @param raw the external form
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if a parsing error occurred
+     * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier fromExternalForm(
             String raw )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( null, raw, false );
     }
@@ -271,13 +293,13 @@ public class DefaultNetMeshBaseIdentifierFactory
      * @param context the NetMeshBaseIdentifier that forms the context
      * @param raw the external form
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if a parsing error occurred
+     * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier fromExternalForm(
             NetMeshBaseIdentifier context,
             String                raw )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( context, raw, false );
     }
@@ -288,13 +310,13 @@ public class DefaultNetMeshBaseIdentifierFactory
      * @param representation the StringRepresentation in which this String is represented
      * @param s the String to parse
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if a parsing error occurred
+     * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier fromStringRepresentation(
             StringRepresentation representation,
             String               s )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         try {
             Object [] found = representation.parseEntry( NetMeshBaseIdentifier.class, NetMeshBaseIdentifier.DEFAULT_ENTRY, s, this );
@@ -306,15 +328,15 @@ public class DefaultNetMeshBaseIdentifierFactory
                     break;
 
                 default:
-                    throw new StringRepresentationParseException( s, null, null );
+                    throw new InvalidObjectNumberFoundParseException( s, 1, found );
             }
 
             return ret;
 
-        // pass-through StringRepresentationParseException
+        // pass-through ParseException
 
         } catch( ClassCastException ex ) {
-            throw new StringRepresentationParseException( s, null, null );
+            throw new InvalidObjectTypeFoundParseException( s, NetMeshBaseIdentifier.class, null, ex );
         }
         
     }
@@ -366,10 +388,15 @@ public class DefaultNetMeshBaseIdentifierFactory
             "http://xri.net/" );
 
     /**
-     * The supported protocols.
+     * The REST-ful protocols for this instance.
      */
-    protected Protocol [] theSupportedProtocols;
-    
+    protected String [] theRestfulProtocols;
+
+    /*
+     * The non-REST-ful protocols for this instance.
+     */
+    protected String [] theNonRestfulProtocols;
+
     /**
      * The pattern that allows us to remove a unnecessary port 80 from a URL spec.
      */
@@ -383,72 +410,16 @@ public class DefaultNetMeshBaseIdentifierFactory
             "^(https://[^/:]+):443(/.*)$" );
 
     /**
-     * The default protocols for this class.
+     * The default REST-ful protocols for this class.
      */
-    protected static Protocol [] DEFAULT_PROTOCOLS = {
-        new Protocol( "http", true ),
-        new Protocol( "https", true ),
-        new Protocol( "file", true )
-    };
+    protected static final String [] DEFAULT_RESTFUL_PROTOCOL_NAMES = theResourceHelper.getResourceStringArrayOrDefault(
+            "RestfulProtocolNames",
+            new String [] { "http", "https", "file" } );
 
     /**
-     * Captures all we need to know about protocol support here.
+     * The default non-REST-ful protocol for this class.
      */
-    public static class Protocol
-    {
-        /**
-         * Constructor.
-         * 
-         * @param name the protocol name in a URI
-         * @param isRestful true if this is a RESTful protocol
-         */
-        public Protocol(
-                String  name,
-                boolean isRestful )
-        {
-            theName      = name;
-            theIsRestful = isRestful;
-        }
-        
-        /**
-         * Obtain the name of this protocol.
-         * 
-         * @return the name
-         */
-        public String getName()
-        {
-            return theName;
-        }
-
-        /**
-         * Determine whether this protocol is RESTfully resolvable.
-         * 
-         * @return true if it is RESTfully resolvable
-         */
-        public boolean getIsRestfullyResolvable()
-        {
-            return theIsRestful;
-        }
-              
-        /**
-         * String form for debugging.
-         * 
-         * @return String form
-         */
-        @Override
-        public String toString()
-        {
-            return theName;
-        }
-        
-        /**
-         * The name of the protocol.
-         */
-        protected String theName;
-        
-        /**
-         * True if this is a RESTful protocol.
-         */
-        protected boolean theIsRestful;
-    }
+    protected static final String [] DEFAULT_NON_RESTFUL_PROTOCOL_NAMES = theResourceHelper.getResourceStringArrayOrDefault(
+            "NonRestfulProtocolNames",
+            new String[] {} );
 }

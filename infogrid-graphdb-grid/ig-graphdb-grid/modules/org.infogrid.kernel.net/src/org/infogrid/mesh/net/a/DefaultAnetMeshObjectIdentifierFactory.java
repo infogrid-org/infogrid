@@ -12,15 +12,15 @@
 // All rights reserved.
 //
 
-package org.infogrid.meshbase.net.a;
+package org.infogrid.mesh.net.a;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.text.ParseException;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-import org.infogrid.mesh.net.a.DefaultAnetMeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBaseIdentifier;
-import org.infogrid.meshbase.a.DefaultAMeshObjectIdentifierFactory;
+import org.infogrid.mesh.a.DefaultAMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
@@ -84,13 +84,13 @@ public class DefaultAnetMeshObjectIdentifierFactory
      *
      * @param raw the identifier String
      * @return the created DefaultAnetMeshObjectIdentifier
-     * @throws StringRepresentationParseException a parsing error occurred
+     * @throws ParseException a parsing error occurred
      */
     @Override
     public DefaultAnetMeshObjectIdentifier fromExternalForm(
             String raw )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         DefaultAnetMeshObjectIdentifier ret = obtain( theMeshBaseIdentifier, raw, false );
         return ret;
@@ -102,13 +102,13 @@ public class DefaultAnetMeshObjectIdentifierFactory
      * @param contextIdentifier identifier of the NetMeshBase relative to which the external form is to be evaluated
      * @param raw the external form of the DefaultAnetMeshObjectIdentifier
      * @return the created DefaultAnetMeshObjectIdentifier
-     * @throws StringRepresentationParseException thrown if a syntax error was encountered during parsing
+     * @throws ParseException a parsing error occurred
      */
     public DefaultAnetMeshObjectIdentifier fromExternalForm(
             NetMeshBaseIdentifier contextIdentifier,
             String                raw )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( contextIdentifier, raw, false );
     }
@@ -120,50 +120,65 @@ public class DefaultAnetMeshObjectIdentifierFactory
      * @param raw the external form of the DefaultAnetMeshObjectIdentifier
      * @param guess if true, attempt to guess the protocol if none was given
      * @return the created DefaultAnetMeshObjectIdentifier
-     * @throws StringRepresentationParseException thrown if a syntax error was encountered during parsing
+     * @throws ParseException a parsing error occurred
      */
     protected DefaultAnetMeshObjectIdentifier obtain(
             NetMeshBaseIdentifier contextIdentifier,
             String                raw,
             boolean               guess )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         if( raw == null ) {
             return new HomeObject( this, contextIdentifier );
         }
         
         NetMeshBaseIdentifier meshBase;
-        String                local;
+        String                localId;
         
         DefaultAnetMeshObjectIdentifier ret;
         
         int hash = raw.indexOf( DefaultAnetMeshObjectIdentifier.SEPARATOR );
         if( hash == 0 ) {
             meshBase = contextIdentifier;
-            local    = raw.substring( hash+1 );
+            localId    = raw.substring( hash+1 );
         } else if( hash > 0 ) {
             if( guess ) {
                 meshBase = theMeshBaseIdentifierFactory.guessFromExternalForm( raw.substring( 0, hash ));
             } else {
                 meshBase = theMeshBaseIdentifierFactory.fromExternalForm( raw.substring( 0, hash ));
             }
-            local = raw.substring( hash+1 );
+            localId = raw.substring( hash+1 );
         } else if( treatAsGlobalIdentifier( raw )) {
             if( guess ) {
                 meshBase = theMeshBaseIdentifierFactory.guessFromExternalForm( raw );
             } else {
                 meshBase = theMeshBaseIdentifierFactory.fromExternalForm( raw );
             }
-            local = null;
+            localId = null;
         } else {
             meshBase = contextIdentifier;
-            local    = raw;
+            localId    = raw;
         }
+
+        if( meshBase == null ) {
+            throw new NullPointerException();
+        }
+
+        if( localId != null && treatAsGlobalIdentifier( localId )) {
+            throw new IllegalArgumentException( "DefaultAnetMeshObjectIdentifier's localId must not contain a period: " + localId );
+        }
+
+        if( localId != null && localId.length() == 0 ) {
+            localId = null;
+        }
+
+        checkLocalId( localId );
+
         ret = DefaultAnetMeshObjectIdentifier.create(
                 this,
                 meshBase,
-                local,
+                localId,
                 raw );
         return ret;
     }
@@ -175,13 +190,13 @@ public class DefaultAnetMeshObjectIdentifierFactory
      *
      * @param raw the external form
      * @return the created MeshObjectIdentifier
-     * @throws StringRepresentationParseException thrown if a parsing error occurred
+     * @throws ParseException thrown if a parsing error occurred
      */
     @Override
     public DefaultAnetMeshObjectIdentifier guessFromExternalForm(
             String raw )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( theMeshBaseIdentifier, raw, true );
     }
@@ -189,14 +204,14 @@ public class DefaultAnetMeshObjectIdentifierFactory
     /**
      * Factory method.
      *
-     * @param file the local File whose NetMeshObjectIdentifier we obtain
+     * @param file the localId File whose NetMeshObjectIdentifier we obtain
      * @return the created NetMeshObjectIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if a parsing error occurred
      */
     public DefaultAnetMeshObjectIdentifier obtain(
             File file )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( file.toURI() );
     }
@@ -206,12 +221,12 @@ public class DefaultAnetMeshObjectIdentifierFactory
      *
      * @param url the URL whose NetMeshObjectIdentifier we obtain
      * @return the created NetMeshObjectIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if a parsing error occurred
      */
     public DefaultAnetMeshObjectIdentifier obtain(
             URL url )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( theMeshBaseIdentifier, url.toExternalForm(), false );
     }
@@ -221,12 +236,12 @@ public class DefaultAnetMeshObjectIdentifierFactory
      *
      * @param uri the URI whose NetMeshObjectIdentifier we obtain
      * @return the created NetMeshObjectIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if the syntax could not be parsed
      */
     public DefaultAnetMeshObjectIdentifier obtain(
             URI uri )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         return obtain( theMeshBaseIdentifier, uri.toASCIIString(), false );
     }
@@ -248,7 +263,7 @@ public class DefaultAnetMeshObjectIdentifierFactory
             MeshBaseIdentifier found = theMeshBaseIdentifierFactory.fromExternalForm( raw );
             return true;
 
-        } catch( StringRepresentationParseException ex ) {
+        } catch( ParseException ex ) {
             // ignore
         }
         return false;
@@ -260,14 +275,14 @@ public class DefaultAnetMeshObjectIdentifierFactory
      * @param representation the StringRepresentation in which this String is represented
      * @param s the String to parse
      * @return the created MeshObjectIdentifier
-     * @throws StringRepresentationParseException a parsing error occurred
+     * @throws ParseException thrown if a parsing error occurred
      */
     @Override
     public DefaultAnetMeshObjectIdentifier fromStringRepresentation(
             StringRepresentation representation,
             String               s )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         String [] entriesToTry1 = {
                 DefaultAnetMeshObjectIdentifier.DEFAULT_MESH_BASE_HOME_ENTRY,
@@ -294,13 +309,10 @@ public class DefaultAnetMeshObjectIdentifierFactory
                 DefaultAnetMeshObjectIdentifier.NON_DEFAULT_MESH_BASE_ENTRY };
 
         for( String entry : entriesToTry2 ) {
-            try {
-                Object [] found = representation.parseEntry( DefaultAnetMeshObjectIdentifier.class, entry, s, this );
+            Object [] found = null;
 
-                if( found.length == 1 ) {
-                    DefaultAnetMeshObjectIdentifier ret = obtain( theMeshBaseIdentifier, (String) found[0], true );
-                    return ret;
-                }
+            try {
+                found = representation.parseEntry( DefaultAnetMeshObjectIdentifier.class, entry, s, this );
 
             } catch( StringRepresentationParseException ex ) {
                 // that wasn't it ...
@@ -313,6 +325,10 @@ public class DefaultAnetMeshObjectIdentifierFactory
                 if( firstException == null ) {
                     firstException = ex;
                 }
+            }
+            if( found != null && found.length == 1 ) {
+                DefaultAnetMeshObjectIdentifier ret = obtain( theMeshBaseIdentifier, (String) found[0], true ); // may throw
+                return ret;
             }
         }
         throw new StringRepresentationParseException( s, null, firstException );

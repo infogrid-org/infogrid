@@ -8,12 +8,13 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.kernel.net.test.xpriso;
 
+import java.text.ParseException;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.net.NetMeshObject;
@@ -28,7 +29,6 @@ import org.infogrid.meshbase.transaction.TransactionAction;
 import org.infogrid.meshbase.transaction.TransactionActionException;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * Tests concurrent execution of accessLocally to different NetMeshBases.
@@ -62,7 +62,7 @@ public class XprisoTest15
                             return ((NetMeshBase)tx.getMeshBase()).getMeshBaseLifecycleManager().createMeshObject(
                                     tx.getMeshBase().getMeshObjectIdentifierFactory().fromExternalForm( "#obj" ));
 
-                        } catch( StringRepresentationParseException ex ) {
+                        } catch( ParseException ex ) {
                             throw new TransactionActionException.Error( ex );
                         }
                     }

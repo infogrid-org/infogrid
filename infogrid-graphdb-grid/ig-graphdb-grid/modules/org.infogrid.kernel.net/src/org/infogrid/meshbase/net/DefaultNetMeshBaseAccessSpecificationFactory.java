@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.net;
 
+import java.text.ParseException;
 import org.infogrid.util.http.HTTP;
 import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationParseException;
@@ -128,12 +129,12 @@ public class DefaultNetMeshBaseAccessSpecificationFactory
      *
      * @param raw the external form
      * @return the created NetMeshBaseAccessSpecification
-     * @throws StringRepresentationParseException thrown if a parsing error occurred
+     * @throws ParseException thrown if a parsing error occurred
      */
     public DefaultNetMeshBaseAccessSpecification fromExternalForm(
             String raw )
         throws
-            StringRepresentationParseException
+            ParseException
     {
         int q = raw.indexOf( '?' );
         if( q < 0 ) {

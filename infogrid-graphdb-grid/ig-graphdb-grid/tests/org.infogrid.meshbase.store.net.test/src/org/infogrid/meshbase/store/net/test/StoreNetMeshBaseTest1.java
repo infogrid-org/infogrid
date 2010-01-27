@@ -8,12 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.store.net.test;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
@@ -33,7 +34,6 @@ import org.infogrid.store.prefixing.IterablePrefixingStore;
 import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * Makes sure we do the right number of writes and reads.
@@ -222,7 +222,7 @@ public class StoreNetMeshBaseTest1
         try {
             id = theMeshBaseIdentifierFactory.fromExternalForm( "test://i.am.here" );
 
-        } catch( StringRepresentationParseException ex ) {
+        } catch( ParseException ex ) {
             log.error( ex );
             id = null;
         }

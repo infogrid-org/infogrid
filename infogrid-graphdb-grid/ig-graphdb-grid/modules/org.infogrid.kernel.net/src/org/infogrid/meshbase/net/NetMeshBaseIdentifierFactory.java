@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -17,9 +17,9 @@ package org.infogrid.meshbase.net;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.text.ParseException;
 import org.infogrid.meshbase.MeshBaseIdentifierFactory;
 import org.infogrid.util.text.StringRepresentation;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * Factory for NetMeshBaseIdentifiers.
@@ -34,61 +34,61 @@ public interface NetMeshBaseIdentifierFactory
      * @param context the NetMeshBaseIdentifier that forms the context
      * @param raw the external form
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if a parsing error occurred
+     * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier fromExternalForm(
             NetMeshBaseIdentifier context,
             String                raw )
         throws
-            StringRepresentationParseException;
+            ParseException;
 
     /**
      * Recreate a NetMeshBaseIdentifier from an external form.
      *
      * @param raw the external form
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if a parsing error occurred
+     * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier fromExternalForm(
             String raw )
         throws
-            StringRepresentationParseException;
+            ParseException;
 
     /**
      * Factory method.
      * 
      * @param file the local File whose NetMeshBaseIdentifier we obtain
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if a parsing error occurred
+     * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier obtain(
             File file )
         throws
-            StringRepresentationParseException;
+            ParseException;
 
     /**
      * Factory method.
      * 
      * @param url the URL whose NetMeshBaseIdentifier we obtain
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier obtain(
             URL url )
         throws
-            StringRepresentationParseException;
+            ParseException;
     
     /**
      * Factory method.
      * 
      * @param uri the URI form
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if a parsing error occurred
+     * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier obtain(
             URI uri )
         throws
-            StringRepresentationParseException;
+            ParseException;
 
     /**
      * Factory method to obtain a NetMeshBaseIdentifier.
@@ -96,12 +96,12 @@ public interface NetMeshBaseIdentifierFactory
      * 
      * @param string the (potentially incomplete) String form of this NetMeshBaseIdentifier
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier guessFromExternalForm(
             String string )
         throws
-            StringRepresentationParseException;
+            ParseException;
     
     /**
      * Factory method to obtain a NetMeshBaseIdentifier specified in relative form in the
@@ -110,13 +110,13 @@ public interface NetMeshBaseIdentifierFactory
      * @param context the NetMeshBaseIdentifier that forms the context
      * @param string the (potentially incomplete) String form of this NetMeshBaseIdentifier
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if the syntax could not be parsed
+     * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier guessFromExternalForm(
             NetMeshBaseIdentifier context,
             String                string )
         throws
-            StringRepresentationParseException;
+            ParseException;
 
     /**
      * Convert this StringRepresentation back to a NetMeshBaseIdentifier.
@@ -124,11 +124,11 @@ public interface NetMeshBaseIdentifierFactory
      * @param representation the StringRepresentation in which this String is represented
      * @param s the String to parse
      * @return the created NetMeshBaseIdentifier
-     * @throws StringRepresentationParseException thrown if a parsing error occurred
+     * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier fromStringRepresentation(
             StringRepresentation representation,
             String               s )
         throws
-            StringRepresentationParseException;
+            ParseException;
 }

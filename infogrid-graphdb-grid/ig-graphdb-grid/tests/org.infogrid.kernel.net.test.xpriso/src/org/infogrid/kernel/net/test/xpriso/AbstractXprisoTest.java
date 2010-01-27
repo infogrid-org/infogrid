@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -326,10 +326,8 @@ public abstract class AbstractXprisoTest
      * Factory for NetMeshBaseIdentifiers.
      */
     protected NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
-            new DefaultNetMeshBaseIdentifierFactory.Protocol[] {
-                    new DefaultNetMeshBaseIdentifierFactory.Protocol( "test", false ),
-                    new DefaultNetMeshBaseIdentifierFactory.Protocol( "http", true )
-            });
+            new String[] { "http" },
+            new String[] { "test" } );
     
     /**
      * The root context for these tests.

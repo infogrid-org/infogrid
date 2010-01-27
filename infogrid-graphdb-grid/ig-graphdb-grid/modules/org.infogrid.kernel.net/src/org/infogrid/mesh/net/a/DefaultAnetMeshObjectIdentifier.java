@@ -20,7 +20,6 @@ import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.text.MeshStringRepresentationContext;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.a.DefaultAnetMeshObjectIdentifierFactory;
 import org.infogrid.util.text.IdentifierStringifier;
 import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationContext;
@@ -46,23 +45,13 @@ public class DefaultAnetMeshObjectIdentifier
      * @return the created DefaultAnetMeshObjectIdentifier
      * @throws IllegalArgumentException thrown if a non-null localId contains a period.
      */
-    public static DefaultAnetMeshObjectIdentifier create(
+    static DefaultAnetMeshObjectIdentifier create(
             DefaultAnetMeshObjectIdentifierFactory factory,
             NetMeshBaseIdentifier                  baseIdentifier,
             String                                 localId,
             String                                 asEnteredByUser )
     {
-        if( baseIdentifier == null ) {
-            throw new NullPointerException();
-        }
-        
-        if( localId != null && factory.treatAsGlobalIdentifier( localId )) {
-            throw new IllegalArgumentException( "DefaultAnetMeshObjectIdentifier's localId must not contain a period: " + localId );
-        }
-        
-        if( localId != null && localId.length() == 0 ) {
-            localId = null;
-        }
+        // all correctness checking is being moved into the factory.
         
         return new DefaultAnetMeshObjectIdentifier( factory, baseIdentifier, localId, asEnteredByUser );
     }
