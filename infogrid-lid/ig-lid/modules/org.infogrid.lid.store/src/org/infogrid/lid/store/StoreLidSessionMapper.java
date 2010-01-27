@@ -8,13 +8,14 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.store;
 
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import org.infogrid.lid.LidSession;
 import org.infogrid.lid.SimpleLidSession;
 import org.infogrid.store.StoreEntryMapper;
@@ -22,7 +23,6 @@ import org.infogrid.store.StoreValue;
 import org.infogrid.store.StoreValueDecodingException;
 import org.infogrid.store.StoreValueEncodingException;
 import org.infogrid.util.IdentifierFactory;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * Maps session cookies into the Store.
@@ -147,7 +147,7 @@ public class StoreLidSessionMapper
 
         } catch( UnsupportedEncodingException ex ) {
             throw new StoreValueDecodingException( ex );
-        } catch( StringRepresentationParseException ex ) {
+        } catch( ParseException ex ) {
             throw new StoreValueDecodingException( ex );
         }
     }

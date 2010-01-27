@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -30,6 +30,7 @@ import org.infogrid.lid.local.LidLocalPersona;
 import org.infogrid.lid.local.LidLocalPersonaUnknownException;
 import org.infogrid.lid.local.SimpleLidLocalPersona;
 import org.infogrid.util.Identifier;
+import org.infogrid.util.InvalidCharacterParseException;
 import org.infogrid.util.InvalidIdentifierException;
 import org.infogrid.util.logging.Log;
 
