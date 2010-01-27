@@ -8,12 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.util.text;
 
+import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -72,7 +73,7 @@ public interface StringRepresentation
      * @param factory optional factory object that may be required to instantiate one or more of the values. This is highly
      *        dependent on the context of use of this method.
      * @return the found values
-     * @throws StringRepresentationParseException thrown if the String could not be parsed.
+     * @throws ParseException thrown if the String could not be parsed.
      */
     public Object [] parseEntry(
             Class<? extends HasStringRepresentation> classOfFormattedObject,
@@ -80,7 +81,7 @@ public interface StringRepresentation
             String                                   s,
             StringifierUnformatFactory               factory )
         throws
-            StringRepresentationParseException;
+            ParseException;
 
     /**
      * Format a Throwable about which nothing else is known.

@@ -12,14 +12,12 @@
 // All rights reserved.
 //
 
-package org.infogrid.util.text;
-
-import org.infogrid.util.LocalizedParseException;
+package org.infogrid.util;
 
 /**
- * Thrown if a String could not be parsed by a StringRepresentation.
+ * A ParseException indicating that the String contained an unknown symbol.
  */
-public class StringRepresentationParseException
+public class UnknownSymbolParseException
     extends
         LocalizedParseException
 {
@@ -29,27 +27,27 @@ public class StringRepresentationParseException
      * Constructor.
      *
      * @param string the text that could not be parsed
-     * @param formatString the format String that defines the syntax of the String to be parsed
-     * @param cause the cause of this Exception
+     * @param errorOffset the offset, into the string, where the error occurred
+     * @param unknown the unknown symbol
      */
-    public StringRepresentationParseException(
-            String    string,
-            String    formatString,
-            Throwable cause )
+    public UnknownSymbolParseException(
+            String string,
+            int    errorOffset,
+            String unknown )
     {
-        super( string, null, 0, cause );
+        super( string, null, errorOffset, null );
 
-        theFormatString = formatString;
+        theUnknown = unknown;
     }
 
     /**
-     * Obtain the format String.
+     * Obtain the unknown symbol.
      *
-     * @return the format String
+     * @return the unknown symbol
      */
-    public String getFormatString()
+    public String getUnknown()
     {
-        return theFormatString;
+        return theUnknown;
     }
 
     /**
@@ -60,11 +58,11 @@ public class StringRepresentationParseException
     @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theString, theFormatString };
+        return new Object[] { theString, theUnknown };
     }
 
     /**
-     * The format String for the String.
+     * The unknown symbol.
      */
-    protected String theFormatString;
+    protected String theUnknown;
 }

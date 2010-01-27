@@ -125,6 +125,10 @@ public class StringRepresentationDirectorySingleton
         // html: same as plain
         // url:  same as plain
 
+        plainMap.put(   "stringarray",    ArrayStringifier.create( StringStringifier.create(), ", " ));
+        // html: same as plain
+        // url:  same as plain
+
         plainMap.put(   "idarray",        ArrayStringifier.create( IdentifierStringifier.create(), ", " ));
         // html: same as plain
         // url:  same as plain

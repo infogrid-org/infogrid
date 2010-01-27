@@ -12,14 +12,13 @@
 // All rights reserved.
 //
 
-package org.infogrid.util.text;
-
-import org.infogrid.util.LocalizedParseException;
+package org.infogrid.util;
 
 /**
- * Thrown if a String could not be parsed by a StringRepresentation.
+ * An ParseException indicating that the while parsing succeeded, the wrong number
+ * of objects were found.
  */
-public class StringRepresentationParseException
+public class InvalidObjectNumberFoundParseException
     extends
         LocalizedParseException
 {
@@ -29,27 +28,38 @@ public class StringRepresentationParseException
      * Constructor.
      *
      * @param string the text that could not be parsed
-     * @param formatString the format String that defines the syntax of the String to be parsed
-     * @param cause the cause of this Exception
+     * @param rightNumber the number of objects expected
+     * @param found the found objects
      */
-    public StringRepresentationParseException(
+    public InvalidObjectNumberFoundParseException(
             String    string,
-            String    formatString,
-            Throwable cause )
+            int       rightNumber,
+            Object [] found )
     {
-        super( string, null, 0, cause );
+        super( string, null, 0, null );
 
-        theFormatString = formatString;
+        theRightNumber = rightNumber;
+        theFound       = found;
     }
 
     /**
-     * Obtain the format String.
+     * Obtain the right number of objects that should have been found.
      *
-     * @return the format String
+     * @return the right number of objects
      */
-    public String getFormatString()
+    public int getRightNumber()
     {
-        return theFormatString;
+        return theRightNumber;
+    }
+
+    /**
+     * Obtain the found objects.
+     *
+     * @return the found objects
+     */
+    public Object [] getFound()
+    {
+        return theFound;
     }
 
     /**
@@ -60,11 +70,16 @@ public class StringRepresentationParseException
     @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theString, theFormatString };
+        return new Object[] { theString, theRightNumber, theFound.length, theFound };
     }
 
     /**
-     * The format String for the String.
+     * The right number of objects that should have been found.
      */
-    protected String theFormatString;
+    protected int theRightNumber;
+
+    /**
+     * The found objects.
+     */
+    protected Object [] theFound;
 }

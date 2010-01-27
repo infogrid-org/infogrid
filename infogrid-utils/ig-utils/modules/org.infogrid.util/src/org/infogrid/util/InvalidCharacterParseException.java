@@ -12,14 +12,13 @@
 // All rights reserved.
 //
 
-package org.infogrid.util.text;
-
-import org.infogrid.util.LocalizedParseException;
+package org.infogrid.util;
 
 /**
- * Thrown if a String could not be parsed by a StringRepresentation.
+ * An ParseException indicating that the String contained one or more
+ * invalid characters or character strings.
  */
-public class StringRepresentationParseException
+public class InvalidCharacterParseException
     extends
         LocalizedParseException
 {
@@ -29,27 +28,29 @@ public class StringRepresentationParseException
      * Constructor.
      *
      * @param string the text that could not be parsed
-     * @param formatString the format String that defines the syntax of the String to be parsed
-     * @param cause the cause of this Exception
+     * @param message error message
+     * @param errorOffset the position where the error is found while parsing.
+     * @param invalid the invalid character or string
      */
-    public StringRepresentationParseException(
-            String    string,
-            String    formatString,
-            Throwable cause )
+    public InvalidCharacterParseException(
+            String string,
+            String message,
+            int    errorOffset,
+            String invalid )
     {
-        super( string, null, 0, cause );
+        super( string, message, errorOffset, null );
 
-        theFormatString = formatString;
+        theInvalid = invalid;
     }
 
     /**
-     * Obtain the format String.
+     * Obtain the invalid sub-String.
      *
-     * @return the format String
+     * @return the invalid sub-String
      */
-    public String getFormatString()
+    public String getInvalid()
     {
-        return theFormatString;
+        return theInvalid;
     }
 
     /**
@@ -60,11 +61,11 @@ public class StringRepresentationParseException
     @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theString, theFormatString };
+        return new Object[] { theString, getErrorOffset(), theInvalid };
     }
 
     /**
-     * The format String for the String.
+     * The invalid sub-String.
      */
-    protected String theFormatString;
+    protected String theInvalid;
 }

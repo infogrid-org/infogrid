@@ -12,14 +12,12 @@
 // All rights reserved.
 //
 
-package org.infogrid.util.text;
-
-import org.infogrid.util.LocalizedParseException;
+package org.infogrid.util;
 
 /**
- * Thrown if a String could not be parsed by a StringRepresentation.
+ * A ParseException indicating that the String was too short.
  */
-public class StringRepresentationParseException
+public class StringTooShortParseException
     extends
         LocalizedParseException
 {
@@ -29,27 +27,27 @@ public class StringRepresentationParseException
      * Constructor.
      *
      * @param string the text that could not be parsed
-     * @param formatString the format String that defines the syntax of the String to be parsed
-     * @param cause the cause of this Exception
+     * @param message error message
+     * @param minLength the minimally required length
      */
-    public StringRepresentationParseException(
-            String    string,
-            String    formatString,
-            Throwable cause )
+    public StringTooShortParseException(
+            String string,
+            String message,
+            int    minLength )
     {
-        super( string, null, 0, cause );
+        super( string, message, 0, null );
 
-        theFormatString = formatString;
+        theMinLength = minLength;
     }
 
     /**
-     * Obtain the format String.
+     * Obtain the minimally required length.
      *
-     * @return the format String
+     * @return the minimally required length
      */
-    public String getFormatString()
+    public int getRequiredMinLength()
     {
-        return theFormatString;
+        return theMinLength;
     }
 
     /**
@@ -57,14 +55,13 @@ public class StringRepresentationParseException
      *
      * @return the resource parameters
      */
-    @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theString, theFormatString };
+        return new Object[] { theString, theMinLength };
     }
 
     /**
-     * The format String for the String.
+     * The minimally required length.
      */
-    protected String theFormatString;
+    protected int theMinLength;
 }
