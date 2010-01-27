@@ -8,13 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.store;
 
-import org.infogrid.util.text.StringRepresentationParseException;
+import java.text.ParseException;
 
 /**
  * Classes implementing this interface know how to map key-value pairs, of a
@@ -39,12 +39,12 @@ public interface StoreEntryMapper<K,V>
      *
      * @param stringKey key the key in String form
      * @return the corresponding key
-     * @throws StringRepresentationParseException thrown if a stringKey could not be converted into a valid Identifier
+     * @throws ParseException thrown if a parsing error occurred
      */
     public abstract K stringToKey(
             String stringKey )
         throws
-            StringRepresentationParseException;
+            ParseException;
 
     /**
      * Map a StoreValue to a value.

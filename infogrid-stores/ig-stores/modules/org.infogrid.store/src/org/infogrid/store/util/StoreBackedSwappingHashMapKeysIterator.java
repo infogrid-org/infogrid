@@ -8,12 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.store.util;
 
+import java.text.ParseException;
 import java.util.NoSuchElementException;
 import org.infogrid.store.IterableStoreCursor;
 import org.infogrid.store.StoreEntryMapper;
@@ -23,7 +24,6 @@ import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * Iterator over all keys in an InterableStoreBackedMap.
@@ -83,7 +83,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
 
             return ret;
 
-        } catch( StringRepresentationParseException ex ) {
+        } catch( ParseException ex ) {
             log.error( ex );
             return null;
         }
@@ -104,7 +104,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
 
             return ret;
 
-        } catch( StringRepresentationParseException ex ) {
+        } catch( ParseException ex ) {
             log.error( ex );
             return null;
         }
@@ -182,7 +182,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
 
             return ret;
 
-        } catch( StringRepresentationParseException ex ) {
+        } catch( ParseException ex ) {
             log.error( ex );
             return null;
         }
@@ -206,7 +206,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
             try {
                 ret[i] = theMapper.stringToKey( values[i].getKey() );
 
-            } catch( StringRepresentationParseException ex ) {
+            } catch( ParseException ex ) {
                 log.error( ex );
                 return null;
             }
@@ -229,7 +229,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
 
             return ret;
 
-        } catch( StringRepresentationParseException ex ) {
+        } catch( ParseException ex ) {
             log.error( ex );
             return null;
         }
@@ -258,7 +258,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
             try {
                 ret[i] = theMapper.stringToKey( values[i].getKey() );
 
-            } catch( StringRepresentationParseException ex ) {
+            } catch( ParseException ex ) {
                 log.error( ex );
                 return null;
             }
