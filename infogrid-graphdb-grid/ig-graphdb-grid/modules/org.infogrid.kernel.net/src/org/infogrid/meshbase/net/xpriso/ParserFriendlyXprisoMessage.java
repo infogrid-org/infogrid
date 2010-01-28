@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -44,7 +44,8 @@ public class ParserFriendlyXprisoMessage
         implements
             CanBeDumped
 {
-    private static final Log log = Log.getLogInstance( ParserFriendlyXprisoMessage.class ); // our own, private logger
+    private static final long serialVersionUID = 1L; // helps with serialization
+    private static final Log  log              = Log.getLogInstance( ParserFriendlyXprisoMessage.class ); // our own, private logger
 
     /**
      * Factory method.
@@ -146,6 +147,20 @@ public class ParserFriendlyXprisoMessage
     }
 
     /**
+     * Add several externalized representations of NetMeshObjects that are conveyed
+     * by the sender to the receiver, e.g. in response to a first-time lease request.
+     *
+     * @param toAdd the ExternalizedNetMeshObjects
+     */
+    public void addConveyedMeshObjects(
+            ExternalizedNetMeshObject [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theConveyedMeshObjects.add( toAdd[i] );
+        }
+    }
+
+    /**
      * Obtain the externalized representation of the NetMeshObjects that are conveyed
      * by the sender to the receiver, e.g. in response to a first-time lease request.
      *
@@ -156,7 +171,7 @@ public class ParserFriendlyXprisoMessage
         ExternalizedNetMeshObject [] ret = ArrayHelper.copyIntoNewArray( theConveyedMeshObjects, ExternalizedNetMeshObject.class );
         return ret;
     }
-    
+
     /**
      * Add a NetMeshObjectAccessSpecification to a NetMeshObject for which the sender requests
      * a lease for the first time.
@@ -168,7 +183,21 @@ public class ParserFriendlyXprisoMessage
     {
         theRequestedFirstTimeObjects.add( toAdd );
     }
-    
+
+    /**
+     * Add several NetMeshObjectAccessSpecifications to NetMeshObjects for which the sender requests
+     * a lease for the first time.
+     *
+     * @param toAdd the NetMeshObjectAccessSpecifications to the NetMeshObjects
+     */
+    public void addRequestedFirstTimeObjects(
+            NetMeshObjectAccessSpecification [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theRequestedFirstTimeObjects.add( toAdd[i] );
+        }
+    }
+
     /**
      * Obtain the NetMeshObjectAccessSpecifications to the NetMeshObjects for which the sender requests
      * a lease for the first time.
@@ -194,6 +223,20 @@ public class ParserFriendlyXprisoMessage
     }
     
     /**
+     * Add several identifiers for NetMeshObjects for which the sender requests
+     * that a currently valid lease be chanceled.
+     *
+     * @param toAdd the NetMeshObjectIdentifiers for the NetMeshObjectss
+     */
+    public void addRequestedCanceledObjects(
+            NetMeshObjectIdentifier [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theRequestedCanceledObjects.add( toAdd[i] );
+        }
+    }
+
+    /**
      * Obtain the identifiers for the NetMeshObjects for which the sender requests
      * that a currently valid lease be canceled.
      *
@@ -206,15 +249,29 @@ public class ParserFriendlyXprisoMessage
     }
 
     /**
-     * Add an identifier for the NetMeshObjects for which the sender requests
+     * Add an identifier for a NetMeshObject for which the sender requests
      * a freshening.
      *
-     * @param toAdd the NetMeshObjectIdentifier for the NetMeshObjects
+     * @param toAdd the NetMeshObjectIdentifier for the NetMeshObject
      */
     public void addRequestedFreshenReplica(
             NetMeshObjectIdentifier toAdd )
     {
         theRequestedFreshenReplicas.add( toAdd );
+    }
+
+    /**
+     * Add several identifiers for the NetMeshObjects for which the sender requests
+     * a freshening.
+     *
+     * @param toAdd the NetMeshObjectIdentifiers for the NetMeshObjects
+     */
+    public void addRequestedFreshenReplicas(
+            NetMeshObjectIdentifier [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theRequestedFreshenReplicas.add( toAdd[i] );
+        }
     }
 
     /**
@@ -242,6 +299,20 @@ public class ParserFriendlyXprisoMessage
     }
 
     /**
+     * Add several identifiers for NetMeshObjects for which the sender has replicas
+     * that it wishes to resynchronize.
+     *
+     * @param toAdd the NetMeshObjectIdentifiers for the NetMeshObjects
+     */
+    public void addRequestedResynchronizeReplicas(
+            NetMeshObjectIdentifier [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theRequestedResynchronizeReplicas.add( toAdd[i] );
+        }
+    }
+
+    /**
      * Obtain the identifiers for the NetMeshObjects for which the sender has a replica
      * that it wishes to resynchronize.
      *
@@ -263,6 +334,20 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectIdentifier toAdd )
     {
         theRequestedLockObjects.add( toAdd );
+    }
+
+    /**
+     * Add several identifiers for NetMeshObjects for which the sender requests
+     * the lock from the receiver (i.e. update rights).
+     *
+     * @param toAdd the NetMeshObjectIdentifiers for the NetMeshObjects
+     */
+    public void addRequestedLockObjects(
+            NetMeshObjectIdentifier [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theRequestedLockObjects.add( toAdd[i] );
+        }
     }
 
     /**
@@ -290,6 +375,20 @@ public class ParserFriendlyXprisoMessage
     }
 
     /**
+     * Add several identifiers for NetMeshObjects for which the sender surrenders
+     * the lock to the receiver (i.e. update rights).
+     *
+     * @param toAdd the NetMeshObjectIdentifiers for the NetMeshObjects
+     */
+    public void addPushLockObjects(
+            NetMeshObjectIdentifier [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            thePushLockObjects.add( toAdd[i] );
+        }
+    }
+
+    /**
      * Obtain the identifiers for the NetMeshObjects for which the sender surrenders
      * the lock to the receiver (i.e. update rights).
      *
@@ -311,6 +410,20 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectIdentifier toAdd )
     {
         theReclaimedLockObjects.add( toAdd );
+    }
+
+    /**
+     * Add several identifiers for the NetMeshObjects for which the sender has forcefully
+     * reclaimed the lock.
+     *
+     * @param toAdd the NetMeshObjectIdentifiers for the NetMeshObjects
+     */
+    public void addReclaimedLockObjects(
+            NetMeshObjectIdentifier [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theReclaimedLockObjects.add( toAdd[i] );
+        }
     }
 
     /**
@@ -338,6 +451,20 @@ public class ParserFriendlyXprisoMessage
     }
 
     /**
+     * Add several identifiers for the NetMeshObjects for which the sender requests
+     * home replica status.
+     *
+     * @param toAdd the NetMeshObjectIdentifiers for the NetMeshObjects
+     */
+    public void addRequestedHomeReplicas(
+            NetMeshObjectIdentifier [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theRequestedHomeReplicas.add( toAdd[i] );
+        }
+    }
+
+    /**
      * Obtain the identifiers for the NetMeshObjects for which the sender requests
      * home replica status.
      * 
@@ -359,6 +486,20 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectIdentifier toAdd )
     {
         thePushHomeReplicas.add( toAdd );
+    }
+
+    /**
+     * Add several identifiers for the NetMeshObjects for which the sender surrenders
+     * the home replica status to the receiver.
+     *
+     * @param toAdd the NetMeshObjectIdentifier for the NetMeshObject
+     */
+    public void addPushHomeReplicas(
+            NetMeshObjectIdentifier [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            thePushHomeReplicas.add( toAdd[i] );
+        }
     }
 
     /**
@@ -386,6 +527,20 @@ public class ParserFriendlyXprisoMessage
     }
 
     /**
+     * Add several type added events that the sender needs to convey to the
+     * receiver.
+     *
+     * @param toAdd the type addition events
+     */
+    public void addTypeAdditions(
+            NetMeshObjectTypeAddedEvent [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theTypeAdditions.add( toAdd[i] );
+        }
+    }
+
+    /**
      * Obtain the type addition events that the sender needs to convey to the
      * receiver.
      *
@@ -407,6 +562,20 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectTypeRemovedEvent toAdd )
     {
         theTypeRemovals.add( toAdd );
+    }
+
+    /**
+     * Add several type removed events that the sender needs to convey to the
+     * receiver.
+     *
+     * @param toAdd the type removed event
+     */
+    public void addTypeRemovals(
+            NetMeshObjectTypeRemovedEvent [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theTypeRemovals.add( toAdd[i] );
+        }
     }
 
     /**
@@ -434,6 +603,20 @@ public class ParserFriendlyXprisoMessage
     }
 
     /**
+     * Add several property change events that the sender needs to convey to the
+     * received.
+     *
+     * @param toAdd the property change events
+     */
+    public void addPropertyChanges(
+            NetMeshObjectPropertyChangeEvent [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            thePropertyChanges.add( toAdd[i] );
+        }
+    }
+
+    /**
      * Obtain the property change events that the sender needs to convey to the
      * receiver.
      *
@@ -455,6 +638,20 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectNeighborAddedEvent toAdd )
     {
         theNeighborAdditions.add( toAdd );
+    }
+
+    /**
+     * Add several neighbor addition events that the sender needs to convey to the
+     * receiver.
+     *
+     * @param toAdd the neighbor addition events
+     */
+    public void addNeighborAdditions(
+            NetMeshObjectNeighborAddedEvent [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theNeighborAdditions.add( toAdd[i] );
+        }
     }
 
     /**
@@ -482,6 +679,20 @@ public class ParserFriendlyXprisoMessage
     }
 
     /**
+     * Add several neighbor removal events that the sender needs to convey to the
+     * receiver.
+     *
+     * @param toAdd the neighbor removal events
+     */
+    public void addNeighborRemovals(
+            NetMeshObjectNeighborRemovedEvent [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theNeighborRemovals.add( toAdd[i] );
+        }
+    }
+
+    /**
      * Obtain the neighbor removal events that the sender needs to convey to the
      * receiver.
      *
@@ -503,6 +714,20 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectEquivalentsAddedEvent toAdd )
     {
         theEquivalentsAdditions.add( toAdd );
+    }
+
+    /**
+     * Add several equivalent addition events that the sender needs to convey to the
+     * receiver.
+     *
+     * @param toAdd the equivalent addition event
+     */
+    public void addEquivalentAdditions(
+            NetMeshObjectEquivalentsAddedEvent [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theEquivalentsAdditions.add( toAdd[i] );
+        }
     }
 
     /**
@@ -530,6 +755,20 @@ public class ParserFriendlyXprisoMessage
     }
 
     /**
+     * Add several equivalent removal events that the sender needs to convey to the
+     * receiver.
+     *
+     * @param toAdd the equivalent removal event
+     */
+    public void addEquivalentRemovals(
+            NetMeshObjectEquivalentsRemovedEvent [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theEquivalentsRemovals.add( toAdd[i] );
+        }
+    }
+
+    /**
      * Obtain the equivalent removal events that the sender needs to convey to the
      * receiver.
      *
@@ -551,6 +790,20 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectRoleAddedEvent toAdd )
     {
         theRoleAdditions.add( toAdd );
+    }
+
+    /**
+     * Add several role addition events that the sender needs to convey to the
+     * receiver.
+     *
+     * @param toAdd the role addition events
+     */
+    public void addRoleAdditions(
+            NetMeshObjectRoleAddedEvent [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theRoleAdditions.add( toAdd[i] );
+        }
     }
 
     /**
@@ -579,6 +832,20 @@ public class ParserFriendlyXprisoMessage
     }
 
     /**
+     * Add several role removal event that the sender needs to convey to the
+     * receiver.
+     *
+     * @param toAdd the role removal events
+     */
+    public void addRoleRemovals(
+            NetMeshObjectRoleRemovedEvent [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theRoleRemovals.add( toAdd[i] );
+        }
+    }
+
+    /**
      * Obtain the role removal events that the sender needs to convey to the
      * receiver.
      *
@@ -600,6 +867,20 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectDeletedEvent toAdd )
     {
         theDeleteChanges.add( toAdd );
+    }
+
+    /**
+     * Add several deletion events for NetMeshObjects that the sender has deleted
+     * semantically and that the sender needs to convey to the receiver.
+     *
+     * @param toAdd the deletion events
+     */
+    public void addDeleteChanges(
+            NetMeshObjectDeletedEvent [] toAdd )
+    {
+        for( int i=0 ; i<toAdd.length ; ++i ) {
+            theDeleteChanges.add( toAdd[i] );
+        }
     }
 
     /**
