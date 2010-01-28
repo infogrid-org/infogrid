@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -22,6 +22,7 @@ import java.io.OutputStreamWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.infogrid.lid.LidNonceManager;
+import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.ResourceHelper;
@@ -64,14 +65,27 @@ public class CommandLineWrapperLidGpg
         super( nonceManager );
 
         // make sure the home directory exists
+        theGpgHomeDir = null;
+        if( theGpgHomeDirChoices != null ) {
+            for( String choice : theGpgHomeDirChoices ) {
+                File homeDir = new File( choice );
+                if( !homeDir.exists() ) {
+                    homeDir.mkdirs();
+                }
+                if( homeDir.isDirectory() ) {
+                    theGpgHomeDir = homeDir;
+                    break;
+                }
+            }
+            if( theGpgHomeDir == null ) {
+                // if something is specified but cannot be created, throw
+                throw new IOException( "Cannot create GPG working directory, tried: " + ArrayHelper.join( theGpgHomeDirChoices ));
+            }
+        }
         if( theGpgHomeDir != null ) {
-            File homeDir = new File( theGpgHomeDir );
-            if( !homeDir.exists() ) {
-                homeDir.mkdirs();
-            }
-            if( !homeDir.isDirectory() ) {
-                throw new IOException( "Cannot create GPG working directory: " + homeDir.getAbsolutePath() );
-            }
+            theFullExecutable = theExecutable + " --homedir " + theGpgHomeDir.getAbsolutePath();
+        } else {
+            theFullExecutable = theExecutable; // use default homedir
         }
     }
 
@@ -296,9 +310,7 @@ public class CommandLineWrapperLidGpg
     protected void cleanupHomedir()
     {
         if( theGpgHomeDir != null ) {
-            File homeDir = new File( theGpgHomeDir );
-
-            File contained [] = homeDir.listFiles();
+            File contained [] = theGpgHomeDir.listFiles();
             if( contained != null ) {
                 // If this is null, something else might be wrong (e.g. homeDir does not exist),
                 // but the cleanup method is not the place where to test that
@@ -463,14 +475,21 @@ public class CommandLineWrapperLidGpg
     protected static final String theExecutable = theResourceHelper.getResourceStringOrDefault( "GpgPath", "/usr/bin/gpg" );
 
     /**
-     * The Gpg home directory.
+     * The Gpg home directory choices
      */
-    protected static final String theGpgHomeDir = theResourceHelper.getResourceStringOrNull( "GpgHomedir" );
+    protected static final String [] theGpgHomeDirChoices = theResourceHelper.getResourceStringArrayOrDefault(
+            "GpgHomedir",
+            new String[] { "/tmp/org.infogrid.lid.gpg.CommandLineWrapperLidGpg" } ); // applications should set this to something else
+
+    /**
+     * The actual Gpg home directory.
+     */
+    protected File theGpgHomeDir;
 
     /**
      * The full-qualified executable.
      */
-    protected static final String theFullExecutable = theGpgHomeDir != null ? ( theExecutable + " --homedir " + theGpgHomeDir ) : theExecutable;
+    protected String theFullExecutable;
 
     /**
      * The pattern in the gpg output that contains our LID.
