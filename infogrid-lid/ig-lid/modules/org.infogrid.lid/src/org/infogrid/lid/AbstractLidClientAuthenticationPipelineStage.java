@@ -14,6 +14,7 @@
 
 package org.infogrid.lid;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidCredentialTypesFactory;
@@ -26,7 +27,6 @@ import org.infogrid.util.context.AbstractObjectInContext;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * Collects functionality common to LidClientAuthenticationPipelineStage
@@ -274,13 +274,13 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
      * @param contextUri the absolute URI of the application's context
      * @param candidate what the user typed
      * @return the corrected clientIdentifier
-     * @throws StringRepresentationParseException thrown if the identifier was malformed
+     * @throws ParseException thrown if the identifier was malformed
      */
     protected abstract Identifier correctIdentifier(
             String contextUri,
             String candidate )
         throws
-            StringRepresentationParseException;
+            ParseException;
 
     /**
      * Determine the available authentication services for this client.
