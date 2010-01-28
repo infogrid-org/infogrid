@@ -20,6 +20,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import org.infogrid.lid.credential.AbstractLidPasswordCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
+import org.infogrid.lid.credential.LidWrongPasswordException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
@@ -99,7 +100,7 @@ public class LdapLidPasswordCredentialType
             if( log.isDebugEnabled() ) {
                 log.debug( ex );
             }
-            throw new LidInvalidCredentialException( subject.getIdentifier(), this, ex );
+            throw new LidWrongPasswordException( subject.getIdentifier(), this, ex );
         }
     }
 

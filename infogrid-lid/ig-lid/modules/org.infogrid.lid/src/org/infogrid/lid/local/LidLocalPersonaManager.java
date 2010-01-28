@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -45,40 +45,6 @@ public interface LidLocalPersonaManager
         throws
             LidLocalPersonaExistsAlreadyException,
             UnsupportedOperationException;
-
-//    /**
-//     * Determine whether a a credential is valid for a given identifier.
-//     *
-//     * @param identifier the identifier for which the credential will be checked
-//     * @param type the type of credential to be checked
-//     * @param credential the credential to be checked
-//     * @throws LidLocalPersonaUnknownException thrown if no LidLocalPersona exists with this identifier
-//     * @throws LidInvalidCredentialException thrown if the credential was invalid
-//     */
-//    public abstract void checkCredential(
-//            String            identifier,
-//            LidCredentialType type,
-//            String            credential )
-//        throws
-//            LidLocalPersonaUnknownException,
-//            LidInvalidCredentialException;
-//
-//    /**
-//     * Change the credential associated with a given identifier.
-//     *
-//     * @param identifier the identifier for which the credential will be changed
-//     * @param type the type of credential to be changed
-//     * @param credential the new credential
-//     * @throws UnsupportedOperationException thrown if this LidLocalPersonaManager does not permit the changing of passwords
-//     * @throws LidLocalPersonaUnknownException thrown if no LidLocalPersona exists with this identifier
-//     */
-//    public void changeCredential(
-//            String            identifier,
-//            LidCredentialType type,
-//            String            credential )
-//        throws
-//            UnsupportedOperationException,
-//            LidLocalPersonaUnknownException;
 
     /**
      * Obtain a LidLocalPersona, given its identifier.

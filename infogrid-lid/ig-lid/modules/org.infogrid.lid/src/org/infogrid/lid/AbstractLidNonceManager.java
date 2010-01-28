@@ -19,6 +19,8 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.lid.credential.LidCredentialType;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.http.SaneRequest;
 
@@ -67,17 +69,21 @@ public abstract class AbstractLidNonceManager
     }
 
     /**
-     * Validate a LID nonce contained in a request.
+     * Validate a LID nonce contained in a request with the given URL parameter.
      *
      * @param request the request
-     * @throws LidInvalidNonceException thrown if the nonce was invalid
+     * @param identifier identifier of the client on whose behalf the nonce is checked
+     * @param type the LidCredentialType that used this nonce
+     * @throws LidInvalidNonceException thrown if the nonce was unacceptable
      */
     public void validateNonce(
-            SaneRequest request )
+            SaneRequest       request,
+            Identifier        identifier,
+            LidCredentialType type )
         throws
             LidInvalidNonceException
     {
-        validateNonce( request, LID_NONCE_PARAMETER_NAME );
+        validateNonce( request, identifier, type, LID_NONCE_PARAMETER_NAME );
     }
 
     /**

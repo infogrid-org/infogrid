@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -17,6 +17,7 @@ package org.infogrid.lid.local.regex;
 import java.util.regex.Pattern;
 import org.infogrid.lid.credential.AbstractLidPasswordCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
+import org.infogrid.lid.credential.LidWrongPasswordException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
 
@@ -83,7 +84,7 @@ public class RegexLidPasswordCredentialType
         if( thePasswordRegex.matcher( givenPassword ).matches()) {
             return;
         }
-        throw new LidInvalidCredentialException( subject.getIdentifier(), this );
+        throw new LidWrongPasswordException( subject.getIdentifier(), this );
     }
 
     /**

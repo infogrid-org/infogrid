@@ -17,6 +17,7 @@ package org.infogrid.lid.local;
 import org.infogrid.lid.credential.AbstractLidCredentialType;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
+import org.infogrid.lid.credential.TranslatingLidInvalidCredentialException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.InvalidIdentifierException;
 import org.infogrid.util.http.SaneRequest;
@@ -82,19 +83,22 @@ public class TranslatingLidCredentialType
         throws
             LidInvalidCredentialException
     {
+        HasIdentifier delegateSubject;
         try {
-            HasIdentifier delegateSubject = theBridge.translatePersonaForward( (LidLocalPersona) subject );
-        
+            delegateSubject = theBridge.translatePersonaForward( (LidLocalPersona) subject );
+        } catch( LidLocalPersonaUnknownException ex ) {
+            throw new TranslatingLidInvalidCredentialException( null, subject.getIdentifier(), this, ex );
+
+        } catch( InvalidIdentifierException ex ) {
+            throw new TranslatingLidInvalidCredentialException( null, subject.getIdentifier(), this, ex );
+        }
+
+        try {
             theDelegate.checkCredential( request, delegateSubject );
 
         } catch( LidInvalidCredentialException ex ) {
-            throw new LidInvalidCredentialException( subject.getIdentifier(), this, ex );
+            throw new TranslatingLidInvalidCredentialException( delegateSubject.getIdentifier(), subject.getIdentifier(), this, ex );
 
-        } catch( LidLocalPersonaUnknownException ex ) {
-            throw new LidInvalidCredentialException( subject.getIdentifier(), this, ex );
-
-        } catch( InvalidIdentifierException ex ) {
-            throw new LidInvalidCredentialException( subject.getIdentifier(), this, ex );
         }
     }
 

@@ -14,6 +14,8 @@
 
 package org.infogrid.lid;
 
+import org.infogrid.lid.credential.LidCredentialType;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.http.SaneRequest;
 
 /**
@@ -29,13 +31,17 @@ public interface LidNonceManager
     public String generateNewNonce();
 
     /**
-     * Validate a LID nonce contained in a request.
-     * 
+     * Validate a LID nonce contained in a request with the given URL parameter.
+     *
      * @param request the request
-     * @throws LidInvalidNonceException thrown if the nonce was invalid
+     * @param identifier identifier of the client on whose behalf the nonce is checked
+     * @param type the LidCredentialType that used this nonce
+     * @throws LidInvalidNonceException thrown if the nonce was unacceptable
      */
     public void validateNonce(
-            SaneRequest request )
+            SaneRequest       request,
+            Identifier        identifier,
+            LidCredentialType type )
         throws
             LidInvalidNonceException;
 
@@ -43,12 +49,16 @@ public interface LidNonceManager
      * Validate a LID nonce contained in a request with the given URL parameter.
      *
      * @param request the request
+     * @param identifier identifier of the client on whose behalf the nonce is checked
+     * @param type the LidCredentialType that used this nonce
      * @param name the name of the URL parameter
-     * @throws LidInvalidNonceException thrown if the nonce was invalid
+     * @throws LidInvalidNonceException thrown if the nonce was unacceptable
      */
     public void validateNonce(
-            SaneRequest request,
-            String      name )
+            SaneRequest       request,
+            Identifier        identifier,
+            LidCredentialType type,
+            String            name )
         throws
             LidInvalidNonceException;
 

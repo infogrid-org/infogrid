@@ -22,7 +22,7 @@ import org.infogrid.util.logging.Dumper;
 /**
  * Thrown if a credential was provided that was invalid.
  */
-public class LidInvalidCredentialException
+public abstract class LidInvalidCredentialException
         extends
             AbstractLocalizedException
         implements
@@ -36,7 +36,7 @@ public class LidInvalidCredentialException
      * @param identifier the identifier for which an invalid credential was provided
      * @param type the type of credential that was invalid
      */
-    public LidInvalidCredentialException(
+    protected LidInvalidCredentialException(
             Identifier        identifier,
             LidCredentialType type )
     {
@@ -52,7 +52,7 @@ public class LidInvalidCredentialException
      * @param type the type of credential that was invalid
      * @param cause the underlying cause, if any
      */
-    public LidInvalidCredentialException(
+    protected LidInvalidCredentialException(
             Identifier        identifier,
             LidCredentialType type,
             Throwable         cause )

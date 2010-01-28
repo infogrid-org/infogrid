@@ -8,13 +8,15 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid;
 
-import org.infogrid.util.AbstractLocalizedException;
+import org.infogrid.lid.credential.LidCredentialType;
+import org.infogrid.lid.credential.LidInvalidCredentialException;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.ResourceHelper;
 
 /**
@@ -22,18 +24,24 @@ import org.infogrid.util.ResourceHelper;
  */
 public abstract class LidInvalidNonceException
         extends
-            AbstractLocalizedException
+            LidInvalidCredentialException
 {
     private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Constructor.
      *
+     * @param identifier the identifier for which an invalid credential was provided
+     * @param type the type of credential that was invalid
      * @param invalidNonce the invalid nonce
      */
-    public LidInvalidNonceException(
-            String invalidNonce )
+    protected LidInvalidNonceException(
+            Identifier        identifier,
+            LidCredentialType type,
+            String            invalidNonce )
     {
+        super( identifier, type );
+
         theInvalidNonce = invalidNonce;
     }
 
@@ -86,9 +94,10 @@ public abstract class LidInvalidNonceException
      *
      * @return the resource parameters
      */
+    @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theInvalidNonce };
+        return new Object[] { theIdentifier, theType, theInvalidNonce };
     }
 
     /**
@@ -107,10 +116,15 @@ public abstract class LidInvalidNonceException
 
         /**
          * Constructor.
+         *
+         * @param identifier the identifier for which an invalid credential was provided
+         * @param type the type of credential that was invalid
          */
-        public Empty()
+        public Empty(
+                Identifier        identifier,
+                LidCredentialType type )
         {
-            super( null );
+            super( identifier, type, null );
         }
     }
 
@@ -126,12 +140,16 @@ public abstract class LidInvalidNonceException
         /**
          * Constructor.
          *
+         * @param identifier the identifier for which an invalid credential was provided
+         * @param type the type of credential that was invalid
          * @param invalidNonce the invalid nonce
          */
         public InvalidTimeRange(
-                String invalidNonce )
+                Identifier        identifier,
+                LidCredentialType type,
+                String            invalidNonce )
         {
-            super( invalidNonce );
+            super( identifier, type, invalidNonce );
         }
     }
 
@@ -147,12 +165,16 @@ public abstract class LidInvalidNonceException
         /**
          * Constructor.
          *
+         * @param identifier the identifier for which an invalid credential was provided
+         * @param type the type of credential that was invalid
          * @param invalidNonce the invalid nonce
          */
         public NotKnown(
-                String invalidNonce )
+                Identifier        identifier,
+                LidCredentialType type,
+                String            invalidNonce )
         {
-            super( invalidNonce );
+            super( identifier, type, invalidNonce );
         }
     }
 
@@ -168,12 +190,16 @@ public abstract class LidInvalidNonceException
         /**
          * Constructor.
          *
+         * @param identifier the identifier for which an invalid credential was provided
+         * @param type the type of credential that was invalid
          * @param invalidNonce the invalid nonce
          */
         public UsedAlready(
-                String invalidNonce )
+                Identifier        identifier,
+                LidCredentialType type,
+                String            invalidNonce )
         {
-            super( invalidNonce );
+            super( identifier, type, invalidNonce );
         }
     }
 }

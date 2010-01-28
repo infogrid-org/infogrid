@@ -15,7 +15,6 @@
 package org.infogrid.lid.gpg;
 
 import java.io.IOException;
-import org.infogrid.lid.LidInvalidNonceException;
 import org.infogrid.lid.LidNonceManager;
 import org.infogrid.lid.credential.AbstractLidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
@@ -114,16 +113,11 @@ public class LidGpgClearSignCredentialType
             throw new LidGpgNoPublicKeyException( subject.getIdentifier(), this );
         }
 
-        try {
-            theNonceManager.validateNonce( originalRequest );
-
-        } catch( LidInvalidNonceException ex ) {
-            throw new LidInvalidCredentialException( subject.getIdentifier(), this, ex );
-        }
+        theNonceManager.validateNonce( originalRequest, subject.getIdentifier(), this ); // throws LidInvalidNonceException
 
         String credential = originalRequest.getUrlArgument( LID_CREDENTIAL_PARAMETER_NAME );
         if( credential == null || credential.length() == 0 ) {
-            throw new LidInvalidCredentialException( subject.getIdentifier(), this );
+            throw new LidGpgWrongSignatureException( subject.getIdentifier(), this );
         }
 
         String  fullUri    = originalRequest.getAbsoluteFullUri();
@@ -134,11 +128,11 @@ public class LidGpgClearSignCredentialType
 
             boolean ret = theGpg.validateSignedText( personaIdentifier, signedText, thePublicKey );
             if( !ret ) {
-                throw new LidInvalidCredentialException( subject.getIdentifier(), this );
+                throw new LidGpgWrongSignatureException( subject.getIdentifier(), this );
             }
         } catch( IOException ex ) {
             log.error( ex );
-            throw new LidInvalidCredentialException( subject.getIdentifier(), this, ex );
+            throw new LidGpgWrongSignatureException( subject.getIdentifier(), this, ex );
         }
     }
 

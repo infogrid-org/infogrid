@@ -16,7 +16,6 @@ package org.infogrid.lid.openid.auth;
 
 import java.util.HashSet;
 import java.util.StringTokenizer;
-import org.infogrid.lid.LidInvalidNonceException;
 import org.infogrid.lid.LidNonceManager;
 import org.infogrid.lid.credential.AbstractLidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
@@ -102,14 +101,10 @@ public abstract class AbstractOpenIdCredentialType
             throw new OpenIdAssociationExpiredException( subject.getIdentifier(), this );
         }
 
-        try {
-            if( nonceParameterName != null ) {
-                theNonceManager.validateNonce( request, nonceParameterName );
-            } else {
-                theNonceManager.validateNonce( request );
-            }
-        } catch( LidInvalidNonceException ex ) {
-            throw new LidInvalidCredentialException( subject.getIdentifier(), this, ex );
+        if( nonceParameterName != null ) {
+            theNonceManager.validateNonce( request, subject.getIdentifier(), this, nonceParameterName ); // throws LidInvalidNonceException
+        } else {
+            theNonceManager.validateNonce( request, subject.getIdentifier(), this ); // throws LidInvalidNonceException
         }
 
         @SuppressWarnings("unchecked")

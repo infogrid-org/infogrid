@@ -16,8 +16,10 @@ package org.infogrid.lid.store;
 
 import org.infogrid.lid.AbstractLidNonceManager;
 import org.infogrid.lid.LidInvalidNonceException;
+import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.store.Store;
 import org.infogrid.store.util.StoreBackedSwappingHashMap;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.http.SaneRequest;
 
 /**
@@ -78,27 +80,31 @@ public class StoreLidNonceManager
      * Validate a LID nonce contained in a request with the given URL parameter.
      *
      * @param request the request
+     * @param identifier identifier of the client on whose behalf the nonce is checked
+     * @param type the LidCredentialType that used this nonce
      * @param name the name of the URL parameter
      * @throws LidInvalidNonceException thrown if the nonce was unacceptable
      */
     public void validateNonce(
-            SaneRequest request,
-            String      name )
+            SaneRequest       request,
+            Identifier        identifier,
+            LidCredentialType type,
+            String            name )
         throws
             LidInvalidNonceException
     {
         String nonce = request.getUrlArgument( name );
 
         if( nonce == null || nonce.length() == 0 ) {
-            throw new LidInvalidNonceException.Empty();
+            throw new LidInvalidNonceException.Empty( identifier, type );
         }
         if( !validateNonceTimeRange( nonce )) {
-            throw new LidInvalidNonceException.InvalidTimeRange( nonce );
+            throw new LidInvalidNonceException.InvalidTimeRange( identifier, type, nonce );
         }
         
         String found = theStorage.put( nonce, nonce );
         if( found != null ) {
-            throw new LidInvalidNonceException.UsedAlready( nonce );
+            throw new LidInvalidNonceException.UsedAlready( identifier, type, nonce );
         }
     }
 
