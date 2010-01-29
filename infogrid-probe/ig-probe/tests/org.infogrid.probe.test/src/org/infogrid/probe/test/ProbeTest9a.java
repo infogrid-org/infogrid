@@ -105,7 +105,7 @@ public class ProbeTest9a
         checkNotObject( throwable1,   "unexpected exception 1" );
         checkNotObject( throwable2,   "unexpected exception 2" );
 
-        super.sleepFor( PINGPONG_ROUNDTRIP_DURATION );
+        sleepFor( PINGPONG_ROUNDTRIP_DURATION );
 
         log.info( "Advancing second thread" );
 
