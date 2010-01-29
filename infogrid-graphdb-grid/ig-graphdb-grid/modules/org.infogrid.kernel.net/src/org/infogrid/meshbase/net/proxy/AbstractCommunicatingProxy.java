@@ -495,10 +495,6 @@ public abstract class AbstractCommunicatingProxy
 
         XprisoMessage incoming = instructions.getIncomingXprisoMessage();
 
-//        if( incoming != null ) {
-//            theWaitEndpoint.messageReceived( instructions.getIncomingXprisoMessageEndpoint(), incoming );
-//        }
-
         NetMeshBaseLifecycleManager life = theMeshBase.getMeshBaseLifecycleManager();
 
         for( NetMeshObject current : instructions.getRegisterReplicationsIfNotAlready()) {
@@ -753,30 +749,30 @@ public abstract class AbstractCommunicatingProxy
             theEndpoint.startCommunicating(); // this is no-op on subsequent calls
         }
 
-        XprisoMessage outgoing              = instructions.getSendViaWaitEndpoint();
-        Long          outgoingTransactionId = instructions.getSendViaWaitEndpointQueryKey();
+        XprisoMessage outgoingViaWaitEndpoint = instructions.getSendViaWaitEndpoint();
+        Long          outgoingTransactionId   = instructions.getSendViaWaitEndpointQueryKey();
         
-        if( outgoing != null ) {
-            outgoing.check();
+        if( outgoingViaWaitEndpoint != null ) {
+            outgoingViaWaitEndpoint.check();
             try {
                 if( outgoingTransactionId != null ) {
                     if( queryIdOfOngoingQuery != null ) {
                         log.error( "Have both, what now: " + outgoingTransactionId + " vs " + queryIdOfOngoingQuery );
                     }
-                    theWaitEndpoint.call( outgoing, outgoingTransactionId, instructions.getWaitEndpointTimeout() );
+                    theWaitEndpoint.call( outgoingViaWaitEndpoint, outgoingTransactionId, instructions.getWaitEndpointTimeout() );
                 } else {
-                    theWaitEndpoint.call( outgoing, queryIdOfOngoingQuery, instructions.getWaitEndpointTimeout() );
+                    theWaitEndpoint.call( outgoingViaWaitEndpoint, queryIdOfOngoingQuery, instructions.getWaitEndpointTimeout() );
                 }
 
             } catch( Throwable t ) {
-                theProxyListeners.fireEvent( new SendViaWaitForReplicaResponseEndpointFailedEvent( this, outgoing, t ));
+                theProxyListeners.fireEvent( new SendViaWaitForReplicaResponseEndpointFailedEvent( this, outgoingViaWaitEndpoint, t ));
             }
         }
 
-        outgoing = instructions.getSendViaEndpoint();
-        if( outgoing != null ) {
-            outgoing.check();
-            theEndpoint.sendMessageAsap( outgoing );
+        XprisoMessage outgoingViaEndpoint = instructions.getSendViaEndpoint();
+        if( outgoingViaEndpoint != null ) {
+            outgoingViaEndpoint.check();
+            theEndpoint.sendMessageAsap( outgoingViaEndpoint );
         }
         if( incoming != null ) {
             theWaitEndpoint.messageReceived( instructions.getIncomingXprisoMessageEndpoint(), incoming );
