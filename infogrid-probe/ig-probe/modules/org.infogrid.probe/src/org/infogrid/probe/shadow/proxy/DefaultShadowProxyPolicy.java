@@ -22,6 +22,7 @@ import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.proxy.AbstractProxyPolicy;
+import org.infogrid.meshbase.net.proxy.CommunicatingProxy;
 import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.ProxyProcessingInstructions;
 import org.infogrid.meshbase.net.proxy.RippleInstructions;
@@ -80,7 +81,7 @@ public class DefaultShadowProxyPolicy
     public ProxyProcessingInstructions calculateForObtainReplicas(
             NetMeshObjectAccessSpecification [] paths,
             long                                duration,
-            Proxy                               proxy )
+            CommunicatingProxy                  proxy )
     {
         throw new UnsupportedOperationException( "A Shadow should not invoke this" );
     }
@@ -96,9 +97,9 @@ public class DefaultShadowProxyPolicy
      */
     @Override
     public ProxyProcessingInstructions calculateForTryToObtainLocks(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy )
+            NetMeshObject []   localReplicas,
+            long               duration,
+            CommunicatingProxy proxy )
     {
         throw new UnsupportedOperationException( "A Shadow should not invoke this" );
     }
@@ -116,10 +117,10 @@ public class DefaultShadowProxyPolicy
      */
     @Override
     public ProxyProcessingInstructions calculateForTryToPushLocks(
-            NetMeshObject [] localReplicas,
-            boolean []       isNewProxy,
-            long             duration,
-            Proxy            proxy )
+            NetMeshObject []   localReplicas,
+            boolean []         isNewProxy,
+            long               duration,
+            CommunicatingProxy proxy )
     {
         throw new UnsupportedOperationException( "A Shadow should not invoke this" );
     }
@@ -135,9 +136,9 @@ public class DefaultShadowProxyPolicy
      */
     @Override
     public ProxyProcessingInstructions calculateForTryToObtainHomeReplicas(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy )
+            NetMeshObject []   localReplicas,
+            long               duration,
+            CommunicatingProxy proxy )
     {
         throw new UnsupportedOperationException( "A Shadow should not invoke this" );
     }
@@ -155,10 +156,10 @@ public class DefaultShadowProxyPolicy
      */
     @Override
     public ProxyProcessingInstructions calculateForTryToPushHomeReplicas(
-            NetMeshObject [] localReplicas,
-            boolean []       isNewProxy,
-            long             duration,
-            Proxy            proxy )
+            NetMeshObject []   localReplicas,
+            boolean []         isNewProxy,
+            long               duration,
+            CommunicatingProxy proxy )
     {
         throw new UnsupportedOperationException( "A Shadow should not invoke this" );
     }
@@ -179,7 +180,7 @@ public class DefaultShadowProxyPolicy
             ReceivingMessageEndpoint<XprisoMessage> endpoint,
             XprisoMessage                           incoming,
             boolean                                 isResponseToOngoingQuery,
-            final Proxy                             proxy )
+            final CommunicatingProxy                proxy )
     {
         ProxyProcessingInstructions ret = createInstructions();
 
@@ -351,8 +352,8 @@ public class DefaultShadowProxyPolicy
      */
     @Override
     public ProxyProcessingInstructions calculateForTransactionCommitted(
-            Transaction tx,
-            Proxy       proxy )
+            Transaction        tx,
+            CommunicatingProxy proxy )
     {
          // This is overridden simply to make setting of shadow-specific breakpoints easier
          ProxyProcessingInstructions ret = super.calculateForTransactionCommitted( tx, proxy );

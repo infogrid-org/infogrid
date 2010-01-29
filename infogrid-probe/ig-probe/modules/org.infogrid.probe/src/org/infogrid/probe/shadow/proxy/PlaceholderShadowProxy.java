@@ -237,11 +237,13 @@ public class PlaceholderShadowProxy
      * given NetMeshObjects in the returning XprisoMessage.</p>
      *
      * @param localReplicas the local replicas that need to be freshened
+     * @param waitForOngoingResynchronization if true, a response should wait until all resynchronization attempts have completed
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
     public long freshen(
             NetMeshObject [] localReplicas,
+            boolean          waitForOngoingResynchronization,
             long             duration )
     {
         throw new UnsupportedOperationException( "should never be called" );
