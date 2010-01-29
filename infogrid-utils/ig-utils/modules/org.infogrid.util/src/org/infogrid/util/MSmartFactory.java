@@ -381,6 +381,7 @@ public class MSmartFactory<K,V,A>
      *
      * @return true if there are no key-value paris in this SmartFactory
      */
+    @Override
     public boolean isEmpty()
     {
         return theKeyValueMap.isEmpty();
