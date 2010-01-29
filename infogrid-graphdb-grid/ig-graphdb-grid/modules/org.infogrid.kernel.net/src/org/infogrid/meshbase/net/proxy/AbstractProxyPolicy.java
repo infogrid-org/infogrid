@@ -43,9 +43,9 @@ import org.infogrid.meshbase.net.transaction.ReplicaCreatedEvent;
 import org.infogrid.meshbase.net.transaction.ReplicaPurgedEvent;
 import org.infogrid.meshbase.net.transaction.Utils;
 import org.infogrid.meshbase.net.xpriso.ParserFriendlyXprisoMessage;
-import org.infogrid.meshbase.net.xpriso.SimpleXprisoMessage;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.meshbase.net.a.AccessLocallySynchronizer;
+import org.infogrid.meshbase.net.xpriso.SimpleXprisoMessage;
 import org.infogrid.meshbase.transaction.Change;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.util.ArrayHelper;
@@ -120,7 +120,7 @@ public abstract class AbstractProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForCeaseCommunications(
-            Proxy proxy )
+            CommunicatingProxy proxy )
     {
         ProxyProcessingInstructions ret = createInstructions();
         
@@ -142,7 +142,7 @@ public abstract class AbstractProxyPolicy
     public ProxyProcessingInstructions calculateForObtainReplicas(
             NetMeshObjectAccessSpecification [] paths,
             long                                duration,
-            Proxy                               proxy )
+            CommunicatingProxy                  proxy )
     {
         ProxyProcessingInstructions ret = createInstructions();
 
@@ -172,9 +172,9 @@ public abstract class AbstractProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToObtainLocks(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy )
+            NetMeshObject []   localReplicas,
+            long               duration,
+            CommunicatingProxy proxy )
     {
         NetMeshObjectIdentifier [] identifiers = new NetMeshObjectIdentifier[ localReplicas.length ];
         for( int i=0 ; i<localReplicas.length ; ++i ) {
@@ -210,13 +210,13 @@ public abstract class AbstractProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToPushLocks(
-            NetMeshObject [] localReplicas,
-            boolean []       isNewProxy,
-            long             duration,
-            final Proxy      proxy )
+            NetMeshObject []   localReplicas,
+            boolean []         isNewProxy,
+            long               duration,
+           final CommunicatingProxy proxy )
     {
         ProxyProcessingInstructions ret = createInstructions();
-        
+
         CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = new CreateWhenNeeded<ParserFriendlyXprisoMessage>() {
                 /**
                  * Instantiation method.
@@ -257,9 +257,9 @@ public abstract class AbstractProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToObtainHomeReplicas(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy )
+            NetMeshObject []   localReplicas,
+            long               duration,
+            CommunicatingProxy proxy )
     {
         NetMeshObjectIdentifier [] identifiers = new NetMeshObjectIdentifier[ localReplicas.length ];
         for( int i=0 ; i<localReplicas.length ; ++i ) {
@@ -295,13 +295,13 @@ public abstract class AbstractProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToPushHomeReplicas(
-            NetMeshObject [] localReplicas,
-            boolean []       isNewProxy,
-            long             duration,
-            final Proxy      proxy )
+            NetMeshObject []   localReplicas,
+            boolean []         isNewProxy,
+            long               duration,
+            final CommunicatingProxy proxy )
     {
         ProxyProcessingInstructions ret = createInstructions();
-        
+
         CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = new CreateWhenNeeded<ParserFriendlyXprisoMessage>() {
                 /**
                  * Instantiation method.
@@ -342,9 +342,9 @@ public abstract class AbstractProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForForceObtainLocks(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy )
+            NetMeshObject []   localReplicas,
+            long               duration,
+            CommunicatingProxy proxy )
     {
         NetMeshObjectIdentifier [] identifiers = new NetMeshObjectIdentifier[ localReplicas.length ];
         for( int i=0 ; i<localReplicas.length ; ++i ) {
@@ -381,7 +381,7 @@ public abstract class AbstractProxyPolicy
      */
     public ProxyProcessingInstructions calculateForTryResynchronizeReplicas(
             NetMeshObjectIdentifier [] identifiers,
-            Proxy                      proxy,
+            CommunicatingProxy         proxy,
             Long                       accessLocallySynchronizerQueryKey )
     {
         ProxyProcessingInstructions ret = createInstructions();
@@ -414,9 +414,9 @@ public abstract class AbstractProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForCancelReplicas(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy )
+            NetMeshObject []   localReplicas,
+            long               duration,
+            CommunicatingProxy proxy )
     {
         NetMeshObjectIdentifier [] identifiers = new NetMeshObjectIdentifier[ localReplicas.length ];
         for( int i=0 ; i<localReplicas.length ; ++i ) {
@@ -444,14 +444,16 @@ public abstract class AbstractProxyPolicy
      * NetMeshObject leases via this Proxy.
      *
      * @param localReplicas the local replicas that should be freshened
+     * @param waitForOngoingResynchronization if true, a response should wait until all resynchronization attempts have completed
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForFreshenReplicas(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy )
+            NetMeshObject []   localReplicas,
+            boolean            waitForOngoingResynchronization,
+            long               duration,
+            CommunicatingProxy proxy )
     {
         NetMeshObjectIdentifier [] identifiers = new NetMeshObjectIdentifier[ localReplicas.length ];
         for( int i=0 ; i<localReplicas.length ; ++i ) {
@@ -482,8 +484,8 @@ public abstract class AbstractProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
      public ProxyProcessingInstructions calculateForTransactionCommitted(
-            Transaction tx,
-            final Proxy proxy )
+            Transaction        tx,
+            final CommunicatingProxy proxy )
     {
         ProxyProcessingInstructions ret = createInstructions();
         
@@ -611,7 +613,7 @@ public abstract class AbstractProxyPolicy
             ReceivingMessageEndpoint<XprisoMessage> endpoint,
             XprisoMessage                           incoming,
             boolean                                 isResponseToOngoingQuery,
-            final Proxy                             proxy )
+            final CommunicatingProxy                      proxy )
     {
         ProxyProcessingInstructions ret = createInstructions();
 

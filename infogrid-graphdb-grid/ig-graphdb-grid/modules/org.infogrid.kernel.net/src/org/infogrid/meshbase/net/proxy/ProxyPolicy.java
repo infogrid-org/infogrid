@@ -49,7 +49,7 @@ public interface ProxyPolicy
     public ProxyProcessingInstructions calculateForObtainReplicas(
             NetMeshObjectAccessSpecification [] paths,
             long                                duration,
-            Proxy                               proxy );
+            CommunicatingProxy                  proxy );
 
     /**
      * Determine the ProxyProcessingInstructions for obtaining one or more
@@ -61,9 +61,9 @@ public interface ProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToObtainLocks(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy );
+            NetMeshObject []   localReplicas,
+            long               duration,
+            CommunicatingProxy proxy );
 
     /**
      * Determine the ProxyProcessingInstructions for pushing one or more
@@ -77,10 +77,10 @@ public interface ProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToPushLocks(
-            NetMeshObject [] localReplicas,
-            boolean []       isNewProxy,
-            long             duration,
-            Proxy            proxy );
+            NetMeshObject []   localReplicas,
+            boolean []         isNewProxy,
+            long               duration,
+            CommunicatingProxy proxy );
 
     /**
      * Determine the ProxyProcessingInstructions for obtaining one or more
@@ -92,9 +92,9 @@ public interface ProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToObtainHomeReplicas(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy );
+            NetMeshObject []   localReplicas,
+            long               duration,
+            CommunicatingProxy proxy );
 
     /**
      * Determine the ProxyProcessingInstructions for pushing one or more
@@ -108,10 +108,10 @@ public interface ProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToPushHomeReplicas(
-            NetMeshObject [] localReplicas,
-            boolean []       isNewProxy,
-            long             duration,
-            Proxy            proxy );
+            NetMeshObject []   localReplicas,
+            boolean []         isNewProxy,
+            long               duration,
+            CommunicatingProxy proxy );
 
     /**
      * Determine the ProxyProcessingInstructions for forcefully re-acquiring one or more
@@ -123,9 +123,9 @@ public interface ProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForForceObtainLocks(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy );
+            NetMeshObject []   localReplicas,
+            long               duration,
+            CommunicatingProxy proxy );
     
     /**
      * Determine the ProxyProcessingInstructions for attempting to resynchronize one or more
@@ -140,7 +140,7 @@ public interface ProxyPolicy
      */
     public ProxyProcessingInstructions calculateForTryResynchronizeReplicas(
             NetMeshObjectIdentifier [] identifiers,
-            Proxy                      proxy,
+            CommunicatingProxy         proxy,
             Long                       accessLocallySynchronizerQueryKey );
 
     /**
@@ -153,23 +153,25 @@ public interface ProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForCancelReplicas(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy );
+            NetMeshObject []   localReplicas,
+            long               duration,
+            CommunicatingProxy proxy );
 
     /**
      * Determine the ProxyProcessingInstructions for freshening one or more
      * NetMeshObject leases via this Proxy.
      *
      * @param localReplicas the local replicas that should be freshened
+     * @param waitForOngoingResynchronization if true, a response should wait until all resynchronization attempts have completed
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForFreshenReplicas(
-            NetMeshObject [] localReplicas,
-            long             duration,
-            Proxy            proxy );
+            NetMeshObject []   localReplicas,
+            boolean            waitForOngoingResynchronization,
+            long               duration,
+            CommunicatingProxy proxy );
 
     /**
      * Determine the ProxyProcessingInstructions for ceasing communications.
@@ -178,7 +180,7 @@ public interface ProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForCeaseCommunications(
-            Proxy            proxy );
+            CommunicatingProxy proxy );
     
     /**
      * Given a committed Transaction, determine the ProxyProcessingInstructions for notifying
@@ -189,8 +191,8 @@ public interface ProxyPolicy
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTransactionCommitted(
-            Transaction tx,
-            Proxy       proxy );
+            Transaction        tx,
+            CommunicatingProxy proxy );
 
     /**
      * Determine the necessary operations that need to be performed to process
@@ -207,5 +209,5 @@ public interface ProxyPolicy
             ReceivingMessageEndpoint<XprisoMessage> endpoint,
             XprisoMessage                           incoming,
             boolean                                 isResponseToOngoingQuery,
-            Proxy                                   proxy );
+            CommunicatingProxy                      proxy );
 }

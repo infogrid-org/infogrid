@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,7 +21,6 @@ import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.comm.ReturnSynchronizerEndpoint;
 import org.infogrid.comm.SendingMessageEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
-import org.infogrid.comm.pingpong.PingPongMessageEndpointListener;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.net.NetMeshObject;
@@ -69,7 +68,7 @@ public abstract class AbstractCommunicatingProxy
         extends
             AbstractProxy
         implements
-            PingPongMessageEndpointListener<XprisoMessage>
+            CommunicatingProxy
 {
     private static final Log log = Log.getLogInstance( AbstractCommunicatingProxy.class ); // our own, private logger
 
@@ -296,14 +295,16 @@ public abstract class AbstractCommunicatingProxy
      * given NetMeshObjects in the returning XprisoMessage.</p>
      *
      * @param localReplicas the local replicas that need to be freshened
+     * @param waitForOngoingResynchronization if true, a response should wait until all resynchronization attempts have completed
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
     public long freshen(
             NetMeshObject [] localReplicas,
+            boolean          waitForOngoingResynchronization,
             long             duration )
     {
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForFreshenReplicas( localReplicas, duration, this );
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForFreshenReplicas( localReplicas, waitForOngoingResynchronization, duration, this );
         performInstructions( instructions );
 
         return instructions.getExpectedFreshenReplicasWait();
