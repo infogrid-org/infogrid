@@ -117,10 +117,11 @@ public class DefaultShadowProxyPolicy
      */
     @Override
     public ProxyProcessingInstructions calculateForTryToPushLocks(
-            NetMeshObject []   localReplicas,
-            boolean []         isNewProxy,
-            long               duration,
-            CommunicatingProxy proxy )
+            NetMeshObject []                              localReplicas,
+            boolean []                                    isNewProxy,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )
     {
         throw new UnsupportedOperationException( "A Shadow should not invoke this" );
     }
@@ -156,10 +157,11 @@ public class DefaultShadowProxyPolicy
      */
     @Override
     public ProxyProcessingInstructions calculateForTryToPushHomeReplicas(
-            NetMeshObject []   localReplicas,
-            boolean []         isNewProxy,
-            long               duration,
-            CommunicatingProxy proxy )
+            NetMeshObject []                              localReplicas,
+            boolean []                                    isNewProxy,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )
     {
         throw new UnsupportedOperationException( "A Shadow should not invoke this" );
     }
@@ -177,30 +179,16 @@ public class DefaultShadowProxyPolicy
      */
     @Override
     public ProxyProcessingInstructions calculateForIncomingMessage(
-            ReceivingMessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                           incoming,
-            boolean                                 isResponseToOngoingQuery,
-            final CommunicatingProxy                proxy )
+            ReceivingMessageEndpoint<XprisoMessage>       endpoint,
+            XprisoMessage                                 incoming,
+            boolean                                       isResponseToOngoingQuery,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )
     {
         ProxyProcessingInstructions ret = createInstructions();
 
         ret.setIncomingXprisoMessageEndpoint( endpoint );
         ret.setIncomingXprisoMessage( incoming );
-
-        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = new CreateWhenNeeded<ParserFriendlyXprisoMessage>() {
-                /**
-                 * Instantiation method.
-                 *
-                 * @return the instantiated object
-                 */
-                protected ParserFriendlyXprisoMessage instantiate()
-                {
-                    ParserFriendlyXprisoMessage ret = ParserFriendlyXprisoMessage.create(
-                            proxy.getNetMeshBase().getIdentifier(),
-                            proxy.getPartnerMeshBaseIdentifier() );
-                    return ret;
-                }
-        };
 
         processIncomingRequestedFirstTimeObjects(      proxy, ret, perhapsOutgoing );
         processIncomingRequestedResynchronizeReplicas( proxy, ret, perhapsOutgoing );
@@ -352,11 +340,12 @@ public class DefaultShadowProxyPolicy
      */
     @Override
     public ProxyProcessingInstructions calculateForTransactionCommitted(
-            Transaction        tx,
-            CommunicatingProxy proxy )
+            Transaction                                   tx,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )
     {
          // This is overridden simply to make setting of shadow-specific breakpoints easier
-         ProxyProcessingInstructions ret = super.calculateForTransactionCommitted( tx, proxy );
+         ProxyProcessingInstructions ret = super.calculateForTransactionCommitted( tx, proxy, perhapsOutgoing );
          
          return ret;
     }
