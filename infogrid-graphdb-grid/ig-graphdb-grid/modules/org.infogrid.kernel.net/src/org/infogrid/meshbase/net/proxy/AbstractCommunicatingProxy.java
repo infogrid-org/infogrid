@@ -42,6 +42,7 @@ import org.infogrid.meshbase.net.transaction.NetMeshObjectRoleAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectRoleRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeRemovedEvent;
+import org.infogrid.meshbase.net.xpriso.ParserFriendlyXprisoMessage;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.meshbase.net.xpriso.logging.XprisoMessageLogger;
 import org.infogrid.meshbase.security.IdentityChangeException;
@@ -181,7 +182,9 @@ public abstract class AbstractCommunicatingProxy
             boolean []       isNewProxy,
             long             duration )
     {
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToPushLocks( localReplicas, isNewProxy, duration, this );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToPushLocks( localReplicas, isNewProxy, duration, this, perhapsOutgoing );
         performInstructions( instructions );
 
         return instructions.getExpectedPushLocksWait();
@@ -224,7 +227,9 @@ public abstract class AbstractCommunicatingProxy
             boolean []       isNewProxy,
             long             duration )
     {
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToPushHomeReplicas( localReplicas, isNewProxy, duration, this );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToPushHomeReplicas( localReplicas, isNewProxy, duration, this, perhapsOutgoing );
         performInstructions( instructions );
 
         return instructions.getExpectedPushHomeReplicasWait();
@@ -355,7 +360,9 @@ public abstract class AbstractCommunicatingProxy
             log.traceMethodCallEntry( this, "transactionCommitted", theTransaction );
         }
 
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTransactionCommitted( theTransaction, this );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTransactionCommitted( theTransaction, this, perhapsOutgoing );
 
         performInstructions( instructions );
     }
@@ -429,7 +436,9 @@ public abstract class AbstractCommunicatingProxy
         long    responseId    = incoming.getResponseId();
         boolean callIsWaiting = theWaitEndpoint.isCallWaitingFor( responseId );
 
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForIncomingMessage( endpoint, incoming, callIsWaiting, this );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForIncomingMessage( endpoint, incoming, callIsWaiting, this, perhapsOutgoing );
 
         AccessLocallySynchronizer synchronizer = theMeshBase.getAccessLocallySynchronizer();
         try {
@@ -891,6 +900,30 @@ public abstract class AbstractCommunicatingProxy
         theWaitEndpoint.disablingError( endpoint, msg, t );
 
         proxyUpdated();
+    }
+
+    /**
+     * Internal helper factory method for CreateWhenNeeded<XprisoMessage>.
+     *
+     * @return the created object
+     */
+    protected CreateWhenNeeded<ParserFriendlyXprisoMessage> createPotentialOutgoingMessage()
+    {
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> ret = new CreateWhenNeeded<ParserFriendlyXprisoMessage>() {
+                /**
+                 * Instantiation method.
+                 *
+                 * @return the instantiated object
+                 */
+                protected ParserFriendlyXprisoMessage instantiate()
+                {
+                    ParserFriendlyXprisoMessage ret = ParserFriendlyXprisoMessage.create(
+                            getNetMeshBase().getIdentifier(),
+                            getPartnerMeshBaseIdentifier() );
+                    return ret;
+                }
+        };
+        return ret;
     }
 
     /**

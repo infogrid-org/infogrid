@@ -19,8 +19,10 @@ import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
+import org.infogrid.meshbase.net.xpriso.ParserFriendlyXprisoMessage;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.meshbase.transaction.Transaction;
+import org.infogrid.util.CreateWhenNeeded;
 
 /**
  * <p>Factors out the communications policies of a Proxy. When faced with a request
@@ -74,13 +76,15 @@ public interface ProxyPolicy
      *         The sequence in the array is the same sequence as in localReplicas.
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToPushLocks(
-            NetMeshObject []   localReplicas,
-            boolean []         isNewProxy,
-            long               duration,
-            CommunicatingProxy proxy );
+            NetMeshObject []                              localReplicas,
+            boolean []                                    isNewProxy,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
 
     /**
      * Determine the ProxyProcessingInstructions for obtaining one or more
@@ -105,13 +109,15 @@ public interface ProxyPolicy
      *         The sequence in the array is the same sequence as in localReplicas.
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToPushHomeReplicas(
-            NetMeshObject []   localReplicas,
-            boolean []         isNewProxy,
-            long               duration,
-            CommunicatingProxy proxy );
+            NetMeshObject []                              localReplicas,
+            boolean []                                    isNewProxy,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
 
     /**
      * Determine the ProxyProcessingInstructions for forcefully re-acquiring one or more
@@ -188,11 +194,13 @@ public interface ProxyPolicy
      * 
      * @param tx the Transaction
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTransactionCommitted(
-            Transaction        tx,
-            CommunicatingProxy proxy );
+            Transaction                                   tx,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
 
     /**
      * Determine the necessary operations that need to be performed to process
@@ -203,11 +211,13 @@ public interface ProxyPolicy
      * @param isResponseToOngoingQuery if true, this message is known to be a response to a still-ongoing
      *        query
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForIncomingMessage(
-            ReceivingMessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                           incoming,
-            boolean                                 isResponseToOngoingQuery,
-            CommunicatingProxy                      proxy );
+            ReceivingMessageEndpoint<XprisoMessage>       endpoint,
+            XprisoMessage                                 incoming,
+            boolean                                       isResponseToOngoingQuery,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
 }
