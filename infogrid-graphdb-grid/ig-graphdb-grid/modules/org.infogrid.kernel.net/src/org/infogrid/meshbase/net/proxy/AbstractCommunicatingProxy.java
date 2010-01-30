@@ -536,16 +536,10 @@ public abstract class AbstractCommunicatingProxy
                     throws
                         Throwable
                 {
-                    Transaction      tx     = theMeshBase.createTransactionAsapIfNeeded();
-                    NetAccessManager access = theMeshBase.getAccessManager();
+                    Transaction tx = theMeshBase.createTransactionAsapIfNeeded();
 
-                    if( access != null && !access.isSu() ) {
-                        try {
-                            access.sudo();
-                        } catch( IdentityChangeException ex ) {
-                            log.error( ex );
-                        }
-                    }
+                    tx.sudo();
+
                     return tx;
                 }
         };
