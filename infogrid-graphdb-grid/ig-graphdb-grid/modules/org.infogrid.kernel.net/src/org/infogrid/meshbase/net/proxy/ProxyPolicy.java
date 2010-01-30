@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -46,12 +46,14 @@ public interface ProxyPolicy
      * @param paths the NetMeshObjectAccessSpecification for finding the NetMeshObjects to be replicated
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForObtainReplicas(
-            NetMeshObjectAccessSpecification [] paths,
-            long                                duration,
-            CommunicatingProxy                  proxy );
+            NetMeshObjectAccessSpecification []           paths,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
 
     /**
      * Determine the ProxyProcessingInstructions for obtaining one or more
@@ -60,12 +62,14 @@ public interface ProxyPolicy
      * @param localReplicas the local replicas for which the lock should be obtained
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToObtainLocks(
-            NetMeshObject []   localReplicas,
-            long               duration,
-            CommunicatingProxy proxy );
+            NetMeshObject []                              localReplicas,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
 
     /**
      * Determine the ProxyProcessingInstructions for pushing one or more
@@ -93,12 +97,14 @@ public interface ProxyPolicy
      * @param localReplicas the local replicas for which the home replica statuses should be obtained
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryToObtainHomeReplicas(
-            NetMeshObject []   localReplicas,
-            long               duration,
-            CommunicatingProxy proxy );
+            NetMeshObject []                              localReplicas,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
 
     /**
      * Determine the ProxyProcessingInstructions for pushing one or more
@@ -126,12 +132,14 @@ public interface ProxyPolicy
      * @param localReplicas the local replicas for which the locks are forcefully re-acquired
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForForceObtainLocks(
-            NetMeshObject []   localReplicas,
-            long               duration,
-            CommunicatingProxy proxy );
+            NetMeshObject []                              localReplicas,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
     
     /**
      * Determine the ProxyProcessingInstructions for attempting to resynchronize one or more
@@ -142,12 +150,14 @@ public interface ProxyPolicy
      * @param accessLocallySynchronizerQueryKey if given, add all to-be-opened queries within this operation to the existing transaction
      *         with this query key. If not given, add all to-be-opened queries within this operation to this thread's transaction. This
      *         enables resynchronization to be performed on another thread while an accessLocally operation is still waiting
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForTryResynchronizeReplicas(
-            NetMeshObjectIdentifier [] identifiers,
-            CommunicatingProxy         proxy,
-            Long                       accessLocallySynchronizerQueryKey );
+            NetMeshObjectIdentifier []                    identifiers,
+            CommunicatingProxy                            proxy,
+            Long                                          accessLocallySynchronizerQueryKey,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
 
     /**
      * Determine the ProxyProcessingInstructions for canceling one or more 
@@ -156,12 +166,14 @@ public interface ProxyPolicy
      * @param localReplicas the local replicas for which the lease should be canceled
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForCancelReplicas(
-            NetMeshObject []   localReplicas,
-            long               duration,
-            CommunicatingProxy proxy );
+            NetMeshObject []                              localReplicas,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
 
     /**
      * Determine the ProxyProcessingInstructions for freshening one or more
@@ -171,22 +183,26 @@ public interface ProxyPolicy
      * @param waitForOngoingResynchronization if true, a response should wait until all resynchronization attempts have completed
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForFreshenReplicas(
-            NetMeshObject []   localReplicas,
-            boolean            waitForOngoingResynchronization,
-            long               duration,
-            CommunicatingProxy proxy );
+            NetMeshObject []                              localReplicas,
+            boolean                                       waitForOngoingResynchronization,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
 
     /**
      * Determine the ProxyProcessingInstructions for ceasing communications.
      * 
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     public ProxyProcessingInstructions calculateForCeaseCommunications(
-            CommunicatingProxy proxy );
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
     
     /**
      * Given a committed Transaction, determine the ProxyProcessingInstructions for notifying

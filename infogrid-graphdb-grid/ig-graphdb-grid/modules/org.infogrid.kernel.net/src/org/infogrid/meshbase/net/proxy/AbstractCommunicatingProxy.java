@@ -139,7 +139,9 @@ public abstract class AbstractCommunicatingProxy
             NetMeshObjectAccessSpecification [] paths,
             long                                duration )
     {
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForObtainReplicas( paths, duration, this );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForObtainReplicas( paths, duration, this, perhapsOutgoing );
         performInstructions( instructions );
 
         return instructions.getExpectedObtainReplicasWait();
@@ -159,7 +161,9 @@ public abstract class AbstractCommunicatingProxy
             NetMeshObject [] localReplicas,
             long             duration )
     {
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToObtainLocks( localReplicas, duration, this );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToObtainLocks( localReplicas, duration, this, perhapsOutgoing );
         performInstructions( instructions );
 
         return instructions.getExpectedObtainLocksWait();
@@ -204,7 +208,9 @@ public abstract class AbstractCommunicatingProxy
             NetMeshObject [] localReplicas,
             long             duration )
     {
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToObtainHomeReplicas( localReplicas, duration, this );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryToObtainHomeReplicas( localReplicas, duration, this, perhapsOutgoing );
         performInstructions( instructions );
 
         return instructions.getExpectedObtainHomeReplicasWait();
@@ -249,7 +255,9 @@ public abstract class AbstractCommunicatingProxy
             NetMeshObject [] localReplicas,
             long             duration )
     {
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForForceObtainLocks( localReplicas, duration, this );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForForceObtainLocks( localReplicas, duration, this, perhapsOutgoing );
         performInstructions( instructions );
 
         return instructions.getExpectedForceObtainLocksWait();
@@ -273,7 +281,9 @@ public abstract class AbstractCommunicatingProxy
             long                       duration,
             Long                       accessLocallySynchronizerQueryKey )
      {
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryResynchronizeReplicas( identifiers, this, accessLocallySynchronizerQueryKey );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForTryResynchronizeReplicas( identifiers, this, accessLocallySynchronizerQueryKey, perhapsOutgoing );
         performInstructions( instructions );
 
         return instructions.getExpectedResynchronizeWait();
@@ -289,7 +299,9 @@ public abstract class AbstractCommunicatingProxy
             NetMeshObject [] localReplicas,
             long             duration )
     {
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForCancelReplicas( localReplicas, duration, this );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForCancelReplicas( localReplicas, duration, this, perhapsOutgoing );
         performInstructions( instructions );
 
         return instructions.getExpectedCancelReplicasWait();
@@ -309,7 +321,9 @@ public abstract class AbstractCommunicatingProxy
             boolean          waitForOngoingResynchronization,
             long             duration )
     {
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForFreshenReplicas( localReplicas, waitForOngoingResynchronization, duration, this );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForFreshenReplicas( localReplicas, waitForOngoingResynchronization, duration, this, perhapsOutgoing );
         performInstructions( instructions );
 
         return instructions.getExpectedFreshenReplicasWait();
@@ -323,7 +337,9 @@ public abstract class AbstractCommunicatingProxy
     @SuppressWarnings(value={"unchecked"})
     public void initiateCeaseCommunications()
     {
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForCeaseCommunications( this );
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = createPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForCeaseCommunications( this, perhapsOutgoing );
         performInstructions( instructions );
     }
 
