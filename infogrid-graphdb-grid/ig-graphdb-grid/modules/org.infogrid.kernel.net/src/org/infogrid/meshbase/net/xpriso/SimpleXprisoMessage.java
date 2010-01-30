@@ -489,7 +489,7 @@ public class SimpleXprisoMessage
     public void setEquivalentAdditions(
             NetMeshObjectEquivalentsAddedEvent [] newValue )
     {
-        theEquivalentAdditions = newValue;
+        theEquivalentsAdditions = newValue;
     }
 
     /**
@@ -500,7 +500,7 @@ public class SimpleXprisoMessage
      */
     public NetMeshObjectEquivalentsAddedEvent [] getEquivalentsAdditions()
     {
-        return theEquivalentAdditions;
+        return theEquivalentsAdditions;
     }
 
     /**
@@ -512,7 +512,7 @@ public class SimpleXprisoMessage
     public void setEquivalentRemovals(
             NetMeshObjectEquivalentsRemovedEvent [] newValue )
     {
-        theEquivalentRemovals = newValue;
+        theEquivalentsRemovals = newValue;
     }
 
     /**
@@ -523,7 +523,7 @@ public class SimpleXprisoMessage
      */
     public NetMeshObjectEquivalentsRemovedEvent [] getEquivalentsRemovals()
     {
-        return theEquivalentRemovals;
+        return theEquivalentsRemovals;
     }
 
     /**
@@ -618,10 +618,10 @@ public class SimpleXprisoMessage
         if( theDeleteChanges != null && theDeleteChanges.length > 0 ) {
             return false;
         }
-        if( theEquivalentAdditions != null && theEquivalentAdditions.length > 0 ) {
+        if( theEquivalentsAdditions != null && theEquivalentsAdditions.length > 0 ) {
             return false;
         }
-        if( theEquivalentRemovals != null && theEquivalentRemovals.length > 0 ) {
+        if( theEquivalentsRemovals != null && theEquivalentsRemovals.length > 0 ) {
             return false;
         }
         if( theNeighborAdditions != null && theNeighborAdditions.length > 0 ) {
@@ -648,6 +648,9 @@ public class SimpleXprisoMessage
             return false;
         }
         if( theRequestedFirstTimeObjects != null && theRequestedFirstTimeObjects.length > 0 ) {
+            return false;
+        }
+        if( theRequestedFreshenReplicas != null && theRequestedFreshenReplicas.length > 0 ) {
             return false;
         }
         if( theRequestedHomeReplicas != null && theRequestedHomeReplicas.length > 0 ) {
@@ -694,24 +697,25 @@ public class SimpleXprisoMessage
                     "theResponseId",
                     "theCeaseCommunications",
                     "theConveyedMeshObjects",
-                    "theRequestedFirstTimeObjects",
-                    "theRequestedCanceledObjects",
-                    "theRequestedResynchronizeDependentReplicas",
-                    "theRequestedLockObjects",
-                    "thePushLockObjects",
-                    "theReclaimedLockObjects",
-                    "theRequestedHomeReplicas",
-                    "thePushHomeReplicas",
-                    "theTypeAdditions",
-                    "theTypeRemovals",
-                    "thePropertyChanges",
+                    "theDeleteChanges",
+                    "theEquivalentsAdditions",
+                    "theEquivalentsRemovals",
                     "theNeighborAdditions",
                     "theNeighborRemovals",
-                    "theEquivalentAdditions",
-                    "theEquivalentRemovals",
+                    "thePropertyChanges",
+                    "thePushHomeReplicas",
+                    "thePushLockObjects",
+                    "theReclaimedLockObjects",
+                    "theRequestedCanceledObjects",
+                    "theRequestedFirstTimeObjects",
+                    "theRequestedFreshenReplicas",
+                    "theRequestedHomeReplicas",
+                    "theRequestedLockObjects",
+                    "theRequestedResynchronizeReplicas",
                     "theRoleAdditions",
                     "theRoleRemovals",
-                    "theDeleteChanges",
+                    "theTypeAdditions",
+                    "theTypeRemovals",
                 },
                 new Object[] {
                     theSenderIdentifier,
@@ -720,24 +724,25 @@ public class SimpleXprisoMessage
                     theResponseId,
                     theCeaseCommunications,
                     theConveyedMeshObjects,
-                    theRequestedFirstTimeObjects,
-                    theRequestedCanceledObjects,
-                    theRequestedResynchronizeReplicas,
-                    theRequestedLockObjects,
-                    thePushLockObjects,
-                    theReclaimedLockObjects,
-                    theRequestedHomeReplicas,
-                    thePushHomeReplicas,
-                    theTypeAdditions,
-                    theTypeRemovals,
-                    thePropertyChanges,
+                    theDeleteChanges,
+                    theEquivalentsAdditions,
+                    theEquivalentsRemovals,
                     theNeighborAdditions,
                     theNeighborRemovals,
-                    theEquivalentAdditions,
-                    theEquivalentRemovals,
+                    thePropertyChanges,
+                    thePushHomeReplicas,
+                    thePushLockObjects,
+                    theReclaimedLockObjects,
+                    theRequestedCanceledObjects,
+                    theRequestedFirstTimeObjects,
+                    theRequestedFreshenReplicas,
+                    theRequestedHomeReplicas,
+                    theRequestedLockObjects,
+                    theRequestedResynchronizeReplicas,
                     theRoleAdditions,
                     theRoleRemovals,
-                    theDeleteChanges,
+                    theTypeAdditions,
+                    theTypeRemovals,
                 });
     }
 
@@ -830,12 +835,12 @@ public class SimpleXprisoMessage
     /**
      * The set of EquivalentsAddedEvents that the sender needs to convey to the receiver.
      */
-    protected NetMeshObjectEquivalentsAddedEvent [] theEquivalentAdditions = {};
+    protected NetMeshObjectEquivalentsAddedEvent [] theEquivalentsAdditions = {};
 
     /**
      * The set of EquivalentsRemovedEvents that the sender needs to convey to the receiver.
      */
-    protected NetMeshObjectEquivalentsRemovedEvent [] theEquivalentRemovals = {};
+    protected NetMeshObjectEquivalentsRemovedEvent [] theEquivalentsRemovals = {};
 
     /**
      * The set of RoleChanges that the sender needs to convey to the receiver.
