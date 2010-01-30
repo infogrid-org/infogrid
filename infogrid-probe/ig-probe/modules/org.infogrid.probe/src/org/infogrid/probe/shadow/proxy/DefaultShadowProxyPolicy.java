@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -75,13 +75,15 @@ public class DefaultShadowProxyPolicy
      * @param paths the NetMeshObjectAccessSpecification for finding the NetMeshObjects to be replicated
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     @Override
     public ProxyProcessingInstructions calculateForObtainReplicas(
-            NetMeshObjectAccessSpecification [] paths,
-            long                                duration,
-            CommunicatingProxy                  proxy )
+            NetMeshObjectAccessSpecification []           paths,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )
     {
         throw new UnsupportedOperationException( "A Shadow should not invoke this" );
     }
@@ -93,13 +95,15 @@ public class DefaultShadowProxyPolicy
      * @param localReplicas the local replicas for which the lock should be obtained
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     @Override
     public ProxyProcessingInstructions calculateForTryToObtainLocks(
-            NetMeshObject []   localReplicas,
-            long               duration,
-            CommunicatingProxy proxy )
+            NetMeshObject []                              localReplicas,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )
     {
         throw new UnsupportedOperationException( "A Shadow should not invoke this" );
     }
@@ -113,6 +117,7 @@ public class DefaultShadowProxyPolicy
      *         The sequence in the array is the same sequence as in localReplicas.
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     @Override
@@ -133,13 +138,15 @@ public class DefaultShadowProxyPolicy
      * @param localReplicas the local replicas for which the home replica statuses should be obtained
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     @Override
     public ProxyProcessingInstructions calculateForTryToObtainHomeReplicas(
-            NetMeshObject []   localReplicas,
-            long               duration,
-            CommunicatingProxy proxy )
+            NetMeshObject []                              localReplicas,
+            long                                          duration,
+            CommunicatingProxy                            proxy,
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )
     {
         throw new UnsupportedOperationException( "A Shadow should not invoke this" );
     }
@@ -153,6 +160,7 @@ public class DefaultShadowProxyPolicy
      *         The sequence in the array is the same sequence as in localReplicas.
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     @Override
@@ -175,6 +183,7 @@ public class DefaultShadowProxyPolicy
      * @param isResponseToOngoingQuery if true, this message is known to be a response to a still-ongoing
      *        query
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
+     * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
     @Override
