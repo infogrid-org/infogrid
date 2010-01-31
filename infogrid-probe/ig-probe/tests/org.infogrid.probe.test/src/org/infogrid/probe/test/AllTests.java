@@ -301,6 +301,15 @@ public class AllTests
                         ForwardReferenceTest8.class.getName() + " slow",
                         ForwardReferenceTest8.class,
                         "slow"),
+
+                new TestSpec(
+                        ForwardReferenceTest9.class.getName() + " fast",
+                        ForwardReferenceTest9.class,
+                        "fast"),
+                new TestSpec( // works
+                        ForwardReferenceTest9.class.getName() + " slow",
+                        ForwardReferenceTest9.class,
+                        "slow"),
         };
 
         runTests( probeTests );
