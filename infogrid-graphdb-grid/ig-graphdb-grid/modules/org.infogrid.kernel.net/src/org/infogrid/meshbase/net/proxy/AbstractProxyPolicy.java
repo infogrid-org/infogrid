@@ -87,6 +87,17 @@ public abstract class AbstractProxyPolicy
     }
 
     /**
+     * Set a new CoherenceSpecification.
+     *
+     * @param newValue the new value
+     */
+    public void setCoherenceSpecification(
+            CoherenceSpecification newValue )
+    {
+        theCoherenceSpecification = newValue;
+    }
+
+    /**
      * If this returns true, new Replicas will be created by a branch from the local
      * Replica in the replication graph. If this returns false, this new Replicas
      * create a branch from the Replicas in the third NetMeshBase from which this
@@ -419,7 +430,6 @@ public abstract class AbstractProxyPolicy
      * NetMeshObject leases via this Proxy.
      *
      * @param localReplicas the local replicas that should be freshened
-     * @param waitForOngoingResynchronization if true, a response should wait until all resynchronization attempts have completed
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @param perhapsOutgoing the outgoing message being assembled
@@ -427,7 +437,6 @@ public abstract class AbstractProxyPolicy
      */
     public ProxyProcessingInstructions calculateForFreshenReplicas(
             NetMeshObject []                              localReplicas,
-            boolean                                       waitForOngoingResynchronization,
             long                                          duration,
             CommunicatingProxy                            proxy,
             CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )

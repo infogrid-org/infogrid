@@ -40,6 +40,14 @@ public interface ProxyPolicy
     public CoherenceSpecification getCoherenceSpecification();
 
     /**
+     * Set a new CoherenceSpecification.
+     *
+     * @param newValue the new value
+     */
+    public void setCoherenceSpecification(
+            CoherenceSpecification newValue );
+
+    /**
      * Determine the ProxyProcessingInstructions for obtaining one or more
      * replicas via this Proxy.
      * 
@@ -180,7 +188,6 @@ public interface ProxyPolicy
      * NetMeshObject leases via this Proxy.
      *
      * @param localReplicas the local replicas that should be freshened
-     * @param waitForOngoingResynchronization if true, a response should wait until all resynchronization attempts have completed
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @param perhapsOutgoing the outgoing message being assembled
@@ -188,7 +195,6 @@ public interface ProxyPolicy
      */
     public ProxyProcessingInstructions calculateForFreshenReplicas(
             NetMeshObject []                              localReplicas,
-            boolean                                       waitForOngoingResynchronization,
             long                                          duration,
             CommunicatingProxy                            proxy,
             CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );

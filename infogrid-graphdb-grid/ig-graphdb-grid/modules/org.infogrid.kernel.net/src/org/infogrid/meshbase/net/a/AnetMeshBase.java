@@ -1074,24 +1074,7 @@ public abstract class AnetMeshBase
     public void freshenNow(
             NetMeshObject [] toFreshen )
     {
-        freshenNow( toFreshen, true, -1L );
-    }
-
-    /**
-     * <p>Attempt to update the set of NetMeshObjects to their most current state. Usually, InfoGrid manages
-     * this automatically and on its own schedule. However, under some circumstances the user may
-     * want to request an immediate update; that is what this method is for.</p>
-     *
-     * <p>In many cases, this method will do nothing as the local replicas are already most current.</p>
-     *
-     * @param toFreshen the set of NetMeshObjects to freshen
-     * @param waitForOngoingResynchronization if true, a response should wait until all resynchronization attempts have completed
-     */
-    public void freshenNow(
-            NetMeshObject [] toFreshen,
-            boolean          waitForOngoingResynchronization )
-    {
-        freshenNow( toFreshen, waitForOngoingResynchronization, -1L );
+        freshenNow( toFreshen, -1L );
     }
 
     /**
@@ -1106,29 +1089,10 @@ public abstract class AnetMeshBase
      */
     public void freshenNow(
             NetMeshObject [] toFreshen,
-            long             duration )
-    {
-        freshenNow( toFreshen, true, duration );
-    }
-
-    /**
-     * <p>Attempt to update the set of NetMeshObjects to their most current state. Usually, InfoGrid manages
-     * this automatically and on its own schedule. However, under some circumstances the user may
-     * want to request an immediate update; that is what this method is for.</p>
-     *
-     * <p>In many cases, this method will do nothing as the local replicas are already most current.</p>
-     *
-     * @param toFreshen the set of NetMeshObjects to freshen
-     * @param waitForOngoingResynchronization if true, a response should wait until all resynchronization attempts have completed
-     * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
-     */
-    public void freshenNow(
-            NetMeshObject [] toFreshen,
-            boolean          waitForOngoingResynchronization,
             long             duration )
     {
         if( log.isTraceEnabled() ) {
-            log.traceMethodCallEntry( this, "freshenNow", toFreshen, waitForOngoingResynchronization, duration );
+            log.traceMethodCallEntry( this, "freshenNow", toFreshen, duration );
         }
 
         // we need to group by Proxy
@@ -1170,7 +1134,7 @@ public abstract class AnetMeshBase
                 if( counter < thisChunk.length ) {
                     thisChunk = ArrayHelper.copyIntoNewArray( thisChunk, 0, counter, NetMeshObject.class );
                 }
-                long requestedDuration = towardsLock.freshen( thisChunk, waitForOngoingResynchronization, duration );
+                long requestedDuration = towardsLock.freshen( thisChunk, duration );
                 actualDuration = Math.max( actualDuration, requestedDuration );
 
             }

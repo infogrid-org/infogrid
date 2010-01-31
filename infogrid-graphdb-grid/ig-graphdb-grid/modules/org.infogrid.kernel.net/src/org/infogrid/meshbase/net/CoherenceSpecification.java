@@ -88,6 +88,16 @@ public abstract class CoherenceSpecification
     }
 
     /**
+     * Obtain an instance of this class just like this one, but with a potentially different value for
+     * waitForOngoingResynchronziation.
+     *
+     * @param waitForOngoingResynchronization the new value
+     * @return the CoherenceSpecification, which may or may not be the same instance as this
+     */
+    public abstract CoherenceSpecification withWaitForOngoingResynchronization(
+            boolean waitForOngoingResynchronization );
+
+    /**
      * Obtain the external form of this CoherenceSpecification.
      *
      * @return the external form
@@ -125,6 +135,21 @@ public abstract class CoherenceSpecification
             {
                 return ONE_TIME_ONLY_TAG;
             }
+
+            /**
+             * Obtain an instance of this class just like this one, but with a potentially different value for
+             * waitForOngoingResynchronziation.
+             *
+             * @param waitForOngoingResynchronization the new value
+             * @return the CoherenceSpecification, which may or may not be the same instance as this
+             */
+            public CoherenceSpecification withWaitForOngoingResynchronization(
+                    boolean waitForOngoingResynchronization )
+            {
+                return theWaitForOngoingResynchronization == waitForOngoingResynchronization
+                        ? this
+                        : ONE_TIME_ONLY_FAST;
+            }
     };
 
     /**
@@ -141,6 +166,21 @@ public abstract class CoherenceSpecification
             public String toExternalForm()
             {
                 return ONE_TIME_ONLY_FAST_TAG;
+            }
+
+            /**
+             * Obtain an instance of this class just like this one, but with a potentially different value for
+             * waitForOngoingResynchronziation.
+             *
+             * @param waitForOngoingResynchronization the new value
+             * @return the CoherenceSpecification, which may or may not be the same instance as this
+             */
+            public CoherenceSpecification withWaitForOngoingResynchronization(
+                    boolean waitForOngoingResynchronization )
+            {
+                return theWaitForOngoingResynchronization == waitForOngoingResynchronization
+                        ? this
+                        : ONE_TIME_ONLY;
             }
     };
 
@@ -248,6 +288,21 @@ public abstract class CoherenceSpecification
         public final long getPeriod()
         {
             return thePeriod;
+        }
+
+        /**
+         * Obtain an instance of this class just like this one, but with a potentially different value for
+         * waitForOngoingResynchronziation.
+         *
+         * @param waitForOngoingResynchronization the new value
+         * @return the CoherenceSpecification, which may or may not be the same instance as this
+         */
+        public CoherenceSpecification withWaitForOngoingResynchronization(
+                boolean waitForOngoingResynchronization )
+        {
+            return theWaitForOngoingResynchronization == waitForOngoingResynchronization
+                    ? this
+                    : new Periodic( thePeriod, waitForOngoingResynchronization );
         }
 
         /**
@@ -411,6 +466,21 @@ public abstract class CoherenceSpecification
         public final double getAdaptiveFactor()
         {
             return theAdaptiveFactor;
+        }
+
+        /**
+         * Obtain an instance of this class just like this one, but with a potentially different value for
+         * waitForOngoingResynchronziation.
+         *
+         * @param waitForOngoingResynchronization the new value
+         * @return the CoherenceSpecification, which may or may not be the same instance as this
+         */
+        public CoherenceSpecification withWaitForOngoingResynchronization(
+                boolean waitForOngoingResynchronization )
+        {
+            return theWaitForOngoingResynchronization == waitForOngoingResynchronization
+                    ? this
+                    : new AdaptivePeriodic( theFallbackDelay, theMaxDelay, theAdaptiveFactor, waitForOngoingResynchronization );
         }
 
         /**

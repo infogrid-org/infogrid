@@ -136,6 +136,17 @@ public abstract class AbstractProxy
     }
 
     /**
+     * Set a new CoherenceSpecification.
+     *
+     * @param newValue the new value
+     */
+    public void setCoherenceSpecification(
+            CoherenceSpecification newValue )
+    {
+        theProxyPolicy.setCoherenceSpecification( newValue );
+    }
+
+    /**
      * Determine when this Proxy was first created. Often this will refer to a time long before this
      * particular Java object instance was created; this time refers to when the connection between
      * the two logical NetMeshBases was created, which could have been in a previous run prior to, say,

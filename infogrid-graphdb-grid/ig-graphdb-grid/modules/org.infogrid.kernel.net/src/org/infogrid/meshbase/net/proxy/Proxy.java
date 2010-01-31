@@ -68,6 +68,14 @@ public interface Proxy
      * @return the current CoherenceSpecification
      */
     public abstract CoherenceSpecification getCoherenceSpecification();
+
+    /**
+     * Set a new CoherenceSpecification.
+     *
+     * @param newValue the new value
+     */
+    public void setCoherenceSpecification(
+            CoherenceSpecification newValue );
     
     /**
      * Determine when this Proxy was first created. Often this will refer to a time long before this
@@ -226,13 +234,11 @@ public interface Proxy
      * given NetMeshObjects in the returning XprisoMessage.</p>
      *
      * @param localReplicas the local replicas that need to be freshened
-     * @param waitForOngoingResynchronization if true, a response should wait until all resynchronization attempts have completed
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
     public abstract long freshen(
             NetMeshObject [] localReplicas,
-            boolean          waitForOngoingResynchronization,
             long             duration );
 
     /**
