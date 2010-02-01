@@ -63,7 +63,7 @@ public class DefaultShadowProxyPolicyFactory
         throws
             FactoryException
     {
-        DefaultShadowProxyPolicy ret = DefaultShadowProxyPolicy.create();
+        DefaultShadowProxyPolicy ret = DefaultShadowProxyPolicy.create( argument );
         return ret;
     }
 }

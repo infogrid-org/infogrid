@@ -56,6 +56,18 @@ public class DefaultShadowProxyPolicy
     }
     
     /**
+     * Factory method.
+     *
+     * @param coherence the CoherenceSpecification used by this ProxyPolicy
+     * @return the created DefaultShadowProxyPolicy
+     */
+    public static DefaultShadowProxyPolicy create(
+            CoherenceSpecification coherence )
+    {
+        return new DefaultShadowProxyPolicy( coherence, false ); // needs to point to other MeshBases in order to support ForwardReference resolution.
+    }
+
+    /**
      * Constructor.
      * 
      * @param coherence the CoherenceSpecification used by this ProxyPolicy
