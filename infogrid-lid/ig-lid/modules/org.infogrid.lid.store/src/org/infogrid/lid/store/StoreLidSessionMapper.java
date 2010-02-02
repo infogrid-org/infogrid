@@ -74,7 +74,7 @@ public class StoreLidSessionMapper
      * @return the value
      * @throws StoreValueDecodingException thrown if the StoreValue could not been decoded
      */
-    public LidSession decodeValue(
+    public SimpleLidSession decodeValue(
             String     key,
             StoreValue value )
         throws
@@ -130,7 +130,7 @@ public class StoreLidSessionMapper
                 timeValidUntil = -1L;
             }
             
-            LidSession ret = SimpleLidSession.create(
+            SimpleLidSession ret = SimpleLidSession.create(
                     sessionToken,
                     clientIdentifier != null ? theIdentifierFactory.fromExternalForm( clientIdentifier ) : null,
                     siteIdentifier != null   ? theIdentifierFactory.fromExternalForm( siteIdentifier   ) : null,

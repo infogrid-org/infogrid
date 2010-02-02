@@ -95,14 +95,14 @@ public abstract class AbstractSimpleLidSessionManager
      * It needs to be a static class as the LidSessionManager is only instantiated after this
      * class is.
      */
-    protected static class MyDelegateFactory
+    protected static class SimpleLidSessionDelegateFactory
             extends
                 AbstractFactory<String,LidSession,LidSessionManagerArguments>
     {
         /**
          * Constructor.
          */
-        public MyDelegateFactory()
+        public SimpleLidSessionDelegateFactory()
         {
             // nothing
         }
@@ -114,7 +114,7 @@ public abstract class AbstractSimpleLidSessionManager
          * @param argument any argument-style information required for object creation, if any
          * @return the new LidSession
          */
-        public LidSession obtainFor(
+        public SimpleLidSession obtainFor(
                 String                     key,
                 LidSessionManagerArguments argument )
         {
@@ -126,7 +126,7 @@ public abstract class AbstractSimpleLidSessionManager
             long timeLastUsed      = timeCreated;
             long timeValidUntil    = timeExpires;
             
-            LidSession ret = SimpleLidSession.create(
+            SimpleLidSession ret = SimpleLidSession.create(
                     key,
                     argument.getClientIdentifier(),
                     argument.getSiteIdentifier(),

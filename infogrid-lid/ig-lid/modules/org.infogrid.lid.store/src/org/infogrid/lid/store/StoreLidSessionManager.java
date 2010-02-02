@@ -65,7 +65,7 @@ public class StoreLidSessionManager
                 mapper,
                 store );
         
-        MyDelegateFactory delegateFactory = new MyDelegateFactory();
+        SimpleLidSessionDelegateFactory delegateFactory = new SimpleLidSessionDelegateFactory();
         
         StoreLidSessionManager ret = new StoreLidSessionManager( delegateFactory, storage, sessionDuration );
         delegateFactory.setLidSessionManager( ret );
