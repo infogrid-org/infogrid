@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
@@ -16,22 +16,46 @@ package org.infogrid.meshbase.net;
 
 import java.text.ParseException;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-import org.infogrid.meshbase.MeshObjectIdentifierFactory;
 import org.infogrid.util.text.StringRepresentation;
 
 /**
- * Specializes MeshObjectIdentifierFactory to create NetMeshObjectIdentifiers.
+ * Delegates all requests to a delegate NetMeshObjectIdentifierFactory. Overriding
+ * methods makes it easy to customize NetMeshObjectIdentifierFactory implementations.
  */
-public interface NetMeshObjectIdentifierFactory
-        extends
-            MeshObjectIdentifierFactory
+public abstract class DelegatingNetMeshObjectIdentifierFactory
+        implements
+            NetMeshObjectIdentifierFactory
 {
+    /**
+     * Constructor.
+     *
+     * @param delegate the delegate NetMeshObjectIdentifierFactory
+     */
+    protected DelegatingNetMeshObjectIdentifierFactory(
+            NetMeshObjectIdentifierFactory delegate )
+    {
+        theDelegate = delegate;
+    }
+
+    /**
+     * Obtain the delegate NetMeshObjectIdentifierFactory.
+     *
+     * @return the delegate NetMeshObjectIdentifierFactory
+     */
+    public NetMeshObjectIdentifierFactory getDelegate()
+    {
+        return theDelegate;
+    }
+
     /**
      * Determine the Identifier of the Home Object.
      *
      * @return the Identifier
      */
-    public abstract NetMeshObjectIdentifier getHomeMeshObjectIdentifier();
+    public NetMeshObjectIdentifier getHomeMeshObjectIdentifier()
+    {
+        return theDelegate.getHomeMeshObjectIdentifier();
+    }
 
     /**
      * Determine the Identifier of the Home Object in a NetMeshBase with the given
@@ -40,8 +64,11 @@ public interface NetMeshObjectIdentifierFactory
      * @param mbIdentifier the NetMeshBaseIdentifier of the NetMeshBase
      * @return the Identifier
      */
-    public abstract NetMeshObjectIdentifier getHomeMeshObjectIdentifierFor(
-            NetMeshBaseIdentifier mbIdentifier );
+    public NetMeshObjectIdentifier getHomeMeshObjectIdentifierFor(
+            NetMeshBaseIdentifier mbIdentifier )
+    {
+        return theDelegate.getHomeMeshObjectIdentifierFor( mbIdentifier );
+    }
 
     /**
      * Create a unique Identifier for a MeshObject that can be used to create a MeshObject
@@ -49,7 +76,10 @@ public interface NetMeshObjectIdentifierFactory
      *
      * @return the created Identifier
      */
-    public abstract NetMeshObjectIdentifier createMeshObjectIdentifier();
+    public NetMeshObjectIdentifier createMeshObjectIdentifier()
+    {
+        return theDelegate.createMeshObjectIdentifier();
+    }
 
     /**
      * Create an identifier for a MeshObject held locally at this MeshBase.
@@ -58,11 +88,13 @@ public interface NetMeshObjectIdentifierFactory
      * @return the created NetMeshObjectIdentifier
      * @throws ParseException a parsing error occurred
      */
-    // @Override except that the compiler doesn't like it
     public NetMeshObjectIdentifier fromExternalForm(
             String raw )
         throws
-            ParseException;
+            ParseException
+    {
+        return theDelegate.fromExternalForm( raw );
+    }
 
     /**
      * Create an identifier for a MeshObject held at a different MeshBase.
@@ -76,7 +108,10 @@ public interface NetMeshObjectIdentifierFactory
             NetMeshBaseIdentifier meshBaseIdentifier,
             String                raw )
         throws
-            ParseException;
+            ParseException
+    {
+        return theDelegate.fromExternalForm( meshBaseIdentifier, raw );
+    }
 
     /**
      * Recreate a NetMeshObjectIdentifier from an external form. Be lenient about syntax and
@@ -90,7 +125,10 @@ public interface NetMeshObjectIdentifierFactory
     public NetMeshObjectIdentifier guessFromExternalForm(
             String raw )
         throws
-            ParseException;
+            ParseException
+    {
+        return theDelegate.guessFromExternalForm( raw );
+    }
 
     /**
      * Convert this StringRepresentation back to a MeshObjectIdentifier.
@@ -104,5 +142,13 @@ public interface NetMeshObjectIdentifierFactory
             StringRepresentation representation,
             String               s )
         throws
-            ParseException;
+            ParseException
+    {
+        return theDelegate.fromStringRepresentation( representation, s );
+    }
+
+    /**
+     * The underlying delegate.
+     */
+    protected NetMeshObjectIdentifierFactory theDelegate;
 }

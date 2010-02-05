@@ -248,7 +248,7 @@ public class DefaultAnetMeshObjectIdentifierFactory
 
     /**
      * Determine whether a given String is to be treated as a global identifier. This
-     * method encodes our policy of the String is ambiguous.
+     * method encodes our policy if the String is ambiguous.
      *
      * @param raw the String
      * @return true if the String is to be treated as a global identifier
