@@ -5,23 +5,23 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
-package org.infogrid.lid.local;
+package org.infogrid.lid;
 
 import org.infogrid.util.CannotFindHasIdentifierException;
 import org.infogrid.util.Identifier;
 
 /**
- * Thrown if a LidPersona with this identifier is required for an operation but cannot
+ * Thrown if a LidPersona with this Identifier is required for an operation but cannot
  * be found.
  */
-public class LidLocalPersonaUnknownException
+public class LidPersonaUnknownException
         extends
             CannotFindHasIdentifierException
 {
@@ -29,22 +29,22 @@ public class LidLocalPersonaUnknownException
 
     /**
      * Constructor.
-     * 
+     *
      * @param identifier the identifier that could not be resolved into a LidPersona
      */
-    public LidLocalPersonaUnknownException(
+    public LidPersonaUnknownException(
             Identifier identifier )
     {
         super( identifier );
     }
-    
+
     /**
      * Constructor.
-     * 
+     *
      * @param identifier the identifier that could not be resolved into a LidPersona
      * @param cause the underlying cause, if any
      */
-    public LidLocalPersonaUnknownException(
+    public LidPersonaUnknownException(
             Identifier identifier,
             Throwable  cause )
     {

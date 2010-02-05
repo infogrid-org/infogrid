@@ -25,12 +25,12 @@ import javax.naming.directory.SearchResult;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
-import org.infogrid.lid.AbstractReadOnlyLidLocalPersonaManager;
-import org.infogrid.lid.local.LidLocalPersona;
-import org.infogrid.lid.local.LidLocalPersonaUnknownException;
-import org.infogrid.lid.local.SimpleLidLocalPersona;
+import org.infogrid.lid.AbstractLidPersonaManager;
+import org.infogrid.lid.LidPersona;
+import org.infogrid.lid.LidPersonaUnknownException;
+import org.infogrid.lid.SimpleLidPersona;
+import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.Identifier;
-import org.infogrid.util.InvalidCharacterParseException;
 import org.infogrid.util.InvalidIdentifierException;
 import org.infogrid.util.logging.Log;
 
@@ -56,7 +56,7 @@ import org.infogrid.util.logging.Log;
  */
 public class LdapLidLocalPersonaManager
         extends
-            AbstractReadOnlyLidLocalPersonaManager
+            AbstractLidPersonaManager
 {
     private static final Log log = Log.getLogInstance( LdapLidLocalPersonaManager.class  );
 
@@ -83,7 +83,8 @@ public class LdapLidLocalPersonaManager
                 ldapContextName,
                 filter,
                 null,
-                attributeList );
+                attributeList,
+                null );
     }
 
     /**
@@ -94,6 +95,7 @@ public class LdapLidLocalPersonaManager
      * @param filter the LDAP filter expression, or null if default
      * @param controls the SearchControls to use for queries, or null if default
      * @param attributeList the list of attributes to pull out of LDAP. If null, pull out all attributes.
+     * @param identifierSuffix the suffix to append to all identifiers
      * @return the created LdapLidLocalPersonaManager
      * @throws NamingException something went wrong when attempting to bind to
      */
@@ -102,7 +104,8 @@ public class LdapLidLocalPersonaManager
             String         ldapContextName,
             String         filter,
             SearchControls controls,
-            String []      attributeList )
+            String []      attributeList,
+            String         identifierSuffix )
         throws
             NamingException
     {
@@ -117,7 +120,17 @@ public class LdapLidLocalPersonaManager
             controls.setSearchScope( SearchControls.SUBTREE_SCOPE );
         }
 
-        LdapLidLocalPersonaManager ret = new LdapLidLocalPersonaManager( props, ldapContextName, filter, controls, attributeList );
+        LidCredentialType [] credentialTypes = {
+                new LdapLidPasswordCredentialType( props, identifierSuffix )
+        };
+
+        LdapLidLocalPersonaManager ret = new LdapLidLocalPersonaManager(
+                props,
+                ldapContextName,
+                filter,
+                controls,
+                attributeList,
+                credentialTypes );
         return ret;
     }
 
@@ -129,34 +142,38 @@ public class LdapLidLocalPersonaManager
      * @param filter the LDAP filter expression
      * @param controls the SearchControls to use for queries
      * @param attributeList the list of attributes to pull out of LDAP. If null, pull out all attributes.
+     * @param credentialTypes the LidCredentialTypes for this LidPersonaManager
      */
     protected LdapLidLocalPersonaManager(
-            Properties     props,
-            String         ldapContextName,
-            String         filter,
-            SearchControls controls,
-            String []      attributeList )
+            Properties           props,
+            String               ldapContextName,
+            String               filter,
+            SearchControls       controls,
+            String []            attributeList,
+            LidCredentialType [] credentialTypes )
     {
+        super( );
         theLdapProperties   = props;
         theManagerDir       = null;
         theLdapContextName  = ldapContextName;
         theFilter           = filter;
         theControls         = controls;
         theAttributeList    = attributeList;
+        theCredentialTypes  = credentialTypes;
     }
 
     /**
-     * Obtain a LidLocalPersona, given its identifier.
+     * Obtain a LidPersona, given its identifier.
      *
-     * @param identifier the identifier for which the LidLocalPersona will be retrieved
-     * @return the found LidLocalPersona
-     * @throws LidLocalPersonaUnknownException thrown if no LidLocalPersona exists with this identifier
+     * @param identifier the identifier for which the LidPersona will be retrieved
+     * @return the found LidPersona
+     * @throws LidPersonaUnknownException thrown if no LidPersona exists with this identifier
      * @throws InvalidIdentifierException thrown if an invalid Identifier was provided
      */
-    public LidLocalPersona find(
+    public LidPersona find(
             Identifier identifier )
         throws
-            LidLocalPersonaUnknownException,
+            LidPersonaUnknownException,
             InvalidIdentifierException
     {
         NamingEnumeration found = null;
@@ -166,7 +183,7 @@ public class LdapLidLocalPersonaManager
             throw new InvalidIdentifierException( identifier );
         }
         if( s.length() == 0 ) {
-            throw new LidLocalPersonaUnknownException( identifier );
+            throw new LidPersonaUnknownException( identifier );
         }
         String filter = MessageFormat.format( theFilter, s );
 
@@ -210,7 +227,7 @@ public class LdapLidLocalPersonaManager
                             }
                         }
                     }
-                    LidLocalPersona ret = SimpleLidLocalPersona.create( identifier, attributes );
+                    LidPersona ret = SimpleLidPersona.create( identifier, null, attributes, theCredentialTypes, new String[ theCredentialTypes.length ] );
 
                     if( found.hasMore() ) {
                         SearchResult current2 = (SearchResult) found.next();
@@ -218,7 +235,7 @@ public class LdapLidLocalPersonaManager
                     }
                     return ret;
                 }
-                throw new LidLocalPersonaUnknownException( identifier );
+                throw new LidPersonaUnknownException( identifier );
 
             } catch( CommunicationException ex ) {
                 // connection to directory may have timed out
@@ -226,7 +243,7 @@ public class LdapLidLocalPersonaManager
 
             } catch( NamingException ex ) {
                 log.error( ex );
-                throw new LidLocalPersonaUnknownException( identifier );
+                throw new LidPersonaUnknownException( identifier );
 
             } finally {
                 if( found != null ) {
@@ -239,7 +256,7 @@ public class LdapLidLocalPersonaManager
             }
         }
         log.error( "Could not connect to LDAP: " + theLdapProperties );
-        throw new LidLocalPersonaUnknownException( identifier );
+        throw new LidPersonaUnknownException( identifier );
     }
 
     /**
@@ -271,6 +288,11 @@ public class LdapLidLocalPersonaManager
      * The list of attributes to pull out of LDAP. If null, pull out all attributes.
      */
     protected String [] theAttributeList;
+
+    /**
+     * The CredentialTypes for this LidPersonaManager.
+     */
+    protected LidCredentialType [] theCredentialTypes;
 
     /**
      * The default filter.

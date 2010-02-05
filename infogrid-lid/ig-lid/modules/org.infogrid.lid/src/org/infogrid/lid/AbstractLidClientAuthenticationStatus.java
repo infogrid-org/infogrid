@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,7 +16,6 @@ package org.infogrid.lid;
 
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
-import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
@@ -33,6 +32,7 @@ public abstract class AbstractLidClientAuthenticationStatus
     /**
      * Constructor for subclasses only.
      * 
+     * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientPersona the client LidPersona that was found, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
@@ -47,8 +47,9 @@ public abstract class AbstractLidClientAuthenticationStatus
      * @param siteIdentifier identifies the site at which this status applies
      */
     protected AbstractLidClientAuthenticationStatus(
+            String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
-            HasIdentifier                    clientPersona,
+            LidPersona                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
             LidCredentialType []             carriedInvalidCredentialTypes,
@@ -60,8 +61,9 @@ public abstract class AbstractLidClientAuthenticationStatus
             LidAuthenticationService []      authenticationServices,
             Identifier                       siteIdentifier )
     {
-        theClientIdentifier = clientIdentifier;
-        theClientPersona    = clientPersona;
+        theClientIdentifierAsEntered = clientIdentifierAsEntered;
+        theClientIdentifier          = clientIdentifier;
+        theClientPersona             = clientPersona;
 
         thePreexistingClientSession = preexistingClientSession;
         
@@ -274,6 +276,17 @@ public abstract class AbstractLidClientAuthenticationStatus
     }
 
     /**
+     * Obtain the String that was entered by the client as the identifier as the client. If parsing this String
+     * was successful, getClientIdentifier() will also return non-null.
+     *
+     * @return the claimed client identifier as entered by the client
+     */
+    public String getClientIdentifierAsEntered()
+    {
+        return theClientIdentifierAsEntered;
+    }
+
+    /**
      * Obtain the identifier of the client. To determine whether to trust that the client indeed
      * owns this identifier, other methods need to be consulted. This method makes no statement 
      * about trustworthiness.
@@ -290,7 +303,7 @@ public abstract class AbstractLidClientAuthenticationStatus
      * 
      * @return the LidPersona
      */
-    public HasIdentifier getClientPersona()
+    public LidPersona getClientPersona()
     {
         return theClientPersona;
     }
@@ -361,6 +374,45 @@ public abstract class AbstractLidClientAuthenticationStatus
     }
 
     /**
+     * Convenience method to determine whether the client is authenticated. This aggregates information
+     * from the other calls.
+     *
+     * @return true if the client is authenticated
+     */
+    public boolean isAuthenticated()
+    {
+        if( isInvalidIdentity() ) {
+            return false;
+        }
+        if( isAnonymous() ) {
+            return false;
+        }
+        if( isClaimedOnly() ) {
+            return false;
+        }
+        if( isExpiredSessionOnly() ) {
+            return false;
+        }
+        if( clientWishesToCancelSession() ) {
+            return false;
+        }
+        if( clientWishesToLogout() ) {
+            return false;
+        }
+        if( isCarryingInvalidCredential() ) {
+            return false;
+        }
+
+        if( isCarryingValidCredential() ) {
+            return true;
+        }
+        if( isValidSessionOnly() ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Dump this object.
      *
      * @param d the Dumper to dump to
@@ -370,6 +422,7 @@ public abstract class AbstractLidClientAuthenticationStatus
     {
         d.dump( this,
                 new String[] {
+                    "theClientIdentifierAsEntered",
                     "theClientIdentifier",
                     "theClientPersona",
                     "thePreexistingClientSession",
@@ -381,6 +434,7 @@ public abstract class AbstractLidClientAuthenticationStatus
                     "theClientWishesToLogout",
                     "theAuthenticationServices"
                 }, new Object[] {
+                    theClientIdentifierAsEntered,
                     theClientIdentifier,
                     theClientPersona,
                     thePreexistingClientSession,
@@ -395,14 +449,19 @@ public abstract class AbstractLidClientAuthenticationStatus
     }
 
     /**
+     * The identifier provided by the client as entered by the client.
+     */
+    protected String theClientIdentifierAsEntered;
+
+    /**
      * The normalized identifier provided by the client.
      */
     protected Identifier theClientIdentifier;
     
     /**
-     * The determined client HasIdentifier.
+     * The determined client LidPersona.
      */
-    protected HasIdentifier theClientPersona;
+    protected LidPersona theClientPersona;
     
     /**
      * The credential types that were provided by the client as part of this request and that

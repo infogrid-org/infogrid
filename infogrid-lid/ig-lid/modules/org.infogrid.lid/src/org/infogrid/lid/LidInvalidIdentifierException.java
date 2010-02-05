@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,7 +18,7 @@ import org.infogrid.util.AbstractLocalizedException;
 import org.infogrid.util.Identifier;
 
 /**
- * An invalidIdentifier was entered that was invalid.
+ * An invalid Identifier was provided by the client that was invalid.
  */
 public class LidInvalidIdentifierException
         extends
@@ -40,7 +40,7 @@ public class LidInvalidIdentifierException
     /**
      * Constructor.
      * 
-     * @param invalidIdentifier the invalid invalidIdentifier
+     * @param invalidIdentifier the invalid Identifier
      * @param cause the underlying cause, if any
      */
     public LidInvalidIdentifierException(
@@ -53,9 +53,9 @@ public class LidInvalidIdentifierException
     }
     
     /**
-     * Obtain the invalid invalidIdentifier.
+     * Obtain the invalid Identifier.
      * 
-     * @return the invalidIdentifier
+     * @return the invalid Identifier
      */
     public Identifier getIdentifier()
     {
@@ -73,7 +73,7 @@ public class LidInvalidIdentifierException
     }
 
     /**
-     * The invalid invalidIdentifier.
+     * The invalid Identifier.
      */
     protected Identifier theInvalidIdentifier;
 }

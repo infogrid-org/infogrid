@@ -106,9 +106,9 @@ public class DefaultOpenIdLidProcessingPipeline
             }
         }
 
-        if( theResourceFinder != null ) {
+        if( thePersonaManager != null ) {
             try {
-                requestedResource = theResourceFinder.findFromRequest( lidRequest );
+                requestedResource = thePersonaManager.findFromRequest( lidRequest );
             } catch( Exception ex ) {
                 if( log.isInfoEnabled() ) {
                     log.info( ex );

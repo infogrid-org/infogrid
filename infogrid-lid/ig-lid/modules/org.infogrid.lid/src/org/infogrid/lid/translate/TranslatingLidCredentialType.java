@@ -12,18 +12,19 @@
 // All rights reserved.
 //
 
-package org.infogrid.lid.local;
+package org.infogrid.lid.translate;
 
+import org.infogrid.lid.LidPersona;
+import org.infogrid.lid.LidPersonaUnknownException;
 import org.infogrid.lid.credential.AbstractLidCredentialType;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.lid.credential.TranslatingLidInvalidCredentialException;
-import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.InvalidIdentifierException;
 import org.infogrid.util.http.SaneRequest;
 
 /**
- * A LidCredentialType that implements the parallel to TranslatingLidLocalPersonaManager.
+ * A LidCredentialType that implements the parallel to TranslatingLidPersonaManager.
  */
 public class TranslatingLidCredentialType
         extends
@@ -32,12 +33,12 @@ public class TranslatingLidCredentialType
     /**
      * Factory method.
      *
-     * @param bridge the corresponding TranslatingLidLocalPersonaManager
+     * @param bridge the corresponding TranslatingLidPersonaManager
      * @param delegate the delegate LidCredentialType
      * @return the created TranslatingLidCredentialType
      */
     public static TranslatingLidCredentialType create(
-            TranslatingLidLocalPersonaManager bridge,
+            TranslatingLidPersonaManager bridge,
             LidCredentialType                 delegate )
     {
         return new TranslatingLidCredentialType( bridge, delegate );
@@ -46,11 +47,11 @@ public class TranslatingLidCredentialType
     /**
      * Constructor.
      *
-     * @param bridge the corresponding TranslatingLidLocalPersonaManager
+     * @param bridge the corresponding TranslatingLidPersonaManager
      * @param delegate the delegate LidCredentialType
      */
     protected TranslatingLidCredentialType(
-            TranslatingLidLocalPersonaManager bridge,
+            TranslatingLidPersonaManager bridge,
             LidCredentialType                 delegate )
     {
         theBridge   = bridge;
@@ -78,15 +79,15 @@ public class TranslatingLidCredentialType
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
-            SaneRequest   request,
-            HasIdentifier subject )
+            SaneRequest request,
+            LidPersona  subject )
         throws
             LidInvalidCredentialException
     {
-        HasIdentifier delegateSubject;
+        LidPersona delegateSubject;
         try {
-            delegateSubject = theBridge.translatePersonaForward( (LidLocalPersona) subject );
-        } catch( LidLocalPersonaUnknownException ex ) {
+            delegateSubject = theBridge.translatePersonaForward( subject );
+        } catch( LidPersonaUnknownException ex ) {
             throw new TranslatingLidInvalidCredentialException( null, subject.getIdentifier(), this, ex );
 
         } catch( InvalidIdentifierException ex ) {
@@ -136,9 +137,9 @@ public class TranslatingLidCredentialType
     }
 
     /**
-     * The corresponding TranslatingLidLocalPersonaManager.
+     * The corresponding TranslatingLidPersonaManager.
      */
-    protected TranslatingLidLocalPersonaManager theBridge;
+    protected TranslatingLidPersonaManager theBridge;
 
     /**
      * The delegate.

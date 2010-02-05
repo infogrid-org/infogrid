@@ -18,12 +18,11 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.Identifier;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
 
 /**
- * Knows how to manage the session.
+ * Knows how to manage a Lidsession.
  */
 public class DefaultLidSessionManagementStage
         implements
@@ -76,7 +75,7 @@ public class DefaultLidSessionManagementStage
         Boolean deleteSessionCookie;
         Boolean createNewSession;
 
-        Identifier lidCookieIdentifierToSet = null;
+        LidPersona personaToSet             = null;
         LidSession preexistingSession       = clientAuthStatus.getPreexistingClientSession();
 
         ArrayList<LidSession> sessionsToCancel = new ArrayList<LidSession>();
@@ -125,7 +124,7 @@ public class DefaultLidSessionManagementStage
             deleteSessionCookie = Boolean.FALSE;
 
             if( preexistingSession != null ) {
-                if( preexistingSession.getClientIdentifier().equals( clientAuthStatus.getClientIdentifier() )) {
+                if( preexistingSession.getClient().isIdentifiedBy( clientAuthStatus.getClientIdentifier() )) {
                     // always renew, whether still valid or not
                     sessionsToRenew.add( preexistingSession );
                     createNewSession = Boolean.FALSE;
@@ -140,7 +139,7 @@ public class DefaultLidSessionManagementStage
                 createNewSession = Boolean.TRUE;
             }
 
-            lidCookieIdentifierToSet = clientAuthStatus.getClientIdentifier();
+            personaToSet = clientAuthStatus.getClientPersona();
 
         } else if( clientAuthStatus.clientWishesToLogin() ) {
             // valid user, but no valid session
@@ -200,7 +199,7 @@ public class DefaultLidSessionManagementStage
                     clientAuthStatus,
                     ArrayHelper.copyIntoNewArray( sessionsToCancel, LidSession.class ),
                     ArrayHelper.copyIntoNewArray( sessionsToRenew, LidSession.class ),
-                    lidCookieIdentifierToSet,
+                    personaToSet,
                     clientAuthStatus.getSiteIdentifier(),
                     sessionCookieStringToSet,
                     theSessionManager.getDefaultSessionDuration() );
@@ -237,10 +236,10 @@ public class DefaultLidSessionManagementStage
             ret.addCookieToRemove( sessionCookieName, cookieDomain, cookiePath );
         }
 
-        if( lidCookieIdentifierToSet != null ) {
+        if( personaToSet != null ) {
             ret.addCookieToSet(
                     lidCookieName,
-                    lidCookieIdentifierToSet.toExternalForm(),
+                    personaToSet.getIdentifier().toExternalForm(),
                     cookieDomain,
                     cookiePath,
                     LidCookies.LID_IDENTIFIER_COOKIE_DEFAULT_MAX_AGE );

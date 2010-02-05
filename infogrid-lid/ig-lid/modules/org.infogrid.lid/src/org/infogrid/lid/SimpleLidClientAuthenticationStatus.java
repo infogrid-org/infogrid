@@ -18,7 +18,6 @@ import java.util.Collection;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.ArrayHelper;
-import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 
 /**
@@ -31,6 +30,7 @@ public class SimpleLidClientAuthenticationStatus
     /**
      * Factory method.
      * 
+     * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientPersona the client LidPersona that was found, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
@@ -46,8 +46,9 @@ public class SimpleLidClientAuthenticationStatus
      * @return the created SimpleLidClientAuthenticationStatus
      */
     public static SimpleLidClientAuthenticationStatus create(
+            String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
-            HasIdentifier                    clientPersona,
+            LidPersona                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
             LidCredentialType []             carriedInvalidCredentialTypes,
@@ -60,6 +61,7 @@ public class SimpleLidClientAuthenticationStatus
             Identifier                       siteIdentifier )
     {
         SimpleLidClientAuthenticationStatus ret = new SimpleLidClientAuthenticationStatus(
+                clientIdentifierAsEntered,
                 clientIdentifier,
                 clientPersona,
                 preexistingClientSession,
@@ -79,6 +81,7 @@ public class SimpleLidClientAuthenticationStatus
     /**
      * Factory method.
      *
+     * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientPersona the client LidPersona that was found, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
@@ -94,8 +97,9 @@ public class SimpleLidClientAuthenticationStatus
      * @return the created SimpleLidClientAuthenticationStatus
      */
     public static SimpleLidClientAuthenticationStatus create(
+            String                                    clientIdentifierAsEntered,
             Identifier                                clientIdentifier,
-            HasIdentifier                             clientPersona,
+            LidPersona                                clientPersona,
             LidSession                                preexistingClientSession,
             Collection<LidCredentialType>             carriedValidCredentialTypes,
             Collection<LidCredentialType>             carriedInvalidCredentialTypes,
@@ -108,6 +112,7 @@ public class SimpleLidClientAuthenticationStatus
             Identifier                                siteIdentifier )
     {
         SimpleLidClientAuthenticationStatus ret = SimpleLidClientAuthenticationStatus.create(
+                clientIdentifierAsEntered,
                 clientIdentifier,
                 clientPersona,
                 preexistingClientSession,
@@ -133,6 +138,7 @@ public class SimpleLidClientAuthenticationStatus
     /**
      * Constructor for subclasses only, use factory method.
      * 
+     * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientPersona the client LidPersona that was found, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
@@ -147,8 +153,9 @@ public class SimpleLidClientAuthenticationStatus
      * @param siteIdentifier identifies the site at which this status applies
      */
     protected SimpleLidClientAuthenticationStatus(
+            String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
-            HasIdentifier                    clientPersona,
+            LidPersona                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
             LidCredentialType []             carriedInvalidCredentialTypes,
@@ -160,7 +167,8 @@ public class SimpleLidClientAuthenticationStatus
             LidAuthenticationService []      authenticationServices,
             Identifier                       siteIdentifier )
     {
-        super(  clientIdentifier,
+        super(  clientIdentifierAsEntered,
+                clientIdentifier,
                 clientPersona,
                 preexistingClientSession,
                 carriedValidCredentialTypes,

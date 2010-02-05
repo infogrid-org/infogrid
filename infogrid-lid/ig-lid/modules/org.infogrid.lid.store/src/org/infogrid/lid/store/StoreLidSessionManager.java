@@ -8,13 +8,14 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.store;
 
 import org.infogrid.lid.AbstractSimpleLidSessionManager;
+import org.infogrid.lid.LidPersonaManager;
 import org.infogrid.lid.LidSession;
 import org.infogrid.lid.LidSessionManager;
 import org.infogrid.lid.LidSessionManagerArguments;
@@ -22,6 +23,7 @@ import org.infogrid.store.Store;
 import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.Factory;
 import org.infogrid.util.IdentifierFactory;
+import org.infogrid.util.SimpleStringIdentifierFactory;
 
 /**
  * Implements LidSessionManager using the Store abstraction.
@@ -34,16 +36,32 @@ public class StoreLidSessionManager
 {
     /**
      * Factory method.
-     * 
+     *
      * @param store the Store to use
-     * @param idFact the IdentifierFactory for client and site identifiers
+     * @param personaManager the LidPersonaManager to find any LidPersona referenced in a LidSession
      * @return the created StoreLidSessionManager
      */
     public static StoreLidSessionManager create(
             Store             store,
-            IdentifierFactory idFact )
+            LidPersonaManager personaManager )
     {
-        return create( store, idFact, DEFAULT_SESSION_DURATION );
+        return create( store, new SimpleStringIdentifierFactory(), personaManager, DEFAULT_SESSION_DURATION );
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param store the Store to use
+     * @param idFact the IdentifierFactory for client and site identifiers
+     * @param personaManager the LidPersonaManager to find any LidPersona referenced in a LidSession
+     * @return the created StoreLidSessionManager
+     */
+    public static StoreLidSessionManager create(
+            Store             store,
+            IdentifierFactory idFact,
+            LidPersonaManager personaManager )
+    {
+        return create( store, idFact, personaManager, DEFAULT_SESSION_DURATION );
     }
 
     /**
@@ -51,15 +69,17 @@ public class StoreLidSessionManager
      * 
      * @param store the Store to use
      * @param idFact the IdentifierFactory for client and site identifiers
+     * @param personaManager the LidPersonaManager to find any LidPersona referenced in a LidSession
      * @param sessionDuration the duration of the session, in milliseconds
      * @return the created StoreLidSessionManager
      */
     public static StoreLidSessionManager create(
             Store             store,
             IdentifierFactory idFact,
+            LidPersonaManager personaManager,
             long              sessionDuration )
     {
-        StoreLidSessionMapper mapper = new StoreLidSessionMapper( idFact );
+        StoreLidSessionMapper mapper = new StoreLidSessionMapper( idFact, personaManager );
         
         StoreBackedSwappingHashMap<String,LidSession> storage = StoreBackedSwappingHashMap.createWeak(
                 mapper,

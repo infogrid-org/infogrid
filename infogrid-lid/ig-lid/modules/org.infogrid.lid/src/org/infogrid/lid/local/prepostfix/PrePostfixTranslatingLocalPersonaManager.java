@@ -8,14 +8,14 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.local.prepostfix;
 
-import org.infogrid.lid.local.LidLocalPersonaManager;
-import org.infogrid.lid.local.TranslatingLidLocalPersonaManager;
+import org.infogrid.lid.LidPersonaManager;
+import org.infogrid.lid.translate.TranslatingLidPersonaManager;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.SimpleStringIdentifier;
 import org.infogrid.util.logging.CanBeDumped;
@@ -27,7 +27,7 @@ import org.infogrid.util.logging.Dumper;
  */
 public class PrePostfixTranslatingLocalPersonaManager
         extends
-            TranslatingLidLocalPersonaManager
+            TranslatingLidPersonaManager
         implements
             CanBeDumped
 {
@@ -39,8 +39,8 @@ public class PrePostfixTranslatingLocalPersonaManager
      * @return the created PrePostfixTranslatingLocalPersonaManager
      */
     public static PrePostfixTranslatingLocalPersonaManager create(
-            String                 prefix,
-            LidLocalPersonaManager delegate )
+            String            prefix,
+            LidPersonaManager delegate )
     {
         PrePostfixTranslatingLocalPersonaManager ret = new PrePostfixTranslatingLocalPersonaManager(
                 prefix,
@@ -59,9 +59,9 @@ public class PrePostfixTranslatingLocalPersonaManager
      * @return the created PrePostfixTranslatingLocalPersonaManager
      */
     public static PrePostfixTranslatingLocalPersonaManager create(
-            String                 prefix,
-            String                 postfix,
-            LidLocalPersonaManager delegate )
+            String            prefix,
+            String            postfix,
+            LidPersonaManager delegate )
     {
         PrePostfixTranslatingLocalPersonaManager ret = new PrePostfixTranslatingLocalPersonaManager(
                 prefix,
@@ -79,9 +79,9 @@ public class PrePostfixTranslatingLocalPersonaManager
      * @param delegate the delegate LidLocalPersonaManager
      */
     protected PrePostfixTranslatingLocalPersonaManager(
-            String                 prefix,
-            String                 postfix,
-            LidLocalPersonaManager delegate )
+            String            prefix,
+            String            postfix,
+            LidPersonaManager delegate )
     {
         super( delegate );
         

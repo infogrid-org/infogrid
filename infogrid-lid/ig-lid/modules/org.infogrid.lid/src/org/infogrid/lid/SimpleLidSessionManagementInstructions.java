@@ -44,7 +44,7 @@ public class SimpleLidSessionManagementInstructions
      * @param clientAuthenticationStatus the current client's authentication status
      * @param sessionsToCancel all sessions to cancel
      * @param sessionToRenew all sessions to renew
-     * @param clientIdentifierForNewSession  Identifier of the client for which a new session shall be created
+     * @param clientForNewSession the client for which a new session shall be created
      * @param siteIdentifierForNewSession Identifier of the site for which a new session shall be created
      * @param tokenForNewSession token for the new session
      * @param durationForNewSession duration for the new session, in milliseconds
@@ -54,7 +54,7 @@ public class SimpleLidSessionManagementInstructions
             LidClientAuthenticationStatus clientAuthenticationStatus,
             LidSession []                 sessionsToCancel,
             LidSession []                 sessionToRenew,
-            Identifier                    clientIdentifierForNewSession,
+            LidPersona                    clientForNewSession,
             Identifier                    siteIdentifierForNewSession,
             String                        tokenForNewSession,
             long                          durationForNewSession )
@@ -63,7 +63,7 @@ public class SimpleLidSessionManagementInstructions
                 clientAuthenticationStatus,
                 sessionsToCancel,
                 sessionToRenew,
-                clientIdentifierForNewSession,
+                clientForNewSession,
                 siteIdentifierForNewSession,
                 tokenForNewSession,
                 durationForNewSession );
@@ -98,7 +98,7 @@ public class SimpleLidSessionManagementInstructions
      * @param clientAuthenticationStatus the current client's authentication status
      * @param sessionsToCancel all sessions to cancel
      * @param sessionToRenew all sessions to renew
-     * @param clientIdentifierForNewSession  Identifier of the client for which a new session shall be created
+     * @param clientForNewSession the client for which a new session shall be created
      * @param siteIdentifierForNewSession Identifier of the site for which a new session shall be created
      * @param tokenForNewSession token for the new session
      * @param durationForNewSession duration for the new session, in milliseconds
@@ -107,7 +107,7 @@ public class SimpleLidSessionManagementInstructions
             LidClientAuthenticationStatus clientAuthenticationStatus,
             LidSession []                 sessionsToCancel,
             LidSession []                 sessionToRenew,
-            Identifier                    clientIdentifierForNewSession,
+            LidPersona                    clientForNewSession,
             Identifier                    siteIdentifierForNewSession,
             String                        tokenForNewSession,
             long                          durationForNewSession )
@@ -117,8 +117,8 @@ public class SimpleLidSessionManagementInstructions
         theSessionsToCancel = sessionsToCancel;
         theSessionsToRenew  = sessionToRenew;
 
-        theClientIdentifierForNewSession = clientIdentifierForNewSession;
-        theSiteIdentifierForNewSession   = siteIdentifierForNewSession;
+        theClientForNewSession         = clientForNewSession;
+        theSiteIdentifierForNewSession = siteIdentifierForNewSession;
 
         theTokenForNewSession    = tokenForNewSession;
         theDurationForNewSession = durationForNewSession;
@@ -155,13 +155,13 @@ public class SimpleLidSessionManagementInstructions
     }
 
     /**
-     * Obtain the Identifier of the client for which a new session shall be created, if any.
+     * Obtain the client for which a new session shall be created, if any.
      *
-     * @return the client Identifier
+     * @return the client
      */
-    public Identifier getClientIdentifierForNewSession()
+    public LidPersona getClientForNewSession()
     {
-        return theClientIdentifierForNewSession;
+        return theClientForNewSession;
     }
 
     /**
@@ -294,13 +294,13 @@ public class SimpleLidSessionManagementInstructions
         }
 
         LidSession newSession; // out here for debugging
-        if( theClientIdentifierForNewSession != null ) {
+        if( theClientForNewSession != null ) {
             try {
                 newSession = sessionManager.obtainFor(
                         theTokenForNewSession,
                         LidSessionManagerArguments.create(
                                 sessionManager.getDefaultSessionDuration(),
-                                theClientIdentifierForNewSession,
+                                theClientForNewSession,
                                 theSiteIdentifierForNewSession,
                                 request.getClientIp() ));
 
@@ -392,9 +392,9 @@ public class SimpleLidSessionManagementInstructions
                 buf.append( theSessionsToCancel[i] );
             }
         }
-        if( theClientIdentifierForNewSession != null ) {
-            buf.append( "\n    clientIdentifierForNewSession: " );
-            buf.append( theClientIdentifierForNewSession.toExternalForm() );
+        if( theClientForNewSession != null ) {
+            buf.append( "\n    clientForNewSession: " );
+            buf.append( theClientForNewSession );
         }
         if( theSiteIdentifierForNewSession != null ) {
             buf.append( "\n    siteIdentifierForNewSession: " );
@@ -441,9 +441,9 @@ public class SimpleLidSessionManagementInstructions
     protected LidSession [] theSessionsToRenew;
 
     /**
-     * Identifier of the client for which a new session shall be created.
+     * The client for which a new session shall be created.
      */
-    protected Identifier theClientIdentifierForNewSession;
+    protected LidPersona theClientForNewSession;
 
     /**
      * Identifier of the site for which a new session shall be created.

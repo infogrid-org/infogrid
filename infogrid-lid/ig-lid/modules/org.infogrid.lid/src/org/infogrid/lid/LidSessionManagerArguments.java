@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -25,36 +25,36 @@ public class LidSessionManagerArguments
      * Factory method.
      *
      * @param sessionDuration the session duration, in milliseconds
-     * @param clientIdentifier identifier of the client whose session it is
+     * @param client the client whose session it is
      * @param siteIdentifier identifier of the site where the session takes place
      * @param clientIp IP address of the client that created the session
      * @return the created LidSessionManagerArguments
      */
     public static LidSessionManagerArguments create(
             long       sessionDuration,
-            Identifier clientIdentifier,
+            LidPersona client,
             Identifier siteIdentifier,
             String     clientIp )
     {
-        return new LidSessionManagerArguments( sessionDuration, clientIdentifier, siteIdentifier, clientIp );
+        return new LidSessionManagerArguments( sessionDuration, client, siteIdentifier, clientIp );
     }
 
     /**
      * Constructor for subclasses only, use factory method.
      *
      * @param sessionDuration the session duration, in milliseconds
-     * @param clientIdentifier identifier of the client whose session it is
+     * @param client the client whose session it is
      * @param siteIdentifier identifier of the site where the session takes place
      * @param clientIp IP address of the client that created the session
      */
     protected LidSessionManagerArguments(
             long       sessionDuration,
-            Identifier clientIdentifier,
+            LidPersona client,
             Identifier siteIdentifier,
             String     clientIp )
     {
         theSessionDuration  = sessionDuration;
-        theClientIdentifier = clientIdentifier;
+        theClient           = client;
         theSiteIdentifier   = siteIdentifier;
         theClientIp         = clientIp;
     }
@@ -70,13 +70,13 @@ public class LidSessionManagerArguments
     }
 
     /**
-     * Obtain the Identifier of the client whose session it is.
+     * Obtain the client whose session it is.
      *
-     * @return the client Identifier
+     * @return the client
      */
-    public Identifier getClientIdentifier()
+    public LidPersona getClient()
     {
-        return theClientIdentifier;
+        return theClient;
     }
 
     /**
@@ -105,9 +105,9 @@ public class LidSessionManagerArguments
     protected long theSessionDuration;
 
     /**
-     * Identifier of the client whose session it is.
+     * The client whose session it is.
      */
-    protected Identifier theClientIdentifier;
+    protected LidPersona theClient;
 
     /**
      * Identifier of the site whose session it is.

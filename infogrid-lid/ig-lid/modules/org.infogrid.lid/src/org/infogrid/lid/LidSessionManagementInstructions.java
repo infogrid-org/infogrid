@@ -46,11 +46,11 @@ public interface LidSessionManagementInstructions
     public LidSession [] getSessionsToRenew();
 
     /**
-     * Obtain the Identifier of the client for which a new session shall be created, if any.
+     * Obtain the client for which a new session shall be created, if any.
      *
-     * @return the client Identifier
+     * @return the client
      */
-    public Identifier getClientIdentifierForNewSession();
+    public LidPersona getClientForNewSession();
 
     /**
      * Obtain the Identifier of the site for which a new session shall be created, if any.

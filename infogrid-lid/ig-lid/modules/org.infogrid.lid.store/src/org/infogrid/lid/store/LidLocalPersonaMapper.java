@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -19,14 +19,18 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Stack;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import org.infogrid.lid.LidPersona;
+import org.infogrid.lid.SimpleLidPersona;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.store.StoreEntryMapper;
 import org.infogrid.store.StoreValue;
 import org.infogrid.store.StoreValueDecodingException;
 import org.infogrid.store.StoreValueEncodingException;
+import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.SimpleStringIdentifier;
 import org.infogrid.util.XmlUtils;
@@ -44,7 +48,7 @@ public class LidLocalPersonaMapper
         extends
             DefaultHandler
         implements
-            StoreEntryMapper<Identifier,StoreLidLocalPersona>,
+            StoreEntryMapper<Identifier,LidPersona>,
             LidLocalPersonaTags
 {
     private static final Log log = Log.getLogInstance( LidLocalPersonaMapper.class  ); // our own, private logger
@@ -100,7 +104,7 @@ public class LidLocalPersonaMapper
      * @return the value
      * @throws StoreValueDecodingException thrown if the StoreValue could not been decoded
      */
-    public StoreLidLocalPersona decodeValue(
+    public SimpleLidPersona decodeValue(
             Identifier key,
             StoreValue value )
         throws
@@ -109,12 +113,20 @@ public class LidLocalPersonaMapper
         try {
             InputStream contentAsStream = value.getDataAsStream();
 
+            theCurrentIdentifier     = null;
+            theRemoteIdentifiers     = new ArrayList<Identifier>();
+            theCurrentAttCreds       = null;
+            theCurrentAttribute      = null;
+            theCurrentCredentialType = null;
+
             theParser.parse( contentAsStream, this );
             
-            StoreLidLocalPersona ret = new StoreLidLocalPersona(
+            SimpleLidPersona ret = SimpleLidPersona.create(
                     theCurrentIdentifier,
+                    ArrayHelper.copyIntoNewArray( theRemoteIdentifiers, Identifier.class ),
                     theCurrentAttCreds.getAttributes(),
-                    theCurrentAttCreds.getCredentials() );
+                    theCurrentAttCreds.getCredentialTypes(),
+                    theCurrentAttCreds.getCredentialValues() );
             
             return ret;
 
@@ -373,7 +385,7 @@ public class LidLocalPersonaMapper
      * @return the time created, in System.currentTimeMillis() format
      */
     public long getTimeCreated(
-            StoreLidLocalPersona value )
+            LidPersona value )
     {
         return -1L;
     }
@@ -385,7 +397,7 @@ public class LidLocalPersonaMapper
      * @return the time updated, in System.currentTimeMillis() format
      */
     public long getTimeUpdated(
-            StoreLidLocalPersona value )
+            LidPersona value )
     {
         return -1L;
     }
@@ -397,7 +409,7 @@ public class LidLocalPersonaMapper
      * @return the time read, in System.currentTimeMillis() format
      */
     public long getTimeRead(
-            StoreLidLocalPersona value )
+            LidPersona value )
     {
         return -1L;
     }
@@ -409,7 +421,7 @@ public class LidLocalPersonaMapper
      * @return the time will expire, in System.currentTimeMillis() format
      */
     public long getTimeExpires(
-            StoreLidLocalPersona value )
+            LidPersona value )
     {
         return -1L;
     }
@@ -422,7 +434,7 @@ public class LidLocalPersonaMapper
      * @throws StoreValueEncodingException thrown if the value could not been encoded
      */
     public byte [] asBytes(
-            StoreLidLocalPersona persona )
+            LidPersona persona )
         throws
             StoreValueEncodingException
     {
@@ -490,6 +502,11 @@ public class LidLocalPersonaMapper
      */
     protected Identifier theCurrentIdentifier;
     
+    /**
+     * The remote Identifiers of the LidPersona currently being parsed.
+     */
+    protected ArrayList<Identifier> theRemoteIdentifiers;
+
     /**
      * The AttributesCredentials of the LidLocalPersona currently being parsed.
      */

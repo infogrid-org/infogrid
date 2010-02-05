@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,34 +18,36 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.lid.AbstractLidPersonaManager;
+import org.infogrid.lid.LidPersona;
+import org.infogrid.lid.LidPersonaUnknownException;
 import org.infogrid.lid.credential.LidCredentialType;
-import org.infogrid.lid.local.AbstractLidLocalPersonaManager;
-import org.infogrid.lid.local.LidLocalPersona;
-import org.infogrid.lid.local.LidLocalPersonaExistsAlreadyException;
-import org.infogrid.lid.local.LidLocalPersonaUnknownException;
-import org.infogrid.lid.local.SimpleLidLocalPersona;
+import org.infogrid.lid.SimpleLidPersona;
 import org.infogrid.util.Identifier;
 
 /**
- * A LidLocalPersonaManager that compares user name and password against regular expressions.
+ * A LidPersonaManager that compares user name and password against regular expressions.
  * This is not likely to be useful in a production scenario, but can help during development
  * or testing.
  */
 public class RegexLidLocalPersonaManager
         extends
-            AbstractLidLocalPersonaManager
+            AbstractLidPersonaManager
 {
     /**
      * Factory method.
      * 
      * @param userNameRegex the user name regular expression
+     * @param passwordRegex the password regular expression
      * @return the created RegexLidLocalPersonaManager
      */
     public static RegexLidLocalPersonaManager create(
-            String userNameRegex )
+            String userNameRegex,
+            String passwordRegex )
     {
         RegexLidLocalPersonaManager ret = new RegexLidLocalPersonaManager(
-                Pattern.compile( userNameRegex ));
+                Pattern.compile( userNameRegex ),
+                Pattern.compile( passwordRegex ));
         
         return ret;
     }
@@ -54,13 +56,16 @@ public class RegexLidLocalPersonaManager
      * Factory method.
      * 
      * @param userNameRegex the user name regular expression
+     * @param passwordRegex the password regular expression
      * @return the created RegexLidLocalPersonaManager
      */
     public static RegexLidLocalPersonaManager create(
-            Pattern userNameRegex )
+            Pattern userNameRegex,
+            Pattern passwordRegex )
     {
         RegexLidLocalPersonaManager ret = new RegexLidLocalPersonaManager(
-                userNameRegex );
+                userNameRegex,
+                passwordRegex );
         
         return ret;
     }
@@ -69,76 +74,48 @@ public class RegexLidLocalPersonaManager
      * Private constructor, use factory method.
      * 
      * @param userNameRegex the user name regular expression
+     * @param passwordRegex the password regular expression
      */
     protected RegexLidLocalPersonaManager(
-            Pattern userNameRegex )
+            Pattern userNameRegex,
+            Pattern passwordRegex )
     {
         theUserNameRegex = userNameRegex;
+
+        theCredentialTypes = new LidCredentialType[] {
+                RegexLidPasswordCredentialType.create( passwordRegex )
+        };
+        theCredentials = new String[] {
+                null
+        };
     }
 
     /**
-     * Create a LidLocalPersona.
+     * Obtain a LidPersona, given its Identifier.
      *
-     * @param identifier the identifier for the to-be-created LidLocalPersona
-     * @param attributes the attributes for the to-be-created LidLocalPersona
-     * @param credentials the credentials for the to-be-created LidLocalPersona
-     * @return the LocalPersona that was created
-     * @throws LidLocalPersonaExistsAlreadyException thrown if a LidLocalPersona with this identifier exists already
-     * @throws UnsupportedOperationException thrown if this LidIdentityManager does not permit the creation of new LidLocalPersonas
+     * @param identifier the Identifier for which the LidPersona will be retrieved
+     * @return the found LidPersona
+     * @throws LidPersonaUnknownException thrown if no LidPersona exists with this Identifier
      */
-    public LidLocalPersona createLocalPersona(
-            Identifier                    identifier,
-            Map<String,String>            attributes,
-            Map<LidCredentialType,String> credentials )
-        throws
-            LidLocalPersonaExistsAlreadyException,
-            UnsupportedOperationException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Obtain a LidLocalPersona, given its identifier.
-     *
-     * @param identifier the identifier for which the LidLocalPersona will be retrieved
-     * @return the found LidLocalPersona
-     * @throws LidLocalPersonaUnknownException thrown if no LidLocalPersona exists with this identifier
-     */
-    public LidLocalPersona find(
+    public LidPersona find(
             Identifier identifier )
         throws
-            LidLocalPersonaUnknownException
+            LidPersonaUnknownException
     {
         if( isUser( identifier )) {
             HashMap<String,String> attributes  = new HashMap<String,String>();
-            attributes.put( LidLocalPersona.IDENTIFIER_ATTRIBUTE_NAME, identifier.toExternalForm() );
+            attributes.put( LidPersona.IDENTIFIER_ATTRIBUTE_NAME, identifier.toExternalForm() );
             attributes.put( "FirstName",  "John" );
             attributes.put( "LastName",   "Doe" );
             attributes.put( "Profession", "Mythical Man" );
             
-            LidLocalPersona ret = SimpleLidLocalPersona.create( identifier, attributes );
+            LidPersona ret = SimpleLidPersona.create( identifier, null, attributes, theCredentialTypes, theCredentials );
         
             return ret;
 
         } else {
-            throw new LidLocalPersonaUnknownException( identifier );
+            throw new LidPersonaUnknownException( identifier );
         }
-    }
-
-    /**
-     * Delete a LidLocalPersona, given its identifier.
-     * 
-     * @param identifier the identifier of the LidLocalPersona that will be deleted
-     * @throws UnsupportedOperationException thrown if this LidIdentityManager does not permit the deletion of LidLocalPersonas
-     * @throws LidLocalPersonaUnknownException thrown if no LidLocalPersona exists with this identifier
-     */
-    public void delete(
-            Identifier identifier )
-        throws
-            UnsupportedOperationException,
-            LidLocalPersonaUnknownException
-    {
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -167,4 +144,14 @@ public class RegexLidLocalPersonaManager
      * The user name regular expression.
      */
     protected Pattern theUserNameRegex;
+
+    /**
+     * The credential types accepted.
+     */
+    protected LidCredentialType [] theCredentialTypes;
+
+    /**
+     * The credential values (not used).
+     */
+    protected String [] theCredentials;
 }

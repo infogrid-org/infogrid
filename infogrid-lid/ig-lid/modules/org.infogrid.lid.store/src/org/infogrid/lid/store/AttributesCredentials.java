@@ -8,15 +8,17 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.store;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.infogrid.lid.credential.LidCredentialType;
+import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -31,8 +33,9 @@ public class AttributesCredentials
      */
     public AttributesCredentials()
     {
-        theAttributes  = new HashMap<String,String>();
-        theCredentials = new HashMap<LidCredentialType,String>();
+        theAttributes       = new HashMap<String,String>();
+        theCredentialTypes  = new ArrayList<LidCredentialType>();
+        theCredentialValues = new ArrayList<String>();
     }
 
     /**
@@ -46,7 +49,18 @@ public class AttributesCredentials
             Map<LidCredentialType,String> credentials )
     {
         theAttributes  = attributes;
-        theCredentials = credentials;
+
+        theCredentialTypes  = new ArrayList<LidCredentialType>();
+        theCredentialValues = new ArrayList<String>();
+
+        if( credentials != null ) {
+            for( LidCredentialType key : credentials.keySet() ) {
+                String value = credentials.get(  key );
+
+                theCredentialTypes.add( key );
+                theCredentialValues.add(  value );
+            }
+        }
     }
 
     /**
@@ -60,15 +74,25 @@ public class AttributesCredentials
     }
     
     /**
-     * Obtain the credentials of the persona.
-     * 
-     * @return the credentials
+     * Obtain the LidCredentialTypes of the LidPersona.
+     *
+     * @return the LidCredentialTypes
      */
-    public Map<LidCredentialType,String> getCredentials()
+    public LidCredentialType [] getCredentialTypes()
     {
-        return theCredentials;
+        return ArrayHelper.copyIntoNewArray( theCredentialTypes, LidCredentialType.class );
     }
-    
+
+    /**
+     * Obtain the values of the LidCredentialTypes of the LidPersona.
+     *
+     * @return the value
+     */
+    public String [] getCredentialValues()
+    {
+        return ArrayHelper.copyIntoNewArray( theCredentialValues, String.class );
+    }
+
     /**
      * Add an attribute.
      * 
@@ -95,10 +119,8 @@ public class AttributesCredentials
             LidCredentialType credentialType,
             String            value )
     {
-        String ret = theCredentials.put( credentialType, value );
-        if( ret != null ) {
-            log.error( "Overwriting credentialType " + credentialType + " with new value " + value + ", was " + ret );
-        }
+        theCredentialTypes.add( credentialType );
+        theCredentialValues.add( value );
     }
 
     /**
@@ -107,7 +129,12 @@ public class AttributesCredentials
     protected Map<String,String> theAttributes;
 
     /**
-     * Credentials of the persona, keyed by credential type.
+     * LidCredentialTypes of the persona.
      */
-    protected Map<LidCredentialType,String> theCredentials;
+    protected ArrayList<LidCredentialType> theCredentialTypes;
+
+    /**
+     * Values of the LidCredentialTypes, in the same sequence.
+     */
+    protected ArrayList<String> theCredentialValues;
 }

@@ -8,25 +8,25 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
-package org.infogrid.lid.local;
+package org.infogrid.lid.translate;
 
 import java.util.Map;
 import java.util.Set;
-import org.infogrid.util.AbstractHasIdentifier;
+import org.infogrid.lid.AbstractLidPersona;
+import org.infogrid.lid.LidPersona;
+import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.Identifier;
 
 /**
- * Implementation of LidLocalPersona for this LidLocalPersonaManager.
+ * Implementation of LidPersona for this TranslatingLidPersonaManager.
  */
-public class TranslatingLidLocalPersona
+public class TranslatingLidPersona
         extends
-            AbstractHasIdentifier
-        implements
-            LidLocalPersona
+            AbstractLidPersona
 {
     private static final long serialVersionUID = 1L; // helps with serialization
 
@@ -36,9 +36,9 @@ public class TranslatingLidLocalPersona
      * @param identifier the unique identifier of the persona, e.g. their identity URL
      * @param delegate the underlying LidLocalPersona from/to which we translate
      */
-    protected TranslatingLidLocalPersona(
-            Identifier      identifier,
-            LidLocalPersona delegate )
+    protected TranslatingLidPersona(
+            Identifier identifier,
+            LidPersona delegate )
     {
         super( identifier );
 
@@ -50,19 +50,20 @@ public class TranslatingLidLocalPersona
      *
      * @return the delegate
      */
-    public LidLocalPersona getDelegate()
+    public LidPersona getDelegate()
     {
         return theDelegate;
     }
 
     /**
-     * Determine whether this LidPersona is hosted locally or remotely.
+     * Determine the set of remote Identifiers that are also associated with this LidPersona.
+     * The Identifier inherited from HasIdentifier is considered the local Identifier.
      *
-     * @return true if the LidPersona is hosted locally
+     * @return the set of remote Identifiers, if any
      */
-    public boolean isHostedLocally()
+    public Identifier [] getRemoteIdentifiers()
     {
-        return theDelegate.isHostedLocally();
+        return theDelegate.getRemoteIdentifiers();
     }
 
     /**
@@ -71,6 +72,7 @@ public class TranslatingLidLocalPersona
      * @param key the name of the attribute
      * @return the value of the attribute, or null
      */
+    @Override
     public String getAttribute(
             String key )
     {
@@ -82,6 +84,7 @@ public class TranslatingLidLocalPersona
      *
      * @return the keys into the set of attributes
      */
+    @Override
     public Set<String> getAttributeKeys()
     {
         return theDelegate.getAttributeKeys();
@@ -99,20 +102,29 @@ public class TranslatingLidLocalPersona
     }
 
     /**
-     * Set an attribute of the persona.
+     * Obtain the set of available credential types.
      *
-     * @param key the name of the attribute
-     * @param value the value of the attribute
+     * @return the set of available credential types
      */
-    public void setAttribute(
-            String key,
-            String value )
+    public LidCredentialType [] getCredentialTypes()
     {
-        theDelegate.setAttribute( key, value );
+        return theDelegate.getCredentialTypes();
     }
 
     /**
-     * The underlying LidLocalPersona from/to which we translate.
+     * Obtain a specific credential.
+     *
+     * @param type the LidCredentialType for which the credential is to be obtained
+     * @return the credential, or null
      */
-    protected LidLocalPersona theDelegate;
+    public String getCredentialFor(
+            LidCredentialType type )
+    {
+        return theDelegate.getCredentialFor( type );
+    }
+
+    /**
+     * The underlying LidPersona from/to which we translate.
+     */
+    protected LidPersona theDelegate;
 }

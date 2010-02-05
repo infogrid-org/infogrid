@@ -8,18 +8,19 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.store;
 
 import java.util.Map;
-import org.infogrid.lid.local.AbstractLidLocalPersonaManager;
-import org.infogrid.lid.local.LidLocalPersona;
+import org.infogrid.lid.AbstractLidPersonaManager;
+import org.infogrid.lid.LidPersona;
+import org.infogrid.lid.LidPersonaUnknownException;
 import org.infogrid.lid.credential.LidCredentialType;
-import org.infogrid.lid.local.LidLocalPersonaExistsAlreadyException;
-import org.infogrid.lid.local.LidLocalPersonaUnknownException;
+import org.infogrid.lid.LidPersonaExistsAlreadyException;
+import org.infogrid.lid.SimpleLidPersona;
 import org.infogrid.store.Store;
 import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.AbstractFactory;
@@ -35,7 +36,7 @@ import org.infogrid.util.SmartFactory;
  */
 public class StoreLidLocalPersonaManager
         extends
-            AbstractLidLocalPersonaManager
+            AbstractLidPersonaManager
 {
     /**
      * Factory method.
@@ -50,24 +51,26 @@ public class StoreLidLocalPersonaManager
     {
         LidLocalPersonaMapper mapper = new LidLocalPersonaMapper( credentialTypeClassLoader );
         
-        Factory<Identifier,StoreLidLocalPersona,AttributesCredentials> delegateFactory
-                = new AbstractFactory<Identifier,StoreLidLocalPersona,AttributesCredentials>() {
-                    public StoreLidLocalPersona obtainFor(
+        Factory<Identifier,LidPersona,AttributesCredentials> delegateFactory
+                = new AbstractFactory<Identifier,LidPersona,AttributesCredentials>() {
+                    public SimpleLidPersona obtainFor(
                             Identifier            identifier,
                             AttributesCredentials attCred )
                     {
-                        StoreLidLocalPersona ret = new StoreLidLocalPersona(
+                        SimpleLidPersona ret = SimpleLidPersona.create(
                                 identifier,
+                                null,
                                 attCred.getAttributes(),
-                                attCred.getCredentials() );
+                                attCred.getCredentialTypes(),
+                                attCred.getCredentialValues());
                         return ret;
                     }
                 };
 
-        StoreBackedSwappingHashMap<Identifier,StoreLidLocalPersona> storage = StoreBackedSwappingHashMap.createWeak( mapper, store );
+        StoreBackedSwappingHashMap<Identifier,LidPersona> storage = StoreBackedSwappingHashMap.createWeak( mapper, store );
         
-        SmartFactory<Identifier,StoreLidLocalPersona,AttributesCredentials> smartFactory
-                = new PatientSmartFactory<Identifier,StoreLidLocalPersona,AttributesCredentials>( delegateFactory, storage );
+        SmartFactory<Identifier,LidPersona,AttributesCredentials> smartFactory
+                = new PatientSmartFactory<Identifier,LidPersona,AttributesCredentials>( delegateFactory, storage );
         
         StoreLidLocalPersonaManager ret = new StoreLidLocalPersonaManager( smartFactory );
         return ret;
@@ -79,7 +82,7 @@ public class StoreLidLocalPersonaManager
      * @param delegateFactory the underlying SmartFactory
      */
     protected StoreLidLocalPersonaManager(
-            SmartFactory<Identifier,StoreLidLocalPersona,AttributesCredentials> delegateFactory )
+            SmartFactory<Identifier,LidPersona,AttributesCredentials> delegateFactory )
     {
         theDelegateFactory = delegateFactory;
     }
@@ -91,25 +94,26 @@ public class StoreLidLocalPersonaManager
      * @param attributes the attributes for the to-be-created LidLocalPersona
      * @param credentials the credentials for the to-be-created LidLocalPersona
      * @return the LocalPersona that was created
-     * @throws LidLocalPersonaExistsAlreadyException thrown if a LidLocalPersona with this identifier exists already
+     * @throws LidPersonaExistsAlreadyException thrown if a LidLocalPersona with this identifier exists already
      * @throws UnsupportedOperationException thrown if this LidLocalPersonaManager does not permit the creation of new LidLocalPersonas
      */
-    public LidLocalPersona createLocalPersona(
+    @Override
+    public LidPersona provisionPersona(
             Identifier                    identifier,
             Map<String,String>            attributes,
             Map<LidCredentialType,String> credentials )
         throws
-            LidLocalPersonaExistsAlreadyException,
+            LidPersonaExistsAlreadyException,
             UnsupportedOperationException
     {
         AttributesCredentials attCred = new AttributesCredentials( attributes, credentials );
         
         try {
-            LidLocalPersona ret = theDelegateFactory.obtainNewFor( identifier, attCred );
+            LidPersona ret = theDelegateFactory.obtainNewFor( identifier, attCred );
             return ret;
 
         } catch( ObjectExistsAlreadyFactoryException ex ) {
-            throw new LidLocalPersonaExistsAlreadyException( (LidLocalPersona) ex.getExisting(), ex );
+            throw new LidPersonaExistsAlreadyException( (LidPersona) ex.getExisting(), ex );
 
         } catch( FactoryException ex ) {
             throw new RuntimeException( ex );
@@ -117,20 +121,20 @@ public class StoreLidLocalPersonaManager
     }
 
     /**
-     * Obtain a LidLocalPersona, given its identifier.
+     * Obtain a LidPersona, given its identifier.
      *
-     * @param identifier the identifier for which the LidLocalPersona will be retrieved
-     * @return the found LidLocalPersona
-     * @throws LidLocalPersonaUnknownException thrown if no LidLocalPersona exists with this identifier
+     * @param identifier the identifier for which the LidPersona will be retrieved
+     * @return the found LidPersona
+     * @throws LidPersonaUnknownException thrown if no LidPersona exists with this identifier
      */
-    public LidLocalPersona find(
+    public LidPersona find(
             Identifier identifier )
         throws
-            LidLocalPersonaUnknownException
+            LidPersonaUnknownException
     {
-        LidLocalPersona ret = theDelegateFactory.get( identifier );
+        LidPersona ret = theDelegateFactory.get( identifier );
         if( ret == null ) {
-            throw new LidLocalPersonaUnknownException( identifier );
+            throw new LidPersonaUnknownException( identifier );
         }
         return ret;
     }
@@ -140,17 +144,18 @@ public class StoreLidLocalPersonaManager
      * 
      * @param identifier the identifier of the LidLocalPersona that will be deleted
      * @throws UnsupportedOperationException thrown if this LidLocalPersonaManager does not permit the deletion of LidLocalPersonas
-     * @throws LidLocalPersonaUnknownException thrown if no LidLocalPersona exists with this identifier
+     * @throws LidPersonaUnknownException thrown if no LidLocalPersona exists with this identifier
      */
+    @Override
     public void delete(
             Identifier identifier )
         throws
             UnsupportedOperationException,
-            LidLocalPersonaUnknownException
+            LidPersonaUnknownException
     {
-        LidLocalPersona found = theDelegateFactory.remove( identifier );
+        LidPersona found = theDelegateFactory.remove( identifier );
         if( found == null ) {
-            throw new LidLocalPersonaUnknownException( identifier );
+            throw new LidPersonaUnknownException( identifier );
         }
     }
 
@@ -158,5 +163,5 @@ public class StoreLidLocalPersonaManager
      * The underlying SmartFactory. This is hidden so we can do access control and
      * expose the API we want.
      */
-    protected SmartFactory<Identifier,StoreLidLocalPersona,AttributesCredentials> theDelegateFactory;
+    protected SmartFactory<Identifier,LidPersona,AttributesCredentials> theDelegateFactory;
 }

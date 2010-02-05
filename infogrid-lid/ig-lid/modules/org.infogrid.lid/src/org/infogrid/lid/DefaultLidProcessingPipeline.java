@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -56,7 +56,7 @@ public class DefaultLidProcessingPipeline
     {
         super( c );
         
-        theResourceFinder         = c.findContextObject( LidHasIdentifierFinder.class );
+        thePersonaManager         = c.findContextObject( LidPersonaManager.class );
         theYadisStage             = c.findContextObject( YadisPipelineProcessingStage.class );
         theAuthenticationStage    = c.findContextObject( LidClientAuthenticationPipelineStage.class );
         theSessionManagementStage = c.findContextObject( LidSessionManagementStage.class );
@@ -83,9 +83,9 @@ public class DefaultLidProcessingPipeline
         HasIdentifier                    clientPersona     = null;
         LidSessionManagementInstructions sessionMgmtInstructions = null;
 
-        if( theResourceFinder != null ) {
+        if( thePersonaManager != null ) {
             try {
-                requestedResource = theResourceFinder.findFromRequest( lidRequest );
+                requestedResource = thePersonaManager.findFromRequest( lidRequest );
 
             } catch( Exception ex ) {
                 if( log.isInfoEnabled() ) {
@@ -117,9 +117,9 @@ public class DefaultLidProcessingPipeline
     }
     
     /**
-     * The service that knows how to find LidResources for incoming requests.
+     * The service that knows how to find LidPersonas for incoming requests.
      */
-    protected LidHasIdentifierFinder theResourceFinder;
+    protected LidPersonaManager thePersonaManager;
 
     /**
      * The service that knows how to respond to Yadis requests.

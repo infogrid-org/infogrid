@@ -8,18 +8,19 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
-package org.infogrid.lid.local;
+package org.infogrid.lid;
 
 import org.infogrid.util.AbstractLocalizedException;
 
 /**
- * Thrown if the LidLocalPersona existed already during an attempt to create it.
+ * Thrown if the LidPersona with this local Identifier existed already during
+ * an attempt to provision it.
  */
-public class LidLocalPersonaExistsAlreadyException
+public class LidPersonaExistsAlreadyException
         extends
             AbstractLocalizedException
 {
@@ -28,10 +29,10 @@ public class LidLocalPersonaExistsAlreadyException
     /**
      * Constructor.
      * 
-     * @param persona the LidLocalPersona that existed already
+     * @param persona the LidPersona that existed already
      */
-    public LidLocalPersonaExistsAlreadyException(
-            LidLocalPersona persona )
+    public LidPersonaExistsAlreadyException(
+            LidPersona persona )
     {
         thePersona = persona;
     }
@@ -39,12 +40,12 @@ public class LidLocalPersonaExistsAlreadyException
     /**
      * Constructor.
      * 
-     * @param persona the LidLocalPersona that existed already
+     * @param persona the LidPersona that existed already
      * @param cause the underlying cause
      */
-    public LidLocalPersonaExistsAlreadyException(
-            LidLocalPersona persona,
-            Throwable       cause )
+    public LidPersonaExistsAlreadyException(
+            LidPersona persona,
+            Throwable  cause )
     {
         super( cause );
 
@@ -52,11 +53,11 @@ public class LidLocalPersonaExistsAlreadyException
     }
     
     /**
-     * Obtain the LidLocalPersona that existed already.
+     * Obtain the LidPersona that existed already.
      * 
-     * @return the LidLocalPersona
+     * @return the LidPersona
      */
-    public LidLocalPersona getPersona()
+    public LidPersona getPersona()
     {
         return thePersona;
     }
@@ -72,7 +73,7 @@ public class LidLocalPersonaExistsAlreadyException
     }
 
     /**
-     * The LidLocalPersona that existed already.
+     * The LidPersona that existed already.
      */
-    protected LidLocalPersona thePersona;
+    protected LidPersona thePersona;
 }

@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -17,6 +17,7 @@ package org.infogrid.lid.openid.auth;
 import java.util.HashSet;
 import java.util.StringTokenizer;
 import org.infogrid.lid.LidNonceManager;
+import org.infogrid.lid.LidPersona;
 import org.infogrid.lid.credential.AbstractLidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.lid.openid.CryptUtils;
@@ -64,7 +65,7 @@ public abstract class AbstractOpenIdCredentialType
      */
     protected void checkCredential(
             SaneRequest     request,
-            HasIdentifier   subject,
+            LidPersona      subject,
             HashSet<String> mandatoryFields,
             String          nonceParameterName )
         throws

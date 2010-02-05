@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,9 +16,9 @@ package org.infogrid.lid.store;
 
 import org.infogrid.lid.credential.LidWrongPasswordException;
 import org.infogrid.crypto.hashedpassword.HashedPasswordUtils;
+import org.infogrid.lid.LidPersona;
 import org.infogrid.lid.credential.AbstractLidPasswordCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
-import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
 
 /**
@@ -56,13 +56,12 @@ public class StoreLidPasswordCredentialType
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
-            SaneRequest   request,
-            HasIdentifier subject )
+            SaneRequest request,
+            LidPersona  subject )
         throws
             LidInvalidCredentialException
     {
-        StoreLidLocalPersona realSubject            = (StoreLidLocalPersona) subject; // may throw ClassCastException
-        String               storedHashedCredential = realSubject.getCredentialFor( this );
+        String storedHashedCredential = subject.getCredentialFor( this );
 
         if( storedHashedCredential == null ) {
             throw new LidWrongPasswordException( subject.getIdentifier(), this );
