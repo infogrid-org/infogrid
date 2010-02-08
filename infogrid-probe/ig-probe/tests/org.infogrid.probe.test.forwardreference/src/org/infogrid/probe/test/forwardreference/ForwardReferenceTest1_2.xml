@@ -13,17 +13,16 @@
     All rights reserved.
 -->
 
-<project name="org.infogrid.probe.test"
-         default="default"
-         basedir="."
-         xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3"
-         xmlns:j2seproject2="http://www.netbeans.org/ns/j2se-project/2"
-         xmlns:j2seproject1="http://www.netbeans.org/ns/j2se-project/1"
-         xmlns:jaxws="http://www.netbeans.org/ns/jax-ws/1">
-    <description>Builds, tests, and runs the project org.infogrid.probe.test.</description>
-    <import file="../../../ig-tools/infogrid-ant-library.xml"/>
-    <import file="nbproject/build-impl.xml"/>
-
-    <target name="-pre-compile" depends="-module-setup"/>
-</project>
-
+<!DOCTYPE MeshObjectSet>
+<MeshObjectSet>
+  <MeshObject ID="">
+    <MeshType>org.infogrid.model.Test/AA</MeshType>
+    <MeshType>org.infogrid.model.Test/B</MeshType>
+    <Property type="org.infogrid.model.Test/A_X"><StringValue>resolved</StringValue></Property>
+    <Relationship ID="#other"/>
+  </MeshObject>
+  <MeshObject ID="#other">
+    <MeshType>org.infogrid.model.Test/B</MeshType>
+    <Relationship ID=""/>
+  </MeshObject>
+</MeshObjectSet>
