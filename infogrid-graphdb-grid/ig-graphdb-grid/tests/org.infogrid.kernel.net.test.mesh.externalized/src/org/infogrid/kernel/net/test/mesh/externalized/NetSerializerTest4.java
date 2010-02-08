@@ -44,7 +44,7 @@ public class NetSerializerTest4
         NetMeshBaseIdentifier nmbid        = theMeshBaseIdentifierFactory.fromExternalForm( "http://here.local/" );
         DefaultProxyFactory   proxyFactory = DefaultProxyFactory.create( null, NiceAndTrustingProxyPolicyFactory.create() );
 
-        final NetMMeshBase mb = NetMMeshBase.create(
+        NetMMeshBase mb = NetMMeshBase.create(
                 nmbid,
                 DefaultNetMeshObjectAccessSpecificationFactory.create( nmbid, theMeshBaseIdentifierFactory ),
                 theModelBase,
@@ -60,7 +60,7 @@ public class NetSerializerTest4
                         throws
                             Throwable
                     {
-                        return mb.getMeshBaseLifecycleManager().createMeshObject( mb.getMeshObjectIdentifierFactory().fromExternalForm( "#1234" ));
+                        return (NetMeshObject) life.createMeshObject( mb.getMeshObjectIdentifierFactory().fromExternalForm( "#1234" ));
                     }
                 });
 

@@ -59,8 +59,7 @@ public class XprisoTest15
                             TransactionActionException
                     {
                         try {
-                            return ((NetMeshBase)tx.getMeshBase()).getMeshBaseLifecycleManager().createMeshObject(
-                                    tx.getMeshBase().getMeshObjectIdentifierFactory().fromExternalForm( "#obj" ));
+                            return (NetMeshObject) life.createMeshObject( idFact.fromExternalForm( "#obj" ));
 
                         } catch( ParseException ex ) {
                             throw new TransactionActionException.Error( ex );
