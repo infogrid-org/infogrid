@@ -31,6 +31,23 @@ public class InvalidIdentifierException
     public InvalidIdentifierException(
             Identifier identifier )
     {
+        super( null, null );
+
+        theIdentifier = identifier;
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param identifier the invalid identifier
+     * @param cause the underlying cause, if any
+     */
+    public InvalidIdentifierException(
+            Identifier identifier,
+            Throwable  cause )
+    {
+        super( null, cause );
+
         theIdentifier = identifier;
     }
 
