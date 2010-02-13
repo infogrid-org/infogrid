@@ -105,13 +105,15 @@ public class SimpleLidPersona
     }
 
     /**
-     * Obtain the set of available credential types.
+     * Obtain the subset of credential types applicable to this LidPersona.
      *
-     * @return the set of available credential types
+     * @param set the set of credential types
+     * @return the subset of credential types
      */
-    public LidCredentialType [] getCredentialTypes()
+    public LidCredentialType [] getApplicableCredentialTypes(
+            LidCredentialType [] set )
     {
-        return theCredentialTypes;
+        return theCredentialTypes; // this presumes that these credential types are always a subset -- reasonable assumption
     }
 
     /**

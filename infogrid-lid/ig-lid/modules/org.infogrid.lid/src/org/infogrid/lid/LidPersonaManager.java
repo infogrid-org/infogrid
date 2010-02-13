@@ -14,55 +14,56 @@
 
 package org.infogrid.lid;
 
-import java.text.ParseException;
 import java.util.Map;
 import org.infogrid.lid.credential.LidCredentialType;
+import org.infogrid.util.CannotFindHasIdentifierException;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.HasIdentifierFinder;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.InvalidIdentifierException;
-import org.infogrid.util.http.SaneRequest;
 
 /**
- * Manages identities.
+ * Manages locally provisioned accounts.
  */
 public interface LidPersonaManager
         extends
-            HasIdentifierFinder
+            HasIdentifierFinder,
+            LidResourceFinder
 {
     /**
-     * Obtain a LidPersona, given its Identifier.
+     * Obtain a HasIdentifier, given its Identifier. This will either return a LidPersona
+     * or not. If it returns a LidPersona, the identifier referred to that locally provisioned
+     * LidPersona. If it returns something other than a LidPersona, it refers to a remote
+     * persona. To determine the LidPersona that may be associated with the remote persona,
+     * call determineLidPersonaFromRemoteIdentifier.
      *
-     * @param identifier the Identifier for which the LidPersona will be retrieved
-     * @return the found LidPersona
-     * @throws LidPersonaUnknownException thrown if no LidPersona exists with this Identifier
-     * @throws InvalidIdentifierException thrown if an invalid Identifier was provided
+     * @param identifier the Identifier for which the HasIdentifier will be retrieved
+     * @return the found HasIdentifier
+     * @throws CannotFindHasIdentifierException thrown if the HasIdentifier cannot be found
+     * @throws InvalidIdentifierException thrown if the provided Identifier was invalid for this HasIdentifierFinder
      */
-    public abstract LidPersona find(
+    public abstract HasIdentifier find(
             Identifier identifier )
         throws
-            LidPersonaUnknownException,
+            CannotFindHasIdentifierException,
             InvalidIdentifierException;
 
     /**
-     * Find the LidPersona, or null.
-     *
-     * @param request the incoming request
+     * Given a remote persona, determine the locally provisioned corresponding
+     * LidPersona. May return null if none has been provisioned.
+     * 
+     * @param remote the remote persona
      * @return the found LidPersona, or null
-     * @throws LidPersonaUnknownException thrown if no LidPersona exists with this Identifier
-     * @throws InvalidIdentifierException thrown if an invalid Identifier was provided
-     * @throws ParseException if the request could not be parsed
      */
-    public LidPersona findFromRequest(
-            SaneRequest request )
-        throws
-            LidPersonaUnknownException,
-            InvalidIdentifierException,
-            ParseException;
+    public abstract LidPersona determineLidPersonaFromRemotePersona(
+            HasIdentifier remote );
 
     /**
      * Provision a LidPersona.
      *
-     * @param localIdentifier the Identifier for the to-be-created LidPersona
+     * @param localIdentifier the Identifier for the to-be-created LidPersona. This may be null, in which case
+     *        the LidPersonaManager assigns a localIdentifier
+     * @param remotePersonas the remote personas to be associated with the locally provisioned LidPersona
      * @param attributes the attributes for the to-be-created LidPersona
      * @param credentials the credentials for the to-be-created LidPersona
      * @return the LidPersona that was created
@@ -70,19 +71,19 @@ public interface LidPersonaManager
      */
     public LidPersona provisionPersona(
             Identifier                    localIdentifier,
+            HasIdentifier []              remotePersonas,
             Map<String,String>            attributes,
             Map<LidCredentialType,String> credentials )
         throws
             LidPersonaExistsAlreadyException;
 
     /**
-     * Delete a LidPersona, given its Identifier.
+     * Delete a LidPersona. This overridable method always throws
+     * UnsupportedOperationException.
      *
-     * @param identifier the Identifier of the LidPersona that will be deleted
-     * @throws LidPersonaUnknownException thrown if no LidPersona exists with this Identifier
+     * @param toDelete the LidPersona that will be deleted
+     * @throws UnsupportedOperationException thrown if this LidPersonaManager does not permit the deletion of LidPersonas
      */
-    public abstract void delete(
-            Identifier identifier )
-        throws
-            LidPersonaUnknownException;
+    public void delete(
+            LidPersona toDelete );
 }

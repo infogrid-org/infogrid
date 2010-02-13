@@ -16,39 +16,45 @@ package org.infogrid.lid.store;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.logging.Log;
 
 /**
  * Helper class to package attributes and credentials into the same instance.
  */
-public class AttributesCredentials
+public class PersonaData
 {
-    private static final Log log = Log.getLogInstance( AttributesCredentials.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance( PersonaData.class ); // our own, private logger
 
     /**
      * Constructor.
      */
-    public AttributesCredentials()
+    public PersonaData()
     {
-        theAttributes       = new HashMap<String,String>();
-        theCredentialTypes  = new ArrayList<LidCredentialType>();
-        theCredentialValues = new ArrayList<String>();
+        theRemoteIdentifiers = new ArrayList<Identifier>();
+        theAttributes        = new HashMap<String,String>();
+        theCredentialTypes   = new ArrayList<LidCredentialType>();
+        theCredentialValues  = new ArrayList<String>();
     }
 
     /**
      * Constructor.
-     * 
+     *
+     * @param remoteIdentifiers identifiers of the remote personas of this persona
      * @param attributes the attributes
      * @param credentials the credentials
      */
-    public AttributesCredentials(
+    public PersonaData(
+            ArrayList<Identifier>         remoteIdentifiers,
             Map<String,String>            attributes,
             Map<LidCredentialType,String> credentials )
     {
-        theAttributes  = attributes;
+        theRemoteIdentifiers = remoteIdentifiers;
+        theAttributes        = attributes;
 
         theCredentialTypes  = new ArrayList<LidCredentialType>();
         theCredentialValues = new ArrayList<String>();
@@ -61,6 +67,16 @@ public class AttributesCredentials
                 theCredentialValues.add(  value );
             }
         }
+    }
+
+    /**
+     * Obtain the identifiers of the remote personas, if any.
+     *
+     * @return the identifiers of the remote personas
+     */
+    public List<Identifier> getRemoteIdentifiers()
+    {
+        return theRemoteIdentifiers;
     }
 
     /**
@@ -122,6 +138,11 @@ public class AttributesCredentials
         theCredentialTypes.add( credentialType );
         theCredentialValues.add( value );
     }
+
+    /**
+     * Identifiers of the remote personas, if any.
+     */
+    protected ArrayList<Identifier> theRemoteIdentifiers;
 
     /**
      * Attributes of the persona.

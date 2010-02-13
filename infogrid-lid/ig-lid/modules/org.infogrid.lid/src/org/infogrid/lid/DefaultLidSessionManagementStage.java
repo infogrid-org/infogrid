@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
 
@@ -75,8 +76,8 @@ public class DefaultLidSessionManagementStage
         Boolean deleteSessionCookie;
         Boolean createNewSession;
 
-        LidPersona personaToSet             = null;
-        LidSession preexistingSession       = clientAuthStatus.getPreexistingClientSession();
+        HasIdentifier personaToSet       = null;
+        LidSession    preexistingSession = clientAuthStatus.getPreexistingClientSession();
 
         ArrayList<LidSession> sessionsToCancel = new ArrayList<LidSession>();
         ArrayList<LidSession> sessionsToRenew  = new ArrayList<LidSession>();
@@ -124,7 +125,7 @@ public class DefaultLidSessionManagementStage
             deleteSessionCookie = Boolean.FALSE;
 
             if( preexistingSession != null ) {
-                if( preexistingSession.getClient().isIdentifiedBy( clientAuthStatus.getClientIdentifier() )) {
+                if( preexistingSession.getSessionClient().isIdentifiedBy( clientAuthStatus.getClientIdentifier() )) {
                     // always renew, whether still valid or not
                     sessionsToRenew.add( preexistingSession );
                     createNewSession = Boolean.FALSE;
@@ -140,6 +141,9 @@ public class DefaultLidSessionManagementStage
             }
 
             personaToSet = clientAuthStatus.getClientPersona();
+            if( personaToSet == null ) {
+                personaToSet = clientAuthStatus.getRemotePersona();
+            }
 
         } else if( clientAuthStatus.clientWishesToLogin() ) {
             // valid user, but no valid session

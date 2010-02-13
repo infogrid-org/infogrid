@@ -16,6 +16,7 @@ package org.infogrid.lid;
 
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 
 /**
@@ -151,16 +152,24 @@ public interface LidClientAuthenticationStatus
      * @see #getClientPersona
      */
     public abstract Identifier getClientIdentifier();
-    
+
     /**
-     * Obtain what we know about the client with this client identifier here locally. If the persona
-     * is not known locally, this will return <code>null</code>.
-     * 
+     * Obtain the client's remote persona, if the clientIdentifier refers to one. If there is none,
+     * or if the remote persona could not be resolved, this will return <code>null</code>.
+     *
+     * @return the remote persona
+     */
+    public abstract HasIdentifier getRemotePersona();
+
+    /**
+     * Obtain the client's local LidPersona, if there is one. If there is none, or if the LidPersona
+     * could not be resolved, this will return <code>null</code>.
+     *
      * @return the LidPersona
      * @see #getClientIdentifier
      */
     public abstract LidPersona getClientPersona();
-    
+
     /**
      * Determine whether the client has indicated its desire to log in.
      *

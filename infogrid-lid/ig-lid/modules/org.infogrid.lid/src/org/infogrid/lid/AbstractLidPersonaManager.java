@@ -17,6 +17,8 @@ package org.infogrid.lid;
 import java.text.ParseException;
 import java.util.Map;
 import org.infogrid.lid.credential.LidCredentialType;
+import org.infogrid.util.CannotFindHasIdentifierException;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.IdentifierFactory;
 import org.infogrid.util.InvalidIdentifierException;
@@ -50,32 +52,31 @@ public abstract class AbstractLidPersonaManager
     }
 
     /**
-     * Find the LidPersona, or null.
+     * Find the resource requested by this incoming request.
      *
      * @param request the incoming request
-     * @return the found LidPersona, or null
-     * @throws LidPersonaUnknownException thrown if no LidPersona exists with this identifier
-     * @throws InvalidIdentifierException thrown if an invalid Identifier was provided
-     * @throws ParseException if the request could not be parsed
+     * @return the found resource
+     * @throws ParseException thrown if the identifier in the request could not be parsed
      */
-    public LidPersona findFromRequest(
+    public HasIdentifier findFromRequest(
             SaneRequest request )
         throws
-            LidPersonaUnknownException,
+            CannotFindHasIdentifierException,
             InvalidIdentifierException,
             ParseException
     {
-        String     identifier = request.getAbsoluteBaseUri();
-        Identifier realId     = theIdentifierFactory.fromExternalForm( identifier );
-        LidPersona ret        = find( realId );
+        String        identifier = request.getAbsoluteBaseUri();
+        Identifier    realId     = theIdentifierFactory.fromExternalForm( identifier );
+        HasIdentifier ret        = find( realId );
         return ret;
     }
 
     /**
-     * Provision a LidPersona. This overridable method always throws
-     * UnsupportedOperationException.
+     * Provision a LidPersona.
      *
-     * @param localIdentifier the Identifier for the to-be-created LidPersona
+     * @param localIdentifier the Identifier for the to-be-created LidPersona. This may be null, in which case
+     *        the LidPersonaManager assigns a localIdentifier
+     * @param remotePersonas the remote personas to be associated with the locally provisioned LidPersona
      * @param attributes the attributes for the to-be-created LidPersona
      * @param credentials the credentials for the to-be-created LidPersona
      * @return the LidPersona that was created
@@ -83,6 +84,7 @@ public abstract class AbstractLidPersonaManager
      */
     public LidPersona provisionPersona(
             Identifier                    localIdentifier,
+            HasIdentifier []              remotePersonas,
             Map<String,String>            attributes,
             Map<LidCredentialType,String> credentials )
         throws
@@ -92,18 +94,16 @@ public abstract class AbstractLidPersonaManager
     }
 
     /**
-     * Delete a LidPersona, given its identifier. This overridable method always throws
+     * Delete a LidPersona. This overridable method always throws
      * UnsupportedOperationException.
      *
-     * @param identifier the identifier of the LidPersona that will be deleted
+     * @param toDelete the LidPersona that will be deleted
      * @throws UnsupportedOperationException thrown if this LidPersonaManager does not permit the deletion of LidPersonas
-     * @throws LidPersonaUnknownException thrown if no LidPersona exists with this identifier
      */
     public void delete(
-            Identifier identifier )
+            LidPersona toDelete )
         throws
-            UnsupportedOperationException,
-            LidPersonaUnknownException
+            UnsupportedOperationException
     {
         throw new UnsupportedOperationException();
     }

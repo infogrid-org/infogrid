@@ -15,12 +15,10 @@
 package org.infogrid.lid.translate;
 
 import org.infogrid.lid.LidPersona;
-import org.infogrid.lid.LidPersonaUnknownException;
 import org.infogrid.lid.credential.AbstractLidCredentialType;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
-import org.infogrid.lid.credential.TranslatingLidInvalidCredentialException;
-import org.infogrid.util.InvalidIdentifierException;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
 
 /**
@@ -79,28 +77,29 @@ public class TranslatingLidCredentialType
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
-            SaneRequest request,
-            LidPersona  subject )
+            SaneRequest   request,
+            HasIdentifier subject )
         throws
             LidInvalidCredentialException
     {
-        LidPersona delegateSubject;
-        try {
-            delegateSubject = theBridge.translatePersonaForward( subject );
-        } catch( LidPersonaUnknownException ex ) {
-            throw new TranslatingLidInvalidCredentialException( null, subject.getIdentifier(), this, ex );
+        if( subject instanceof TranslatingLidPersona ) {
+            LidPersona delegate = theBridge.translatePersonaForward( (TranslatingLidPersona) subject );
 
-        } catch( InvalidIdentifierException ex ) {
-            throw new TranslatingLidInvalidCredentialException( null, subject.getIdentifier(), this, ex );
+            theDelegate.checkCredential( request, delegate ); // pass-through LidInvalidCredentialException (FIXME?)
+        } else {
+            theDelegate.checkCredential( request, subject ); // pass-through LidInvalidCredentialException (FIXME?)
         }
+    }
 
-        try {
-            theDelegate.checkCredential( request, delegateSubject );
-
-        } catch( LidInvalidCredentialException ex ) {
-            throw new TranslatingLidInvalidCredentialException( delegateSubject.getIdentifier(), subject.getIdentifier(), this, ex );
-
-        }
+    /**
+     * Determine whether this LidCredentialType is a credential type that is about a remote persona.
+     * E.g. an OpenID credential type would return true, while a password credential type would return false.
+     *
+     * @return true if it is about a remote persona
+     */
+    public boolean isRemote()
+    {
+        return theDelegate.isRemote();
     }
 
     /**

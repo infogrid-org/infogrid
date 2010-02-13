@@ -34,7 +34,7 @@ public class TranslatingLidPersona
      * Constructor.
      *
      * @param identifier the unique identifier of the persona, e.g. their identity URL
-     * @param delegate the underlying LidLocalPersona from/to which we translate
+     * @param delegate the underlying LidPersona from/to which we translate
      */
     protected TranslatingLidPersona(
             Identifier identifier,
@@ -102,13 +102,15 @@ public class TranslatingLidPersona
     }
 
     /**
-     * Obtain the set of available credential types.
+     * Obtain the subset of credential types applicable to this LidPersona.
      *
-     * @return the set of available credential types
+     * @param set the set of credential types
+     * @return the subset of credential types
      */
-    public LidCredentialType [] getCredentialTypes()
+    public LidCredentialType [] getApplicableCredentialTypes(
+            LidCredentialType [] set )
     {
-        return theDelegate.getCredentialTypes();
+        return theDelegate.getApplicableCredentialTypes( set );
     }
 
     /**

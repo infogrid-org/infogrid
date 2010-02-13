@@ -15,10 +15,10 @@
 package org.infogrid.lid.local.regex;
 
 import java.util.regex.Pattern;
-import org.infogrid.lid.LidPersona;
 import org.infogrid.lid.credential.AbstractLidPasswordCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.lid.credential.LidWrongPasswordException;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
 
 /**
@@ -74,8 +74,8 @@ public class RegexLidPasswordCredentialType
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
-            SaneRequest request,
-            LidPersona  subject )
+            SaneRequest   request,
+            HasIdentifier subject )
         throws
             LidInvalidCredentialException
     {

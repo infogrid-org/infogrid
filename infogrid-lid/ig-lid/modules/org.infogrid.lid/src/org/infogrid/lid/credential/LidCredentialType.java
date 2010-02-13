@@ -14,7 +14,7 @@
 
 package org.infogrid.lid.credential;
 
-import org.infogrid.lid.LidPersona;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.text.HasStringRepresentation;
 
@@ -52,10 +52,18 @@ public interface LidCredentialType
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public abstract void checkCredential(
-            SaneRequest request,
-            LidPersona  subject )
+            SaneRequest   request,
+            HasIdentifier subject )
         throws
             LidInvalidCredentialException;
+
+    /**
+     * Determine whether this LidCredentialType is a credential type that is about a remote persona.
+     * E.g. an OpenID credential type would return true, while a password credential type would return false.
+     *
+     * @return true if it is about a remote persona
+     */
+    public abstract boolean isRemote();
 
     /**
      * Name of the URL parameter that indicates the LID credential type.

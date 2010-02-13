@@ -16,6 +16,7 @@ package org.infogrid.lid;
 
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
@@ -34,7 +35,8 @@ public abstract class AbstractLidClientAuthenticationStatus
      * 
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
-     * @param clientPersona the client LidPersona that was found, if any
+     * @param clientRemotePersona the client's remote persona, if used
+     * @param clientPersona the client's LidPersona that was found locally, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
      * @param carriedInvalidCredentialTypes the credential types carried as part of this request that did not validate successfully, if any
@@ -49,6 +51,7 @@ public abstract class AbstractLidClientAuthenticationStatus
     protected AbstractLidClientAuthenticationStatus(
             String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
+            HasIdentifier                    clientRemotePersona,
             LidPersona                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
@@ -63,6 +66,7 @@ public abstract class AbstractLidClientAuthenticationStatus
     {
         theClientIdentifierAsEntered = clientIdentifierAsEntered;
         theClientIdentifier          = clientIdentifier;
+        theClientRemotePersona       = clientRemotePersona;
         theClientPersona             = clientPersona;
 
         thePreexistingClientSession = preexistingClientSession;
@@ -112,7 +116,7 @@ public abstract class AbstractLidClientAuthenticationStatus
     {
         boolean ret;
 
-        if( theClientIdentifier != null && theClientPersona == null ) {
+        if( theClientIdentifier != null && theClientRemotePersona == null && theClientPersona == null ) {
             ret = true;
         } else {
             ret = false;
@@ -297,11 +301,24 @@ public abstract class AbstractLidClientAuthenticationStatus
     {
         return theClientIdentifier;
     }
+
+    /**
+     * Obtain the client's remote persona, if the clientIdentifier refers to one. If there is none,
+     * or if the remote persona could not be resolved, this will return <code>null</code>.
+     *
+     * @return the remote persona
+     */
+    public HasIdentifier getRemotePersona()
+    {
+        return theClientRemotePersona;
+    }
     
     /**
-     * Obtain what we know about the client with this client identifier here locally.
-     * 
+     * Obtain the client's local LidPersona, if there is one. If there is none, or if the LidPersona
+     * could not be resolved, this will return <code>null</code>.
+     *
      * @return the LidPersona
+     * @see #getClientIdentifier
      */
     public LidPersona getClientPersona()
     {
@@ -457,12 +474,17 @@ public abstract class AbstractLidClientAuthenticationStatus
      * The normalized identifier provided by the client.
      */
     protected Identifier theClientIdentifier;
-    
+
     /**
-     * The determined client LidPersona.
+     * The client's remote persona, if there is one.
+     */
+    protected HasIdentifier theClientRemotePersona;
+
+    /**
+     * The client's local LidPersona, if there is one.
      */
     protected LidPersona theClientPersona;
-    
+
     /**
      * The credential types that were provided by the client as part of this request and that
      * were successfully validated.

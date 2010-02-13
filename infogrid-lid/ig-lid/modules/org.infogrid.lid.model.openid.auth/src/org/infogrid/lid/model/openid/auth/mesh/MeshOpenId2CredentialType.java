@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -61,7 +61,7 @@ public class MeshOpenId2CredentialType
     }
 
     /**
-     * Determine the endpoint URLs that support OpenID V1 authentication, for this subject.
+     * Determine the endpoint URLs that support authentication for this credential type, for this subject.
      *
      * @param subject the subject
      * @return the endpoint URLs

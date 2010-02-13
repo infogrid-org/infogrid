@@ -18,10 +18,10 @@ import java.util.Properties;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
-import org.infogrid.lid.LidPersona;
 import org.infogrid.lid.credential.AbstractLidPasswordCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.lid.credential.LidWrongPasswordException;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
 
@@ -33,6 +33,32 @@ public class LdapLidPasswordCredentialType
         AbstractLidPasswordCredentialType
 {
     private static final Log log = Log.getLogInstance( LdapLidPasswordCredentialType.class ); // our own, private logger
+
+    /**
+     * Factory method.
+     *
+     * @param passwordDirProps properties for directory access
+     * @return the created LdapLidPasswordCredentialType
+     */
+    public static LdapLidPasswordCredentialType create(
+            Properties passwordDirProps )
+    {
+        return new LdapLidPasswordCredentialType( passwordDirProps, null );
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param passwordDirProps properties for directory access
+     * @param identifierSuffix to append to the identifier when attempting to check a password, if any
+     * @return the created LdapLidPasswordCredentialType
+     */
+    public static LdapLidPasswordCredentialType create(
+            Properties passwordDirProps,
+            String     identifierSuffix )
+    {
+        return new LdapLidPasswordCredentialType( passwordDirProps, identifierSuffix );
+    }
 
     /**
      * Constructor, for package and subclasses only.
@@ -57,8 +83,8 @@ public class LdapLidPasswordCredentialType
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
-            SaneRequest request,
-            LidPersona  subject )
+            SaneRequest   request,
+            HasIdentifier subject )
         throws
             LidInvalidCredentialException
     {

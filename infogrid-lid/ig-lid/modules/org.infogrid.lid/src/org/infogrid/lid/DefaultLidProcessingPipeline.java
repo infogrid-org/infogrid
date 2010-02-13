@@ -55,7 +55,8 @@ public class DefaultLidProcessingPipeline
             Context c )
     {
         super( c );
-        
+
+        theResourceFinder         = c.findContextObject( LidResourceFinder.class );
         thePersonaManager         = c.findContextObject( LidPersonaManager.class );
         theYadisStage             = c.findContextObject( YadisPipelineProcessingStage.class );
         theAuthenticationStage    = c.findContextObject( LidClientAuthenticationPipelineStage.class );
@@ -78,14 +79,14 @@ public class DefaultLidProcessingPipeline
         throws
             LidAbortProcessingPipelineException
     {
-        HasIdentifier                    requestedResource = null;
-        LidClientAuthenticationStatus    clientAuthStatus  = null;
-        HasIdentifier                    clientPersona     = null;
+        HasIdentifier                    requestedResource   = null;
+        LidClientAuthenticationStatus    clientAuthStatus    = null;
+        LidPersona                       clientPersona       = null;
         LidSessionManagementInstructions sessionMgmtInstructions = null;
 
-        if( thePersonaManager != null ) {
+        if( theResourceFinder != null ) {
             try {
-                requestedResource = thePersonaManager.findFromRequest( lidRequest );
+                requestedResource = theResourceFinder.findFromRequest( lidRequest );
 
             } catch( Exception ex ) {
                 if( log.isInfoEnabled() ) {
@@ -115,7 +116,12 @@ public class DefaultLidProcessingPipeline
         }
         lidRequest.setAttribute( SESSION_MANAGEMENT_INSTRUCTIONS_ATTRIBUTE_NAME, sessionMgmtInstructions );
     }
-    
+
+    /**
+     * The service that knows how to find requested resources.
+     */
+    protected LidResourceFinder theResourceFinder;
+
     /**
      * The service that knows how to find LidPersonas for incoming requests.
      */

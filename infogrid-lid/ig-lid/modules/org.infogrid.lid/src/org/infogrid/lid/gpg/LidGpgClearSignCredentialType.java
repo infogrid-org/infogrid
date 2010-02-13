@@ -16,10 +16,10 @@ package org.infogrid.lid.gpg;
 
 import java.io.IOException;
 import org.infogrid.lid.LidNonceManager;
-import org.infogrid.lid.LidPersona;
 import org.infogrid.lid.credential.AbstractLidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.FactoryException;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
 
@@ -93,8 +93,8 @@ public class LidGpgClearSignCredentialType
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
-            SaneRequest request,
-            LidPersona  subject )
+            SaneRequest      request,
+            HasIdentifier subject )
         throws
             LidInvalidCredentialException
     {
@@ -134,6 +134,17 @@ public class LidGpgClearSignCredentialType
             log.error( ex );
             throw new LidGpgWrongSignatureException( subject.getIdentifier(), this, ex );
         }
+    }
+
+    /**
+     * Determine whether this LidCredentialType is a credential type that is about a remote persona.
+     * E.g. an OpenID credential type would return true, while a password credential type would return false.
+     *
+     * @return true if it is about a remote persona
+     */
+    public boolean isRemote()
+    {
+        return true;
     }
 
     /**

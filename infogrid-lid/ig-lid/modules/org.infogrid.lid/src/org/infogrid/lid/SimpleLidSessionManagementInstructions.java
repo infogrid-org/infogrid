@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.FactoryException;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.http.HTTP;
 import org.infogrid.util.http.OutgoingSaneCookie;
@@ -54,7 +55,7 @@ public class SimpleLidSessionManagementInstructions
             LidClientAuthenticationStatus clientAuthenticationStatus,
             LidSession []                 sessionsToCancel,
             LidSession []                 sessionToRenew,
-            LidPersona                    clientForNewSession,
+            HasIdentifier                 clientForNewSession,
             Identifier                    siteIdentifierForNewSession,
             String                        tokenForNewSession,
             long                          durationForNewSession )
@@ -107,7 +108,7 @@ public class SimpleLidSessionManagementInstructions
             LidClientAuthenticationStatus clientAuthenticationStatus,
             LidSession []                 sessionsToCancel,
             LidSession []                 sessionToRenew,
-            LidPersona                    clientForNewSession,
+            HasIdentifier                 clientForNewSession,
             Identifier                    siteIdentifierForNewSession,
             String                        tokenForNewSession,
             long                          durationForNewSession )
@@ -159,7 +160,7 @@ public class SimpleLidSessionManagementInstructions
      *
      * @return the client
      */
-    public LidPersona getClientForNewSession()
+    public HasIdentifier getClientForNewSession()
     {
         return theClientForNewSession;
     }
@@ -443,7 +444,7 @@ public class SimpleLidSessionManagementInstructions
     /**
      * The client for which a new session shall be created.
      */
-    protected LidPersona theClientForNewSession;
+    protected HasIdentifier theClientForNewSession;
 
     /**
      * Identifier of the site for which a new session shall be created.

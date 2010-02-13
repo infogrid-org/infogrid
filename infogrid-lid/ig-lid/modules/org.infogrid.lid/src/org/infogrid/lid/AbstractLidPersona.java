@@ -16,11 +16,8 @@ package org.infogrid.lid;
 
 import java.util.Map;
 import java.util.Set;
-import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.AbstractHasIdentifier;
-import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.Identifier;
-import org.infogrid.util.http.SaneRequest;
 
 /**
  * Collects features of LidPersona that are common to many implementations.
@@ -98,35 +95,4 @@ public abstract class AbstractLidPersona
         Set<String> ret = atts.keySet();
         return ret;
     }
-
-    /**
-     * Determine the set of LidCredentialTypes known by this LidPersona given in this request.
-     * The LidCredentialTypes will be returned regardless of whether the credentials are
-     * valid or invalid.
-     *
-     * @param request the request
-     * @return the recognized LidCredentialTypes
-     */
-    public LidCredentialType [] findRecognizedCredentialTypesIn(
-            SaneRequest request )
-    {
-        LidCredentialType [] found = getCredentialTypes();
-        if( found == null || found.length == 0 ) {
-            return new LidCredentialType[0];
-        }
-
-        LidCredentialType [] ret = new LidCredentialType[ found.length ];
-        int count = 0;
-
-        for( LidCredentialType current : found ) {
-            if( current.isContainedIn( request )) {
-                ret[count++] = current;
-            }
-        }
-        if( count < ret.length ) {
-            ret = ArrayHelper.copyIntoNewArray( ret, 0, count, LidCredentialType.class );
-        }
-        return ret;
-    }
-
 }

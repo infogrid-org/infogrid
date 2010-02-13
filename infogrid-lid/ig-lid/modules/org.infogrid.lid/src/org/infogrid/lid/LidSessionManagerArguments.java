@@ -14,6 +14,7 @@
 
 package org.infogrid.lid;
 
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 
 /**
@@ -31,10 +32,10 @@ public class LidSessionManagerArguments
      * @return the created LidSessionManagerArguments
      */
     public static LidSessionManagerArguments create(
-            long       sessionDuration,
-            LidPersona client,
-            Identifier siteIdentifier,
-            String     clientIp )
+            long          sessionDuration,
+            HasIdentifier client,
+            Identifier    siteIdentifier,
+            String        clientIp )
     {
         return new LidSessionManagerArguments( sessionDuration, client, siteIdentifier, clientIp );
     }
@@ -48,10 +49,10 @@ public class LidSessionManagerArguments
      * @param clientIp IP address of the client that created the session
      */
     protected LidSessionManagerArguments(
-            long       sessionDuration,
-            LidPersona client,
-            Identifier siteIdentifier,
-            String     clientIp )
+            long          sessionDuration,
+            HasIdentifier client,
+            Identifier    siteIdentifier,
+            String        clientIp )
     {
         theSessionDuration  = sessionDuration;
         theClient           = client;
@@ -74,7 +75,7 @@ public class LidSessionManagerArguments
      *
      * @return the client
      */
-    public LidPersona getClient()
+    public HasIdentifier getClient()
     {
         return theClient;
     }
@@ -107,7 +108,7 @@ public class LidSessionManagerArguments
     /**
      * The client whose session it is.
      */
-    protected LidPersona theClient;
+    protected HasIdentifier theClient;
 
     /**
      * Identifier of the site whose session it is.

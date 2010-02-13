@@ -17,13 +17,10 @@ package org.infogrid.lid.store;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Stack;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import org.infogrid.lid.LidPersona;
 import org.infogrid.lid.SimpleLidPersona;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.store.StoreEntryMapper;
@@ -44,24 +41,24 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * Knows how to map LidLocalPersonWithCredentials to and from the Store.
  */
-public class LidLocalPersonaMapper
+public class SimpleLidPersonaMapper
         extends
             DefaultHandler
         implements
-            StoreEntryMapper<Identifier,LidPersona>,
-            LidLocalPersonaTags
+            StoreEntryMapper<Identifier,SimpleLidPersona>,
+            SimpleLidPersonaTags
 {
-    private static final Log log = Log.getLogInstance( LidLocalPersonaMapper.class  ); // our own, private logger
+    private static final Log log = Log.getLogInstance( SimpleLidPersonaMapper.class  ); // our own, private logger
 
     /**
      * Constructor.
-     * 
-     * @param credentialTypeClassLoader the ClassLoader to use to instantiate LidCredentialTypes
+     *
+     * @param availableCredentialTypes the credential types known to the application
      */
-    public LidLocalPersonaMapper(
-            ClassLoader credentialTypeClassLoader )
+    public SimpleLidPersonaMapper(
+            LidCredentialType [] availableCredentialTypes )
     {
-        theCredentialTypeClassLoader = credentialTypeClassLoader;
+        theAvailableCredentialTypes  = availableCredentialTypes;
         
         try {
             theParser = theSaxParserFactory.newSAXParser();
@@ -206,7 +203,7 @@ public class LidLocalPersonaMapper
                 throw new SAXParseException( "Repeated tag " + PERSONA_TAG, theLocator );
             }
             theCurrentIdentifier = SimpleStringIdentifier.create( attrs.getValue( IDENTIFIER_TAG ));
-            theCurrentAttCreds = new AttributesCredentials();
+            theCurrentAttCreds = new PersonaData();
 
         } else if( ATTRIBUTE_TAG.equals( qName )) {
             if( theCurrentAttribute != null ) {
@@ -218,7 +215,7 @@ public class LidLocalPersonaMapper
             if( theCurrentCredentialType != null ) {
                 throw new SAXParseException( "Have current " + CREDENTIAL_TAG + " already", theLocator );
             }
-            theCurrentCredentialType = instantiateCredentialType( attrs.getValue( IDENTIFIER_TAG ));
+            theCurrentCredentialType = findCredentialType( attrs.getValue( IDENTIFIER_TAG ));
 
         } else {
             startElement1( namespaceURI, localName, qName, attrs );
@@ -336,36 +333,25 @@ public class LidLocalPersonaMapper
     }
     
     /**
-     * Helper method to instantiate a LidCredentialType based on its name.
+     * Helper method to find a LidCredentialType based on its name.
      * 
      * @param className name of the Class
      * @return the LidCredentialType
-     * @throws org.xml.sax.SAXParseException thrown if a prob
+     * @throws org.xml.sax.SAXParseException thrown if a problem occurred
      */
-    protected LidCredentialType instantiateCredentialType(
+    protected LidCredentialType findCredentialType(
             String className )
         throws
             SAXParseException
     {
-        try {
-            Class<?> foundClass    = Class.forName( className, true, theCredentialTypeClassLoader );
-            Method   factoryMethod = foundClass.getMethod( "create" );
-            
-            Object ret = factoryMethod.invoke( null );
-            return (LidCredentialType) ret;
-
-        } catch( ClassNotFoundException ex ) {
-            throw new FixedSAXParseException( "Could not find class " + className, theLocator, ex );
-
-        } catch( NoSuchMethodException ex ) {
-            throw new FixedSAXParseException( "Could not find method 'create' in class " + className, theLocator, ex );
-
-        } catch( IllegalAccessException ex ) {
-            throw new FixedSAXParseException( "Could not access method 'create' in class " + className, theLocator, ex );
-
-        } catch( InvocationTargetException ex ) {
-            throw new FixedSAXParseException( "Could not invoke method 'create' in class " + className, theLocator, ex );
+        for( LidCredentialType current : theAvailableCredentialTypes ) {
+            if( current.getFullName().equals( className )) {
+                return current;
+            }
         }
+        log.error( this, "Could not find LidCredentialType", className );
+
+        throw new FixedSAXParseException( theErrorPrefix, theLocator, null );
     }
 
     /**
@@ -385,7 +371,7 @@ public class LidLocalPersonaMapper
      * @return the time created, in System.currentTimeMillis() format
      */
     public long getTimeCreated(
-            LidPersona value )
+            SimpleLidPersona value )
     {
         return -1L;
     }
@@ -397,7 +383,7 @@ public class LidLocalPersonaMapper
      * @return the time updated, in System.currentTimeMillis() format
      */
     public long getTimeUpdated(
-            LidPersona value )
+            SimpleLidPersona value )
     {
         return -1L;
     }
@@ -409,7 +395,7 @@ public class LidLocalPersonaMapper
      * @return the time read, in System.currentTimeMillis() format
      */
     public long getTimeRead(
-            LidPersona value )
+            SimpleLidPersona value )
     {
         return -1L;
     }
@@ -421,7 +407,7 @@ public class LidLocalPersonaMapper
      * @return the time will expire, in System.currentTimeMillis() format
      */
     public long getTimeExpires(
-            LidPersona value )
+            SimpleLidPersona value )
     {
         return -1L;
     }
@@ -434,7 +420,7 @@ public class LidLocalPersonaMapper
      * @throws StoreValueEncodingException thrown if the value could not been encoded
      */
     public byte [] asBytes(
-            LidPersona persona )
+            SimpleLidPersona persona )
         throws
             StoreValueEncodingException
     {
@@ -450,7 +436,7 @@ public class LidLocalPersonaMapper
             buf.append( XmlUtils.escape( value ));
             buf.append( "</" ).append( ATTRIBUTE_TAG ).append( ">" );
         }
-        for( LidCredentialType type : persona.getCredentialTypes() ) {
+        for( LidCredentialType type : persona.getApplicableCredentialTypes( null ) ) { // for SimpleLidPersona argument null is fine
             String value = persona.getCredentialFor( type );
             
             buf.append( "<" ).append( CREDENTIAL_TAG );
@@ -471,7 +457,7 @@ public class LidLocalPersonaMapper
     /**
      * The encoding to use.
      */
-    public static final String ENCODING = LidLocalPersonaMapper.class.getName();
+    public static final String ENCODING = SimpleLidPersonaMapper.class.getName();
 
     /**
      * The character set to use.
@@ -488,15 +474,15 @@ public class LidLocalPersonaMapper
     }
 
     /**
+     * The credential types known by the application.
+     */
+    protected LidCredentialType [] theAvailableCredentialTypes;
+
+    /**
      * Our SAX parser.
      */
     protected SAXParser theParser;
     
-    /**
-     * The ClassLoader to use to instantiate a LidCredentialType.
-     */
-    protected ClassLoader theCredentialTypeClassLoader;
-
     /**
      * The identifier of the LidLocalPersona currently being parsed.
      */
@@ -508,9 +494,9 @@ public class LidLocalPersonaMapper
     protected ArrayList<Identifier> theRemoteIdentifiers;
 
     /**
-     * The AttributesCredentials of the LidLocalPersona currently being parsed.
+     * The PersonaData of the LidLocalPersona currently being parsed.
      */
-    protected AttributesCredentials theCurrentAttCreds;
+    protected PersonaData theCurrentAttCreds;
     
     /**
      * The name of the currently being parsed attribute in theObjectBeingParsed.

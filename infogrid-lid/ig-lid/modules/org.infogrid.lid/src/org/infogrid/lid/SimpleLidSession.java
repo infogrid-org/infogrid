@@ -15,6 +15,7 @@
 package org.infogrid.lid;
 
 import org.infogrid.util.AbstractFactoryCreatedObject;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 
 /**
@@ -43,17 +44,17 @@ public class SimpleLidSession
      * @return the created LidSession
      */
     public static SimpleLidSession create(
-            String     sessionToken,
-            LidPersona client,
-            Identifier siteIdentifier,
-            long       timeCreated,
-            long       timeUpdated,
-            long       timeRead,
-            long       timeExpires,
-            long       timeAuthenticated,
-            long       timeUsedSuccessfully,
-            long       timeValidUntil,
-            String     creationClientIp )
+            String        sessionToken,
+            HasIdentifier client,
+            Identifier    siteIdentifier,
+            long          timeCreated,
+            long          timeUpdated,
+            long          timeRead,
+            long          timeExpires,
+            long          timeAuthenticated,
+            long          timeUsedSuccessfully,
+            long          timeValidUntil,
+            String        creationClientIp )
     {
         SimpleLidSession ret = new SimpleLidSession(
                 sessionToken,
@@ -86,17 +87,17 @@ public class SimpleLidSession
      * @param creationClientIp the IP address of the client that created the session
      */
     protected SimpleLidSession(
-            String     sessionToken,
-            LidPersona client,
-            Identifier siteIdentifier,
-            long       timeCreated,
-            long       timeUpdated,
-            long       timeRead,
-            long       timeExpires,
-            long       timeAuthenticated,
-            long       timeUsedSuccessfully,
-            long       timeValidUntil,
-            String     creationClientIp )
+            String        sessionToken,
+            HasIdentifier client,
+            Identifier    siteIdentifier,
+            long          timeCreated,
+            long          timeUpdated,
+            long          timeRead,
+            long          timeExpires,
+            long          timeAuthenticated,
+            long          timeUsedSuccessfully,
+            long          timeValidUntil,
+            String        creationClientIp )
     {
         theSessionToken             = sessionToken;
         theClient                   = client;
@@ -126,7 +127,7 @@ public class SimpleLidSession
      *
      * @return the client
      */
-    public LidPersona getClient()
+    public HasIdentifier getSessionClient()
     {
         return theClient;
     }
@@ -295,7 +296,7 @@ public class SimpleLidSession
     /**
      * The client whose session it is.
      */
-    protected LidPersona theClient;
+    protected HasIdentifier theClient;
 
     /**
      * Identifier of the site whose session it is.

@@ -17,6 +17,7 @@ package org.infogrid.lid.openid;
 import org.infogrid.lid.DefaultLidProcessingPipeline;
 import org.infogrid.lid.LidAbortProcessingPipelineException;
 import org.infogrid.lid.LidClientAuthenticationStatus;
+import org.infogrid.lid.LidPersona;
 import org.infogrid.lid.LidProcessingPipeline;
 import org.infogrid.lid.LidSessionManagementInstructions;
 import org.infogrid.util.HasIdentifier;
@@ -83,7 +84,7 @@ public class DefaultOpenIdLidProcessingPipeline
     {
         HasIdentifier                    requestedResource = null;
         LidClientAuthenticationStatus    clientAuthStatus  = null;
-        HasIdentifier                    clientPersona     = null;
+        LidPersona                       clientPersona       = null;
         LidSessionManagementInstructions sessionMgmtInstructions = null;
 
         if( log.isTraceEnabled() ) {
@@ -106,9 +107,10 @@ public class DefaultOpenIdLidProcessingPipeline
             }
         }
 
-        if( thePersonaManager != null ) {
+        if( theResourceFinder != null ) {
             try {
-                requestedResource = thePersonaManager.findFromRequest( lidRequest );
+                requestedResource = theResourceFinder.findFromRequest( lidRequest );
+
             } catch( Exception ex ) {
                 if( log.isInfoEnabled() ) {
                     log.info( ex );

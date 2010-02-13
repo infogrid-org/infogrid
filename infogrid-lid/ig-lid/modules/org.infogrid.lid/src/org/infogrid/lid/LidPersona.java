@@ -19,10 +19,9 @@ import java.util.Set;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
-import org.infogrid.util.http.SaneRequest;
 
 /**
- * Represents a persona, which could be provisioned either locally or remotely.
+ * Represents a locally provisioned persona.
  */
 public interface LidPersona
         extends
@@ -71,11 +70,13 @@ public interface LidPersona
     public Map<String,String> getAttributes();
 
     /**
-     * Obtain the set of available credential types.
+     * Obtain the subset of credential types applicable to this LidPersona.
      *
-     * @return the set of available credential types
+     * @param set the set of credential types
+     * @return the subset of credential types
      */
-    public LidCredentialType [] getCredentialTypes();
+    public LidCredentialType [] getApplicableCredentialTypes(
+            LidCredentialType [] set );
 
     /**
      * Obtain a specific credential.
@@ -85,17 +86,6 @@ public interface LidPersona
      */
     public String getCredentialFor(
             LidCredentialType type );
-
-    /**
-     * Determine the set of LidCredentialTypes known by this LidPersona given in this request.
-     * The LidCredentialTypes will be returned regardless of whether the credentials are
-     * valid or invalid.
-     *
-     * @param request the request
-     * @return the recognized LidCredentialTypes
-     */
-    public LidCredentialType [] findRecognizedCredentialTypesIn(
-            SaneRequest request );
 
     /**
      * Name of the attribute that contains the persona's identifier.

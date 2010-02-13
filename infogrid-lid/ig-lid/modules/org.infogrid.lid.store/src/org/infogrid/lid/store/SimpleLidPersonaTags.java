@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -17,7 +17,7 @@ package org.infogrid.lid.store;
 /**
  * Collects the XML tags for the LidLocalPersonaWithCredentials mapping.
  */
-public interface LidLocalPersonaTags
+public interface SimpleLidPersonaTags
 {
     /** Top-level tag representing a LidLocalPersonaWithCredentials. */
     public static final String PERSONA_TAG = "persona";

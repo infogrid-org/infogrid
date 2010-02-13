@@ -16,11 +16,12 @@ package org.infogrid.lid.translate;
 
 import java.util.Map;
 import org.infogrid.lid.AbstractLidPersonaManager;
-import org.infogrid.lid.LidPersona;
 import org.infogrid.lid.LidPersonaExistsAlreadyException;
 import org.infogrid.lid.LidPersonaManager;
-import org.infogrid.lid.LidPersonaUnknownException;
+import org.infogrid.lid.LidPersona;
 import org.infogrid.lid.credential.LidCredentialType;
+import org.infogrid.util.CannotFindHasIdentifierException;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.IdentifierFactory;
 import org.infogrid.util.InvalidIdentifierException;
@@ -61,9 +62,62 @@ public abstract class TranslatingLidPersonaManager
     }
 
     /**
+     * Obtain a HasIdentifier, given its Identifier. This will either return a LidPersona
+     * or not. If it returns a LidPersona, the identifier referred to that locally provisioned
+     * LidPersona. If it returns something other than a LidPersona, it refers to a remote
+     * persona. To determine the LidPersona that may be associated with the remote persona,
+     * call determineLidPersonaFromRemoteIdentifier.
+     *
+     * @param identifier the Identifier for which the HasIdentifier will be retrieved
+     * @return the found HasIdentifier
+     * @throws CannotFindHasIdentifierException thrown if the HasIdentifier cannot be found
+     * @throws InvalidIdentifierException thrown if the provided Identifier was invalid for this HasIdentifierFinder
+     */
+    public HasIdentifier find(
+            Identifier identifier )
+        throws
+            CannotFindHasIdentifierException,
+            InvalidIdentifierException
+    {
+        if( identifier == null ) {
+            throw new NullPointerException( "identifier must not be null" );
+        }
+        Identifier delegateIdentifier = translateIdentifierForward( identifier );
+
+        HasIdentifier delegateHasIdentifier = theDelegate.find( delegateIdentifier );
+        if( delegateHasIdentifier instanceof LidPersona ) {
+            LidPersona ret = translatePersonaBackward( (LidPersona) delegateHasIdentifier );
+            return ret;
+        } else {
+            return delegateHasIdentifier;
+
+        }
+    }
+    
+    /**
+     * Given a remote persona, determine the locally provisioned corresponding
+     * LidPersona. May return null if none has been provisioned.
+     *
+     * @param remote the remote persona
+     * @return the found LidPersona, or null
+     */
+    public LidPersona determineLidPersonaFromRemotePersona(
+            HasIdentifier remote )
+    {
+        LidPersona delegatePersona = theDelegate.determineLidPersonaFromRemotePersona( remote );
+        if( delegatePersona == null ) {
+            return null;
+        }
+        LidPersona ret = translatePersonaBackward( delegatePersona );
+        return ret;
+    }
+
+    /**
      * Provision a LidPersona.
      *
-     * @param localIdentifier the Identifier for the to-be-created LidPersona
+     * @param localIdentifier the Identifier for the to-be-created LidPersona. This may be null, in which case
+     *        the LidPersonaManager assigns a localIdentifier
+     * @param remotePersonas the remote personas to be associated with the locally provisioned LidPersona
      * @param attributes the attributes for the to-be-created LidPersona
      * @param credentials the credentials for the to-be-created LidPersona
      * @return the LidPersona that was created
@@ -72,19 +126,18 @@ public abstract class TranslatingLidPersonaManager
     @Override
     public LidPersona provisionPersona(
             Identifier                    localIdentifier,
+            HasIdentifier []              remotePersonas,
             Map<String,String>            attributes,
             Map<LidCredentialType,String> credentials )
         throws
             LidPersonaExistsAlreadyException
     {
-        if( localIdentifier == null ) {
-            throw new NullPointerException( "localIdentifier must not be null" );
-        }
-        Identifier delegateIdentifier = translateIdentifierForward( localIdentifier );
+        Identifier delegateIdentifier = localIdentifier != null ? translateIdentifierForward( localIdentifier ) : null;
         
         try {
             LidPersona delegatePersona = theDelegate.provisionPersona(
                     delegateIdentifier,
+                    remotePersonas,
                     attributes,
                     credentials );
             
@@ -99,61 +152,19 @@ public abstract class TranslatingLidPersonaManager
     }
 
     /**
-     * Obtain a LidPersona, given its Identifier.
-     *
-     * @param identifier the Identifier for which the LidPersona will be retrieved
-     * @return the found LidPersona
-     * @throws LidPersonaUnknownException thrown if no LidPersona exists with this Identifier
-     * @throws InvalidIdentifierException thrown if an invalid Identifier was provided
-     */
-    public LidPersona find(
-            Identifier identifier )
-        throws
-            LidPersonaUnknownException,
-            InvalidIdentifierException
-    {
-        if( identifier == null ) {
-            throw new NullPointerException( "identifier must not be null" );
-        }
-        Identifier delegateIdentifier = translateIdentifierForward( identifier );
-
-        try {
-            LidPersona delegatePersona = theDelegate.find( delegateIdentifier );
-            LidPersona ret             = translatePersonaBackward( delegatePersona );
-            return ret;
-
-        } catch( LidPersonaUnknownException ex ) {
-            throw new LidPersonaUnknownException( identifier, ex );
-        }        
-    }
-
-    /**
-     * Delete a LidPersona, given its identifier. This overridable method always throws
+     * Delete a LidPersona. This overridable method always throws
      * UnsupportedOperationException.
      *
-     * @param identifier the identifier of the LidPersona that will be deleted
+     * @param toDelete the LidPersona that will be deleted
      * @throws UnsupportedOperationException thrown if this LidPersonaManager does not permit the deletion of LidPersonas
-     * @throws LidPersonaUnknownException thrown if no LidPersona exists with this identifier
      */
     @Override
     public void delete(
-            Identifier identifier )
-        throws
-            UnsupportedOperationException,
-            LidPersonaUnknownException
+            LidPersona toDelete )
     {
-        if( identifier == null ) {
-            throw new NullPointerException( "identifier must not be null" );
-        }
-        Identifier delegateIdentifier = translateIdentifierForward( identifier );
+        LidPersona delegate = translatePersonaForward( (TranslatingLidPersona) toDelete );
 
-        try {
-            theDelegate.delete( delegateIdentifier );
-
-        // we don't catch UnsupportedOperationException
-        } catch( LidPersonaUnknownException ex ) {
-            throw new LidPersonaUnknownException( identifier, ex );
-        }
+        theDelegate.delete( delegate );
     }
     
     /**
@@ -179,22 +190,15 @@ public abstract class TranslatingLidPersonaManager
      * 
      * @param persona input parameter
      * @return translated LidPersona
-     * @throws LidPersonaUnknownException thrown if the LidPersona is unknown
-     * @throws InvalidIdentifierException thrown if the identifier is invalid
      */
     protected LidPersona translatePersonaForward(
-            LidPersona persona )
-        throws
-            LidPersonaUnknownException,
-            InvalidIdentifierException
+            TranslatingLidPersona persona )
     {
         if( persona == null ) {
             return null;
         }
-        Identifier delegateIdentifier = translateIdentifierForward( persona.getIdentifier() );
-        
-        LidPersona ret = theDelegate.find( delegateIdentifier );
 
+        LidPersona ret = persona.getDelegate();
         return ret;
     }
 
@@ -202,18 +206,17 @@ public abstract class TranslatingLidPersonaManager
      * Translate a LidPersona as used by the delegate into the LidPersona as used by this class.
      * 
      * @param persona input parameter
-     * @return translated LidLocalPersona
+     * @return translated LidPersona
      */
-    protected LidPersona translatePersonaBackward(
+    protected TranslatingLidPersona translatePersonaBackward(
             LidPersona persona )
     {
         if( persona == null ) {
             return null;
         }
         Identifier delegateIdentifier = translateIdentifierBackward( persona.getIdentifier() );
-        
-        LidPersona ret = new TranslatingLidPersona( delegateIdentifier, persona );
 
+        TranslatingLidPersona ret = new TranslatingLidPersona( delegateIdentifier, persona );
         return ret;
     }    
 

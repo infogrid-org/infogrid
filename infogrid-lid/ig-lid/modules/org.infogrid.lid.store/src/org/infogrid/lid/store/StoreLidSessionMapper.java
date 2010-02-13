@@ -18,13 +18,13 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import org.infogrid.lid.LidPersona;
 import org.infogrid.lid.LidPersonaManager;
-import org.infogrid.lid.LidPersonaUnknownException;
 import org.infogrid.lid.LidSession;
 import org.infogrid.lid.SimpleLidSession;
 import org.infogrid.store.StoreEntryMapper;
 import org.infogrid.store.StoreValue;
 import org.infogrid.store.StoreValueDecodingException;
 import org.infogrid.store.StoreValueEncodingException;
+import org.infogrid.util.CannotFindHasIdentifierException;
 import org.infogrid.util.IdentifierFactory;
 import org.infogrid.util.InvalidIdentifierException;
 
@@ -137,7 +137,10 @@ public class StoreLidSessionMapper
                 timeValidUntil = -1L;
             }
 
-            LidPersona client = clientIdentifier != null ? thePersonaManager.find( theIdentifierFactory.fromExternalForm( clientIdentifier )) : null;
+            LidPersona client = null;
+            if( clientIdentifier != null ) {
+                client = (LidPersona) thePersonaManager.find( theIdentifierFactory.fromExternalForm( clientIdentifier ));
+            }
             
             SimpleLidSession ret = SimpleLidSession.create(
                     sessionToken,
@@ -154,7 +157,7 @@ public class StoreLidSessionMapper
             
             return ret;
 
-        } catch( LidPersonaUnknownException ex ) {
+        } catch( CannotFindHasIdentifierException ex ) {
             throw new StoreValueDecodingException( ex );
 
         } catch( InvalidIdentifierException ex ) {
@@ -242,7 +245,7 @@ public class StoreLidSessionMapper
             StringBuilder buf = new StringBuilder();
             buf.append( value.getSessionToken() );
             buf.append( SEPARATOR );
-            buf.append( value.getClient().getIdentifier().toExternalForm() );
+            buf.append( value.getSessionClient().getIdentifier().toExternalForm() );
             buf.append( SEPARATOR );
             buf.append( value.getSiteIdentifier().toExternalForm() );
             buf.append( SEPARATOR );

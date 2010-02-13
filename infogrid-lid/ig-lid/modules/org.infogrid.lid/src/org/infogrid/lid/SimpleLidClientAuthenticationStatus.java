@@ -18,6 +18,7 @@ import java.util.Collection;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 
 /**
@@ -32,6 +33,7 @@ public class SimpleLidClientAuthenticationStatus
      * 
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
+     * @param clientRemotePersona the client's remote persona, if used
      * @param clientPersona the client LidPersona that was found, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
@@ -48,6 +50,7 @@ public class SimpleLidClientAuthenticationStatus
     public static SimpleLidClientAuthenticationStatus create(
             String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
+            HasIdentifier                    clientRemotePersona,
             LidPersona                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
@@ -63,6 +66,7 @@ public class SimpleLidClientAuthenticationStatus
         SimpleLidClientAuthenticationStatus ret = new SimpleLidClientAuthenticationStatus(
                 clientIdentifierAsEntered,
                 clientIdentifier,
+                clientRemotePersona,
                 clientPersona,
                 preexistingClientSession,
                 carriedValidCredentialTypes,
@@ -83,6 +87,7 @@ public class SimpleLidClientAuthenticationStatus
      *
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
+     * @param clientRemotePersona the client's remote persona, if used
      * @param clientPersona the client LidPersona that was found, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
@@ -99,6 +104,7 @@ public class SimpleLidClientAuthenticationStatus
     public static SimpleLidClientAuthenticationStatus create(
             String                                    clientIdentifierAsEntered,
             Identifier                                clientIdentifier,
+            HasIdentifier                             clientRemotePersona,
             LidPersona                                clientPersona,
             LidSession                                preexistingClientSession,
             Collection<LidCredentialType>             carriedValidCredentialTypes,
@@ -114,6 +120,7 @@ public class SimpleLidClientAuthenticationStatus
         SimpleLidClientAuthenticationStatus ret = SimpleLidClientAuthenticationStatus.create(
                 clientIdentifierAsEntered,
                 clientIdentifier,
+                clientRemotePersona,
                 clientPersona,
                 preexistingClientSession,
                 carriedValidCredentialTypes != null
@@ -136,18 +143,19 @@ public class SimpleLidClientAuthenticationStatus
     }
 
     /**
-     * Constructor for subclasses only, use factory method.
-     * 
+     * Constructor for subclasses only.
+     *
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
-     * @param clientPersona the client LidPersona that was found, if any
+     * @param clientRemotePersona the client's remote persona, if used
+     * @param clientPersona the client's LidPersona that was found locally, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
      * @param carriedInvalidCredentialTypes the credential types carried as part of this request that did not validate successfully, if any
      * @param invalidCredentialExceptions the exceptions indicating the problems with the invalid credentials, in the same sequence, if any
      * @param clientLoggedOn the client just logged on
      * @param clientWishesToLogin the client wishes to log in
-     * @param wishesCancelSession the client wishes to cancel the session
+     * @param clientWishesToCancelSession the client wishes to cancel the session
      * @param clientWishesToLogout the client wishes to log out
      * @param authenticationServices the authentication services available to this client, if any
      * @param siteIdentifier identifies the site at which this status applies
@@ -155,6 +163,7 @@ public class SimpleLidClientAuthenticationStatus
     protected SimpleLidClientAuthenticationStatus(
             String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
+            HasIdentifier                    clientRemotePersona,
             LidPersona                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
@@ -162,13 +171,14 @@ public class SimpleLidClientAuthenticationStatus
             LidInvalidCredentialException [] invalidCredentialExceptions,
             boolean                          clientLoggedOn,
             boolean                          clientWishesToLogin,
-            boolean                          wishesCancelSession,
+            boolean                          clientWishesToCancelSession,
             boolean                          clientWishesToLogout,
             LidAuthenticationService []      authenticationServices,
             Identifier                       siteIdentifier )
     {
         super(  clientIdentifierAsEntered,
                 clientIdentifier,
+                clientRemotePersona,
                 clientPersona,
                 preexistingClientSession,
                 carriedValidCredentialTypes,
@@ -176,7 +186,7 @@ public class SimpleLidClientAuthenticationStatus
                 invalidCredentialExceptions,
                 clientLoggedOn,
                 clientWishesToLogin,
-                wishesCancelSession,
+                clientWishesToCancelSession,
                 clientWishesToLogout,
                 authenticationServices,
                 siteIdentifier );

@@ -15,9 +15,9 @@
 package org.infogrid.lid.openid.auth;
 
 import org.infogrid.lid.LidNonceManager;
-import org.infogrid.lid.LidPersona;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.lid.openid.OpenIdRpSideAssociationManager;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
 
 /**
@@ -68,8 +68,8 @@ public abstract class AbstractOpenId1CredentialType
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
-            SaneRequest request,
-            LidPersona  subject )
+            SaneRequest   request,
+            HasIdentifier subject )
         throws
             LidInvalidCredentialException
     {

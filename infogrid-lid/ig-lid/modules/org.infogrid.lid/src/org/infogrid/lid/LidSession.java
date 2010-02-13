@@ -15,6 +15,7 @@
 package org.infogrid.lid;
 
 import org.infogrid.util.FactoryCreatedObject;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 
 /**
@@ -35,7 +36,7 @@ public interface LidSession
      *
      * @return the client
      */
-    public LidPersona getClient();
+    public HasIdentifier getSessionClient();
 
     /**
      * Obtain the Identifier of the site where the session takes place.
