@@ -24,6 +24,9 @@ import org.infogrid.mesh.a.DefaultAMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
+import org.infogrid.util.InvalidCharacterParseException;
+import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.StringTooShortParseException;
 import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationParseException;
 
@@ -173,7 +176,7 @@ public class DefaultAnetMeshObjectIdentifierFactory
             localId = null;
         }
 
-        checkLocalId( localId );
+        checkRawId( meshBase, localId );
 
         ret = DefaultAnetMeshObjectIdentifier.create(
                 this,
@@ -359,6 +362,34 @@ public class DefaultAnetMeshObjectIdentifierFactory
     }
 
     /**
+     * Check whether the proposed String for a NetMeshObjectIdentifier is valid.
+     * Subclasses can override this.
+     *
+     * @param mbId the MeshBaseIdentifier component
+     * @param rawLocalId the proposed local ID component
+     * @throws ParseException thrown if the String is not valid
+     */
+    protected void checkRawId(
+            NetMeshBaseIdentifier mbId,
+            String                rawLocalId )
+        throws
+            ParseException
+    {
+        if( rawLocalId == null ) {
+            return;
+        }
+
+        for( int i=0 ; i<DISALLOWED_LOCAL_ID_STRINGS.length ; ++i ) {
+            if( rawLocalId.indexOf( DISALLOWED_LOCAL_ID_STRINGS[i] ) >= 0 ) {
+                throw new InvalidCharacterParseException( rawLocalId, null, rawLocalId.indexOf( DISALLOWED_LOCAL_ID_STRINGS[i] ), DISALLOWED_LOCAL_ID_STRINGS[i] );
+            }
+        }
+        if( MINIMUM_LOCAL_ID_LENGTH > 0 && rawLocalId.length() < MINIMUM_LOCAL_ID_LENGTH ) {
+            throw new StringTooShortParseException( rawLocalId, null, MINIMUM_LOCAL_ID_LENGTH );
+        }
+    }
+
+    /**
      * Identifies the NetMeshBase to which this factory belongs.
      */
     protected NetMeshBaseIdentifier theMeshBaseIdentifier;
@@ -372,6 +403,24 @@ public class DefaultAnetMeshObjectIdentifierFactory
      * The home object identifier.
      */
     public final DefaultAnetMeshObjectIdentifier NET_HOME_OBJECT;
+
+
+    /**
+     * Our ResourceHelper.
+     */
+    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( DefaultAnetMeshObjectIdentifierFactory.class );
+
+    /**
+     * The minimum length for a local id.
+     */
+    public final static int MINIMUM_LOCAL_ID_LENGTH = theResourceHelper.getResourceIntegerOrDefault( "MinimumLocalIdLength", 4 );
+
+    /**
+     * The disallowed character strings in a local id.
+     */
+    public final static String [] DISALLOWED_LOCAL_ID_STRINGS = theResourceHelper.getResourceStringArrayOrDefault(
+            "DisallowedLocalIdString",
+            new String [] { "." } );
 
     /**
      * This subclass of DefaultAnetMeshObjectIdentifier is only used for identifiers
