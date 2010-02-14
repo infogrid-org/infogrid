@@ -8,13 +8,14 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid;
 
 import javax.servlet.RequestDispatcher;
+import org.infogrid.util.AbstractLocalizedException;
 
 /**
  * Thrown by stages of the LID pipeline during processing of an incoming request, for the sole purpose
@@ -22,7 +23,7 @@ import javax.servlet.RequestDispatcher;
  */
 public class LidAbortProcessingPipelineException
         extends
-            Exception
+            AbstractLocalizedException
 {
     private static final long serialVersionUID = 1L; // helps with serialization
 
@@ -96,6 +97,16 @@ public class LidAbortProcessingPipelineException
         
         theSource          = source;
         theDispatcherToRun = dispatcherToRun;
+    }
+
+    /**
+     * Obtain resource parameters for the internationalization.
+     *
+     * @return the resource parameters
+     */
+    public Object [] getLocalizationParameters()
+    {
+        return new Object[0];
     }
 
     /**
