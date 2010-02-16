@@ -404,7 +404,6 @@ public class DefaultAnetMeshObjectIdentifierFactory
      */
     public final DefaultAnetMeshObjectIdentifier NET_HOME_OBJECT;
 
-
     /**
      * Our ResourceHelper.
      */
