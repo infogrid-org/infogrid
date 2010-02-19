@@ -20,6 +20,9 @@ import org.infogrid.lid.LidAbortProcessingPipelineException;
 import org.infogrid.lid.LidAbortProcessingPipelineWithContentException;
 import org.infogrid.lid.LidAbortProcessingPipelineWithRedirectException;
 import org.infogrid.lid.LidClientAuthenticationStatus;
+import org.infogrid.lid.openid.auth.OpenId1CredentialType;
+import org.infogrid.lid.openid.auth.OpenId2CredentialType;
+import org.infogrid.lid.openid.auth.OpenIdCredentialType;
 import org.infogrid.lid.yadis.AbstractYadisService;
 import org.infogrid.util.Base64;
 import org.infogrid.util.HasIdentifier;
@@ -29,7 +32,7 @@ import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
 
 /**
- * Knows how to process incoming OpenID SSO requests. THis does NOT handle dumb mode.
+ * Knows how to process incoming OpenID SSO requests. This does NOT handle dumb mode.
  */
 public class OpenIdSsoPipelineStage
         extends
@@ -133,10 +136,13 @@ public class OpenIdSsoPipelineStage
             return;
         }
         
-        String identifier   = lidRequest.getUrlArgument( "openid.identity" );
-        String assoc_handle = lidRequest.getUrlArgument( "openid.assoc_handle" );
-        String return_to    = lidRequest.getUrlArgument( "openid.return_to" );
-        String trust_root   = lidRequest.getUrlArgument( "openid.trust_root" );
+        String identifier = lidRequest.getUrlArgument( OpenId2CredentialType.OPENID2_IDENTIFIER_PARAMETER_NAME ); // "openid.identity" );
+        if( identifier == null ) {
+            identifier = lidRequest.getUrlArgument( OpenId1CredentialType.OPENID1_IDENTIFIER_PARAMETER_NAME );
+        }
+        String assoc_handle = lidRequest.getUrlArgument( OpenIdCredentialType.OPENID_ASSOC_HANDLE_PARAMETER_NAME ); //  "openid.assoc_handle" );
+        String return_to    = lidRequest.getUrlArgument( OPENID_RETURN_TO_PARAMETER_NAME );
+        String trust_root   = lidRequest.getUrlArgument( OPENID_TRUST_ROOT_PARAMETER_NAME );
 
         if( identifier == null || identifier.length() == 0 ) {
             throw new OpenIdSsoException( this, "openid.identifier must not be empty" );
@@ -145,7 +151,7 @@ public class OpenIdSsoPipelineStage
             throw new OpenIdSsoException( this, "openid.assoc_handle must not be empty" );
         }
         if( return_to == null || return_to.length() == 0 ) {
-            throw new OpenIdSsoException( this, "openid.return_to must not be empty" );
+            throw new OpenIdSsoException( this, OPENID_RETURN_TO_PARAMETER_NAME + " must not be empty" );
             // The spec says it's optional, but I can't see how that can work
         }
         if( trust_root == null || trust_root.length() == 0 ) {
@@ -356,4 +362,14 @@ public class OpenIdSsoPipelineStage
             = "<xrd:Type>http://openid.net/signon/1.0</xrd:Type>\n"
             + "<xrd:URI>{0}</xrd:URI>\n"
             + "<openid:Delegate xmlns:openid=\"http://openid.net/xmlns/1.0\">{0}</openid:Delegate>\n";
+
+    /**
+     * Name of the URL parameter that contains the OpenID return_to URL.
+     */
+    public static final String OPENID_RETURN_TO_PARAMETER_NAME = "openid.return_to";
+
+    /**
+     * Name of the URL parameter that contains the OpenID trust root.
+     */
+    public static final String OPENID_TRUST_ROOT_PARAMETER_NAME = "openid.trust_root";
 }

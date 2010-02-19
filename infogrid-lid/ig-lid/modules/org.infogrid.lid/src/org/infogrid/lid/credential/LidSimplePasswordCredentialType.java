@@ -5,27 +5,24 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
-package org.infogrid.lid;
+package org.infogrid.lid.credential;
 
 /**
- * A stage in the LidProcessingPipeline.
+ * The LID "simple password" LidCredentialType.
  */
-public interface LidProcessingPipelineStage
+public interface LidSimplePasswordCredentialType
+        extends
+            LidCredentialType
 {
     /**
-     * Name of the lid-meta parameter.
+     * Name of the LidCredentialType.
      */
-    public static final String LID_META_PARAMETER_NAME = "lid-meta";
-
-    /**
-     * Possible value of the lid-meta parameter.
-     */
-    public static final String LID_META_CAPABILITIES_PARAMETER_VALUE = "capabilities";
+    public static final String LID_SIMPLE_PASSWORD_CREDTYPE_PARAMETER_VALUE = "simple-password";
 }

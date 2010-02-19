@@ -19,6 +19,7 @@ import java.util.Iterator;
 import org.infogrid.lid.LidAbortProcessingPipelineException;
 import org.infogrid.lid.LidAbortProcessingPipelineWithContentException;
 import org.infogrid.lid.LidAbortProcessingPipelineWithErrorException;
+import org.infogrid.lid.LidProcessingPipelineStage;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.http.HTTP;
@@ -116,8 +117,8 @@ public class DefaultYadisPipelineProcessingStage
                     YADIS_HTTP_HEADER_REQUEST_ATTRIBUTE_NAME,
                     HTTP.appendArgumentToUrl(
                             lidRequest.getOriginalSaneRequest().getAbsoluteBaseUri(),
-                            "lid-meta",
-                            "capabilities" ));
+                            LidProcessingPipelineStage.LID_META_PARAMETER_NAME,
+                            LidProcessingPipelineStage.LID_META_CAPABILITIES_PARAMETER_VALUE ));
         }
     }
 }

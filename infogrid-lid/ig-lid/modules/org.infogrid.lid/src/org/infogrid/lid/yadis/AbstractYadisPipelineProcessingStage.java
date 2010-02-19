@@ -15,6 +15,7 @@
 package org.infogrid.lid.yadis;
 
 import org.infogrid.lid.LidAbortProcessingPipelineException;
+import org.infogrid.lid.LidProcessingPipelineStage;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.context.AbstractObjectInContext;
 import org.infogrid.util.context.Context;
@@ -53,13 +54,13 @@ public abstract class AbstractYadisPipelineProcessingStage
         throws
             LidAbortProcessingPipelineException
     {
-        String meta = lidRequest.getUrlArgument( "lid-meta" );
+        String meta = lidRequest.getUrlArgument( LidProcessingPipelineStage.LID_META_PARAMETER_NAME );
         if( meta == null ) {
             meta = lidRequest.getUrlArgument( "meta" );
         }
         String acceptHeader = lidRequest.getAcceptHeader();
 
-        if(    "capabilities".equals( meta )
+        if(    LidProcessingPipelineStage.LID_META_CAPABILITIES_PARAMETER_VALUE.equals( meta )
             || ( acceptHeader != null && acceptHeader.indexOf( XRDS_MIME_TYPE ) >= 0 ))
         {
             processYadisRequest( lidRequest, resource );

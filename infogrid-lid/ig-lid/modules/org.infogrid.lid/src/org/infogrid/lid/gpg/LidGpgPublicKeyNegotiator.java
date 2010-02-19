@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -17,6 +17,7 @@ package org.infogrid.lid.gpg;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.lid.LidProcessingPipelineStage;
 import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.Identifier;
@@ -44,7 +45,7 @@ public class LidGpgPublicKeyNegotiator
             FactoryException
     {
         try {
-            String url = HTTP.appendArgumentPairToUrl( key.toExternalForm(), "lid-meta=gpg%20--export%20--armor" );
+            String url = HTTP.appendArgumentPairToUrl( key.toExternalForm(), LidProcessingPipelineStage.LID_META_PARAMETER_NAME + "=gpg%20--export%20--armor" );
 
             HTTP.Response response = HTTP.http_get( url );
             if( !response.isSuccess() ) {

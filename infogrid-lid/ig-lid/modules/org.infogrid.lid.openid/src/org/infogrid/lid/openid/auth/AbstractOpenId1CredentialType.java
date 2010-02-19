@@ -26,6 +26,8 @@ import org.infogrid.util.http.SaneRequest;
 public abstract class AbstractOpenId1CredentialType
         extends
             AbstractOpenIdCredentialType
+        implements
+            OpenId1CredentialType
 {
     /**
      * Constructor.
@@ -49,7 +51,7 @@ public abstract class AbstractOpenId1CredentialType
     public boolean isContainedIn(
             SaneRequest request )
     {
-        if( request.getMultivaluedUrlArgument( OPENID_NS_PARAMETER_NAME ) != null ) {
+        if( request.getMultivaluedUrlArgument( OpenId2CredentialType.OPENID_NS_PARAMETER_NAME ) != null ) {
             return false;
         }
         if( !request.matchUrlArgument( OPENID_MODE_PARAMETER_NAME, OPENID_MODE_IDRES_PARAMETER_VALUE )) {

@@ -22,6 +22,7 @@ import java.io.OutputStreamWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.infogrid.lid.LidNonceManager;
+import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.Identifier;
@@ -258,10 +259,10 @@ public class CommandLineWrapperLidGpg
 
                 append.append( "lid=" );
                 append.append( HTTP.encodeToValidUrlArgument( lid ));
-                append.append( "&lid-credtype=gpg%20--clearsign" );
+                append.append( "&" ).append( LidCredentialType.LID_CREDTYPE_PARAMETER_NAME ).append( "=" ).append( HTTP.encodeToValidUrlArgument( LidGpgClearSignCredentialType.LID_GPG_CLEARSIGN_PARAMETER_VALUE ));
 
                 String nonce = theNonceManager.generateNewNonce();
-                append.append( "&lid-nonce=" );
+                append.append( "&" ).append( LidNonceManager.LID_NONCE_PARAMETER_NAME ).append(  "=" );
                 append.append( HTTP.encodeToValidUrlArgument( nonce ));
 
                 command = theFullExecutable + " --clearsign -u =" + lid;
@@ -276,9 +277,9 @@ public class CommandLineWrapperLidGpg
                     String sig  = m.group( 3 );
 
                     if( lidVersion != null && lidVersion.startsWith( "1." )) {
-                        append.append( "&credential=" + HTTP.encodeToValidUrlArgument( hash + "\n" + sig ));
+                        append.append( "&credential=" ).append( HTTP.encodeToValidUrlArgument( hash + "\n" + sig ));
                     } else {
-                        append.append( "&lid-credential=" + HTTP.encodeToValidUrlArgument( hash + "\n" + sig ));
+                        append.append( "&" ).append( LidCredentialType.LID_CREDTYPE_PARAMETER_NAME ).append( "=" ).append( HTTP.encodeToValidUrlArgument( hash + "\n" + sig ));
                     }
                     return append.toString();
 

@@ -5,27 +5,24 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
-package org.infogrid.lid;
+package org.infogrid.lid.openid.auth;
 
 /**
- * A stage in the LidProcessingPipeline.
+ * Represents the OpenID authentication credential type in OpenID Authentication V2.
  */
-public interface LidProcessingPipelineStage
+public interface OpenId1CredentialType
+        extends
+            OpenIdCredentialType
 {
     /**
-     * Name of the lid-meta parameter.
+     * Name of the URL parameter that contains the OpenID identifier.
      */
-    public static final String LID_META_PARAMETER_NAME = "lid-meta";
-
-    /**
-     * Possible value of the lid-meta parameter.
-     */
-    public static final String LID_META_CAPABILITIES_PARAMETER_VALUE = "capabilities";
+    public static final String OPENID1_IDENTIFIER_PARAMETER_NAME = "openid_identifier";
 }

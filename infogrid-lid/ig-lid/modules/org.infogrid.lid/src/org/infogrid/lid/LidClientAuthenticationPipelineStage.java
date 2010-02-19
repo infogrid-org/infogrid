@@ -40,4 +40,19 @@ public interface LidClientAuthenticationPipelineStage
             String             realm )
         throws
             LidAbortProcessingPipelineException;
+
+    /**
+     * Name of the LID argument for the identifier.
+     */
+    public static final String LID_PARAMETER_NAME = "lid";
+
+    /**
+     * Name of the argument for the LID action.
+     */
+    public static final String LID_ACTION_PARAMETER_NAME = "lid-action";
+
+    /**
+     * The LID action that cancels the session.
+     */
+    public static final String LID_ACTION_CANCEL_SESSION_PARAMETER_VALUE = "cancel-session";
 }

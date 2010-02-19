@@ -92,25 +92,7 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
         lidCookieString     = cleanupCookieValue( lidCookieString );
 
         // LID argument: ignore URL arguments in case of a POST
-        String lidArgumentString;
-        if( "POST".equalsIgnoreCase( lidRequest.getMethod() )) {
-            lidArgumentString = lidRequest.getPostedArgument( "lid" );
-            if( lidArgumentString == null ) {
-                lidArgumentString = lidRequest.getPostedArgument( "openid_identifier" );
-            }
-            if( lidArgumentString == null ) {
-                lidArgumentString = lidRequest.getPostedArgument( "openid.identity" );
-            }
-        } else {
-
-            lidArgumentString = lidRequest.getUrlArgument( "lid" );
-            if( lidArgumentString == null ) {
-                lidArgumentString = lidRequest.getUrlArgument( "openid_identifier" );
-            }
-            if( lidArgumentString == null ) {
-                lidArgumentString = lidRequest.getUrlArgument( "openid.identity" );
-            }
-        }
+        String lidArgumentString = determineLidArgumentString( lidRequest );
 
         Identifier lidCookieIdentifier   = null;
         Identifier lidArgumentIdentifier = null;
@@ -187,8 +169,8 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
         boolean clientWishesToLogin       = false;
         boolean clientWishesCancelSession = false;
         boolean clientWishesToLogout      = false;
-        if(    lidRequest.matchUrlArgument(    "lid-action", "cancel-session" )
-            || lidRequest.matchPostedArgument( "lid-action", "cancel-session" ) )
+        if(    lidRequest.matchUrlArgument(    LID_ACTION_PARAMETER_NAME, LID_ACTION_CANCEL_SESSION_PARAMETER_VALUE )
+            || lidRequest.matchPostedArgument( LID_ACTION_PARAMETER_NAME, LID_ACTION_CANCEL_SESSION_PARAMETER_VALUE ) )
         {
             clientWishesCancelSession = true;
         }
@@ -287,6 +269,27 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
             log.traceMethodCallExit( this, "determineAuthenticationStatus", ret );
         }
         return ret;
+    }
+
+    /**
+     * Overridable method to determine the LID argument String.
+     *
+     * @param lidRequest the incoming request
+     * @return the LID argument String, if any
+     */
+    protected String determineLidArgumentString(
+            SaneRequest lidRequest )
+    {
+        String lidArgumentString;
+
+        if( "POST".equalsIgnoreCase( lidRequest.getMethod() )) {
+            lidArgumentString = lidRequest.getPostedArgument( LidClientAuthenticationPipelineStage.LID_PARAMETER_NAME );
+
+        } else {
+            lidArgumentString = lidRequest.getUrlArgument( LidClientAuthenticationPipelineStage.LID_PARAMETER_NAME );
+        }
+
+        return lidArgumentString;
     }
 
     /**

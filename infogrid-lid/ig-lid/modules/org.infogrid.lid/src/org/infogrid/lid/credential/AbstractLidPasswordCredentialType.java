@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -22,6 +22,8 @@ import org.infogrid.util.http.SaneRequest;
 public abstract class AbstractLidPasswordCredentialType
         extends
             AbstractLidCredentialType
+        implements
+            LidSimplePasswordCredentialType
 {
     /**
      * Constructor, for subclasses only.
@@ -40,7 +42,7 @@ public abstract class AbstractLidPasswordCredentialType
     public boolean isContainedIn(
             SaneRequest request )
     {
-        if( request.matchPostedArgument( "lid-credtype", "simple-password" )) {
+        if( request.matchPostedArgument( LID_CREDTYPE_PARAMETER_NAME, LID_SIMPLE_PASSWORD_CREDTYPE_PARAMETER_VALUE )) {
             return true;
         }
 

@@ -37,6 +37,8 @@ import org.infogrid.util.http.SaneRequest;
 public abstract class AbstractOpenIdCredentialType
         extends
             AbstractLidCredentialType
+        implements
+            OpenIdCredentialType
 {
     /**
      * Constructor, for subclasses only.
@@ -175,39 +177,4 @@ public abstract class AbstractOpenIdCredentialType
      */
     protected LidNonceManager theNonceManager;
 
-    /**
-     * Name of the URL parameter that indicates the OpenID namespace as defined in the
-     * OpenID Authentication V2 specification.
-     */
-    public static final String OPENID_NS_PARAMETER_NAME = "openid.ns";
-    
-    /**
-     * Name of the URL parameter that indicates the OpenID mode.
-     */
-    public static final String OPENID_MODE_PARAMETER_NAME = "openid.mode";
-
-    /**
-     * Value of the URL parameter that indicates the OpenID credential.
-     */
-    public static final String OPENID_MODE_IDRES_PARAMETER_VALUE = "id_res";
-
-    /**
-     * Name of the URL parameter that holds the association handle.
-     */
-    public static final String OPENID_ASSOC_HANDLE_PARAMETER_NAME = "openid.assoc_handle";
-
-    /**
-     * Name of the URL parameter that holds the list of signed fields.
-     */
-    public static final String OPENID_SIGNED_PARAMETER_NAME = "openid.signed";
-
-    /**
-     * Name of the URL parameter that holds the signature.
-     */
-    public static final String OPENID_SIGNATURE_PARAMETER_NAME = "openid.sig";
-
-    /**
-     * Name of the URL parameter that contains the OpenID V2 nonce.
-     */
-    public static final String OPENID_NONCE_PARAMETER_NAME = "openid.response_nonce";
 }

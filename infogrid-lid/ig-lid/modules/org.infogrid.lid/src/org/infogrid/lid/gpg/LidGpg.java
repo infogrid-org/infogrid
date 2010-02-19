@@ -16,6 +16,7 @@ package org.infogrid.lid.gpg;
 
 import java.io.IOException;
 import org.infogrid.lid.LidNonceManager;
+import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.Identifier;
@@ -73,7 +74,7 @@ public abstract class LidGpg
         // try argument list first
         int credentialIndex = url.indexOf( "&credential=" );
         if( credentialIndex <= 0 ) {
-            credentialIndex = url.indexOf( "&lid-credential=" );
+            credentialIndex = url.indexOf( "&" + LidCredentialType.LID_CREDENTIAL_PARAMETER_NAME + "=" );
         }
         if( credentialIndex >= 0 ) {
             url = url.substring( 0, credentialIndex );
@@ -82,7 +83,7 @@ public abstract class LidGpg
 
             credentialIndex = postData.indexOf( "&credential=" );
             if( credentialIndex <= 0 ) {
-               credentialIndex = postData.indexOf( "&lid-credential=" );
+               credentialIndex = postData.indexOf( "&" + LidCredentialType.LID_CREDENTIAL_PARAMETER_NAME + "=" );
             }
             if( credentialIndex >= 0 ) {
                 postData = postData.substring( 0, credentialIndex );
