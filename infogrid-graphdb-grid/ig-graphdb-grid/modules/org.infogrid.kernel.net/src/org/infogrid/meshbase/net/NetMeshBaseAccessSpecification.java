@@ -48,7 +48,7 @@ public interface NetMeshBaseAccessSpecification
      * The default coherence for the object graph that we want.
      */
     public static final CoherenceSpecification DEFAULT_COHERENCE = null;
-    
+
     /**
      * URL parameter keyword indicating the coherence parameter.
      */
