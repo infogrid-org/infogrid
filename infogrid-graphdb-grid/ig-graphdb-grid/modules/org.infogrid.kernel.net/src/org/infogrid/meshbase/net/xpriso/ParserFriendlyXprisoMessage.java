@@ -143,6 +143,9 @@ public class ParserFriendlyXprisoMessage
     public void addConveyedMeshObject(
             ExternalizedNetMeshObject toAdd )
     {
+        if( theConveyedMeshObjects.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theConveyedMeshObjects.add( toAdd );
     }
 
@@ -156,6 +159,9 @@ public class ParserFriendlyXprisoMessage
             ExternalizedNetMeshObject [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theConveyedMeshObjects.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theConveyedMeshObjects.add( toAdd[i] );
         }
     }
@@ -181,6 +187,9 @@ public class ParserFriendlyXprisoMessage
     public void addRequestedFirstTimeObject(
             NetMeshObjectAccessSpecification toAdd )
     {
+        if( theRequestedFirstTimeObjects.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theRequestedFirstTimeObjects.add( toAdd );
     }
 
@@ -194,6 +203,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectAccessSpecification [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theRequestedFirstTimeObjects.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theRequestedFirstTimeObjects.add( toAdd[i] );
         }
     }
@@ -219,6 +231,9 @@ public class ParserFriendlyXprisoMessage
     public void addRequestedCanceledObject(
             NetMeshObjectIdentifier toAdd )
     {
+        if( theRequestedCanceledObjects.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theRequestedCanceledObjects.add( toAdd );
     }
     
@@ -232,6 +247,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectIdentifier [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theRequestedCanceledObjects.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theRequestedCanceledObjects.add( toAdd[i] );
         }
     }
@@ -257,6 +275,9 @@ public class ParserFriendlyXprisoMessage
     public void addRequestedFreshenReplica(
             NetMeshObjectIdentifier toAdd )
     {
+        if( theRequestedFreshenReplicas.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theRequestedFreshenReplicas.add( toAdd );
     }
 
@@ -270,6 +291,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectIdentifier [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theRequestedFreshenReplicas.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theRequestedFreshenReplicas.add( toAdd[i] );
         }
     }
@@ -295,6 +319,9 @@ public class ParserFriendlyXprisoMessage
     public void addRequestedResynchronizeReplica(
             NetMeshObjectIdentifier toAdd )
     {
+        if( theRequestedResynchronizeReplicas.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theRequestedResynchronizeReplicas.add( toAdd );
     }
 
@@ -308,6 +335,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectIdentifier [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theRequestedResynchronizeReplicas.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theRequestedResynchronizeReplicas.add( toAdd[i] );
         }
     }
@@ -333,6 +363,9 @@ public class ParserFriendlyXprisoMessage
     public void addRequestedLockObject(
             NetMeshObjectIdentifier toAdd )
     {
+        if( theRequestedLockObjects.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theRequestedLockObjects.add( toAdd );
     }
 
@@ -346,6 +379,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectIdentifier [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theRequestedLockObjects.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theRequestedLockObjects.add( toAdd[i] );
         }
     }
@@ -371,6 +407,9 @@ public class ParserFriendlyXprisoMessage
     public void addPushLockObject(
             NetMeshObjectIdentifier toAdd )
     {
+        if( thePushLockObjects.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         thePushLockObjects.add( toAdd );
     }
 
@@ -384,6 +423,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectIdentifier [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( thePushLockObjects.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             thePushLockObjects.add( toAdd[i] );
         }
     }
@@ -409,6 +451,9 @@ public class ParserFriendlyXprisoMessage
     public void addReclaimedLockObject(
             NetMeshObjectIdentifier toAdd )
     {
+        if( theReclaimedLockObjects.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theReclaimedLockObjects.add( toAdd );
     }
 
@@ -422,6 +467,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectIdentifier [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theReclaimedLockObjects.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theReclaimedLockObjects.add( toAdd[i] );
         }
     }
@@ -447,6 +495,9 @@ public class ParserFriendlyXprisoMessage
     public void addRequestedHomeReplica(
             NetMeshObjectIdentifier toAdd )
     {
+        if( theRequestedHomeReplicas.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theRequestedHomeReplicas.add( toAdd );
     }
 
@@ -460,6 +511,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectIdentifier [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theRequestedHomeReplicas.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theRequestedHomeReplicas.add( toAdd[i] );
         }
     }
@@ -485,6 +539,9 @@ public class ParserFriendlyXprisoMessage
     public void addPushHomeReplica(
             NetMeshObjectIdentifier toAdd )
     {
+        if( thePushHomeReplicas.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         thePushHomeReplicas.add( toAdd );
     }
 
@@ -498,6 +555,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectIdentifier [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( thePushHomeReplicas.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             thePushHomeReplicas.add( toAdd[i] );
         }
     }
@@ -523,6 +583,9 @@ public class ParserFriendlyXprisoMessage
     public void addTypeAddition(
             NetMeshObjectTypeAddedEvent toAdd )
     {
+        if( theTypeAdditions.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theTypeAdditions.add( toAdd );
     }
 
@@ -536,6 +599,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectTypeAddedEvent [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theTypeAdditions.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theTypeAdditions.add( toAdd[i] );
         }
     }
@@ -561,6 +627,9 @@ public class ParserFriendlyXprisoMessage
     public void addTypeRemoval(
             NetMeshObjectTypeRemovedEvent toAdd )
     {
+        if( theTypeRemovals.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theTypeRemovals.add( toAdd );
     }
 
@@ -574,6 +643,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectTypeRemovedEvent [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theTypeRemovals.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theTypeRemovals.add( toAdd[i] );
         }
     }
@@ -599,6 +671,9 @@ public class ParserFriendlyXprisoMessage
     public void addPropertyChange(
             NetMeshObjectPropertyChangeEvent toAdd )
     {
+        if( thePropertyChanges.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         thePropertyChanges.add( toAdd );
     }
 
@@ -612,6 +687,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectPropertyChangeEvent [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( thePropertyChanges.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             thePropertyChanges.add( toAdd[i] );
         }
     }
@@ -637,6 +715,9 @@ public class ParserFriendlyXprisoMessage
     public void addNeighborAddition(
             NetMeshObjectNeighborAddedEvent toAdd )
     {
+        if( theNeighborAdditions.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theNeighborAdditions.add( toAdd );
     }
 
@@ -650,6 +731,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectNeighborAddedEvent [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theNeighborAdditions.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theNeighborAdditions.add( toAdd[i] );
         }
     }
@@ -675,6 +759,9 @@ public class ParserFriendlyXprisoMessage
     public void addNeighborRemoval(
             NetMeshObjectNeighborRemovedEvent toAdd )
     {
+        if( theNeighborRemovals.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theNeighborRemovals.add( toAdd );
     }
 
@@ -688,6 +775,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectNeighborRemovedEvent [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theNeighborRemovals.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theNeighborRemovals.add( toAdd[i] );
         }
     }
@@ -713,6 +803,9 @@ public class ParserFriendlyXprisoMessage
     public void addEquivalentAddition(
             NetMeshObjectEquivalentsAddedEvent toAdd )
     {
+        if( theEquivalentsAdditions.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theEquivalentsAdditions.add( toAdd );
     }
 
@@ -726,6 +819,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectEquivalentsAddedEvent [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theEquivalentsAdditions.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theEquivalentsAdditions.add( toAdd[i] );
         }
     }
@@ -751,6 +847,9 @@ public class ParserFriendlyXprisoMessage
     public void addEquivalentRemoval(
             NetMeshObjectEquivalentsRemovedEvent toAdd )
     {
+        if( theEquivalentsRemovals.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theEquivalentsRemovals.add( toAdd );
     }
 
@@ -764,6 +863,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectEquivalentsRemovedEvent [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theEquivalentsRemovals.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theEquivalentsRemovals.add( toAdd[i] );
         }
     }
@@ -789,6 +891,9 @@ public class ParserFriendlyXprisoMessage
     public void addRoleAddition(
             NetMeshObjectRoleAddedEvent toAdd )
     {
+        if( theRoleAdditions.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theRoleAdditions.add( toAdd );
     }
 
@@ -802,6 +907,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectRoleAddedEvent [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theRoleAdditions.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theRoleAdditions.add( toAdd[i] );
         }
     }
@@ -828,6 +936,9 @@ public class ParserFriendlyXprisoMessage
     public void addRoleRemoval(
             NetMeshObjectRoleRemovedEvent toAdd )
     {
+        if( theRoleRemovals.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theRoleRemovals.add( toAdd );
     }
 
@@ -841,6 +952,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectRoleRemovedEvent [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theRoleRemovals.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theRoleRemovals.add( toAdd[i] );
         }
     }
@@ -866,6 +980,9 @@ public class ParserFriendlyXprisoMessage
     public void addDeleteChange(
             NetMeshObjectDeletedEvent toAdd )
     {
+        if( theDeleteChanges.contains( toAdd )) {
+            throw new IllegalStateException( "Have element already: " + toAdd );
+        }
         theDeleteChanges.add( toAdd );
     }
 
@@ -879,6 +996,9 @@ public class ParserFriendlyXprisoMessage
             NetMeshObjectDeletedEvent [] toAdd )
     {
         for( int i=0 ; i<toAdd.length ; ++i ) {
+            if( theDeleteChanges.contains( toAdd[i] )) {
+                throw new IllegalStateException( "Have element already: " + toAdd[i] );
+            }
             theDeleteChanges.add( toAdd[i] );
         }
     }
