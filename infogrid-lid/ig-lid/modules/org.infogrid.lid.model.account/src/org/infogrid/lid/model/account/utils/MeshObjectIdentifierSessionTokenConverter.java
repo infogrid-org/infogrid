@@ -12,7 +12,7 @@
 // All rights reserved.
 //
 
-package org.infogrid.lid.model.utils;
+package org.infogrid.lid.model.account.utils;
 
 import java.text.ParseException;
 import org.infogrid.mesh.MeshObjectIdentifier;
