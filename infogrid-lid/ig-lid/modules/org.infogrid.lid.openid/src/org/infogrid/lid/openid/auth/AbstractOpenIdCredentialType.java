@@ -16,7 +16,7 @@ package org.infogrid.lid.openid.auth;
 
 import java.util.HashSet;
 import java.util.StringTokenizer;
-import org.infogrid.lid.LidNonceManager;
+import org.infogrid.lid.nonce.LidNonceManager;
 import org.infogrid.lid.credential.AbstractLidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.lid.openid.CryptUtils;

@@ -15,7 +15,7 @@
 package org.infogrid.lid.gpg;
 
 import java.io.IOException;
-import org.infogrid.lid.LidNonceManager;
+import org.infogrid.lid.nonce.LidNonceManager;
 import org.infogrid.lid.credential.AbstractLidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.FactoryException;

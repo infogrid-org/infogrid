@@ -30,13 +30,13 @@
             </modulereference>
         </dependson>
 
-        <entitytype ID="org.infogrid.model.Web/Persona">
-            <name>Persona</name>
-            <username>Persona</username>
+        <entitytype ID="org.infogrid.lid.model.account/Account">
+            <name>Account</name>
+            <username>Account</username>
             <userdescription>A user at a particular website, aka account.</userdescription>
-            <additionalinterface>org.infogrid.lid.LidPersona</additionalinterface>
+            <additionalinterface>org.infogrid.lid.account.LidAccount</additionalinterface>
 
-            <propertytype ID="org.infogrid.model.Web/Persona_Nickname">
+            <propertytype ID="org.infogrid.lid.model.account/Account_Nickname">
                 <name>Nickname</name>
                 <username>Local nickname</username>
                 <userdescription>The user's local nick name, if any.</userdescription>
@@ -46,25 +46,57 @@
                 <isoptional/>
             </propertytype>
 
+            <propertytype ID="org.infogrid.lid.model.account/Account_Status">
+                <name>Status</name>
+                <username>Status</username>
+                <userdescription>Status of the account.</userdescription>
+                <datatype>
+                    <EnumeratedDataType>
+                        <enum>
+                            <name>Created</name>
+                            <username>Created</username>
+                            <userdescription>Account has been created, but never been used.</userdescription>
+                        </enum>
+                        <enum>
+                            <name>Active</name>
+                            <username>Active</username>
+                            <userdescription>The Account has been in use and can be used again.</userdescription>
+                        </enum>
+                        <enum>
+                            <name>Disabled</name>
+                            <username>Disabled</username>
+                            <userdescription>The Account has been disabled and cannot currently be used. It may or may not
+                            become active again.</userdescription>
+                        </enum>
+                        <enum>
+                            <name>Obsoleted</name>
+                            <username>Obsoleted</username>
+                            <userdescription>The Account has been disabled and will never be used again.</userdescription>
+                        </enum>
+                    </EnumeratedDataType>
+                </datatype>
+                <defaultvalue>Created</defaultvalue>
+            </propertytype>
+
             <implementsMethod><![CDATA[
     /**
-     * Determine the set of remote Identifiers that are also associated with this LidPersona.
+     * Determine the set of remote Identifiers that are also associated with this LidAccount.
      * The Identifier inherited from HasIdentifier is considered the local Identifier.
      *
      * @return the set of remote Identifiers, if any
      */
     public org.infogrid.util.Identifier [] getRemoteIdentifiers()
     {
-        org.infogrid.mesh.set.MeshObjectSet remotes = traverse( AccountSubjectArea.PERSONA_MAYUSEIDENTITY_WEBRESOURCE.getSource() );
+        org.infogrid.mesh.set.MeshObjectSet remotes = traverse( AccountSubjectArea.ACCOUNT_MAYUSEIDENTITY_MESHOBJECT.getSource() );
         return remotes.asIdentifiers();
     }
 
     /**
-     * Convenience method to determine whether this LidPersona is identified by the
+     * Convenience method to determine whether this LidAccount is identified by the
      * provided Identifier.
      *
      * @param identifier the Identifier to test
-     * @return true if this LidPersona is identified by the provided Identifier
+     * @return true if this LidAccount is identified by the provided Identifier
      */
     public boolean isIdentifiedBy(
             org.infogrid.util.Identifier identifier )
@@ -72,7 +104,7 @@
         if( getIdentifier().equals( identifier )) {
             return true;
         }
-        org.infogrid.mesh.set.MeshObjectSet remotes = traverse( AccountSubjectArea.PERSONA_MAYUSEIDENTITY_WEBRESOURCE.getSource() );
+        org.infogrid.mesh.set.MeshObjectSet remotes = traverse( AccountSubjectArea.ACCOUNT_MAYUSEIDENTITY_MESHOBJECT.getSource() );
         if( remotes.contains( identifier )) {
             return true;
         } else {
@@ -81,7 +113,7 @@
     }
 
     /**
-     * Obtain an attribute of the persona.
+     * Obtain an attribute of the account
      *
      * @param key the name of the attribute
      * @return the value of the attribute, or null
@@ -127,7 +159,7 @@
     }
 
     /**
-     * Obtain the subset of credential types applicable to this LidPersona.
+     * Obtain the subset of credential types applicable to this LidAccount
      *
      * @param set the set of credential types
      * @return the subset of credential types
@@ -152,13 +184,13 @@
 
     ]]></implementsMethod>
 
-            </entitytype>
+        </entitytype>
 
-        <entitytype ID="org.infogrid.model.Web/Session">
+        <entitytype ID="org.infogrid.lid.model.account/Session">
             <name>Session</name>
             <username>Session</username>
             <userdescription>A session of a user at a website.</userdescription>
-            <additionalinterface>org.infogrid.lid.LidSession</additionalinterface>
+            <additionalinterface>org.infogrid.lid.session.LidSession</additionalinterface>
 
             <implementsMethod><![CDATA[
     /**
@@ -170,12 +202,12 @@
     {
         try {
             // try local persona first
-            MeshObject found = traverse( AccountSubjectArea.SESSION_FOR_PERSONA.getSource() ).getSingleMember();
+            MeshObject found = traverse( AccountSubjectArea.SESSION_FOR_ACCOUNT.getSource() ).getSingleMember();
             if( found != null ) {
-                return (org.infogrid.lid.model.account.Persona) found.getTypedFacadeFor( AccountSubjectArea.PERSONA );
+                return (org.infogrid.lid.model.account.Account) found.getTypedFacadeFor( AccountSubjectArea.ACCOUNT );
             }
-            // if there is no local persona, use the remote persona
-            found = traverse( AccountSubjectArea.SESSION_USESIDENTITY_WEBRESOURCE.getSource() ).getSingleMember();
+            // if there is no local account, use the remote persona
+            found = traverse( AccountSubjectArea.SESSION_USESIDENTITY_MESHOBJECT.getSource() ).getSingleMember();
             return found;
         } catch( NotBlessedException ex ) {
             log.error( ex );
@@ -376,7 +408,7 @@
      * @param factory the Factory that created the FactoryCreatedObject
      */
     public void setFactory(
-            org.infogrid.util.Factory<String,org.infogrid.lid.LidSession,org.infogrid.lid.LidSessionManagerArguments> factory )
+            org.infogrid.util.Factory<String,org.infogrid.lid.session.LidSession,org.infogrid.lid.session.LidSessionManagerArguments> factory )
     {
         throw new UnsupportedOperationException();
     }
@@ -388,14 +420,14 @@
      *
      * @return the Factory that created the FactoryCreatedObject
      */
-    public org.infogrid.util.Factory<String,org.infogrid.lid.LidSession,org.infogrid.lid.LidSessionManagerArguments> getFactory()
+    public org.infogrid.util.Factory<String,org.infogrid.lid.session.LidSession,org.infogrid.lid.session.LidSessionManagerArguments> getFactory()
     {
         throw new UnsupportedOperationException();
     }
 
     ]]></implementsMethod>
 
-            <propertytype ID="org.infogrid.model.Web/Session_FirstAuthenticated">
+            <propertytype ID="org.infogrid.lid.model.account/Session_FirstAuthenticated">
                 <name>FirstAuthenticated</name>
                 <username>First authenticated at</username>
                 <userdescription>The TimeStamp when the user was first authenticated at this site.</userdescription>
@@ -405,7 +437,7 @@
                 <defaultvalue code="true">TimeStampValue.now()</defaultvalue>
             </propertytype>
 
-            <propertytype ID="org.infogrid.model.Web/Session_LastAuthenticated">
+            <propertytype ID="org.infogrid.lid.model.account/Session_LastAuthenticated">
                 <name>LastAuthenticated</name>
                 <username>Most recently authenticated at</username>
                 <userdescription>The TimeStamp when the user was most recently authenticated at this site.</userdescription>
@@ -415,7 +447,7 @@
                 <defaultvalue code="true">TimeStampValue.now()</defaultvalue>
             </propertytype>
 
-            <propertytype ID="org.infogrid.model.Web/Session_LastUsedSuccesfully">
+            <propertytype ID="org.infogrid.lid.model.account/Session_LastUsedSuccesfully">
                 <name>LastUsedSuccessfully</name>
                 <username>Most recently used successfully at</username>
                 <userdescription>The TimeStamp when the user was most recently using this session successfully.</userdescription>
@@ -425,7 +457,7 @@
                 <isoptional/>
             </propertytype>
 
-            <propertytype ID="org.infogrid.model.Web/Session_ValidUntil">
+            <propertytype ID="org.infogrid.lid.model.account/Session_ValidUntil">
                 <name>ValidUntil</name>
                 <username>Valid until</username>
                 <userdescription>The TimeStamp when the session has, or will expire and a new authentication is required.</userdescription>
@@ -435,7 +467,7 @@
                 <defaultvalue code="true">TimeStampValue.now()</defaultvalue>
             </propertytype>
 
-            <propertytype ID="org.infogrid.model.Web/Session_CreatedAtIp">
+            <propertytype ID="org.infogrid.lid.model.account/Session_CreatedAtIp">
                 <name>CreatedAtIp</name>
                 <username>Created at IP address</username>
                 <userdescription>The IP address from where this session was created.</userdescription>
@@ -446,40 +478,39 @@
             </propertytype>
         </entitytype>
 
-        <relationshiptype ID="org.infogrid.model.Web/Session_For_Persona">
-            <name>Session_For_Persona</name>
+        <relationshiptype ID="org.infogrid.lid.model.account/Session_For_Account">
+            <name>Session_For_Account</name>
             <username>for</username>
-            <userdescription>Identifies the Persona that owns this Session</userdescription>
+            <userdescription>Identifies the Account that owns this Session</userdescription>
             <src>
-              <e>org.infogrid.model.Web/Session</e>
+              <e>org.infogrid.lid.model.account/Session</e>
               <MultiplicityValue>1:1</MultiplicityValue>
             </src>
             <dest>
-              <e>org.infogrid.model.Web/Persona</e>
+              <e>org.infogrid.lid.model.account/Account</e>
               <MultiplicityValue>0:n</MultiplicityValue>
             </dest>
         </relationshiptype>
 
-        <relationshiptype ID="org.infogrid.model.Web/Persona_MayUseIdentity_WebResource">
-            <name>Persona_MayUseIdentity_WebResource</name>
+        <relationshiptype ID="org.infogrid.lid.model.account/Account_MayUseIdentity_MeshObject">
+            <name>Account_MayUseIdentity_MeshObject</name>
             <username>May use identity</username>
-            <userdescription>Enumerates the identities possibly used by Persona</userdescription>
+            <userdescription>Enumerates the identities possibly used by this Account</userdescription>
             <src>
-              <e>org.infogrid.model.Web/Persona</e>
+              <e>org.infogrid.lid.model.account/Account</e>
               <MultiplicityValue>1:n</MultiplicityValue>
             </src>
             <dest>
-              <e>org.infogrid.model.Web/WebResource</e>
               <MultiplicityValue>0:n</MultiplicityValue>
             </dest>
         </relationshiptype>
 
-        <relationshiptype ID="org.infogrid.model.Web/Persona_AtSite_WebResource">
-            <name>Persona_AtSite_WebResource</name>
+        <relationshiptype ID="org.infogrid.lid.model.account/Account_AtSite_WebResource">
+            <name>Account_AtSite_WebResource</name>
             <username>At site</username>
-            <userdescription>Identifies the website where the Persona is hosted</userdescription>
+            <userdescription>Identifies the website where the Account is hosted</userdescription>
             <src>
-              <e>org.infogrid.model.Web/Persona</e>
+              <e>org.infogrid.lid.model.account/Account</e>
               <MultiplicityValue>1:1</MultiplicityValue>
             </src>
             <dest>
@@ -488,12 +519,12 @@
             </dest>
         </relationshiptype>
 
-        <relationshiptype ID="org.infogrid.model.Web/Session_AtSite_WebResource">
+        <relationshiptype ID="org.infogrid.lid.model.account/Session_AtSite_WebResource">
             <name>Session_AtSite_WebResource</name>
             <username>At site</username>
             <userdescription>Identifies the website where the session is taking place</userdescription>
             <src>
-              <e>org.infogrid.model.Web/Session</e>
+              <e>org.infogrid.lid.model.account/Session</e>
               <MultiplicityValue>1:1</MultiplicityValue>
             </src>
             <dest>
@@ -502,16 +533,15 @@
             </dest>
         </relationshiptype>
 
-        <relationshiptype ID="org.infogrid.model.Web/Session_UsesIdentity_WebResource">
-            <name>Session_UsesIdentity_WebResource</name>
+        <relationshiptype ID="org.infogrid.lid.model.account/Session_UsesIdentity_MeshObject">
+            <name>Session_UsesIdentity_MeshObject</name>
             <username>Uses identity</username>
             <userdescription>Identifies the identity used for this session</userdescription>
             <src>
-              <e>org.infogrid.model.Web/Session</e>
+              <e>org.infogrid.lid.model.account/Session</e>
               <MultiplicityValue>1:1</MultiplicityValue>
             </src>
             <dest>
-              <e>org.infogrid.model.Web/WebResource</e>
               <MultiplicityValue>0:n</MultiplicityValue>
             </dest>
         </relationshiptype>

@@ -14,6 +14,7 @@
 
 package org.infogrid.lid;
 
+import org.infogrid.lid.session.LidSessionManagementInstructions;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.http.SaneRequestUtils;
@@ -54,7 +55,7 @@ public interface LidProcessingPipeline
             = SaneRequestUtils.classToAttributeName( LidSessionManagementInstructions.class );
 
     /**
-     * Name of the LidPersona instance representing the client, and found in the request after the
+     * Name of the HasIdentifier instance representing the client, and found in the request after the
      * pipeline has been processed.
      */
     public static final String CLIENT_PERSONA_ATTRIBUTE_NAME = "org_infogrid_lid_RequestingClient";

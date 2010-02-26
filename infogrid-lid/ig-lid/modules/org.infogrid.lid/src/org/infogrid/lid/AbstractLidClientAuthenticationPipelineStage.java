@@ -16,6 +16,10 @@ package org.infogrid.lid;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import org.infogrid.lid.account.LidAccount;
+import org.infogrid.lid.account.LidAccountManager;
+import org.infogrid.lid.session.LidSession;
+import org.infogrid.lid.session.LidSessionManager;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.ArrayHelper;
@@ -40,16 +44,16 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
      * Constructor.
      *
      * @param sessionManager the LidSessionManager to use
-     * @param personaManager the LidPersonaManager to use
+     * @param accountManager the LidAccountManager to use
      * @param availableCredentialTypes the LidCredentialTypes known by this application
      */
     protected AbstractLidClientAuthenticationPipelineStage(
             LidSessionManager       sessionManager,
-            LidPersonaManager       personaManager,
+            LidAccountManager       accountManager,
             LidCredentialType []    availableCredentialTypes )
     {
         theSessionManager           = sessionManager;
-        thePersonaManager           = personaManager;
+        theAccountManager           = accountManager;
         theAvailableCredentialTypes = availableCredentialTypes;
     }
 
@@ -135,16 +139,16 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
             clientIdentifier = null;
         }
 
-        LidPersona    clientPersona = null;
+        LidAccount    clientPersona = null;
         HasIdentifier clientRemotePersona = null;
 
         if( clientIdentifier != null ) {
             try {
-                HasIdentifier found = thePersonaManager.find( clientIdentifier );
+                HasIdentifier found = theAccountManager.find( clientIdentifier );
 
-                if( found instanceof LidPersona ) {
+                if( found instanceof LidAccount ) {
                     // refers to a local account
-                    clientPersona = (LidPersona) found;
+                    clientPersona = (LidAccount) found;
                 } else {
                     clientRemotePersona = found;
                 }
@@ -161,8 +165,8 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
             }
         }
         if( clientPersona == null && clientRemotePersona != null ) {
-            // check whether there's a LidPersona for it
-            clientPersona = thePersonaManager.determineLidPersonaFromRemotePersona( clientRemotePersona );
+            // check whether there's a LidAccount for it
+            clientPersona = theAccountManager.determineLidAccountFromRemotePersona( clientRemotePersona );
         }
 
         boolean clientLoggedOn            = false;
@@ -414,9 +418,9 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
     protected LidSessionManager theSessionManager;
 
     /**
-     * The LidPersonaManager to use.
+     * The LidAccountManager to use.
      */
-    protected LidPersonaManager thePersonaManager;
+    protected LidAccountManager theAccountManager;
 
     /**
      * The credential types known by this application.

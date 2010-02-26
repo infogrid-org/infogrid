@@ -16,8 +16,8 @@ package org.infogrid.lid.openid;
 
 import org.infogrid.lid.AbstractLidClientAuthenticationPipelineStage;
 import org.infogrid.lid.LidClientAuthenticationPipelineStage;
-import org.infogrid.lid.LidPersonaManager;
-import org.infogrid.lid.LidSessionManager;
+import org.infogrid.lid.account.LidAccountManager;
+import org.infogrid.lid.session.LidSessionManager;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.openid.auth.OpenId1CredentialType;
 import org.infogrid.lid.openid.auth.OpenId2CredentialType;
@@ -34,15 +34,15 @@ public abstract class AbstractOpenIdClientAuthenticationPipelineStage
      * Constructor.
      *
      * @param sessionManager the LidSessionManager to use
-     * @param personaManager the LidPersonaManager to use
+     * @param accountManager the LidAccountManager to use
      * @param availableCredentialTypes the LidCredentialTypes known by this application
      */
     protected AbstractOpenIdClientAuthenticationPipelineStage(
             LidSessionManager       sessionManager,
-            LidPersonaManager       personaManager,
+            LidAccountManager       accountManager,
             LidCredentialType []    availableCredentialTypes )
     {
-        super( sessionManager, personaManager, availableCredentialTypes );
+        super( sessionManager, accountManager, availableCredentialTypes );
     }
 
     /**

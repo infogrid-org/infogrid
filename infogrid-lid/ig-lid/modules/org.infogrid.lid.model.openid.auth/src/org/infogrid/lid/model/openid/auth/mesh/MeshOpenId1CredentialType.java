@@ -15,7 +15,7 @@
 package org.infogrid.lid.model.openid.auth.mesh;
 
 import java.util.ArrayList;
-import org.infogrid.lid.LidNonceManager;
+import org.infogrid.lid.nonce.LidNonceManager;
 import org.infogrid.lid.model.openid.auth.AuthSubjectArea;
 import org.infogrid.lid.model.yadis.util.YadisUtil;
 import org.infogrid.lid.openid.OpenIdRpSideAssociationManager;

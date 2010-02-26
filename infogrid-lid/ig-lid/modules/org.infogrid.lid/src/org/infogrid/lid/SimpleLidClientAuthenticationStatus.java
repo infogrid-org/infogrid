@@ -14,6 +14,8 @@
 
 package org.infogrid.lid;
 
+import org.infogrid.lid.account.LidAccount;
+import org.infogrid.lid.session.LidSession;
 import java.util.Collection;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
@@ -34,7 +36,7 @@ public class SimpleLidClientAuthenticationStatus
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientRemotePersona the client's remote persona, if used
-     * @param clientPersona the client LidPersona that was found, if any
+     * @param clientPersona the client LidAccount that was found, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
      * @param carriedInvalidCredentialTypes the credential types carried as part of this request that did not validate successfully, if any
@@ -51,7 +53,7 @@ public class SimpleLidClientAuthenticationStatus
             String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
             HasIdentifier                    clientRemotePersona,
-            LidPersona                       clientPersona,
+            LidAccount                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
             LidCredentialType []             carriedInvalidCredentialTypes,
@@ -88,7 +90,7 @@ public class SimpleLidClientAuthenticationStatus
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientRemotePersona the client's remote persona, if used
-     * @param clientPersona the client LidPersona that was found, if any
+     * @param clientPersona the client LidAccount that was found, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
      * @param carriedInvalidCredentialTypes the credential types carried as part of this request that did not validate successfully, if any
@@ -105,7 +107,7 @@ public class SimpleLidClientAuthenticationStatus
             String                                    clientIdentifierAsEntered,
             Identifier                                clientIdentifier,
             HasIdentifier                             clientRemotePersona,
-            LidPersona                                clientPersona,
+            LidAccount                                clientPersona,
             LidSession                                preexistingClientSession,
             Collection<LidCredentialType>             carriedValidCredentialTypes,
             Collection<LidCredentialType>             carriedInvalidCredentialTypes,
@@ -148,7 +150,7 @@ public class SimpleLidClientAuthenticationStatus
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientRemotePersona the client's remote persona, if used
-     * @param clientPersona the client's LidPersona that was found locally, if any
+     * @param clientPersona the client's LidAccount that was found locally, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
      * @param carriedInvalidCredentialTypes the credential types carried as part of this request that did not validate successfully, if any
@@ -164,7 +166,7 @@ public class SimpleLidClientAuthenticationStatus
             String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
             HasIdentifier                    clientRemotePersona,
-            LidPersona                       clientPersona,
+            LidAccount                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
             LidCredentialType []             carriedInvalidCredentialTypes,

@@ -14,6 +14,8 @@
 
 package org.infogrid.lid;
 
+import org.infogrid.lid.account.LidAccount;
+import org.infogrid.lid.session.LidSession;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.HasIdentifier;
@@ -145,11 +147,11 @@ public interface LidClientAuthenticationStatus
     /**
      * Obtain the identifier provided by the client. To determine whether to trust that the client indeed
      * owns this identifier, other methods need to be consulted. This method makes no statement 
-     * about trustworthiness. If this returns a non-null value, and {@link #getClientPersona} returns
+     * about trustworthiness. If this returns a non-null value, and {@link #getClientAccount} returns
      * <code>null</code>, this indicates that the client persona is not known or not valid.
      * 
      * @return the claimed client identifier
-     * @see #getClientPersona
+     * @see #getClientAccount
      */
     public abstract Identifier getClientIdentifier();
 
@@ -162,13 +164,13 @@ public interface LidClientAuthenticationStatus
     public abstract HasIdentifier getRemotePersona();
 
     /**
-     * Obtain the client's local LidPersona, if there is one. If there is none, or if the LidPersona
+     * Obtain the client's local LidAccount, if there is one. If there is none, or if the LidAccount
      * could not be resolved, this will return <code>null</code>.
      *
-     * @return the LidPersona
+     * @return the LidAccount
      * @see #getClientIdentifier
      */
-    public abstract LidPersona getClientPersona();
+    public abstract LidAccount getClientAccount();
 
     /**
      * Determine whether the client has indicated its desire to log in.

@@ -14,6 +14,8 @@
 
 package org.infogrid.lid;
 
+import org.infogrid.lid.account.LidAccount;
+import org.infogrid.lid.session.LidSession;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.HasIdentifier;
@@ -36,7 +38,7 @@ public abstract class AbstractLidClientAuthenticationStatus
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientRemotePersona the client's remote persona, if used
-     * @param clientPersona the client's LidPersona that was found locally, if any
+     * @param clientPersona the client's LidAccount that was found locally, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
      * @param carriedInvalidCredentialTypes the credential types carried as part of this request that did not validate successfully, if any
@@ -52,7 +54,7 @@ public abstract class AbstractLidClientAuthenticationStatus
             String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
             HasIdentifier                    clientRemotePersona,
-            LidPersona                       clientPersona,
+            LidAccount                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
             LidCredentialType []             carriedInvalidCredentialTypes,
@@ -67,7 +69,7 @@ public abstract class AbstractLidClientAuthenticationStatus
         theClientIdentifierAsEntered = clientIdentifierAsEntered;
         theClientIdentifier          = clientIdentifier;
         theClientRemotePersona       = clientRemotePersona;
-        theClientPersona             = clientPersona;
+        theClientAccount             = clientPersona;
 
         thePreexistingClientSession = preexistingClientSession;
         
@@ -107,16 +109,16 @@ public abstract class AbstractLidClientAuthenticationStatus
 
     /**
      * <p>Returns true of the client of this request claimed an identifier that could not be resolved into
-     *    a valid LidPersona.</p>
+     *    a valid LidAccount.</p>
      *
      * @return true if the client claimed an identifier as part of this request that could not be resolved into
-     *         a valid LidPersona
+     *         a valid LidAccount
      */
     public boolean isInvalidIdentity()
     {
         boolean ret;
 
-        if( theClientIdentifier != null && theClientRemotePersona == null && theClientPersona == null ) {
+        if( theClientIdentifier != null && theClientRemotePersona == null && theClientAccount == null ) {
             ret = true;
         } else {
             ret = false;
@@ -314,15 +316,15 @@ public abstract class AbstractLidClientAuthenticationStatus
     }
     
     /**
-     * Obtain the client's local LidPersona, if there is one. If there is none, or if the LidPersona
+     * Obtain the client's local LidAccount, if there is one. If there is none, or if the LidAccount
      * could not be resolved, this will return <code>null</code>.
      *
-     * @return the LidPersona
+     * @return the LidAccount
      * @see #getClientIdentifier
      */
-    public LidPersona getClientPersona()
+    public LidAccount getClientAccount()
     {
-        return theClientPersona;
+        return theClientAccount;
     }
     
     /**
@@ -347,7 +349,7 @@ public abstract class AbstractLidClientAuthenticationStatus
 
     /**
      * Determine whether the client has indicated its desire to cancel the active session, if any.
-     * This does not mean the client wishes to become anonymous (that would be expressed as getClientPersona()==null
+     * This does not mean the client wishes to become anonymous (that would be expressed as getClientAccount()==null
      * with a non-null getSessionBelongsToPersona()) but that the client wishes to move from authenticated
      * status to claimed only.
      * 
@@ -453,7 +455,7 @@ public abstract class AbstractLidClientAuthenticationStatus
                 }, new Object[] {
                     theClientIdentifierAsEntered,
                     theClientIdentifier,
-                    theClientPersona,
+                    theClientAccount,
                     thePreexistingClientSession,
                     theCarriedValidCredentialTypes,
                     theCarriedInvalidCredentialTypes,
@@ -481,9 +483,9 @@ public abstract class AbstractLidClientAuthenticationStatus
     protected HasIdentifier theClientRemotePersona;
 
     /**
-     * The client's local LidPersona, if there is one.
+     * The client's local LidAccount, if there is one.
      */
-    protected LidPersona theClientPersona;
+    protected LidAccount theClientAccount;
 
     /**
      * The credential types that were provided by the client as part of this request and that

@@ -14,6 +14,10 @@
 
 package org.infogrid.lid;
 
+import org.infogrid.lid.account.LidAccount;
+import org.infogrid.lid.account.LidAccountManager;
+import org.infogrid.lid.session.LidSessionManagementStage;
+import org.infogrid.lid.session.LidSessionManagementInstructions;
 import org.infogrid.lid.yadis.YadisPipelineProcessingStage;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
@@ -57,7 +61,7 @@ public class DefaultLidProcessingPipeline
         super( c );
 
         theResourceFinder         = c.findContextObject( LidResourceFinder.class );
-        thePersonaManager         = c.findContextObject( LidPersonaManager.class );
+        theAccountManager         = c.findContextObject( LidAccountManager.class );
         theYadisStage             = c.findContextObject( YadisPipelineProcessingStage.class );
         theAuthenticationStage    = c.findContextObject( LidClientAuthenticationPipelineStage.class );
         theSessionManagementStage = c.findContextObject( LidSessionManagementStage.class );
@@ -81,7 +85,7 @@ public class DefaultLidProcessingPipeline
     {
         HasIdentifier                    requestedResource   = null;
         LidClientAuthenticationStatus    clientAuthStatus    = null;
-        LidPersona                       clientPersona       = null;
+        LidAccount                       clientPersona       = null;
         LidSessionManagementInstructions sessionMgmtInstructions = null;
 
         if( theResourceFinder != null ) {
@@ -107,7 +111,7 @@ public class DefaultLidProcessingPipeline
         lidRequest.setAttribute( CLIENT_AUTHENTICATION_STATUS_ATTRIBUTE_NAME, clientAuthStatus );
         
         if( clientAuthStatus != null ) {
-            clientPersona = clientAuthStatus.getClientPersona();
+            clientPersona = clientAuthStatus.getClientAccount();
         }
         lidRequest.setAttribute( CLIENT_PERSONA_ATTRIBUTE_NAME, clientPersona );
 
@@ -123,9 +127,9 @@ public class DefaultLidProcessingPipeline
     protected LidResourceFinder theResourceFinder;
 
     /**
-     * The service that knows how to find LidPersonas for incoming requests.
+     * The service that knows how to find LidAccounts for incoming requests.
      */
-    protected LidPersonaManager thePersonaManager;
+    protected LidAccountManager theAccountManager;
 
     /**
      * The service that knows how to respond to Yadis requests.
