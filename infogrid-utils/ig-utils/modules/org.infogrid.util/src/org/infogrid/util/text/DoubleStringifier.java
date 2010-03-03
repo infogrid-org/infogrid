@@ -194,7 +194,12 @@ public class DoubleStringifier
             theEndIndex    = endIndex;
             theMax         = max;
             theMatchAll    = matchAll;
-            
+
+            // trim leading white space
+            while( theCurrentEnd < theEndIndex && Character.isWhitespace( theRawString.charAt( theCurrentEnd ))) {
+                ++theCurrentEnd;
+            }
+
             goNext();
         }
 
@@ -222,6 +227,11 @@ public class DoubleStringifier
                 return;
             }
             if( ++theCurrentEnd >= theRawString.length()) {
+                theNext = null;
+                return;
+            }
+            // if the remainder is only white space, we are done, too
+            if( theRawString.substring( theCurrentEnd, theEndIndex ).trim().isEmpty() ) {
                 theNext = null;
                 return;
             }

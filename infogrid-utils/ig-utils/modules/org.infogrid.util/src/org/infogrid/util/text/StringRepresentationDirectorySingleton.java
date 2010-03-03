@@ -77,6 +77,10 @@ public class StringRepresentationDirectorySingleton
         // html: same as plain
         // url:  same as plain
 
+        plainMap.put(   "int3",           LongStringifier.create( 3 ) );
+        // html: same as plain
+        // url:  same as plain
+
         plainMap.put(   "int4",           LongStringifier.create( 4 ) );
         // html: same as plain
         // url:  same as plain
