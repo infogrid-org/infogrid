@@ -30,6 +30,12 @@
             </modulereference>
         </dependson>
 
+        <entitytype ID="org.infogrid.lid.model.account/AccountCollection">
+            <name>AccountCollection</name>
+            <username>Accounts</username>
+            <userdescription>Set of Accounts.</userdescription>
+        </entitytype>
+
         <entitytype ID="org.infogrid.lid.model.account/Account">
             <name>Account</name>
             <username>Account</username>
@@ -185,6 +191,20 @@
     ]]></implementsMethod>
 
         </entitytype>
+
+        <relationshiptype ID="org.infogrid.lid.model.account/AccountCollection_Collects_Account">
+            <name>AccountCollection_Collects_Account</name>
+            <username>collects</username>
+            <userdescription>Collects the known Accounts</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.account/AccountCollection</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.lid.model.account/Account</e>
+              <MultiplicityValue>1:1</MultiplicityValue>
+            </dest>
+        </relationshiptype>
 
         <entitytype ID="org.infogrid.lid.model.account/Session">
             <name>Session</name>
