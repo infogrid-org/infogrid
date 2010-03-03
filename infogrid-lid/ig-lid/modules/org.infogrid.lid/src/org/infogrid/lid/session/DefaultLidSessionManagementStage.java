@@ -273,7 +273,6 @@ public class DefaultLidSessionManagementStage
      * @param realm the name of the realm
      * @return name of the LID cookie
      * @see #determineSessionCookieName
-     * @see AbstractLidClientAuthenticationPipelineStage#determineLidCookieName
      */
     protected String determineLidCookieName(
             String realm )
