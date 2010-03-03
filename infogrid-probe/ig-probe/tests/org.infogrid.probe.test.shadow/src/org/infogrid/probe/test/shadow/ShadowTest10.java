@@ -96,9 +96,9 @@ public class ShadowTest10
 
         tx.commitTransaction();
 
-        checkEquals( a1.getPropertyValue( TestSubjectArea.PROPERTYTEST_WHATAINTEGERDATATYPE ), IntegerValue.create( 100 ), "Wrong flag" );
-        checkEquals( a2.getPropertyValue( TestSubjectArea.PROPERTYTEST_WHATAINTEGERDATATYPE ), IntegerValue.create( 100 ), "Wrong flag" );
-        checkEquals( a3.getPropertyValue( TestSubjectArea.PROPERTYTEST_WHATAINTEGERDATATYPE ), IntegerValue.create( 100 ), "Wrong flag" );
+        checkEquals( a1.getPropertyValue( TestSubjectArea.PROPERTYTEST_OPTIONALINTEGERDATATYPE ), IntegerValue.create( 100 ), "Wrong flag" );
+        checkEquals( a2.getPropertyValue( TestSubjectArea.PROPERTYTEST_OPTIONALINTEGERDATATYPE ), IntegerValue.create( 100 ), "Wrong flag" );
+        checkEquals( a3.getPropertyValue( TestSubjectArea.PROPERTYTEST_OPTIONALINTEGERDATATYPE ), IntegerValue.create( 100 ), "Wrong flag" );
 
         //
 
@@ -114,9 +114,9 @@ public class ShadowTest10
 
         log.info( "Checking" );
 
-        checkEquals( a1.getPropertyValue( TestSubjectArea.PROPERTYTEST_WHATAINTEGERDATATYPE ), IntegerValue.create( 200 ), "Wrong flag" );
-        checkEquals( a2.getPropertyValue( TestSubjectArea.PROPERTYTEST_WHATAINTEGERDATATYPE ), IntegerValue.create( 100 ), "Wrong flag" );
-        checkEquals( a1.getPropertyValue( TestSubjectArea.PROPERTYTEST_WHATAINTEGERDATATYPE ), IntegerValue.create( 200 ), "Wrong flag" );
+        checkEquals( a1.getPropertyValue( TestSubjectArea.PROPERTYTEST_OPTIONALINTEGERDATATYPE ), IntegerValue.create( 200 ), "Wrong flag" );
+        checkEquals( a2.getPropertyValue( TestSubjectArea.PROPERTYTEST_OPTIONALINTEGERDATATYPE ), IntegerValue.create( 100 ), "Wrong flag" );
+        checkEquals( a1.getPropertyValue( TestSubjectArea.PROPERTYTEST_OPTIONALINTEGERDATATYPE ), IntegerValue.create( 200 ), "Wrong flag" );
     }
 
     /**
@@ -252,7 +252,7 @@ public class ShadowTest10
             MeshObject home = mb.getHomeObject();
 
             MeshObject a = life.createMeshObject( mb.getMeshObjectIdentifierFactory().fromExternalForm( "a" ), TestSubjectArea.PROPERTYTEST );
-            a.setPropertyValue( TestSubjectArea.PROPERTYTEST_WHATAINTEGERDATATYPE, IntegerValue.create( probeFlag ));
+            a.setPropertyValue( TestSubjectArea.PROPERTYTEST_OPTIONALINTEGERDATATYPE, IntegerValue.create( probeFlag ));
 
             home.relate( a );
         }
