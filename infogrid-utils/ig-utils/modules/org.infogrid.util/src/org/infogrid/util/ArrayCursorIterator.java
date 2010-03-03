@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -262,10 +262,10 @@ public class ArrayCursorIterator<E>
         throws
             NoSuchElementException
     {
-        if( thePosition + n >= theUpperBound || thePosition - n < theLowerBound ) {
+        if( n >= theUpperBound || n < theLowerBound ) {
             throw new NoSuchElementException();
         }
-        thePosition -= n;
+        thePosition = n;
     }
 
     /**
