@@ -56,17 +56,18 @@ public class StoreNetMeshBaseTest6
         
         theNameServerA.put( mb1A.getIdentifier(), mb1A );
         theNameServerA.put( mb2A.getIdentifier(), mb2A );
-        
-        NetMeshObjectIdentifier id1 = mb1A.getMeshObjectIdentifierFactory().fromExternalForm( "one" );
+
+        String id1String = "one";
+        NetMeshObjectIdentifier id1A = mb1A.getMeshObjectIdentifierFactory().fromExternalForm( id1String );
 
         Transaction tx1A = mb1A.createTransactionNow();
         
-        NetMeshObject obj1_1A = mb1A.getMeshBaseLifecycleManager().createMeshObject( id1 );
+        NetMeshObject obj1_1A = mb1A.getMeshBaseLifecycleManager().createMeshObject( id1A );
         
         tx1A.commitTransaction();
         tx1A = null;
 
-        NetMeshObject obj1_2A = mb2A.accessLocally( mb1A.getIdentifier(), id1 );
+        NetMeshObject obj1_2A = mb2A.accessLocally( mb1A.getIdentifier(), id1A );
         
         checkObject( obj1_1A, "No object obj1_1" );
         checkObject( obj1_2A, "No object obj1_2" );
@@ -79,7 +80,8 @@ public class StoreNetMeshBaseTest6
         WeakReference<NetStoreMeshBase> mb2ARef = new WeakReference<NetStoreMeshBase>( mb2A );
         WeakReference<NetMeshObject>    obj1_1ARef = new WeakReference<NetMeshObject>( obj1_1A );
         WeakReference<NetMeshObject>    obj1_2ARef = new WeakReference<NetMeshObject>( obj1_2A );
-        
+
+        id1A = null;
         endpointFactoryA = null;
         theNameServerA   = null;
         obj1_1A = null;
@@ -110,8 +112,9 @@ public class StoreNetMeshBaseTest6
         
         theNameServerB.put( mb1B.getIdentifier(), mb1B );
         theNameServerB.put( mb2B.getIdentifier(), mb2B );
-        
-        NetMeshObject obj1_1B = mb1B.findMeshObjectByIdentifier( id1 );
+
+        NetMeshObjectIdentifier id1B = mb1B.getMeshObjectIdentifierFactory().fromExternalForm( id1String );
+        NetMeshObject obj1_1B = mb1B.findMeshObjectByIdentifier( id1B );
         
         checkObject( obj1_1B, "obj1_1 not found" );
         
@@ -127,7 +130,7 @@ public class StoreNetMeshBaseTest6
         
         Thread.sleep( PINGPONG_ROUNDTRIP_DURATION );
 
-        NetMeshObject obj1_2B = mb2B.findMeshObjectByIdentifier( id1 );
+        NetMeshObject obj1_2B = mb2B.findMeshObjectByIdentifier( id1B );
         checkObject( obj1_2B, "obj1_2 not found" );
 
         checkObject( obj1_1B, "obj1_1 not found" );
