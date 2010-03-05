@@ -98,9 +98,9 @@ public class StoreShadowMeshBaseTest8
         ShadowMeshBase shadow = base.getShadowMeshBaseFor( found.getProxyTowardsHomeReplica().getPartnerMeshBaseIdentifier() );
         checkObject( shadow, "Shadow not found" );
 
-        MeshObjectIdentifier foundIdentifier = found.getIdentifier();
+        String foundIdentifier = found.getIdentifier().toExternalForm();
 
-        NetMeshObject foundInShadow = shadow.findMeshObjectByIdentifier( foundIdentifier );
+        NetMeshObject foundInShadow = shadow.findMeshObjectByIdentifier( shadow.getMeshObjectIdentifierFactory().fromExternalForm( foundIdentifier ));
         checkObject( foundInShadow, "Object not found in shadow" );
 
         checkProxies( found,         new NetMeshBase[] { shadow }, shadow, shadow, "Wrong proxies in main NetMeshBase" );
@@ -149,14 +149,14 @@ public class StoreShadowMeshBaseTest8
         checkEquals( base2.size(), 2, "Wrong number of MeshObjects found in recreated MeshBase" );
         checkEquals( base2.getShadowMeshBases().size(), 1, "Wrong number of shadows" );
         
-        NetMeshObject found2 = base2.findMeshObjectByIdentifier( foundIdentifier );
+        NetMeshObject found2 = base2.findMeshObjectByIdentifier( base2.getMeshObjectIdentifierFactory().fromExternalForm( foundIdentifier ));
         checkObject( found2, "Object not found" );
         checkCondition( !found2.isBlessedBy( TestSubjectArea.AA ), "Not blessed correctly" );
 
         ShadowMeshBase shadow2 = base2.getShadowMeshBaseFor( found2.getProxyTowardsHomeReplica().getPartnerMeshBaseIdentifier() );
         checkObject( shadow2, "Shadow not found" );
 
-        NetMeshObject foundInShadow2 = shadow2.findMeshObjectByIdentifier( foundIdentifier );
+        NetMeshObject foundInShadow2 = shadow2.findMeshObjectByIdentifier( shadow2.getMeshObjectIdentifierFactory().fromExternalForm( foundIdentifier ));
         checkObject( foundInShadow2, "Object not found in shadow" );
         checkCondition( !foundInShadow2.isBlessedBy( TestSubjectArea.AA ), "Not blessed correctly" );
 

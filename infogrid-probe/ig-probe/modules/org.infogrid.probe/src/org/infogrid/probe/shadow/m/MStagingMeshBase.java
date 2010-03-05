@@ -18,8 +18,13 @@ import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
+import org.infogrid.meshbase.net.DefaultNetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
+import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
@@ -68,10 +73,19 @@ public class MStagingMeshBase
         DefaultShadowProxyFactory proxyFactory = DefaultShadowProxyFactory.create( null, proxyPolicyFactory );
         ProxyManager              proxyManager = ProxyManager.create( proxyFactory, proxyStorage );
 
+        NetMeshObjectAccessSpecificationFactory netMeshObjectAccessSpecificationFactory
+                = DefaultNetMeshObjectAccessSpecificationFactory.create( shadow.getIdentifier() );
+        MeshObjectSetFactory setFactory
+                = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
+
         AStagingMeshBaseLifecycleManager life      = AStagingMeshBaseLifecycleManager.create();
         NetAccessManager                 accessMgr = null;
 
         MStagingMeshBase ret = new MStagingMeshBase(
+                netMeshObjectAccessSpecificationFactory.getNetMeshObjectIdentifierFactory(),
+                netMeshObjectAccessSpecificationFactory.getNetMeshBaseIdentifierFactory(),
+                netMeshObjectAccessSpecificationFactory,
+                setFactory,
                 life,
                 accessMgr,
                 objectStorage,
@@ -90,6 +104,10 @@ public class MStagingMeshBase
     /**
      * Constructor.
      *
+     * @param identifierFactory the factory for NetMeshObjectIdentifiers appropriate for this NetMeshBase
+     * @param meshBaseIdentifierFactory the factory for NetMeshBaseIdentifiers
+     * @param netMeshObjectAccessSpecificationFactory the factory for NetMeshObjectAccessSpecifications
+     * @param setFactory the factory for MeshObjectSets appropriate for this NetMeshBase
      * @param life the MeshBaseLifecycleManager to use
      * @param accessMgr the NetAccessManager to use. This is usually null. (FIUXME?)
      * @param cache stores the MeshObjects
@@ -97,6 +115,10 @@ public class MStagingMeshBase
      * @param placeholderProxyManager the ProxyManager for this MStagingMeshBase. It only creates PlaceholderProxies.
      */
     protected MStagingMeshBase(
+            NetMeshObjectIdentifierFactory              identifierFactory,
+            NetMeshBaseIdentifierFactory                meshBaseIdentifierFactory,
+            NetMeshObjectAccessSpecificationFactory     netMeshObjectAccessSpecificationFactory,
+            MeshObjectSetFactory                        setFactory,
             AStagingMeshBaseLifecycleManager            life,
             NetAccessManager                            accessMgr,
             CachingMap<MeshObjectIdentifier,MeshObject> cache,
@@ -104,10 +126,10 @@ public class MStagingMeshBase
             ShadowMeshBase                              shadow )
     {
         super(  shadow.getIdentifier(),
-                shadow.getMeshObjectIdentifierFactory(),
-                shadow.getMeshBaseIdentifierFactory(),
-                shadow.getNetMeshObjectAccessSpecificationFactory(),
-                ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class ),
+                identifierFactory,
+                meshBaseIdentifierFactory,
+                netMeshObjectAccessSpecificationFactory,
+                setFactory,
                 shadow.getModelBase(),
                 life,
                 accessMgr,
