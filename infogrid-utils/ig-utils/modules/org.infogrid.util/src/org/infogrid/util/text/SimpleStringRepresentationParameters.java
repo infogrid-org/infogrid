@@ -15,6 +15,7 @@
 package org.infogrid.util.text;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Simple implementation of StringRepresentationParameters.
@@ -32,7 +33,22 @@ public class SimpleStringRepresentationParameters
      */
     public static SimpleStringRepresentationParameters create()
     {
-        return new SimpleStringRepresentationParameters( null );
+        SimpleStringRepresentationParameters ret = new SimpleStringRepresentationParameters( null );
+        return ret;
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param map the initial content for this object
+     * @return the created SimpleStringRepresentationParameters
+     */
+    public static SimpleStringRepresentationParameters create(
+            Map<String,?> map )
+    {
+        SimpleStringRepresentationParameters ret = new SimpleStringRepresentationParameters( null );
+        ret.putAll( map );
+        return ret;
     }
 
     /**
@@ -44,7 +60,24 @@ public class SimpleStringRepresentationParameters
     public static SimpleStringRepresentationParameters create(
             StringRepresentationParameters delegate )
     {
-        return new SimpleStringRepresentationParameters( delegate );
+        SimpleStringRepresentationParameters ret = new SimpleStringRepresentationParameters( delegate );
+        return ret;
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param delegate the delegate, if any
+     * @param map the initial content for this object
+     * @return the created SimpleStringRepresentationParameters
+     */
+    public static SimpleStringRepresentationParameters create(
+            StringRepresentationParameters delegate,
+            Map<String,?>                  map )
+    {
+        SimpleStringRepresentationParameters ret = new SimpleStringRepresentationParameters( delegate );
+        ret.putAll( map );
+        return ret;
     }
 
     /**
@@ -125,6 +158,50 @@ public class SimpleStringRepresentationParameters
             Object value )
     {
         theStorage.put( key, value );
+    }
+
+    /**
+     * Put all the members of the map into this object.
+     *
+     * @param map the map
+     */
+    public void putAll(
+            Map<String,?> map )
+    {
+        for( String key : map.keySet() ) {
+            Object value = map.get( key );
+            theStorage.put( key, value );
+        }
+    }
+
+    /**
+     * Create a copy of this instance, but with an additional the named value.
+     *
+     * @param key the name of the value
+     * @param value the value
+     * @return copy, with the named value
+     */
+    public StringRepresentationParameters with(
+            String key,
+            Object value )
+    {
+        SimpleStringRepresentationParameters ret = new SimpleStringRepresentationParameters( this );
+        ret.put( key, value );
+        return ret;
+    }
+
+    /**
+     * Create a copy of this instance, but with the named values.
+     *
+     * @param map the named values
+     * @return copy, with the named values
+     */
+    public StringRepresentationParameters with(
+            Map<String,?> map )
+    {
+        SimpleStringRepresentationParameters ret = new SimpleStringRepresentationParameters( this );
+        ret.putAll( map );
+        return ret;
     }
 
     /**

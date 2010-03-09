@@ -14,6 +14,8 @@
 
 package org.infogrid.util.text;
 
+import java.util.Map;
+
 /**
  * Collects parameters that may influence the formatting of a String using StringRepresentation.
  */
@@ -41,6 +43,26 @@ public interface StringRepresentationParameters
      */
     public Object get(
             String key );
+
+    /**
+     * Create a copy of this instance, but with an additional the named value.
+     *
+     * @param key the name of the value
+     * @param value the value
+     * @return copy, with the named value
+     */
+    public StringRepresentationParameters with(
+            String key,
+            Object value );
+
+    /**
+     * Create a copy of this instance, but with the named values.
+     *
+     * @param map the named values
+     * @return copy, with the named values
+     */
+    public StringRepresentationParameters with(
+            Map<String,?> map );
 
     /**
      * Create a copy of this instance, but without the named value.
@@ -83,4 +105,9 @@ public interface StringRepresentationParameters
      * be rendered is null.
      */
     public final String NULL_STRING = "nullString";
+
+    /**
+     * The key that represents a web application's context path.
+     */
+    public static final String WEB_CONTEXT_KEY = "web-context-path";
 }

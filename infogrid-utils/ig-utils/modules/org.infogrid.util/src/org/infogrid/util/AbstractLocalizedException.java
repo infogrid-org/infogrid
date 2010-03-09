@@ -16,7 +16,6 @@ package org.infogrid.util;
 
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.text.StringRepresentation;
-import org.infogrid.util.text.StringRepresentationContext;
 import org.infogrid.util.text.StringRepresentationDirectory;
 import org.infogrid.util.text.StringRepresentationDirectorySingleton;
 import org.infogrid.util.text.StringRepresentationParameters;
@@ -89,7 +88,6 @@ public abstract class AbstractLocalizedException
         try {
             return toStringRepresentation(
                     StringRepresentationDirectorySingleton.getSingleton().get( StringRepresentationDirectory.TEXT_PLAIN_NAME ),
-                    null,
                     null );
         } catch( StringifierException ex ) {
             log.error( ex );
@@ -108,14 +106,12 @@ public abstract class AbstractLocalizedException
      * Obtain a String representation of this instance that can be shown to the user.
      *
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
      * @param pars collects parameters that may influence the String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      * @return String representation
      */
     public String toStringRepresentation(
             StringRepresentation           rep,
-            StringRepresentationContext    context,
             StringRepresentationParameters pars )
         throws
             StringifierException
@@ -123,11 +119,10 @@ public abstract class AbstractLocalizedException
         return constructStringRepresentation(
                 this,
                 rep,
-                context,
+                pars,
                 findResourceHelperForLocalizedMessage(),
                 getLocalizationParameters(),
-                findStringRepresentationParameter(),
-                pars );
+                findStringRepresentationParameter() );
     }
 
     /**
@@ -138,15 +133,15 @@ public abstract class AbstractLocalizedException
      * @param target the HTML target, if any
      * @param title title of the HTML link, if any
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
+     * @param pars collects parameters that may influence the String representation
      * @return String representation
      */
     public String toStringRepresentationLinkStart(
-            String                      additionalArguments,
-            String                      target,
-            String                      title,
-            StringRepresentation        rep,
-            StringRepresentationContext context )
+            String                         additionalArguments,
+            String                         target,
+            String                         title,
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
         throws
             StringifierException
     {
@@ -156,7 +151,7 @@ public abstract class AbstractLocalizedException
                 target,
                 title,
                 rep,
-                context,
+                pars,
                 findResourceHelperForLocalizedMessage(),
                 getLocalizationParameters(),
                 findStringRepresentationLinkStartParameter() );
@@ -167,19 +162,19 @@ public abstract class AbstractLocalizedException
      * as a link/hyperlink and can be shown to the user.
      *
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
+     * @param pars collects parameters that may influence the String representation
      * @return String representation
      */
     public String toStringRepresentationLinkEnd(
-            StringRepresentation        rep,
-            StringRepresentationContext context )
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
         throws
             StringifierException
     {
         return constructStringRepresentationLinkEnd(
                 this,
                 rep,
-                context,
+                pars,
                 findResourceHelperForLocalizedMessage(),
                 getLocalizationParameters(),
                 findStringRepresentationLinkEndParameter() );
@@ -190,8 +185,7 @@ public abstract class AbstractLocalizedException
      *
      * @param ex the LocalizedException to be converted
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
-     * @param theHelper the ResourceHelper to use
+     * @param helper the ResourceHelper to use
      * @param params the localization parameters to use
      * @param messageParameter the name of the message parameter to use with the ResourceHelper
      * @param pars collects parameters that may influence the String representation
@@ -201,11 +195,10 @@ public abstract class AbstractLocalizedException
     public static String constructStringRepresentation(
             LocalizedException             ex,
             StringRepresentation           rep,
-            StringRepresentationContext    context,
-            ResourceHelper                 theHelper,
+            StringRepresentationParameters pars,
+            ResourceHelper                 helper,
             Object []                      params,
-            String                         messageParameter,
-            StringRepresentationParameters pars )
+            String                         messageParameter )
         throws
             StringifierException
     {
@@ -220,23 +213,23 @@ public abstract class AbstractLocalizedException
      * @param target the HTML target, if any
      * @param title title of the HTML link, if any
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
-     * @param theHelper the ResourceHelper to use
+     * @param pars collects parameters that may influence the String representation
+     * @param helper the ResourceHelper to use
      * @param params the localization parameters to use
      * @param messageParameter the name of the message parameter to use with the ResourceHelper
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      * @return the string
      */
     public static String constructStringRepresentationLinkStart(
-            LocalizedException          ex,
-            String                      additionalArguments,
-            String                      target,
-            String                      title,
-            StringRepresentation        rep,
-            StringRepresentationContext context,
-            ResourceHelper              theHelper,
-            Object []                   params,
-            String                      messageParameter )
+            LocalizedException             ex,
+            String                         additionalArguments,
+            String                         target,
+            String                         title,
+            StringRepresentation           rep,
+            StringRepresentationParameters pars,
+            ResourceHelper                 helper,
+            Object []                      params,
+            String                         messageParameter )
         throws
             StringifierException
     {
@@ -248,20 +241,20 @@ public abstract class AbstractLocalizedException
      *
      * @param ex the LocalizedException to be converted
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
-     * @param theHelper the ResourceHelper to use
+     * @param pars collects parameters that may influence the String representation
+     * @param helper the ResourceHelper to use
      * @param params the localization parameters to use
      * @param messageParameter the name of the message parameter to use with the ResourceHelper
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      * @return the string
      */
     public static String constructStringRepresentationLinkEnd(
-            LocalizedException          ex,
-            StringRepresentation        rep,
-            StringRepresentationContext context,
-            ResourceHelper              theHelper,
-            Object []                   params,
-            String                      messageParameter )
+            LocalizedException             ex,
+            StringRepresentation           rep,
+            StringRepresentationParameters pars,
+            ResourceHelper                 helper,
+            Object []                      params,
+            String                         messageParameter )
         throws
             StringifierException
     {

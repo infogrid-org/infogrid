@@ -16,7 +16,6 @@ package org.infogrid.util;
 
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.text.StringRepresentation;
-import org.infogrid.util.text.StringRepresentationContext;
 import org.infogrid.util.text.StringRepresentationDirectory;
 import org.infogrid.util.text.StringRepresentationDirectorySingleton;
 import org.infogrid.util.text.StringRepresentationParameters;
@@ -96,7 +95,6 @@ public abstract class AbstractLocalizedFactoryException
         try {
             return toStringRepresentation(
                     StringRepresentationDirectorySingleton.getSingleton().get( StringRepresentationDirectory.TEXT_PLAIN_NAME ),
-                    null,
                     null );
         } catch( StringifierException ex ) {
             log.error( ex );
@@ -115,14 +113,12 @@ public abstract class AbstractLocalizedFactoryException
      * Obtain a String representation of this instance that can be shown to the user.
      *
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
      * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     public String toStringRepresentation(
             StringRepresentation           rep,
-            StringRepresentationContext    context,
             StringRepresentationParameters pars )
         throws
             StringifierException
@@ -130,11 +126,10 @@ public abstract class AbstractLocalizedFactoryException
         return AbstractLocalizedException.constructStringRepresentation(
                 this,
                 rep,
-                context,
+                pars,
                 findResourceHelperForLocalizedMessage(),
                 getLocalizationParameters(),
-                findStringRepresentationParameter(),
-                pars );
+                findStringRepresentationParameter() );
     }
 
     /**
@@ -145,16 +140,16 @@ public abstract class AbstractLocalizedFactoryException
      * @param target the HTML target, if any
      * @param title title of the HTML link, if any
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
+     * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     public String toStringRepresentationLinkStart(
-            String                      additionalArguments,
-            String                      target,
-            String                      title,
-            StringRepresentation        rep,
-            StringRepresentationContext context )
+            String                         additionalArguments,
+            String                         target,
+            String                         title,
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
         throws
             StringifierException
     {
@@ -164,7 +159,7 @@ public abstract class AbstractLocalizedFactoryException
                 target,
                 title,
                 rep,
-                context,
+                pars,
                 findResourceHelperForLocalizedMessage(),
                 getLocalizationParameters(),
                 findStringRepresentationLinkStartParameter() );
@@ -175,20 +170,20 @@ public abstract class AbstractLocalizedFactoryException
      * as a link/hyperlink and can be shown to the user.
      *
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
+     * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     public String toStringRepresentationLinkEnd(
-            StringRepresentation        rep,
-            StringRepresentationContext context )
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
         throws
             StringifierException
     {
         return AbstractLocalizedException.constructStringRepresentationLinkEnd(
                 this,
                 rep,
-                context,
+                pars,
                 findResourceHelperForLocalizedMessage(),
                 getLocalizationParameters(),
                 findStringRepresentationLinkEndParameter() );

@@ -219,24 +219,22 @@ public class SimpleStringRepresentation
      * Format a Throwable about which nothing else is known.
      * 
      * @param t the Throwable
-     * @param context the StringRepresentationContext to use
      * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     public String formatThrowable(
             Throwable                      t,
-            StringRepresentationContext    context,
             StringRepresentationParameters pars )
         throws
             StringifierException
     {
         String ret;
         if( t instanceof HasStringRepresentation ) {
-            ret = formatHasStringRepresentationThrowable( (HasStringRepresentation) t, context, pars );
+            ret = formatHasStringRepresentationThrowable( (HasStringRepresentation) t, pars );
 
         } else {
-            ret = formatNoStringRepresentationThrowable( t, context, pars );
+            ret = formatNoStringRepresentationThrowable( t, pars );
         }
         return ret;
     }
@@ -245,19 +243,17 @@ public class SimpleStringRepresentation
      * Format a Throwable that has a StringRepresentation per declared interface.
      * 
      * @param t the Throwable
-     * @param context the StringRepresentationContext to use
      * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     public String formatHasStringRepresentationThrowable(
             HasStringRepresentation        t,
-            StringRepresentationContext    context,
             StringRepresentationParameters pars )
         throws
             StringifierException
     {
-        String ret = t.toStringRepresentation( this, context, pars );
+        String ret = t.toStringRepresentation( this, pars );
         return ret;
     }
 
@@ -265,13 +261,11 @@ public class SimpleStringRepresentation
      * Format a Throwable that does not have a StringRepresentation per declared interface.
      * By default, we format 
      * @param t the Throwable
-     * @param context the StringRepresentationContext to use
      * @param pars collects parameters that may influence the String representation
      * @return String representation
      */
     public String formatNoStringRepresentationThrowable(
             Throwable                      t,
-            StringRepresentationContext    context,
             StringRepresentationParameters pars )
     {
         try {
