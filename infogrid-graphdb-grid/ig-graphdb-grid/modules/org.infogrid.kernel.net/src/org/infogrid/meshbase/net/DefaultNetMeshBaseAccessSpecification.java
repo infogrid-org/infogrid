@@ -20,7 +20,6 @@ import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.text.IdentifierStringifier;
 import org.infogrid.util.text.StringRepresentation;
-import org.infogrid.util.text.StringRepresentationContext;
 import org.infogrid.util.text.StringRepresentationParameters;
 import org.infogrid.util.text.StringifierException;
 
@@ -118,14 +117,12 @@ public class DefaultNetMeshBaseAccessSpecification
      * Obtain a String representation of this instance that can be shown to the user.
      *
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
      * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     public String toStringRepresentation(
             StringRepresentation           rep,
-            StringRepresentationContext    context,
             StringRepresentationParameters pars )
         throws
             StringifierException
@@ -150,20 +147,20 @@ public class DefaultNetMeshBaseAccessSpecification
      * @param target the HTML target, if any
      * @param title title of the HTML link, if any
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
+     * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     public String toStringRepresentationLinkStart(
-            String                      additionalArguments,
-            String                      target,
-            String                      title,
-            StringRepresentation        rep,
-            StringRepresentationContext context )
+            String                         additionalArguments,
+            String                         target,
+            String                         title,
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
         throws
             StringifierException
     {
-        String contextPath  = context != null ? (String) context.get( StringRepresentationContext.WEB_CONTEXT_KEY ) : null;
+        String contextPath  = pars != null ? (String) pars.get( StringRepresentationParameters.WEB_CONTEXT_KEY ) : null;
         String externalForm = toExternalForm();
 
         String ret = rep.formatEntry(
@@ -184,17 +181,17 @@ public class DefaultNetMeshBaseAccessSpecification
      * as a link/hyperlink and can be shown to the user.
      *
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
+     * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     public String toStringRepresentationLinkEnd(
-            StringRepresentation        rep,
-            StringRepresentationContext context )
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
         throws
             StringifierException
     {
-        String contextPath  = context != null ? (String) context.get( StringRepresentationContext.WEB_CONTEXT_KEY ) : null;
+        String contextPath  = pars != null ? (String) pars.get( StringRepresentationParameters.WEB_CONTEXT_KEY ) : null;
         String externalForm = toExternalForm();
 
         String ret = rep.formatEntry(

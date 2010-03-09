@@ -16,9 +16,8 @@ package org.infogrid.kernel.net.test.urls;
 
 import java.util.HashMap;
 import java.util.concurrent.ScheduledExecutorService;
-import org.infogrid.mesh.text.MeshStringRepresentationContext;
+import org.infogrid.mesh.text.MeshStringRepresentationParameters;
 import org.infogrid.mesh.net.NetMeshObject;
-import org.infogrid.mesh.text.SimpleMeshStringRepresentationContext;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
@@ -29,10 +28,11 @@ import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.primitives.text.ModelPrimitivesStringRepresentationDirectorySingleton;
 import org.infogrid.util.logging.Log;
+import org.infogrid.util.text.SimpleStringRepresentationParameters;
 import org.infogrid.util.text.StringRepresentation;
-import org.infogrid.util.text.StringRepresentationContext;
 import org.infogrid.util.text.StringRepresentationDirectory;
 import org.infogrid.util.text.StringRepresentationDirectorySingleton;
+import org.infogrid.util.text.StringRepresentationParameters;
 
 /**
  * Tests conversion of NetMeshObjectIdentifiers into URLs.
@@ -80,25 +80,25 @@ public class UrlTest1
         HashMap<String,Object> obj2_mb1Map = new HashMap<String,Object>();
         HashMap<String,Object> obj2_mb2Map = new HashMap<String,Object>();
         
-        obj1_mb1Map.put( StringRepresentationContext.WEB_CONTEXT_KEY, contextUrl );
-        obj1_mb2Map.put( StringRepresentationContext.WEB_CONTEXT_KEY, contextUrl );
-        obj2_mb1Map.put( StringRepresentationContext.WEB_CONTEXT_KEY, contextUrl );
-        obj2_mb2Map.put( StringRepresentationContext.WEB_CONTEXT_KEY, contextUrl );
+        obj1_mb1Map.put( StringRepresentationParameters.WEB_CONTEXT_KEY, contextUrl );
+        obj1_mb2Map.put( StringRepresentationParameters.WEB_CONTEXT_KEY, contextUrl );
+        obj2_mb1Map.put( StringRepresentationParameters.WEB_CONTEXT_KEY, contextUrl );
+        obj2_mb2Map.put( StringRepresentationParameters.WEB_CONTEXT_KEY, contextUrl );
         
-        obj1_mb1Map.put( MeshStringRepresentationContext.DEFAULT_MESHBASE_KEY, mb1 );
-        obj1_mb2Map.put( MeshStringRepresentationContext.DEFAULT_MESHBASE_KEY, mb2 );
-        obj2_mb1Map.put( MeshStringRepresentationContext.DEFAULT_MESHBASE_KEY, mb1 );
-        obj2_mb2Map.put( MeshStringRepresentationContext.DEFAULT_MESHBASE_KEY, mb2 );
+        obj1_mb1Map.put( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY, mb1 );
+        obj1_mb2Map.put( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY, mb2 );
+        obj2_mb1Map.put( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY, mb1 );
+        obj2_mb2Map.put( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY, mb2 );
 
-        obj1_mb1Map.put( MeshStringRepresentationContext.MESHOBJECT_KEY, obj1_mb1 );
-        obj1_mb2Map.put( MeshStringRepresentationContext.MESHOBJECT_KEY, obj1_mb1 ); // this needs to contain obj1 from MB1 in the MB2 map to make for a non-default MeshBase
-        obj2_mb1Map.put( MeshStringRepresentationContext.MESHOBJECT_KEY, obj2_mb1 ); // same here
-        obj2_mb2Map.put( MeshStringRepresentationContext.MESHOBJECT_KEY, obj2_mb1 );
+        obj1_mb1Map.put( MeshStringRepresentationParameters.MESHOBJECT_KEY, obj1_mb1 );
+        obj1_mb2Map.put( MeshStringRepresentationParameters.MESHOBJECT_KEY, obj1_mb1 ); // this needs to contain obj1 from MB1 in the MB2 map to make for a non-default MeshBase
+        obj2_mb1Map.put( MeshStringRepresentationParameters.MESHOBJECT_KEY, obj2_mb1 ); // same here
+        obj2_mb2Map.put( MeshStringRepresentationParameters.MESHOBJECT_KEY, obj2_mb1 );
         
-        SimpleMeshStringRepresentationContext obj1_mb1Context = SimpleMeshStringRepresentationContext.create( obj1_mb1Map );
-        SimpleMeshStringRepresentationContext obj1_mb2Context = SimpleMeshStringRepresentationContext.create( obj1_mb2Map );
-        SimpleMeshStringRepresentationContext obj2_mb1Context = SimpleMeshStringRepresentationContext.create( obj2_mb1Map );
-        SimpleMeshStringRepresentationContext obj2_mb2Context = SimpleMeshStringRepresentationContext.create( obj2_mb2Map );
+        SimpleStringRepresentationParameters obj1_mb1Context = SimpleStringRepresentationParameters.create( obj1_mb1Map );
+        SimpleStringRepresentationParameters obj1_mb2Context = SimpleStringRepresentationParameters.create( obj1_mb2Map );
+        SimpleStringRepresentationParameters obj2_mb1Context = SimpleStringRepresentationParameters.create( obj2_mb1Map );
+        SimpleStringRepresentationParameters obj2_mb2Context = SimpleStringRepresentationParameters.create( obj2_mb2Map );
         
         String target = "foo";
         String title  = "bar";

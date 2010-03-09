@@ -17,12 +17,11 @@ package org.infogrid.mesh.net.a;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.a.DefaultAMeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-import org.infogrid.mesh.text.MeshStringRepresentationContext;
+import org.infogrid.mesh.text.MeshStringRepresentationParameters;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.util.text.IdentifierStringifier;
 import org.infogrid.util.text.StringRepresentation;
-import org.infogrid.util.text.StringRepresentationContext;
 import org.infogrid.util.text.StringRepresentationParameters;
 import org.infogrid.util.text.StringifierException;
 
@@ -149,7 +148,6 @@ public class DefaultAnetMeshObjectIdentifier
      * Obtain a String representation of this instance that can be shown to the user.
      *
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
      * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
@@ -157,18 +155,17 @@ public class DefaultAnetMeshObjectIdentifier
     @Override
     public String toStringRepresentation(
             StringRepresentation           rep,
-            StringRepresentationContext    context,
             StringRepresentationParameters pars )
         throws
             StringifierException
     {
-        MeshObject meshObject  = context != null ? (MeshObject) context.get( MeshStringRepresentationContext.MESHOBJECT_KEY ) : null;
-        String     contextPath = context != null ? (String) context.get(  StringRepresentationContext.WEB_CONTEXT_KEY ) : null;
+        MeshObject meshObject  = pars != null ? (MeshObject) pars.get( MeshStringRepresentationParameters.MESHOBJECT_KEY ) : null;
+        String     contextPath = pars != null ? (String) pars.get(  StringRepresentationParameters.WEB_CONTEXT_KEY ) : null;
         MeshBase   meshBase    = meshObject != null ? meshObject.getMeshBase() : null;
 
         boolean isDefaultMeshBase = false;
-        if( meshBase != null && context != null ) {
-            isDefaultMeshBase = meshBase.equals( context.get( MeshStringRepresentationContext.DEFAULT_MESHBASE_KEY ));
+        if( meshBase != null && pars != null ) {
+            isDefaultMeshBase = meshBase.equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
         }
         boolean isHomeObject;
         if( meshBase != null ) {
@@ -224,27 +221,27 @@ public class DefaultAnetMeshObjectIdentifier
      * @param target the HTML target, if any
      * @param title title of the HTML link, if any
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
+     * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     @Override
     public String toStringRepresentationLinkStart(
-            String                      additionalArguments,
-            String                      target,
-            String                      title,
-            StringRepresentation        rep,
-            StringRepresentationContext context )
+            String                         additionalArguments,
+            String                         target,
+            String                         title,
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
         throws
             StringifierException
     {
-        MeshObject meshObject  = context != null ? (MeshObject) context.get( MeshStringRepresentationContext.MESHOBJECT_KEY ) : null;
-        String     contextPath = context != null ? (String) context.get(  StringRepresentationContext.WEB_CONTEXT_KEY ) : null;
+        MeshObject meshObject  = pars != null ? (MeshObject) pars.get( MeshStringRepresentationParameters.MESHOBJECT_KEY ) : null;
+        String     contextPath = pars != null ? (String) pars.get(  StringRepresentationParameters.WEB_CONTEXT_KEY ) : null;
         MeshBase   meshBase    = meshObject != null ? meshObject.getMeshBase() : null;
 
         boolean isDefaultMeshBase = true;
-        if( meshBase != null && context != null ) {
-            isDefaultMeshBase = meshBase.equals( context.get( MeshStringRepresentationContext.DEFAULT_MESHBASE_KEY ));
+        if( meshBase != null && pars != null ) {
+            isDefaultMeshBase = meshBase.equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
         }
         boolean isHomeObject;
         if( meshBase != null ) {
@@ -347,24 +344,24 @@ public class DefaultAnetMeshObjectIdentifier
      * as a link/hyperlink and can be shown to the user.
      *
      * @param rep the StringRepresentation
-     * @param context the StringRepresentationContext of this object
+     * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     @Override
     public String toStringRepresentationLinkEnd(
-            StringRepresentation        rep,
-            StringRepresentationContext context )
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
         throws
             StringifierException
     {
-        MeshObject meshObject  = context != null ? (MeshObject) context.get( MeshStringRepresentationContext.MESHOBJECT_KEY ) : null;
-        String     contextPath = context != null ? (String) context.get(  StringRepresentationContext.WEB_CONTEXT_KEY ) : null;
+        MeshObject meshObject  = pars != null ? (MeshObject) pars.get( MeshStringRepresentationParameters.MESHOBJECT_KEY ) : null;
+        String     contextPath = pars != null ? (String) pars.get(  StringRepresentationParameters.WEB_CONTEXT_KEY ) : null;
         MeshBase   meshBase    = meshObject != null ? meshObject.getMeshBase() : null;
 
         boolean isDefaultMeshBase = false;
-        if( meshBase != null && context != null ) {
-            isDefaultMeshBase = meshBase.equals( context.get( MeshStringRepresentationContext.DEFAULT_MESHBASE_KEY ));
+        if( meshBase != null && pars != null ) {
+            isDefaultMeshBase = meshBase.equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
         }
         boolean isHomeObject;
         if( meshBase != null ) {
