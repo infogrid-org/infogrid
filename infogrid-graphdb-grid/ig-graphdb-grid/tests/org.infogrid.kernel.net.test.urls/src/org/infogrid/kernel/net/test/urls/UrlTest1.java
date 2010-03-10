@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,8 +16,10 @@ package org.infogrid.kernel.net.test.urls;
 
 import java.util.HashMap;
 import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.text.MeshStringRepresentationParameters;
 import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
@@ -103,25 +105,25 @@ public class UrlTest1
         String target = "foo";
         String title  = "bar";
 
-        String obj1_mb1_different_default_target      = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( null, target, null, rep, obj1_mb1Context );
-        String obj1_mb1_different_nonDefault_target   = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( null, target, null, rep, obj1_mb2Context );
-        String obj1_mb1_different_default_notarget    = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( null, null,   null, rep, obj1_mb1Context );
-        String obj1_mb1_different_nonDefault_notarget = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( null, null,   null, rep, obj1_mb2Context );
+        String obj1_mb1_different_default_target      = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, null, contextUrl, obj1_mb1, mb1 ));
+        String obj1_mb1_different_nonDefault_target   = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, null, contextUrl, obj1_mb1, mb2 ));
+        String obj1_mb1_different_default_notarget    = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   null, contextUrl, obj1_mb1, mb1 ));
+        String obj1_mb1_different_nonDefault_notarget = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   null, contextUrl, obj1_mb1, mb2 ));
 
-        String obj1_mb1_different_default_target_title      = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( null, target, title, rep, obj1_mb1Context );
-        String obj1_mb1_different_nonDefault_target_title   = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( null, target, title, rep, obj1_mb2Context );
-        String obj1_mb1_different_default_notarget_title    = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( null, null,   title, rep, obj1_mb1Context );
-        String obj1_mb1_different_nonDefault_notarget_title = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( null, null,   title, rep, obj1_mb2Context );
+        String obj1_mb1_different_default_target_title      = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, title, contextUrl, obj1_mb1, mb1 ));
+        String obj1_mb1_different_nonDefault_target_title   = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, title, contextUrl, obj1_mb1, mb2 ));
+        String obj1_mb1_different_default_notarget_title    = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   title, contextUrl, obj1_mb1, mb1 ));
+        String obj1_mb1_different_nonDefault_notarget_title = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   title, contextUrl, obj1_mb1, mb2 ));
 
-        String obj2_mb1_different_default_target      = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( null, target, null, rep, obj2_mb1Context );
-        String obj2_mb1_different_nonDefault_target   = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( null, target, null, rep, obj2_mb2Context );
-        String obj2_mb1_different_default_notarget    = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( null, null,   null, rep, obj2_mb1Context );
-        String obj2_mb1_different_nonDefault_notarget = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( null, null,   null, rep, obj2_mb2Context );
+        String obj2_mb1_different_default_target      = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, null, contextUrl, obj2_mb1, mb1 ));
+        String obj2_mb1_different_nonDefault_target   = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, null, contextUrl, obj2_mb1, mb2 ));
+        String obj2_mb1_different_default_notarget    = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   null, contextUrl, obj2_mb1, mb1 ));
+        String obj2_mb1_different_nonDefault_notarget = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   null, contextUrl, obj2_mb1, mb2 ));
 
-        String obj2_mb1_different_default_target_title      = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( null, target, title, rep, obj2_mb1Context );
-        String obj2_mb1_different_nonDefault_target_title   = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( null, target, title, rep, obj2_mb2Context );
-        String obj2_mb1_different_default_notarget_title    = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( null, null,   title, rep, obj2_mb1Context );
-        String obj2_mb1_different_nonDefault_notarget_title = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( null, null,   title, rep, obj2_mb2Context );
+        String obj2_mb1_different_default_target_title      = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, title, contextUrl, obj2_mb1, mb1 ));
+        String obj2_mb1_different_nonDefault_target_title   = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, title, contextUrl, obj2_mb1, mb2 ));
+        String obj2_mb1_different_default_notarget_title    = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   title, contextUrl, obj2_mb1, mb1 ));
+        String obj2_mb1_different_nonDefault_notarget_title = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   title, contextUrl, obj2_mb1, mb2 ));
 
         checkEquals(
                 obj1_mb1_different_default_target,
@@ -316,7 +318,44 @@ public class UrlTest1
                         + title
                         + "\">",
                 "obj2_mb1_different_nonDefault_notarget is wrong" );
-     }
+    }
+
+    /**
+     * Helper method to easily assemble the right StringRepresentationParameters object.
+     *
+     * @param target the link target, if any
+     * @param title the link title, if any
+     * @param contextPath the context path, if any
+     * @param obj the default MeshObject, if any
+     * @param mb the default MeshBase, if any
+     * @return the constructed StringRepresentationParameters
+     */
+    protected StringRepresentationParameters constructPars(
+            String     target,
+            String     title,
+            String     contextPath,
+            MeshObject obj,
+            MeshBase   mb )
+    {
+        SimpleStringRepresentationParameters ret = SimpleStringRepresentationParameters.create();
+        if( target != null ) {
+            ret.put( StringRepresentationParameters.LINK_TARGET_KEY, target );
+        }
+        if( title != null ) {
+            ret.put( StringRepresentationParameters.LINK_TITLE_KEY, title );
+        }
+        if( contextPath != null ) {
+            ret.put( StringRepresentationParameters.WEB_CONTEXT_KEY, contextPath );
+        }
+        if( obj != null ) {
+            ret.put( MeshStringRepresentationParameters.MESHOBJECT_KEY, obj );
+        }
+        if( mb != null ) {
+            ret.put( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY, mb );
+        }
+
+        return ret;
+    }
 
     /**
      * Main program.

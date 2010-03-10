@@ -16,6 +16,7 @@ package org.infogrid.meshbase.net;
 
 import java.text.ParseException;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.util.text.StringRepresentation;
 
 /**
@@ -45,6 +46,33 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
     public NetMeshObjectIdentifierFactory getDelegate()
     {
         return theDelegate;
+    }
+
+    /**
+     * Determine the MeshBase to which this MeshObjectIdentifierFactory belongs.
+     *
+     * @return the MeshBase
+     */
+    public MeshBase getMeshBase()
+    {
+        return theDelegate.getMeshBase();
+    }
+
+    /**
+     * Set the MeshBase to which this MeshObjectIdentifierFactory belongs.
+     * This is invoked by the MeshBase's constructor and does not need to invoked
+     * by the application programmer. It can only be invoked once; subsequent
+     * invocations throw an IllegalStateException.
+     *
+     * @param mb the MeshBase
+     * @throws IllegalStateException thrown if this call is performed more than one on the same instance
+     */
+    public void setMeshBase(
+            MeshBase mb )
+        throws
+            IllegalStateException
+    {
+        theDelegate.setMeshBase( mb );
     }
 
     /**

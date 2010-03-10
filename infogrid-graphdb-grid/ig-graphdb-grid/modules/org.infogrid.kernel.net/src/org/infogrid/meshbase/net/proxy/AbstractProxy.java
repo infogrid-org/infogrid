@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -287,7 +287,11 @@ public abstract class AbstractProxy
         throws
             StringifierException
     {
-        boolean isDefaultMeshBase = pars != null ? ( getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ))) : true;
+        boolean isDefaultMeshBase = true;
+
+        if( pars != null ) {
+            isDefaultMeshBase = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
+        }
 
         String proxyExternalForm    = IdentifierStringifier.defaultFormat( getPartnerMeshBaseIdentifier().toExternalForm(), pars );
         String meshBaseExternalForm = IdentifierStringifier.defaultFormat( getNetMeshBase().getIdentifier().toExternalForm(), pars );
@@ -313,25 +317,30 @@ public abstract class AbstractProxy
      * Obtain the start part of a String representation of this object that acts
      * as a link/hyperlink and can be shown to the user.
      *
-     * @param additionalArguments additional arguments for URLs, if any
-     * @param target the HTML target, if any
-     * @param title title of the HTML link, if any
      * @param rep the StringRepresentation
      * @param pars collects parameters that may influence the String representation
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     public String toStringRepresentationLinkStart(
-            String                         additionalArguments,
-            String                         target,
-            String                         title,
             StringRepresentation           rep,
             StringRepresentationParameters pars )
         throws
             StringifierException
     {
-        boolean isDefaultMeshBase = pars != null ? ( getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ))) : true;
-        String  contextPath       = pars != null ? (String) pars.get( StringRepresentationParameters.WEB_CONTEXT_KEY ) : null;
+        boolean isDefaultMeshBase   = true;
+        String  contextPath         = null;
+        String  additionalArguments = null;
+        String  target              = null;
+        String  title               = null;
+
+        if( pars != null ) {
+            isDefaultMeshBase = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
+            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_CONTEXT_KEY );
+            target              = (String) pars.get( StringRepresentationParameters.LINK_TARGET_KEY );
+            title               = (String) pars.get( StringRepresentationParameters.LINK_TITLE_KEY );
+            additionalArguments = (String) pars.get( StringRepresentationParameters.HTML_URL_ADDITIONAL_ARGUMENTS );
+        }
 
         String proxyExternalForm    = getPartnerMeshBaseIdentifier().toExternalForm();
         String meshBaseExternalForm = this.getNetMeshBase().getIdentifier().toExternalForm();
@@ -372,8 +381,13 @@ public abstract class AbstractProxy
         throws
             StringifierException
     {
-        boolean isDefaultMeshBase = pars != null ? ( getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ))) : true;
-        String  contextPath       = pars != null ? (String) pars.get( StringRepresentationParameters.WEB_CONTEXT_KEY ) : null;
+        boolean isDefaultMeshBase   = true;
+        String  contextPath         = null;
+
+        if( pars != null ) {
+            isDefaultMeshBase = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
+            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_CONTEXT_KEY );
+        }
 
         String proxyExternalForm    = getPartnerMeshBaseIdentifier().toExternalForm();
         String meshBaseExternalForm = this.getNetMeshBase().getIdentifier().toExternalForm();
