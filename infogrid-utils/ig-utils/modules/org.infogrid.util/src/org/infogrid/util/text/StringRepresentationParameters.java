@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -107,7 +107,23 @@ public interface StringRepresentationParameters
     public final String NULL_STRING = "nullString";
 
     /**
-     * The key that represents a web application's context path.
+     * The key into this object that represents a web application's context path.
      */
     public static final String WEB_CONTEXT_KEY = "web-context-path";
+
+    /**
+     * The key into this object that represents a desired target for a link, like in HTML href tags.
+     */
+    public static final String LINK_TARGET_KEY = "link-target";
+
+    /**
+     * The key into this object that represents a title for a link, like in HTML href tags.
+     */
+    public static final String LINK_TITLE_KEY = "link-title";
+
+    /**
+     * The key into this object that represents additional arguments to be appended to an HTML URL link.
+     */
+    public static final String HTML_URL_ADDITIONAL_ARGUMENTS = "html-url-additional-arguments";
+
 }
