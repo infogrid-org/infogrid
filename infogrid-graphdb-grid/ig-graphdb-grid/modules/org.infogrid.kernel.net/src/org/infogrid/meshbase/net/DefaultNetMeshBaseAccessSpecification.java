@@ -18,7 +18,6 @@ import org.infogrid.util.AbstractIdentifier;
 import org.infogrid.util.http.HTTP;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
-import org.infogrid.util.text.IdentifierStringifier;
 import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationParameters;
 import org.infogrid.util.text.StringifierException;
@@ -127,13 +126,11 @@ public class DefaultNetMeshBaseAccessSpecification
         throws
             StringifierException
     {
-        String externalForm = IdentifierStringifier.defaultFormat( toExternalForm(), pars );
-
         String ret = rep.formatEntry(
                 getClass(), // dispatch to the right subtype
-                DEFAULT_ENTRY,
+                StringRepresentation.DEFAULT_ENTRY,
                 pars,
-                externalForm );
+                this );
 
         return ret;
 
@@ -160,7 +157,7 @@ public class DefaultNetMeshBaseAccessSpecification
         String title               = null;
 
         if( pars != null ) {
-            contextPath         = (String) pars.get(  StringRepresentationParameters.WEB_CONTEXT_KEY );
+            contextPath         = (String) pars.get(  StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
             target              = (String) pars.get( StringRepresentationParameters.LINK_TARGET_KEY );
             title               = (String) pars.get( StringRepresentationParameters.LINK_TITLE_KEY );
             additionalArguments = (String) pars.get( StringRepresentationParameters.HTML_URL_ADDITIONAL_ARGUMENTS );
@@ -196,7 +193,7 @@ public class DefaultNetMeshBaseAccessSpecification
         throws
             StringifierException
     {
-        String contextPath  = pars != null ? (String) pars.get( StringRepresentationParameters.WEB_CONTEXT_KEY ) : null;
+        String contextPath  = pars != null ? (String) pars.get( StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY ) : null;
         String externalForm = toExternalForm();
 
         String ret = rep.formatEntry(

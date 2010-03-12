@@ -293,9 +293,6 @@ public abstract class AbstractProxy
             isDefaultMeshBase = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
         }
 
-        String proxyExternalForm    = IdentifierStringifier.defaultFormat( getPartnerMeshBaseIdentifier().toExternalForm(), pars );
-        String meshBaseExternalForm = IdentifierStringifier.defaultFormat( getNetMeshBase().getIdentifier().toExternalForm(), pars );
-
         String key;
         if( isDefaultMeshBase ) {
             key = DEFAULT_MESH_BASE_ENTRY;
@@ -307,8 +304,8 @@ public abstract class AbstractProxy
                 getClass(),
                 key,
                 pars,
-                proxyExternalForm,
-                meshBaseExternalForm );
+        /* 0 */ getPartnerMeshBaseIdentifier(),
+        /* 1 */ getNetMeshBase());
 
         return ret;
     }
@@ -336,14 +333,11 @@ public abstract class AbstractProxy
 
         if( pars != null ) {
             isDefaultMeshBase = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
-            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_CONTEXT_KEY );
+            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
             target              = (String) pars.get( StringRepresentationParameters.LINK_TARGET_KEY );
             title               = (String) pars.get( StringRepresentationParameters.LINK_TITLE_KEY );
             additionalArguments = (String) pars.get( StringRepresentationParameters.HTML_URL_ADDITIONAL_ARGUMENTS );
         }
-
-        String proxyExternalForm    = getPartnerMeshBaseIdentifier().toExternalForm();
-        String meshBaseExternalForm = this.getNetMeshBase().getIdentifier().toExternalForm();
 
         String key;
         if( isDefaultMeshBase ) {
@@ -355,10 +349,10 @@ public abstract class AbstractProxy
         String ret = rep.formatEntry(
                 getClass(),
                 key,
-                null,
+                pars,
         /* 0 */ contextPath,
-        /* 1 */ proxyExternalForm,
-        /* 2 */ meshBaseExternalForm,
+        /* 1 */ getPartnerMeshBaseIdentifier(),
+        /* 2 */ getNetMeshBase(),
         /* 3 */ additionalArguments,
         /* 4 */ target,
         /* 5 */ title );
@@ -386,11 +380,8 @@ public abstract class AbstractProxy
 
         if( pars != null ) {
             isDefaultMeshBase = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
-            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_CONTEXT_KEY );
+            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
         }
-
-        String proxyExternalForm    = getPartnerMeshBaseIdentifier().toExternalForm();
-        String meshBaseExternalForm = this.getNetMeshBase().getIdentifier().toExternalForm();
 
         String key;
         if( isDefaultMeshBase ) {
@@ -402,10 +393,10 @@ public abstract class AbstractProxy
         String ret = rep.formatEntry(
                 getClass(),
                 key,
-                null,
-                contextPath,
-                proxyExternalForm,
-                meshBaseExternalForm );
+                pars,
+        /* 0 */ contextPath,
+        /* 1 */ getPartnerMeshBaseIdentifier(),
+        /* 2 */ getNetMeshBase() );
 
         return ret;
     }

@@ -14,16 +14,10 @@
 
 package org.infogrid.mesh.net.a;
 
-import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.a.DefaultAMeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-import org.infogrid.mesh.text.MeshStringRepresentationParameters;
-import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.util.text.IdentifierStringifier;
-import org.infogrid.util.text.StringRepresentation;
-import org.infogrid.util.text.StringRepresentationParameters;
-import org.infogrid.util.text.StringifierException;
+import org.infogrid.util.http.HTTP;
 
 /**
  * Implements NetMeshObjectIdentifier for the Anet implementation.
@@ -101,6 +95,33 @@ public class DefaultAnetMeshObjectIdentifier
     }
 
     /**
+     * Obtain the external form of the MeshObjectIdentifier relative to some path.
+     *
+     * @param relativePath the relative path
+     * @param assembleAsPartOfLongerId if true, escape properly so that the produced String can become part of a longer identifier
+     * @return the local external form
+     */
+    @Override
+    public String toLocalExternalForm(
+            String  relativePath,
+            boolean assembleAsPartOfLongerId )
+    {
+        if( relativePath == null ) {
+            return theLocalId;
+        }
+        String baseId = theNetMeshBaseIdentifier.toExternalForm();
+        if( relativePath.equals( baseId )) {
+            return theLocalId;
+        }
+        // Escape URL arguments
+        String ret = toExternalForm();
+        if( assembleAsPartOfLongerId ) {
+            ret = HTTP.encodeToValidUrlArgument( ret );
+        }
+        return ret;
+    }
+
+    /**
      * Obtain the identifier of the NetMeshBase in which this NetMeshObjectIdentifier was allocated.
      *
      * @return the dentifier of the NetMeshBase
@@ -142,286 +163,6 @@ public class DefaultAnetMeshObjectIdentifier
         } else {
             return SEPARATOR + theLocalId;
         }
-    }
-
-    /**
-     * Obtain a String representation of this instance that can be shown to the user.
-     *
-     * @param rep the StringRepresentation
-     * @param pars collects parameters that may influence the String representation
-     * @return String representation
-     * @throws StringifierException thrown if there was a problem when attempting to stringify
-     */
-    @Override
-    public String toStringRepresentation(
-            StringRepresentation           rep,
-            StringRepresentationParameters pars )
-        throws
-            StringifierException
-    {
-        MeshObject meshObject  = null;
-        String     contextPath = null;
-        MeshBase   meshBase    = null;
-
-        if( pars != null ) {
-            meshObject  = (MeshObject) pars.get( MeshStringRepresentationParameters.MESHOBJECT_KEY );
-            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_CONTEXT_KEY );
-            meshBase    = meshObject.getMeshBase();
-        }
-
-        boolean isDefaultMeshBase = false;
-        if( meshBase != null && pars != null ) {
-            isDefaultMeshBase = meshBase.equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
-        }
-        boolean isHomeObject;
-        if( meshBase != null ) {
-            isHomeObject = meshObject == meshBase.getHomeObject();
-        } else {
-            isHomeObject = identifiesHomeObject();
-        }
-
-        String key;
-        if( isDefaultMeshBase ) {
-            if( isHomeObject ) {
-                key = DEFAULT_MESH_BASE_HOME_ENTRY;
-            } else {
-                key = DEFAULT_MESH_BASE_ENTRY;
-            }
-        } else {
-            if( isHomeObject ) {
-                key = NON_DEFAULT_MESH_BASE_HOME_ENTRY;
-            } else {
-                key = NON_DEFAULT_MESH_BASE_ENTRY;
-            }
-        }
-
-        String meshBaseExternalForm = meshBase != null ? meshBase.getIdentifier().toExternalForm() : null;
-
-        String meshObjectExternalForm;
-        if( meshBase != null && getNetMeshBaseIdentifier().equals( meshBase.getIdentifier() )) {
-            meshObjectExternalForm = toLocalExternalForm();
-        } else {
-            meshObjectExternalForm = toExternalForm();
-        }
-
-        meshBaseExternalForm   = IdentifierStringifier.defaultFormat( meshBaseExternalForm,   pars );
-        meshObjectExternalForm = IdentifierStringifier.defaultFormat( meshObjectExternalForm, pars );
-
-        String ret = rep.formatEntry(
-                getClass(), // dispatch to the right subtype
-                key,
-                pars,
-                meshObjectExternalForm,
-                contextPath,
-                meshBaseExternalForm,
-                theAsEntered );
-
-        return ret;
-    }
-
-    /**
-     * Obtain the start part of a String representation of this object that acts
-     * as a link/hyperlink and can be shown to the user.
-     *
-     * @param rep the StringRepresentation
-     * @param pars collects parameters that may influence the String representation
-     * @return String representation
-     * @throws StringifierException thrown if there was a problem when attempting to stringify
-     */
-    @Override
-    public String toStringRepresentationLinkStart(
-            StringRepresentation           rep,
-            StringRepresentationParameters pars )
-        throws
-            StringifierException
-    {
-        MeshObject meshObject          = null;
-        String     contextPath         = null;
-        MeshBase   meshBase            = null;
-        String     additionalArguments = null;
-        String     target              = null;
-        String     title               = null;
-
-        if( pars != null ) {
-            meshObject  = (MeshObject) pars.get( MeshStringRepresentationParameters.MESHOBJECT_KEY );
-            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_CONTEXT_KEY );
-            meshBase    = meshObject.getMeshBase();
-            target              = (String) pars.get( StringRepresentationParameters.LINK_TARGET_KEY );
-            title               = (String) pars.get( StringRepresentationParameters.LINK_TITLE_KEY );
-            additionalArguments = (String) pars.get( StringRepresentationParameters.HTML_URL_ADDITIONAL_ARGUMENTS );
-        }
-
-        boolean isDefaultMeshBase = true;
-        if( meshBase != null && pars != null ) {
-            isDefaultMeshBase = meshBase.equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
-        }
-        boolean isHomeObject;
-        if( meshBase != null ) {
-            isHomeObject = meshObject == meshBase.getHomeObject();
-        } else {
-            isHomeObject = identifiesHomeObject();
-        }
-
-        String key;
-        if( isDefaultMeshBase ) {
-            if( isHomeObject ) {
-                key = DEFAULT_MESH_BASE_HOME_LINK_START_ENTRY;
-            } else {
-                key = DEFAULT_MESH_BASE_LINK_START_ENTRY;
-            }
-        } else {
-            if( isHomeObject ) {
-                key = NON_DEFAULT_MESH_BASE_HOME_LINK_START_ENTRY;
-            } else {
-                key = NON_DEFAULT_MESH_BASE_LINK_START_ENTRY;
-            }
-        }
-        if( target == null ) {
-            target = "_self";
-        }
-
-        String meshObjectExternalForm;
-        String meshBaseExternalForm;
-        if( meshBase != null ) {
-            meshBaseExternalForm   = meshBase.getIdentifier().toExternalForm();
-            meshObjectExternalForm = toLocalExternalForm(); // only escape localIds
-
-            StringBuilder buf = new StringBuilder();
-
-            if( !getNetMeshBaseIdentifier().equals( meshBase.getIdentifier() )) {
-                String there = getNetMeshBaseIdentifier().toExternalForm();
-                for( int i=0 ; i<there.length() ; ++i ) {
-                    char c = there.charAt( i );
-                    switch( c ) {
-                        case '?':
-                        case '&':
-                            buf.append( '%' );
-                            buf.append( Integer.toHexString( ((int)c) / 16 ));
-                            buf.append( Integer.toHexString( ((int)c) % 16 ));
-                            break;
-
-                        default:
-                            buf.append( c );
-                            break;
-                    }
-                }
-            }
-
-            for( int i=0 ; i<meshObjectExternalForm.length() ; ++i ) {
-                char c = meshObjectExternalForm.charAt( i );
-                switch( c ) {
-                    case '.':
-                    case ':':
-                    case '/':
-                    case '#':
-                    case '?':
-                    case '&':
-                    case ';':
-                    case '%':
-                        buf.append( '%' );
-                        buf.append( Integer.toHexString( ((int)c) / 16 ));
-                        buf.append( Integer.toHexString( ((int)c) % 16 ));
-                        break;
-
-                    default:
-                        buf.append( c );
-                        break;
-                }
-            }
-            meshObjectExternalForm = buf.toString();
-
-        } else {
-            meshBaseExternalForm = null;
-            meshObjectExternalForm = toExternalForm();
-        }
-
-
-        String ret = rep.formatEntry(
-                getClass(), // dispatch to the right subclass
-                key,
-                null,
-        /* 0 */ meshObjectExternalForm,
-        /* 1 */ contextPath,
-        /* 2 */ meshBaseExternalForm,
-        /* 3 */ additionalArguments,
-        /* 4 */ target,
-        /* 5 */ title,
-        /* 6 */ theAsEntered );
-
-        return ret;
-    }
-
-    /**
-     * Obtain the end part of a String representation of this MeshBase that acts
-     * as a link/hyperlink and can be shown to the user.
-     *
-     * @param rep the StringRepresentation
-     * @param pars collects parameters that may influence the String representation
-     * @return String representation
-     * @throws StringifierException thrown if there was a problem when attempting to stringify
-     */
-    @Override
-    public String toStringRepresentationLinkEnd(
-            StringRepresentation           rep,
-            StringRepresentationParameters pars )
-        throws
-            StringifierException
-    {
-        MeshObject meshObject  = null;
-        String     contextPath = null;
-        MeshBase   meshBase    = null;
-
-        if( pars != null ) {
-            meshObject  = (MeshObject) pars.get( MeshStringRepresentationParameters.MESHOBJECT_KEY );
-            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_CONTEXT_KEY );
-            meshBase    = meshObject.getMeshBase();
-        }
-
-        boolean isDefaultMeshBase = false;
-        if( meshBase != null && pars != null ) {
-            isDefaultMeshBase = meshBase.equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
-        }
-        boolean isHomeObject;
-        if( meshBase != null ) {
-            isHomeObject = meshObject == meshBase.getHomeObject();
-        } else {
-            isHomeObject = identifiesHomeObject();
-        }
-
-        String key;
-        if( isDefaultMeshBase ) {
-            if( isHomeObject ) {
-                key = DEFAULT_MESH_BASE_HOME_LINK_END_ENTRY;
-            } else {
-                key = DEFAULT_MESH_BASE_LINK_END_ENTRY;
-            }
-        } else {
-            if( isHomeObject ) {
-                key = NON_DEFAULT_MESH_BASE_HOME_LINK_END_ENTRY;
-            } else {
-                key = NON_DEFAULT_MESH_BASE_LINK_END_ENTRY;
-            }
-        }
-
-        String meshBaseExternalForm = meshBase != null ? meshBase.getIdentifier().toExternalForm() : null;
-
-        String meshObjectExternalForm;
-        if( meshBase != null && getNetMeshBaseIdentifier().equals( meshBase.getIdentifier() )) {
-            meshObjectExternalForm = toLocalExternalForm();
-        } else {
-            meshObjectExternalForm = toExternalForm();
-        }
-
-        String ret = rep.formatEntry(
-                getClass(), // dispatch to the right subclass
-                key,
-                null,
-                meshObjectExternalForm,
-                contextPath,
-                meshBaseExternalForm,
-                theAsEntered );
-
-        return ret;
     }
 
     /**

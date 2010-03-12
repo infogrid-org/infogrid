@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -131,7 +131,7 @@ public class XprisoMessageDumper
                     String sep = " ";
                     for( NetMeshObjectIdentifier current2 : current.getNeighbors() ) {
                         emit( sep );
-                        emit( current2.toLocalExternalForm() );
+                        emit( current2.toLocalExternalForm( null, false ) );
                         sep = ", ";
                     }
                 }

@@ -330,10 +330,21 @@ public class DefaultAnetMeshObjectIdentifierFactory
                 }
             }
             if( found != null && found.length == 1 ) {
-                DefaultAnetMeshObjectIdentifier ret = obtain( theMeshBaseIdentifier, (String) found[0], true ); // may throw
+                DefaultAnetMeshObjectIdentifier ret = (DefaultAnetMeshObjectIdentifier) found[0];
                 return ret;
             }
         }
+
+        try {
+            DefaultAnetMeshObjectIdentifier ret = guessFromExternalForm( s );
+            return ret;
+        } catch( StringRepresentationParseException ex ) {
+            // that wasn't it ...
+            if( firstException == null ) {
+                firstException = ex;
+            }
+        }
+
         throw new StringRepresentationParseException( s, null, firstException );
     }
 

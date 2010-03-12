@@ -8,36 +8,30 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.mesh.net;
 
 import org.infogrid.mesh.MeshObjectIdentifier;
-
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 
 /**
- * Extends MeshObjectIdentifier for NetMeshObjects.
+ * Extends MeshObjectIdentifier for NetMeshObjects. A NetMeshObjectIdentifier also carries
+ * the identifier of the NetMeshBase that acts as the scope for a local ID. For example,
+ * identifier 'abcd' is scoped by NetMeshBaseIdentifier 'http://example.com/'.
  */
 public interface NetMeshObjectIdentifier
         extends
             MeshObjectIdentifier
 {
     /**
-     * Obtain the identifier of the MeshBase in which this NetMeshObjectIdentifier was allocated.
+     * Obtain the identifier of the NetMeshBase that acts as the scope for this NetMeshObjectIdentifier
      *
-     * @return the identifier of the MeshBase
+     * @return the identifier of the NetMeshBase
      */
     public abstract NetMeshBaseIdentifier getNetMeshBaseIdentifier();
-    
-    /**
-     * Obtain the external form just of the local part of the NetMeshObjectIdentifier.
-     * 
-     * @return the local external form
-     */
-    public abstract String toLocalExternalForm();
 
     /**
      * To save memory, this constant is allocated here and used wherever appropriate.

@@ -324,7 +324,7 @@ public class DefaultNetMeshBaseIdentifierFactory
             NetMeshBaseIdentifier ret;
             switch( found.length ) {
                 case 1:
-                    ret = fromExternalForm( (String) found[0] );
+                    ret = (NetMeshBaseIdentifier) found[0];
                     break;
 
                 default:
