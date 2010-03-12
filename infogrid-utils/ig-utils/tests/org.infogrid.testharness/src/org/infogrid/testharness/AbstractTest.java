@@ -143,14 +143,14 @@ public abstract class AbstractTest
             if( two == null ) {
                 return true;
             } else {
-                reportError( msg, one, two  );
+                reportError( msg, one, two );
                 return false;
             }
         }
         if( one.equals( two )) {
             return true;
         } else {
-            reportError( msg, one, two  );
+            reportError( msg, one, two );
             return false;
         }
     }
