@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -55,8 +55,9 @@ public class StringStringifier
             String                         arg,
             StringRepresentationParameters pars )
     {
-        String ret = escape( arg );
-        ret = potentiallyShorten( ret, pars );
+        String ret = potentiallyShorten( arg, pars );
+
+        ret = escape( ret );
 
         return ret;
     }

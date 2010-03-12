@@ -110,4 +110,9 @@ public interface StringRepresentation
      * @return the stringifier map
      */
     public Map<String,Stringifier<? extends Object>> getRecursiveStringifierMap();
+
+    /**
+     * The default entry.
+     */
+    public static final String DEFAULT_ENTRY = "String";
 }

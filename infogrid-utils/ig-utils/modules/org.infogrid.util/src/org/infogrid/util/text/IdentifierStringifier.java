@@ -14,7 +14,12 @@
 
 package org.infogrid.util.text;
 
+import java.text.ParseException;
+import java.util.Iterator;
 import org.infogrid.util.Identifier;
+import org.infogrid.util.IdentifierFactory;
+import org.infogrid.util.OneElementIterator;
+import org.infogrid.util.ZeroElementCursorIterator;
 
 /**
  * Stringifies an Identifier.
@@ -30,35 +35,40 @@ public class IdentifierStringifier
      */
     public static IdentifierStringifier create()
     {
-        return new IdentifierStringifier( null, null );
+        return new IdentifierStringifier( true, null, null );
     }
 
     /**
      * Factory method with prefix or postfix.
      *
+     * @param processColloquial if true, process the colloquial parameter (if given). If false, leave identifier as is.
      * @param prefix the prefix for the identifier, if any
      * @param postfix the postfix for the identifier, if any
      * @return the created IdentifierStringifier
      */
     public static IdentifierStringifier create(
-            String prefix,
-            String postfix )
+            boolean processColloquial,
+            String  prefix,
+            String  postfix )
     {
-        return new IdentifierStringifier( prefix, postfix );
+        return new IdentifierStringifier( processColloquial, prefix, postfix );
     }
 
     /**
      * Constructor. Use factory method.
      *
+     * @param processColloquial if true, process the colloquial parameter (if given). If false, leave identifier as is.
      * @param prefix the prefix for the identifier, if any
      * @param postfix the postfix for the identifier, if any
      */
     protected IdentifierStringifier(
-            String prefix,
-            String postfix )
+            boolean processColloquial,
+            String  prefix,
+            String  postfix )
     {
-        thePrefix  = prefix;
-        thePostfix = postfix;
+        theProcessColloquial = processColloquial;
+        thePrefix            = prefix;
+        thePostfix           = postfix;
     }
 
     /**
@@ -75,25 +85,17 @@ public class IdentifierStringifier
             StringRepresentationParameters pars )
     {
         if( arg == null ) {
-            return "null";
+            return formatToNull( soFar, pars );
         }
 
-        String ext = escape( arg.toExternalForm() );
+        String ext = arg.toExternalForm();
 
-        if( thePrefix == null && thePostfix == null ) {
-            return ext;
+        ext = potentiallyProcessColloquial( ext, pars );
+        ext = potentiallyShorten( ext, pars );
+        ext = escape( ext );
 
-        } else {
-            StringBuilder buf = new StringBuilder();
-            if( thePrefix != null ) {
-                buf.append( thePrefix );
-            }
-            buf.append( ext );
-            if( thePostfix != null ) {
-                buf.append( thePrefix );
-            }
-            return buf.toString();
-        }
+        String ret = processPrefixPostfix( ext );
+        return ret;
     }
 
     /**
@@ -141,41 +143,136 @@ public class IdentifierStringifier
     }
 
     /**
-     * Default format. This evaluates and processes the COLLOQUIAL parameter.
+     * Format an a null Object using this Stringifier.
      *
-     * @param input the full URL
+     * @param soFar the String so far, if any
      * @param pars collects parameters that may influence the String representation
-     * @return the potentially formatted URL
+     * @return the formatted String
      */
-    public static String defaultFormat(
-            String                         input,
+    protected String formatToNull(
+            String                         soFar,
             StringRepresentationParameters pars )
     {
-        if( input == null ) {
-            return null;
-        }
-        if( pars == null ) {
-            return input;
-        }
-        Boolean colloquial = (Boolean) pars.get( StringRepresentationParameters.COLLOQUIAL );
-        if( colloquial == null ) {
-            return input;
-        }
-        if( !colloquial.booleanValue() ) {
-            return input;
-        }
+        return "null"; // FIXME?
+    }
 
-        String ret;
-        final String PREFIX = "http://";
-        if( input.startsWith( PREFIX )) {
-            ret = input.substring( PREFIX.length() );
-        } else {
-            ret = input;
-        }
-        if( ret.charAt( ret.length()-1 ) == '/' ) {
-            ret = ret.substring( 0, ret.length()-1 );
+    /**
+     * Process the string according to the value of theProcessColloquial
+     * and the parameter.
+     *
+     * @param in the input String
+     * @param pars collects parameters that may influence the String representation
+     * @return the output String
+     */
+    protected String potentiallyProcessColloquial(
+            String                         in,
+            StringRepresentationParameters pars )
+    {
+        String ret = in;
+
+        if( theProcessColloquial && pars != null ) {
+            Boolean colloquial = (Boolean) pars.get( StringRepresentationParameters.COLLOQUIAL );
+            if( colloquial != null && colloquial.booleanValue() ) {
+
+                final String PREFIX = "http://";
+                if( ret.startsWith( PREFIX )) {
+                    ret = ret.substring( PREFIX.length() );
+                }
+                if( ret.charAt( ret.length()-1 ) == '/' ) {
+                    ret = ret.substring( 0, ret.length()-1 );
+                }
+            }
         }
         return ret;
+    }
+
+    /**
+     * Perform prefix and postfix processing, if applicable
+     *
+     * @param in the input String
+     * @return the output String
+     */
+    protected String processPrefixPostfix(
+            String in )
+    {
+        if( thePrefix == null && thePostfix == null ) {
+            return in;
+
+        } else {
+            StringBuilder buf = new StringBuilder();
+            if( thePrefix != null ) {
+                buf.append( thePrefix );
+            }
+            buf.append( in );
+            if( thePostfix != null ) {
+                buf.append( thePrefix );
+            }
+            return buf.toString();
+        }
+    }
+
+    /**
+     * Parse out the Object in rawString that were inserted using this Stringifier.
+     * This default implementation simply throws an UnsupportedOperationException.
+     *
+     * @param rawString the String to parse
+     * @param factory the factory needed to create the parsed values, if any
+     * @return the found Object
+     * @throws StringifierParseException thrown if a parsing problem occurred
+     */
+    @Override
+    public Identifier unformat(
+            String                     rawString,
+            StringifierUnformatFactory factory )
+        throws
+            StringifierParseException
+    {
+        IdentifierFactory realFactory = (IdentifierFactory) factory;
+
+        try {
+            Identifier found = realFactory.fromExternalForm( rawString );
+            return found;
+
+        } catch( ParseException ex ) {
+            throw new StringifierParseException( this, rawString, ex );
+        }
+    }
+
+    /**
+     * Obtain an iterator that iterates through all the choices that exist for this Stringifier to
+     * parse the String. The iterator returns zero elements if the String could not be parsed
+     * by this Stringifier.
+     * This default implementation simply throws an UnsupportedOperationException.
+     *
+     * @param rawString the String to parse
+     * @param startIndex the position at which to parse rawString
+     * @param endIndex the position at which to end parsing rawString
+     * @param max the maximum number of choices to be returned by the Iterator.
+     * @param matchAll if true, only return those matches that match the entire String from startIndex to endIndex.
+     *                 If false, return other matches that only match the beginning of the String.
+     * @param factory the factory needed to create the parsed values, if any
+     * @return the Iterator
+     */
+    @Override
+    public Iterator<StringifierParsingChoice<Identifier>> parsingChoiceIterator(
+            String                     rawString,
+            int                        startIndex,
+            int                        endIndex,
+            int                        max,
+            boolean                    matchAll,
+            StringifierUnformatFactory factory )
+    {
+        IdentifierFactory realFactory = (IdentifierFactory) factory;
+
+        try {
+            Identifier found = realFactory.fromExternalForm( rawString.substring( startIndex, endIndex ));
+
+            return OneElementIterator.<StringifierParsingChoice<Identifier>>create(
+                    new StringifierValueParsingChoice<Identifier>( startIndex, endIndex, found ));
+
+        } catch( ParseException ex ) {
+            return ZeroElementCursorIterator.create();
+        }
     }
 
     /**
@@ -187,4 +284,9 @@ public class IdentifierStringifier
      * The postfix, if any.
      */
     protected String thePostfix;
+
+    /**
+     * If true, and colloquial is specified, do the colloquial processing. If false, keep as is.
+     */
+    protected boolean theProcessColloquial;
 }

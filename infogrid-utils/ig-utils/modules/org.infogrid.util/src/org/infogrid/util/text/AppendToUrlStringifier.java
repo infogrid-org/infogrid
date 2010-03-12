@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -17,7 +17,7 @@ package org.infogrid.util.text;
 /**
  * Stringifies a URL argument by prepending & or ? correctly.
  */
-public class UrlAppendStringifier
+public class AppendToUrlStringifier
         extends
             StringStringifier
 {
@@ -26,15 +26,15 @@ public class UrlAppendStringifier
      *
      * @return the created StringStringifier
      */
-    public static UrlAppendStringifier create()
+    public static AppendToUrlStringifier create()
     {
-        return new UrlAppendStringifier();
+        return new AppendToUrlStringifier();
     }
 
     /**
      * No-op constructor. Use factory method.
      */
-    protected UrlAppendStringifier()
+    protected AppendToUrlStringifier()
     {
         // no op
     }
@@ -63,9 +63,12 @@ public class UrlAppendStringifier
             buf.append( '?' );
         }
 
-        buf.append( escape( arg ));
+        buf.append( arg );
 
-        return potentiallyShorten( buf.toString(), pars );
+        String ret = potentiallyShorten( buf.toString(), pars );
         // not sure this is the best we can do. Use case: show too long URL on screen.
+
+        ret = escape( ret );
+        return ret;
     }
 }

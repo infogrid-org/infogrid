@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.ArrayFacade;
 import org.infogrid.util.text.AnyMessageStringifier;
-import org.infogrid.util.text.HtmlStacktraceStringifier;
+import org.infogrid.util.text.HtmlifyingDelegatingStringifier;
 import org.infogrid.util.text.IntegerStringifier;
 import org.infogrid.util.text.LongStringifier;
 import org.infogrid.util.text.MessageStringifier;
@@ -58,7 +58,7 @@ public abstract class AbstractMessageStringifierTest
         map1.put( "longhex4",       LongStringifier.create( 4, 16 ) );
         map1.put( "string",         StringStringifier.create() );
         map1.put( "stacktrace",     StacktraceStringifier.create() );
-        map1.put( "htmlstacktrace", HtmlStacktraceStringifier.create() );
+        map1.put( "htmlstacktrace", HtmlifyingDelegatingStringifier.create( StacktraceStringifier.create() ));
 
         MessageStringifier str1 = AnyMessageStringifier.create( current.theFormatString, map1 );
 

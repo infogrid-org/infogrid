@@ -14,9 +14,9 @@
 
 package org.infogrid.util;
 
-import org.infogrid.util.text.IdentifierStringifier;
 import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationParameters;
+import org.infogrid.util.text.StringifierException;
 
 /**
  * Trivially simple implementation of Identifier using a String.
@@ -71,12 +71,19 @@ public class SimpleStringIdentifier
      * @param rep the StringRepresentation
      * @param pars collects parameters that may influence the String representation
      * @return String representation
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
     public String toStringRepresentation(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
+        throws
+            StringifierException
     {
-        String ret = IdentifierStringifier.defaultFormat( toExternalForm(), pars );
+        String ret = rep.formatEntry(
+                    getClass(), // dispatch to the right subtype
+                    StringRepresentation.DEFAULT_ENTRY,
+                    pars,
+                    this );
         return ret;
     }
 
@@ -86,11 +93,14 @@ public class SimpleStringIdentifier
      *
      * @param rep the StringRepresentation
      * @param pars collects parameters that may influence the String representation
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
      * @return String representation
      */
     public String toStringRepresentationLinkStart(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
+        throws
+            StringifierException
     {
         return ""; // FIXME?
     }
@@ -101,11 +111,14 @@ public class SimpleStringIdentifier
      *
      * @param rep the StringRepresentation
      * @param pars collects parameters that may influence the String representation
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
      * @return String representation
      */
     public String toStringRepresentationLinkEnd(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
+        throws
+            StringifierException
     {
         return ""; // FIXME?
     }

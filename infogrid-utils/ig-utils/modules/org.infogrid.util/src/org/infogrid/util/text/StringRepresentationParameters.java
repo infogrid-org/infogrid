@@ -107,9 +107,14 @@ public interface StringRepresentationParameters
     public final String NULL_STRING = "nullString";
 
     /**
-     * The key into this object that represents a web application's context path.
+     * The key into this object that represents a web application's context path relative to /.
      */
-    public static final String WEB_CONTEXT_KEY = "web-context-path";
+    public static final String WEB_RELATIVE_CONTEXT_KEY = "web-relative-context-path";
+
+    /**
+     * The key into this object that represents a web application's full context path including http...
+     */
+    public static final String WEB_ABSOLUTE_CONTEXT_KEY = "web-absolute-context-path";
 
     /**
      * The key into this object that represents a desired target for a link, like in HTML href tags.

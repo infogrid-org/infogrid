@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,20 +21,22 @@ import java.util.List;
  *
  * @param <T> the type of the Objects to be stringified
  */
-public class ListStringifier<T extends List<?>>
+public class ListStringifier<T>
         extends
-             AbstractStringifier<T>
+             AbstractStringifier<List<T>>
 {
     /**
      * Factory method. This creates an ListStringifier that merely appends the
      * individual components after each other.
      *
+     * @param delegate the underlying Stringifier that knows how to deal with the real type
      * @return the created ListStringifier
      * @param <T> the type of the Objects to be stringified
      */
-    public static <T extends List<?>> ListStringifier<T> create()
+    public static <T> ListStringifier<T> create(
+            Stringifier<T> delegate )
     {
-        return new ListStringifier<T>( null, null, null, null );
+        return new ListStringifier<T>( null, null, null, null, delegate );
     }
 
     /**
@@ -43,13 +45,15 @@ public class ListStringifier<T extends List<?>>
      * This is similar to Perl's join.
      *
      * @param middle the string to insert in the middle
+     * @param delegate the underlying Stringifier that knows how to deal with the real type
      * @return the created ListStringifier
      * @param <T> the type of the Objects to be stringified
      */
-    public static <T extends List<?>> ListStringifier<T> create(
-            String         middle )
+    public static <T> ListStringifier<T> create(
+            String         middle,
+            Stringifier<T> delegate )
     {
-        return new ListStringifier<T>( null, middle, null, null );
+        return new ListStringifier<T>( null, middle, null, null, delegate );
     }
 
     /**
@@ -60,15 +64,17 @@ public class ListStringifier<T extends List<?>>
      * @param start the string to insert at the beginning
      * @param middle the string to insert in the middle
      * @param end the string to append at the end
+     * @param delegate the underlying Stringifier that knows how to deal with the real type
      * @return the created ListStringifier
      * @param <T> the type of the Objects to be stringified
      */
-    public static <T extends List<?>> ListStringifier<T> create(
+    public static <T> ListStringifier<T> create(
             String         start,
             String         middle,
-            String         end )
+            String         end,
+            Stringifier<T> delegate )
     {
-        return new ListStringifier<T>( start, middle, end, null );
+        return new ListStringifier<T>( start, middle, end, null, delegate );
     }
 
     /**
@@ -81,16 +87,18 @@ public class ListStringifier<T extends List<?>>
      * @param middle the string to insert in the middle
      * @param end the string to append at the end
      * @param empty what to emit instead if the array is empty
+     * @param delegate the underlying Stringifier that knows how to deal with the real type
      * @return the created ListStringifier
      * @param <T> the type of the Objects to be stringified
      */
-    public static <T extends List<?>> ListStringifier<T> create(
+    public static <T> ListStringifier<T> create(
             String         start,
             String         middle,
             String         end,
-            String         empty )
+            String         empty,
+            Stringifier<T> delegate )
     {
-        return new ListStringifier<T>( start, middle, end, empty );
+        return new ListStringifier<T>( start, middle, end, empty, delegate );
     }
 
     /**
@@ -99,18 +107,21 @@ public class ListStringifier<T extends List<?>>
      * @param start the string to insert at the beginning
      * @param middle the string to insert in the middle
      * @param end the string to append at the end
+     * @param delegate the underlying Stringifier that knows how to deal with the real type
      * @param empty what to emit instead if the array is empty
      */
     protected ListStringifier(
             String         start,
             String         middle,
             String         end,
-            String         empty )
+            String         empty,
+            Stringifier<T> delegate )
     {
         theStart       = start;
         theMiddle      = middle;
         theEnd         = end;
         theEmptyString = empty;
+        theDelegate    = delegate;
     }
 
     /**
@@ -144,17 +155,31 @@ public class ListStringifier<T extends List<?>>
     }
 
     /**
+     * Obtain the delegate Stringifier.
+     *
+     * @return the delegate
+     */
+    public Stringifier<T> getDelegate()
+    {
+        return theDelegate;
+    }
+
+    /**
      * Format an Object using this Stringifier.
      *
      * @param soFar the String so far, if any
      * @param arg the Object to format, or null
      * @param pars collects parameters that may influence the String representation
      * @return the formatted String
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
+    @Override
     public String format(
             String                         soFar,
-            T                              arg,
+            List<T>                        arg,
             StringRepresentationParameters pars )
+        throws
+            StringifierException
     {
         if( arg == null || arg.isEmpty() ) {
             if( theEmptyString != null ) {
@@ -179,7 +204,7 @@ public class ListStringifier<T extends List<?>>
             if( sep != null ) {
                 ret.append( sep );
             }
-            String childInput = String.valueOf( current );
+            String childInput = theDelegate.attemptFormat( soFar, current, pars );
             if( childInput != null ) {
                 ret.append( childInput );
             }
@@ -199,18 +224,21 @@ public class ListStringifier<T extends List<?>>
      * @param arg the Object to format, or null
      * @param pars collects parameters that may influence the String representation
      * @return the formatted String
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
      * @throws ClassCastException thrown if this Stringifier could not format the provided Object
      *         because the provided Object was not of a type supported by this Stringifier
      */
     @SuppressWarnings("unchecked")
+    @Override
     public String attemptFormat(
             String                         soFar,
             Object                         arg,
             StringRepresentationParameters pars )
         throws
+            StringifierException,
             ClassCastException
     {
-        return format( soFar, (T) arg, pars );
+        return format( soFar, (List<T>) arg, pars );
     }
 
     /**
@@ -232,4 +260,9 @@ public class ListStringifier<T extends List<?>>
      * The String to emit if the array if empty. May be null, in which case it is assumed to theStart+theEnd.
      */
     protected String theEmptyString;
+
+    /**
+     * The underlying Stringifier that knows how to deal with the real type.
+     */
+    protected Stringifier<T> theDelegate;
 }

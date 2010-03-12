@@ -15,6 +15,7 @@
 package org.infogrid.util.text;
 
 import java.util.HashMap;
+import org.infogrid.util.Identifier;
 
 /**
  * Helps find a StringRepresentationDirectory. The found StringRepresentationDirectory
@@ -106,61 +107,72 @@ public class StringRepresentationDirectorySingleton
         // url:  same as plain
 
         plainMap.put(   "string",         StringStringifier.create() );
-        htmlMap.put(    "string",         HtmlStringStringifier.create() );
+        htmlMap.put(    "string",         HtmlifyingDelegatingStringifier.create( StringStringifier.create() ));
         // url:  same as plain
 
         plainMap.put(   "verbatim",       StringStringifier.create() );
-        htmlMap.put(    "verbatim",       StringStringifier.create() );
+        htmlMap.put(    "verbatim",       StringStringifier.create() ); // don't Htmlify
         // url:  same as plain
 
         plainMap.put(   "stacktrace",     StacktraceStringifier.create() );
-        htmlMap.put(    "stacktrace",     HtmlStacktraceStringifier.create() );
+        htmlMap.put(    "stacktrace",     HtmlifyingDelegatingStringifier.create( StacktraceStringifier.create() ));
         // url:  same as plain
 
-        plainMap.put(   "urlappend",      UrlAppendStringifier.create() );
+        plainMap.put(   "urlappend",      AppendToUrlStringifier.create() );
+        htmlMap.put(    "urlappend",      HtmlifyingDelegatingStringifier.create( AppendToUrlStringifier.create() ));
         // html: same as plain
         // url:  same as plain
 
-        plainMap.put(   "urlarg",         UrlArgStringifier.create() );
+        plainMap.put(   "urlArgument",    ToValidUrlArgumentStringifier.create( StringStringifier.create() ) );
+        htmlMap.put(    "urlArgument",    HtmlifyingDelegatingStringifier.create( ToValidUrlArgumentStringifier.create( StringStringifier.create() )));
         // html: same as plain
         // url:  same as plain
 
         plainMap.put(   "id",             IdentifierStringifier.create() );
-        // html: same as plain
+        htmlMap.put(    "id",             HtmlifyingDelegatingStringifier.create( IdentifierStringifier.create() ));
+        // url:  same as plain
+
+        plainMap.put(   "idAsUrlArgument", ToValidUrlArgumentStringifier.create( IdentifierStringifier.create() ));
+        htmlMap.put(    "idAsUrlArgument", HtmlifyingDelegatingStringifier.create( ToValidUrlArgumentStringifier.create( IdentifierStringifier.create() )));
+        // url:  same as plain
+
+        plainMap.put(   "hasIdAsUrlArgument", ToValidUrlArgumentStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create() )));
+        htmlMap.put(    "hasIdAsUrlArgument", HtmlifyingDelegatingStringifier.create( ToValidUrlArgumentStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create() ))));
         // url:  same as plain
 
         plainMap.put(   "stringarray",    ArrayStringifier.create( StringStringifier.create(), ", " ));
-        // html: same as plain
+        htmlMap.put(    "stringarray",    ArrayStringifier.create( HtmlifyingDelegatingStringifier.create( StringStringifier.create() ), ", " ));
         // url:  same as plain
 
         plainMap.put(   "idarray",        ArrayStringifier.create( IdentifierStringifier.create(), ", " ));
-        // html: same as plain
+        htmlMap.put(    "idarray",        ArrayStringifier.create( HtmlifyingDelegatingStringifier.create( IdentifierStringifier.create() ), ", " ));
         // url:  same as plain
 
-        plainMap.put(   "hasid",          HasIdentifierStringifier.create() );
-        // html: same as plain
+        plainMap.put(   "hasid",          HasIdentifierStringifier.create( IdentifierStringifier.create() ));
+        htmlMap.put(    "hasid",          HtmlifyingDelegatingStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create() )));
         // url:  same as plain
 
-        plainMap.put(   "hasidarray",     ArrayStringifier.create( HasIdentifierStringifier.create(), ", " ));
-        // html: same as plain
+        plainMap.put(   "hasidarray",     ArrayStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create() ), ", " ));
+        htmlMap.put(    "hasidarray",     HtmlifyingDelegatingStringifier.create( ArrayStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create() ), ", " )));
         // url:  same as plain
 
         plainMap.put(   "class",          ClassStringifier.create() );
         // html: same as plain
         // url:  same as plain
 
-        plainMap.put(   "list",           ListStringifier.create( ", " ));
-        htmlMap.put(    "list",           ListStringifier.create( "<li>", "</li>\n<li>", "</li>", "" ));
+        plainMap.put(   "list",           ListStringifier.create( ", ", StringStringifier.create() ));
+        htmlMap.put(    "list",           ListStringifier.create( "<li>", "</li>\n<li>", "</li>", "", StringStringifier.create() ));
         // url:  same as plain
 
-        plainMap.put(   "htmlescaped",    HtmlStringStringifier.create() );
         plainMap.put(   "javascriptescaped", JavaScriptStringStringifier.create() );
 
         plainMap.put(   "as-entered",     AsEnteredStringifier.create() );
-        // html: same as plain
+        htmlMap.put(    "as-entered",     HtmlifyingDelegatingStringifier.create( AsEnteredStringifier.create() ));
         // url:  same as plain
 
-        plainMap.put(   "as-entered-array",  ArrayStringifier.create( AsEnteredStringifier.create(), ", " ));
+        plainMap.put(   "as-entered-array", ArrayStringifier.create( AsEnteredStringifier.create(), ", " ));
+        htmlMap.put(    "as-entered-array", HtmlifyingDelegatingStringifier.create( ArrayStringifier.create( AsEnteredStringifier.create(), ", " )));
+
         // html: same as plain
         // url:  same as plain
         

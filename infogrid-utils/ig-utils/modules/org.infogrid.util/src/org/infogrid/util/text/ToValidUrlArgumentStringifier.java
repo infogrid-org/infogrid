@@ -8,38 +8,47 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.util.text;
 
+import java.util.Iterator;
 import org.infogrid.util.http.HTTP;
 
 /**
  * Stringifies a String by escaping all characters necessary to make the String a valid URL argument.
  * For example, it replaces ? and &.
+ *
+ * @param <T> the type of the Objects to be stringified
  */
-public class UrlArgStringifier
+public class ToValidUrlArgumentStringifier<T>
         extends
-            StringStringifier
+            AbstractDelegatingStringifier<T>
 {
     /**
      * Factory method.
      *
+     * @param delegate the underlying Stringifier that knows how to deal with the real type
      * @return the created StringStringifier
+     * @param <T> the type of the Objects to be stringified
      */
-    public static UrlArgStringifier create()
+    public static <T> ToValidUrlArgumentStringifier<T> create(
+            Stringifier<T> delegate )
     {
-        return new UrlArgStringifier();
+        return new ToValidUrlArgumentStringifier<T>( delegate );
     }
 
     /**
-     * No-op constructor. Use factory method.
+     * Private constructor. Use factory method.
+     *
+     * @param delegate the underlying Stringifier that knows how to deal with the real type
      */
-    protected UrlArgStringifier()
+    protected ToValidUrlArgumentStringifier(
+            Stringifier<T> delegate )
     {
-        // no op
+        super( delegate );
     }
 
     /**
@@ -48,11 +57,10 @@ public class UrlArgStringifier
      * @param s the String to be escaped
      * @return the escaped String
      */
-    @Override
     protected String escape(
             String s )
     {
-        String ret = HTTP.encodeToValidUrl( s );
+        String ret = HTTP.encodeToValidUrlArgument( s );
         return ret;
     }
 
@@ -62,7 +70,6 @@ public class UrlArgStringifier
      * @param s the String to be unescaped
      * @return the unescaped String
      */
-    @Override
     protected String unescape(
             String s )
     {

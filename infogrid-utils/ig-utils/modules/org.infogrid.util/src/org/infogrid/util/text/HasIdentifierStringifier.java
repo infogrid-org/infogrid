@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -26,19 +26,24 @@ public class HasIdentifierStringifier
     /**
      * Factory method.
      *
+     * @param delegate the underlying IdentifierStringifier to use
      * @return the created HasIdentifierStringifier
      */
-    public static HasIdentifierStringifier create()
+    public static HasIdentifierStringifier create(
+            IdentifierStringifier delegate )
     {
-        return new HasIdentifierStringifier();
+        return new HasIdentifierStringifier( delegate );
     }
 
     /**
-     * No-op constructor. Use factory method.
+     * Constructor. Use factory method.
+     *
+     * @param delegate the underlying IdentifierStringifier to use
      */
-    protected HasIdentifierStringifier()
+    protected HasIdentifierStringifier(
+            IdentifierStringifier delegate )
     {
-        // no op
+        theDelegate = delegate;
     }
 
     /**
@@ -54,8 +59,7 @@ public class HasIdentifierStringifier
             HasIdentifier                  arg,
             StringRepresentationParameters pars )
     {
-        String ret = escape( arg.getIdentifier().toExternalForm() );
-        ret = potentiallyShorten( ret, pars );
+        String ret = theDelegate.format( soFar, arg.getIdentifier(), pars );
         return ret;
     }
 
@@ -80,26 +84,7 @@ public class HasIdentifierStringifier
     }
 
     /**
-     * Overridable method to possibly escape a String first.
-     *
-     * @param s the String to be escaped
-     * @return the escaped String
+     * The underlying IdentifierStringifier to use.
      */
-    protected String escape(
-            String s )
-    {
-        return s;
-    }
-
-    /**
-     * Overridable method to possibly unescape a String first.
-     *
-     * @param s the String to be unescaped
-     * @return the unescaped String
-     */
-    protected String unescape(
-            String s )
-    {
-        return s;
-    }
+    protected IdentifierStringifier theDelegate;
 }
