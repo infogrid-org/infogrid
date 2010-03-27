@@ -815,11 +815,33 @@ public final class ResourceHelper
     protected String createApplicationLevelResourceName(
             String resourceName )
     {
-        StringBuilder ret = new StringBuilder();
-        ret.append( theName );
-        ret.append( '!' );
-        ret.append( resourceName );
-        return ret.toString();
+        if( resourceName.indexOf( '!' ) < 0 ) {
+            StringBuilder ret = new StringBuilder();
+            ret.append( theName );
+            ret.append( '!' );
+            ret.append( resourceName );
+            return ret.toString();
+        } else {
+            return resourceName;
+        }
+    }
+
+    /**
+     * Convert to String, for debugging only.
+     *
+     * @return String
+     */
+    @Override
+    public String toString()
+    {
+        StringBuilder buf = new StringBuilder();
+        buf.append( super.toString());
+        buf.append( "{ name: " );
+        buf.append( theName );
+        buf.append( ", delegate: " );
+        buf.append( theDelegate != null ? theDelegate.theName : "null" );
+        buf.append( " }" );
+        return buf.toString();
     }
 
     /**
