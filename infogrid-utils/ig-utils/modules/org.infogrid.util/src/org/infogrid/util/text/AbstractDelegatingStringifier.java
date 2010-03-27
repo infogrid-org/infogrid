@@ -150,8 +150,11 @@ public abstract class AbstractDelegatingStringifier<T>
      * @param s the String to be escaped
      * @return the escaped String
      */
-    protected abstract String escape(
-            String s );
+    protected String escape(
+            String s )
+    {
+        return s;
+    }
 
     /**
      * Overridable method to possibly unescape a String first.
@@ -159,8 +162,11 @@ public abstract class AbstractDelegatingStringifier<T>
      * @param s the String to be unescaped
      * @return the unescaped String
      */
-    protected abstract String unescape(
-            String s );
+    protected String unescape(
+            String s )
+    {
+        return s;
+    }
 
     /**
      * The underlying Stringifier that knows how to deal with the real type.

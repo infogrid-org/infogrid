@@ -55,6 +55,7 @@ public class HtmlifyingDelegatingStringifier<T>
      * @param s the String to be escaped
      * @return the escaped String
      */
+    @Override
     protected String escape(
             String s )
     {
@@ -68,6 +69,7 @@ public class HtmlifyingDelegatingStringifier<T>
      * @param s the String to be unescaped
      * @return the unescaped String
      */
+    @Override
     protected String unescape(
             String s )
     {
