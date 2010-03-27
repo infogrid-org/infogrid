@@ -34,16 +34,17 @@ public abstract class StringHelper
      * @param one the first String
      * @param two the second String
      * @return comparison value, according to String.compareTo
+     * @param <T> the type, such as String
      */
-    public static int compareTo(
-            String one,
-            String two )
+    public static <T> int compareTo(
+            Comparable<T> one,
+            T             two )
     {
         int ret;
         if( one == null ) {
-            ret = two == null ? 0 : -1;
+            ret = two == null ? 0 : Integer.MIN_VALUE;
         } else if( two == null ) {
-            ret = 1;
+            ret = Integer.MAX_VALUE;
         } else {
             ret = one.compareTo( two );
         }
@@ -414,7 +415,7 @@ public abstract class StringHelper
      * @param s the unescaped String
      * @return the escaped String
      */
-    public static String stringToJavascript(
+    public static String stringToJavaString(
             String s )
     {
         if( s == null ) {
@@ -423,7 +424,6 @@ public abstract class StringHelper
         StringBuilder sb = new StringBuilder( s.length() * 5 / 4 ); // fudge
 
         int len = s.length();
-
         for( int i=0; i<len; ++i ) {
             char c = s.charAt( i );
 
@@ -436,8 +436,23 @@ public abstract class StringHelper
                     sb.append( "\\'" );
                     break;
 
+                case '\n':
+                    sb.append( "\\n" );
+                    break;
+
                 default:
-                    sb.append( c );
+                    if( Character.isISOControl( c )) {
+                        String v = String.valueOf( (int) c );
+
+                        sb.append( "\\u" );
+                        for( int j=v.length() ; j<4 ; ++j ) {
+                            sb.append( '0' );
+                        }
+                        sb.append( v );
+                        sb.append( c );
+                    } else {
+                        sb.append( c );
+                    }
                     break;
             }
         }

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -41,7 +41,7 @@ public class ArrayStringifierTest1
 
         log.info( "ArrayStringifier" );
 
-        ArrayStringifier<Long> str = ArrayStringifier.create( LongStringifier.create(), "aaa", "bbb", "ccc" );
+        ArrayStringifier<Long> str = ArrayStringifier.create( "aaa", "bbb", "ccc", LongStringifier.create() );
         Long [] data = { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 0L };
         
         String result = str.format( null, ArrayFacade.create( data ), null );

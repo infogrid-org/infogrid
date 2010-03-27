@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -56,22 +56,37 @@ public interface StringRepresentationDirectory
 
     /**
      * Name of the StringRepresentation, contained in this StringRepresentationDirectory, that contains
-     * the formatting for URLs.
+     * the default formatting for URLs.
      */
     public static final String TEXT_URL_NAME = "Url";
 
     /**
-     * Name of the StringRepresentation, which may be contained in this StringRepresentationDirectory,
-     * that contains the default Java formatting.
+     * Name of the StringRepresentation, contained in this StringRepresentationDirectory, that contains
+     * the default formatting for conveying values in an HTTP POST.
+     */
+    public static final String TEXT_HTTP_POST_NAME = "HttpPost";
+
+    /**
+     * Name of the StringRepresentation, contained in this StringRepresentationDirectory, that contains
+     * the default Java formatting.
      */
     public static final String TEXT_JAVA_NAME = "Java";
 
     /**
-     * Name of the StringRepresentation, which may be contained in this StringRepresentationDirectory,
-     * that contains the default JavaDoc formatting.
+     * Name of the StringRepresentation, contained in this StringRepresentationDirectory, that contains
+     * the default JavaDoc formatting.
      *
      * Use lowercase d in Javadoc to avoid name collisions with entries in resource files that
      * belong to the "Java" formatting and start with "Doc".
      */
     public static final String TEXT_JAVADOC_NAME = "Javadoc";
+
+    /**
+     * Name of the StringRepresentation, contained in this StringRepresentationDirectory, that contains
+     * the default JavaScript formatting.
+     *
+     * Use lowercase s in Javascript to avoid name collisions with entries in resource files that
+     * belong to the "Java" formatting and start with "Script".
+     */
+    public static final String TEXT_JAVASCRIPT_NAME = "Javascript";
 }

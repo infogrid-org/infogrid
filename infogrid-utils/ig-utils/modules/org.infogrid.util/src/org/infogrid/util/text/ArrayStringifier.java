@@ -39,7 +39,7 @@ public class ArrayStringifier<T>
     public static <T> ArrayStringifier<T> create(
             Stringifier<T> delegate )
     {
-        return new ArrayStringifier<T>( delegate, null, null, null, null );
+        return new ArrayStringifier<T>( null, null, null, null, delegate );
     }
 
     /**
@@ -53,10 +53,10 @@ public class ArrayStringifier<T>
      * @param <T> the type of the Objects to be stringified
      */
     public static <T> ArrayStringifier<T> create(
-            Stringifier<T> delegate,
-            String         middle )
+            String         middle,
+            Stringifier<T> delegate )
     {
-        return new ArrayStringifier<T>( delegate, null, middle, null, null );
+        return new ArrayStringifier<T>( null, middle, null, null, delegate );
     }
 
     /**
@@ -72,12 +72,12 @@ public class ArrayStringifier<T>
      * @param <T> the type of the Objects to be stringified
      */
     public static <T> ArrayStringifier<T> create(
-            Stringifier<T> delegate,
             String         start,
             String         middle,
-            String         end )
+            String         end,
+            Stringifier<T> delegate )
     {
-        return new ArrayStringifier<T>( delegate, start, middle, end, null );
+        return new ArrayStringifier<T>( start, middle, end, null, delegate );
     }
     
     /**
@@ -95,13 +95,13 @@ public class ArrayStringifier<T>
      * @param <T> the type of the Objects to be stringified
      */
     public static <T> ArrayStringifier<T> create(
-            Stringifier<T> delegate,
             String         start,
             String         middle,
             String         end,
-            String         empty )
+            String         empty,
+            Stringifier<T> delegate )
     {
-        return new ArrayStringifier<T>( delegate, start, middle, end, empty );
+        return new ArrayStringifier<T>( start, middle, end, empty, delegate );
     }
     
     /**
@@ -114,17 +114,17 @@ public class ArrayStringifier<T>
      * @param empty what to emit instead if the array is empty
      */
     protected ArrayStringifier(
-            Stringifier<T> delegate,
             String         start,
             String         middle,
             String         end,
-            String         empty )
+            String         empty,
+            Stringifier<T> delegate )
     {
-        theDelegate    = delegate;
         theStart       = start;
         theMiddle      = middle;
         theEnd         = end;
         theEmpty       = empty;
+        theDelegate    = delegate;
     }
     
     /**
