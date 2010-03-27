@@ -114,7 +114,14 @@ public abstract class Log
     public static Log getLogInstance(
             Class clazz )
     {
-        return theFactory.create( clazz );
+        try {
+            return theFactory.create( clazz );
+
+        } catch( NullPointerException ex ) {
+            // This can happen when Tomcat stops a web app and some classes get re-loaded after having been freed.
+            // In the debugger, that will hit NullPointerException breakpoints and we don't like that.
+            return null;
+        }
     }
 
     /**
