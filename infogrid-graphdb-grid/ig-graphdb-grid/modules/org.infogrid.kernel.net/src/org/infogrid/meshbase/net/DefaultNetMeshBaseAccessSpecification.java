@@ -193,8 +193,12 @@ public class DefaultNetMeshBaseAccessSpecification
         throws
             StringifierException
     {
-        String contextPath  = pars != null ? (String) pars.get( StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY ) : null;
+        String contextPath = null;
         String externalForm = toExternalForm();
+
+        if( pars != null ) {
+            contextPath = (String) pars.get( StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
+        }
 
         String ret = rep.formatEntry(
                 getClass(), // dispatch to the right subtype

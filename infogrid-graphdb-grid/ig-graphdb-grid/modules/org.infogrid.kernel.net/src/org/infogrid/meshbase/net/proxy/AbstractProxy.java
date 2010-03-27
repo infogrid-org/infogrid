@@ -380,7 +380,7 @@ public abstract class AbstractProxy
 
         if( pars != null ) {
             isDefaultMeshBase = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
-            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
+            contextPath       = (String) pars.get(  StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
         }
 
         String key;
