@@ -174,13 +174,30 @@ public class IdentifierStringifier
             Boolean colloquial = (Boolean) pars.get( StringRepresentationParameters.COLLOQUIAL );
             if( colloquial != null && colloquial.booleanValue() ) {
 
-                final String PREFIX = "http://";
-                if( ret.startsWith( PREFIX )) {
-                    ret = ret.substring( PREFIX.length() );
-                }
-                if( ret.charAt( ret.length()-1 ) == '/' ) {
-                    ret = ret.substring( 0, ret.length()-1 );
-                }
+                ret = toColloquialIdentifier( ret );
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Factored out colloquial processing for easier reusability.
+     *
+     * @param identifier
+     * @return colloquial form of identifier
+     */
+    public static String toColloquialIdentifier(
+            String identifier )
+    {
+        String ret = identifier;
+
+        if( ret != null ) {
+            final String PREFIX = "http://";
+            if( ret.startsWith( PREFIX )) {
+                ret = ret.substring( PREFIX.length() );
+            }
+            if( ret.charAt( ret.length()-1 ) == '/' ) {
+                ret = ret.substring( 0, ret.length()-1 );
             }
         }
         return ret;
