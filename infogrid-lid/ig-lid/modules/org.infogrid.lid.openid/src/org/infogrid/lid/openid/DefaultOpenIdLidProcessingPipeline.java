@@ -34,7 +34,7 @@ public class DefaultOpenIdLidProcessingPipeline
         extends
             DefaultLidProcessingPipeline
         implements
-             LidProcessingPipeline
+            LidProcessingPipeline
 {
     private static final Log log = Log.getLogInstance( DefaultOpenIdLidProcessingPipeline.class  ); // our own, private logger
 

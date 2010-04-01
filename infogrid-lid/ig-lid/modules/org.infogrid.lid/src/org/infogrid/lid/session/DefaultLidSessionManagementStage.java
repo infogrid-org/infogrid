@@ -14,14 +14,10 @@
 
 package org.infogrid.lid.session;
 
-import org.infogrid.lid.session.LidSession;
-import org.infogrid.lid.session.LidSessionManagementStage;
-import org.infogrid.lid.session.LidSessionManagementInstructions;
-import org.infogrid.lid.session.LidSessionManager;
-import org.infogrid.lid.session.SimpleLidSessionManagementInstructions;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.lid.AbstractLidClientAuthenticationPipelineStage;
 import org.infogrid.lid.LidAbortProcessingPipelineException;
 import org.infogrid.lid.LidClientAuthenticationStatus;
 import org.infogrid.lid.LidCookies;
