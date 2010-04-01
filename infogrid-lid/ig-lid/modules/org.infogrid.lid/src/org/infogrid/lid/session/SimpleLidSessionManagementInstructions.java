@@ -211,6 +211,9 @@ public class SimpleLidSessionManagementInstructions
         if( theCookiesToRemove == null ) {
             theCookiesToRemove = new ArrayList<OutgoingSimpleSaneCookie>();
         }
+        if( domain != null && domain.isEmpty() ) {
+            domain = null; // don't want to send an empty domain, it confuses IE
+        }
         theCookiesToRemove.add(
                 OutgoingSimpleSaneCookie.create( name, "", domain, path, LONG_TIME_AGO ));
     }
@@ -248,6 +251,10 @@ public class SimpleLidSessionManagementInstructions
         if( theCookiesToSet == null ) {
             theCookiesToSet = new ArrayList<OutgoingSimpleSaneCookie>();
         }
+        if( domain != null && domain.isEmpty() ) {
+            domain = null; // don't want to send an empty domain, it confuses IE
+        }
+
         Date expires;
         if( expiresInSeconds < 0 ) {
             expires = null;
@@ -284,6 +291,9 @@ public class SimpleLidSessionManagementInstructions
             HttpServletResponse response,
             LidSessionManager   sessionManager )
     {
+        if( log.isDebugEnabled() ) {
+            log.debug( "SimpleLidSessionManagementInstructions.applyAsRecommended: ", this );
+        }
         if( theSessionsToCancel != null ) {
             for( LidSession current : theSessionsToCancel ) {
                 current.cancel();
