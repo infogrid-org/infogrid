@@ -14,6 +14,7 @@
 
 package org.infogrid.util;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import org.infogrid.module.Module;
@@ -114,7 +115,12 @@ public abstract class Init
             return;
         }
 
-        ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle( bundleName ));
+        // Find out which Module specified and use their ClassLoader
+        Module      specified = whereParametersSpecifiedMap.get( RESOURCE_HELPER_APPLICATION_BUNDLE_PARAMETER_NAME );
+        ClassLoader loader    = specified.getClassLoader();
+
+        ResourceHelper.setApplicationResourceBundle(
+                ResourceBundle.getBundle( bundleName, Locale.getDefault(), loader ));
     }
 
     /**
