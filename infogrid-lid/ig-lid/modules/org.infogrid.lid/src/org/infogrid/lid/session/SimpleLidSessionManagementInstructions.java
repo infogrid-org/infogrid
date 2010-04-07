@@ -50,6 +50,7 @@ public class SimpleLidSessionManagementInstructions
      * @param siteIdentifierForNewSession Identifier of the site for which a new session shall be created
      * @param tokenForNewSession token for the new session
      * @param durationForNewSession duration for the new session, in milliseconds
+     * @param sessionManager the LidSessionManager to use
      * @return the created SimpleLidSessionManagementInstructions
      */
     public static SimpleLidSessionManagementInstructions create(
@@ -59,7 +60,8 @@ public class SimpleLidSessionManagementInstructions
             HasIdentifier                 clientForNewSession,
             Identifier                    siteIdentifierForNewSession,
             String                        tokenForNewSession,
-            long                          durationForNewSession )
+            long                          durationForNewSession,
+            LidSessionManager             sessionManager )
     {
         return new SimpleLidSessionManagementInstructions(
                 clientAuthenticationStatus,
@@ -68,7 +70,8 @@ public class SimpleLidSessionManagementInstructions
                 clientForNewSession,
                 siteIdentifierForNewSession,
                 tokenForNewSession,
-                durationForNewSession );
+                durationForNewSession,
+                sessionManager );
     }
 
     /**
@@ -77,12 +80,14 @@ public class SimpleLidSessionManagementInstructions
      * @param clientAuthenticationStatus the current client's authentication status
      * @param sessionsToCancel all sessions to cancel
      * @param sessionToRenew all sessions to renew
+     * @param sessionManager the LidSessionManager to use
      * @return the created SimpleLidSessionManagementInstructions
      */
     public static SimpleLidSessionManagementInstructions create(
             LidClientAuthenticationStatus clientAuthenticationStatus,
             LidSession []                 sessionsToCancel,
-            LidSession []                 sessionToRenew )
+            LidSession []                 sessionToRenew,
+            LidSessionManager             sessionManager )
     {
         return new SimpleLidSessionManagementInstructions(
                 clientAuthenticationStatus,
@@ -91,7 +96,8 @@ public class SimpleLidSessionManagementInstructions
                 null,
                 null,
                 null,
-                -1L );
+                -1L,
+                sessionManager );
     }
 
     /**
@@ -104,6 +110,7 @@ public class SimpleLidSessionManagementInstructions
      * @param siteIdentifierForNewSession Identifier of the site for which a new session shall be created
      * @param tokenForNewSession token for the new session
      * @param durationForNewSession duration for the new session, in milliseconds
+     * @param sessionManager the LidSessionManager to use
      */
     protected SimpleLidSessionManagementInstructions(
             LidClientAuthenticationStatus clientAuthenticationStatus,
@@ -112,7 +119,8 @@ public class SimpleLidSessionManagementInstructions
             HasIdentifier                 clientForNewSession,
             Identifier                    siteIdentifierForNewSession,
             String                        tokenForNewSession,
-            long                          durationForNewSession )
+            long                          durationForNewSession,
+            LidSessionManager             sessionManager )
     {
         theClientAuthenticationStatus = clientAuthenticationStatus;
 
@@ -124,6 +132,28 @@ public class SimpleLidSessionManagementInstructions
 
         theTokenForNewSession    = tokenForNewSession;
         theDurationForNewSession = durationForNewSession;
+
+        theSessionManager = sessionManager;
+    }
+
+    /**
+     * Obtain the content to be returned.
+     *
+     * @return the content
+     */
+    public String getContent()
+    {
+        return null;
+    }
+
+    /**
+     * Obtain the content type to be returned.
+     *
+     * @return the content type
+     */
+    public String getContentType()
+    {
+        return null;
     }
 
     /**
@@ -284,12 +314,11 @@ public class SimpleLidSessionManagementInstructions
      *
      * @param request the incoming request
      * @param response the outgoing response
-     * @param sessionManager the LidSessionManager to use
+     * @return true if no further action needs to be taken by the pipeline
      */
-    public void applyAsRecommended(
+    public boolean applyAsRecommended(
             SaneRequest         request,
-            HttpServletResponse response,
-            LidSessionManager   sessionManager )
+            HttpServletResponse response )
     {
         if( log.isDebugEnabled() ) {
             log.debug( "SimpleLidSessionManagementInstructions.applyAsRecommended: ", this );
@@ -301,17 +330,17 @@ public class SimpleLidSessionManagementInstructions
         }
         if( theSessionsToRenew != null ) {
             for( LidSession current : theSessionsToRenew ) {
-                current.renew( sessionManager.getDefaultSessionDuration() );
+                current.renew( theSessionManager.getDefaultSessionDuration() );
             }
         }
 
         LidSession newSession; // out here for debugging
         if( theClientForNewSession != null ) {
             try {
-                newSession = sessionManager.obtainFor(
+                newSession = theSessionManager.obtainFor(
                         theTokenForNewSession,
                         LidSessionManagerArguments.create(
-                                sessionManager.getDefaultSessionDuration(),
+                                theSessionManager.getDefaultSessionDuration(),
                                 theClientForNewSession,
                                 theSiteIdentifierForNewSession,
                                 request.getClientIp() ));
@@ -355,6 +384,7 @@ public class SimpleLidSessionManagementInstructions
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -437,6 +467,11 @@ public class SimpleLidSessionManagementInstructions
     }
 
     /**
+     * The LidSessionManager to use.
+     */
+    protected LidSessionManager theSessionManager;
+
+    /**
      * The current client's authentication status.
      */
     protected LidClientAuthenticationStatus theClientAuthenticationStatus;
@@ -444,7 +479,6 @@ public class SimpleLidSessionManagementInstructions
     /**
      * All sessions to cancel.
      */
-
     protected LidSession [] theSessionsToCancel;
 
     /**

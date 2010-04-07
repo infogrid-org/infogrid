@@ -14,82 +14,84 @@
 
 package org.infogrid.lid.yadis;
 
-import org.infogrid.lid.LidAbortProcessingPipelineException;
-import org.infogrid.lid.LidProcessingPipelineStage;
+import org.infogrid.lid.LidPipelineInstructions;
+import org.infogrid.lid.LidPipelineStageInstructions;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.context.AbstractObjectInContext;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.http.SaneRequest;
 
 /**
- * Factors out functionality common to YadisPipelineProcessingStage implementations.
+ * Factors out functionality common to YadisPipelineStage implementations.
  */
-public abstract class AbstractYadisPipelineProcessingStage
+public abstract class AbstractYadisPipelineStage
         extends
             AbstractObjectInContext
         implements
-            YadisPipelineProcessingStage
+            YadisPipelineStage
 {
     /**
      * Constructor for subclasses only, use factory method.
      *
      * @param c the context containing the available services.
      */
-    protected AbstractYadisPipelineProcessingStage(
+    protected AbstractYadisPipelineStage(
             Context c )
     {
         super( c );
     }
 
     /**
-     * Process any relevant requests.
+     * Process this stage.
      *
      * @param lidRequest the incoming request
-     * @param resource the resource to which the request refers, if any
-     * @throws LidAbortProcessingPipelineException thrown if processing is complete
+     * @param requestedResource the requested resource, if any
+     * @param instructionsSoFar the instructions assembled by the pipeline so far
+     * @return the instructions for constructing a response to the client, if any
      */
-    public void processRequest(
-            SaneRequest        lidRequest,
-            HasIdentifier      resource )
-        throws
-            LidAbortProcessingPipelineException
+    public LidPipelineStageInstructions processStage(
+            SaneRequest                       lidRequest,
+            HasIdentifier                     requestedResource,
+            LidPipelineInstructions instructionsSoFar )
     {
-        String meta = lidRequest.getUrlArgument( LidProcessingPipelineStage.LID_META_PARAMETER_NAME );
+        String meta = lidRequest.getUrlArgument( LID_META_PARAMETER_NAME );
         if( meta == null ) {
             meta = lidRequest.getUrlArgument( "meta" );
         }
         String acceptHeader = lidRequest.getAcceptHeader();
 
-        if(    LidProcessingPipelineStage.LID_META_CAPABILITIES_PARAMETER_VALUE.equals( meta )
+        LidPipelineStageInstructions ret;
+        if(    LID_META_CAPABILITIES_PARAMETER_VALUE.equals( meta )
             || ( acceptHeader != null && acceptHeader.indexOf( XRDS_MIME_TYPE ) >= 0 ))
         {
-            processYadisRequest( lidRequest, resource );
+            ret = processYadisRequest( lidRequest, requestedResource );
+
         } else {
-            addYadisHeader( lidRequest, resource );
+            ret = addYadisHeader( lidRequest, requestedResource );
         }
+        return ret;
     }
 
     /**
      * It was discovered that this is a Yadis request. Process.
      *
      * @param lidRequest the incoming request
-     * @param resource the resource to which the request refers, if any
-     * @throws LidAbortProcessingPipelineException thrown if processing is complete
+     * @param requestedResource the resource to which the request refers, if any
+     * @return the instructions for constructing a response to the client, if any
      */
-    protected abstract void processYadisRequest(
+    protected abstract LidPipelineStageInstructions processYadisRequest(
             SaneRequest        lidRequest,
-            HasIdentifier      resource )
-        throws
-            LidAbortProcessingPipelineException;
+            HasIdentifier      requestedResource );
 
     /**
      * Add a suitable Yadis HTTP header. This method does this by putting an attribute
      * into the incoming request, which needs to be processed by the calling logic.
      *
      * @param lidRequest the incoming request
-     * @param resource the resource to which the request refers, if any
+     * @param requestedResource the resource to which the request refers, if any
+     * @return the instructions for constructing a response to the client, if any
      */
-    protected abstract void addYadisHeader(
+    protected abstract LidPipelineStageInstructions addYadisHeader(
             SaneRequest        lidRequest,
-            HasIdentifier      resource );
+            HasIdentifier      requestedResource );
 }

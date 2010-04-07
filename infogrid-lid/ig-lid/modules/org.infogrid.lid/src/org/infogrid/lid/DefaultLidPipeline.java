@@ -14,11 +14,12 @@
 
 package org.infogrid.lid;
 
-import org.infogrid.lid.account.LidAccount;
+import java.util.Iterator;
 import org.infogrid.lid.account.LidAccountManager;
-import org.infogrid.lid.session.LidSessionManagementStage;
 import org.infogrid.lid.session.LidSessionManagementInstructions;
-import org.infogrid.lid.yadis.YadisPipelineProcessingStage;
+import org.infogrid.lid.session.LidSessionManagementPipelineStage;
+import org.infogrid.lid.yadis.YadisPipelineStage;
+import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.context.AbstractObjectInContext;
@@ -29,24 +30,24 @@ import org.infogrid.util.logging.Log;
 /**
  * Processes LID requests in the default manner.
  */
-public class DefaultLidProcessingPipeline
+public class DefaultLidPipeline
         extends
             AbstractObjectInContext
         implements
-             LidProcessingPipeline
+             LidPipeline
 {
-    private static final Log log = Log.getLogInstance( LidProcessingPipeline.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance( LidPipeline.class ); // our own, private logger
 
     /**
      * Factory method.
      *
      * @param c the Context in which this object operates
-     * @return the created LidProcessingPipeline
+     * @return the created LidPipeline
      */
-    public static DefaultLidProcessingPipeline create(
+    public static DefaultLidPipeline create(
             Context c )
     {
-        DefaultLidProcessingPipeline ret = new DefaultLidProcessingPipeline( c );
+        DefaultLidPipeline ret = new DefaultLidPipeline( c );
         return ret;
     }
 
@@ -55,39 +56,39 @@ public class DefaultLidProcessingPipeline
      * 
      * @param c the Context in which this object operates
      */
-    protected DefaultLidProcessingPipeline(
+    protected DefaultLidPipeline(
             Context c )
     {
         super( c );
 
         theResourceFinder         = c.findContextObject( LidResourceFinder.class );
         theAccountManager         = c.findContextObject( LidAccountManager.class );
-        theYadisStage             = c.findContextObject( YadisPipelineProcessingStage.class );
+        theYadisStage             = c.findContextObject( YadisPipelineStage.class );
         theAuthenticationStage    = c.findContextObject( LidClientAuthenticationPipelineStage.class );
-        theSessionManagementStage = c.findContextObject( LidSessionManagementStage.class );
+        theSessionManagementStage = c.findContextObject( LidSessionManagementPipelineStage.class );
+        
+        theSsoStages = new LidSsoPipelineStage[0]; // inefficient but will do
+        Iterator<LidSsoPipelineStage> iter = c.contextObjectIterator( LidSsoPipelineStage.class );
+        while( iter.hasNext() ) {
+            LidSsoPipelineStage current = iter.next();
+            theSsoStages = ArrayHelper.append( theSsoStages, current, LidSsoPipelineStage.class );
+        }
     }
     
     /**
      * Process the pipeline.
-     * 
+     *
      * @param lidRequest the incoming request
      * @param siteIdentifier identifies this site
      * @param realm the realm of the authentication
-     * @throws LidAbortProcessingPipelineException thrown if the response has been found,
-     *         and no further processing is necessary
+     * @return the compound instructions
      */
-    public void processPipeline(
+    public LidPipelineInstructions processPipeline(
             SaneRequest        lidRequest,
             Identifier         siteIdentifier,
             String             realm )
-        throws
-            LidAbortProcessingPipelineException
     {
-        HasIdentifier                    requestedResource   = null;
-        LidClientAuthenticationStatus    clientAuthStatus    = null;
-        LidAccount                       clientPersona       = null;
-        LidSessionManagementInstructions sessionMgmtInstructions = null;
-
+        HasIdentifier requestedResource = null;
         if( theResourceFinder != null ) {
             try {
                 requestedResource = theResourceFinder.findFromRequest( lidRequest );
@@ -98,27 +99,42 @@ public class DefaultLidProcessingPipeline
                 }
             }
         }
-        lidRequest.setAttribute( REQUESTED_RESOURCE_ATTRIBUTE_NAME, requestedResource );
-        
-        if( theYadisStage != null ) {
-            // this also needs to be invoked if requestedResource is null
-            theYadisStage.processRequest( lidRequest, requestedResource );
-        }
-        
+
+        LidClientAuthenticationStatus clientAuthStatus = null;
         if( theAuthenticationStage != null ) {
             clientAuthStatus = theAuthenticationStage.determineAuthenticationStatus( lidRequest, siteIdentifier, realm );
         }
-        lidRequest.setAttribute( CLIENT_AUTHENTICATION_STATUS_ATTRIBUTE_NAME, clientAuthStatus );
-        
-        if( clientAuthStatus != null ) {
-            clientPersona = clientAuthStatus.getClientAccount();
-        }
-        lidRequest.setAttribute( CLIENT_PERSONA_ATTRIBUTE_NAME, clientPersona );
 
-        if( theSessionManagementStage != null ) {
-            sessionMgmtInstructions = theSessionManagementStage.processSession( lidRequest, realm, clientAuthStatus );
+        LidPipelineInstructions instructionsSoFar = LidPipelineInstructions.create(
+                siteIdentifier,
+                realm,
+                clientAuthStatus,
+                requestedResource );
+        LidPipelineStageInstructions instructionsToAdd;
+
+        if( theYadisStage != null ) {
+            // this also needs to be invoked if requestedResource is null
+            instructionsToAdd = theYadisStage.processStage( lidRequest, requestedResource, instructionsSoFar );
+            if( instructionsToAdd != null ) {
+                instructionsSoFar.setYadisInstructions( instructionsToAdd );
+            }
         }
-        lidRequest.setAttribute( SESSION_MANAGEMENT_INSTRUCTIONS_ATTRIBUTE_NAME, sessionMgmtInstructions );
+
+        if( theSsoStages != null ) {
+            for( int i=0 ; i<theSsoStages.length ; ++i ) {
+                instructionsToAdd = theSsoStages[i].processStage( lidRequest, requestedResource, instructionsSoFar );
+                if( instructionsToAdd != null ) {
+                    instructionsSoFar.addSsoInstructions( (LidSsoPipelineStageInstructions) instructionsToAdd );
+                }
+            }
+        }
+        if( theSessionManagementStage != null ) {
+            instructionsToAdd = theSessionManagementStage.processStage( lidRequest, requestedResource, instructionsSoFar );
+            if( instructionsToAdd != null ) {
+                instructionsSoFar.setSessionManagementInstructions( (LidSessionManagementInstructions) instructionsToAdd );
+            }
+        }
+        return instructionsSoFar;
     }
 
     /**
@@ -134,7 +150,7 @@ public class DefaultLidProcessingPipeline
     /**
      * The service that knows how to respond to Yadis requests.
      */
-    protected YadisPipelineProcessingStage theYadisStage;
+    protected YadisPipelineStage theYadisStage;
 
     /**
      * The service that knows how to determine the authentication status of the client.
@@ -144,5 +160,10 @@ public class DefaultLidProcessingPipeline
     /**
      * The service that knows how to manage sessions.
      */
-    protected LidSessionManagementStage theSessionManagementStage;
+    protected LidSessionManagementPipelineStage theSessionManagementStage;
+
+    /**
+     * The services that know how to handle IdP-side SSO.
+     */
+    protected LidSsoPipelineStage [] theSsoStages;
 }

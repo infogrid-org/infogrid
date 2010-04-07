@@ -14,28 +14,35 @@
 
 package org.infogrid.lid.openid;
 
-import org.infogrid.lid.LidAbortProcessingPipelineException;
-import org.infogrid.lid.LidProcessingPipelineStage;
+import org.infogrid.util.AbstractLocalizedRuntimeException;
 
 /**
  * This Exception is thrown when an error occurred while attempting to SSO.
  */
 public class OpenIdSsoException
     extends
-        LidAbortProcessingPipelineException
+        AbstractLocalizedRuntimeException
 {
     private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
      * Constructor.
      *
-     * @param source the LidProcessingPipelineStage that threw this exception
      * @param message the message, if any
      */
     protected OpenIdSsoException(
-            LidProcessingPipelineStage source,
-            String                     message )
+            String message )
     {
-        super( source, null, message, null );
+        super( message );
+    }
+
+    /**
+     * Obtain resource parameters for the internationalization.
+     *
+     * @return the resource parameters
+     */
+    public Object [] getLocalizationParameters()
+    {
+        return null;
     }
 }

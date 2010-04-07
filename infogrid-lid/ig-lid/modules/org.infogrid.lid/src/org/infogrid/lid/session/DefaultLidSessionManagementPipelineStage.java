@@ -17,10 +17,10 @@ package org.infogrid.lid.session;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.infogrid.lid.AbstractLidClientAuthenticationPipelineStage;
-import org.infogrid.lid.LidAbortProcessingPipelineException;
 import org.infogrid.lid.LidClientAuthenticationStatus;
 import org.infogrid.lid.LidCookies;
+import org.infogrid.lid.LidPipelineInstructions;
+import org.infogrid.lid.LidPipelineStageInstructions;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
@@ -29,22 +29,22 @@ import org.infogrid.util.logging.Log;
 /**
  * Knows how to manage a Lidsession.
  */
-public class DefaultLidSessionManagementStage
+public class DefaultLidSessionManagementPipelineStage
         implements
-             LidSessionManagementStage
+             LidSessionManagementPipelineStage
 {
-    private static final Log log = Log.getLogInstance( DefaultLidSessionManagementStage.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance( DefaultLidSessionManagementPipelineStage.class ); // our own, private logger
 
     /**
      * Factory method.
      *
      * @param sessionMgr the LidSessionManager to use
-     * @return the created DefaultLidSessionManagementStage
+     * @return the created DefaultLidSessionManagementPipelineStage
      */
-    public static DefaultLidSessionManagementStage create(
+    public static DefaultLidSessionManagementPipelineStage create(
             LidSessionManager sessionMgr )
     {
-        return new DefaultLidSessionManagementStage( sessionMgr );
+        return new DefaultLidSessionManagementPipelineStage( sessionMgr );
     }
 
     /**
@@ -52,30 +52,28 @@ public class DefaultLidSessionManagementStage
      *
      * @param sessionMgr the LidSessionManager to use
      */
-    protected DefaultLidSessionManagementStage(
+    protected DefaultLidSessionManagementPipelineStage(
             LidSessionManager sessionMgr )
     {
         theSessionManager = sessionMgr;
     }
 
     /**
-     * Determine what operations should be performed to manage the client's session.
-     * This acts as a factory method for LidSessionManagementInstructions.
+     * Process this stage.
      *
      * @param lidRequest the incoming request
-     * @param realm the realm of the session
-     * @param clientAuthStatus authentication status of the client
-     * @return LidSessionManagementInstructions the instructions, if any
-     * @throws LidAbortProcessingPipelineException thrown if the response has been found,
-     *         and no further processing is necessary
+     * @param requestedResource the requested resource, if any
+     * @param instructionsSoFar the instructions assembled by the pipeline so far
+     * @return the instructions for constructing a response to the client, if any
      */
-    public LidSessionManagementInstructions processSession(
-            SaneRequest                   lidRequest,
-            String                        realm,
-            LidClientAuthenticationStatus clientAuthStatus )
-        throws
-            LidAbortProcessingPipelineException
+    public LidPipelineStageInstructions processStage(
+            SaneRequest                       lidRequest,
+            HasIdentifier                     requestedResource,
+            LidPipelineInstructions instructionsSoFar )
     {
+        LidClientAuthenticationStatus clientAuthStatus = instructionsSoFar.getClientAuthenticationStatus();
+        String                        realm            = instructionsSoFar.getRealm();
+
         Boolean deleteLidCookie; // using Boolean instead of boolean to detect if we don't catch a case
         Boolean deleteSessionCookie;
         Boolean createNewSession;
@@ -210,14 +208,16 @@ public class DefaultLidSessionManagementStage
                     personaToSet,
                     clientAuthStatus.getSiteIdentifier(),
                     sessionCookieStringToSet,
-                    theSessionManager.getDefaultSessionDuration() );
+                    theSessionManager.getDefaultSessionDuration(),
+                    theSessionManager );
         } else {
             sessionCookieStringToSet = null;
             
             ret = SimpleLidSessionManagementInstructions.create(
                     clientAuthStatus,
                     ArrayHelper.copyIntoNewArray( sessionsToCancel, LidSession.class ),
-                    ArrayHelper.copyIntoNewArray( sessionsToRenew, LidSession.class ));
+                    ArrayHelper.copyIntoNewArray( sessionsToRenew, LidSession.class ),
+                    theSessionManager );
         }
 
         String cookieDomain = "";

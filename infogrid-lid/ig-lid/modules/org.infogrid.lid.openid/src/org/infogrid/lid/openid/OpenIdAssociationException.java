@@ -8,13 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.openid;
 
-import org.infogrid.util.AbstractLocalizedException;
+import org.infogrid.util.AbstractLocalizedRuntimeException;
 
 /**
  * This Exception is thrown when an error occurred while attempting to set up or
@@ -22,7 +22,7 @@ import org.infogrid.util.AbstractLocalizedException;
  */
 public abstract class OpenIdAssociationException
     extends
-        AbstractLocalizedException
+        AbstractLocalizedRuntimeException
 {
     /**
      * Constructor.
@@ -233,5 +233,74 @@ public abstract class OpenIdAssociationException
         {
             return null;
         }
+    }
+
+    /**
+     * This Exception is thrown if an error message was specified in the response.
+     */
+    public static class ModeError
+        extends
+            OpenIdAssociationException
+    {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
+        /**
+         * Constructor.
+         *
+         * @param errorCode the error code conveyed by the protocol
+         * @param errorMessage the error message conveyed by the protocol
+         */
+        public ModeError(
+                String errorCode,
+                String errorMessage )
+        {
+            super( null );
+            
+            theErrorCode    = errorCode;
+            theErrorMessage = errorMessage;
+        }
+
+        /**
+         * Obtain the error code conveyed by the protocol.
+         *
+         * @return the error code
+         */
+        public String getErrorCode()
+        {
+            return theErrorCode;
+        }
+
+        /**
+         * Obtain the error message conveyed by the protocol.
+         *
+         * @return the error message
+         */
+        public String getErrorMessage()
+        {
+            return theErrorMessage;
+        }
+
+        /**
+         * Obtain resource parameters for the internationalization.
+         *
+         * @return the resource parameters
+         */
+        public Object [] getLocalizationParameters()
+        {
+            return new Object[] {
+                theErrorCode,
+                theErrorMessage
+            };
+        }
+
+        /**
+         * The error code conveyed by the protocol.
+         */
+        protected String theErrorCode;
+
+        /**
+         * The error message conveyed by the protocol.
+         */
+        protected String theErrorMessage;
     }
 }

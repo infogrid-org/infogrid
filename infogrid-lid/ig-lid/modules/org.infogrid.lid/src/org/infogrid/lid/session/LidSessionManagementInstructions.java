@@ -14,18 +14,17 @@
 
 package org.infogrid.lid.session;
 
-import org.infogrid.lid.session.LidSessionManager;
-import javax.servlet.http.HttpServletResponse;
 import org.infogrid.lid.LidClientAuthenticationStatus;
+import org.infogrid.lid.LidPipelineStageInstructions;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
-import org.infogrid.util.http.OutgoingSaneCookie;
-import org.infogrid.util.http.SaneRequest;
 
 /**
  * Instructions what to do to manage the client's session.
  */
 public interface LidSessionManagementInstructions
+        extends
+            LidPipelineStageInstructions
 {
     /**
      * Obtain the current client's authentication status.
@@ -75,30 +74,4 @@ public interface LidSessionManagementInstructions
      * @return the duration, or -1L
      */
     public long getDurationOfNewSession();
-
-    /**
-     * Obtain the cookies that shall be removed.
-     *
-     * @return the cookies, if any
-     */
-    public OutgoingSaneCookie [] getCookiesToRemove();
-
-    /**
-     * Obtain the cookies that shall be set.
-     *
-     * @return the cookies, if any
-     */
-    public OutgoingSaneCookie [] getCookiesToSet();
-
-    /**
-     * Apply all instructions as recommended.
-     *
-     * @param request the incoming request
-     * @param response the outgoing response
-     * @param sessionManager the LidSessionManager to use
-     */
-    public void applyAsRecommended(
-            SaneRequest         request,
-            HttpServletResponse response,
-            LidSessionManager   sessionManager );
 }

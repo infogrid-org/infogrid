@@ -15,15 +15,19 @@
 package org.infogrid.lid.openid;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.util.Map;
-import org.infogrid.lid.LidAbortProcessingPipelineException;
-import org.infogrid.lid.LidAbortProcessingPipelineWithContentException;
-import org.infogrid.lid.LidAbortProcessingPipelineWithRedirectException;
+import javax.servlet.http.HttpServletResponse;
+import org.infogrid.crypto.diffiehellman.DiffieHellmanEndpoint;
 import org.infogrid.lid.LidClientAuthenticationStatus;
+import org.infogrid.lid.LidPipelineInstructions;
+import org.infogrid.lid.LidSsoPipelineStage;
+import org.infogrid.lid.SimpleLidPipelineStageInstructions;
+import org.infogrid.lid.SimpleLidSsoPipelineStageInstructions;
 import org.infogrid.lid.openid.auth.OpenId1CredentialType;
 import org.infogrid.lid.openid.auth.OpenId2CredentialType;
 import org.infogrid.lid.openid.auth.OpenIdCredentialType;
-import org.infogrid.lid.yadis.AbstractYadisService;
+import org.infogrid.lid.yadis.AbstractDeclaresYadisFragment;
 import org.infogrid.util.Base64;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.context.Context;
@@ -36,7 +40,10 @@ import org.infogrid.util.logging.Log;
  */
 public class OpenIdSsoPipelineStage
         extends
-            AbstractYadisService
+            AbstractDeclaresYadisFragment
+        implements
+            LidSsoPipelineStage,
+            OpenIdConstants
 {
     private static final Log log = Log.getLogInstance( OpenIdSsoPipelineStage.class ); // our own, private logger
 
@@ -76,42 +83,175 @@ public class OpenIdSsoPipelineStage
     }
 
     /**
-     * Process any relevant requests.
-     * 
+     * Process this stage.
+     *
      * @param lidRequest the incoming request
-     * @param clientAuthStatus knows the authentication status of the client
      * @param requestedResource the requested resource, if any
-     * @throws LidAbortProcessingPipelineException thrown if processing is complete
+     * @param instructionsSoFar the instructions assembled by the pipeline so far
+     * @return the instructions for constructing a response to the client, if any
      */
-    public void processRequest(
-            SaneRequest                   lidRequest,
-            LidClientAuthenticationStatus clientAuthStatus,
-            HasIdentifier                 requestedResource )
-        throws
-            LidAbortProcessingPipelineException
+    public SimpleLidSsoPipelineStageInstructions processStage(
+            SaneRequest                       lidRequest,
+            HasIdentifier                     requestedResource,
+            LidPipelineInstructions instructionsSoFar )
     {
+        // to be safe, look for multi-valued arguments first
+        if( lidRequest.matchUrlArgument( "openid.mode", "error" ) || lidRequest.matchPostedArgument( "openid.mode", "error" )) {
+            log.error(  "OpenID error", lidRequest );
+            return null; // FIXME?
+        }
+        if( lidRequest.matchUrlArgument( "openid.mode", "cancel" ) || lidRequest.matchPostedArgument( "openid.mode", "cancel" ) ) {
+            return null;
+        }
+
         String mode = lidRequest.getUrlArgument( "openid.mode" );
         if( mode == null ) {
             mode = lidRequest.getPostedArgument( "openid.mode" );
         }
         if( mode == null ) {
-            return;
+            return null;
         }
 
-        if( "checkid_immediate".equals( mode )) {
-            processCheckId( lidRequest, clientAuthStatus, requestedResource, true );
+        LidClientAuthenticationStatus         clientAuthStatus = instructionsSoFar.getClientAuthenticationStatus();
+        SimpleLidSsoPipelineStageInstructions ret              = null;
+
+        if( "associate".equals( mode )) {
+            ret = processAssociate( lidRequest );
+
+        } else if( "checkid_immediate".equals( mode )) {
+            ret = processCheckId( lidRequest, clientAuthStatus, requestedResource, true );
 
         } else if( "checkid_setup".equals( mode )) {
-            processCheckId( lidRequest, clientAuthStatus, requestedResource, false );
+            ret = processCheckId( lidRequest, clientAuthStatus, requestedResource, false );
 
         } else if( "check_authentication".equals( mode )) {
-            processCheckAuthentication( lidRequest, clientAuthStatus, requestedResource );
+            ret = processCheckAuthentication( lidRequest, clientAuthStatus, requestedResource );
 
         } else {
-            throw new OpenIdSsoException( this, "Unsupported value given for openid.mode: " + mode );
+            log.warn( "Unsupported value given for openid.mode", mode );
         }
+        return ret;
     }
-    
+
+    /**
+     * Process incoming associate requests.
+     *
+     * @param lidRequest the incoming request
+     * @return the created instructions, if any
+     */
+    public SimpleLidSsoPipelineStageInstructions processAssociate(
+            SaneRequest lidRequest )
+    {
+        String assocType                 = lidRequest.getPostedArgument( "openid.assoc_type" );
+        String sessionType               = lidRequest.getPostedArgument( "openid.session_type" );
+        String dh_modulus_string         = lidRequest.getPostedArgument( "openid.dh_modulus" );
+        String dh_gen_string             = lidRequest.getPostedArgument( "openid.dh_gen" );
+        String dh_consumer_public_string = lidRequest.getPostedArgument( "openid.dh_consumer_public" );
+
+        BigInteger dh_modulus         = null;
+        BigInteger dh_gen             = null;
+        BigInteger dh_consumer_public = null;
+
+        if( dh_modulus_string != null ) {
+            dh_modulus = new BigInteger( Base64.base64decode( dh_modulus_string ));
+        }
+        if( dh_gen_string != null ) {
+            dh_gen = new BigInteger( Base64.base64decode( dh_gen_string ));
+        }
+        if(    DH_SHA1.equals( sessionType )
+            && ( dh_consumer_public_string == null || dh_consumer_public_string.length() == 0 ))
+        {
+             throw new OpenIdAssociationException.InvalidPublicKey();
+        }
+        if( dh_consumer_public_string != null && dh_consumer_public_string.length() > 0 ) {
+            dh_consumer_public = new BigInteger( Base64.base64decode( dh_consumer_public_string ));
+        }
+
+        // insert defaults
+        assocType   = useDefaultIfNeeded( assocType,   HMAC_SHA1 );
+        sessionType = useDefaultIfNeeded( sessionType, null ); // null means cleartext
+        dh_modulus  = useDefaultIfNeeded( dh_modulus,  DEFAULT_P );
+        dh_gen      = useDefaultIfNeeded( dh_gen,      DEFAULT_G );
+
+        // sanity check
+
+        if( !HMAC_SHA1.equals( assocType )) {
+            throw new OpenIdAssociationException.UnknownAssociationType( assocType );
+        }
+        if( sessionType != null && !DH_SHA1.equals( sessionType )) {
+            throw new OpenIdAssociationException.UnknownSessionType( sessionType );
+        }
+        if( DH_SHA1.equals( sessionType ) && dh_consumer_public == null ) {
+            throw new OpenIdAssociationException.InvalidPublicKey();
+        }
+
+        OpenIdIdpSideAssociation assoc = theSmartAssociationManager.create( sessionType );
+
+        byte [] mac_key     = null;
+        byte [] enc_mac_key = null;
+
+        String dh_server_public_string = null;
+
+        if( sessionType == null ) {
+            // cleartext
+            mac_key = assoc.getSharedSecret();
+
+        } else {
+            // Diffie-Hellman
+            DiffieHellmanEndpoint dh             = DiffieHellmanEndpoint.create( dh_modulus, dh_gen );
+            BigInteger            sharedDhSecret = dh.computeSharedSecret( dh_consumer_public );
+
+            byte [] sharedSecret = assoc.getSharedSecret();
+            enc_mac_key = CryptUtils.do160BitXor(
+                    CryptUtils.calculateSha1( sharedDhSecret ),
+                    sharedSecret );
+
+            dh_server_public_string = Base64.base64encodeNoCr( dh.getPublicKey().toByteArray());
+        }
+
+        StringBuilder buf = new StringBuilder();
+        long          now = System.currentTimeMillis();
+
+        if( assocType != null ) {
+            buf.append( "assoc_type:" );
+            buf.append( assocType );
+            buf.append( "\n" );
+        }
+        if( assoc.getAssociationHandle() != null ) {
+            buf.append( "assoc_handle:" );
+            buf.append( assoc.getAssociationHandle() );
+            buf.append( "\n" );
+        }
+        if( assoc.getTimeExpires() > 0 ) {
+            long delta = assoc.getTimeExpires() - now;
+            buf.append( "expires_in:" );
+            buf.append( delta / 1000L ); // need seconds
+            buf.append( "\n" );
+        }
+        if( sessionType != null ) {
+            buf.append( "session_type:" );
+            buf.append( sessionType );
+            buf.append( "\n" );
+        }
+        if( dh_server_public_string != null ) {
+            buf.append( "dh_server_public:" );
+            buf.append( dh_server_public_string );
+            buf.append( "\n" );
+        }
+        if( enc_mac_key != null ) {
+            buf.append( "enc_mac_key:" );
+            buf.append( Base64.base64encodeNoCr( enc_mac_key ));
+            buf.append( "\n" );
+        }
+        if( mac_key != null ) {
+            buf.append( "mac_key:" );
+            buf.append( Base64.base64encodeNoCr( mac_key ));
+            buf.append( "\n" );
+        }
+
+        return SimpleLidSsoPipelineStageInstructions.createContentOnly( buf.toString(), "text/plain" );
+    }
+
     /**
      * Process incoming checkid_immediate and checkid_setup requests.
      * 
@@ -119,21 +259,19 @@ public class OpenIdSsoPipelineStage
      * @param clientAuthStatus knows the authentication status of the client
      * @param requestedResource the requested resource, if any
      * @param checkIdImmediate if true, performed checkid_immediate; if false, perform checkid_setup
-     * @throws LidAbortProcessingPipelineException thrown if processing is complete
+     * @return the created instructions, if any
      */
-    protected void processCheckId(
+    protected SimpleLidSsoPipelineStageInstructions processCheckId(
             SaneRequest                   lidRequest,
             LidClientAuthenticationStatus clientAuthStatus,
             HasIdentifier                 requestedResource,
             boolean                       checkIdImmediate )
-        throws
-            LidAbortProcessingPipelineException
     {
-        if( !"GET".equals( lidRequest.getMethod() )) {
-            return;
-        }
+        // This has to react to GET or POST, because input arguments to a login dialog may be submitted at the
+        // same time
+
         if( theSmartAssociationManager == null ) {
-            return;
+            return null;
         }
         
         String identifier = lidRequest.getUrlArgument( OpenId2CredentialType.OPENID2_IDENTIFIER_PARAMETER_NAME ); // "openid.identity" );
@@ -145,14 +283,17 @@ public class OpenIdSsoPipelineStage
         String trust_root   = lidRequest.getUrlArgument( OPENID_TRUST_ROOT_PARAMETER_NAME );
 
         if( identifier == null || identifier.length() == 0 ) {
-            throw new OpenIdSsoException( this, "openid.identifier must not be empty" );
+            log.warn( "openid.identifier must not be empty", lidRequest );
+            return null;
         }
         if( assoc_handle == null || assoc_handle.length() == 0 ) {
-            throw new OpenIdSsoException( this, "openid.assoc_handle must not be empty" );
+            log.warn( "openid.assoc_handle must not be empty", lidRequest );
+            return null;
         }
         if( return_to == null || return_to.length() == 0 ) {
-            throw new OpenIdSsoException( this, OPENID_RETURN_TO_PARAMETER_NAME + " must not be empty" );
+            log.warn( OPENID_RETURN_TO_PARAMETER_NAME + " must not be empty" );
             // The spec says it's optional, but I can't see how that can work
+            return null;
         }
         if( trust_root == null || trust_root.length() == 0 ) {
             trust_root = return_to;
@@ -160,31 +301,27 @@ public class OpenIdSsoPipelineStage
         
         OpenIdIdpSideAssociation assoc = theSmartAssociationManager.get( assoc_handle );
         if( assoc == null ) {
-            throw new OpenIdSsoException( this, "cannot find association with handle " + assoc_handle );
+            log.warn( "Cannot find association with handle", assoc_handle, lidRequest );
+            return SimpleLidSsoPipelineStageInstructions.create( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
         }
         // checking whether it is valid happens later
         
-        boolean shouldSso = false; // don't do it unless we are sure we want to
-        
-        if( clientAuthStatus.isValidSessionOnly() ) {
-            // everything else we consider invalid, even if credentials are provided with this request: they
-            // have no business as part of the request.
-            if( clientAuthStatus.getClientIdentifier().toExternalForm().equals( identifier )) {
-                shouldSso = true;
-            }
+        boolean authenticationConfirmed = false; // don't do it unless we are sure we want to
+
+        if(    clientAuthStatus.isAuthenticated()
+            && clientAuthStatus.getClientIdentifier().toExternalForm().equals( identifier ))
+        {
+            authenticationConfirmed = true;
         }
 
         // assemble response
         
-        StringBuilder redirect       = new StringBuilder();
-        StringBuilder token_contents = new StringBuilder();
-        
-        if( shouldSso ) {
+        if( authenticationConfirmed ) {
+            StringBuilder redirect       = new StringBuilder();
+            StringBuilder token_contents = new StringBuilder();
+            String        redirectUrl;
+
             construct( redirect, token_contents, "mode", "id_res" );
-        } else if( checkIdImmediate ) {
-            construct( redirect, token_contents, "mode", "cancel" );
-        }
-        if( shouldSso ) {
             construct( redirect, token_contents, "identity",  identifier );
             construct( redirect, token_contents, "return_to", return_to );
 
@@ -193,7 +330,7 @@ public class OpenIdSsoPipelineStage
                     construct( redirect, token_contents, "assoc_handle", assoc_handle );
                 } else {
                     theSmartAssociationManager.remove( assoc.getAssociationHandle() );
-                    // the spec seems to allow not to automatically create a new association
+                    // the spec seems to allow not to automatically createContentOnly a new association
                     construct( redirect, token_contents, "invalidate_handle", assoc_handle );
                 }
             }
@@ -211,25 +348,32 @@ public class OpenIdSsoPipelineStage
                 redirect.append( HTTP.encodeToValidUrlArgument( signedFields ));
                 // FIXME? We don't do openid.invalidate_handle right now
 
+                redirectUrl = HTTP.appendArgumentPairToUrl( return_to, redirect.toString().substring( 1 ));
+                return SimpleLidSsoPipelineStageInstructions.create( redirectUrl, 302 );
+
             } catch( UnsupportedEncodingException ex ) {
                 log.error( ex );
+                return null;
             }
+
         } else if( checkIdImmediate ) {
+            StringBuilder redirect       = new StringBuilder();
+            StringBuilder token_contents = new StringBuilder();
+            String        redirectUrl;
+
+            construct( redirect, token_contents, "mode", "cancel" );
             redirect.append( "&openid.user_setup_url=" );
             redirect.append(
                     HTTP.encodeToValidUrlArgument(
                             lidRequest.getOriginalSaneRequest().getAbsoluteBaseUri()
                             + "?lid=" + HTTP.encodeToValidUrlArgument( identifier )));
-        }
 
-        if( redirect.length() > 0 ) {
-            String redirectUrl = HTTP.appendArgumentPairToUrl( return_to, redirect.toString().substring( 1 ));
-
-            throw new LidAbortProcessingPipelineWithRedirectException( redirectUrl, 302, this );
+            redirectUrl = HTTP.appendArgumentPairToUrl( return_to, redirect.toString().substring( 1 ));
+            return SimpleLidSsoPipelineStageInstructions.create( redirectUrl, 302 );
 
         } else {
-            // user needs to authenticate first
-            
+            // else: !checkIdImmediate but no valid session -- have user log in
+            return SimpleLidSsoPipelineStageInstructions.createNeedAuth();
         }
     }
 
@@ -239,25 +383,23 @@ public class OpenIdSsoPipelineStage
      * @param lidRequest the incoming request
      * @param clientAuthStatus knows the authentication status of the client
      * @param requestedResource the requested resource, if any
-     * @throws LidAbortProcessingPipelineException thrown if processing is complete
+     * @return the created instructions, if any
      */
-    protected void processCheckAuthentication(
+    protected SimpleLidSsoPipelineStageInstructions processCheckAuthentication(
             SaneRequest                   lidRequest,
             LidClientAuthenticationStatus clientAuthStatus,
             HasIdentifier                 requestedResource )
-        throws
-            LidAbortProcessingPipelineException
     {
         if( !"POST".equals( lidRequest.getMethod() )) {
-            return;
+            return null;
         }
         if( theDumbAssociationManager == null ) {
-            return;
+            return null;
         }
 
         Map<String,String[]> postPars = lidRequest.getPostedArguments();
         if( postPars == null || postPars.isEmpty() ) {
-            return;
+            return null;
         }
 
         String assoc_handle = lidRequest.getPostedArgument( "openid.assoc_handle" );
@@ -317,7 +459,7 @@ public class OpenIdSsoPipelineStage
         responseBuffer.append( "openid.mode:" ).append( "id_res" ).append( "\n" );
         responseBuffer.append( "is_valid:" ).append( validString ).append( "\n" );
 
-        throw new LidAbortProcessingPipelineWithContentException( responseBuffer.toString(), "text/plain", this );
+        return SimpleLidSsoPipelineStageInstructions.createContentOnly( responseBuffer.toString(), "text/plain" );
     }
 
     /**
@@ -343,6 +485,29 @@ public class OpenIdSsoPipelineStage
         token_contents.append( ":" );
         token_contents.append( appendValue );
         token_contents.append( "\n" );
+    }
+
+    /**
+     * Insert default if no value is given.
+     *
+     * @param value the given value, if any
+     * @param defaultValue the default value
+     * @return the return value
+     * @param <T> allows us to use the same method for different types
+     */
+    protected static <T> T useDefaultIfNeeded(
+            T value,
+            T defaultValue )
+    {
+        if( value == null ) {
+            return defaultValue;
+
+        } else if( value instanceof String && ((String)value).length() == 0 ) {
+            return defaultValue;
+
+        } else {
+            return value;
+        }
     }
 
     /**

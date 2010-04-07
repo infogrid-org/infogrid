@@ -18,35 +18,20 @@ import org.infogrid.util.Identifier;
 import org.infogrid.util.http.SaneRequest;
 
 /**
- * Knows how to determine the authentication status of the client from an incoming request.
+ * Processes LID requests.
  */
-public interface LidClientAuthenticationPipelineStage
+public interface LidPipeline
 {
     /**
-     * Determine the authentication status of the client. This acts as a factory method for LidClientAuthenticationStatus.
+     * Process the pipeline.
      * 
      * @param lidRequest the incoming request
      * @param siteIdentifier identifies this site
-     * @param realm the authentication realm
-     * @return the LidClientAuthenticationStatus
+     * @param realm the realm of the authentication
+     * @return the compound instructions
      */
-    public LidClientAuthenticationStatus determineAuthenticationStatus(
+    public LidPipelineInstructions processPipeline(
             SaneRequest        lidRequest,
             Identifier         siteIdentifier,
             String             realm );
-
-    /**
-     * Name of the LID argument for the identifier.
-     */
-    public static final String LID_PARAMETER_NAME = "lid";
-
-    /**
-     * Name of the argument for the LID action.
-     */
-    public static final String LID_ACTION_PARAMETER_NAME = "lid-action";
-
-    /**
-     * The LID action that cancels the session.
-     */
-    public static final String LID_ACTION_CANCEL_SESSION_PARAMETER_VALUE = "cancel-session";
 }

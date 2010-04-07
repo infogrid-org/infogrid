@@ -16,10 +16,9 @@ package org.infogrid.lid.yadis;
 
 import java.text.MessageFormat;
 import java.util.Iterator;
-import org.infogrid.lid.LidAbortProcessingPipelineException;
-import org.infogrid.lid.LidAbortProcessingPipelineWithContentException;
-import org.infogrid.lid.LidAbortProcessingPipelineWithErrorException;
-import org.infogrid.lid.LidProcessingPipelineStage;
+import javax.servlet.http.HttpServletResponse;
+import org.infogrid.lid.LidPipelineStageInstructions;
+import org.infogrid.lid.SimpleLidPipelineStageInstructions;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.http.HTTP;
@@ -28,20 +27,20 @@ import org.infogrid.util.http.SaneRequest;
 /**
  * Default implementation of YadisPipelineProcessingStage.
  */
-public class DefaultYadisPipelineProcessingStage
+public class DefaultYadisPipelineStage
         extends
-            AbstractYadisPipelineProcessingStage
+            AbstractYadisPipelineStage
 {
     /**
      * Factory method.
      *
      * @param c the context containing the available services.
-     * @return the created DefaultYadisPipelineProcessingStage
+     * @return the created DefaultYadisPipelineStage
      */
-    public static DefaultYadisPipelineProcessingStage create(
+    public static DefaultYadisPipelineStage create(
             Context c )
     {
-        DefaultYadisPipelineProcessingStage ret = new DefaultYadisPipelineProcessingStage( c );
+        DefaultYadisPipelineStage ret = new DefaultYadisPipelineStage( c );
         return ret;
     }
 
@@ -50,7 +49,7 @@ public class DefaultYadisPipelineProcessingStage
      *
      * @param c the context containing the available services.
      */
-    protected DefaultYadisPipelineProcessingStage(
+    protected DefaultYadisPipelineStage(
             Context c )
     {
         super( c );
@@ -60,16 +59,14 @@ public class DefaultYadisPipelineProcessingStage
      * It was discovered that this is a Yadis request. Process.
      *
      * @param lidRequest the incoming request
-     * @param resource the resource to which the request refers, if any
-     * @throws LidAbortProcessingPipelineException thrown if processing is complete
+     * @param requestedResource the resource to which the request refers, if any
+     * @return the instructions for constructing a response to the client, if any
      */
-    protected void processYadisRequest(
+    protected LidPipelineStageInstructions processYadisRequest(
             SaneRequest        lidRequest,
-            HasIdentifier      resource )
-        throws
-            LidAbortProcessingPipelineException
+            HasIdentifier      requestedResource )
     {
-        if( resource != null ) {
+        if( requestedResource != null ) {
             StringBuilder content = new StringBuilder( 256 );
             content.append( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
             content.append( "<XRDS xmlns=\"xri://$xrds\" xmlns:xrd=\"xri://$xrd*($v*2.0)\">\n" );
@@ -94,10 +91,10 @@ public class DefaultYadisPipelineProcessingStage
             content.append( " </xrd:XRD>\n" );
             content.append( "</XRDS>\n" );
 
-            throw new LidAbortProcessingPipelineWithContentException( content.toString(), XRDS_MIME_TYPE, this );
+            return SimpleLidPipelineStageInstructions.createContentOnly( content.toString(), XRDS_MIME_TYPE );
 
         } else {
-            throw new LidAbortProcessingPipelineWithErrorException( 404, this );
+            return SimpleLidPipelineStageInstructions.create( HttpServletResponse.SC_NOT_FOUND );
         }
     }
 
@@ -106,19 +103,23 @@ public class DefaultYadisPipelineProcessingStage
      * into the incoming request, which needs to be processed by the calling logic.
      *
      * @param lidRequest the incoming request
-     * @param resource the resource to which the request refers, if any
+     * @param requestedResource the resource to which the request refers, if any
+     * @return the instructions for constructing a response to the client, if any
      */
-    protected void addYadisHeader(
+    protected LidPipelineStageInstructions addYadisHeader(
             SaneRequest        lidRequest,
-            HasIdentifier      resource )
+            HasIdentifier      requestedResource )
     {
-        if( resource != null ) {
-            lidRequest.setAttribute(
-                    YADIS_HTTP_HEADER_REQUEST_ATTRIBUTE_NAME,
+        if( requestedResource != null ) {
+            return SimpleLidPipelineStageInstructions.createHeaderOnly(
+                    YADIS_HTTP_HEADER,
                     HTTP.appendArgumentToUrl(
                             lidRequest.getOriginalSaneRequest().getAbsoluteBaseUri(),
-                            LidProcessingPipelineStage.LID_META_PARAMETER_NAME,
-                            LidProcessingPipelineStage.LID_META_CAPABILITIES_PARAMETER_VALUE ));
+                            LID_META_PARAMETER_NAME,
+                            LID_META_CAPABILITIES_PARAMETER_VALUE ));
+
+        } else {
+            return null;
         }
     }
 }

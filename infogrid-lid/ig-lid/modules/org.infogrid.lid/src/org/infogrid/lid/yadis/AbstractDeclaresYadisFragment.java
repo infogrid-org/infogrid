@@ -8,25 +8,24 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.yadis;
 
-import org.infogrid.lid.LidProcessingPipelineStage;
+import org.infogrid.lid.LidPipelineStage;
 import org.infogrid.util.context.AbstractObjectInContext;
 import org.infogrid.util.context.Context;
 
 /**
  * Useful superclass for classes that implement Yadis services.
  */
-public abstract class AbstractYadisService
+public abstract class AbstractDeclaresYadisFragment
         extends
             AbstractObjectInContext
         implements
-            DeclaresYadisFragment,
-            LidProcessingPipelineStage
+            DeclaresYadisFragment            
 {
     /**
      * Constructor for subclasses only, use factory method.
@@ -34,7 +33,7 @@ public abstract class AbstractYadisService
      * @param yadisFragment Yadis fragment of this DeclaresYadisFragment
      * @param c the context in which this <code>ObjectInContext</code> runs.
      */
-    protected AbstractYadisService(
+    protected AbstractDeclaresYadisFragment(
             String  yadisFragment,
             Context c )
     {

@@ -12,20 +12,26 @@
 // All rights reserved.
 //
 
-package org.infogrid.lid;
+package org.infogrid.lid.yadis;
+
+import org.infogrid.lid.LidPipelineStage;
+import org.infogrid.util.context.ObjectInContext;
 
 /**
- * A stage in the LidProcessingPipeline.
+ * Knows how to process Yadis requests.
  */
-public interface LidProcessingPipelineStage
+public interface YadisPipelineStage
+        extends
+            LidPipelineStage,
+            ObjectInContext
 {
     /**
-     * Name of the lid-meta parameter.
+     * Name of the Yadis HTTP header.
      */
-    public static final String LID_META_PARAMETER_NAME = "lid-meta";
+    public static final String YADIS_HTTP_HEADER = "X-XRDS-Location";
 
     /**
-     * Possible value of the lid-meta parameter.
+     * Yadis MIME type.
      */
-    public static final String LID_META_CAPABILITIES_PARAMETER_VALUE = "capabilities";
+    public static final String XRDS_MIME_TYPE = "application/xrds+xml";
 }

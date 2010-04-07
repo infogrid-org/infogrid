@@ -279,7 +279,7 @@ public class CommandLineWrapperLidGpg
                     if( lidVersion != null && lidVersion.startsWith( "1." )) {
                         append.append( "&credential=" ).append( HTTP.encodeToValidUrlArgument( hash + "\n" + sig ));
                     } else {
-                        append.append( "&" ).append( LidCredentialType.LID_CREDTYPE_PARAMETER_NAME ).append( "=" ).append( HTTP.encodeToValidUrlArgument( hash + "\n" + sig ));
+                        append.append( "&" ).append( LidCredentialType.LID_CREDENTIAL_PARAMETER_NAME ).append( "=" ).append( HTTP.encodeToValidUrlArgument( hash + "\n" + sig ));
                     }
                     return append.toString();
 

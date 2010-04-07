@@ -8,28 +8,19 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
-package org.infogrid.lid.openid;
+package org.infogrid.lid.session;
 
-import org.infogrid.lid.LidAbortProcessingPipelineException;
+import org.infogrid.lid.LidPipelineStage;
 
 /**
- * Thrown when a OpenID mode "cancel" has been discovered.
+ * Knows how to manage the session.
  */
-public class OpenIdModeCancelException
-    extends
-        LidAbortProcessingPipelineException
+public interface LidSessionManagementPipelineStage
+        extends
+            LidPipelineStage
 {
-    private static final long serialVersionUID = 1L; // helps with serialization
-
-    /**
-     * Constructor.
-     */
-    public OpenIdModeCancelException( )
-    {
-        super( null );
-    }
 }

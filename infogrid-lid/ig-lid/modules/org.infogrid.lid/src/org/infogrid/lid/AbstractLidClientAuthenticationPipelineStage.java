@@ -64,15 +64,11 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
      * @param siteIdentifier identifies this site
      * @param realm the authentication realm
      * @return the LidClientAuthenticationStatus
-     * @throws LidAbortProcessingPipelineException thrown if the response has been found,
-     *         and no further processing is necessary
      */
     public LidClientAuthenticationStatus determineAuthenticationStatus(
             SaneRequest        lidRequest,
             Identifier         siteIdentifier,
             String             realm )
-        throws
-            LidAbortProcessingPipelineException
     {
         if( log.isTraceEnabled() ) {
             log.traceMethodCallEntry( this, "determineAuthenticationStatus", lidRequest, siteIdentifier );
