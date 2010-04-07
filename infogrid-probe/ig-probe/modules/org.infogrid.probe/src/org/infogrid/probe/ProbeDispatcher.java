@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.infogrid.lid.model.yadis.YadisSubjectArea;
-import org.infogrid.lid.yadis.YadisPipelineProcessingStage;
+import org.infogrid.lid.yadis.YadisPipelineStage;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
 import org.infogrid.mesh.EntityNotBlessedException;
 import org.infogrid.mesh.IllegalPropertyTypeException;
@@ -526,7 +526,7 @@ public class ProbeDispatcher
                 }
 
             } else {
-                yadisUrl = httpResponse.getSingleHttpHeaderField( YadisPipelineProcessingStage.YADIS_HTTP_HEADER );
+                yadisUrl = httpResponse.getSingleHttpHeaderField( YadisPipelineStage.YADIS_HTTP_HEADER );
                 if( yadisUrl == null ) {
                     yadisUrl = httpResponse.getSingleHttpHeaderField( "X-YADIS-Location" );
                 }
