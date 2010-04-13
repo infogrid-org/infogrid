@@ -86,6 +86,24 @@
 
             <implementsMethod><![CDATA[
     /**
+     * User-visible String is the the nickname if there is one.
+     *
+     * @return the user-visible String representing this instance
+     */
+    public String get_UserVisibleString()
+    {
+        try {
+            StringValue name = getNickname();
+            if( name != null ) {
+                return name.value();
+            }
+        } catch( NotPermittedException ex ) {
+            // ignore;
+        }
+        return null;
+    }
+
+    /**
      * Determine the set of remote Identifiers that are also associated with this LidAccount.
      * The Identifier inherited from HasIdentifier is considered the local Identifier.
      *
