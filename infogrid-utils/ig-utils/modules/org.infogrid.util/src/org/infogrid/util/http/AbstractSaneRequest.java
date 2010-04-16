@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.logging.Log;
 
@@ -294,7 +295,7 @@ public abstract class AbstractSaneRequest
         } else if( almost.length == 1 ) {
             return almost[0];
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException( "POST argument '" + argName + "' posted more than once: " + ArrayHelper.join( almost ));
         }
     }
 
