@@ -224,11 +224,14 @@ public class DefaultLidSessionManagementPipelineStage
         String cookiePath   = "/";
         
         if( clientAuthStatus.getSiteIdentifier() != null ) {
+            // if localhost has been requested, at developer is running the app, and we don't send the domain or path
             String siteString = clientAuthStatus.getSiteIdentifier().toExternalForm();
             
             Matcher m = theUrlPattern.matcher( siteString );
             if( m.find() ) {
-                cookieDomain = m.group( 1 );
+                if( !"localhost".equals( lidRequest.getHttpHostOnly())) {
+                    cookieDomain = m.group( 1 );
+                }
                 cookiePath   = m.group( 2 );
             }
         }

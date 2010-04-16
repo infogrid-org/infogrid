@@ -52,6 +52,16 @@
                 <isoptional/>
             </propertytype>
 
+            <propertytype ID="org.infogrid.lid.model.account/Account_Picture">
+                <name>Picture</name>
+                <username>Picture</username>
+                <userdescription>The user's picture, if any.</userdescription>
+                <datatype>
+                    <BlobDataType typefield="theJdkSupportedBitmapType"/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
             <propertytype ID="org.infogrid.lid.model.account/Account_Status">
                 <name>Status</name>
                 <username>Status</username>
