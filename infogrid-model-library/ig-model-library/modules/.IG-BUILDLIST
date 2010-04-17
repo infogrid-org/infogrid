@@ -1,5 +1,4 @@
 org.infogrid.model.Common
-org.infogrid.model.Account
 org.infogrid.model.Annotation
 org.infogrid.model.Blob
 org.infogrid.model.Bookmark
