@@ -120,6 +120,7 @@ public abstract class TranslatingLidAccountManager
      * @param remotePersonas the remote personas to be associated with the locally provisioned LidAccount
      * @param attributes the attributes for the to-be-created LidAccount
      * @param credentials the credentials for the to-be-created LidAccount
+     * @param groupIdentifiers identifiers of the groups the Account belongs to
      * @return the LidAccount that was created
      * @throws LidAccountExistsAlreadyException thrown if a LidAccount with this Identifier exists already
      */
@@ -128,7 +129,8 @@ public abstract class TranslatingLidAccountManager
             Identifier                    localIdentifier,
             HasIdentifier []              remotePersonas,
             Map<String,String>            attributes,
-            Map<LidCredentialType,String> credentials )
+            Map<LidCredentialType,String> credentials,
+            Identifier []                 groupIdentifiers )
         throws
             LidAccountExistsAlreadyException
     {
@@ -139,7 +141,8 @@ public abstract class TranslatingLidAccountManager
                     delegateIdentifier,
                     remotePersonas,
                     attributes,
-                    credentials );
+                    credentials,
+                    groupIdentifiers );
             
             LidAccount ret = translateAccountBackward( delegateAccount );
             return ret;

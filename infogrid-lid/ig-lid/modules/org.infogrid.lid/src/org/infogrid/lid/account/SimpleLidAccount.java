@@ -33,6 +33,7 @@ public class SimpleLidAccount
      * @param attributes attributes of the persona, e.g. first name
      * @param credentialTypes the types of credentials available to locally authenticate this LidAccount
      * @param credentials the values for the credentials available to locally authenticate this LidAccount
+     * @param groupIdentifiers identifiers of the groups that this LidAccount is a member of
      * @return the created SimpleLidAccount
      */
     public static SimpleLidAccount create(
@@ -40,9 +41,10 @@ public class SimpleLidAccount
             Identifier []        remoteIdentifiers,
             Map<String,String>   attributes,
             LidCredentialType [] credentialTypes,
-            String []            credentials )
+            String []            credentials,
+            Identifier []        groupIdentifiers )
     {
-        return new SimpleLidAccount( identifier, remoteIdentifiers, attributes, credentialTypes, credentials );
+        return new SimpleLidAccount( identifier, remoteIdentifiers, attributes, credentialTypes, credentials, groupIdentifiers );
     }
 
     /**
@@ -53,13 +55,15 @@ public class SimpleLidAccount
      * @param attributes attributes of the persona, e.g. first name
      * @param credentialTypes the types of credentials available to locally authenticate this LidAccount
      * @param credentials the values for the credentials available to locally authenticate this LidAccount
+     * @param groupIdentifiers identifiers of the groups that this LidAccount is a member of
      */
     protected SimpleLidAccount(
             Identifier           identifier,
             Identifier []        remoteIdentifiers,
             Map<String,String>   attributes,
             LidCredentialType [] credentialTypes,
-            String []            credentials )
+            String []            credentials,
+            Identifier []        groupIdentifiers )
     {
         super( identifier );
 
@@ -67,6 +71,7 @@ public class SimpleLidAccount
         theAttributes        = attributes;
         theCredentialTypes   = credentialTypes;
         theCredentials       = credentials;
+        theGroupIdentifiers  = groupIdentifiers;
     }
 
     /**
@@ -134,6 +139,16 @@ public class SimpleLidAccount
     }
 
     /**
+     * Obtain the Identifiers of the set of groups that this LidAccount is a member of.
+     *
+     * @return the Identifiers
+     */
+    public Identifier [] getGroupIdentifiers()
+    {
+        return theGroupIdentifiers;
+    }
+
+    /**
      * Remote Identifiers also associated with this LidAccount.
      */
     protected Identifier [] theRemoteIdentifiers;
@@ -152,4 +167,9 @@ public class SimpleLidAccount
      * Actual credentials. Same order as theCredentialTypes.
      */
     protected String [] theCredentials;
+
+    /**
+     * Set of identifiers of the groups that this account is a member of.
+     */
+    protected Identifier [] theGroupIdentifiers;
 }

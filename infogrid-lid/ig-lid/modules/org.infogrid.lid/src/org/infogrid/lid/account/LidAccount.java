@@ -88,6 +88,13 @@ public interface LidAccount
             LidCredentialType type );
 
     /**
+     * Obtain the Identifiers of the set of groups that this LidAccount is a member of.
+     *
+     * @return the Identifiers
+     */
+    public Identifier [] getGroupIdentifiers();
+
+    /**
      * Name of the attribute that contains the persona's identifier.
      */
     public static final String IDENTIFIER_ATTRIBUTE_NAME = "Identifier";

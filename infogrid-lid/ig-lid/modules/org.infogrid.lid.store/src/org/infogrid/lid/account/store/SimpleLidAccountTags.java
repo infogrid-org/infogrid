@@ -30,4 +30,7 @@ public interface SimpleLidAccountTags
     
     /** Tag for a credential. */
     public static final String CREDENTIAL_TAG = "credential";
+
+    /** Tag for a group identifier. */
+    public static final String GROUP_TAG = "group";
 }

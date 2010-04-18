@@ -67,6 +67,7 @@ public interface LidAccountManager
      * @param remotePersonas the remote personas to be associated with the locally provisioned LidAccount
      * @param attributes the attributes for the to-be-created LidAccount
      * @param credentials the credentials for the to-be-created LidAccount
+     * @param groupIdentifiers the Identifiers of the groups that this LidAccount belongs to
      * @return the LidAccount that was created
      * @throws LidAccountExistsAlreadyException thrown if a LidAccount with this Identifier exists already
      */
@@ -74,7 +75,8 @@ public interface LidAccountManager
             Identifier                    localIdentifier,
             HasIdentifier []              remotePersonas,
             Map<String,String>            attributes,
-            Map<LidCredentialType,String> credentials )
+            Map<LidCredentialType,String> credentials,
+            Identifier []                 groupIdentifiers )
         throws
             LidAccountExistsAlreadyException;
 

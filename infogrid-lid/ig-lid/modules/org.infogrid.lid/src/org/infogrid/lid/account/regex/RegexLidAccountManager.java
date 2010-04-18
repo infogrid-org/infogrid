@@ -41,14 +41,17 @@ public class RegexLidAccountManager
      * @param userNameRegex the user name regular expression
      * @param passwordRegex the password regular expression
      * @return the created RegexLidAccountManager
+     * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
      */
     public static RegexLidAccountManager create(
-            String userNameRegex,
-            String passwordRegex )
+            String        userNameRegex,
+            String        passwordRegex,
+            Identifier [] groupIdentifiers )
     {
         RegexLidAccountManager ret = new RegexLidAccountManager(
                 Pattern.compile( userNameRegex ),
-                RegexLidPasswordCredentialType.create( Pattern.compile( passwordRegex )));
+                RegexLidPasswordCredentialType.create( Pattern.compile( passwordRegex )),
+                groupIdentifiers );
         
         return ret;
     }
@@ -59,14 +62,17 @@ public class RegexLidAccountManager
      * @param userNameRegex the user name regular expression
      * @param passwordRegex the password regular expression
      * @return the created RegexLidAccountManager
+     * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
      */
     public static RegexLidAccountManager create(
-            Pattern userNameRegex,
-            Pattern passwordRegex )
+            Pattern       userNameRegex,
+            Pattern       passwordRegex,
+            Identifier [] groupIdentifiers )
     {
         RegexLidAccountManager ret = new RegexLidAccountManager(
                 userNameRegex,
-                RegexLidPasswordCredentialType.create( passwordRegex ) );
+                RegexLidPasswordCredentialType.create( passwordRegex ),
+                groupIdentifiers );
         
         return ret;
     }
@@ -77,14 +83,17 @@ public class RegexLidAccountManager
      * @param userNameRegex the user name regular expression
      * @param credentialType the available LidCredentialType
      * @return the created RegexLidAccountManager
+     * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
      */
     public static RegexLidAccountManager create(
             String                         userNameRegex,
-            RegexLidPasswordCredentialType credentialType )
+            RegexLidPasswordCredentialType credentialType,
+            Identifier []                  groupIdentifiers )
     {
         RegexLidAccountManager ret = new RegexLidAccountManager(
                 Pattern.compile( userNameRegex ),
-                credentialType );
+                credentialType,
+                groupIdentifiers );
 
         return ret;
     }
@@ -95,14 +104,17 @@ public class RegexLidAccountManager
      * @param userNameRegex the user name regular expression
      * @param credentialType the available LidCredentialType
      * @return the created RegexLidAccountManager
+     * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
      */
     public static RegexLidAccountManager create(
             Pattern                        userNameRegex,
-            RegexLidPasswordCredentialType credentialType )
+            RegexLidPasswordCredentialType credentialType,
+            Identifier []                  groupIdentifiers )
     {
         RegexLidAccountManager ret = new RegexLidAccountManager(
                 userNameRegex,
-                credentialType );
+                credentialType,
+                groupIdentifiers );
 
         return ret;
     }
@@ -112,10 +124,12 @@ public class RegexLidAccountManager
      * 
      * @param userNameRegex the user name regular expression
      * @param credentialType the available LidCredentialType
+     * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
      */
     protected RegexLidAccountManager(
             Pattern                        userNameRegex,
-            RegexLidPasswordCredentialType credentialType )
+            RegexLidPasswordCredentialType credentialType,
+            Identifier []                  groupIdentifiers )
     {
         theUserNameRegex = userNameRegex;
 
@@ -125,6 +139,8 @@ public class RegexLidAccountManager
         theCredentials = new String[] {
                 null
         };
+
+        theGroupIdentifiers = groupIdentifiers;
     }
 
     /**
@@ -153,7 +169,8 @@ public class RegexLidAccountManager
                     null,
                     attributes,
                     theCredentialTypes,
-                    theCredentials );
+                    theCredentials,
+                    theGroupIdentifiers );
             return ret;
 
         } else {
@@ -197,6 +214,16 @@ public class RegexLidAccountManager
     }
     
     /**
+     * Obtain the Identifiers of the set of groups that this LidAccount is a member of.
+     *
+     * @return the Identifiers
+     */
+    public Identifier [] getGroupIdentifiers()
+    {
+        return theGroupIdentifiers;
+    }
+
+    /**
      * The user name regular expression.
      */
     protected Pattern theUserNameRegex;
@@ -210,4 +237,9 @@ public class RegexLidAccountManager
      * The credential values (not used).
      */
     protected String [] theCredentials;
+
+    /**
+     * Identiifers of the groups that this LidAccount is a member of.
+     */
+    protected Identifier [] theGroupIdentifiers;
 }

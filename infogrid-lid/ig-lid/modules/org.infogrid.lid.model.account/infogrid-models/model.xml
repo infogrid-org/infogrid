@@ -216,6 +216,17 @@
         return null; // FIXME for now
     }
 
+    /**
+     * Obtain the Identifiers of the set of groups that this LidAccount is a member of.
+     *
+     * @return the Identifiers
+     */
+    public org.infogrid.mesh.MeshObjectIdentifier [] getGroupIdentifiers()
+    {
+        org.infogrid.mesh.set.MeshObjectSet categories = traverse( AccountSubjectArea.ACCOUNTCATEGORY_CATEGORIZES_ACCOUNT.getDestination() );
+        return categories.asIdentifiers();
+    }
+
     ]]></implementsMethod>
 
         </entitytype>
@@ -231,6 +242,36 @@
             <dest>
               <e>org.infogrid.lid.model.account/Account</e>
               <MultiplicityValue>1:1</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <entitytype ID="org.infogrid.lid.model.account/AccountCategory">
+            <name>AccountCategory</name>
+            <username>Account Category</username>
+            <userdescription>Categorizes accounts into categories</userdescription>
+
+            <propertytype ID="org.infogrid.lid.model.account/AccountCategory_Name">
+                <name>Name</name>
+                <username>Name</username>
+                <userdescription>Name of the category.</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+        </entitytype>
+
+        <relationshiptype ID="org.infogrid.lid.model.account/AccountCategory_Categorizes_Account">
+            <name>AccountCategory_Categorizes_Account</name>
+            <username>categorizes</username>
+            <userdescription>Categorizes the accounts into categories</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.account/AccountCategory</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.lid.model.account/Account</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
             </dest>
         </relationshiptype>
 

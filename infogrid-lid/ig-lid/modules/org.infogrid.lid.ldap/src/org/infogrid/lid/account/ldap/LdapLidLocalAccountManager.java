@@ -227,7 +227,13 @@ public class LdapLidLocalAccountManager
                             }
                         }
                     }
-                    LidAccount ret = SimpleLidAccount.create( identifier, null, attributes, theCredentialTypes, new String[ theCredentialTypes.length ] );
+                    LidAccount ret = SimpleLidAccount.create(
+                            identifier,
+                            null,
+                            attributes,
+                            theCredentialTypes,
+                            new String[ theCredentialTypes.length ],
+                            new Identifier[ 0 ] );
 
                     if( found.hasMore() ) {
                         SearchResult current2 = (SearchResult) found.next();

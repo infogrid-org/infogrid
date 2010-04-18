@@ -85,7 +85,8 @@ public class StoreSimpleLidAccountManager
                                 ArrayHelper.copyIntoNewArray( arg.getRemoteIdentifiers(), Identifier.class ),
                                 arg.getAttributes(),
                                 arg.getCredentialTypes(),
-                                arg.getCredentialValues());
+                                arg.getCredentialValues(),
+                                arg.getGroupIdentifiers() );
                         return ret;
                     }
                 };
@@ -127,6 +128,7 @@ public class StoreSimpleLidAccountManager
      * @param remotePersonas the remote personas to be associated with the locally provisioned LidAccount
      * @param attributes the attributes for the to-be-created LidAccount
      * @param credentials the credentials for the to-be-created LidAccount
+     * @param groupIdentifiers identifiers of the groups the Account belongs to
      * @return the LidAccount that was created
      * @throws LidAccountExistsAlreadyException thrown if a LidAccount with this Identifier exists already
      */
@@ -135,7 +137,8 @@ public class StoreSimpleLidAccountManager
             Identifier                    localIdentifier,
             HasIdentifier []              remotePersonas,
             Map<String,String>            attributes,
-            Map<LidCredentialType,String> credentials )
+            Map<LidCredentialType,String> credentials,
+            Identifier []                 groupIdentifiers )
         throws
             LidAccountExistsAlreadyException
     {
@@ -145,7 +148,13 @@ public class StoreSimpleLidAccountManager
                 remoteIdentifiers.add( remote.getIdentifier() );
             }
         }
-        AccountData attCred = new AccountData( remoteIdentifiers, attributes, credentials );
+        ArrayList<Identifier> groupIds = new ArrayList<Identifier>( groupIdentifiers != null ? groupIdentifiers.length : 0 );
+        if( groupIdentifiers != null ) {
+            for( Identifier group : groupIdentifiers ) {
+                groupIds.add( group );
+            }
+        }
+        AccountData attCred = new AccountData( remoteIdentifiers, attributes, credentials, groupIds );
         
         try {
             LidAccount ret = theDelegateFactory.obtainNewFor( localIdentifier, attCred );

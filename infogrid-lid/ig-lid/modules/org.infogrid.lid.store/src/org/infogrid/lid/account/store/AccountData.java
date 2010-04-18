@@ -39,6 +39,7 @@ public class AccountData
         theAttributes        = new HashMap<String,String>();
         theCredentialTypes   = new ArrayList<LidCredentialType>();
         theCredentialValues  = new ArrayList<String>();
+        theGroupIdentifiers  = new ArrayList<Identifier>();
     }
 
     /**
@@ -47,11 +48,13 @@ public class AccountData
      * @param remoteIdentifiers identifiers of the remote personas associated with this Account
      * @param attributes the attributes
      * @param credentials the credentials
+     * @param groupIdentifiers identifiers of the groups the Account belongs to
      */
     public AccountData(
             ArrayList<Identifier>         remoteIdentifiers,
             Map<String,String>            attributes,
-            Map<LidCredentialType,String> credentials )
+            Map<LidCredentialType,String> credentials,
+            ArrayList<Identifier>         groupIdentifiers )
     {
         theRemoteIdentifiers = remoteIdentifiers;
         theAttributes        = attributes;
@@ -67,6 +70,7 @@ public class AccountData
                 theCredentialValues.add(  value );
             }
         }
+        theGroupIdentifiers = groupIdentifiers;
     }
 
     /**
@@ -110,6 +114,16 @@ public class AccountData
     }
 
     /**
+     * Obtain the Identifiers of the set of groups that this LidAccount is a member of.
+     *
+     * @return the Identifiers
+     */
+    public Identifier [] getGroupIdentifiers()
+    {
+        return ArrayHelper.copyIntoNewArray( theGroupIdentifiers, Identifier.class );
+    }
+
+    /**
      * Add an attribute.
      * 
      * @param name the name of the attribute
@@ -140,6 +154,17 @@ public class AccountData
     }
 
     /**
+     * Add a group identifier.
+     *
+     * @param id the identifier
+     */
+    protected void addGroupIdentifier(
+            Identifier id )
+    {
+        theGroupIdentifiers.add( id );
+    }
+
+    /**
      * Identifiers of the remote personas, if any.
      */
     protected ArrayList<Identifier> theRemoteIdentifiers;
@@ -158,4 +183,9 @@ public class AccountData
      * Values of the LidCredentialTypes, in the same sequence.
      */
     protected ArrayList<String> theCredentialValues;
+
+    /**
+     * Identifiers of the groups a LidAccount belongs to.
+     */
+    protected ArrayList<Identifier> theGroupIdentifiers;
 }

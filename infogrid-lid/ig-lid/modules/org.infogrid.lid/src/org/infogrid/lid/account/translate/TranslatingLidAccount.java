@@ -126,6 +126,16 @@ public class TranslatingLidAccount
     }
 
     /**
+     * Obtain the Identifiers of the set of groups that this LidAccount is a member of.
+     *
+     * @return the Identifiers
+     */
+    public Identifier [] getGroupIdentifiers()
+    {
+        return theDelegate.getGroupIdentifiers();
+    }
+
+    /**
      * The underlying LidAccount from/to which we translate.
      */
     protected LidAccount theDelegate;

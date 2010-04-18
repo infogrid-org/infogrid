@@ -112,7 +112,7 @@ public class SimpleLidAccountMapper
 
             theCurrentIdentifier     = null;
             theRemoteIdentifiers     = new ArrayList<Identifier>();
-            theCurrentAttCreds       = null;
+            theCurrentAccountData    = null;
             theCurrentAttribute      = null;
             theCurrentCredentialType = null;
 
@@ -121,9 +121,10 @@ public class SimpleLidAccountMapper
             SimpleLidAccount ret = SimpleLidAccount.create(
                     theCurrentIdentifier,
                     ArrayHelper.copyIntoNewArray( theRemoteIdentifiers, Identifier.class ),
-                    theCurrentAttCreds.getAttributes(),
-                    theCurrentAttCreds.getCredentialTypes(),
-                    theCurrentAttCreds.getCredentialValues() );
+                    theCurrentAccountData.getAttributes(),
+                    theCurrentAccountData.getCredentialTypes(),
+                    theCurrentAccountData.getCredentialValues(),
+                    theCurrentAccountData.getGroupIdentifiers() );
             
             return ret;
 
@@ -203,7 +204,7 @@ public class SimpleLidAccountMapper
                 throw new SAXParseException( "Repeated tag " + ACCOUNT_TAG, theLocator );
             }
             theCurrentIdentifier = SimpleStringIdentifier.create( attrs.getValue( IDENTIFIER_TAG ));
-            theCurrentAttCreds = new AccountData();
+            theCurrentAccountData = new AccountData();
 
         } else if( ATTRIBUTE_TAG.equals( qName )) {
             if( theCurrentAttribute != null ) {
@@ -216,6 +217,9 @@ public class SimpleLidAccountMapper
                 throw new SAXParseException( "Have current " + CREDENTIAL_TAG + " already", theLocator );
             }
             theCurrentCredentialType = findCredentialType( attrs.getValue( IDENTIFIER_TAG ));
+
+        } else if( GROUP_TAG.equals( qName )) {
+            // no op
 
         } else {
             startElement1( namespaceURI, localName, qName, attrs );
@@ -266,16 +270,19 @@ public class SimpleLidAccountMapper
             // no op
 
         } else if( ATTRIBUTE_TAG.equals( qName )) {
-            theCurrentAttCreds.addAttribute(
+            theCurrentAccountData.addAttribute(
                     theCurrentAttribute,
                     theCharacters != null ? XmlUtils.cdataDescape( theCharacters.toString()) : "" );
             theCurrentAttribute = null;
 
         } else if( CREDENTIAL_TAG.equals( qName )) {
-            theCurrentAttCreds.addCredential(
+            theCurrentAccountData.addCredential(
                     theCurrentCredentialType,
                     theCharacters != null ? XmlUtils.cdataDescape( theCharacters.toString()) : ""  );
             theCurrentCredentialType = null;
+
+        } else if( GROUP_TAG.equals( qName )) {
+            theCurrentAccountData.addGroupIdentifier( SimpleStringIdentifier.create( theCharacters.toString() ));
 
         } else {
             endElement1( namespaceURI, localName, qName );
@@ -307,7 +314,7 @@ public class SimpleLidAccountMapper
     {
         theCharacters            = null;
         theCurrentIdentifier     = null;
-        theCurrentAttCreds       = null;
+        theCurrentAccountData    = null;
         theCurrentAttribute      = null;
         theCurrentCredentialType = null;
 
@@ -444,7 +451,12 @@ public class SimpleLidAccountMapper
             buf.append( XmlUtils.escape( value ));
             buf.append( "</" ).append( CREDENTIAL_TAG ).append( ">" );
         }
-        
+        for( Identifier id : account.getGroupIdentifiers() ) {
+            buf.append( "<" ).append( GROUP_TAG ).append( ">" );
+            buf.append( XmlUtils.escape( id.toExternalForm() ));
+            buf.append( "</" ).append( GROUP_TAG ).append( ">" );
+        }
+
         buf.append( "</" ).append( ACCOUNT_TAG ).append( ">" );
         try {
             return buf.toString().getBytes( CHARSET );
@@ -496,7 +508,7 @@ public class SimpleLidAccountMapper
     /**
      * The AccountData of the SimpleLidAccount currently being parsed.
      */
-    protected AccountData theCurrentAttCreds;
+    protected AccountData theCurrentAccountData;
     
     /**
      * The name of the currently being parsed attribute in theObjectBeingParsed.
