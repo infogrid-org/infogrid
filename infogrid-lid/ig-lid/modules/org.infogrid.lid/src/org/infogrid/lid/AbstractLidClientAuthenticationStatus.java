@@ -68,7 +68,7 @@ public abstract class AbstractLidClientAuthenticationStatus
     {
         theClientIdentifierAsEntered = clientIdentifierAsEntered;
         theClientIdentifier          = clientIdentifier;
-        theClientRemotePersona       = clientRemotePersona;
+        theClient       = clientRemotePersona;
         theClientAccount             = clientPersona;
 
         thePreexistingClientSession = preexistingClientSession;
@@ -118,7 +118,7 @@ public abstract class AbstractLidClientAuthenticationStatus
     {
         boolean ret;
 
-        if( theClientIdentifier != null && theClientRemotePersona == null && theClientAccount == null ) {
+        if( theClientIdentifier != null && theClient == null && theClientAccount == null ) {
             ret = true;
         } else {
             ret = false;
@@ -310,9 +310,9 @@ public abstract class AbstractLidClientAuthenticationStatus
      *
      * @return the remote persona
      */
-    public HasIdentifier getRemotePersona()
+    public HasIdentifier getClient()
     {
-        return theClientRemotePersona;
+        return theClient;
     }
     
     /**
@@ -321,12 +321,29 @@ public abstract class AbstractLidClientAuthenticationStatus
      *
      * @return the LidAccount
      * @see #getClientIdentifier
+     * @see #getClientAccountIdentifier
      */
     public LidAccount getClientAccount()
     {
         return theClientAccount;
     }
     
+    /**
+     * Obtain the identifier of the client's local LidAccount, if there is one. If there is none, or if the LidAccount
+     * could not be resolved, this will return <code>null</code>.
+     *
+     * @return the LidAccount's identifier
+     * @see #getClientAccount
+     */
+    public Identifier getClientAccountIdentifier()
+    {
+        if( theClientAccount != null ) {
+            return theClientAccount.getIdentifier();
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Determine whether the client just logged on.
      *
@@ -480,7 +497,7 @@ public abstract class AbstractLidClientAuthenticationStatus
     /**
      * The client's remote persona, if there is one.
      */
-    protected HasIdentifier theClientRemotePersona;
+    protected HasIdentifier theClient;
 
     /**
      * The client's local LidAccount, if there is one.

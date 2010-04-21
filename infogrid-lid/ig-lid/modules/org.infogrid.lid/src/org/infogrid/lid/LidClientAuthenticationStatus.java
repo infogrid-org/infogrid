@@ -161,7 +161,7 @@ public interface LidClientAuthenticationStatus
      *
      * @return the remote persona
      */
-    public abstract HasIdentifier getRemotePersona();
+    public abstract HasIdentifier getClient();
 
     /**
      * Obtain the client's local LidAccount, if there is one. If there is none, or if the LidAccount
@@ -171,6 +171,14 @@ public interface LidClientAuthenticationStatus
      * @see #getClientIdentifier
      */
     public abstract LidAccount getClientAccount();
+
+    /**
+     * Obtain the client's local LidAccount's identifier, if there is one. If there is no LidAccount, or the
+     * LidAccount could not be resolved, this will return <code>null</code>.
+     *
+     * @return the LidAccount's identifier
+     */
+    public abstract Identifier getClientAccountIdentifier();
 
     /**
      * Determine whether the client has indicated its desire to log in.

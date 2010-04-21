@@ -144,7 +144,7 @@ public class DefaultLidSessionManagementPipelineStage
 
             personaToSet = clientAuthStatus.getClientAccount();
             if( personaToSet == null ) {
-                personaToSet = clientAuthStatus.getRemotePersona();
+                personaToSet = clientAuthStatus.getClient();
             }
 
         } else if( clientAuthStatus.clientWishesToLogin() ) {
