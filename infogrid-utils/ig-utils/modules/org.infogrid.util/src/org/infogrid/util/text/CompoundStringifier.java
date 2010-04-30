@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,7 +16,6 @@ package org.infogrid.util.text;
 
 import java.util.Iterator;
 import org.infogrid.util.ArrayFacade;
-
 
 /**
  * Abstract superclass for compound Stringifiers that delegate to N child Stringifiers.
@@ -90,7 +89,7 @@ public abstract class CompoundStringifier
         for( int i=0 ; i<theComponents.length ; ++i ) {
             CompoundStringifierComponent current = theComponents[i];
             
-            String found = current.format( soFar + ret.toString(), arg, pars ); // presumably shorter, but we don't know
+            String found = current.format( soFar != null ? soFar + ret.toString() : ret.toString(), arg, pars ); // presumably shorter, but we don't know
             
             ret.append( found );
         }
