@@ -28,7 +28,6 @@ import org.infogrid.util.InvalidCharacterParseException;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.StringTooShortParseException;
 import org.infogrid.util.text.StringRepresentation;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
  * The default NetMeshObjectIdentifierFactory in the "A" implementation.
@@ -287,65 +286,8 @@ public class DefaultAnetMeshObjectIdentifierFactory
         throws
             ParseException
     {
-        String [] entriesToTry1 = {
-                DefaultAnetMeshObjectIdentifier.DEFAULT_MESH_BASE_HOME_ENTRY,
-                DefaultAnetMeshObjectIdentifier.NON_DEFAULT_MESH_BASE_HOME_ENTRY };
-
-        Throwable firstException = null;
-
-        for( String entry : entriesToTry1 ) {
-
-            try {
-                representation.parseEntry( DefaultAnetMeshObjectIdentifier.class, entry, s, this );
-                return fromExternalForm( "" );
-
-            } catch( StringRepresentationParseException ex ) {
-                // that wasn't it ...
-                if( firstException == null ) {
-                    firstException = ex;
-                }
-            }
-        }
-
-        String [] entriesToTry2 = {
-                DefaultAnetMeshObjectIdentifier.DEFAULT_MESH_BASE_ENTRY,
-                DefaultAnetMeshObjectIdentifier.NON_DEFAULT_MESH_BASE_ENTRY };
-
-        for( String entry : entriesToTry2 ) {
-            Object [] found = null;
-
-            try {
-                found = representation.parseEntry( DefaultAnetMeshObjectIdentifier.class, entry, s, this );
-
-            } catch( StringRepresentationParseException ex ) {
-                // that wasn't it ...
-                if( firstException == null ) {
-                    firstException = ex;
-                }
-
-            } catch( ClassCastException ex ) {
-                // that wasn't it ...
-                if( firstException == null ) {
-                    firstException = ex;
-                }
-            }
-            if( found != null && found.length == 1 ) {
-                DefaultAnetMeshObjectIdentifier ret = (DefaultAnetMeshObjectIdentifier) found[0];
-                return ret;
-            }
-        }
-
-        try {
-            DefaultAnetMeshObjectIdentifier ret = guessFromExternalForm( s );
-            return ret;
-        } catch( StringRepresentationParseException ex ) {
-            // that wasn't it ...
-            if( firstException == null ) {
-                firstException = ex;
-            }
-        }
-
-        throw new StringRepresentationParseException( s, null, firstException );
+        Object [] found = representation.parseEntry( DefaultAnetMeshObjectIdentifier.class, StringRepresentation.DEFAULT_ENTRY, s, this );
+        return (DefaultAnetMeshObjectIdentifier) found[0];
     }
 
     /**

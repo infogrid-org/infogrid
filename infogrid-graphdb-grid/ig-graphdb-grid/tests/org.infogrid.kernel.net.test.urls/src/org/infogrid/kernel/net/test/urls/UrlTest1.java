@@ -103,25 +103,25 @@ public class UrlTest1
         String target = "foo";
         String title  = "bar";
 
-        String obj1_mb1_different_default_target      = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, null, net1.toExternalForm(), relativePath1, obj1_mb1, mb1 ));
-        String obj1_mb1_different_nonDefault_target   = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, null, net1.toExternalForm(), relativePath1, obj1_mb1, mb2 ));
-        String obj1_mb1_different_default_notarget    = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   null, net1.toExternalForm(), relativePath1, obj1_mb1, mb1 ));
-        String obj1_mb1_different_nonDefault_notarget = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   null, net1.toExternalForm(), relativePath1, obj1_mb1, mb2 ));
+        String obj1_mb1_different_default_target      = obj1_mb1.toStringRepresentationLinkStart( rep, constructPars( target, null, net1.toExternalForm(), relativePath1, obj1_mb1, mb1 ));
+        String obj1_mb1_different_nonDefault_target   = obj1_mb1.toStringRepresentationLinkStart( rep, constructPars( target, null, net1.toExternalForm(), relativePath1, obj1_mb1, mb2 ));
+        String obj1_mb1_different_default_notarget    = obj1_mb1.toStringRepresentationLinkStart( rep, constructPars( null,   null, net1.toExternalForm(), relativePath1, obj1_mb1, mb1 ));
+        String obj1_mb1_different_nonDefault_notarget = obj1_mb1.toStringRepresentationLinkStart( rep, constructPars( null,   null, net1.toExternalForm(), relativePath1, obj1_mb1, mb2 ));
 
-        String obj1_mb1_different_default_target_title      = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, title, net1.toExternalForm(), relativePath1, obj1_mb1, mb1 ));
-        String obj1_mb1_different_nonDefault_target_title   = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, title, net1.toExternalForm(), relativePath1, obj1_mb1, mb2 ));
-        String obj1_mb1_different_default_notarget_title    = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   title, net1.toExternalForm(), relativePath1, obj1_mb1, mb1 ));
-        String obj1_mb1_different_nonDefault_notarget_title = obj1_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   title, net1.toExternalForm(), relativePath1, obj1_mb1, mb2 ));
+        String obj1_mb1_different_default_target_title      = obj1_mb1.toStringRepresentationLinkStart( rep, constructPars( target, title, net1.toExternalForm(), relativePath1, obj1_mb1, mb1 ));
+        String obj1_mb1_different_nonDefault_target_title   = obj1_mb1.toStringRepresentationLinkStart( rep, constructPars( target, title, net1.toExternalForm(), relativePath1, obj1_mb1, mb2 ));
+        String obj1_mb1_different_default_notarget_title    = obj1_mb1.toStringRepresentationLinkStart( rep, constructPars( null,   title, net1.toExternalForm(), relativePath1, obj1_mb1, mb1 ));
+        String obj1_mb1_different_nonDefault_notarget_title = obj1_mb1.toStringRepresentationLinkStart( rep, constructPars( null,   title, net1.toExternalForm(), relativePath1, obj1_mb1, mb2 ));
 
-        String obj2_mb1_different_default_target      = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, null, net1.toExternalForm(), relativePath1, obj2_mb1, mb1 ));
-        String obj2_mb1_different_nonDefault_target   = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, null, net1.toExternalForm(), relativePath1, obj2_mb1, mb2 ));
-        String obj2_mb1_different_default_notarget    = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   null, net1.toExternalForm(), relativePath1, obj2_mb1, mb1 ));
-        String obj2_mb1_different_nonDefault_notarget = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   null, net1.toExternalForm(), relativePath1, obj2_mb1, mb2 ));
+        String obj2_mb1_different_default_target      = obj2_mb1.toStringRepresentationLinkStart( rep, constructPars( target, null, net1.toExternalForm(), relativePath1, obj2_mb1, mb1 ));
+        String obj2_mb1_different_nonDefault_target   = obj2_mb1.toStringRepresentationLinkStart( rep, constructPars( target, null, net1.toExternalForm(), relativePath1, obj2_mb1, mb2 ));
+        String obj2_mb1_different_default_notarget    = obj2_mb1.toStringRepresentationLinkStart( rep, constructPars( null,   null, net1.toExternalForm(), relativePath1, obj2_mb1, mb1 ));
+        String obj2_mb1_different_nonDefault_notarget = obj2_mb1.toStringRepresentationLinkStart( rep, constructPars( null,   null, net1.toExternalForm(), relativePath1, obj2_mb1, mb2 ));
 
-        String obj2_mb1_different_default_target_title      = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, title, net1.toExternalForm(), relativePath1, obj2_mb1, mb1 ));
-        String obj2_mb1_different_nonDefault_target_title   = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( target, title, net1.toExternalForm(), relativePath1, obj2_mb1, mb2 ));
-        String obj2_mb1_different_default_notarget_title    = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   title, net1.toExternalForm(), relativePath1, obj2_mb1, mb1 ));
-        String obj2_mb1_different_nonDefault_notarget_title = obj2_mb1.getIdentifier().toStringRepresentationLinkStart( rep, constructPars( null,   title, net1.toExternalForm(), relativePath1, obj2_mb1, mb2 ));
+        String obj2_mb1_different_default_target_title      = obj2_mb1.toStringRepresentationLinkStart( rep, constructPars( target, title, net1.toExternalForm(), relativePath1, obj2_mb1, mb1 ));
+        String obj2_mb1_different_nonDefault_target_title   = obj2_mb1.toStringRepresentationLinkStart( rep, constructPars( target, title, net1.toExternalForm(), relativePath1, obj2_mb1, mb2 ));
+        String obj2_mb1_different_default_notarget_title    = obj2_mb1.toStringRepresentationLinkStart( rep, constructPars( null,   title, net1.toExternalForm(), relativePath1, obj2_mb1, mb1 ));
+        String obj2_mb1_different_nonDefault_notarget_title = obj2_mb1.toStringRepresentationLinkStart( rep, constructPars( null,   title, net1.toExternalForm(), relativePath1, obj2_mb1, mb2 ));
 
         checkEquals(
                 obj1_mb1_different_default_target,
@@ -353,9 +353,6 @@ public class UrlTest1
         }
         if( relativeContextPath != null ) {
             ret.put( StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY, relativeContextPath );
-        }
-        if( obj != null ) {
-            ret.put( MeshStringRepresentationParameters.MESHOBJECT_KEY, obj );
         }
         if( mb != null ) {
             ret.put( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY, mb );

@@ -80,21 +80,6 @@ public class DefaultAnetMeshObjectIdentifier
     }
 
     /**
-     * Determine whether this MeshObjectIdentifier identifies a Home Object.
-     *
-     * @return true if it identifies a Home Object
-     */
-    @Override
-    public boolean identifiesHomeObject()
-    {
-        if( theLocalId == null || theLocalId.length() == 0 ) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Obtain the external form of the MeshObjectIdentifier relative to some path.
      *
      * @param relativePath the relative path
