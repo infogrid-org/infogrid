@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -24,9 +24,19 @@ public class SimpleStringIdentifierFactory
         IdentifierFactory
 {
     /**
-     * Public constructor.
+     * Factory method.
+     *
+     * @return the created SimpleStringIdentifierFactory
      */
-    public SimpleStringIdentifierFactory()
+    public static SimpleStringIdentifierFactory create()
+    {
+        return new SimpleStringIdentifierFactory();
+    }
+
+    /**
+     * Constructor for subclasses only, use factory method.
+     */
+    protected SimpleStringIdentifierFactory()
     {
         // no op
     }
