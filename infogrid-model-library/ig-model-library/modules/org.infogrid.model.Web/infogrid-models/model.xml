@@ -26,22 +26,6 @@ information found on the web.</userdescription>
             <username>Web Resource</username>
             <userdescription>The resource at a URI. The URI is found in the identifier property.</userdescription>
             <maybeusedasforwardreference/>
-
-            <implementsMethod><![CDATA[
-    /**
-     * User-visible String is the first non-null result of considering:
-     * <ol>
-     *  <li>the Bookmark's name</li>
-     *  <li>the Bookmark's bookmarked MeshObject's user-visible name</li>
-     * </ol>
-     *
-     * @return the user-visible String representing this instance
-     */
-    public String get_UserVisibleString()
-    {
-        return getIdentifier().toExternalForm();
-    }
-            ]]></implementsMethod>
         </entitytype>
 
         <relationshiptype ID="org.infogrid.model.Web/WebResource_HasLinkTo_WebResource">
