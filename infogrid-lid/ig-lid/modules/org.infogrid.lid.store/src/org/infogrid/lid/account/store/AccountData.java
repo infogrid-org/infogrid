@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.Identifier;
@@ -32,9 +33,13 @@ public class AccountData
 
     /**
      * Constructor.
+     *
+     * @param status the status of the Account
      */
-    public AccountData()
+    public AccountData(
+            LidAccount.LidAccountStatus status )
     {
+        theStatus            = status;
         theRemoteIdentifiers = new ArrayList<Identifier>();
         theAttributes        = new HashMap<String,String>();
         theCredentialTypes   = new ArrayList<LidCredentialType>();
@@ -45,17 +50,20 @@ public class AccountData
     /**
      * Constructor.
      *
+     * @param status the status of the Account
      * @param remoteIdentifiers identifiers of the remote personas associated with this Account
      * @param attributes the attributes
      * @param credentials the credentials
      * @param groupIdentifiers identifiers of the groups the Account belongs to
      */
     public AccountData(
+            LidAccount.LidAccountStatus   status,
             ArrayList<Identifier>         remoteIdentifiers,
             Map<String,String>            attributes,
             Map<LidCredentialType,String> credentials,
             ArrayList<Identifier>         groupIdentifiers )
     {
+        theStatus            = status;
         theRemoteIdentifiers = remoteIdentifiers;
         theAttributes        = attributes;
 
@@ -71,6 +79,16 @@ public class AccountData
             }
         }
         theGroupIdentifiers = groupIdentifiers;
+    }
+
+    /**
+     * Obtain the account status.
+     *
+     * @return the account status
+     */
+    public LidAccount.LidAccountStatus getStatus()
+    {
+        return theStatus;
     }
 
     /**
@@ -163,6 +181,11 @@ public class AccountData
     {
         theGroupIdentifiers.add( id );
     }
+
+    /**
+     * The account status.
+     */
+    protected LidAccount.LidAccountStatus theStatus;
 
     /**
      * Identifiers of the remote personas, if any.

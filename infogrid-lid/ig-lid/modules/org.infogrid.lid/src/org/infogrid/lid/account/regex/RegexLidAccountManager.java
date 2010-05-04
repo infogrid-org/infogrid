@@ -38,17 +38,20 @@ public class RegexLidAccountManager
     /**
      * Factory method.
      * 
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param userNameRegex the user name regular expression
      * @param passwordRegex the password regular expression
      * @return the created RegexLidAccountManager
      * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
      */
     public static RegexLidAccountManager create(
+            Identifier    siteIdentifier,
             String        userNameRegex,
             String        passwordRegex,
             Identifier [] groupIdentifiers )
     {
         RegexLidAccountManager ret = new RegexLidAccountManager(
+                siteIdentifier,
                 Pattern.compile( userNameRegex ),
                 RegexLidPasswordCredentialType.create( Pattern.compile( passwordRegex )),
                 groupIdentifiers );
@@ -59,17 +62,20 @@ public class RegexLidAccountManager
     /**
      * Factory method.
      * 
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param userNameRegex the user name regular expression
      * @param passwordRegex the password regular expression
      * @return the created RegexLidAccountManager
      * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
      */
     public static RegexLidAccountManager create(
+            Identifier    siteIdentifier,
             Pattern       userNameRegex,
             Pattern       passwordRegex,
             Identifier [] groupIdentifiers )
     {
         RegexLidAccountManager ret = new RegexLidAccountManager(
+                siteIdentifier,
                 userNameRegex,
                 RegexLidPasswordCredentialType.create( passwordRegex ),
                 groupIdentifiers );
@@ -80,17 +86,20 @@ public class RegexLidAccountManager
     /**
      * Factory method.
      *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param userNameRegex the user name regular expression
      * @param credentialType the available LidCredentialType
      * @return the created RegexLidAccountManager
      * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
      */
     public static RegexLidAccountManager create(
+            Identifier                     siteIdentifier,
             String                         userNameRegex,
             RegexLidPasswordCredentialType credentialType,
             Identifier []                  groupIdentifiers )
     {
         RegexLidAccountManager ret = new RegexLidAccountManager(
+                siteIdentifier,
                 Pattern.compile( userNameRegex ),
                 credentialType,
                 groupIdentifiers );
@@ -101,17 +110,20 @@ public class RegexLidAccountManager
     /**
      * Factory method.
      *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param userNameRegex the user name regular expression
      * @param credentialType the available LidCredentialType
      * @return the created RegexLidAccountManager
      * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
      */
     public static RegexLidAccountManager create(
+            Identifier                     siteIdentifier,
             Pattern                        userNameRegex,
             RegexLidPasswordCredentialType credentialType,
             Identifier []                  groupIdentifiers )
     {
         RegexLidAccountManager ret = new RegexLidAccountManager(
+                siteIdentifier,
                 userNameRegex,
                 credentialType,
                 groupIdentifiers );
@@ -121,17 +133,21 @@ public class RegexLidAccountManager
 
     /**
      * Private constructor, use factory method.
-     * 
+     *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param userNameRegex the user name regular expression
      * @param credentialType the available LidCredentialType
      * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
      */
     protected RegexLidAccountManager(
+            Identifier                     siteIdentifier,
             Pattern                        userNameRegex,
             RegexLidPasswordCredentialType credentialType,
             Identifier []                  groupIdentifiers )
     {
-        theUserNameRegex = userNameRegex;
+        super( siteIdentifier );
+
+        theUserNameRegex  = userNameRegex;
 
         theCredentialTypes = new LidCredentialType[] {
                 credentialType
@@ -166,6 +182,8 @@ public class RegexLidAccountManager
 
             LidAccount ret = SimpleLidAccount.create(
                     identifier,
+                    theSiteIdentifier,
+                    LidAccount.LidAccountStatus.ACTIVE,
                     null,
                     attributes,
                     theCredentialTypes,

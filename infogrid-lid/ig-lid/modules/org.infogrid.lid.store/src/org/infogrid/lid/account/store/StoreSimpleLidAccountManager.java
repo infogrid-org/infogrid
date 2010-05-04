@@ -46,33 +46,37 @@ public class StoreSimpleLidAccountManager
     /**
      * Factory method.
      *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param store the Store to store to
      * @param availableCredentialTypes the credential types known to the application
      * @return the created StoreSimpleLidAccountManager
      */
     public static StoreSimpleLidAccountManager create(
+            Identifier           siteIdentifier,
             LidCredentialType [] availableCredentialTypes,
             Store                store )
     {
         PrefixingStore accountStore       = PrefixingStore.create( "local", store );
         PrefixingStore remotePersonaStore = PrefixingStore.create( "remote", store );
-        return create( availableCredentialTypes, accountStore , remotePersonaStore );
+        return create( siteIdentifier, availableCredentialTypes, accountStore , remotePersonaStore );
     }
 
     /**
      * Factory method.
      *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param accountStore the Store to store LidAccounts in
      * @param remotePersonaStore the Store to map remote personas to LidAccounts in
      * @param availableCredentialTypes the credential types known to the application
      * @return the created StoreSimpleLidAccountManager
      */
     public static StoreSimpleLidAccountManager create(
+            final Identifier     siteIdentifier,
             LidCredentialType [] availableCredentialTypes,
             Store                accountStore,
             Store                remotePersonaStore )
     {
-        SimpleLidAccountMapper accountManager = new SimpleLidAccountMapper( availableCredentialTypes );
+        SimpleLidAccountMapper accountManager = new SimpleLidAccountMapper( siteIdentifier, availableCredentialTypes );
         
         Factory<Identifier,SimpleLidAccount,AccountData> accountFactory
                 = new AbstractFactory<Identifier,SimpleLidAccount,AccountData>() {
@@ -82,6 +86,8 @@ public class StoreSimpleLidAccountManager
                     {
                         SimpleLidAccount ret = SimpleLidAccount.create(
                                 identifier,
+                                siteIdentifier,
+                                arg.getStatus(),
                                 ArrayHelper.copyIntoNewArray( arg.getRemoteIdentifiers(), Identifier.class ),
                                 arg.getAttributes(),
                                 arg.getCredentialTypes(),
@@ -101,6 +107,7 @@ public class StoreSimpleLidAccountManager
         Map<Identifier,Identifier> remoteLocalMap = StoreBackedSwappingHashMap.createWeak( identifierMapper, remotePersonaStore );
 
         StoreSimpleLidAccountManager ret = new StoreSimpleLidAccountManager(
+                siteIdentifier,
                 smartAccountFactory,
                 remoteLocalMap );
         return ret;
@@ -109,13 +116,17 @@ public class StoreSimpleLidAccountManager
     /**
      * Constructor, use factory method.
      * 
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param delegateFactory the underlying SmartFactory
      * @param remoteLocalMap maps remote identifiers to local identifiers
      */
     protected StoreSimpleLidAccountManager(
+            Identifier                                            siteIdentifier,
             SmartFactory<Identifier,SimpleLidAccount,AccountData> delegateFactory,
             Map<Identifier,Identifier>                            remoteLocalMap )
     {
+        super( siteIdentifier );
+
         theDelegateFactory = delegateFactory;
         theRemoteLocalMap  = remoteLocalMap;
     }
@@ -154,7 +165,12 @@ public class StoreSimpleLidAccountManager
                 groupIds.add( group );
             }
         }
-        AccountData attCred = new AccountData( remoteIdentifiers, attributes, credentials, groupIds );
+        AccountData attCred = new AccountData(
+                LidAccount.LidAccountStatus.CREATED,
+                remoteIdentifiers,
+                attributes,
+                credentials,
+                groupIds );
         
         try {
             LidAccount ret = theDelegateFactory.obtainNewFor( localIdentifier, attCred );

@@ -29,6 +29,8 @@ public class SimpleLidAccount
      * Factory method.
      *
      * @param identifier the unique identifier of the persona, e.g. their identity URL
+     * @param siteIdentifier the identifier of the site at which the LidAccount exists
+     * @param status the status of the LidAccount
      * @param remoteIdentifiers set of remote Identifiers that are also associated with this LidAccount
      * @param attributes attributes of the persona, e.g. first name
      * @param credentialTypes the types of credentials available to locally authenticate this LidAccount
@@ -38,19 +40,31 @@ public class SimpleLidAccount
      */
     public static SimpleLidAccount create(
             Identifier           identifier,
+            Identifier           siteIdentifier,
+            LidAccountStatus     status,
             Identifier []        remoteIdentifiers,
             Map<String,String>   attributes,
             LidCredentialType [] credentialTypes,
             String []            credentials,
             Identifier []        groupIdentifiers )
     {
-        return new SimpleLidAccount( identifier, remoteIdentifiers, attributes, credentialTypes, credentials, groupIdentifiers );
+        return new SimpleLidAccount(
+                identifier,
+                siteIdentifier,
+                status,
+                remoteIdentifiers,
+                attributes,
+                credentialTypes,
+                credentials,
+                groupIdentifiers );
     }
 
     /**
      * Constructor, use factory.
      *
      * @param identifier the unique identifier of the persona, e.g. their identity URL
+     * @param siteIdentifier the identifier of the site at which the LidAccount exists
+     * @param status the status of the LidAccount
      * @param remoteIdentifiers set of remote Identifiers that are also associated with this LidAccount
      * @param attributes attributes of the persona, e.g. first name
      * @param credentialTypes the types of credentials available to locally authenticate this LidAccount
@@ -59,19 +73,32 @@ public class SimpleLidAccount
      */
     protected SimpleLidAccount(
             Identifier           identifier,
+            Identifier           siteIdentifier,
+            LidAccountStatus     status,
             Identifier []        remoteIdentifiers,
             Map<String,String>   attributes,
             LidCredentialType [] credentialTypes,
             String []            credentials,
             Identifier []        groupIdentifiers )
     {
-        super( identifier );
+        super( identifier, siteIdentifier );
 
+        theStatus            = status;
         theRemoteIdentifiers = remoteIdentifiers;
         theAttributes        = attributes;
         theCredentialTypes   = credentialTypes;
         theCredentials       = credentials;
         theGroupIdentifiers  = groupIdentifiers;
+    }
+
+    /**
+     * Determine this LidAccount's status.
+     *
+     * @return the LidAccount's status
+     */
+    public LidAccountStatus getAccountStatus()
+    {
+        return theStatus;
     }
 
     /**
@@ -147,6 +174,11 @@ public class SimpleLidAccount
     {
         return theGroupIdentifiers;
     }
+
+    /**
+     * The status of the account.
+     */
+    protected LidAccountStatus theStatus;
 
     /**
      * Remote Identifiers also associated with this LidAccount.

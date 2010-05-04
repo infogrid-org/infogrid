@@ -64,6 +64,7 @@ public class LdapLidLocalAccountManager
     /**
      * Factory method.
      *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param props Properties to use to connect to the directory
      * @param ldapContextName name of the LDAP context object in which to search, or null if default
      * @param filter the LDAP filter expression, or null if default
@@ -73,6 +74,7 @@ public class LdapLidLocalAccountManager
      * @throws NamingException something went wrong when attempting to bind to
      */
     public static LdapLidLocalAccountManager create(
+            Identifier           siteIdentifier,
             Properties           props,
             String               ldapContextName,
             String               filter,
@@ -82,6 +84,7 @@ public class LdapLidLocalAccountManager
             NamingException
     {
         return create(
+                siteIdentifier,
                 props,
                 ldapContextName,
                 filter,
@@ -93,6 +96,7 @@ public class LdapLidLocalAccountManager
     /**
      * Factory method.
      *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param props Properties to use to connect to the directory
      * @param ldapContextName name of the LDAP context object in which to search, or null if default
      * @param filter the LDAP filter expression, or null if default
@@ -103,6 +107,7 @@ public class LdapLidLocalAccountManager
      * @throws NamingException something went wrong when attempting to bind to
      */
     public static LdapLidLocalAccountManager create(
+            Identifier           siteIdentifier,
             Properties           props,
             String               ldapContextName,
             String               filter,
@@ -124,6 +129,7 @@ public class LdapLidLocalAccountManager
         }
 
         LdapLidLocalAccountManager ret = new LdapLidLocalAccountManager(
+                siteIdentifier,
                 props,
                 ldapContextName,
                 filter,
@@ -136,6 +142,7 @@ public class LdapLidLocalAccountManager
     /**
      * Constructor for subclasses only, use factory method.
      * 
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param props Properties to use to connect to the directory
      * @param ldapContextName name of the LDAP context object in which to search
      * @param filter the LDAP filter expression
@@ -144,6 +151,7 @@ public class LdapLidLocalAccountManager
      * @param credentialTypes the LidCredentialTypes for this LidAccountManager
      */
     protected LdapLidLocalAccountManager(
+            Identifier           siteIdentifier,
             Properties           props,
             String               ldapContextName,
             String               filter,
@@ -151,7 +159,8 @@ public class LdapLidLocalAccountManager
             String []            attributeList,
             LidCredentialType [] credentialTypes )
     {
-        super( );
+        super( siteIdentifier );
+
         theLdapProperties   = props;
         theManagerDir       = null;
         theLdapContextName  = ldapContextName;
@@ -229,6 +238,8 @@ public class LdapLidLocalAccountManager
                     }
                     LidAccount ret = SimpleLidAccount.create(
                             identifier,
+                            theSiteIdentifier,
+                            LidAccount.LidAccountStatus.ACTIVE,
                             null,
                             attributes,
                             theCredentialTypes,

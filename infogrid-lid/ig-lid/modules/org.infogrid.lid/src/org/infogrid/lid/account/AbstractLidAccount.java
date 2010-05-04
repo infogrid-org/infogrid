@@ -32,11 +32,25 @@ public abstract class AbstractLidAccount
      * Constructor for subclasses only.
      * 
      * @param identifier the unique identifier of the LidAccount, e.g. their local handle.
+     * @param siteIdentifier the identifier of the site at which the LidAccount exists
      */
     protected AbstractLidAccount(
-            Identifier identifier )
+            Identifier identifier,
+            Identifier siteIdentifier )
     {
         super( identifier );
+
+        theSiteIdentifier = siteIdentifier;
+    }
+
+    /**
+     * Determine the Identifier of the site at which this LidAccount exists.
+     *
+     * @return the Identifier of the site
+     */
+    public Identifier getSiteIdentifier()
+    {
+        return theSiteIdentifier;
     }
 
     /**
@@ -96,4 +110,9 @@ public abstract class AbstractLidAccount
         Set<String> ret = atts.keySet();
         return ret;
     }
+
+    /**
+     * The Identifier of the site at which this LidAccount exists.
+     */
+    protected Identifier theSiteIdentifier;
 }

@@ -142,9 +142,10 @@ public class DefaultLidSessionManagementPipelineStage
                 createNewSession = Boolean.TRUE;
             }
 
-            personaToSet = clientAuthStatus.getClientAccount();
+            // preferably set the remote persona: that's what the user thinks themselves as
+            personaToSet = clientAuthStatus.getClient();
             if( personaToSet == null ) {
-                personaToSet = clientAuthStatus.getClient();
+                personaToSet = clientAuthStatus.getClientAccount();
             }
 
         } else if( clientAuthStatus.clientWishesToLogin() ) {

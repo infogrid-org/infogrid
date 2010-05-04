@@ -25,6 +25,9 @@ public interface SimpleLidAccountTags
     /** Tag for an identifier. */
     public static final String IDENTIFIER_TAG = "id";
 
+    /** Tag for the LidAccount status. */
+    public static final String STATUS_TAG = "status";
+    
     /** Tag for an identity attribute. */
     public static final String ATTRIBUTE_TAG = "attribute";
     

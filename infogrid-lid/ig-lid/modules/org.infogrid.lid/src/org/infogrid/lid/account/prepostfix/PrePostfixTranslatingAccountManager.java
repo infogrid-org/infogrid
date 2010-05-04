@@ -34,15 +34,18 @@ public class PrePostfixTranslatingAccountManager
     /**
      * Factory method.
      *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param prefix the prefix
      * @param delegate the delegate LidLocalPersonaManager
      * @return the created PrePostfixTranslatingAccountManager
      */
     public static PrePostfixTranslatingAccountManager create(
+            Identifier        siteIdentifier,
             String            prefix,
             LidAccountManager delegate )
     {
         PrePostfixTranslatingAccountManager ret = new PrePostfixTranslatingAccountManager(
+                siteIdentifier,
                 prefix,
                 null,
                 delegate );
@@ -53,17 +56,20 @@ public class PrePostfixTranslatingAccountManager
     /**
      * Factory method.
      *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param prefix the prefix, if any
      * @param postfix the postfix, if any
      * @param delegate the delegate LidLocalPersonaManager
      * @return the created PrePostfixTranslatingAccountManager
      */
     public static PrePostfixTranslatingAccountManager create(
+            Identifier        siteIdentifier,
             String            prefix,
             String            postfix,
             LidAccountManager delegate )
     {
         PrePostfixTranslatingAccountManager ret = new PrePostfixTranslatingAccountManager(
+                siteIdentifier,
                 prefix,
                 postfix,
                 delegate );
@@ -74,16 +80,18 @@ public class PrePostfixTranslatingAccountManager
     /**
      * Constructor for subclasses only.
      * 
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param prefix the prefix, if any
      * @param postfix the postfix, if any
      * @param delegate the delegate LidLocalPersonaManager
      */
     protected PrePostfixTranslatingAccountManager(
+            Identifier        siteIdentifier,
             String            prefix,
             String            postfix,
             LidAccountManager delegate )
     {
-        super( delegate );
+        super( siteIdentifier, delegate );
         
         thePrefix  = prefix;
         thePostfix = postfix;

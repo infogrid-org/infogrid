@@ -14,10 +14,8 @@
 
 package org.infogrid.lid.session;
 
-import org.infogrid.lid.session.LidSession;
-import org.infogrid.lid.session.LidSessionManager;
-import org.infogrid.lid.session.LidSessionManagerArguments;
-import org.infogrid.lid.session.SimpleLidSession;
+import org.infogrid.lid.account.LidAccount;
+import org.infogrid.lid.account.LidAccountManager;
 import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.Factory;
@@ -39,15 +37,18 @@ public abstract class AbstractSimpleLidSessionManager
      * 
      * @param delegateFactory the underlying factory for LidSessions
      * @param storage the storage to use
+     * @param accountManager the LidAccountManager to find any LidAccount referenced in a LidSession
      * @param sessionDuration the duration of new or renewed sessions in milli-seconds
      */
     protected AbstractSimpleLidSessionManager(
             Factory<String,LidSession,LidSessionManagerArguments> delegateFactory,
             CachingMap<String,LidSession>                         storage,
+            LidAccountManager                                     accountManager,
             long                                                  sessionDuration )
     {
         super( delegateFactory, storage );
-        
+
+        theAccountManager  = accountManager;
         theSessionDuration = sessionDuration;
     }
     
@@ -71,6 +72,12 @@ public abstract class AbstractSimpleLidSessionManager
     {
         return theSessionDuration;
     }
+
+
+    /**
+     * The LidAccountManager to find any LidAccount referenced in a LidSession.
+     */
+    protected LidAccountManager theAccountManager;
 
     /**
      * The session duration, in milliseconds.
@@ -129,11 +136,14 @@ public abstract class AbstractSimpleLidSessionManager
             long timeAuthenticated = timeCreated;
             long timeLastUsed      = timeCreated;
             long timeValidUntil    = timeExpires;
-            
+
+            LidAccount account = theSessionManager.theAccountManager.determineLidAccountFromRemotePersona( argument.getClient() );
+
             SimpleLidSession ret = SimpleLidSession.create(
                     key,
                     argument.getClient(),
                     argument.getSiteIdentifier(),
+                    account,
                     timeCreated,
                     timeUpdated,
                     timeRead,

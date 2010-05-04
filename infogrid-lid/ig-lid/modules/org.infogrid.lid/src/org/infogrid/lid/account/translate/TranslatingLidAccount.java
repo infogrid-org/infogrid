@@ -40,7 +40,7 @@ public class TranslatingLidAccount
             Identifier identifier,
             LidAccount delegate )
     {
-        super( identifier );
+        super( identifier, delegate.getSiteIdentifier() );
 
         theDelegate = delegate;
     }
@@ -53,6 +53,16 @@ public class TranslatingLidAccount
     public LidAccount getDelegate()
     {
         return theDelegate;
+    }
+
+    /**
+     * Determine this LidAccount's status.
+     *
+     * @return the LidAccount's status
+     */
+    public LidAccountStatus getAccountStatus()
+    {
+        return theDelegate.getAccountStatus();
     }
 
     /**

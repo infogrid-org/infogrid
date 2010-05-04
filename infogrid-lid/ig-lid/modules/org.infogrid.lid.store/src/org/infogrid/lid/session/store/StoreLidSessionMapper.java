@@ -25,6 +25,7 @@ import org.infogrid.store.StoreValue;
 import org.infogrid.store.StoreValueDecodingException;
 import org.infogrid.store.StoreValueEncodingException;
 import org.infogrid.util.CannotFindHasIdentifierException;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.IdentifierFactory;
 import org.infogrid.util.InvalidIdentifierException;
 
@@ -137,15 +138,20 @@ public class StoreLidSessionMapper
                 timeValidUntil = -1L;
             }
 
-            LidAccount client = null;
-            if( clientIdentifier != null ) {
-                client = (LidAccount) theAccountManager.find( theIdentifierFactory.fromExternalForm( clientIdentifier ));
+            HasIdentifier client = theAccountManager.find( theIdentifierFactory.fromExternalForm( clientIdentifier ));
+            LidAccount    account;
+
+            if( client instanceof LidAccount ) {
+                account = (LidAccount) client;
+            } else {
+                account = theAccountManager.determineLidAccountFromRemotePersona( client );
             }
-            
+
             SimpleLidSession ret = SimpleLidSession.create(
                     sessionToken,
                     client,
                     siteIdentifier != null ? theIdentifierFactory.fromExternalForm( siteIdentifier ) : null,
+                    account,
                     value.getTimeCreated(),
                     value.getTimeUpdated(),
                     value.getTimeRead(),

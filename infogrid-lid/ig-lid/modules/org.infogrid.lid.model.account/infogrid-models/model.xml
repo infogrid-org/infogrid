@@ -112,6 +112,41 @@
         }
         return null;
     }
+    /**
+     * Determine the Identifier of the site at which this LidAccount exists.
+     *
+     * @return the Identifier of the site
+     */
+    public org.infogrid.util.Identifier getSiteIdentifier()
+    {
+        org.infogrid.mesh.MeshObject site = traverse( AccountSubjectArea.ACCOUNT_ATSITE_WEBRESOURCE.getSource() ).getSingleMember();
+        return site.getIdentifier();
+    }
+
+    /**
+     * Determine this LidAccount's status.
+     *
+     * @return the LidAccount's status
+     */
+    public org.infogrid.lid.account.LidAccount.LidAccountStatus getAccountStatus()
+    {
+        try {
+            if( AccountSubjectArea.ACCOUNT_STATUS_type_ACTIVE.equals( getStatus() )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.ACTIVE;
+            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_CREATED.equals( getStatus() )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.CREATED;
+            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_DISABLED.equals( getStatus() )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.DISABLED;
+            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_OBSOLETED.equals( getStatus() )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.OBSOLETED;
+            } else {
+                log.error( "Unexpected value: " + getStatus() );
+            }
+        } catch( NotPermittedException ex ) {
+            // ignore;
+        }
+        return null;
+    }
 
     /**
      * Determine the set of remote Identifiers that are also associated with this LidAccount.
@@ -289,19 +324,8 @@
      */
     public org.infogrid.util.HasIdentifier getSessionClient()
     {
-        try {
-            // try local persona first
-            MeshObject found = traverse( AccountSubjectArea.SESSION_FOR_ACCOUNT.getSource() ).getSingleMember();
-            if( found != null ) {
-                return (org.infogrid.lid.model.account.Account) found.getTypedFacadeFor( AccountSubjectArea.ACCOUNT );
-            }
-            // if there is no local account, use the remote persona
-            found = traverse( AccountSubjectArea.SESSION_USESIDENTITY_MESHOBJECT.getSource() ).getSingleMember();
-            return found;
-        } catch( NotBlessedException ex ) {
-            log.error( ex );
-            return null;
-        }
+        MeshObject found = traverse( AccountSubjectArea.SESSION_USESIDENTITY_MESHOBJECT.getSource() ).getSingleMember();
+        return found;
     }
 
     /**
@@ -318,6 +342,24 @@
         } else {
             return found.getIdentifier();
         }
+    }
+
+    /**
+     * Obtain the LidAccount on whose behalf the session takes place.
+     *
+     * @return the LidAccount, if any
+     */
+    public Account getAccount()
+    {
+        try {
+            MeshObject found = traverse( AccountSubjectArea.SESSION_FOR_ACCOUNT.getSource() ).getSingleMember();
+            if( found != null ) {
+                return (org.infogrid.lid.model.account.Account) found.getTypedFacadeFor( AccountSubjectArea.ACCOUNT );
+            }
+        } catch( NotBlessedException ex ) {
+            log.error( ex );
+        }
+        return null;
     }
 
     /**

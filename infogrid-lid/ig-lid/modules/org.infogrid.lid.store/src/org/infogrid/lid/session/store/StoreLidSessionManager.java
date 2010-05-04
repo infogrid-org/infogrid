@@ -45,7 +45,7 @@ public class StoreLidSessionManager
             Store             store,
             LidAccountManager accountManager )
     {
-        return create( store, new SimpleStringIdentifierFactory(), accountManager, DEFAULT_SESSION_DURATION );
+        return create( store, SimpleStringIdentifierFactory.create(), accountManager, DEFAULT_SESSION_DURATION );
     }
 
     /**
@@ -87,7 +87,7 @@ public class StoreLidSessionManager
         
         SimpleLidSessionDelegateFactory delegateFactory = new SimpleLidSessionDelegateFactory();
         
-        StoreLidSessionManager ret = new StoreLidSessionManager( delegateFactory, storage, sessionDuration );
+        StoreLidSessionManager ret = new StoreLidSessionManager( delegateFactory, storage, accountManager, sessionDuration );
         delegateFactory.setLidSessionManager( ret );
         
         return ret;
@@ -98,14 +98,16 @@ public class StoreLidSessionManager
      * 
      * @param delegateFactory the underlying factory for LidSessions
      * @param storage the storage to use
+     * @param accountManager the LidAccountManager to find any LidAccount referenced in a LidSession
      * @param sessionDuration the duration of new or renewed sessions in milli-seconds
      */
     protected StoreLidSessionManager(
             Factory<String,LidSession,LidSessionManagerArguments> delegateFactory,
             StoreBackedSwappingHashMap<String,LidSession>         storage,
+            LidAccountManager                                     accountManager,
             long                                                  sessionDuration )
     {
-        super( delegateFactory, storage, sessionDuration );
+        super( delegateFactory, storage, accountManager, sessionDuration );
     }    
 }
 

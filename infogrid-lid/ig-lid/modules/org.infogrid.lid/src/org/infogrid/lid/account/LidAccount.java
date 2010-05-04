@@ -28,6 +28,13 @@ public interface LidAccount
             HasIdentifier
 {
     /**
+     * Determine the Identifier of the site at which this LidAccount exists.
+     *
+     * @return the Identifier of the site
+     */
+    public Identifier getSiteIdentifier();
+
+    /**
      * Determine the set of remote Identifiers that are also associated with this LidAccount.
      * The Identifier inherited from HasIdentifier is considered the local Identifier.
      *
@@ -95,6 +102,13 @@ public interface LidAccount
     public Identifier [] getGroupIdentifiers();
 
     /**
+     * Determine this LidAccount's status.
+     *
+     * @return the LidAccount's status
+     */
+    public LidAccountStatus getAccountStatus();
+
+    /**
      * Name of the attribute that contains the persona's identifier.
      */
     public static final String IDENTIFIER_ATTRIBUTE_NAME = "Identifier";
@@ -103,4 +117,15 @@ public interface LidAccount
      * Name of the attribute that contains the persona's nickname.
      */
     public static final String NICKNAME_ATTRIBUTE_NAME = "Nickname";
+
+    /**
+     * The status of the LidAccount.
+     */
+    public static enum LidAccountStatus
+    {
+        CREATED,
+        ACTIVE,
+        DISABLED,
+        OBSOLETED;
+    }
 }

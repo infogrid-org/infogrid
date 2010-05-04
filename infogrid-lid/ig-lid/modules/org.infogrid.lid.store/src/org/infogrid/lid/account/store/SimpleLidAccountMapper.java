@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.account.SimpleLidAccount;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.store.StoreEntryMapper;
@@ -53,12 +54,15 @@ public class SimpleLidAccountMapper
     /**
      * Constructor.
      *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param availableCredentialTypes the credential types known to the application
      */
     public SimpleLidAccountMapper(
+            Identifier           siteIdentifier,
             LidCredentialType [] availableCredentialTypes )
     {
-        theAvailableCredentialTypes  = availableCredentialTypes;
+        theSiteIdentifier           = siteIdentifier;
+        theAvailableCredentialTypes = availableCredentialTypes;
         
         try {
             theParser = theSaxParserFactory.newSAXParser();
@@ -120,6 +124,8 @@ public class SimpleLidAccountMapper
             
             SimpleLidAccount ret = SimpleLidAccount.create(
                     theCurrentIdentifier,
+                    theSiteIdentifier,
+                    theCurrentAccountData.getStatus(),
                     ArrayHelper.copyIntoNewArray( theRemoteIdentifiers, Identifier.class ),
                     theCurrentAccountData.getAttributes(),
                     theCurrentAccountData.getCredentialTypes(),
@@ -204,7 +210,7 @@ public class SimpleLidAccountMapper
                 throw new SAXParseException( "Repeated tag " + ACCOUNT_TAG, theLocator );
             }
             theCurrentIdentifier = SimpleStringIdentifier.create( attrs.getValue( IDENTIFIER_TAG ));
-            theCurrentAccountData = new AccountData();
+            theCurrentAccountData = new AccountData( LidAccount.LidAccountStatus.valueOf( attrs.getValue( STATUS_TAG )));
 
         } else if( ATTRIBUTE_TAG.equals( qName )) {
             if( theCurrentAttribute != null ) {
@@ -433,7 +439,8 @@ public class SimpleLidAccountMapper
     {
         StringBuilder buf = new StringBuilder();
         buf.append( "<" ).append( ACCOUNT_TAG );
-        buf.append(  " " ).append( IDENTIFIER_TAG ).append( "=\"" ).append( XmlUtils.escape( account.getIdentifier().toExternalForm() )).append( "\">\n");
+        buf.append(  " " ).append( IDENTIFIER_TAG ).append( "=\"" ).append( XmlUtils.escape( account.getIdentifier().toExternalForm() )).append( "\"");
+        buf.append(  " " ).append( STATUS_TAG ).append( "=\"" ).append( XmlUtils.escape( account.getAccountStatus().name() )).append( "\">\n");
 
         for( String name : account.getAttributeKeys() ) {
             String value = account.getAttribute( name );
@@ -484,6 +491,11 @@ public class SimpleLidAccountMapper
         theSaxParserFactory = SAXParserFactory.newInstance();
         theSaxParserFactory.setValidating( true );
     }
+
+    /**
+     * The identifier of the site at which the accounts are managed.
+     */
+    protected Identifier theSiteIdentifier;
 
     /**
      * The credential types known by the application.

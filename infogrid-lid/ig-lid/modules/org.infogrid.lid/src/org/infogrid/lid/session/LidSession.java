@@ -14,7 +14,7 @@
 
 package org.infogrid.lid.session;
 
-import org.infogrid.lid.session.LidSessionManagerArguments;
+import org.infogrid.lid.account.LidAccount;
 import org.infogrid.util.FactoryCreatedObject;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
@@ -46,6 +46,13 @@ public interface LidSession
      */
     public Identifier getSiteIdentifier();
 
+    /**
+     * Obtain the LidAccount on whose behalf the session takes place.
+     *
+     * @return the LidAccount, if any
+     */
+    public LidAccount getAccount();
+    
     /**
      * Obtain the time the LidSession was created.
      *

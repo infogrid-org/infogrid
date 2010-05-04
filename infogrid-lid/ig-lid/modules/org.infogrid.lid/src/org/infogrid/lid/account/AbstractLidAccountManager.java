@@ -34,20 +34,26 @@ public abstract class AbstractLidAccountManager
 {
     /**
      * Constructor for subclasses only.
+     *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      */
-    protected AbstractLidAccountManager()
+    protected AbstractLidAccountManager(
+            Identifier siteIdentifier )
     {
-        theIdentifierFactory = new SimpleStringIdentifierFactory();
+        this( siteIdentifier, SimpleStringIdentifierFactory.create());
     }
 
     /**
      * Constructor for subclasses only.
      *
+     * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param identifierFactory the IdentifierFactory to use
      */
     protected AbstractLidAccountManager(
+            Identifier        siteIdentifier,
             IdentifierFactory identifierFactory )
     {
+        theSiteIdentifier    = siteIdentifier;
         theIdentifierFactory = identifierFactory;
     }
 
@@ -109,6 +115,11 @@ public abstract class AbstractLidAccountManager
     {
         throw new UnsupportedOperationException();
     }
+
+    /**
+     * Identifier of the site at which the accounts are managed.
+     */
+    protected Identifier theSiteIdentifier;
 
     /**
      * Factory for Identifiers.

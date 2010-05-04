@@ -14,6 +14,7 @@
 
 package org.infogrid.lid.session;
 
+import org.infogrid.lid.account.LidAccount;
 import org.infogrid.util.AbstractFactoryCreatedObject;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
@@ -33,6 +34,7 @@ public class SimpleLidSession
      * @param sessionToken the value identifying this session in a browser cookie
      * @param client the client whose session it is
      * @param siteIdentifier the identifier of the site
+     * @param account the LidAccount on whose behalf the session is created
      * @param timeCreated the time the session was created, in System.currentTimeMillis() format
      * @param timeUpdated the time the session was last updated, in System.currentTimeMillis() format
      * @param timeRead the time the session was last read, in System.currentTimeMillis() format
@@ -47,6 +49,7 @@ public class SimpleLidSession
             String        sessionToken,
             HasIdentifier client,
             Identifier    siteIdentifier,
+            LidAccount    account,
             long          timeCreated,
             long          timeUpdated,
             long          timeRead,
@@ -60,6 +63,7 @@ public class SimpleLidSession
                 sessionToken,
                 client,
                 siteIdentifier,
+                account,
                 timeCreated,
                 timeUpdated,
                 timeRead,
@@ -77,6 +81,7 @@ public class SimpleLidSession
      * @param sessionToken the value identifying this session in a browser cookie
      * @param client the client whose session it is
      * @param siteIdentifier the identifier of the site
+     * @param account the LidAccount on whose behalf the session is created
      * @param timeCreated the time the session was created, in System.currentTimeMillis() format
      * @param timeUpdated the time the session was last updated, in System.currentTimeMillis() format
      * @param timeRead the time the session was last read, in System.currentTimeMillis() format
@@ -90,6 +95,7 @@ public class SimpleLidSession
             String        sessionToken,
             HasIdentifier client,
             Identifier    siteIdentifier,
+            LidAccount    account,
             long          timeCreated,
             long          timeUpdated,
             long          timeRead,
@@ -102,6 +108,7 @@ public class SimpleLidSession
         theSessionToken             = sessionToken;
         theClient                   = client;
         theSiteIdentifier           = siteIdentifier;
+        theAccount                  = account;
         theTimeCreated              = timeCreated;
         theTimeUpdated              = timeUpdated;
         theTimeRead                 = timeRead;
@@ -140,6 +147,16 @@ public class SimpleLidSession
     public Identifier getSiteIdentifier()
     {
         return theSiteIdentifier;
+    }
+
+    /**
+     * Obtain the LidAccount on whose behalf the session takes place.
+     *
+     * @return the LidAccount, if any
+     */
+    public LidAccount getAccount()
+    {
+        return theAccount;
     }
 
     /**
@@ -302,6 +319,11 @@ public class SimpleLidSession
      * Identifier of the site whose session it is.
      */
     protected Identifier theSiteIdentifier;
+
+    /**
+     * LidAccount on whose behalf the session takes place.
+     */
+    protected LidAccount theAccount;
 
     /**
      * The time the session was created, in System.currentTimeMillis() format.
