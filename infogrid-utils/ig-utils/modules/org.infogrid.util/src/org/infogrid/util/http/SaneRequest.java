@@ -25,6 +25,8 @@ import org.infogrid.util.CursorIterator;
  * A saner API for incoming HTTP requests than the JDK's HttpServletRequest.
  */
 public interface SaneRequest
+        extends
+            SaneUrl
 {
     /**
      * If this request was obtained by way of a reverse proxy, return the SaneRequest
@@ -49,136 +51,6 @@ public interface SaneRequest
      * @return the HTTP method
      */
     public abstract String getMethod();
-
-    /**
-     * Obtain the requested root URI.
-     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
-     * that would be <code>http://example.com:123</code> (no trailing slash).
-     *
-     * @return the requested root URI
-     */
-    public abstract String getRootUri();
-
-    /**
-     * Determine the requested, relative base URI.
-     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
-     * that would be <code>/foo/bar</code>.
-     *
-     * @return the requested base URI
-     */
-    public abstract String getRelativeBaseUri();
-
-    /**
-     * Determine the requested, absolute base URI.
-     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
-     * that would be <code>http://example.com:123/foo/bar</code>.
-     *
-     * @return the requested absolute base URI
-     */
-    public abstract String getAbsoluteBaseUri();
-
-    /**
-     * Determine the requested, relative full URI.
-     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
-     * that would be <code>/foo/bar?abc=def</code>.
-     *
-     * @return the requested relative full URI
-     */
-    public abstract String getRelativeFullUri();
-
-    /**
-     * Determine the requested, absolute full URI.
-     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
-     * that would be <code>http://example.com:123/foo/bar?abc=def</code>.
-     *
-     * @return the requested absolute full URI
-     */
-    public abstract String getAbsoluteFullUri();
-
-    /**
-     * Get the name of the server.
-     *
-     * @return the name of the server
-     */
-    public abstract String getServer();
-
-    /**
-     * Get the value of the HTTP 1.1 host name field, which may include the port.
-     *
-     * @return the HTTP 1.1 Host name field
-     */
-    public abstract String getHttpHost();
-
-    /**
-     * Get the value of the HTTP 1.1 host name field, but without the port.
-     *
-     * @return the HTTP 1.1 host name field, but without the port
-     */
-    public abstract String getHttpHostOnly();
-
-    /**
-     * Get the port at which this Request arrived.
-     *
-     * @return the port at which this Request arrived
-     */
-    public abstract int getPort();
-
-    /**
-     * Get the protocol, i.e. http or https.
-     *
-     * @return http or https
-     */
-    public abstract String getProtocol();    
-    
-    /**
-     * Obtain all values of a multi-valued argument given in the URL.
-     *
-     * @param argName name of the argument
-     * @return value.
-     */
-    public abstract String [] getMultivaluedUrlArgument(
-            String argName );
-
-    /**
-     * Obtain the value of a named argument provided in the URL, or null.
-     * If more than one argument is given by this name,
-     * this will throw an IllegalStateException.
-     *
-     * @param name the name of the argument
-     * @return the value of the argument with name name
-     */
-    public abstract String getUrlArgument(
-            String name );
-
-    /**
-     * Obtain the value of a named argument provided in the URL, or null.
-     * If more than one argument is given by this name,
-     * return the first one.
-     *
-     * @param name the name of the argument
-     * @return the value of the argument with name name
-     */
-    public abstract String getFirstUrlArgument(
-            String name );
-
-    /**
-     * Obtain all arguments of this Request provided in the URL.
-     *
-     * @return a Map of name to value mappings for all arguments
-     */
-    public abstract Map<String,String[]> getUrlArguments();
-
-    /**
-     * Determine whether a named argument provided in the URL  has the given value.
-     * This method is useful in case several arguments have been given with the same name.
-     * 
-     * @param name the name of the argument
-     * @param value the desired value of the argument
-     * @return true if the request contains an argument with this name and value
-     */
-    public abstract boolean matchUrlArgument(
-            String name,
-            String value );
 
     /**
      * Obtain a POST'd argument. If more than one argument is given by this name,
@@ -219,34 +91,6 @@ public interface SaneRequest
             String value );
 
     /**
-     * Obtain the relative context Uri of this application.
-     *
-     * @return the relative context URI
-     */
-    public abstract String getContextPath();
-
-    /**
-     * Obtain the relative context Uri of this application with a trailing slash.
-     *
-     * @return the relative context URI with a trailing slash
-     */
-    public abstract String getContextPathWithSlash();
-
-    /**
-     * Obtain the absolute context Uri of this application.
-     *
-     * @return the absolute context URI
-     */
-    public abstract String getAbsoluteContextUri();
-
-    /**
-     * Obtain the absolute context Uri of this application with a trailing slash.
-     *
-     * @return the absolute context URI with a trailing slash.
-     */
-    public abstract String getAbsoluteContextUriWithSlash();
-
-    /**
      * Obtain the cookies that were sent as part of this Request.
      *
      * @return the cookies that were sent as part of this Request.
@@ -271,13 +115,6 @@ public interface SaneRequest
     public abstract String getCookieValue(
             String name );
 
-    /**
-     * Obtain the query string, if any.
-     * 
-     * @return the query string
-     */
-    public abstract String getQueryString();
-    
     /**
      * Obtain the client IP address.
      *

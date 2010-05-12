@@ -115,4 +115,14 @@ public interface StringRepresentation
      * The default entry.
      */
     public static final String DEFAULT_ENTRY = "String";
+
+    /**
+     * The default entry for the start of a link.
+     */
+    public static final String DEFAULT_LINK_START_ENTRY = "LinkStartString";
+
+    /**
+     * The default entry for the end of a link
+     */
+    public static final String DEFAULT_LINK_END_ENTRY = "LinkEndString";
 }
