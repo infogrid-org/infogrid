@@ -319,7 +319,7 @@ public class DefaultNetMeshBaseIdentifierFactory
             ParseException
     {
         try {
-            Object [] found = representation.parseEntry( NetMeshBaseIdentifier.class, NetMeshBaseIdentifier.DEFAULT_ENTRY, s, this );
+            Object [] found = representation.parseEntry( NetMeshBaseIdentifier.class, StringRepresentation.DEFAULT_ENTRY, s, this );
 
             NetMeshBaseIdentifier ret;
             switch( found.length ) {

@@ -167,7 +167,7 @@ public class DefaultNetMeshBaseAccessSpecification
 
         String ret = rep.formatEntry(
                 getClass(), // dispatch to the right subtype
-                DEFAULT_LINK_START_ENTRY,
+                StringRepresentation.DEFAULT_LINK_START_ENTRY,
                 null,
         /* 0 */ contextPath,
         /* 1 */ externalForm,
@@ -202,7 +202,7 @@ public class DefaultNetMeshBaseAccessSpecification
 
         String ret = rep.formatEntry(
                 getClass(), // dispatch to the right subtype
-                DEFAULT_LINK_END_ENTRY,
+                StringRepresentation.DEFAULT_LINK_END_ENTRY,
                 null,
                 contextPath,
                 externalForm );
@@ -311,19 +311,4 @@ public class DefaultNetMeshBaseAccessSpecification
      * The requested Coherence.
      */
     protected CoherenceSpecification theCoherenceSpecification;
-
-    /**
-     * Entry in the resource files, prefixed by the StringRepresentation's prefix.
-     */
-    public static final String DEFAULT_ENTRY = "String";
-
-    /**
-     * Entry in the resource files, prefixed by the StringRepresentation's prefix.
-     */
-    public static final String DEFAULT_LINK_START_ENTRY = "LinkStartString";
-
-    /**
-     * Entry in the resource files, prefixed by the StringRepresentation's prefix.
-     */
-    public static final String DEFAULT_LINK_END_ENTRY = "LinkEndString";
 }
