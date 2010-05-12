@@ -230,7 +230,7 @@ public class DefaultLidSessionManagementPipelineStage
             
             Matcher m = theUrlPattern.matcher( siteString );
             if( m.find() ) {
-                if( !"localhost".equals( lidRequest.getHttpHostOnly())) {
+                if( !"localhost".equals( lidRequest.getServer())) {
                     cookieDomain = m.group( 1 );
                 }
                 cookiePath   = m.group( 2 );
