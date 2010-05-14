@@ -433,7 +433,7 @@ public class ModuleAdvertisementXmlParser
             // no op
 
         } else if( JAR_TAG.equals( qName )) {
-            jars.add( relativeFile( lastString ));
+            jars.add( jarFile( lastString ));
 
         } else if( ACTIVATIONCLASS_TAG.equals( qName )) {
             activationClassName = lastString;
@@ -523,24 +523,25 @@ public class ModuleAdvertisementXmlParser
     }
 
     /**
-     * Helper method to construct a relative file.
+     * Helper method to construct the path of a JAR file.
      *
-     * @param relative the name of the File
+     * @param string name of the File as given in the ModuleAdvertisement.
      * @return the File
      * @throws SAXException thrown if the filesystem could not be queried
      */
-    protected File relativeFile(
-            String relative )
+    protected File jarFile(
+            String string )
         throws
             SAXException
     {
         try {
             File ret;
 
-            if( relative.startsWith( "/" )) {
-                ret = new File( relative );
+            if( string.startsWith( "/" )) {
+                ret = new File( string );
             } else {
-                ret = new File( theFile.getCanonicalFile().getParentFile(), relative );
+                File distDir = new File( theFile.getCanonicalFile().getParentFile().getParentFile(), "dist" );
+                ret = new File( distDir, string );
             }
             return ret;
 
