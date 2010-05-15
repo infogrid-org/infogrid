@@ -137,7 +137,7 @@ public abstract class AbstractSimpleLidSessionManager
             long timeLastUsed      = timeCreated;
             long timeValidUntil    = timeExpires;
 
-            LidAccount account = theSessionManager.theAccountManager.determineLidAccountFromRemotePersona( argument.getClient() );
+            LidAccount account = theSessionManager.theAccountManager.determineLidAccountFromRemotePersona( argument.getClient(), argument.getSiteIdentifier() );
 
             SimpleLidSession ret = SimpleLidSession.create(
                     key,

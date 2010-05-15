@@ -26,6 +26,7 @@ import org.infogrid.store.StoreValueDecodingException;
 import org.infogrid.store.StoreValueEncodingException;
 import org.infogrid.util.CannotFindHasIdentifierException;
 import org.infogrid.util.HasIdentifier;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.IdentifierFactory;
 import org.infogrid.util.InvalidIdentifierException;
 
@@ -96,7 +97,7 @@ public class StoreLidSessionMapper
             String [] components = data.split( SEPARATOR );
             String sessionToken;
             String clientIdentifier;
-            String siteIdentifier;
+            String siteIdentifierString;
             String creationClientIp;
             long   timeLastAuthenticated;
             long   timeLastUsedSuccessfully;
@@ -113,9 +114,9 @@ public class StoreLidSessionMapper
                 clientIdentifier = null;
             }
             if( components.length >= 3 ) {
-                siteIdentifier = components[2];
+                siteIdentifierString = components[2];
             } else {
-                siteIdentifier = null;
+                siteIdentifierString = null;
             }
             if( components.length >= 4 ) {
                 creationClientIp = components[3];
@@ -139,18 +140,19 @@ public class StoreLidSessionMapper
             }
 
             HasIdentifier client = theAccountManager.find( theIdentifierFactory.fromExternalForm( clientIdentifier ));
+            Identifier    siteIdentifier = siteIdentifierString != null ? theIdentifierFactory.fromExternalForm( siteIdentifierString ) : null;
             LidAccount    account;
 
             if( client instanceof LidAccount ) {
                 account = (LidAccount) client;
             } else {
-                account = theAccountManager.determineLidAccountFromRemotePersona( client );
+                account = theAccountManager.determineLidAccountFromRemotePersona( client, siteIdentifier );
             }
 
             SimpleLidSession ret = SimpleLidSession.create(
                     sessionToken,
                     client,
-                    siteIdentifier != null ? theIdentifierFactory.fromExternalForm( siteIdentifier ) : null,
+                    siteIdentifier,
                     account,
                     value.getTimeCreated(),
                     value.getTimeUpdated(),

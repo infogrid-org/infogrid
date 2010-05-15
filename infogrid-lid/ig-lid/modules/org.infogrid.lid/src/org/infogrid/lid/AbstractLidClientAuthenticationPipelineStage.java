@@ -162,7 +162,7 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
         }
         if( clientPersona == null && clientRemotePersona != null ) {
             // check whether there's a LidAccount for it
-            clientPersona = theAccountManager.determineLidAccountFromRemotePersona( clientRemotePersona );
+            clientPersona = theAccountManager.determineLidAccountFromRemotePersona( clientRemotePersona, siteIdentifier );
         }
 
         boolean clientLoggedOn            = false;

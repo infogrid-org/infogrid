@@ -277,14 +277,16 @@ public class LdapLidLocalAccountManager
     }
 
     /**
-     * Given a remote persona, determine the locally provisioned corresponding
-     * LidAccount. May return null if none has been provisioned.
+     * Given a remote persona and a site, determine the LidAccount that has been provisioned for
+     * the remote persona at the site. May return null if none has been provisioned.
      *
      * @param remote the remote persona
+     * @param siteIdentifier identifier of the site at which the account has been provisioned
      * @return the found LidAccount, or null
      */
     public LidAccount determineLidAccountFromRemotePersona(
-            HasIdentifier remote )
+            HasIdentifier remote,
+            Identifier    siteIdentifier )
     {
         // we don't do this, it's LDAP after all
         return null;

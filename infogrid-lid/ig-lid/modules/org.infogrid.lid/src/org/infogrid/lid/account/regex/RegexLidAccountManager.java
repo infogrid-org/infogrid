@@ -197,14 +197,17 @@ public class RegexLidAccountManager
     }
 
     /**
-     * Given a remote persona, determine the locally provisioned corresponding
-     * LidAccount. Always returns null in this implementation.
+     * Given a remote persona and a site, determine the LidAccount that has been provisioned for
+     * the remote persona at the site. May return null if none has been provisioned.
+     * Always returns null in this implementation.
      *
      * @param remote the remote persona
+     * @param siteIdentifier identifier of the site at which the account has been provisioned
      * @return the found LidAccount, or null
      */
     public LidAccount determineLidAccountFromRemotePersona(
-            HasIdentifier remote )
+            HasIdentifier remote,
+            Identifier    siteIdentifier )
     {
         return null;
     }
