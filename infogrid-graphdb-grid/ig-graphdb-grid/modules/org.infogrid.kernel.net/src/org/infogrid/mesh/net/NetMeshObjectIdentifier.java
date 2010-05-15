@@ -34,6 +34,13 @@ public interface NetMeshObjectIdentifier
     public abstract NetMeshBaseIdentifier getNetMeshBaseIdentifier();
 
     /**
+     * Obtain the local components of the NetMeshObjectIdentifier.
+     *
+     * @return the local component
+     */
+    public abstract String getLocalId();
+
+    /**
      * To save memory, this constant is allocated here and used wherever appropriate.
      */
     public static final NetMeshObjectIdentifier [] NET_EMPTY_ARRAY = {};
