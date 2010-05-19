@@ -116,6 +116,44 @@ public class DefaultAnetMeshObjectIdentifierFactory
     }
 
     /**
+     * Recreate a NetMeshObjectIdentifier from an external form. Be lenient about syntax and
+     * attempt to interpret what the user meant when entering an invalid or incomplete
+     * raw String.
+     *
+     * @param contextIdentifier identifier of the NetMeshBase relative to which the external form is to be evaluated
+     * @param raw the external form
+     * @return the created MeshObjectIdentifier
+     * @throws ParseException thrown if a parsing error occurred
+     */
+    @Override
+    public DefaultAnetMeshObjectIdentifier guessFromExternalForm(
+            NetMeshBaseIdentifier contextIdentifier,
+            String                raw )
+        throws
+            ParseException
+    {
+        return obtain( contextIdentifier, raw, true );
+    }
+
+    /**
+     * Recreate a NetMeshObjectIdentifier from an external form. Be lenient about syntax and
+     * attempt to interpret what the user meant when entering an invalid or incomplete
+     * raw String.
+     *
+     * @param raw the external form
+     * @return the created MeshObjectIdentifier
+     * @throws ParseException thrown if a parsing error occurred
+     */
+    @Override
+    public DefaultAnetMeshObjectIdentifier guessFromExternalForm(
+            String raw )
+        throws
+            ParseException
+    {
+        return obtain( theMeshBaseIdentifier, raw, true );
+    }
+
+    /**
      * Re-construct a DefaultAnetMeshObjectIdentifier from an external form.
      *
      * @param contextIdentifier identifier of the NetMeshBase relative to which the external form is to be evaluated
@@ -132,6 +170,9 @@ public class DefaultAnetMeshObjectIdentifierFactory
             ParseException
     {
         if( raw == null ) {
+            raw = "";
+        }
+        if( raw.length() == 0 ) {
             return new HomeObject( this, contextIdentifier );
         }
         
@@ -171,8 +212,8 @@ public class DefaultAnetMeshObjectIdentifierFactory
             throw new IllegalArgumentException( "DefaultAnetMeshObjectIdentifier's localId must not contain a period: " + localId );
         }
 
-        if( localId != null && localId.length() == 0 ) {
-            localId = null;
+        if( localId == null ) {
+            localId = "";
         }
 
         checkRawId( meshBase, localId );
@@ -183,24 +224,6 @@ public class DefaultAnetMeshObjectIdentifierFactory
                 localId,
                 raw );
         return ret;
-    }
-
-    /**
-     * Recreate a NetMeshObjectIdentifier from an external form. Be lenient about syntax and
-     * attempt to interpret what the user meant when entering an invalid or incomplete
-     * raw String.
-     *
-     * @param raw the external form
-     * @return the created MeshObjectIdentifier
-     * @throws ParseException thrown if a parsing error occurred
-     */
-    @Override
-    public DefaultAnetMeshObjectIdentifier guessFromExternalForm(
-            String raw )
-        throws
-            ParseException
-    {
-        return obtain( theMeshBaseIdentifier, raw, true );
     }
     
     /**
@@ -329,6 +352,9 @@ public class DefaultAnetMeshObjectIdentifierFactory
             ParseException
     {
         if( rawLocalId == null ) {
+            throw new NullPointerException();
+        }
+        if( rawLocalId.length() == 0 ) {
             return;
         }
 
@@ -392,7 +418,7 @@ public class DefaultAnetMeshObjectIdentifierFactory
                 DefaultAnetMeshObjectIdentifierFactory factory,
                 NetMeshBaseIdentifier                  meshBaseIdentifier )
         {
-            super( factory, meshBaseIdentifier, null, null );
+            super( factory, meshBaseIdentifier, "", null );
         }
     }
 }

@@ -159,6 +159,25 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
     }
 
     /**
+     * Recreate a NetMeshObjectIdentifier from an external form. Be lenient about syntax and
+     * attempt to interpret what the user meant when entering an invalid or incomplete
+     * raw String.
+     *
+     * @param contextIdentifier identifier of the NetMeshBase relative to which the external form is to be evaluated
+     * @param raw the external form
+     * @return the created MeshObjectIdentifier
+     * @throws ParseException thrown if a parsing error occurred
+     */
+    public NetMeshObjectIdentifier guessFromExternalForm(
+            NetMeshBaseIdentifier contextIdentifier,
+            String                raw )
+        throws
+            ParseException
+    {
+        return theDelegate.guessFromExternalForm( contextIdentifier, raw );
+    }
+
+    /**
      * Convert this StringRepresentation back to a MeshObjectIdentifier.
      *
      * @param representation the StringRepresentation in which this String is represented
