@@ -39,6 +39,20 @@ public interface IdentifierFactory
             ParseException;
 
     /**
+     * Create an {@link Identifier} given its external form. Be lenient about syntax and
+     * attempt to interpret what the user meant when entering an invalid or incomplete
+     * raw String.
+     *
+     * @param raw the external form
+     * @return the Identifier
+     * @throws ParseException thrown if the String could not be successfully parsed
+     */
+    public Identifier guessFromExternalForm(
+            String raw )
+        throws
+            ParseException;
+
+    /**
      * Convert a String in a given {@link org.infogrid.util.text.StringRepresentation}
      * back to an {@link Identifier}.
      *

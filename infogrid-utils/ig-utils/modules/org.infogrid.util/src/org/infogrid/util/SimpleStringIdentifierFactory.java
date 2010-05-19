@@ -55,6 +55,20 @@ public class SimpleStringIdentifierFactory
     }
 
     /**
+     * Create an {@link Identifier} given its external form. Be lenient about syntax and
+     * attempt to interpret what the user meant when entering an invalid or incomplete
+     * raw String.
+     *
+     * @param raw the external form
+     * @return the Identifier
+     */
+    public Identifier guessFromExternalForm(
+            String raw )
+    {
+        return fromExternalForm( raw );
+    }
+
+    /**
      * Convert a String in a given {@link org.infogrid.util.text.StringRepresentation}
      * back to an {@link Identifier}.
      *

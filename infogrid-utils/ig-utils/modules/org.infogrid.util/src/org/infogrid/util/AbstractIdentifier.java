@@ -29,7 +29,7 @@ public abstract class AbstractIdentifier
     protected AbstractIdentifier(
             String asEntered )
     {
-        theAsEntered = asEntered;
+        theAsEntered = asEntered; // may be null, user may not have entered anything
     }
 
     /**
