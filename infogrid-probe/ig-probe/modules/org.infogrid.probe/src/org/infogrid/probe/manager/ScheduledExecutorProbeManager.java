@@ -16,6 +16,7 @@ package org.infogrid.probe.manager;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -232,7 +233,14 @@ public abstract class ScheduledExecutorProbeManager
         if( log.isTraceEnabled() ) {
             log.traceMethodCallEntry( this, "die" );
         }
+        // Apparently a ConcurrentModificationException is possible here. (Why? FIXME)
+        // So we do it as two steps:
+
+        ArrayList<ShadowMeshBase> toKill = new ArrayList<ShadowMeshBase>( theKeyValueMap.size() );
         for( ShadowMeshBase shadow : theKeyValueMap.values() ) {
+            toKill.add( shadow );
+        }
+        for( ShadowMeshBase shadow : toKill ) {
             // attempt to be as successful as possible
             try {
                 shadow.die();
