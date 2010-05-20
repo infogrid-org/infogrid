@@ -233,7 +233,7 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
                     }
                 }
                 if( !validCredentialTypes.isEmpty() && invalidCredentialTypes.isEmpty() ) {
-                    if( sessionClientIdentifier == null ) {
+                    if( preexistingClientSession == null ) {
                         clientLoggedOn = true;
                     }
                 }
