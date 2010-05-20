@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -59,6 +59,12 @@ public class SimpleXprisoMessage
             NetMeshBaseIdentifier sender,
             NetMeshBaseIdentifier receiver )
     {
+        if( sender == null ) {
+            throw new NullPointerException();
+        }
+        if( receiver == null ) {
+            throw new NullPointerException();
+        }
         SimpleXprisoMessage ret = new SimpleXprisoMessage( sender, receiver );
 
         if( log.isTraceEnabled() ) {
@@ -80,28 +86,6 @@ public class SimpleXprisoMessage
         super( sender, receiver );
     }
     
-    /**
-     * Set the NetMeshBaseIdentifier of the sender.
-     * 
-     * @param newValue the NetMeshBaseIdentifier of the sender
-     */
-    public void setSenderIdentifier(
-            NetMeshBaseIdentifier newValue )
-    {
-        theSenderIdentifier = newValue;
-    }
-
-    /**
-     * Set the NetMeshBaseIdentifier of the receiver.
-     * 
-     * @param newValue the NetMeshBaseIdentifier of the receiver
-     */
-    public void setReceiverIdentifier(
-            NetMeshBaseIdentifier newValue )
-    {
-        theReceiverIdentifier = newValue;
-    }
-
     /**
      * Set the request ID.
      *
@@ -144,6 +128,11 @@ public class SimpleXprisoMessage
     public void setConveyedMeshObjects(
             ExternalizedNetMeshObject [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theConveyedMeshObjects = newValue;
     }
 
@@ -167,6 +156,11 @@ public class SimpleXprisoMessage
     public void setRequestedFirstTimeObjects(
             NetMeshObjectAccessSpecification [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theRequestedFirstTimeObjects = newValue;
     }
     
@@ -190,6 +184,11 @@ public class SimpleXprisoMessage
     public void setRequestedCanceledObjects(
             NetMeshObjectIdentifier [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theRequestedCanceledObjects = newValue;
     }
     
@@ -213,6 +212,11 @@ public class SimpleXprisoMessage
     public void setRequestedFreshenReplicas(
             NetMeshObjectIdentifier [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theRequestedFreshenReplicas = newValue;
     }
 
@@ -236,6 +240,11 @@ public class SimpleXprisoMessage
     public void setRequestedResynchronizeReplicas(
             NetMeshObjectIdentifier [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theRequestedResynchronizeReplicas = newValue;
     }
 
@@ -259,6 +268,11 @@ public class SimpleXprisoMessage
     public void setRequestedLockObjects(
             NetMeshObjectIdentifier [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theRequestedLockObjects = newValue;
     }
 
@@ -282,6 +296,11 @@ public class SimpleXprisoMessage
     public void setPushLockObjects(
             NetMeshObjectIdentifier [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         thePushLockObjects = newValue;
     }
 
@@ -305,6 +324,11 @@ public class SimpleXprisoMessage
     public void setReclaimedLockObjects(
             NetMeshObjectIdentifier [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theReclaimedLockObjects = newValue;
     }
 
@@ -328,6 +352,11 @@ public class SimpleXprisoMessage
     public void setRequestedHomeReplicas(
             NetMeshObjectIdentifier [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theRequestedHomeReplicas = newValue;
     }
 
@@ -351,6 +380,11 @@ public class SimpleXprisoMessage
     public void setPushHomeReplicas(
             NetMeshObjectIdentifier [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         thePushHomeReplicas = newValue;
     }
 
@@ -374,6 +408,11 @@ public class SimpleXprisoMessage
     public void setTypeAdditions(
             NetMeshObjectTypeAddedEvent [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theTypeAdditions = newValue;
     }
 
@@ -397,6 +436,11 @@ public class SimpleXprisoMessage
     public void setTypeRemovals(
             NetMeshObjectTypeRemovedEvent [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theTypeRemovals = newValue;
     }
 
@@ -420,6 +464,11 @@ public class SimpleXprisoMessage
     public void setPropertyChanges(
             NetMeshObjectPropertyChangeEvent [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         thePropertyChanges = newValue;
     }
 
@@ -443,6 +492,11 @@ public class SimpleXprisoMessage
     public void setNeighborAdditions(
             NetMeshObjectNeighborAddedEvent [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theNeighborAdditions = newValue;
     }
 
@@ -466,6 +520,11 @@ public class SimpleXprisoMessage
     public void setNeighborRemovals(
             NetMeshObjectNeighborRemovedEvent [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theNeighborRemovals = newValue;
     }
 
@@ -489,6 +548,11 @@ public class SimpleXprisoMessage
     public void setEquivalentAdditions(
             NetMeshObjectEquivalentsAddedEvent [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theEquivalentsAdditions = newValue;
     }
 
@@ -512,6 +576,11 @@ public class SimpleXprisoMessage
     public void setEquivalentRemovals(
             NetMeshObjectEquivalentsRemovedEvent [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theEquivalentsRemovals = newValue;
     }
 
@@ -535,6 +604,11 @@ public class SimpleXprisoMessage
     public void setRoleAdditions(
             NetMeshObjectRoleAddedEvent [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theRoleAdditions = newValue;
     }
 
@@ -558,6 +632,11 @@ public class SimpleXprisoMessage
     public void setRoleRemovals(
             NetMeshObjectRoleRemovedEvent [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theRoleRemovals = newValue;
     }
 
@@ -581,6 +660,11 @@ public class SimpleXprisoMessage
     public void setDeleteChanges(
             NetMeshObjectDeletedEvent [] newValue )
     {
+        for( int i=0 ; i<newValue.length ; ++i ) {
+            if( newValue[i] == null ) {
+                throw new NullPointerException( "index " + i );
+            }
+        }
         theDeleteChanges = newValue;
     }
 

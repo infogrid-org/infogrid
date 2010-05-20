@@ -17,7 +17,7 @@
   <lastTokenSent>90</lastTokenSent>
   <lastTokenReceived>123</lastTokenReceived>
   <messages-to-send>
-    <XprisoMessage request-id="135" response-id="246">
+    <XprisoMessage request-id="135" response-id="246" sender="http://testing.org/some/where" receiver="http://testing.org/abcdef">
     </XprisoMessage>
   </messages-to-send>
   <messages-last-sent>

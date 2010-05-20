@@ -13,4 +13,4 @@
     All rights reserved.
 -->
 
-<proxy there="=somewhere"/>
+<proxy there="=somewhere" sender="http://one.local/" receiver="https://two.local/foo"/>

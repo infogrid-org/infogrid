@@ -106,8 +106,8 @@ public class ProxySerializationTest1
                         new TestXprisoMessage(
                                 135,
                                 246,
-                                null,
-                                null,
+                                "http://one.local/",
+                                "https://two.local/foo",
                                 null,
                                 null,
                                 null,
@@ -141,8 +141,8 @@ public class ProxySerializationTest1
                         new TestXprisoMessage(
                                 135,
                                 246,
-                                null,
-                                null,
+                                "http://testing.org/some/where",
+                                "http://testing.org/abcdef",
                                 null,
                                 null,
                                 null,
@@ -428,17 +428,11 @@ public class ProxySerializationTest1
             throws
                 Exception
         {
-            super( null, null );
+            super( senderNetworkIdentifierString   != null ? theMeshBaseIdentifierFactory.fromExternalForm( senderNetworkIdentifierString   ) : null,
+                   receiverNetworkIdentifierString != null ? theMeshBaseIdentifierFactory.fromExternalForm( receiverNetworkIdentifierString ) : null );
 
             setRequestId( requestId );
             setResponseId( responseId );
-
-            if( senderNetworkIdentifierString != null ) {
-                setSenderIdentifier( theMeshBaseIdentifierFactory.fromExternalForm( senderNetworkIdentifierString ));
-            }
-            if( receiverNetworkIdentifierString != null ) {
-                setReceiverIdentifier( theMeshBaseIdentifierFactory.fromExternalForm( receiverNetworkIdentifierString ));
-            }
 
             if( requestedFirstTimeObjects != null ) {
                 setRequestedFirstTimeObjects( requestedFirstTimeObjects );

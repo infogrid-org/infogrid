@@ -15,7 +15,7 @@
 
 <proxy there="@some.where.else">
   <messages-to-send>
-    <XprisoMessage request-id="135" response-id="246">
+    <XprisoMessage request-id="135" response-id="246" sender="http://one.local/" receiver="https://two.local/foo">
     </XprisoMessage>
   </messages-to-send>
 </proxy>
