@@ -9,7 +9,7 @@
  
     For more information about InfoGrid go to http://infogrid.org/
 
-    Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+    Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
     All rights reserved.
 -->
 
@@ -30,6 +30,16 @@
             <name>XrdsServiceCollection</name>
             <username>XRDS Service Collection</username>
             <userdescription>A collection of XRDS services.</userdescription>
+
+            <propertytype ID="org.infogrid.lid.model.yadis/XrdsServiceCollection_XrdsResourceContent">
+                <name>XrdsResourceContent</name>
+                <username>XrdsResourceContent</username>
+                <userdescription>Content of the parsed XRDS resource.</userdescription>
+                <datatype>
+                    <BlobDataType typefield="theTextXmlType" />
+                </datatype>
+                <isoptional/>
+            </propertytype>
         </entitytype>
 
         <entitytype ID="org.infogrid.lid.model.yadis/XrdsService">
