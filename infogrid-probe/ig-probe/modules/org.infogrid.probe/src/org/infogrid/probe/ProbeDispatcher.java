@@ -479,9 +479,10 @@ public class ProbeDispatcher
         URL                   url              = sourceIdentifier.toUrl();
         Probe                 probe            = null;
 
-        String yadisServicesXml  = null;
-        String yadisServicesHtml = null;
-        String yadisUrl          = null;
+        byte [] yadisServicesXml  = null;
+        String  yadisServicesType = null;
+        String  yadisServicesHtml = null;
+        String  yadisUrl          = null;
 
         long streamDataCreated      = 0L;
         long streamDataLastModified = 0L;
@@ -508,7 +509,8 @@ public class ProbeDispatcher
             if( httpResponse.isSuccess() && XRDS_MIME_TYPE.equals( httpResponse.getContentType() )) {
                 // found XRDS content via MIME type
                 
-                yadisServicesXml = httpResponse.getContentAsString();
+                yadisServicesXml  = httpResponse.getContent();
+                yadisServicesType = httpResponse.getContentType();
 
                 // now ask again, without the XRDS mime type
                 httpResponse = HTTP.http_get(
@@ -613,6 +615,8 @@ public class ProbeDispatcher
                             oldBase,
                             newBase,
                             coherence,
+                            content,
+                            contentType,
                             inStream );
                 } else {
                     probe = handleNonXml(
@@ -634,7 +638,7 @@ public class ProbeDispatcher
                         getDocumentBuilder() );
             }
             if( yadisServicesXml != null ) {
-                theServiceFactory.addYadisServicesFromXml( sourceIdentifier, yadisServicesXml, newBase );
+                theServiceFactory.addYadisServicesFromXml( sourceIdentifier, yadisServicesXml, yadisServicesType, newBase );
             } else if( yadisServicesHtml != null ) {
                 theServiceFactory.addYadisServicesFromHtml( sourceIdentifier, yadisServicesHtml, newBase );
             } else if( yadisUrl != null ) {
@@ -849,6 +853,8 @@ public class ProbeDispatcher
      * @param oldBase the StagingMeshBase after the most recent successful run, if any
      * @param newBase the new StagingMeshBase into which to instantiate the data
      * @param coherence the CoherenceSpecification specified by the client, if any
+     * @param content the incoming data stream as bytes
+     * @param contentType the MIME type of the incoming data stream
      * @param inStream the incoming data stream
      * @return the used Probe instance
      * @throws ProbeException thrown if unable to compute a result
@@ -860,6 +866,8 @@ public class ProbeDispatcher
             StagingMeshBase        oldBase,
             StagingMeshBase        newBase,
             CoherenceSpecification coherence,
+            byte []                content,
+            String                 contentType,
             InputStream            inStream )
         throws
             ProbeException,
@@ -1010,7 +1018,7 @@ public class ProbeDispatcher
                     ((WritableProbe) probe).write( sourceIdentifier, changesToWriteBack, oldBase );
                 }
 
-                probe.parseDocument( sourceIdentifier, coherence, doc, newBase );
+                probe.parseDocument( sourceIdentifier, coherence, content, contentType, doc, newBase );
 
             } catch( IsAbstractException ex ) {
                 throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, foundClass );

@@ -78,6 +78,8 @@ public class XrdsProbe
      *         Probe must bless the Probe's HomeObject with a subtype of <code>ProbeUpdateSpecification</code> (defined
      *         in the <code>org.infogrid.model.Probe</code> Subject Area) and suitable Property
      *         values that reflect the policy.
+     * @param documentBytes the raw form of the Document, provided if available only
+     * @param documentMime the MIME type of the Document, provided if available only
      * @param theDocument the DOM document to be interpreted
      * @param freshMeshBase the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe.
      *         This StagingMeshBase is empty when passed into this call, except for the home object which always exists
@@ -111,6 +113,8 @@ public class XrdsProbe
     public void parseDocument(
             NetMeshBaseIdentifier  dataSourceIdentifier,
             CoherenceSpecification coherenceSpecification,
+            byte []                documentBytes,
+            String                 documentMime,
             Document               theDocument,
             StagingMeshBase        freshMeshBase )
         throws
@@ -131,13 +135,15 @@ public class XrdsProbe
             URISyntaxException,
             ParseException
     {
-        addYadisServicesFromXml( dataSourceIdentifier, theDocument, freshMeshBase );
+        addYadisServicesFromXml( dataSourceIdentifier, documentBytes, documentMime, theDocument, freshMeshBase );
     }
 
     /**
      * Create all the services that are defined in this Yadis document.
      *
      * @param dataSourceIdentifier identifies the data source that is being accessed
+     * @param yadisBytes raw form of the Yadis file, if available
+     * @param yadisMime MIME type of the Yadis file, if available
      * @param dom the Yadis document's DOM
      * @param base the MeshBase in which to instantiate
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries. This should not happen.
@@ -150,6 +156,8 @@ public class XrdsProbe
      */
     public void addYadisServicesFromXml(
             NetMeshBaseIdentifier dataSourceIdentifier,
+            byte []               yadisBytes,
+            String                yadisMime,
             Document              dom,
             StagingMeshBase       base )
         throws
@@ -165,6 +173,13 @@ public class XrdsProbe
 
         try {
             subject.bless( YadisSubjectArea.XRDSSERVICECOLLECTION );
+
+            if( yadisBytes != null ) {
+                subject.setPropertyValue(
+                        YadisSubjectArea.XRDSSERVICECOLLECTION_XRDSRESOURCECONTENT,
+                        YadisSubjectArea.XRDSSERVICECOLLECTION_XRDSRESOURCECONTENT_type.createBlobValue( yadisBytes, yadisMime ));
+            }
+
 
         } catch( BlessedAlreadyException ex ) {
             log.warn( ex );

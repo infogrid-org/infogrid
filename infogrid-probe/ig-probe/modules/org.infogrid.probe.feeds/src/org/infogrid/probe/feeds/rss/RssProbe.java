@@ -42,7 +42,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-
 /**
  * A Probe for the RSS file format, with optional InfoGrid extensions.
  */
@@ -76,6 +75,8 @@ public class RssProbe
      *         Probe must bless the Probe's HomeObject with a subtype of <code>ProbeUpdateSpecification</code> (defined
      *         in the <code>org.infogrid.model.Probe</code> Subject Area) and suitable Property
      *         values that reflect the policy.
+     * @param documentBytes the raw form of the Document, provided if available only
+     * @param documentMime the MIME type of the Document, provided if available only
      * @param theDocument the DOM document to be interpreted
      * @param freshMeshBase the StagingMeshBase in which the corresponding MeshObjects are to be instantiated by the Probe.
      *         This StagingMeshBase is empty when passed into this call, except for the home object which always exists
@@ -109,6 +110,8 @@ public class RssProbe
     public void parseDocument(
             NetMeshBaseIdentifier  dataSourceIdentifier,
             CoherenceSpecification coherenceSpecification,
+            byte []                documentBytes,
+            String                 documentMime,
             Document               theDocument,
             StagingMeshBase        freshMeshBase )
         throws
