@@ -262,6 +262,30 @@
         return categories.asIdentifiers();
     }
 
+    /**
+     * Obtain the names of the set of groups that this LidAccount is a member of.
+     *
+     * @return the names
+     */
+    public String [] getGroupNames()
+    {
+        org.infogrid.mesh.set.MeshObjectSet categories = traverse( AccountSubjectArea.ACCOUNTCATEGORY_CATEGORIZES_ACCOUNT.getDestination() );
+        String [] ret = new String[ categories.size() ];
+        for( int i=0 ; i<ret.length ; ++i ) {
+            try {
+                StringValue found = (StringValue) categories.get( i ).getPropertyValue( AccountSubjectArea.ACCOUNTCATEGORY_NAME );
+                if( found != null ) {
+                    ret[i] = found.value();
+                } else {
+                    ret[i] = categories.get( i ).getIdentifier().toExternalForm();
+                }
+
+            } catch( Throwable ex ) {
+                log.error( ex );
+            }
+        }
+        return ret;
+    }
     ]]></implementsMethod>
 
         </entitytype>

@@ -176,6 +176,23 @@ public class SimpleLidAccount
     }
 
     /**
+     * Obtain the names of the set of groups that this LidAccount is a member of.
+     *
+     * @return the names
+     */
+    public String [] getGroupNames()
+    {
+        if( theGroupIdentifiers == null ) {
+            return null;
+        }
+        String [] ret = new String[ theGroupIdentifiers.length ];
+        for( int i=0 ; i<theGroupIdentifiers.length ; ++i ) {
+            ret[i] = theGroupIdentifiers[i].toExternalForm();
+        }
+        return ret;
+    }
+
+    /**
      * The status of the account.
      */
     protected LidAccountStatus theStatus;

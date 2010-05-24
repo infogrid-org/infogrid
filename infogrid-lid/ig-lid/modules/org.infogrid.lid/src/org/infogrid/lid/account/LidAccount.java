@@ -102,6 +102,13 @@ public interface LidAccount
     public Identifier [] getGroupIdentifiers();
 
     /**
+     * Obtain the names of the set of groups that this LidAccount is a member of.
+     *
+     * @return the names
+     */
+    public String [] getGroupNames();
+
+    /**
      * Determine this LidAccount's status.
      *
      * @return the LidAccount's status

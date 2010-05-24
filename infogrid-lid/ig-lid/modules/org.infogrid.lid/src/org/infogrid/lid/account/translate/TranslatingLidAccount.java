@@ -146,6 +146,16 @@ public class TranslatingLidAccount
     }
 
     /**
+     * Obtain the names of the set of groups that this LidAccount is a member of.
+     *
+     * @return the names
+     */
+    public String [] getGroupNames()
+    {
+        return theDelegate.getGroupNames();
+    }
+
+    /**
      * The underlying LidAccount from/to which we translate.
      */
     protected LidAccount theDelegate;
