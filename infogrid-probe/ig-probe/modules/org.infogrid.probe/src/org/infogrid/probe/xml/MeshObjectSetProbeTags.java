@@ -92,7 +92,10 @@ public interface MeshObjectSetProbeTags
     
     /** Tag indicating the alpha component of a ColorValue */
     public static final String COLOR_VALUE_ALPHA_TAG = "alpha";
-    
+
+    /** Tag indicating that this is a CurrencyValue */
+    public static final String CURRENCY_VALUE_TAG = "CurrencyValue";
+
     /** Tag indicating that this is an EnumeratedValue. */
     public static final String ENUMERATED_VALUE_TAG = "EnumeratedValue";
     

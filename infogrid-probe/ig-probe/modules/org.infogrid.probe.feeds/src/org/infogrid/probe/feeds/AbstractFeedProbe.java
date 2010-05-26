@@ -34,6 +34,7 @@ import org.infogrid.model.primitives.BlobDataType;
 import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.primitives.BooleanValue;
 import org.infogrid.model.primitives.ColorValue;
+import org.infogrid.model.primitives.CurrencyValue;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.EnumeratedDataType;
 import org.infogrid.model.primitives.ExtentValue;
@@ -324,6 +325,12 @@ public abstract class AbstractFeedProbe
                 PropertyValue ret = ColorValue.create( Integer.parseInt( red ), Integer.parseInt( green ), Integer.parseInt( blue ), Integer.parseInt( alpha ));
                 return ret;
                 
+            } else if( MeshObjectSetProbeTags.CURRENCY_VALUE_TAG.equals( localName )) {
+                String content = realChild.getTextContent();
+
+                PropertyValue ret = CurrencyValue.parseCurrencyValue( content );
+                return ret;
+
             } else if( MeshObjectSetProbeTags.ENUMERATED_VALUE_TAG.equals( localName )) {
                 if( !( type.getDataType() instanceof EnumeratedDataType )) {
                     throw new ProbeException.SyntaxError( dataSourceIdentifier, "Data type not an EnumeratedDataType: " + type, null    );
