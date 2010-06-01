@@ -39,6 +39,11 @@ public interface OpenIdCredentialType
     public static final String OPENID_ASSOC_HANDLE_PARAMETER_NAME = "openid.assoc_handle";
 
     /**
+     * Name of the URL parameter that invalidates an association handle.
+     */
+    public static final String OPENID_INVALIDATE_HANDLE_PARAMETER_NAME = "openid.invalidate_handle";
+
+    /**
      * Name of the URL parameter that holds the list of signed fields.
      */
     public static final String OPENID_SIGNED_PARAMETER_NAME = "openid.signed";

@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
 import org.infogrid.crypto.diffiehellman.DiffieHellmanEndpoint;
+import org.infogrid.lid.openid.auth.OpenIdCredentialType;
 import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.Base64;
 import org.infogrid.util.FactoryException;
@@ -102,7 +103,7 @@ public class OpenIdRpSideAssociationNegotiator
         DiffieHellmanEndpoint localDh = DiffieHellmanEndpoint.create( theDhP, theDhG );
         
         sentContentBuf.append(  "openid.ns="           ).append( "http://specs.openid.net/auth/2.0" ); // ignored by OpenID V1
-        sentContentBuf.append( "&openid.mode="         ).append( "associate" );
+        sentContentBuf.append( "&" ).append( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME ).append( "="         ).append( "associate" );
         sentContentBuf.append( "&openid.assoc_type="   ).append( parameters.getWantedAssociationType() );
 
         if( parameters.getWantedSessionType() != null ) {

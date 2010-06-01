@@ -82,12 +82,19 @@ public abstract class AbstractOpenIdCredentialType
         }
 
         String []               endpointCandidates = determineOpenIdEndpointsFor( subject );
+        String                  invalidateHandle   = request.getUrlArgument( OPENID_INVALIDATE_HANDLE_PARAMETER_NAME );
         OpenIdRpSideAssociation association        = null;
 
         for( String epCandidate : endpointCandidates ) {
 
             OpenIdRpSideAssociation assocCandidate = theAssociationManager.get( epCandidate );
-            if( assocCandidate != null && assocCandidate.getAssociationHandle().equals( associationHandle )) {
+            if( assocCandidate == null ) {
+                continue;
+            }
+            if( invalidateHandle != null && invalidateHandle.equals( assocCandidate.getAssociationHandle() ) ) {
+                theAssociationManager.remove( assocCandidate.getServerUrl() );
+                
+            } else if ( assocCandidate.getAssociationHandle().equals( associationHandle )) {
                 // found
                 association = assocCandidate;
                 break;
@@ -99,7 +106,7 @@ public abstract class AbstractOpenIdCredentialType
             throw new OpenIdNoAssociationException( subject.getIdentifier(), this );
         }
         if( !association.isCurrentlyValid() ) {
-            theAssociationManager.remove( associationHandle );
+            theAssociationManager.remove( association.getServerUrl() );
             throw new OpenIdAssociationExpiredException( subject.getIdentifier(), this );
         }
 

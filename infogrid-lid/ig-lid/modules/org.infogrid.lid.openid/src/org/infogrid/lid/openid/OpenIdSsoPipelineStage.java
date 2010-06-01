@@ -22,7 +22,6 @@ import org.infogrid.crypto.diffiehellman.DiffieHellmanEndpoint;
 import org.infogrid.lid.LidClientAuthenticationStatus;
 import org.infogrid.lid.LidPipelineInstructions;
 import org.infogrid.lid.LidSsoPipelineStage;
-import org.infogrid.lid.SimpleLidPipelineStageInstructions;
 import org.infogrid.lid.SimpleLidSsoPipelineStageInstructions;
 import org.infogrid.lid.openid.auth.OpenId1CredentialType;
 import org.infogrid.lid.openid.auth.OpenId2CredentialType;
@@ -96,17 +95,17 @@ public class OpenIdSsoPipelineStage
             LidPipelineInstructions instructionsSoFar )
     {
         // to be safe, look for multi-valued arguments first
-        if( lidRequest.matchUrlArgument( "openid.mode", "error" ) || lidRequest.matchPostedArgument( "openid.mode", "error" )) {
+        if( lidRequest.matchUrlArgument( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME, "error" ) || lidRequest.matchPostedArgument( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME, "error" )) {
             log.error(  "OpenID error", lidRequest );
             return null; // FIXME?
         }
-        if( lidRequest.matchUrlArgument( "openid.mode", "cancel" ) || lidRequest.matchPostedArgument( "openid.mode", "cancel" ) ) {
+        if( lidRequest.matchUrlArgument( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME, "cancel" ) || lidRequest.matchPostedArgument( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME, "cancel" ) ) {
             return null;
         }
 
-        String mode = lidRequest.getUrlArgument( "openid.mode" );
+        String mode = lidRequest.getUrlArgument( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME );
         if( mode == null ) {
-            mode = lidRequest.getPostedArgument( "openid.mode" );
+            mode = lidRequest.getPostedArgument( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME );
         }
         if( mode == null ) {
             return null;
@@ -342,9 +341,9 @@ public class OpenIdSsoPipelineStage
                 byte [] signed = CryptUtils.calculateHmacSha1( sharedSecret, token_contents_string.getBytes( "US-ASCII" ) );
                 String  signedFields = Base64.base64encodeNoCr( signed );
 
-                redirect.append( "&openid.signed=" );
+                redirect.append( "&" ).append( OpenIdCredentialType.OPENID_SIGNED_PARAMETER_NAME ).append( "=" );
                 redirect.append( "mode,identity,return_to,assoc_handle" );
-                redirect.append( "&openid.sig=" );
+                redirect.append( "&" ).append( OpenIdCredentialType.OPENID_SIGNATURE_PARAMETER_NAME ).append( "=" );
                 redirect.append( HTTP.encodeToValidUrlArgument( signedFields ));
                 // FIXME? We don't do openid.invalidate_handle right now
 
@@ -402,9 +401,9 @@ public class OpenIdSsoPipelineStage
             return null;
         }
 
-        String assoc_handle = lidRequest.getPostedArgument( "openid.assoc_handle" );
-        String sig          = lidRequest.getPostedArgument( "openid.sig" );
-        String signed       = lidRequest.getPostedArgument( "openid.signed" );
+        String assoc_handle = lidRequest.getPostedArgument( OpenIdCredentialType.OPENID_ASSOC_HANDLE_PARAMETER_NAME );
+        String sig          = lidRequest.getPostedArgument( OpenIdCredentialType.OPENID_SIGNATURE_PARAMETER_NAME );
+        String signed       = lidRequest.getPostedArgument( OpenIdCredentialType.OPENID_SIGNED_PARAMETER_NAME );
 
         boolean valid = false;
         OpenIdIdpSideAssociation assoc = theDumbAssociationManager.get( assoc_handle );
@@ -415,7 +414,7 @@ public class OpenIdSsoPipelineStage
                 String field = fields[i];
                 String value;
                 if( "mode".equals( field )) { // see http://lists.danga.com/pipermail/yadis/2005-June/000734.html
-                    value = "id_res";
+                    value = OpenIdCredentialType.OPENID_MODE_IDRES_PARAMETER_VALUE;
                 } else {
                     value = lidRequest.getPostedArgument( field );
                 }
@@ -456,7 +455,7 @@ public class OpenIdSsoPipelineStage
         // construct response
         StringBuilder responseBuffer = new StringBuilder( 64 );
         // obsoleted: responseBuffer.append( "lifetime:" ).append( assoc.getExpiresInSeconds()).append( "\n" );
-        responseBuffer.append( "openid.mode:" ).append( "id_res" ).append( "\n" );
+        responseBuffer.append( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME ).append( ":" ).append( OpenIdCredentialType.OPENID_MODE_IDRES_PARAMETER_VALUE ).append( "\n" );
         responseBuffer.append( "is_valid:" ).append( validString ).append( "\n" );
 
         return SimpleLidSsoPipelineStageInstructions.createContentOnly( responseBuffer.toString(), "text/plain" );
