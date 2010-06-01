@@ -390,7 +390,7 @@ public abstract class HTTP
            IOException
     {
         String           sep       = "";
-        StringBuilder     parBuffer = new StringBuilder();
+        StringBuilder    parBuffer = new StringBuilder();
         Iterator<String> iter      = pars.keySet().iterator();
 
         while( iter.hasNext() ) {
@@ -403,6 +403,10 @@ public abstract class HTTP
             parBuffer.append( encodeToValidUrl( value ));
             sep = "&";
         }
+        if( log.isTraceEnabled() ) {
+            log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, pars, followRedirects, parBuffer );
+        }
+
         return http_post( url, "application/x-www-form-urlencoded", parBuffer.toString().getBytes(), DEFAULT_VERSION, followRedirects );
     }
 
@@ -443,6 +447,10 @@ public abstract class HTTP
        throws
            IOException
     {
+        if( log.isTraceEnabled() ) {
+            log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, contentType, payload, followRedirects );
+        }
+
         return http_post( url, contentType, payload, DEFAULT_VERSION, followRedirects );
     }
 
@@ -556,6 +564,10 @@ public abstract class HTTP
         if( input != null ) {
             input.close();
         }
+
+        if( log.isTraceEnabled() ) {
+            log.traceMethodCallExit( HTTP.class.getName(), "http_post", ret );
+        }
         
         return ret;
     }
@@ -580,6 +592,10 @@ public abstract class HTTP
        throws
            IOException
     {
+        if( log.isTraceEnabled() ) {
+            log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, contentType, payload, version, followRedirects );
+        }
+
         return http_post( new URL( url ), contentType, payload, version, followRedirects );
     }
 
