@@ -431,7 +431,7 @@ public class SimpleLidSessionManagementInstructions
         if( theSessionsToRenew != null ) {
             for( int i=0 ; i<theSessionsToRenew.length ; ++i ) {
                 buf.append( "\n    session to renew: " );
-                buf.append( theSessionsToCancel[i] );
+                buf.append( theSessionsToRenew[i] );
             }
         }
         if( theClientForNewSession != null ) {
