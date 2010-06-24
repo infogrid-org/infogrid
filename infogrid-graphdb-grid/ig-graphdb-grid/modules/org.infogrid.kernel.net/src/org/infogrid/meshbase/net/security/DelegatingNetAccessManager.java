@@ -35,24 +35,36 @@ public class DelegatingNetAccessManager
     /**
      * Factory method.
      *
-     * @param delegate the AccessManager to delegate to
+     * @param singleDelegate a single AccessManager to delegate to
      * @return the created DelegatingNetAccessManager
      */
     public static DelegatingNetAccessManager create(
-            AccessManager delegate )
+            AccessManager singleDelegate )
     {
-        return new DelegatingNetAccessManager( delegate );
+        return new DelegatingNetAccessManager( new AccessManager[] { singleDelegate } );
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param delegates the AccessManagers to delegate to
+     * @return the created DelegatingNetAccessManager
+     */
+    public static DelegatingAccessManager create(
+            AccessManager [] delegates )
+    {
+        return new DelegatingNetAccessManager( delegates );
     }
 
     /**
      * Constructor.
      *
-     * @param delegate the AccessManager to delegate to
+     * @param delegates the AccessManagers to delegate to
      */
     protected DelegatingNetAccessManager(
-            AccessManager delegate )
+            AccessManager [] delegates )
     {
-        super( delegate );
+        super( delegates );
     }
 
     /**
