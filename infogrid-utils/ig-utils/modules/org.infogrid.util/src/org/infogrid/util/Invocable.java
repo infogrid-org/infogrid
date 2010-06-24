@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,8 +18,8 @@ package org.infogrid.util;
  * Similar to Java's <code>Runnable</code>, this interface also supports a parameter
  * to the run method.
  * 
- * @param K the type of the invocation argument
- * @param V the type of the return value
+ * @param <K> the type of the invocation argument
+ * @param <V> the type of the return value
  */
 public interface Invocable<K,V>
 {
