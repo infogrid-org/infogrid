@@ -160,7 +160,7 @@ public abstract class AbstractProbeTest
         if( mylog.isDebugEnabled() && changes.size() > 0 ) {
             int i=0;
             for( Change current : changes ) {
-                mylog.debug( "Change " + i++ + ": " + current );
+                mylog.debug( "Change ", i++, ": ", current );
             }
         }
     }
