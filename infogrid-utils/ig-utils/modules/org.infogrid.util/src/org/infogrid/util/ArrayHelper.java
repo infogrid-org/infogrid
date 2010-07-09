@@ -620,10 +620,7 @@ public abstract class ArrayHelper
                 arrayComponentType,
                 theCollection.size() );
 
-        Iterator<? extends T> theIter = theCollection.iterator();
-        for( int i=0 ; i<ret.length ; ++i ) {
-            myArrayCopy( ret, i, theIter.next() );
-        }
+        ret = theCollection.toArray( ret );
         return ret;
     }
 
