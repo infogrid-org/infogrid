@@ -105,7 +105,9 @@ public class SimpleStoreValueMapper
         throws
             IOException
     {
-        writeStoreValue( value, new FileOutputStream( file ));
+        OutputStream stream = new FileOutputStream( file );
+        writeStoreValue( value, stream );
+        stream.close();
     }
 
     /**
@@ -152,7 +154,10 @@ public class SimpleStoreValueMapper
         throws
             IOException
     {
-        return readStoreValue( new FileInputStream( file ));
+        InputStream stream = new FileInputStream( file );
+        StoreValue  ret    = readStoreValue( stream );
+        stream.close();
+        return ret;
     }
 
     /**
