@@ -480,7 +480,7 @@ public abstract class ModuleAdvertisement
             }
             buf.append( tabs( tabs+1 ));
             buf.append( "new File( \"" );
-            buf.append( constructRelativePath( files[i].getPath(), pwd ));
+            buf.append( stringToJavaString( constructRelativePath( files[i].getPath(), pwd )));
             buf.append( "\" )" );
         }
         return buf.toString();
@@ -599,8 +599,22 @@ public abstract class ModuleAdvertisement
     static String stringToJavaString(
             String raw )
     {
-        String ret = raw.replaceAll( "\n", "\\\\n" ); // regex apparently likes slashes
-        return ret;
+        StringBuilder buf = new StringBuilder( raw.length() * 5 / 4 ); // fudge
+        for( int i=0 ; i<raw.length() ; ++i ) {
+            char c = raw.charAt( i );
+            switch( c ) {
+                case '\\':
+                    buf.append( "\\\\" );
+                    break;
+                case '\n':
+                    buf.append( "\\\\n" );
+                    break;
+                default:
+                    buf.append( c );
+                    break;
+            }
+        }
+        return buf.toString();
     }
 
     /**
