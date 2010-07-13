@@ -335,12 +335,13 @@ public abstract class Module
      * @param overriddenRunClassName optional name of the class to run instead of the default one specified in the ModuleAdvertisement
      * @param overriddenRunMethodName optional name of the method in the class to run instead of the default one specified in the ModuleAdvertisement
      * @param arguments arguments to run, similar to the arguments of a standard main(...) method
+     * @return the System exit code
      * @throws ClassNotFoundException thrown if the specified run class cannot be found
      * @throws StandardModuleRunException thrown if the specified run method threw an Exception
      * @throws NoRunMethodException thrown if a suitable run method cannot be found
      * @throws InvocationTargetException thrown if the run method throws an Exception
      */
-    public abstract void run(
+    public abstract int run(
             String    overriddenRunClassName,
             String    overriddenRunMethodName,
             String [] arguments )

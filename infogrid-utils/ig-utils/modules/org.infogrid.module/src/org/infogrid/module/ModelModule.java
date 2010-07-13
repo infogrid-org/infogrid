@@ -74,9 +74,10 @@ public class ModelModule
      * @param overriddenRunClassName optional name of the class to run instead of the default one specified in the ModuleAdvertisement
      * @param overriddenRunMethodName optional name of the method in the class to run instead of the default one specified in the ModuleAdvertisement
      * @param arguments arguments to run, similar to the arguments of a standard main(...) method
+     * @return the System exit code
      * @throws NoRunMethodException always throws this exception
      */
-    public void run(
+    public int run(
             String    overriddenRunClassName,
             String    overriddenRunMethodName,
             String [] arguments )

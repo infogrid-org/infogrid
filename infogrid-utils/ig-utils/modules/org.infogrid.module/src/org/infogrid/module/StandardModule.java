@@ -134,12 +134,13 @@ public class StandardModule
      * @param overriddenRunClassName optional name of the class to run instead of the default one specified in the ModuleAdvertisement
      * @param overriddenRunMethodName optional name of the method in the class to run instead of the default one specified in the ModuleAdvertisement
      * @param arguments arguments to run, similar to the arguments of a standard main(...) method
+     * @return the System exit code
      * @throws ClassNotFoundException thrown if the specified run class cannot be found
      * @throws StandardModuleRunException thrown if the specified run method threw an Exception
      * @throws NoRunMethodException thrown if a suitable run method cannot be found
      * @throws InvocationTargetException thrown if the run method throws an Exception
      */
-    public void run(
+    public int run(
             String    overriddenRunClassName,
             String    overriddenRunMethodName,
             String [] arguments )
@@ -184,22 +185,30 @@ public class StandardModule
 
             ModuleErrorHandler.informModuleRun( this, runMethod );
 
-            /* Object ret = */ runMethod.invoke(
+            Object ret = runMethod.invoke(
                     null,
                     new Object[] {
                             arguments } );
 
            ModuleErrorHandler.informModuleRunSucceeded( this );
-           
-           return;
+
+           if( ret instanceof Number ) {
+               return ((Number)ret).intValue();
+           }  else {
+               return 0; // everything seems fine
+           }
 
         } catch( MalformedURLException ex ) {
            ModuleErrorHandler.internalError( ex );
            ModuleErrorHandler.informModuleRunFailed( this, ex );
-           return;
+           return 1;
        } catch( InvocationTargetException ex ) {
-           ModuleErrorHandler.informModuleRunFailed( this, ex );
-           throw new StandardModuleRunException( theModuleAdvertisement, runClassName, runMethodName, ex );
+           ModuleErrorHandler.informModuleRunFailed( this, ex.getCause() );
+           if( ex.getCause() instanceof StandardModuleRunException ) {
+               throw (StandardModuleRunException) ex.getCause();
+           } else {
+               throw new StandardModuleRunException( theModuleAdvertisement, runClassName, runMethodName, ex.getCause() );
+           }
        } catch( Throwable ex ) {
            ModuleErrorHandler.informModuleRunFailed( this, ex );
            throw new NoRunMethodException( theModuleAdvertisement, runClassName, runMethodName, ex );
