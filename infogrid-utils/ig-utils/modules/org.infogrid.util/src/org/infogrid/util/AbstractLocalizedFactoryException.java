@@ -85,6 +85,21 @@ public abstract class AbstractLocalizedFactoryException
     }
 
     /**
+     * Return the explicitly set message, or the localized message if non was explicitly set.
+     *
+     * @return the message
+     */
+    @Override
+    public String getMessage()
+    {
+        String ret = super.getMessage();
+        if( ret == null ) {
+            ret = getLocalizedMessage();
+        }
+        return ret;
+    }
+
+    /**
      * Obtain localized message, per JDK 1.5.
      *
      * @return localized message

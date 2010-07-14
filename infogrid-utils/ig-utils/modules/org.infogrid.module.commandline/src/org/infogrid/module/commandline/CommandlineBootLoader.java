@@ -23,6 +23,7 @@ import org.infogrid.module.OverridingStandardModuleActivator;
 import org.infogrid.module.SoftwareInstallationException;
 import org.infogrid.module.StandardModule;
 import org.infogrid.module.StandardModuleActivator;
+import org.infogrid.module.StandardModuleRunException;
 
 /**
  * <p>Acts as the main() program in a Module-based application.
@@ -161,9 +162,26 @@ public abstract class CommandlineBootLoader
 
             return ret;
 
+        } catch( StandardModuleRunException ex ) {
+            return error( ex );
+
         } catch( Throwable ex ) {
             return fatal( null, ex );
         }
+    }
+
+    /**
+     * This is called if an error occurred.
+     *
+     * @param ex exception, if any, that caused the problem
+     * @return the System exit code
+     */
+    protected static int error(
+            Throwable ex )
+    {
+        ModuleErrorHandler.error( ex );
+
+        return 1;
     }
 
     /**

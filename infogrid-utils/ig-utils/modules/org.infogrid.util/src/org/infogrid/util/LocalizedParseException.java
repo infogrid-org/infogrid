@@ -65,6 +65,21 @@ public abstract class LocalizedParseException
     }
 
     /**
+     * Return the explicitly set message, or the localized message if non was explicitly set.
+     *
+     * @return the message
+     */
+    @Override
+    public String getMessage()
+    {
+        String ret = super.getMessage();
+        if( ret == null ) {
+            ret = getLocalizedMessage();
+        }
+        return ret;
+    }
+
+    /**
      * Determine the correct internationalized string that can be shown to the
      * user. Use a default formatter.
      *

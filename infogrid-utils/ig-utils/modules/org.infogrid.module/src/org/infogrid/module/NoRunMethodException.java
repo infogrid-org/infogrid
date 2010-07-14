@@ -66,7 +66,7 @@ public class NoRunMethodException
             buf.append( "null" );
         }
 
-        buf.append( ", cannot execute run method " );
+        buf.append( ", cannot find or access run method " );
         buf.append( theRunMethodName );
         buf.append( " in class " );
         buf.append( theRunClassName );

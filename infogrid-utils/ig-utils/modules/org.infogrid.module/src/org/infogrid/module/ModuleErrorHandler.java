@@ -552,12 +552,22 @@ public abstract class ModuleErrorHandler
             Throwable ex )
     {
         if( errorStream != null ) {
-            errorStream.print( "ERROR: unexpected Throwable: " );
-            ex.printStackTrace( errorStream );
+            errorStream.print( "ERROR: " );
+            for( Throwable current = ex ; current != null ; current = current.getCause() ) {
+                String msg = current.getMessage();
+                if( msg != null ) {
+                    errorStream.println( msg );
+                }
+            }
         }
         if( errorStream != System.err ) {
-            System.err.print( "ERROR: unexpected Throwable: " );
-            ex.printStackTrace( System.err );
+            errorStream.print( "ERROR: " );
+            for( Throwable current = ex ; current != null ; current = current.getCause() ) {
+                String msg = current.getMessage();
+                if( msg != null ) {
+                    errorStream.println( msg );
+                }
+            }
         }
    }
 

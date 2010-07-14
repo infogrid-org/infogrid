@@ -52,6 +52,17 @@ public class StandardModuleRunException
     @Override
     public String toString()
     {
+        return getMessage();
+    }
+
+    /**
+     * Obtain the message.
+     *
+     * @return the message
+     */
+    @Override
+    public String getMessage()
+    {
         StringBuilder buf = new StringBuilder( 100 );
         buf.append( "StandardModuleRunException: Module: " );
         if( theModuleAdvertisement != null ) {
