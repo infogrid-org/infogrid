@@ -87,9 +87,10 @@ public abstract class CompoundStringifier
     {
         StringBuilder ret = new StringBuilder();
         for( int i=0 ; i<theComponents.length ; ++i ) {
-            CompoundStringifierComponent current = theComponents[i];
-            
-            String found = current.format( soFar != null ? soFar + ret.toString() : ret.toString(), arg, pars ); // presumably shorter, but we don't know
+            CompoundStringifierComponent current  = theComponents[i];
+            String                       soFarArg = soFar != null ? soFar + ret.toString() : ret.toString();
+
+            String found = current.format( soFarArg, arg, pars ); // presumably shorter, but we don't know
             
             ret.append( found );
         }
