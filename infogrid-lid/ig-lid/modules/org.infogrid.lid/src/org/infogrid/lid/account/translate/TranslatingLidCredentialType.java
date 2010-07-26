@@ -17,6 +17,7 @@ package org.infogrid.lid.account.translate;
 import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.credential.AbstractLidCredentialType;
 import org.infogrid.lid.credential.LidCredentialType;
+import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
@@ -74,12 +75,14 @@ public class TranslatingLidCredentialType
      *
      * @param request the request
      * @param subject the subject
+     * @throws LidExpiredCredentialException thrown if the contained LidCdedentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
             SaneRequest   request,
             HasIdentifier subject )
         throws
+            LidExpiredCredentialException,
             LidInvalidCredentialException
     {
         if( subject instanceof TranslatingLidAccount ) {

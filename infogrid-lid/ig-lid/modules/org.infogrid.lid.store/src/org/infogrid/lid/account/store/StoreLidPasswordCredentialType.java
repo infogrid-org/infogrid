@@ -18,6 +18,7 @@ import org.infogrid.lid.credential.LidWrongPasswordException;
 import org.infogrid.crypto.hashedpassword.HashedPasswordUtils;
 import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.credential.AbstractLidPasswordCredentialType;
+import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
@@ -54,12 +55,14 @@ public class StoreLidPasswordCredentialType
      *
      * @param request the request
      * @param subject the subject
+     * @throws LidExpiredCredentialException thrown if the contained LidCdedentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
             SaneRequest   request,
             HasIdentifier subject )
         throws
+            LidExpiredCredentialException,
             LidInvalidCredentialException
     {
         LidAccount realSubject = (LidAccount) subject;

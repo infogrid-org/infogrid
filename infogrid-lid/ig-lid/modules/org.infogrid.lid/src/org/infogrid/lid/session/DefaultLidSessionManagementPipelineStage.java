@@ -120,7 +120,7 @@ public class DefaultLidSessionManagementPipelineStage
                 sessionsToCancel.add( preexistingSession );
             }
 
-        } else if( clientAuthStatus.isCarryingValidCredential() ) {
+        } else if( !clientAuthStatus.isCarryingExpiredCredential() && clientAuthStatus.isCarryingValidCredential() ) {
             // client just successfully authenticated
 
             deleteLidCookie     = Boolean.FALSE;

@@ -41,7 +41,8 @@ public abstract class AbstractLidClientAuthenticationStatus
      * @param clientPersona the client's LidAccount that was found locally, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
-     * @param carriedInvalidCredentialTypes the credential types carried as part of this request that did not validate successfully, if any
+     * @param carriedExpiredCredentialTypes the credential types carried as part of this request that were expired, if any
+     * @param carriedInvalidCredentialTypes the credential types carried as part of this request that did not validate successfully, if any, excluding expired ones
      * @param invalidCredentialExceptions the exceptions indicating the problems with the invalid credentials, in the same sequence, if any
      * @param clientLoggedOn the client just logged on
      * @param clientWishesToLogin the client wishes to log in
@@ -57,6 +58,7 @@ public abstract class AbstractLidClientAuthenticationStatus
             LidAccount                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
+            LidCredentialType []             carriedExpiredCredentialTypes,
             LidCredentialType []             carriedInvalidCredentialTypes,
             LidInvalidCredentialException [] invalidCredentialExceptions,
             boolean                          clientLoggedOn,
@@ -74,6 +76,7 @@ public abstract class AbstractLidClientAuthenticationStatus
         thePreexistingClientSession = preexistingClientSession;
         
         theCarriedValidCredentialTypes   = carriedValidCredentialTypes;
+        theCarriedExpiredCredentialTypes = carriedExpiredCredentialTypes;
         theCarriedInvalidCredentialTypes = carriedInvalidCredentialTypes;
         theInvalidCredentialExceptions   = invalidCredentialExceptions;
 
@@ -224,6 +227,19 @@ public abstract class AbstractLidClientAuthenticationStatus
     }
     
     /**
+     * <p>Determine whether the client of this request offered an expired credential stronger than a session id
+     *    for this request. To determine which expired credential type or types were offered, see
+     *    {@link #getCarriedExpiredCredentialTypes}.</p>
+     *
+     * @return true if the client provided an expired credential for this request that is stronger than a session identifier
+     */
+    public boolean isCarryingExpiredCredential()
+    {
+        LidCredentialType [] found = getCarriedExpiredCredentialTypes();
+        return found != null && found.length > 0;
+    }
+
+    /**
      * <p>Determine whether the client of this request offered an invalid credential stronger than a session id
      *    for this request. To determine which invalid credential type or types were offered, see
      *    {@link #getCarriedInvalidCredentialTypes}.</p>
@@ -245,11 +261,29 @@ public abstract class AbstractLidClientAuthenticationStatus
      *    would return the 3 validated credential types.</p>
      * 
      * @return the types of validated credentials provided by the client for this request, or null if none
+     * @see #getCarriedExpiredCredentialTypes
      * @see #getCarriedInvalidCredentialTypes
      */
     public LidCredentialType [] getCarriedValidCredentialTypes()
     {
         return theCarriedValidCredentialTypes;
+    }
+
+    /**
+     * <p>Determine the set of credential types stronger than a session id that were offered by the
+     *    client for this request and that were expired.</p>
+     * <p>This returns null if none such credential type was offered, regardless of whether any were expired or not.
+     *    It returns an empty array if at least one credential type was offered, but none were expired.</p>
+     * <p>For example, if a request carried 5 different credential types, of which 2 where expired, this method
+     *    would return the 2 expired credential types.</p>
+     *
+     * @return the types of expired credentials provided by the client for this request, or null if none
+     * @see #getCarriedValidCredentialTypes
+     * @see #getCarriedInvalidCredentialTypes
+     */
+    public LidCredentialType [] getCarriedExpiredCredentialTypes()
+    {
+        return theCarriedExpiredCredentialTypes;
     }
 
     /**
@@ -261,6 +295,7 @@ public abstract class AbstractLidClientAuthenticationStatus
      *    would return the 2 invalid credential types.</p>
      * 
      * @return the types of invalid credentials provided by the client for this request, or null if none
+     * @see #getCarriedExpiredCredentialTypes
      * @see #getCarriedValidCredentialTypes
      */
     public LidCredentialType [] getCarriedInvalidCredentialTypes()
@@ -435,6 +470,9 @@ public abstract class AbstractLidClientAuthenticationStatus
         if( clientWishesToLogout() ) {
             return false;
         }
+        if( isCarryingExpiredCredential() ) {
+            return false;
+        }
         if( isCarryingInvalidCredential() ) {
             return false;
         }
@@ -509,10 +547,17 @@ public abstract class AbstractLidClientAuthenticationStatus
      * were successfully validated.
      */
     protected LidCredentialType [] theCarriedValidCredentialTypes;
-    
+
+    /**
+     * The credential types that were provided by the client as part of this request and that
+     * were expired.
+     */
+    protected LidCredentialType [] theCarriedExpiredCredentialTypes;
+
     /**
      * The credential types that were NOT successfully validated as part of this request,
-     * although they were provided by the client
+     * although they were provided by the client. This does not include credential types that
+     * were expired.
      */
     protected LidCredentialType [] theCarriedInvalidCredentialTypes;
     

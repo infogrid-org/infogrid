@@ -14,6 +14,7 @@
 
 package org.infogrid.lid.openid.auth;
 
+import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.nonce.LidNonceManager;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.lid.openid.OpenIdRpSideAssociationManager;
@@ -67,12 +68,14 @@ public abstract class AbstractOpenId1CredentialType
      *
      * @param request the request
      * @param subject the subject
+     * @throws LidExpiredCredentialException thrown if the contained LidCdedentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
             SaneRequest   request,
             HasIdentifier subject )
         throws
+            LidExpiredCredentialException,
             LidInvalidCredentialException
     {
         checkCredential( request, subject, null, null );

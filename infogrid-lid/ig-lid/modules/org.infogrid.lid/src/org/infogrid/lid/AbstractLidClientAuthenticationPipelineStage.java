@@ -21,6 +21,7 @@ import org.infogrid.lid.account.LidAccountManager;
 import org.infogrid.lid.session.LidSession;
 import org.infogrid.lid.session.LidSessionManager;
 import org.infogrid.lid.credential.LidCredentialType;
+import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CannotFindHasIdentifierException;
@@ -203,6 +204,7 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
         }
 
         ArrayList<LidCredentialType>             validCredentialTypes        = null;
+        ArrayList<LidCredentialType>             expiredCredentialTypes      = null;
         ArrayList<LidCredentialType>             invalidCredentialTypes      = null;
         ArrayList<LidInvalidCredentialException> invalidCredentialExceptions = null;
 
@@ -214,6 +216,7 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
             if( referencedCredentialTypes != null && referencedCredentialTypes.length > 0 ) {
                 validCredentialTypes        = new ArrayList<LidCredentialType>();
                 invalidCredentialTypes      = new ArrayList<LidCredentialType>();
+                expiredCredentialTypes      = new ArrayList<LidCredentialType>();
                 invalidCredentialExceptions = new ArrayList<LidInvalidCredentialException>();
 
                 for( int i=0 ; i<referencedCredentialTypes.length ; ++i ) {
@@ -224,6 +227,10 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
                         current.checkCredential( lidRequest, personaToCheck );
 
                         validCredentialTypes.add( current );
+
+                    } catch( LidExpiredCredentialException ex ) {
+                        expiredCredentialTypes.add( current );
+                        // FIXME? Should we keep the exception around?
 
                     } catch( LidInvalidCredentialException ex ) {
                         invalidCredentialTypes.add( current );
@@ -256,6 +263,7 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
                 clientPersona,
                 preexistingClientSession,
                 validCredentialTypes,
+                expiredCredentialTypes,
                 invalidCredentialTypes,
                 invalidCredentialExceptions,
                 clientLoggedOn,

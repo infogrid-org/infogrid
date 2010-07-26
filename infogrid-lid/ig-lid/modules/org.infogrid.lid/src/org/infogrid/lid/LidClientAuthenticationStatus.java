@@ -92,6 +92,15 @@ public interface LidClientAuthenticationStatus
     public abstract boolean isCarryingValidCredential();
     
     /**
+     * <p>Determine whether the client of this request offered an expired credential stronger than a session id
+     *    for this request. To determine which expired credential type or types were offered, see
+     *    {@link #getCarriedExpiredCredentialTypes}.</p>
+     *
+     * @return true if the client provided an expired credential for this request that is stronger than a session identifier
+     */
+    public abstract boolean isCarryingExpiredCredential();
+    
+    /**
      * <p>Determine whether the client of this request offered an invalid credential stronger than a session id
      *    for this request. To determine which invalid credential type or types were offered, see
      *    {@link #getCarriedValidCredentialTypes}.</p>

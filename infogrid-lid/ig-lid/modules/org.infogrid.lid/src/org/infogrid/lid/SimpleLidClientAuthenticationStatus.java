@@ -39,6 +39,7 @@ public class SimpleLidClientAuthenticationStatus
      * @param clientPersona the client LidAccount that was found, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
+     * @param carriedExpiredCredentialTypes the credential types carried as part of this request that were expired, if any
      * @param carriedInvalidCredentialTypes the credential types carried as part of this request that did not validate successfully, if any
      * @param invalidCredentialExceptions the exceptions indicating the problems with the invalid credentials, in the same sequence, if any
      * @param clientLoggedOn the client just logged on
@@ -56,6 +57,7 @@ public class SimpleLidClientAuthenticationStatus
             LidAccount                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
+            LidCredentialType []             carriedExpiredCredentialTypes,
             LidCredentialType []             carriedInvalidCredentialTypes,
             LidInvalidCredentialException [] invalidCredentialExceptions,
             boolean                          clientLoggedOn,
@@ -72,6 +74,7 @@ public class SimpleLidClientAuthenticationStatus
                 clientPersona,
                 preexistingClientSession,
                 carriedValidCredentialTypes,
+                carriedExpiredCredentialTypes,
                 carriedInvalidCredentialTypes,
                 invalidCredentialExceptions,
                 clientLoggedOn,
@@ -93,6 +96,7 @@ public class SimpleLidClientAuthenticationStatus
      * @param clientPersona the client LidAccount that was found, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
+     * @param carriedExpiredCredentialTypes the credential types carried as part of this request that were expired, if any
      * @param carriedInvalidCredentialTypes the credential types carried as part of this request that did not validate successfully, if any
      * @param invalidCredentialExceptions the exceptions indicating the problems with the invalid credentials, in the same sequence, if any
      * @param clientLoggedOn the client just logged on
@@ -110,6 +114,7 @@ public class SimpleLidClientAuthenticationStatus
             LidAccount                                clientPersona,
             LidSession                                preexistingClientSession,
             Collection<LidCredentialType>             carriedValidCredentialTypes,
+            Collection<LidCredentialType>             carriedExpiredCredentialTypes,
             Collection<LidCredentialType>             carriedInvalidCredentialTypes,
             Collection<LidInvalidCredentialException> invalidCredentialExceptions,
             boolean                                   clientLoggedOn,
@@ -127,6 +132,9 @@ public class SimpleLidClientAuthenticationStatus
                 preexistingClientSession,
                 carriedValidCredentialTypes != null
                         ? ArrayHelper.copyIntoNewArray( carriedValidCredentialTypes,   LidCredentialType.class )
+                        : null,
+                carriedExpiredCredentialTypes != null
+                        ? ArrayHelper.copyIntoNewArray( carriedExpiredCredentialTypes,   LidCredentialType.class )
                         : null,
                 carriedInvalidCredentialTypes != null
                         ? ArrayHelper.copyIntoNewArray( carriedInvalidCredentialTypes, LidCredentialType.class )
@@ -153,6 +161,7 @@ public class SimpleLidClientAuthenticationStatus
      * @param clientPersona the client's LidAccount that was found locally, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
+     * @param carriedExpiredCredentialTypes the credential types carried as part of this request that were expired, if any
      * @param carriedInvalidCredentialTypes the credential types carried as part of this request that did not validate successfully, if any
      * @param invalidCredentialExceptions the exceptions indicating the problems with the invalid credentials, in the same sequence, if any
      * @param clientLoggedOn the client just logged on
@@ -169,6 +178,7 @@ public class SimpleLidClientAuthenticationStatus
             LidAccount                       clientPersona,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
+            LidCredentialType []             carriedExpiredCredentialTypes,
             LidCredentialType []             carriedInvalidCredentialTypes,
             LidInvalidCredentialException [] invalidCredentialExceptions,
             boolean                          clientLoggedOn,
@@ -184,6 +194,7 @@ public class SimpleLidClientAuthenticationStatus
                 clientPersona,
                 preexistingClientSession,
                 carriedValidCredentialTypes,
+                carriedExpiredCredentialTypes,
                 carriedInvalidCredentialTypes,
                 invalidCredentialExceptions,
                 clientLoggedOn,

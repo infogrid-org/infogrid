@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.StringTokenizer;
 import org.infogrid.lid.nonce.LidNonceManager;
 import org.infogrid.lid.credential.AbstractLidCredentialType;
+import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.lid.openid.CryptUtils;
 import org.infogrid.lid.openid.OpenIdAssociationExpiredException;
@@ -62,6 +63,7 @@ public abstract class AbstractOpenIdCredentialType
      * @param subject the subject
      * @param mandatoryFields set of fields that are mandatory
      * @param nonceParameterName name of the parameter representing the nonce
+     * @throws LidExpiredCredentialException thrown if the contained LidCdedentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     protected void checkCredential(
@@ -70,6 +72,7 @@ public abstract class AbstractOpenIdCredentialType
             HashSet<String> mandatoryFields,
             String          nonceParameterName )
         throws
+            LidExpiredCredentialException,
             LidInvalidCredentialException
     {
         String associationHandle = request.getUrlArgument( OPENID_ASSOC_HANDLE_PARAMETER_NAME );
@@ -102,8 +105,10 @@ public abstract class AbstractOpenIdCredentialType
         }
 
         if( association == null ) {
+            // association is expired, renegotiate. We don't do dumb mode but start again from scratch.
+            
             // we don't do dumb mode
-            throw new OpenIdNoAssociationException( subject.getIdentifier(), this );
+            throw new OpenIdAssociationExpiredException( subject.getIdentifier(), this );
         }
         if( !association.isCurrentlyValid() ) {
             theAssociationManager.remove( association.getServerUrl() );

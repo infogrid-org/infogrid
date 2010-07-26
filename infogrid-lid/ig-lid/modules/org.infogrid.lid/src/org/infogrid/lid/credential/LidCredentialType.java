@@ -49,12 +49,14 @@ public interface LidCredentialType
      *
      * @param request the request
      * @param subject the subject
+     * @throws LidExpiredCredentialException thrown if the contained LidCredentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public abstract void checkCredential(
             SaneRequest   request,
             HasIdentifier subject )
         throws
+            LidExpiredCredentialException,
             LidInvalidCredentialException;
 
     /**
