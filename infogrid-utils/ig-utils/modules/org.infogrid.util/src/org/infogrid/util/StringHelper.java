@@ -29,6 +29,12 @@ public abstract class StringHelper
     private static final Log log = Log.getLogInstance( StringHelper.class ); // our own, private logger
 
     /**
+     * Private no-op constructor to keep this abstract.
+     */
+    private StringHelper()
+    {}
+
+    /**
      * Compare two Strings.
      * 
      * @param one the first String
@@ -442,6 +448,10 @@ public abstract class StringHelper
 
                 case '\n':
                     sb.append( "\\n" );
+                    break;
+
+                case '\\':
+                    sb.append( "\\\\" );
                     break;
 
                 default:
