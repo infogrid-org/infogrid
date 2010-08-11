@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -109,7 +109,7 @@ public abstract class ProbeException
      */
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theNetworkIdentifier.getCanonicalForm(), getMessage() };
+        return new Object[] { theNetworkIdentifier.getCanonicalForm() };
     }
 
     /**
