@@ -422,6 +422,21 @@ public abstract class AbstractSaneUrl
             Pattern [] patterns )
     {
         String        in  = getAbsoluteFullUri();
+
+        return urlWithoutMatchingArguments( in, patterns );
+    }
+
+    /**
+     * Helper method to remove all URL arguments whose names meet at least one of the provided Patterns.
+     *
+     * @param in the original String, interpreted as a URL
+     * @param patterns the Patterns
+     * @return the String without the removed URL arguments
+     */
+    public static String urlWithoutMatchingArguments(
+            String     in,
+            Pattern [] patterns )
+    {
         StringBuilder ret = new StringBuilder( in.length() );
 
         int index = in.indexOf( '?' );
