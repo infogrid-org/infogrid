@@ -70,7 +70,7 @@ public abstract class AbstractLidClientAuthenticationStatus
     {
         theClientIdentifierAsEntered = clientIdentifierAsEntered;
         theClientIdentifier          = clientIdentifier;
-        theClient       = clientRemotePersona;
+        theClient                    = clientRemotePersona;
         theClientAccount             = clientPersona;
 
         thePreexistingClientSession = preexistingClientSession;

@@ -90,15 +90,11 @@ public class OpenIdSsoPipelineStage
      * @return the instructions for constructing a response to the client, if any
      */
     public SimpleLidSsoPipelineStageInstructions processStage(
-            SaneRequest                       lidRequest,
-            HasIdentifier                     requestedResource,
+            SaneRequest             lidRequest,
+            HasIdentifier           requestedResource,
             LidPipelineInstructions instructionsSoFar )
     {
         // to be safe, look for multi-valued arguments first
-        if( lidRequest.matchUrlArgument( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME, "error" ) || lidRequest.matchPostedArgument( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME, "error" )) {
-            log.error(  "OpenID error", lidRequest );
-            return null; // FIXME?
-        }
         if( lidRequest.matchUrlArgument( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME, "cancel" ) || lidRequest.matchPostedArgument( OpenIdCredentialType.OPENID_MODE_PARAMETER_NAME, "cancel" ) ) {
             return null;
         }
@@ -125,6 +121,9 @@ public class OpenIdSsoPipelineStage
 
         } else if( "check_authentication".equals( mode )) {
             ret = processCheckAuthentication( lidRequest, clientAuthStatus, requestedResource );
+
+        } else if( "error".equals( mode )) {
+            // do nothing
 
         } else {
             log.warn( "Unsupported value given for openid.mode", mode );
