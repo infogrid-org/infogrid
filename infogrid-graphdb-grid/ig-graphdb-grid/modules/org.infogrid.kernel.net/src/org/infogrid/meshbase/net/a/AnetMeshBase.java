@@ -1278,7 +1278,7 @@ public abstract class AnetMeshBase
     /**
      * Our ResourceHelper.
      */
-    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( NetMeshBase.class );
+    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( AnetMeshBase.class );
 
     /**
      * The default value for the willGiveUpLock property of newly created NetMeshObjects.
@@ -1323,4 +1323,12 @@ public abstract class AnetMeshBase
      * Logs incoming and outgoing XprisoMessages.
      */
     protected XprisoMessageLogger theMessageLogger;
+
+    /**
+     * If false, we don't allow non-local MeshObject creation. This is the default, but for
+     * test setups it is convenient if it can be overridden easily somewhere.
+     */
+    static final boolean ALLOW_NON_LOCAL_MESHOBJECT_CREATION = theResourceHelper.getResourceBooleanOrDefault(
+            "AllowNonLocalMeshObjectCreation",
+            false );
 }

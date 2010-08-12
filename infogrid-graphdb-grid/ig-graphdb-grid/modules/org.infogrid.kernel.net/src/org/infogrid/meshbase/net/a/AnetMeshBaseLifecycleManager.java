@@ -574,9 +574,11 @@ public class AnetMeshBaseLifecycleManager
 
         super.checkPermittedCreate( identifier );
 
-        NetMeshBaseIdentifier baseIdentifier = realIdentifier.getNetMeshBaseIdentifier();
-        if( !theMeshBase.getIdentifier().equals( baseIdentifier ) ) {
-            throw new CannotCreateNonLocalMeshObjectException( (NetMeshBase) theMeshBase, realIdentifier );
+        if( !AnetMeshBase.ALLOW_NON_LOCAL_MESHOBJECT_CREATION ) {
+            NetMeshBaseIdentifier baseIdentifier = realIdentifier.getNetMeshBaseIdentifier();
+            if( !theMeshBase.getIdentifier().equals( baseIdentifier ) ) {
+                throw new CannotCreateNonLocalMeshObjectException( (NetMeshBase) theMeshBase, realIdentifier );
+            }
         }
     }
 
