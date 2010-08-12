@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -126,14 +126,14 @@ public abstract class AbstractHttpdTest
                     }
                 };
             } else {
-                Map      postPars = request.getPostArguments();
-                Iterator iter     = postPars.keySet().iterator();
+                Map<String,String> postPars = request.getPostArguments();
+                Iterator<String>   iter     = postPars.keySet().iterator();
 
                 String sep = "";
                 final StringBuilder responseContent = new StringBuilder();
                 while( iter.hasNext() ) {
-                    String key   = (String) iter.next();
-                    String value = (String) postPars.get( key );
+                    String key   = iter.next();
+                    String value = postPars.get( key );
 
                     responseContent.append( sep );
                     responseContent.append( key ).append( '=' ).append( value );
