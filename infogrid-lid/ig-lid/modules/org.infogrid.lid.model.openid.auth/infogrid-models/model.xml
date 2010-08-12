@@ -121,7 +121,11 @@
                 // may throw exception
 
         if( association != null ) {
-            org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.assoc_handle", association.getAssociationHandle() );
+            if( association.isCurrentlyValid() ) {
+                org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.assoc_handle", association.getAssociationHandle() );
+            } else {
+                assocMgr.remove( association.getServerUrl() );
+            }
         }
         return ret.toString();
     }        
@@ -194,7 +198,11 @@
                 // may throw exception
 
         if( association != null ) {
-            org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.assoc_handle", association.getAssociationHandle() );
+            if( association.isCurrentlyValid() ) {
+                org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.assoc_handle", association.getAssociationHandle() );
+            } else {
+                assocMgr.remove( association.getServerUrl() );
+            }
         }
         return ret.toString();
     }        
@@ -272,7 +280,11 @@
                 // may throw exception
 
         if( association != null ) {
-            org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.assoc_handle", association.getAssociationHandle() );
+            if( association.isCurrentlyValid() ) {
+                org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.assoc_handle", association.getAssociationHandle() );
+            } else {
+                assocMgr.remove( association.getServerUrl() );
+            }
         }
         return ret.toString();
         }
