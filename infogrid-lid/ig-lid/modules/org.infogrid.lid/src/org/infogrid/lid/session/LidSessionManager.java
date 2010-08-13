@@ -14,7 +14,6 @@
 
 package org.infogrid.lid.session;
 
-import org.infogrid.lid.session.LidSessionManagerArguments;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.SmartFactory;
 
