@@ -117,21 +117,34 @@ public abstract class AbstractOpenIdCredentialType
 
         if( association == null ) {
             LidInvalidCredentialException t = null;
-            for( String epCandidate : endpointCandidates ) {
-                try {
-                    checkCredentialStatelessMode( request, subject, epCandidate ); // aka dumb
 
-                } catch( LidInvalidCredentialException ex ) {
-                    if( log.isDebugEnabled() ) {
-                        log.debug( t );
-                    }
-                    if( t == null ) {
-                        t = ex;
+            String specifiedEndpoint = request.getUrlArgument( OPENID_ENDPOINT_PARAMETER_NAME );
+            if( specifiedEndpoint != null ) {
+                if( !ArrayHelper.isIn( specifiedEndpoint, endpointCandidates, true )) {
+                    log.error( "Cannot find specified endpoint in OpenID request", request, specifiedEndpoint, endpointCandidates );
+                    throw new OpenIdInvalidSignatureException( subject.getIdentifier(), this );
+                }
+            } else {
+                // try all endpoints
+                for( String epCandidate : endpointCandidates ) {
+                    try {
+                        checkCredentialStatelessMode( request, subject, epCandidate ); // aka dumb
+
+                        t = null; // we found one that worked
+                        break;
+
+                    } catch( LidInvalidCredentialException ex ) {
+                        if( log.isDebugEnabled() ) {
+                            log.debug( t );
+                        }
+                        if( t == null ) {
+                            t = ex;
+                        }
                     }
                 }
-            }
-            if( t != null ) {
-                throw t;
+                if( t != null ) {
+                    throw t;
+                }
             }
 
         } else {
@@ -210,7 +223,8 @@ public abstract class AbstractOpenIdCredentialType
                 }
             }
         }
-        if( !"id_res".equals( mode ) || !is_valid ) {
+        if( ( mode != null && !"id_res".equals( mode )) || !is_valid ) {
+            // OpenID V1 says mode=id_res, V2 does not mention mode
             throw new OpenIdInvalidSignatureException( subject.getIdentifier(), this );
         }
         if( invalidate_handle != null ) {

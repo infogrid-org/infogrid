@@ -116,11 +116,26 @@ public interface LidClientAuthenticationStatus
      *    It returns an empty array if at least one credential type was offered, but none were valid.</p>
      * <p>For example, if a request carried 5 different credential types, of which 3 validated and 2 did not, this method
      *    would return the 3 validated credential types.</p>
-     * 
+     *
      * @return the types of validated credentials provided by the client for this request, or null if none
      * @see #getCarriedInvalidCredentialTypes
+     * @see #getCarriedExpiredCredentialTypes
      */
     public abstract LidCredentialType [] getCarriedValidCredentialTypes();
+
+    /**
+     * <p>Determine the set of credential types stronger than a session id that were offered by the
+     *    client for this request and that were expired.</p>
+     * <p>This returns null if none such credential type was offered, regardless of whether any were valid or not.
+     *    It returns an empty array if at least one credential type was offered, but none were valid.</p>
+     * <p>For example, if a request carried 5 different credential types, of which 2 validated and 1 used to be valid
+     *    but is not any more, and 2 did not validate, this method would return the 1 validated credential type.</p>
+     *
+     * @return the types of expired credentials provided by the client for this request, or null if none
+     * @see #getCarriedValidCredentialTypes
+     * @see #getCarriedInvalidCredentialTypes
+     */
+    public abstract LidCredentialType [] getCarriedExpiredCredentialTypes();
 
     /**
      * <p>Determine the set of credential types stronger than a session id that  were offered by the
@@ -132,6 +147,7 @@ public interface LidClientAuthenticationStatus
      * 
      * @return the types of invalid credentials provided by the client for this request, or null if none
      * @see #getCarriedValidCredentialTypes
+     * @see #getCarriedExpiredCredentialTypes
      */
     public abstract LidCredentialType [] getCarriedInvalidCredentialTypes();
 

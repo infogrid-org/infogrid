@@ -57,4 +57,9 @@ public interface OpenIdCredentialType
      * Name of the URL parameter that contains the OpenID V2 nonce.
      */
     public static final String OPENID_NONCE_PARAMETER_NAME = "openid.response_nonce";
+
+    /**
+     * Name of the URL parameter that contains the OpenID V2 endpoint.
+     */
+    public static final String OPENID_ENDPOINT_PARAMETER_NAME = "opend.op_endpoint";
 }
