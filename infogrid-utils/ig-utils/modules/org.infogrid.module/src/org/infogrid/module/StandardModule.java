@@ -203,11 +203,12 @@ public class StandardModule
            ModuleErrorHandler.informModuleRunFailed( this, ex );
            return 1;
        } catch( InvocationTargetException ex ) {
-           ModuleErrorHandler.informModuleRunFailed( this, ex.getCause() );
-           if( ex.getCause() instanceof StandardModuleRunException ) {
-               throw (StandardModuleRunException) ex.getCause();
+
+           ModuleErrorHandler.informModuleRunFailed( this, ex.getTargetException() );
+           if( ex.getTargetException() instanceof StandardModuleRunException ) {
+               throw (StandardModuleRunException) ex.getTargetException();
            } else {
-               throw new StandardModuleRunException( theModuleAdvertisement, runClassName, runMethodName, ex.getCause() );
+               throw new StandardModuleRunException( theModuleAdvertisement, runClassName, runMethodName, ex.getTargetException() );
            }
        } catch( Throwable ex ) {
            ModuleErrorHandler.informModuleRunFailed( this, ex );
