@@ -63,6 +63,9 @@ public class AppendToUrlStringifier
             buf.append( '?' );
         }
 
+        if( arg.startsWith( "&" ) || arg.startsWith( "?" )) {
+            arg = arg.substring( 1 );
+        }
         buf.append( arg );
 
         String ret = potentiallyShorten( buf.toString(), pars );
