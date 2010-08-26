@@ -15,6 +15,7 @@
 package org.infogrid.module;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * Collects the tag names in the ModuleAdvertisements' XML format.
@@ -24,7 +25,7 @@ public interface ModuleXmlTags
     /**
      * The default DateFormat.
      */
-    public static final DateFormat theDefaultDateFormat = DateFormat.getInstance();
+    public static final DateFormat theDefaultDateFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); /// RC 3339
 
     /**
      * XML tag: dependencies.

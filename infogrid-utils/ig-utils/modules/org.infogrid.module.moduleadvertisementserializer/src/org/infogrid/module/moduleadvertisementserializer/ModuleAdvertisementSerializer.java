@@ -27,6 +27,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 import org.infogrid.module.ModuleAdvertisement;
@@ -94,6 +95,8 @@ public class ModuleAdvertisementSerializer
                 throw new IOException( "Cannot access directory " + outputDir.getAbsolutePath() );
             }
 
+            Date now = new Date();
+            
             if( doList ) {
                 BufferedReader listReader = new BufferedReader( new InputStreamReader( new FileInputStream( inputFile )));
                 String         listLine;
@@ -111,7 +114,8 @@ public class ModuleAdvertisementSerializer
                             doSerialize,
                             doXml,
                             doJava,
-                            doDebug );
+                            doDebug,
+                            now );
                 }
             } else {
                 processOne(
@@ -120,7 +124,8 @@ public class ModuleAdvertisementSerializer
                         doSerialize,
                         doXml,
                         doJava,
-                        doDebug );
+                        doDebug,
+                        now );
             }
         } catch( Exception ex ) {
             ex.printStackTrace( System.err );
@@ -139,6 +144,7 @@ public class ModuleAdvertisementSerializer
      * @param doXml if true, generate an XML representation of the ModuleAdvertisement
      * @param doJava if true, generate Java code instantiating the ModuleAdvertisement
      * @param doDebug if true, create a debug file
+     * @param now time of the current run
      * @throws IOException thrown if the input could not be read or the output not written
      * @throws ModuleConfigurationException thrown if the Module was configured incorrectly 
      */
@@ -148,7 +154,8 @@ public class ModuleAdvertisementSerializer
             boolean doSerialize,
             boolean doXml,
             boolean doJava,
-            boolean doDebug )
+            boolean doDebug,
+            Date    now )
         throws
             IOException,
             ModuleConfigurationException
@@ -157,7 +164,7 @@ public class ModuleAdvertisementSerializer
 
         InputStream fromStream = new FileInputStream( inputFile );
 
-        ModuleAdvertisement theAdv = theParser.readAdvertisement( fromStream, inputFile.getAbsoluteFile() );
+        ModuleAdvertisement theAdv = theParser.readAdvertisement( fromStream, inputFile.getAbsoluteFile(), now );
 
         String moduleName    = theAdv.getModuleName();
         String moduleVersion = theAdv.getModuleVersion();

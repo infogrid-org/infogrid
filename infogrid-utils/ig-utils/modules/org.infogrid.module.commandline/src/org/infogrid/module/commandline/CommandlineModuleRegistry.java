@@ -82,7 +82,7 @@ public class CommandlineModuleRegistry
                 try {
                     theStream = new BufferedInputStream( new FileInputStream( candidateFile ));
 
-                    ModuleAdvertisement ad = theParser.readAdvertisement( theStream, candidateFile.getAbsoluteFile() );
+                    ModuleAdvertisement ad = theParser.readAdvertisement( theStream, candidateFile.getAbsoluteFile(), null );
                     if( !ads.contains( ad )) {
                         ads.add( ad );
                     }

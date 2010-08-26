@@ -398,7 +398,7 @@ public abstract class ModuleAdvertisement
         buf.append( ",\n" );
         buf.append( tabs( tabs ));
         if( getModuleBuildDate() != null ) {
-            buf.append( "new java.util.Date( " ).append( getModuleBuildDate().getTime() ).append( " ),\n" );
+            buf.append( "new java.util.Date( " ).append( getModuleBuildDate().getTime() ).append( "L ),\n" );
         } else {
             buf.append( "null,\n" );
         }
@@ -702,11 +702,6 @@ public abstract class ModuleAdvertisement
         if( theModuleBuildDate != null ) {
             appendOpenTag( BUILD_TIME_TAG, buf );
             buf.append( myDateFormat.format( theModuleBuildDate ));
-            appendCloseTag( BUILD_TIME_TAG, buf );
-            buf.append( '\n' );
-        } else {
-            appendOpenTag( BUILD_TIME_TAG, buf );
-            buf.append( myDateFormat.format( new Date() )); // now
             appendCloseTag( BUILD_TIME_TAG, buf );
             buf.append( '\n' );
         }

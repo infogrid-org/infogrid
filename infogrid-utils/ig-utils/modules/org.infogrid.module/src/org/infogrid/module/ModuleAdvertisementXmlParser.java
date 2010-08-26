@@ -59,20 +59,24 @@ public class ModuleAdvertisementXmlParser
      * Parse the XML file.
      *
      * @param theStream the stream from which we read the ModuleAdvertisement
-     * @param file the file that is being parsed, for relative path construction and error reportin
+     * @param file the file that is being parsed, for relative path construction and error reporting
+     * @param defaultBuildDate if given, use this Date as the buildDate for the ModuleAdvertisement if none is given
      * @return the read ModuleAdvertisement (may be subclass)
      * @throws IOException an input/output error occurred
      * @throws ModuleConfigurationException a configuration error occurred during parsing or setup
      */
     public synchronized ModuleAdvertisement readAdvertisement(
             InputStream theStream,
-            File        file )
+            File        file,
+            Date        defaultBuildDate )
         throws
             IOException,
             ModuleConfigurationException
     {
         // initialize first
         initialize();
+
+        buildDate = defaultBuildDate;
 
         // now do it
         try {
