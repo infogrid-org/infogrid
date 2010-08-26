@@ -184,7 +184,7 @@ public class DefaultAnetMeshObjectIdentifierFactory
         int hash = raw.indexOf( DefaultAnetMeshObjectIdentifier.SEPARATOR );
         if( hash == 0 ) {
             meshBase = contextIdentifier;
-            localId    = raw.substring( hash+1 );
+            localId  = raw.substring( hash+1 );
         } else if( hash > 0 ) {
             if( guess ) {
                 meshBase = theMeshBaseIdentifierFactory.guessFromExternalForm( raw.substring( 0, hash ));
@@ -398,7 +398,10 @@ public class DefaultAnetMeshObjectIdentifierFactory
      */
     public final static String [] DISALLOWED_LOCAL_ID_STRINGS = theResourceHelper.getResourceStringArrayOrDefault(
             "DisallowedLocalIdString",
-            new String [] { "." } );
+            new String [] {
+                    ".",
+                    "" + DefaultAnetMeshObjectIdentifier.SEPARATOR
+            } );
 
     /**
      * This subclass of DefaultAnetMeshObjectIdentifier is only used for identifiers
@@ -414,7 +417,7 @@ public class DefaultAnetMeshObjectIdentifierFactory
          * @param factory the DefaultAnetMeshObjectIdentifierFactory that created this identifier
          * @param meshBaseIdentifier the NetMeshBaseIdentifier of the owning NetMeshBase
          */
-        public HomeObject(
+        HomeObject(
                 DefaultAnetMeshObjectIdentifierFactory factory,
                 NetMeshBaseIdentifier                  meshBaseIdentifier )
         {
