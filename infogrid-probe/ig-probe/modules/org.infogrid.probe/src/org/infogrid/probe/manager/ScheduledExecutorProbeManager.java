@@ -177,8 +177,7 @@ public abstract class ScheduledExecutorProbeManager
 
         try {
             shadow.executeAsap( new TransactionAction<ProbeUpdateSpecification>() {
-                    public ProbeUpdateSpecification execute(
-                            Transaction tx )
+                    public ProbeUpdateSpecification execute()
                         throws
                             Throwable
                     {
