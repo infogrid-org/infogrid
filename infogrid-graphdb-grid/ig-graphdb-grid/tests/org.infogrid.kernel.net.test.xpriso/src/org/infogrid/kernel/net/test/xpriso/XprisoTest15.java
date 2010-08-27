@@ -51,8 +51,7 @@ public class XprisoTest15
         NetMeshObject [] instantiated = new NetMeshObject[ otherMbs.length ];
         for( int i=0 ; i<otherMbs.length ; ++i ) {
             instantiated[i] = otherMbs[i].executeNow( new TransactionAction<NetMeshObject>() {
-                    public NetMeshObject execute(
-                            Transaction tx )
+                    public NetMeshObject execute()
                         throws
                             MeshObjectGraphModificationException,
                             TransactionException,

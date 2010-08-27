@@ -55,8 +55,7 @@ public class NetSerializerTest4
         NetMeshObject one = mb.getHomeObject();
         NetMeshObject two
                 = mb.executeNow( new TransactionAction<NetMeshObject>() {
-                    public NetMeshObject execute(
-                            Transaction tx )
+                    public NetMeshObject execute()
                         throws
                             Throwable
                     {
