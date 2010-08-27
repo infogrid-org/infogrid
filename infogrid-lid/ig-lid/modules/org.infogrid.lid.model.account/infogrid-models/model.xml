@@ -517,8 +517,7 @@
             final long duration )
     {
         getMeshBase().executeNow( new org.infogrid.meshbase.transaction.TransactionAction<Void>() {
-                public Void execute(
-                        org.infogrid.meshbase.transaction.Transaction tx )
+                public Void execute()
                     throws
                         Throwable
                 {
@@ -534,8 +533,7 @@
     public void cancel()
     {
         getMeshBase().executeNow( new org.infogrid.meshbase.transaction.TransactionAction<Void>() {
-                public Void execute(
-                        org.infogrid.meshbase.transaction.Transaction tx )
+                public Void execute()
                     throws
                         Throwable
                 {
