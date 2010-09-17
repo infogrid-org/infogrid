@@ -85,7 +85,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
 
         } catch( ParseException ex ) {
             log.error( ex );
-            return null;
+            throw new NoSuchElementException();
         }
     }
     
@@ -106,7 +106,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
 
         } catch( ParseException ex ) {
             log.error( ex );
-            return null;
+            throw new NoSuchElementException();
         }
     }
 
@@ -184,7 +184,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
 
         } catch( ParseException ex ) {
             log.error( ex );
-            return null;
+            throw new NoSuchElementException();
         }
     }
 
@@ -208,7 +208,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
 
             } catch( ParseException ex ) {
                 log.error( ex );
-                return null;
+                throw new NoSuchElementException();
             }
         }
         
@@ -231,7 +231,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
 
         } catch( ParseException ex ) {
             log.error( ex );
-            return null;
+            throw new NoSuchElementException();
         }
     }
 
@@ -260,7 +260,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
 
             } catch( ParseException ex ) {
                 log.error( ex );
-                return null;
+                throw new NoSuchElementException();
             }
         }
         
