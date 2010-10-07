@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -187,7 +187,7 @@ public class PostgresqlStore
             }.execute();
             
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( ex );
+            throw new SqlStoreIOException( "createTables", ex );
         }
     }
 
@@ -289,7 +289,7 @@ public class PostgresqlStore
                 throw new StoreKeyExistsAlreadyException( this, key );
             }
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( ex );
+            throw new SqlStoreIOException( "put", key, encodingId, data, ex );
 
         } finally {
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
@@ -395,7 +395,7 @@ public class PostgresqlStore
                 throw new StoreKeyDoesNotExistException( PostgresqlStore.this, key  );
             }
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( ex );
+            throw new SqlStoreIOException( "update", key, encodingId, data, ex );
 
         } finally {
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
@@ -561,7 +561,7 @@ public class PostgresqlStore
             return updated;
 
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( ex );
+            throw new SqlStoreIOException( "putOrUpdate", key, encodingId, data, ex );
 
         } finally {
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
@@ -648,7 +648,7 @@ public class PostgresqlStore
             return ret;
 
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( ex );
+            throw new SqlStoreIOException( "get", key, ex );
 
         } finally {
             if( ret != null ) {
@@ -699,7 +699,7 @@ public class PostgresqlStore
             }
 
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( ex );
+            throw new SqlStoreIOException( "delete", key, ex );
 
         } finally {
             fireDeletePerformed( key );
@@ -737,7 +737,7 @@ public class PostgresqlStore
             }.execute();
             
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( ex );
+            throw new SqlStoreIOException( "deleteAll", startsWith, ex );
         }
     }
     

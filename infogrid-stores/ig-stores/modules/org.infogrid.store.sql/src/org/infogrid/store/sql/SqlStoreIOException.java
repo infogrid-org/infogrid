@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -32,14 +32,55 @@ public class SqlStoreIOException
     /**
      * Constructor.
      *
+     * @param operation name of the operation, such as "put"
      * @param cause the cause
      */
     public SqlStoreIOException(
+            String       operation,
+            SQLException cause )
+    {
+        this( operation, null, null, null, cause );
+    }
+    
+    /**
+     * Constructor.
+     *
+     * @param operation name of the operation, such as "put"
+     * @param key key of the data element involved in the operation, if any
+     * @param cause the cause
+     */
+    public SqlStoreIOException(
+            String       operation,
+            String       key,
+            SQLException cause )
+    {
+        this( operation, key, null, null, cause );
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param operation name of the operation, such as "put"
+     * @param key key of the data element involved in the operation, if any
+     * @param encodingId the id of the encoding that was used to encode the data element, if any
+     * @param data the data element, expressed as a sequence of bytes, if any
+     * @param cause the cause
+     */
+    public SqlStoreIOException(
+            String       operation,
+            String       key,
+            String       encodingId,
+            byte []      data,
             SQLException cause )
     {
         super( "SQL Exception", cause );
+
+        theOperation  = operation;
+        theKey        = key;
+        theEncodingId = encodingId;
+        theData       = data;
     }
-    
+
     /**
      * Obtain the underlying cause which we know to be a SQLException.
      * 
@@ -50,4 +91,41 @@ public class SqlStoreIOException
     {
         return (SQLException) super.getCause();
     }
+
+    /**
+     * Obtain resource parameters for the internationalization.
+     *
+     * @return the resource parameters
+     */
+    @Override
+    public Object [] getLocalizationParameters()
+    {
+        return new Object[] {
+                theOperation,
+                theKey,
+                theEncodingId,
+                theData,
+                getCause().getMessage(),
+                getCause().getLocalizedMessage() };
+    }
+
+    /**
+     * The name of the operation that produced this exception.
+     */
+    protected String theOperation;
+
+    /**
+     * The key of the data element used in the operation, if any.
+     */
+    protected String theKey;
+
+    /**
+     * The encoding ID of that data element used in the operation, if any.
+     */
+    protected String theEncodingId;
+
+    /**
+     * The data element, expressed as a sequence of bytes, if any.
+     */
+    protected byte [] theData;
 }
