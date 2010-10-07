@@ -185,16 +185,16 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
 
             if( preexistingClientSession != null ) {
                 if( clientIdentifier != null ) {
-                    if( !preexistingClientSession.getSessionClient().isIdentifiedBy( clientIdentifier )) {
+                    if( preexistingClientSession.getSessionClient() == null || !preexistingClientSession.getSessionClient().isIdentifiedBy( clientIdentifier )) {
                         preexistingClientSession = null; // this session does not belong to this client
-                    } else if ( !preexistingClientSession.getSiteIdentifier().equals( siteIdentifier )) {
+                    } else if ( preexistingClientSession.getSiteIdentifier() == null || !preexistingClientSession.getSiteIdentifier().equals( siteIdentifier )) {
                         preexistingClientSession = null; // this session does not belong to this site
                     }
                 } else if( sessionClientIdentifier != null ) {
                     // want to log out, but we still have a session
-                    if( !preexistingClientSession.getSessionClient().isIdentifiedBy( sessionClientIdentifier )) {
+                    if( preexistingClientSession.getSessionClient() == null || !preexistingClientSession.getSessionClient().isIdentifiedBy( sessionClientIdentifier )) {
                         preexistingClientSession = null; // wrong session
-                    } else if ( !preexistingClientSession.getSiteIdentifier().equals( siteIdentifier )) {
+                    } else if ( preexistingClientSession.getSiteIdentifier() == null || !preexistingClientSession.getSiteIdentifier().equals( siteIdentifier )) {
                         preexistingClientSession = null; // wrong session
                     }
                 }
