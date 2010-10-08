@@ -8,13 +8,12 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net.proxy;
 
-import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.util.AbstractFactory;
@@ -24,7 +23,7 @@ import org.infogrid.util.AbstractFactory;
  */
 public abstract class AbstractProxyFactory
         extends
-            AbstractFactory<NetMeshBaseIdentifier,Proxy,CoherenceSpecification>
+            AbstractFactory<NetMeshBaseIdentifier,Proxy,ProxyParameters>
         implements
             ProxyFactory
 {

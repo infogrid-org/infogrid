@@ -35,6 +35,7 @@ import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.ProxyManager;
+import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.net.xpriso.logging.LogXprisoMessageLogger;
 import org.infogrid.meshbase.net.xpriso.logging.XprisoMessageLogger;
@@ -670,7 +671,7 @@ public abstract class AnetMeshBase
         }
 
         // we collect all exceptions here, and the corresponding NetworkPaths
-        ArrayList<Exception>                          thrownExceptions  = new ArrayList<Exception>();
+        ArrayList<Throwable>                          thrownExceptions  = new ArrayList<Throwable>();
         ArrayList<NetMeshObjectAccessSpecification[]> failedObjectPaths = new ArrayList<NetMeshObjectAccessSpecification[]>();
 
         boolean ok;
@@ -695,7 +696,7 @@ public abstract class AnetMeshBase
                 // now find all that have the same first NetMeshBaseIdentifier element
                 NetMeshBaseAccessSpecification pivot     = correctRemotePaths[ runningIndex ].getAccessPath()[0];
                 NetMeshBaseIdentifier          pivotName = pivot.getNetMeshBaseIdentifier();
-                CoherenceSpecification         pivotCalc = pivot.getCoherenceSpecification();
+                ProxyParameters                pivotPars = ProxyParameters.create( pivot.getCoherenceSpecification(), correctRemotePaths[ runningIndex ].getFollowRedirects() );
 
                 // obtain a new set of object names that we still need to get
                 NetMeshObjectAccessSpecification [] nextObjectPaths = new NetMeshObjectAccessSpecification[ stillToGet ]; // potentially over-allocated
@@ -732,14 +733,18 @@ public abstract class AnetMeshBase
 
                 Proxy theProxy = null;
                 try {
-                    theProxy = obtainProxyFor( pivotName, pivotCalc ); // this triggers the Shadow creation in the right subclasses
+                    theProxy = obtainProxyFor( pivotName, pivotPars ); // this triggers the Shadow creation in the right subclasses
                     if( theProxy != null ) {
                         long requestedTimeout = theProxy.obtainReplicas( nextObjectPaths, timeoutInMillis ); // FIXME? Should we use a different timeout here?
                         realTimeout = Math.max( realTimeout, requestedTimeout );
                     }
 
                 } catch( FactoryException ex ) {
-                    thrownExceptions.add( ex );
+                    if( ex.getCause() != null ) {
+                        thrownExceptions.add( ex.getCause() );
+                    } else {
+                        thrownExceptions.add( ex );
+                    }
                     failedObjectPaths.add( withPrefix( pivot, nextObjectPaths ) );
                 }
                 proxyKeeper[ proxyKeeperCount++ ] = theProxy;
@@ -807,7 +812,7 @@ public abstract class AnetMeshBase
                     new RemoteQueryTimeoutException.QueryIsOngoing( this, someFound, ret ));
 
         } else {
-            Exception                           firstException         = thrownExceptions.get( 0 );
+            Throwable                           firstException         = thrownExceptions.get( 0 );
             NetMeshObjectAccessSpecification [] firstFailedObjectPaths = failedObjectPaths.get( 0 );
 
             throw new NetMeshObjectAccessException( this, ret, firstFailedObjectPaths, firstException ); // FIXME
@@ -829,7 +834,6 @@ public abstract class AnetMeshBase
         }
 
         NetMeshBaseAccessSpecification [] path = raw.getAccessPath();
-
         if( path == null ) {
             return raw;
         }
@@ -838,9 +842,11 @@ public abstract class AnetMeshBase
             NetMeshBaseIdentifier candidateName = path[i].getNetMeshBaseIdentifier();
             if( theMeshBaseIdentifier.equals( candidateName )) {
 
-                return theNetMeshObjectAccessSpecificationFactory.obtain(
+                NetMeshObjectAccessSpecification ret = theNetMeshObjectAccessSpecificationFactory.obtain(
                        ArrayHelper.subarray( path, i+1, NetMeshBaseAccessSpecification.class ),
                        raw.getNetMeshObjectIdentifier() );
+                ret.setFollowRedirects( raw.getFollowRedirects() );
+                return ret;
             }
         }
         return raw;
@@ -952,18 +958,18 @@ public abstract class AnetMeshBase
      * Obtain or obtain a Proxy for communication with a NetMeshBase at the specified NetMeshBaseIdentifier.
      * 
      * @param networkIdentifier the NetMeshBaseIdentifier
-     * @param coherence the CoherenceSpecification to use, if any
+     * @param pars the ProxyParameters to use, if any
      * @return the Proxy
      * @throws FactoryException thrown if the Proxy could not be created
      * @see #getProxyFor
      */
     public Proxy obtainProxyFor(
-            NetMeshBaseIdentifier  networkIdentifier,
-            CoherenceSpecification coherence )
+            NetMeshBaseIdentifier networkIdentifier,
+            ProxyParameters       pars )
         throws
             FactoryException
     {
-        return theProxyManager.obtainFor( networkIdentifier, coherence );
+        return theProxyManager.obtainFor( networkIdentifier, pars );
     }
 
     /**

@@ -43,7 +43,8 @@ public class DefaultNetMeshObjectAccessSpecificationFactory
         DefaultNetMeshObjectAccessSpecificationFactory ret = new DefaultNetMeshObjectAccessSpecificationFactory(
                 meshObjectIdentifierFactory,
                 meshBaseIdentifierFactory,
-                netMeshBaseAccessSpecificationFactory );
+                netMeshBaseAccessSpecificationFactory,
+                DEFAULT_FOLLOW_REDIRECTS );
         return ret;
     }
 
@@ -67,7 +68,8 @@ public class DefaultNetMeshObjectAccessSpecificationFactory
         DefaultNetMeshObjectAccessSpecificationFactory ret = new DefaultNetMeshObjectAccessSpecificationFactory(
                 meshObjectIdentifierFactory,
                 meshBaseIdentifierFactory,
-                netMeshBaseAccessSpecificationFactory );
+                netMeshBaseAccessSpecificationFactory,
+                DEFAULT_FOLLOW_REDIRECTS );
         return ret;
     }
     
@@ -87,7 +89,8 @@ public class DefaultNetMeshObjectAccessSpecificationFactory
         DefaultNetMeshObjectAccessSpecificationFactory ret = new DefaultNetMeshObjectAccessSpecificationFactory(
                 meshObjectIdentifierFactory,
                 meshBaseIdentifierFactory,
-                netMeshBaseAccessSpecificationFactory );
+                netMeshBaseAccessSpecificationFactory,
+                DEFAULT_FOLLOW_REDIRECTS );
         return ret;
     }
 
@@ -97,12 +100,23 @@ public class DefaultNetMeshObjectAccessSpecificationFactory
      * @param meshObjectIdentifierFactory the factory for MeshObjectIdentifiers
      * @param meshBaseIdentifierFactory the factory for MeshBaseIdentifiers
      * @param netMeshBaseAccessSpecificationFactory the factory for NetMeshBaseAccessSpecifications
+     * @param defaultFollowRedirects if true, created NetMeshObjectAccessSpecifications will, by default, follow redirects;
+     *                               if false, a redirect will cause a NetMeshObjectAccessException to be thrown.
      */
     protected DefaultNetMeshObjectAccessSpecificationFactory(
             NetMeshObjectIdentifierFactory        meshObjectIdentifierFactory,
             NetMeshBaseIdentifierFactory          meshBaseIdentifierFactory,
-            NetMeshBaseAccessSpecificationFactory netMeshBaseAccessSpecificationFactory )
+            NetMeshBaseAccessSpecificationFactory netMeshBaseAccessSpecificationFactory,
+            boolean                               defaultFollowRedirects )
     {
-        super( meshObjectIdentifierFactory, meshBaseIdentifierFactory, netMeshBaseAccessSpecificationFactory );
+        super(  meshObjectIdentifierFactory,
+                meshBaseIdentifierFactory,
+                netMeshBaseAccessSpecificationFactory,
+                defaultFollowRedirects );
     }
+
+    /**
+     * The default value for the defaultFollowRedirects property.
+     */
+    public static final boolean DEFAULT_FOLLOW_REDIRECTS = true;
 }

@@ -8,13 +8,12 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net.proxy;
 
-import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.util.FactoryException;
@@ -59,18 +58,18 @@ public class DefaultProxyFactory
      * Create a Proxy.
      *
      * @param partnerMeshBaseIdentifier the NetMeshBaseIdentifier of the NetMeshBase to talk to
-     * @param arg the CoherenceSpecification to use
+     * @param arg the ProxyParameters to use
      * @return the created Proxy
      * @throws FactoryException thrown if the Proxy could not be created
      */
     public Proxy obtainFor(
-            NetMeshBaseIdentifier  partnerMeshBaseIdentifier,
-            CoherenceSpecification arg )
+            NetMeshBaseIdentifier partnerMeshBaseIdentifier,
+            ProxyParameters       arg )
         throws
             FactoryException
     {
         ProxyMessageEndpoint endpoint = theEndpointFactory.obtainFor( partnerMeshBaseIdentifier, theNetMeshBase.getIdentifier() );
-        ProxyPolicy          policy   = theProxyPolicyFactory.obtainFor( partnerMeshBaseIdentifier, arg );// in the future, this should become configurable
+        ProxyPolicy          policy   = theProxyPolicyFactory.obtainFor( partnerMeshBaseIdentifier, arg != null ? arg.getCoherenceSpecification() : null );
 
         Proxy ret = DefaultProxy.create( endpoint, theNetMeshBase, policy, partnerMeshBaseIdentifier );
         ret.setFactory( this );
@@ -101,7 +100,8 @@ public class DefaultProxyFactory
                 externalized.messagesLastSent(),
                 externalized.messagesToBeSent() );
 
-        NiceAndTrustingProxyPolicy policy = NiceAndTrustingProxyPolicy.create( // in the future, this should become configurable -- FIXME
+        ProxyPolicy policy = theProxyPolicyFactory.obtainFor(
+                externalized.getNetworkIdentifierOfPartner(),
                 externalized.getCoherenceSpecification() );
 
         DefaultProxy ret = DefaultProxy.restoreProxy(

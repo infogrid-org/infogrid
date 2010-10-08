@@ -791,7 +791,7 @@ public abstract class AbstractCommunicatingProxy
 
         if( messageToSend != null && messageToSend.hasBeenCreated() && messageToSend.obtain().getCeaseCommunications() ) {
             // it's all over
-            ((SmartFactory<NetMeshBaseIdentifier, Proxy, CoherenceSpecification>) theFactory ).remove( getPartnerMeshBaseIdentifier() );
+            ((SmartFactory<NetMeshBaseIdentifier,Proxy,ProxyParameters>) theFactory ).remove( getPartnerMeshBaseIdentifier() );
         }
     }
 

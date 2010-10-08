@@ -25,7 +25,6 @@ import org.infogrid.util.FlexibleListenerSet;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
-import org.infogrid.util.text.IdentifierStringifier;
 import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationParameters;
 import org.infogrid.util.text.StringifierException;
@@ -78,7 +77,7 @@ public abstract class AbstractProxy
      * @param factory the Factory that created the FactoryCreatedObject
      */
     public final void setFactory(
-            Factory<NetMeshBaseIdentifier, Proxy, CoherenceSpecification> factory )
+            Factory<NetMeshBaseIdentifier,Proxy,ProxyParameters> factory )
     {
         if( factory instanceof ProxyManager ) {
             theFactory = (ProxyManager) factory;

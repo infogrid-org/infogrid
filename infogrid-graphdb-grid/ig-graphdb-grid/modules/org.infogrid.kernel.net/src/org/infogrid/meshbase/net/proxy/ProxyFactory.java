@@ -8,13 +8,12 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net.proxy;
 
-import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
@@ -26,7 +25,7 @@ import org.infogrid.util.FactoryException;
  */
 public interface ProxyFactory
         extends
-            Factory<NetMeshBaseIdentifier,Proxy,CoherenceSpecification>
+            Factory<NetMeshBaseIdentifier,Proxy,ProxyParameters>
 {
     /**
      * Set the NetMeshBase to be used with new Proxies.

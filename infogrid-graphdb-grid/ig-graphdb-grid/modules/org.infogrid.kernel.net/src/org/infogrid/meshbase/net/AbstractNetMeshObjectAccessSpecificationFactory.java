@@ -34,15 +34,19 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
      * @param meshObjectIdentifierFactory the factory for MeshObjectIdentifiers
      * @param meshBaseIdentifierFactory the factory for MeshBaseIdentifiers
      * @param netMeshBaseAccessSpecificationFactory the factory for NetMeshBaseAccessSpecifications
+     * @param defaultFollowRedirects if true, created NetMeshObjectAccessSpecifications will, by default, follow redirects;
+     *                               if false, a redirect will cause a NetMeshObjectAccessException to be thrown.
      */
     protected AbstractNetMeshObjectAccessSpecificationFactory(
             NetMeshObjectIdentifierFactory        meshObjectIdentifierFactory,
             NetMeshBaseIdentifierFactory          meshBaseIdentifierFactory,
-            NetMeshBaseAccessSpecificationFactory netMeshBaseAccessSpecificationFactory )
+            NetMeshBaseAccessSpecificationFactory netMeshBaseAccessSpecificationFactory,
+            boolean                               defaultFollowRedirects )
     {
         theMeshObjectIdentifierFactory           = meshObjectIdentifierFactory;
         theMeshBaseIdentifierFactory             = meshBaseIdentifierFactory;
         theNetMeshBaseAccessSpecificationFactory = netMeshBaseAccessSpecificationFactory;
+        theDefaultFollowRedirects                = defaultFollowRedirects;
     }
     
     /**
@@ -89,7 +93,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                 this,
                 new NetMeshBaseAccessSpecification[0],
                 remoteIdentifier,
-                remoteIdentifier.getAsEntered() );
+                remoteIdentifier.getAsEntered(),
+                theDefaultFollowRedirects );
     }
 
     /**
@@ -109,7 +114,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                             theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName ),
                     },
                     theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ),
-                oneElementName.getAsEntered() );
+                oneElementName.getAsEntered(),
+                theDefaultFollowRedirects );
 
         } catch( ParseException ex ) {
             log.error( ex );
@@ -138,7 +144,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                                 && remoteIdentifier != null
                                 && oneElementName.equals( remoteIdentifier.getNetMeshBaseIdentifier() ))
                         ? remoteIdentifier.getAsEntered()
-                        : null );
+                        : null,
+                theDefaultFollowRedirects );
     }
 
     /**
@@ -160,7 +167,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                     new NetMeshBaseAccessSpecification[] {
                             theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, scope ) },
                     theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ),
-                    oneElementName.getAsEntered() );
+                    oneElementName.getAsEntered(),
+                    theDefaultFollowRedirects );
 
         } catch( ParseException ex ) {
             log.error( ex );
@@ -187,7 +195,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                     new NetMeshBaseAccessSpecification[] {
                             theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, coherence ) },
                     theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ),
-                    oneElementName.getAsEntered() );
+                    oneElementName.getAsEntered(),
+                    theDefaultFollowRedirects );
 
         } catch( ParseException ex ) {
             log.error( ex );
@@ -215,7 +224,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                 new NetMeshBaseAccessSpecification[] {
                         theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, scope ) },
                 remoteIdentifier,
-                null );
+                null,
+                theDefaultFollowRedirects );
     }
 
     /**
@@ -238,7 +248,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                 new NetMeshBaseAccessSpecification[] {
                         theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, coherence ) },
                 remoteIdentifier,
-                null );
+                null,
+                theDefaultFollowRedirects );
     }
 
     /**
@@ -262,7 +273,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                     new NetMeshBaseAccessSpecification[] {
                             theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, scope, coherence ) },
                     theMeshObjectIdentifierFactory.fromExternalForm( oneElementName, null ),
-                    oneElementName.getAsEntered() );
+                    oneElementName.getAsEntered(),
+                    theDefaultFollowRedirects );
 
         } catch( ParseException ex ) {
             log.error( ex );
@@ -292,7 +304,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                 new NetMeshBaseAccessSpecification[] {
                         theNetMeshBaseAccessSpecificationFactory.obtain( oneElementName, scope, coherence ) },
                 remoteIdentifier,
-                null );
+                null,
+                theDefaultFollowRedirects );
     }
 
     /**
@@ -310,7 +323,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                     this,
                     elements,
                     theMeshObjectIdentifierFactory.fromExternalForm( elements[ elements.length-1 ].getNetMeshBaseIdentifier(), null ),
-                    elements.length != 1 ? null : elements[0].getAsEntered() );
+                    elements.length != 1 ? null : elements[0].getAsEntered(),
+                    theDefaultFollowRedirects );
 
         } catch( ParseException ex ) {
             log.error( ex );
@@ -335,7 +349,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                 this,
                 elements,
                 remoteIdentifier,
-                remoteIdentifier.getAsEntered());
+                remoteIdentifier.getAsEntered(),
+                theDefaultFollowRedirects );
     }
 
     /**
@@ -353,7 +368,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                     this,
                     createSeveral( elements ),
                     theMeshObjectIdentifierFactory.fromExternalForm( elements[ elements.length-1 ], null ),
-                    elements.length != 1 ? null : elements[0].getAsEntered() );
+                    elements.length != 1 ? null : elements[0].getAsEntered(),
+                    theDefaultFollowRedirects );
 
         } catch( ParseException ex ) {
             log.error( ex );
@@ -385,7 +401,8 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                     this,
                     createSeveral( elements ),
                     remoteIdentifier,
-                    null );
+                    null,
+                    theDefaultFollowRedirects );
         }
     }
     
@@ -539,8 +556,38 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
                 this,
                 pathElements,
                 object,
-                raw );
+                raw,
+                theDefaultFollowRedirects );
         return ret;
+    }
+
+    /**
+     * Set the value of the defaultFollowRedirects property. If true, created NetMeshObjectAccessSpecifications
+     * will, by default, follow redirects; if false, a redirect will cause a NetMeshObjectAccessException to
+     * be thrown. This default can be changed by setting a different value on the created NetMeshObjectAccessSpecification.
+     *
+     * @param newValue the new value
+     * @see #getDefaultFollowRedirects
+     * @see NetMeshObjectAccessSpecification#setFollowRedirects
+     */
+    public void setDefaultFollowRedirects(
+            boolean newValue )
+    {
+        theDefaultFollowRedirects = newValue;
+    }
+
+    /**
+     * Obtain the value of the defaultFollowRedirects property. If true, created NetMeshObjectAccessSpecifications
+     * will, by default, follow redirects; if false, a redirect will cause a NetMeshObjectAccessException to
+     * be thrown. This default can be changed by setting a different value on the created NetMeshObjectAccessSpecification.
+     *
+     * @return the value
+     * @see #setDefaultFollowRedirects
+     * @see NetMeshObjectAccessSpecification#getFollowRedirects
+     */
+    public boolean getDefaultFollowRedirects()
+    {
+        return theDefaultFollowRedirects;
     }
 
     /**
@@ -557,4 +604,11 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
      * The factory for NetMeshBaseAccessSpecifications.
      */
     protected NetMeshBaseAccessSpecificationFactory theNetMeshBaseAccessSpecificationFactory;
+
+    /**
+     * If true, created NetMeshObjectAccessSpecifications
+     * will, by default, follow redirects; if false, a redirect will cause a NetMeshObjectAccessException to
+     * be thrown. This default can be changed by setting a different value on the created NetMeshObjectAccessSpecification.
+     */
+    protected boolean theDefaultFollowRedirects;
 }

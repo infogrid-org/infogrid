@@ -8,14 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net.proxy;
 
 import java.util.ArrayList;
-import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.util.CachingMap;
@@ -28,7 +27,7 @@ import org.infogrid.util.PatientSmartFactory;
  */
 public class ProxyManager
         extends
-            PatientSmartFactory<NetMeshBaseIdentifier,Proxy,CoherenceSpecification>
+            PatientSmartFactory<NetMeshBaseIdentifier,Proxy,ProxyParameters>
 {
     /**
      * Factory method.
@@ -72,7 +71,7 @@ public class ProxyManager
     /**
       * Invoked to tell this ProxyManager it is not needed any more.
       * 
-      * @param isPermanent if true, this MeshBase will go away permanmently; if false, it may come alive again some time later
+      * @param isPermanent if true, this MeshBase will go away permanently; if false, it may come alive again some time later
       */
     public void die(
             boolean isPermanent )
@@ -104,7 +103,7 @@ public class ProxyManager
      */
     @Override
     public void factoryCreatedObjectUpdated(
-            FactoryCreatedObject<NetMeshBaseIdentifier,Proxy,CoherenceSpecification> updatedProxy )
+            FactoryCreatedObject<NetMeshBaseIdentifier,Proxy,ProxyParameters> updatedProxy )
     {
         super.factoryCreatedObjectUpdated( updatedProxy );
     }

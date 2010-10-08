@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,6 +21,7 @@ import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshObjectsNotFoundException;
 import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.net.a.AccessLocallySynchronizer;
 import org.infogrid.meshbase.net.xpriso.logging.XprisoMessageLogger;
@@ -444,14 +445,14 @@ public interface NetMeshBase
      * Obtain or create a Proxy for communication with a NetMeshBase at the specified NetMeshBaseIdentifier.
      * 
      * @param networkIdentifier the NetMeshBaseIdentifier
-     * @param coherence the CoherenceSpecification to use, if any
+     * @param pars the ProxyParameters to use, if any
      * @return the Proxy
      * @throws FactoryException thrown if the Proxy could not be created
      * @see #getProxyFor
      */
     public abstract Proxy obtainProxyFor(
-            NetMeshBaseIdentifier  networkIdentifier,
-            CoherenceSpecification coherence )
+            NetMeshBaseIdentifier networkIdentifier,
+            ProxyParameters       pars )
          throws
             FactoryException;
 
