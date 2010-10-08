@@ -90,6 +90,34 @@ public abstract class ArrayHelper
     }
 
     /**
+     * Compares two byte arrays for same content in the same sequence
+     *
+     * @param one first argument to compare
+     * @param two second argument to compare
+     * @return true if the arrays are the same
+     */
+    public static boolean equals(
+            byte [] one,
+            byte [] two )
+    {
+        if( one == two ) {
+            return true;
+        }
+        if( one == null || two == null ) {
+            return false;
+        }
+        if( one.length != two.length ) {
+            return false;
+        }
+        for( int i=0 ; i<one.length ; ++i ) {
+            if( one[i] != two[i] ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Helper method to determine whether an array has any content.
      *
      * @param array the array

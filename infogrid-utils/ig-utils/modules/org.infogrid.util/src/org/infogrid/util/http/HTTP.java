@@ -1245,6 +1245,22 @@ public abstract class HTTP
         }
 
         /**
+         * Is this response a redirect.
+         *
+         * @return true if it is a redirect
+         */
+        public boolean isRedirect()
+        {
+            boolean ret
+                    =    theResponseCode.startsWith( "301" )
+                      || theResponseCode.startsWith( "302" )
+                      || theResponseCode.startsWith( "303" )
+                      || theResponseCode.startsWith( "307" );
+
+            return ret;
+        }
+
+        /**
          * Helper method to determine the content type and character set.
          */
         protected void determineContentTypeAndCharset()
