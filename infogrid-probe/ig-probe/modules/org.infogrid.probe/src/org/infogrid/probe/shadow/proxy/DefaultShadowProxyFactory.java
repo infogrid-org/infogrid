@@ -7,13 +7,12 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.probe.shadow.proxy;
 
-import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
@@ -22,6 +21,7 @@ import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.proxy.ProxyMessageEndpoint;
 import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.meshbase.net.proxy.ProxyPolicy;
 import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowProxy;
@@ -86,8 +86,8 @@ public class DefaultShadowProxyFactory
      * @throws FactoryException thrown if the Proxy could not be created
      */
     public Proxy obtainFor(
-            NetMeshBaseIdentifier  partnerMeshBaseIdentifier,
-            CoherenceSpecification arg )
+            NetMeshBaseIdentifier partnerMeshBaseIdentifier,
+            ProxyParameters       arg )
         throws
             FactoryException
     {
@@ -99,7 +99,7 @@ public class DefaultShadowProxyFactory
             endpoint = null;
         }
 
-        ProxyPolicy policy = theProxyPolicyFactory.obtainFor( partnerMeshBaseIdentifier, arg );// in the future, this should become configurable
+        ProxyPolicy policy = theProxyPolicyFactory.obtainFor( partnerMeshBaseIdentifier, arg != null ? arg.getCoherenceSpecification() : null );
 
         Proxy ret = DefaultShadowProxy.create( endpoint, theNetMeshBase, policy, partnerMeshBaseIdentifier );
         ret.setFactory( this );

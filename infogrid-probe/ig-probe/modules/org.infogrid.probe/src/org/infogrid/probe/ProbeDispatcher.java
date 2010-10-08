@@ -75,6 +75,7 @@ import org.infogrid.module.StandardModuleAdvertisement;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseEvent;
 import org.infogrid.probe.shadow.ShadowMeshBaseListener;
+import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.probe.shadow.m.MStagingMeshBase;
 import org.infogrid.probe.xml.DomMeshObjectSetProbe;
 import org.infogrid.probe.xml.MeshObjectSetProbeTags;
@@ -127,27 +128,28 @@ public class ProbeDispatcher
     /**
      * Calling this will trigger the Probe to run.
      *
-     * @param coherence the CoherenceSpecification specified by the client, if any
      * @return the computed result is the number of milliseconds until the next desired invocation, or -1 if never
      * @throws ProbeException thrown if unable to compute a result
      */
     public synchronized long doUpdateNow(
-            CoherenceSpecification coherence )
+            ProxyParameters par )
         throws
             ProbeException
     {
         if( log.isInfoEnabled() ) {
-            log.info( this + ".doUpdateNow( " + coherence + " )" );
+            log.info( this + ".doUpdateNow( " + par + " )" );
         }
 
-        Throwable             problem          = null; // this helps us to know what happened in the finally clause
-        boolean               updated          = true; // default is "we have been updated
-        StagingMeshBase       oldBase          = null;
-        StagingMeshBase       newBase          = null;
-        long                  ret              = -1L;
-        boolean               isFirstRun       = theShadowMeshBase.size() == 0;
-        NetMeshBaseIdentifier sourceIdentifier = theShadowMeshBase.getIdentifier();
-        ProbeResult           probeResult      = null;
+        Throwable              problem          = null; // this helps us to know what happened in the finally clause
+        boolean                updated          = true; // default is "we have been updated
+        StagingMeshBase        oldBase          = null;
+        StagingMeshBase        newBase          = null;
+        long                   ret              = -1L;
+        boolean                isFirstRun       = theShadowMeshBase.size() == 0;
+        NetMeshBaseIdentifier  sourceIdentifier = theShadowMeshBase.getIdentifier();
+        ProbeResult            probeResult      = null;
+        CoherenceSpecification coherence        = par != null ? par.getCoherenceSpecification() : null;
+        boolean                followRedirects  = par != null ? par.getFollowRedirects() : true; // FIXME? Good default?
 
         theCurrentUpdate = System.currentTimeMillis();
         
@@ -195,7 +197,7 @@ public class ProbeDispatcher
                 if( isDirectory ) {
                     probeResult = handleDirectory( oldBase, newBase, coherence );
                 } else if( isStream ) {
-                    probeResult = handleStream( oldBase, newBase, coherence );
+                    probeResult = handleStream( oldBase, newBase, coherence, followRedirects );
                 } else {
                     probeResult = handleApi( oldBase, newBase, coherence );
                 }
@@ -454,6 +456,7 @@ public class ProbeDispatcher
      * @param oldBase the StagingMeshBase after the most recent successful run, if any
      * @param newBase the new StagingMeshBase into which to instantiate the data
      * @param coherence the CoherenceSpecification specified by the client, if any
+     * @param followRedirects if true, silently follow HTTP redirects; if false, throw ProbeException.HttpRedirectResponse
      * @return the ProbeResult
      * @throws ProbeException thrown if unable to compute a result
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
@@ -463,7 +466,8 @@ public class ProbeDispatcher
     protected ProbeResult handleStream(
             StagingMeshBase        oldBase,
             StagingMeshBase        newBase,
-            CoherenceSpecification coherence )
+            CoherenceSpecification coherence,
+            boolean                followRedirects )
         throws
             ProbeException,
             TransactionException,
@@ -500,11 +504,15 @@ public class ProbeDispatcher
             HTTP.Response httpResponse = HTTP.http_get(
                     url,
                     XRDS_MIME_TYPE + "," + HTTP_GET_ACCEPT_HEADER,
-                    true,
+                    followRedirects,
                     null, // no cookies
                     HTTP.HTTP_CONNECT_TIMEOUT,
                     HTTP.HTTP_READ_TIMEOUT,
                     theShadowMeshBase.getHostnameVerifier() );
+
+            if( httpResponse.isRedirect() ) {
+                throw new ProbeException.HttpRedirectResponse( sourceIdentifier, httpResponse.getResponseCode(), httpResponse.getLocation() );
+            }
 
             if( httpResponse.isSuccess() && XRDS_MIME_TYPE.equals( httpResponse.getContentType() )) {
                 // found XRDS content via MIME type
@@ -516,13 +524,16 @@ public class ProbeDispatcher
                 httpResponse = HTTP.http_get(
                         url,
                         HTTP_GET_ACCEPT_HEADER,
-                        true,
+                        followRedirects,
                         null, // no cookies
                         HTTP.HTTP_CONNECT_TIMEOUT,
                         HTTP.HTTP_READ_TIMEOUT,
                         theShadowMeshBase.getHostnameVerifier() );
+                if( httpResponse.isRedirect() ) {
+                    throw new ProbeException.HttpRedirectResponse( sourceIdentifier, httpResponse.getResponseCode(), httpResponse.getLocation() );
+                }
 
-                if( yadisServicesXml != null && yadisServicesXml.equals( httpResponse.getContentAsString() )) {
+                if( yadisServicesXml != null && ArrayHelper.equals( yadisServicesXml, httpResponse.getContent() )) {
                     // directly served the XRDS, HTTP_GET_ACCEPT_HEADER made no difference
                     yadisServicesXml = null;
                 }

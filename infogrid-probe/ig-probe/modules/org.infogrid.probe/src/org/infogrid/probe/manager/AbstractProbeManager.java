@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -19,10 +19,12 @@ import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseNameServer;
 import org.infogrid.meshbase.net.m.NetMMeshBaseNameServer;
+import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.meshbase.net.xpriso.logging.XprisoMessageLogger;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
 import org.infogrid.util.CachingMap;
+import org.infogrid.util.FactoryException;
 import org.infogrid.util.PatientSmartFactory;
 
 /**
@@ -30,7 +32,7 @@ import org.infogrid.util.PatientSmartFactory;
  */
 public abstract class AbstractProbeManager
         extends
-            PatientSmartFactory<NetMeshBaseIdentifier,ShadowMeshBase,CoherenceSpecification>
+            PatientSmartFactory<NetMeshBaseIdentifier,ShadowMeshBase,ProxyParameters>
         implements
             ProbeManager
 {
@@ -45,6 +47,23 @@ public abstract class AbstractProbeManager
             CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
     {
         super( delegateFactory, storage );
+    }
+
+    /**
+     * This simplification is often convenient.
+     *
+     * @param key the key for which we want to obtain a value
+     * @param coherence the CoherenceSpecification
+     * @return the found or created value for this key
+     * @throws FactoryException catch-all Exception, consider its cause
+     */
+    public ShadowMeshBase obtainFor(
+            NetMeshBaseIdentifier  key,
+            CoherenceSpecification coherence )
+        throws
+            FactoryException
+    {
+        return obtainFor( key, ProxyParameters.create( coherence ));
     }
 
     /**
@@ -94,9 +113,9 @@ public abstract class AbstractProbeManager
      */
     @Override
     protected void createdHook(
-            NetMeshBaseIdentifier  key,
-            ShadowMeshBase         value,
-            CoherenceSpecification argument )
+            NetMeshBaseIdentifier key,
+            ShadowMeshBase        value,
+            ProxyParameters       argument )
     {
         if( theXprisoMessageLogger != null ) {
             value.setXprisoMessageLogger( theXprisoMessageLogger );

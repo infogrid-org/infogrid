@@ -8,14 +8,14 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.probe.shadow;
 
-import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.proxy.ProxyParameters;
 
 import org.infogrid.util.Factory;
 
@@ -24,7 +24,7 @@ import org.infogrid.util.Factory;
  */
 public interface ShadowMeshBaseFactory
         extends
-            Factory<NetMeshBaseIdentifier,ShadowMeshBase,CoherenceSpecification>
+            Factory<NetMeshBaseIdentifier,ShadowMeshBase,ProxyParameters>
 {
     // nothing
 }

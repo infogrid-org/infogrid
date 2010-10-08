@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -30,6 +30,7 @@ import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
+import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.transaction.ChangeSet;
@@ -143,7 +144,7 @@ public abstract class AShadowMeshBase
      * @param factory the Factory that created the FactoryCreatedObject
      */
     public final void setFactory(
-            Factory<NetMeshBaseIdentifier,ShadowMeshBase,CoherenceSpecification> factory )
+            Factory<NetMeshBaseIdentifier,ShadowMeshBase,ProxyParameters> factory )
     {
         if( factory instanceof ProbeManager ) {
             theProbeManager = (ProbeManager) factory;
@@ -170,7 +171,7 @@ public abstract class AShadowMeshBase
      *
      * @return the Factory that created the FactoryCreatedObject
      */
-    public final Factory<NetMeshBaseIdentifier,ShadowMeshBase,CoherenceSpecification> getFactory()
+    public final Factory<NetMeshBaseIdentifier,ShadowMeshBase,ProxyParameters> getFactory()
     {
         return theProbeManager;
     }
@@ -223,13 +224,13 @@ public abstract class AShadowMeshBase
     /**
      * Invoke a run now.
      *
-     * @param coherence the requested CoherenceSpecification, if any
+     * @param pars the requested CoherenceSpecification, if any
      * @return desired time of the next update, in milliseconds. -1 indicates never.
      * @throws ProbeException thrown if the update was unsuccessful
      * @throws IsDeadException thrown if the ShadowMeshBase is dead already when this method is being invoked
      */
     public long doUpdateNow(
-            CoherenceSpecification coherence )
+            ProxyParameters pars )
         throws
             ProbeException,
             IsDeadException
@@ -241,7 +242,7 @@ public abstract class AShadowMeshBase
         synchronized( theDispatcher ) { // we can't synchronize on the shadow, because incoming transactions need to be able to create threads
             checkDead();
 
-            long nextTime = theDispatcher.doUpdateNow( coherence );
+            long nextTime = theDispatcher.doUpdateNow( pars );
 
             if( theProbeManager != null ) {
                 if( log.isDebugEnabled() ) {

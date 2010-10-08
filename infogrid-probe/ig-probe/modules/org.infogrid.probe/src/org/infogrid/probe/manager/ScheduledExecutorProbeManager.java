@@ -27,8 +27,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.meshbase.transaction.TransactionAction;
 import org.infogrid.meshbase.transaction.TransactionActionException;
 import org.infogrid.model.Probe.ProbeSubjectArea;
@@ -205,9 +205,9 @@ public abstract class ScheduledExecutorProbeManager
      */
     @Override
     protected void createdHook(
-            NetMeshBaseIdentifier  key,
-            ShadowMeshBase         value,
-            CoherenceSpecification argument )
+            NetMeshBaseIdentifier key,
+            ShadowMeshBase        value,
+            ProxyParameters       argument )
     {
         long nextTime = value.getDelayUntilNextUpdate();
         if( nextTime >= 0 && theExecutorService != null ) { // allow 0 for immediate execution
@@ -324,17 +324,17 @@ public abstract class ScheduledExecutorProbeManager
         /**
          * The main call when invoked on the thread of the application programmer.
          * 
-         * @param coherence optional CoherenceSpecification
+         * @param pars optional ProxyParameters
          * @return desired time of the next update, in milliseconds. -1 indicates never.
          * @throws Exception catch-all Exception
          */
         public Long call(
-                CoherenceSpecification coherence )
+                ProxyParameters pars )
             throws
                 Exception
         {
             if( log.isInfoEnabled() ) {
-                log.info( this + ".call( " + coherence + " )" );
+                log.info( this, "call", pars );
             }
             
             ScheduledExecutorProbeManager belongsTo = theBelongsTo.get();
@@ -353,7 +353,7 @@ public abstract class ScheduledExecutorProbeManager
                 }
 
                 try {
-                    nextTime = shadow.doUpdateNow( coherence );
+                    nextTime = shadow.doUpdateNow( pars );
 
                     if( nextTime != null && nextTime.longValue() >= 0 ) { // allow 0 for immediate execution
                         if( log.isDebugEnabled() ) {

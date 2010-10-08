@@ -8,18 +8,18 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.probe.shadow.proxy;
 
-import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.net.proxy.AbstractProxyFactory;
 import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicy;
 import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.meshbase.net.proxy.ProxyPolicy;
 import org.infogrid.util.FactoryException;
 
@@ -59,12 +59,12 @@ public class PlaceholderShadowProxyFactory
      * @throws FactoryException thrown if the Proxy could not be created
      */
     public Proxy obtainFor(
-            NetMeshBaseIdentifier  partnerMeshBaseIdentifier,
-            CoherenceSpecification arg )
+            NetMeshBaseIdentifier partnerMeshBaseIdentifier,
+            ProxyParameters       arg )
         throws
             FactoryException
     {
-        ProxyPolicy policy = theProxyPolicyFactory.obtainFor( partnerMeshBaseIdentifier, arg );// in the future, this should become configurable
+        ProxyPolicy policy = theProxyPolicyFactory.obtainFor( partnerMeshBaseIdentifier, arg.getCoherenceSpecification() );// in the future, this should become configurable
 
         Proxy ret = PlaceholderShadowProxy.create( theNetMeshBase, policy, partnerMeshBaseIdentifier );
         ret.setFactory( this );

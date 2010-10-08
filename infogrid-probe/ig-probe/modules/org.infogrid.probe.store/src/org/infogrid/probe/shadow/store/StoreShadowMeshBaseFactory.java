@@ -14,12 +14,12 @@
 
 package org.infogrid.probe.shadow.store;
 
-import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.DefaultNetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
+import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.shadow.AbstractShadowMeshBaseFactory;
@@ -111,8 +111,8 @@ public class StoreShadowMeshBaseFactory
      * @return the created object
      */
     public ShadowMeshBase obtainFor(
-            NetMeshBaseIdentifier      key,
-            CoherenceSpecification argument )
+            NetMeshBaseIdentifier key,
+            ProxyParameters       argument )
         throws
             FactoryException
     {

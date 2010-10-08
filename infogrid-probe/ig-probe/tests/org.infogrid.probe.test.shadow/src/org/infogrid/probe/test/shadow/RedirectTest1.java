@@ -1,0 +1,356 @@
+//
+// This file is part of InfoGrid(tm). You may not use this file except in
+// compliance with the InfoGrid license. The InfoGrid license and important
+// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+// or you do not consent to all aspects of the license and the disclaimers,
+// no license is granted; do not use this file.
+//
+// For more information about InfoGrid go to http://infogrid.org/
+//
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// All rights reserved.
+//
+
+package org.infogrid.probe.test.shadow;
+
+import java.util.concurrent.ScheduledExecutorService;
+import org.infogrid.httpd.HttpEntity;
+import org.infogrid.httpd.HttpEntityResponse;
+import org.infogrid.httpd.HttpErrorResponse;
+import org.infogrid.httpd.HttpRedirectResponse;
+import org.infogrid.httpd.HttpRequest;
+import org.infogrid.httpd.HttpResponse;
+import org.infogrid.httpd.HttpResponseFactory;
+import org.infogrid.httpd.SnapshotHttpEntity;
+import org.infogrid.httpd.server.HttpServer;
+import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.net.NetMeshObjectAccessException;
+import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
+import org.infogrid.modelbase.ModelBase;
+import org.infogrid.modelbase.ModelBaseSingleton;
+import org.infogrid.probe.ProbeException;
+import org.infogrid.probe.m.MProbeDirectory;
+import org.infogrid.testharness.AbstractTest;
+import org.infogrid.util.context.Context;
+import org.infogrid.util.context.SimpleContext;
+import org.infogrid.util.logging.Log;
+
+/**
+  * Tests behavior in case an HTTP data source issues a redirect.
+  */
+public class RedirectTest1
+        extends
+            AbstractTest
+{
+    private static final Log log = Log.getLogInstance( RedirectTest1.class ); // our own, private logger
+
+    /**
+     * Run the test.
+     *
+     * @throws Exception all sorts of things may happen during a test
+     */
+    public void run()
+        throws
+            Exception
+    {
+        int nRedirects = 2;
+
+        theMeshBase.getNetMeshObjectAccessSpecificationFactory().setDefaultFollowRedirects( false );
+
+        String                              thisIdentifier = WEB_SERVER_IDENTIFIER + REDIRECT_PREFIX + String.valueOf( nRedirects );
+        NetMeshObject                       shadowHome     = null;
+        ProbeException.HttpRedirectResponse cause          = null;
+
+        for( int i=nRedirects ; i>=0 ; --i ) {
+            log.debug( "Now trying", i, thisIdentifier );
+
+            try {
+                shadowHome = theMeshBase.accessLocally(
+                        theMeshBaseIdentifierFactory.fromExternalForm(
+                                thisIdentifier ),
+                        CoherenceSpecification.ONE_TIME_ONLY );
+
+                if( i > 0 ) {
+                    reportError( "Exception not thrown" );
+                }
+
+            } catch( NetMeshObjectAccessException ex ) {
+                if( ex.getCause() instanceof ProbeException.HttpRedirectResponse ) {
+                    cause = (ProbeException.HttpRedirectResponse) ex.getCause();
+                    
+                    checkEquals( cause.getStatusCode(), REDIRECT_STATUS, "Wrong status code" );
+                    thisIdentifier = cause.getLocation();
+                } else {
+                    reportError( "ex", ex );
+                    return; // we are done
+                }
+            }
+        }
+
+
+        checkEquals( shadowHome.getIdentifier().toExternalForm(), WEB_SERVER_IDENTIFIER + RESULT, "Wrong shadow home identifier" );
+        checkEquals( countRemaining( theMeshBase.proxies()), 1, "Wrong number of proxies" );
+        checkEquals( theMeshBase.getShadowMeshBases().size(), 1, "Wrong number of shadows" );
+    }
+
+    /**
+     * Main program.
+     *
+     * @param args command-line arguments
+     * @throws Exception all sorts of things may happen during a test
+     */
+    public static void main(
+            String [] args )
+        throws
+            Exception
+    {
+        RedirectTest1 test = null;
+        try {
+            if( args.length != 0 ) {
+                System.err.println( "Synopsis: <no argument>" );
+                System.err.println( "aborting ..." );
+                System.exit( 1 );
+            }
+
+            test = new RedirectTest1( args );
+            test.run();
+
+        } catch( Throwable ex ) {
+            log.error( ex );
+            System.exit(1);
+        }
+        if( test != null ) {
+            test.cleanup();
+        }
+        if( errorCount == 0 ) {
+            log.info( "PASS" );
+        } else {
+            log.info( "FAIL (" + errorCount + " errors)" );
+        }
+        System.exit( errorCount );
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param args command-line arguments
+     * @throws Exception all sorts of things may happen during a test
+     */
+    public RedirectTest1(
+            String [] args )
+        throws
+            Exception
+    {
+        super( localFileName( RedirectTest1.class, "/ResourceHelper" ));
+
+        theServer = new HttpServer( SERVER_PORT, NUMBER_THREADS );
+        theServer.setResponseFactory( new MyResponseFactory( 1000L, REDIRECT_STATUS ) );
+
+        // start the server
+        theServer.start();
+
+        // MeshBase
+        exec = createThreadPool( 1 );
+
+        theMeshBase = LocalNetMMeshBase.create( here, theModelBase, null, theProbeDirectory, exec, rootContext );
+    }
+
+    /**
+     * Clean up after the test.
+     */
+    @Override
+    public void cleanup()
+    {
+        try {
+            Thread.sleep( 200L ); // just a bit, so ripple effects can have died down
+        } catch( Throwable t ) {
+            log.error( t );
+        }
+
+        theMeshBase.die();
+        theMeshBase = null;
+
+        if( theServer != null ) {
+            theServer.stop();
+        }
+        exec.shutdown();
+    }
+
+    /**
+     * Our HTTP Server.
+     */
+    protected HttpServer theServer;
+
+    /**
+     * The port on which we run our server.
+     */
+    protected static final int SERVER_PORT = 8081;
+
+    /**
+     * The number of threads to create in the server. FIXME? Should we run all tests
+     * with different numbers of threads?
+     */
+    protected static final int NUMBER_THREADS = 0;
+
+    /**
+     * Our ThreadPool.
+     */
+    protected ScheduledExecutorService exec;
+
+    /**
+     * The ProbeDirectory to use.
+     */
+    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
+
+    /**
+     * The test NetMeshBase.
+     */
+    protected LocalNetMMeshBase theMeshBase;
+
+    /**
+     * The root context for these tests.
+     */
+    protected static final Context rootContext = SimpleContext.createRoot( "root-context" );
+
+    /**
+     * The ModelBase.
+     */
+    protected static ModelBase theModelBase = ModelBaseSingleton.getSingleton();
+
+    /**
+     * Factory for NetMeshBaseIdentifiers.
+     */
+    protected static final NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create();
+
+    /**
+     * Expected duration within which at least one ping-pong round trip can be completed.
+     * Milliseconds.
+     */
+    protected static final long PINGPONG_ROUNDTRIP_DURATION = 100L;
+
+    /**
+     * The identifier of the test NetMeshBase.
+     */
+    protected static final NetMeshBaseIdentifier here;
+
+    static {
+        NetMeshBaseIdentifier temp1;
+        try {
+            temp1 = theMeshBaseIdentifierFactory.fromExternalForm( "http://here1.local/" ); // this is not going to work for communications
+        } catch( Exception ex ) {
+            log.error( ex );
+            temp1 = null; // make compiler happy
+        }
+        here = temp1;
+    }
+
+
+    /**
+     * Root identifier of the web server.
+     */
+    protected static final String WEB_SERVER_IDENTIFIER = "http://localhost:" + SERVER_PORT + "/";
+
+    /**
+     * The HTML data to be returned.
+     */
+    protected static final String HTML
+            = "<html>\n"
+            + " <head>\n"
+            + "  <title>Test file</title>\n"
+            + " </head>\n"
+            + " <body>\n"
+            + "  <h1>Test file</h1>\n"
+            + " </body>\n"
+            + "</html>\n";
+
+    /**
+     * Prefix of incoming relative URLs that indicate we should issue a redirect response.
+     */
+    protected final static String REDIRECT_PREFIX = "redirect";
+
+    /**
+     * Incoming relative URL that indicates we are at the final destination.
+     */
+    protected final static String RESULT = "result";
+
+    /**
+     * HTTP status code for the redirect.
+     */
+    protected final static String REDIRECT_STATUS = "302";
+
+    /**
+      * A HttpResponseFactory that acts as the RelyingParty.
+      */
+    static class MyResponseFactory
+        implements
+            HttpResponseFactory
+    {
+        /**
+         * Constructor.
+         *
+         * @param delay the delay by the web server
+         * @param redirectCode the HTTP redirect status code to send in case of redirects
+         */
+        MyResponseFactory(
+                long   delay,
+                String redirectCode )
+        {
+            theDelay        = delay;
+            theRedirectCode = redirectCode;
+        }
+
+        /**
+          * Factory method for a HttpResponse.
+          *
+          * @param request the HttpRequest for which we create a HttpResponse
+          * @return the created HttpResponse
+          */
+        public HttpResponse createResponse(
+                HttpRequest request )
+        {
+            log.debug( "Incoming request", request );
+
+            HttpResponse ret;
+            if( "GET".equals( request.getMethod() ) && ( request.getRelativeBaseUri().startsWith( "/" + REDIRECT_PREFIX ))) {
+                int number = Integer.parseInt( request.getRelativeBaseUri().substring( 1+REDIRECT_PREFIX.length() ) );
+                if( number > 1 ) {
+                    --number;
+                    ret = HttpRedirectResponse.create( request, WEB_SERVER_IDENTIFIER + REDIRECT_PREFIX + String.valueOf( number), theRedirectCode );
+                } else {
+                    ret = HttpRedirectResponse.create( request, WEB_SERVER_IDENTIFIER + RESULT, theRedirectCode );
+                }
+
+            } else if( "GET".equals( request.getMethod() ) && ( request.getRelativeBaseUri().equals( "/" + RESULT ))) {
+                HttpEntity entity = new SnapshotHttpEntity( "text/html", HTML, true );
+                ret = HttpEntityResponse.create( request, true, entity );
+
+            } else {
+                ret = HttpErrorResponse.create( request, "500", null );
+            }
+
+            if( theDelay > 0L ) {
+                try {
+                    Thread.sleep( theDelay );
+                } catch( Throwable t ) {
+                    log.error( t );
+                }
+            }
+            return ret;
+        }
+
+        /**
+         * Captures the slowness of a web server.
+         */
+        protected long theDelay;
+
+        /**
+         * The HTTP redirect status code to send.
+         */
+        protected String theRedirectCode;
+    }
+}

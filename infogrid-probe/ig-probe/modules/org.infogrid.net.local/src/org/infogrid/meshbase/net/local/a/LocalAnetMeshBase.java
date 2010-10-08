@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -19,13 +19,13 @@ import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.meshbase.MeshBaseNameServer;
-import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.ProxyManager;
+import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.meshbase.net.a.AnetMeshBase;
 import org.infogrid.meshbase.net.a.AnetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.local.LocalNetMeshBase;
@@ -96,14 +96,14 @@ public abstract class LocalAnetMeshBase
      * Obtain or create a Proxy for communication with a NetMeshBase at the specified NetMeshBaseIdentifier.
      * 
      * @param networkIdentifier the NetMeshBaseIdentifier
-     * @param coherence the CoherenceSpecification to use, if any
+     * @param pars the ProxyParameters to use, if any
      * @return the Proxy
      * @throws FactoryException thrown if the Proxy could not be created
      */
     @Override
     public Proxy obtainProxyFor(
-            NetMeshBaseIdentifier  networkIdentifier,
-            CoherenceSpecification coherence )
+            NetMeshBaseIdentifier networkIdentifier,
+            ProxyParameters       pars )
         throws
             FactoryException
     {
@@ -112,7 +112,7 @@ public abstract class LocalAnetMeshBase
             //
             // Should that be a different FactoryException than the passed-on one? FIXME?
 
-            ShadowMeshBase shadow = theProbeManager.obtainFor( networkIdentifier, coherence );
+            ShadowMeshBase shadow = theProbeManager.obtainFor( networkIdentifier, pars );
             if( shadow == null ) {
                 // This happens if a second thread gets here while the first thread is creating the shadow, but
                 // an exception is thrown. The first thread gets the exception. The second only gets a null result.
@@ -120,7 +120,7 @@ public abstract class LocalAnetMeshBase
                 throw new FactoryException( theProbeManager, "Shadow could not be created" );
             }
 
-            Proxy ret = theProxyManager.obtainFor( networkIdentifier, coherence );
+            Proxy ret = theProxyManager.obtainFor( networkIdentifier, pars );
 
             return ret;
         } else {

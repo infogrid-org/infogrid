@@ -18,7 +18,6 @@ import org.infogrid.testharness.AbstractTest;
 import org.infogrid.testharness.AbstractTestGroup;
 import org.infogrid.testharness.AbstractTestGroup.TestSpec;
 
-
 /**
  * Runs all tests in this package.
  */
@@ -72,6 +71,9 @@ public class AllTests
 
                 new TestSpec(
                         ProbeMatchTest1.class ),
+
+                new TestSpec(
+                        RedirectTest1.class ),
         };
 
         runTests( tests );
