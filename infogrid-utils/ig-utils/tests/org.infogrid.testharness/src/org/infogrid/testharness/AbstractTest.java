@@ -878,6 +878,23 @@ public abstract class AbstractTest
     }
 
     /**
+     * Count the number of elements remaining on this Iterator.
+     *
+     * @param iter the Iterator
+     * @return the number of elements remaining on this Iterator
+     */
+    public int countRemaining(
+            Iterator<?> iter )
+    {
+        int ret = 0;
+        while( iter.hasNext() ) {
+            iter.next();
+            ++ret;
+        }
+        return ret;
+    }
+
+    /**
      * Report error.
      *
      * @param msg message to print
@@ -1378,7 +1395,7 @@ public abstract class AbstractTest
          * @param threadFactory factory for Threads
          * @param name name of this MyScheduledThreadPoolExecutor, for debugging purposes
          */
-        public MyScheduledThreadPoolExecutor(
+        MyScheduledThreadPoolExecutor(
                 int           corePoolSize,
                 ThreadFactory threadFactory,
                 String        name )
