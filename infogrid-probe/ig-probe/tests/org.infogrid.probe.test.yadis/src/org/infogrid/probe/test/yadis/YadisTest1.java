@@ -208,7 +208,7 @@ public class YadisTest1
          *
          * @param delay the delay by the web server
          */
-        public MyResponseFactory(
+        MyResponseFactory(
                 long delay )
         {
             theDelay = delay;

@@ -14,7 +14,6 @@
 
 package org.infogrid.probe.test;
 
-
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.testharness.AbstractTestGroup;
 import org.infogrid.testharness.AbstractTestGroup.TestSpec;

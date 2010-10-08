@@ -316,7 +316,7 @@ public abstract class AbstractYadisTest
     /**
      * Factory for NetMeshBaseIdentifiers.
      */
-    protected static NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
+    protected static final NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
             new String[] { "http", "file" },
             new String[] { PROTOCOL_NAME } );
 
