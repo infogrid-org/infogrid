@@ -192,7 +192,7 @@ public class StoreShadowMeshBaseTest2
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( StoreShadowMeshBaseTest1.class );
+    private static final Log log = Log.getLogInstance( StoreShadowMeshBaseTest1.class );
 
     /**
      * Our ThreadPool.

@@ -168,7 +168,7 @@ public abstract class AbstractStoreProbeTest
     /**
      * The factory for NetMeshBaseIdentifiers.
      */
-    protected static NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
+    protected static final NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
             new String[] { "http", "file" },
             new String[] { "test" } );
     
@@ -191,7 +191,7 @@ public abstract class AbstractStoreProbeTest
     /**
      * The SQL driver.
      */
-    static Object theSqlDriver;
+    protected static Object theSqlDriver;
     static {
         try {
             // The newInstance() call is a work around for some
