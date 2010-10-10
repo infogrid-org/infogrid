@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -33,15 +33,34 @@ public class NetMeshObjectAccessException
      * @param mb the MeshBase in which the Exception occurred
      * @param partialResult a partial result, if any, available at the time the Exception occurred
      * @param failedPaths the NetMeshObjectAccessSpecifications that were used
-     * @param cause the underlying cause for the Exception
+     * @param causes the underlying causes for the Exception, in the same order as the failedIdentifiers
      */
     public NetMeshObjectAccessException(
             NetMeshBase                         mb,
             NetMeshObject []                    partialResult,
             NetMeshObjectAccessSpecification [] failedPaths,
+            Throwable []                        causes )
+    {
+        this( mb, partialResult, failedPaths, causes, null );
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param mb the MeshBase in which the Exception occurred
+     * @param partialResult a partial result, if any, available at the time the Exception occurred
+     * @param failedPaths the NetMeshObjectAccessSpecifications that were used
+     * @param causes the underlying causes for the Exception, in the same order as the failedIdentifiers
+     * @param cause the cause, if any
+     */
+    public NetMeshObjectAccessException(
+            NetMeshBase                         mb,
+            NetMeshObject []                    partialResult,
+            NetMeshObjectAccessSpecification [] failedPaths,
+            Throwable []                        causes,
             Throwable                           cause )
     {
-        super( mb, mb.getIdentifier(), partialResult, identifiersOf( failedPaths ), cause );
+        super( mb, mb.getIdentifier(), partialResult, identifiersOf( failedPaths ), causes, cause );
         
         theFailedPaths = failedPaths;
     }
@@ -106,6 +125,18 @@ public class NetMeshObjectAccessException
             } // else null
         }
         return ret;
+    }
+
+    /**
+     * Determine the cause for this MeshObjectIdentifier.
+     *
+     * @param key the MeshObjectIdentifier
+     * @return the cause, if any
+     */
+    public Throwable getCauseFor(
+            NetMeshObjectAccessSpecification key )
+    {
+        return super.getCauseFor( key.getNetMeshObjectIdentifier() );
     }
 
     /**

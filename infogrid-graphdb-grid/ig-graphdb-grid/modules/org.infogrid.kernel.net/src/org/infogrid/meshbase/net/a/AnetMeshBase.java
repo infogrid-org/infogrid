@@ -220,25 +220,28 @@ public abstract class AnetMeshBase
     {
         // we replicate the code from our superclass, otherwise we have difficulties with
         // allocating the arrays using the right type
-        NetMeshObject [] ret   = new NetMeshObject[ identifiers.length ];
-        int              count = 0;
+        NetMeshObject []           ret      = new NetMeshObject[ identifiers.length ];
+        NetMeshObjectIdentifier [] notFound = null; // allocated when needed
+        int                        count    = 0;
         
         for( int i=0 ; i<identifiers.length ; ++i ) {
             ret[i] = findMeshObjectByIdentifier( identifiers[i] );
             if( ret[i] == null ) {
-                ++count;
+                if( notFound == null ) {
+                    notFound = new NetMeshObjectIdentifier[ identifiers.length ];
+                }
+                notFound[ count++ ] = (NetMeshObjectIdentifier) identifiers[i];
             }
         }
         if( count == 0 ) {
             return ret;
         }
-        NetMeshObjectIdentifier [] notFound = new NetMeshObjectIdentifier[ count ];
-        for( int i=identifiers.length-1 ; i>=0 ; --i ) {
-            notFound[--count] = (NetMeshObjectIdentifier) identifiers[i];
+        if( count < notFound.length ) {
+            notFound = ArrayHelper.copyIntoNewArray( notFound, 0, count, NetMeshObjectIdentifier.class );
         }
-        throw new MeshObjectsNotFoundException( this, ret, notFound );
-        
+        throw new MeshObjectsNotFoundException( this, notFound );
     }
+
 
     /**
      * Obtain a MeshObject whose unique identifier is known.
@@ -670,9 +673,9 @@ public abstract class AnetMeshBase
             realAccessManager.checkPermittedAccessLocally( this, correctRemotePaths ); // may throw exception
         }
 
-        // we collect all exceptions here, and the corresponding NetworkPaths
-        ArrayList<Throwable>                          thrownExceptions  = new ArrayList<Throwable>();
-        ArrayList<NetMeshObjectAccessSpecification[]> failedObjectPaths = new ArrayList<NetMeshObjectAccessSpecification[]>();
+        // we collect all exceptions here, in the same sequence as the pathsToObjects
+        Throwable [] causes   = new Throwable[ pathsToObjects.length ];
+        boolean      hasCause = false;
 
         boolean ok;
         try {
@@ -740,12 +743,19 @@ public abstract class AnetMeshBase
                     }
 
                 } catch( FactoryException ex ) {
-                    if( ex.getCause() != null ) {
-                        thrownExceptions.add( ex.getCause() );
-                    } else {
-                        thrownExceptions.add( ex );
+                    Throwable toAdd = ex.getCause() != null ? ex.getCause() : ex;
+
+                    NetMeshObjectAccessSpecification [] attemptedThisTime = withPrefix( pivot, nextObjectPaths );
+
+                    for( int i=0 ; i<pathsToObjects.length ; ++i ) {
+                        if( ArrayHelper.isIn( pathsToObjects[i], attemptedThisTime, true )) {
+                            if( causes[i] != null ) {
+                                log.error( "Already have cause", toAdd, causes[i] );
+                            }
+                            causes[i] = toAdd;
+                            hasCause  = true;
+                        }
                     }
-                    failedObjectPaths.add( withPrefix( pivot, nextObjectPaths ) );
                 }
                 proxyKeeper[ proxyKeeperCount++ ] = theProxy;
                 stillToGet -= nextObjectPaths.length;
@@ -757,7 +767,7 @@ public abstract class AnetMeshBase
 
             ok = theAccessLocallySynchronizer.join( realTimeout );
 
-            if( !ok && thrownExceptions.isEmpty() ) {
+            if( !ok && !hasCause ) {
                 log.warn( this + ".accessLocally() timed out trying to reach " + ArrayHelper.arrayToString( pathsToObjects ) + ", timeout: " + realTimeout );
             }
 
@@ -775,7 +785,7 @@ public abstract class AnetMeshBase
             ok = false;
         }
 
-        if( ! thrownExceptions.isEmpty() ) {
+        if( hasCause ) {
             ok = false;
         }
 
@@ -804,18 +814,16 @@ public abstract class AnetMeshBase
         } else if( allFound ) { // we timed out, but we have the answer anyway
             return ret;
 
-        } else if( thrownExceptions.isEmpty() ) { // we timed out, but have a partial result, future results still incoming
+        } else if( !hasCause ) { // we timed out, but have a partial result, future results still incoming
             throw new NetMeshObjectAccessException(
                     this,
                     ret,
                     correctRemotePaths,
+                    causes,
                     new RemoteQueryTimeoutException.QueryIsOngoing( this, someFound, ret ));
 
         } else {
-            Throwable                           firstException         = thrownExceptions.get( 0 );
-            NetMeshObjectAccessSpecification [] firstFailedObjectPaths = failedObjectPaths.get( 0 );
-
-            throw new NetMeshObjectAccessException( this, ret, firstFailedObjectPaths, firstException ); // FIXME
+            throw new NetMeshObjectAccessException( this, ret, pathsToObjects, causes );
         }
     }
     
