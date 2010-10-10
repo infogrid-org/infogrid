@@ -67,7 +67,7 @@ public class AllTests
 
 // FIXME: ProbeTest8 seems to work, but spits out way too many warnings (but only when run in this test suite,
 // not when run standalone). It may be related to failure to clean up Proxies to expired Shadows, and perhaps
-// ProbeTest6. This needs more investigation but does not appear to be critical.\
+// ProbeTest6. This needs more investigation but does not appear to be critical.
 //               new TestSpec(
 //                        ProbeTest8.class ),
 
