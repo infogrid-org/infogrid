@@ -80,8 +80,9 @@ public class RedirectTest1
                 }
 
             } catch( NetMeshObjectAccessException ex ) {
-                if( ex.getCause() instanceof ProbeException.HttpRedirectResponse ) {
-                    cause = (ProbeException.HttpRedirectResponse) ex.getCause();
+                Throwable thisCause = ex.getCauseFor( theMeshBase.getMeshObjectIdentifierFactory().fromExternalForm( thisIdentifier ));
+                if( thisCause instanceof ProbeException.HttpRedirectResponse ) {
+                    cause = (ProbeException.HttpRedirectResponse) thisCause;
                     
                     checkEquals( cause.getStatusCode(), REDIRECT_STATUS, "Wrong status code" );
                     thisIdentifier = cause.getLocation();

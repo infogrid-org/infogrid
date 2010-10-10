@@ -31,6 +31,8 @@ import org.infogrid.mesh.security.CallerHasInsufficientPermissionsException;
 import org.infogrid.mesh.security.PropertyReadOnlyException;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.NetMeshObjectAccessException;
+import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
 import org.infogrid.meshbase.transaction.NotWithinTransactionBoundariesException;
 import org.infogrid.meshbase.transaction.TransactionException;
@@ -82,6 +84,8 @@ public class ProbeTest5
                 ModuleException.class
         };                    
 
+        NetMeshObjectAccessSpecification path = theMeshBase.getNetMeshObjectAccessSpecificationFactory().obtain( test_NETWORK_IDENTIFIER );
+
         // for( int i=4 ; i<5 ; ++i )
         for( int i=0 ; i<expectedExceptionTypes.length ; ++i ) {
             log.info( "Running test " + i );
@@ -92,13 +96,14 @@ public class ProbeTest5
             Throwable  lastException = null; // just there for debugging
             Throwable  lastCause     = null;
 
+
             try {
                 obj = theMeshBase.accessLocally( test_NETWORK_IDENTIFIER );
 
-            } catch( Throwable ex ) {
+            } catch( NetMeshObjectAccessException ex ) {
                 lastException = ex;
 
-                lastCause = ex;
+                lastCause = ex.getCauseFor( path );
                 while( lastCause.getCause() != null ) {
                     lastCause = lastCause.getCause();
                 }
@@ -200,7 +205,7 @@ public class ProbeTest5
     static int probeRunCounter = 0;
 
     // Our Logger
-    private static Log log = Log.getLogInstance(ProbeTest5.class);
+    private static final Log log = Log.getLogInstance(ProbeTest5.class);
 
     /**
      * The NetMeshBaseIdentifier identifying this Probe.

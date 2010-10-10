@@ -107,7 +107,7 @@ public class ShadowTest2
         } catch( NetMeshObjectAccessException ex ) {
             log.debug( "Has correctly thrown an exception", ex );
 
-            Throwable cause = ex;
+            Throwable cause = ex.getCauseFor( base.getNetMeshObjectAccessSpecificationFactory().obtain(  test3_URL ));
             while( cause.getCause() != null ) {
                 cause = cause.getCause();
             }
