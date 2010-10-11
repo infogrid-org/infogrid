@@ -112,7 +112,7 @@ public abstract class LocalAnetMeshBase
             //
             // Should that be a different FactoryException than the passed-on one? FIXME?
 
-            ShadowMeshBase shadow = theProbeManager.obtainFor( networkIdentifier, pars );
+            ShadowMeshBase shadow = theProbeManager.obtainFor( networkIdentifier, pars ); // may throw
             if( shadow == null ) {
                 // This happens if a second thread gets here while the first thread is creating the shadow, but
                 // an exception is thrown. The first thread gets the exception. The second only gets a null result.

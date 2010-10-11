@@ -14,14 +14,17 @@
 
 package org.infogrid.probe.shadow.store;
 
+import java.text.ParseException;
 import org.infogrid.meshbase.net.DefaultNetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.net.NetMeshBaseRedirectException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.probe.ProbeDirectory;
+import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.shadow.AbstractShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
@@ -139,6 +142,16 @@ public class StoreShadowMeshBaseFactory
         Long next; // out here for debugging
         try {
             next = ret.doUpdateNow( argument );
+
+        } catch( ProbeException.HttpRedirectResponse ex ) {
+            try {
+                NetMeshBaseIdentifier newLocationIdentifier = theMeshBaseIdentifierFactory.fromExternalForm( key, ex.getLocation() );
+
+                throw new FactoryException( this, new NetMeshBaseRedirectException( key, newLocationIdentifier, ex ) );
+
+            } catch( ParseException ex2 ) {
+                throw new FactoryException( this, ex2 ); // is that the right cause?
+            }
 
         } catch( Throwable ex ) {
             throw new FactoryException( this, ex );

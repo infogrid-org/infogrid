@@ -19,17 +19,18 @@ import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseRedirectException;
+import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.util.logging.Log;
 
 /**
-  * Tests behavior in case an HTTP data source issues a redirect.
+  * Tests behavior in case an HTTP data source issues a redirect and follow redirects is set to false.
   */
-public class RedirectTest1
+public class RedirectTest2
         extends
             AbstractRedirectTest
 {
-    private static final Log log = Log.getLogInstance( RedirectTest1.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance( RedirectTest2.class ); // our own, private logger
 
     /**
      * Run the test.
@@ -42,7 +43,7 @@ public class RedirectTest1
     {
         int nRedirects = 2;
 
-        theMeshBase.getNetMeshObjectAccessSpecificationFactory().setDefaultFollowRedirects( true );
+        theMeshBase.getNetMeshObjectAccessSpecificationFactory().setDefaultFollowRedirects( false );
 
         // a bit complicated to get the ONE_TIME_ONLY in here
         NetMeshObjectAccessSpecification path = theMeshBase.getNetMeshObjectAccessSpecificationFactory().obtain(
@@ -56,11 +57,37 @@ public class RedirectTest1
         NetMeshBaseRedirectException realCause  = null;
         NetMeshBaseIdentifier        location   = null;
 
-        log.debug( "Now trying", path );
+        for( int i=nRedirects ; i>=0 ; --i ) {
+            log.debug( "Now trying", i, path );
 
-        shadowHome = theMeshBase.accessLocally( path );
+            try {
+                shadowHome = theMeshBase.accessLocally( path );
 
-        checkEquals( shadowHome.getIdentifier().toExternalForm(), WEB_SERVER_IDENTIFIER + REDIRECT_PREFIX + String.valueOf( nRedirects ), "Wrong shadow home identifier" );
+                if( i > 0 ) {
+                    reportError( "Exception not thrown" );
+                }
+
+            } catch( NetMeshObjectAccessException ex ) {
+
+                Throwable cause = ex.getCauseFor( path.getNetMeshObjectIdentifier() );
+
+                if( !( cause instanceof NetMeshBaseRedirectException )) {
+                    reportError( "Wrong exception", ex );
+                    continue;
+                }
+
+                realCause = (NetMeshBaseRedirectException) cause;
+
+                location = realCause.getNewId();
+                checkObject( location, "no location found" );
+
+                path = ex.getSeeOtherPathFor( path.getNetMeshObjectIdentifier() );
+                checkObject( path, "no new path found" );
+            }
+        }
+
+
+        checkEquals( shadowHome.getIdentifier().toExternalForm(), WEB_SERVER_IDENTIFIER + RESULT, "Wrong shadow home identifier" );
         checkEquals( countRemaining( theMeshBase.proxies()), 1, "Wrong number of proxies" );
         checkEquals( theMeshBase.getShadowMeshBases().size(), 1, "Wrong number of shadows" );
     }
@@ -76,7 +103,7 @@ public class RedirectTest1
         throws
             Exception
     {
-        RedirectTest1 test = null;
+        RedirectTest2 test = null;
         try {
             if( args.length != 0 ) {
                 System.err.println( "Synopsis: <no argument>" );
@@ -84,7 +111,7 @@ public class RedirectTest1
                 System.exit( 1 );
             }
 
-            test = new RedirectTest1( args );
+            test = new RedirectTest2( args );
             test.run();
 
         } catch( Throwable ex ) {
@@ -108,11 +135,11 @@ public class RedirectTest1
      * @param args command-line arguments
      * @throws Exception all sorts of things may happen during a test
      */
-    public RedirectTest1(
+    public RedirectTest2(
             String [] args )
         throws
             Exception
     {
-        super( RedirectTest1.class );
+        super( RedirectTest2.class );
     }
 }

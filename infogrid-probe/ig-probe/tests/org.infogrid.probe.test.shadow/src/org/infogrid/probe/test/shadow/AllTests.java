@@ -74,6 +74,9 @@ public class AllTests
 
                 new TestSpec(
                         RedirectTest1.class ),
+
+                new TestSpec(
+                        RedirectTest2.class ),
         };
 
         runTests( tests );
