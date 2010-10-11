@@ -17,6 +17,9 @@ package org.infogrid.meshbase.net;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
+import org.infogrid.util.text.StringRepresentation;
+import org.infogrid.util.text.StringRepresentationParameters;
+import org.infogrid.util.text.StringifierException;
 
 /**
  * Default implementation of NetMeshObjectAccessSpecification.
@@ -109,6 +112,10 @@ public class DefaultNetMeshObjectAccessSpecification
      */
     public String toExternalForm()
     {
+        if( theAccessPath.length == 0 ) {
+            return theRemoteIdentifier.toExternalForm();
+        }
+
         StringBuilder almostRet = new StringBuilder( 100 ); // fudge number
 
         String sep = "";
@@ -118,11 +125,27 @@ public class DefaultNetMeshObjectAccessSpecification
             sep = "!";
         }
         if( theRemoteIdentifier != null ) {
-            almostRet.append( sep );
-            almostRet.append( theRemoteIdentifier.toExternalForm() );
+            if( theAccessPath[ theAccessPath.length-1 ].getNetMeshBaseIdentifier().equals( theRemoteIdentifier.getNetMeshBaseIdentifier() )) {
+                almostRet.append( theRemoteIdentifier.getLocalId() );
+            } else {
+                almostRet.append( sep );
+                almostRet.append( theRemoteIdentifier.toExternalForm() );
+            }
         }
 
         return almostRet.toString();
+    }
+
+    /**
+     * Obtain an external form for this Identifier, similar to
+     * <code>java.net.URL.toExternalForm()</code>. This is provided
+     * to make invocation from JSPs easier.
+     *
+     * @return external form of this Identifier
+     */
+    public String getExternalForm()
+    {
+        return toExternalForm();
     }
 
     /**
@@ -252,6 +275,73 @@ public class DefaultNetMeshObjectAccessSpecification
             ret ^= theRemoteIdentifier.hashCode();
         }
         return ret;
+    }
+
+
+    /**
+     * Obtain a String representation of this instance that can be shown to the user.
+     *
+     * @param rep the StringRepresentation
+     * @param pars collects parameters that may influence the String representation
+     * @return String representation
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
+     */
+    public String toStringRepresentation(
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
+        throws
+            StringifierException
+    {
+        String contextPath = null;
+
+        if( pars != null ) {
+            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
+        }
+
+        String ret = rep.formatEntry(
+                getClass(), // dispatch to the right subtype
+                StringRepresentation.DEFAULT_ENTRY,
+                pars,
+        /* 0 */ this,
+        /* 1 */ contextPath );
+
+        return ret;
+    }
+
+    /**
+     * Obtain the start part of a String representation of this object that acts
+     * as a link/hyperlink and can be shown to the user.
+     *
+     * @param rep the StringRepresentation
+     * @param pars collects parameters that may influence the String representation
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
+     * @return String representation
+     */
+    public String toStringRepresentationLinkStart(
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
+        throws
+            StringifierException
+    {
+        return "";
+    }
+
+    /**
+     * Obtain the end part of a String representation of this object that acts
+     * as a link/hyperlink and can be shown to the user.
+     *
+     * @param rep the StringRepresentation
+     * @param pars collects parameters that may influence the String representation
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
+     * @return String representation
+     */
+    public String toStringRepresentationLinkEnd(
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
+        throws
+            StringifierException
+    {
+        return "";
     }
 
     /**

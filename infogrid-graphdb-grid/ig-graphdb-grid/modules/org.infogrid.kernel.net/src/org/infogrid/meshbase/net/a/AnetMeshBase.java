@@ -14,7 +14,6 @@
 
 package org.infogrid.meshbase.net.a;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
@@ -29,6 +28,7 @@ import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.net.NetMeshBaseRedirectException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
@@ -674,8 +674,9 @@ public abstract class AnetMeshBase
         }
 
         // we collect all exceptions here, in the same sequence as the pathsToObjects
-        Throwable [] causes   = new Throwable[ pathsToObjects.length ];
-        boolean      hasCause = false;
+        Throwable []                        causes          = new Throwable[ pathsToObjects.length ];
+        NetMeshObjectAccessSpecification [] redirectedPaths = new NetMeshObjectAccessSpecification[ pathsToObjects.length ];
+        boolean                             hasCause        = false;
 
         boolean ok;
         try {
@@ -743,9 +744,15 @@ public abstract class AnetMeshBase
                     }
 
                 } catch( FactoryException ex ) {
-                    Throwable toAdd = ex.getCause() != null ? ex.getCause() : ex;
-
                     NetMeshObjectAccessSpecification [] attemptedThisTime = withPrefix( pivot, nextObjectPaths );
+
+                    Throwable toAdd = ex.getCause() != null ? ex.getCause() : ex;
+                    NetMeshObjectAccessSpecification redirect;
+                    if( toAdd instanceof NetMeshBaseRedirectException ) {
+                        redirect = theNetMeshObjectAccessSpecificationFactory.obtain( ((NetMeshBaseRedirectException)toAdd).getNewId());
+                    } else {
+                        redirect = null;
+                    }
 
                     for( int i=0 ; i<pathsToObjects.length ; ++i ) {
                         if( ArrayHelper.isIn( pathsToObjects[i], attemptedThisTime, true )) {
@@ -754,6 +761,8 @@ public abstract class AnetMeshBase
                             }
                             causes[i] = toAdd;
                             hasCause  = true;
+
+                            redirectedPaths[i] = redirect;
                         }
                     }
                 }
@@ -817,13 +826,19 @@ public abstract class AnetMeshBase
         } else if( !hasCause ) { // we timed out, but have a partial result, future results still incoming
             throw new NetMeshObjectAccessException(
                     this,
+                    pathsToObjects,
                     ret,
-                    correctRemotePaths,
+                    redirectedPaths,
                     causes,
                     new RemoteQueryTimeoutException.QueryIsOngoing( this, someFound, ret ));
 
         } else {
-            throw new NetMeshObjectAccessException( this, ret, pathsToObjects, causes );
+            throw new NetMeshObjectAccessException(
+                    this,
+                    pathsToObjects,
+                    ret,
+                    redirectedPaths,
+                    causes );
         }
     }
     

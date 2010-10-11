@@ -15,7 +15,7 @@
 package org.infogrid.meshbase.net;
 
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-import org.infogrid.util.AsEntered;
+import org.infogrid.util.Identifier;
 
 /**
  * <p>A path to a remote NetMeshObject, comprised of zero or more NetMeshBaseIdentifiers.
@@ -23,7 +23,7 @@ import org.infogrid.util.AsEntered;
  */
 public interface NetMeshObjectAccessSpecification
         extends
-            AsEntered
+            Identifier
 {
     /**
      * Obtain the factory that created this object.
@@ -46,13 +46,6 @@ public interface NetMeshObjectAccessSpecification
      * @return the Identifier of the NetMeshObject that we are looking for
      */
     public NetMeshObjectIdentifier getNetMeshObjectIdentifier();
-
-    /**
-     * Obtain an externalized version of this NetMeshObjectAccessSpecification.
-     * 
-     * @return external form of this NetMeshObjectAccessSpecification similar to URL.toExternalForm()
-     */
-    public String toExternalForm();
 
     /**
      * Set the value of the followRedirects property. If true, redirects will be followed silently; if false, a redirect
