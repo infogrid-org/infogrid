@@ -531,7 +531,7 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
         if( core != null && core.length() > 0 ) {
             String [] pathElementStrings = core.split( "!" );
 
-            pathElements = new NetMeshBaseAccessSpecification[ pathElementStrings.length-1 ]; // treat last one different
+            pathElements = new NetMeshBaseAccessSpecification[ pathElementStrings.length > 1 ? pathElementStrings.length-1 : 1 ]; // treat last one different
             for( int i=0 ; i<pathElements.length ; ++i ) {
                 pathElements[i] = theNetMeshBaseAccessSpecificationFactory.fromExternalForm( pathElementStrings[i] );
             }

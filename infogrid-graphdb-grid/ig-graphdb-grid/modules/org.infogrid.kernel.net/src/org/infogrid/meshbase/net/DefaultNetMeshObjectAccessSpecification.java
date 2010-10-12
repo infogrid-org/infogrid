@@ -115,6 +115,13 @@ public class DefaultNetMeshObjectAccessSpecification
         if( theAccessPath.length == 0 ) {
             return theRemoteIdentifier.toExternalForm();
         }
+        if(    theAccessPath.length == 1
+            && theRemoteIdentifier != null
+            && theAccessPath[0].getNetMeshBaseIdentifier().equals( theRemoteIdentifier.getNetMeshBaseIdentifier() ))
+        {
+            // special rule for 1-element access path
+            return theRemoteIdentifier.toExternalForm();
+        }
 
         StringBuilder almostRet = new StringBuilder( 100 ); // fudge number
 
@@ -125,12 +132,8 @@ public class DefaultNetMeshObjectAccessSpecification
             sep = "!";
         }
         if( theRemoteIdentifier != null ) {
-            if( theAccessPath[ theAccessPath.length-1 ].getNetMeshBaseIdentifier().equals( theRemoteIdentifier.getNetMeshBaseIdentifier() )) {
-                almostRet.append( theRemoteIdentifier.getLocalId() );
-            } else {
-                almostRet.append( sep );
-                almostRet.append( theRemoteIdentifier.toExternalForm() );
-            }
+            almostRet.append( sep );
+            almostRet.append( theRemoteIdentifier.toExternalForm() );
         }
 
         return almostRet.toString();
