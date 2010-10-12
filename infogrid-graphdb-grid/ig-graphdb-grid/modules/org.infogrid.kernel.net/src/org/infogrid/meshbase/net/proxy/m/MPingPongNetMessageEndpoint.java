@@ -197,7 +197,7 @@ public class MPingPongNetMessageEndpoint
                 messagesToBeSent );
         
         if( partnerIdentifier.equals( myIdentifier )) {
-            throw new IllegalArgumentException( "Cannot talk to myself" );
+            throw new IllegalArgumentException( "Cannot talk to myself: " + myIdentifier.toExternalForm() );
         }
         
         thePartnerIdentifier = partnerIdentifier;
