@@ -243,18 +243,33 @@ public class NetMeshObjectAccessException
             }
         }
 
-        return new Object[] {
-                theAttemptedIdentifiers,
-                theResults,
-                theSeeOthers,
-                theCauses,
-                ArrayHelper.copyIntoNewArray( foundIdentifiers,         NetMeshObjectIdentifier.class ),
-                ArrayHelper.copyIntoNewArray( somewhereElseIdentifiers, NetMeshObjectIdentifier.class ),
-                ArrayHelper.copyIntoNewArray( notFoundIdentifiers,      NetMeshObjectIdentifier.class ),
-                getCause(),
-                theAttemptedPaths,
-                theSeeOtherPaths
-        };
+        if( theAttemptedIdentifiers.length == 1 ) {
+            return new Object[] {
+                    theAttemptedIdentifiers[0],
+                    theResults,
+                    theSeeOthers,
+                    theCauses,
+                    foundIdentifiers.isEmpty()         ? null :         foundIdentifiers.get( 0 ),
+                    somewhereElseIdentifiers.isEmpty() ? null : somewhereElseIdentifiers.get( 0 ),
+                    notFoundIdentifiers.isEmpty()      ? null :      notFoundIdentifiers.get( 0 ),
+                    getCause(),
+                    theAttemptedPaths[0],
+                    theSeeOtherPaths[0]
+            };
+        } else {
+            return new Object[] {
+                    theAttemptedIdentifiers,
+                    theResults,
+                    theSeeOthers,
+                    theCauses,
+                    ArrayHelper.copyIntoNewArray( foundIdentifiers,         NetMeshObjectIdentifier.class ),
+                    ArrayHelper.copyIntoNewArray( somewhereElseIdentifiers, NetMeshObjectIdentifier.class ),
+                    ArrayHelper.copyIntoNewArray( notFoundIdentifiers,      NetMeshObjectIdentifier.class ),
+                    getCause(),
+                    theAttemptedPaths,
+                    theSeeOtherPaths
+            };
+        }
     }
 
     /**
