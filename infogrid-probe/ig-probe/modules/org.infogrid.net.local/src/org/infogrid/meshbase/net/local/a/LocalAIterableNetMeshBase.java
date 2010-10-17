@@ -8,29 +8,24 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net.local.a;
 
-import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
-import org.infogrid.mesh.net.NetMeshObject;
-import org.infogrid.meshbase.Sweeper;
 import org.infogrid.meshbase.net.IterableNetMeshBase;
 import org.infogrid.meshbase.net.IterableNetMeshBaseDifferencer;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-import org.infogrid.meshbase.net.NetSweeper;
 import org.infogrid.meshbase.net.a.AnetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.proxy.ProxyManager;
 import org.infogrid.meshbase.net.security.NetAccessManager;
-import org.infogrid.meshbase.sweeper.SweepStep;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.probe.manager.ProbeManager;
 import org.infogrid.util.CachingMap;
@@ -132,85 +127,4 @@ public abstract class LocalAIterableNetMeshBase
     {
         return new IterableNetMeshBaseDifferencer( this );
     }
-
-    /**
-     * Continually sweep this IterableMeshBase in the background, according to
-     * the configured Sweeper.
-     *
-     * @param scheduleVia the ScheduledExecutorService to use for scheduling
-     * @throws NullPointerException thrown if no Sweeper has been set
-     */
-    public void startBackgroundSweeping(
-            ScheduledExecutorService scheduleVia )
-        throws
-            NullPointerException
-    {
-        Sweeper sweep = theSweeper;
-        if( sweep == null ) {
-            throw new NullPointerException();
-        }
-        theSweeperScheduler = scheduleVia;
-
-        scheduleSweepStep();
-    }
-    
-    /**
-     * Stop the background sweeping.
-     */
-    public void stopBackgroundSweeping()
-    {
-        SweepStep nextStep = theNextSweepStep;
-        if( nextStep == null ) {
-            return;
-        }
-        synchronized( nextStep ) {
-            nextStep.cancel();
-            theNextSweepStep = null;
-        }
-    }
-    
-    /**
-     * Perform a sweep on every single MeshObject in this InterableMeshBase.
-     * This may take a long time; using background sweeping is almost always
-     * a better alternative.
-     */
-    public synchronized void sweepAllNow()
-    {
-        Sweeper sweep = theSweeper;
-        if( sweep == null ) {
-            throw new NullPointerException( "No sweeper has been set" );
-        }
-        for( MeshObject candidate : this ) {
-            sweep.potentiallyDelete( candidate );
-        }
-        if( sweep instanceof NetSweeper ) {
-            NetSweeper realSweep = (NetSweeper) sweep;
-            for( MeshObject candidate : this ) {
-                realSweep.potentiallyPurge( (NetMeshObject) candidate );
-            }
-        }
-    }
-
-    /**
-     * Invoked by the SweepStep, schedule the next SweepStep.
-     */
-    public void scheduleSweepStep()
-    {
-        if( theNextSweepStep != null ) {
-            theNextSweepStep = theNextSweepStep.nextStep();
-        } else {
-            theNextSweepStep = SweepStep.create( this );
-        }
-        theNextSweepStep.scheduleVia( theSweeperScheduler );
-    }
-
-    /**
-     * The Scheduler for the Sweeper, if any.
-     */
-    protected ScheduledExecutorService theSweeperScheduler;
-    
-    /**
-     * The next background Sweep task, if any.
-     */
-    protected SweepStep theNextSweepStep;
 }

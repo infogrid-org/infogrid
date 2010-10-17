@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,7 +21,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
-import org.infogrid.meshbase.net.sweeper.UnnecessaryReplicasSweeper;
+import org.infogrid.meshbase.net.sweeper.UnnecessaryReplicasSweepPolicy;
+import org.infogrid.meshbase.sweeper.DefaultIterableSweeper;
 import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.util.logging.Log;
@@ -85,7 +86,7 @@ public class ProbeTest6
         
         firstObject.addWeakPropertyChangeListener( listener );
         
-        theMeshBase.sweepAllNow();
+        theMeshBase.getSweeper().sweepAllNow();
         Thread.sleep( 2500L );
 
         //
@@ -101,7 +102,7 @@ public class ProbeTest6
 
         firstObject.removePropertyChangeListener( listener );
         
-        theMeshBase.sweepAllNow();
+        theMeshBase.getSweeper().sweepAllNow();
         Thread.sleep( 2500L );
 
         //
@@ -186,7 +187,7 @@ public class ProbeTest6
 
         theMeshBase = LocalNetMMeshBase.create( here, theModelBase, null, theProbeDirectory, exec, rootContext );
 
-        theMeshBase.setSweeper( UnnecessaryReplicasSweeper.create( 500L ));
+        theMeshBase.setSweeper( DefaultIterableSweeper.create( theMeshBase, UnnecessaryReplicasSweepPolicy.create( 500L )));
     }
 
     /**
