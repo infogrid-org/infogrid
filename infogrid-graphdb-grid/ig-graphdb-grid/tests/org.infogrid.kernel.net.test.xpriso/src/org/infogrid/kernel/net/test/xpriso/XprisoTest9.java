@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,11 +21,12 @@ import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.m.NetMMeshBase;
-import org.infogrid.meshbase.net.sweeper.UnnecessaryReplicasSweeper;
+import org.infogrid.meshbase.net.sweeper.UnnecessaryReplicasSweepPolicy;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.meshbase.net.sweeper.DefaultNetIterableSweeper;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -48,8 +49,8 @@ public class XprisoTest9
         throws
             Exception
     {
-        UnnecessaryReplicasSweeper sweep2 = UnnecessaryReplicasSweeper.create( 0L );
-        mb2.setSweeper( sweep2 );
+        UnnecessaryReplicasSweepPolicy sweepPolicy2 = UnnecessaryReplicasSweepPolicy.create( 0L );
+        mb2.setSweeper( DefaultNetIterableSweeper.create( mb2, sweepPolicy2 ));
 
         //
         
@@ -105,7 +106,7 @@ public class XprisoTest9
 
         log.info( "Sweeping" );
 
-        mb2.sweepAllNow();
+        mb2.getSweeper().sweepAllNow();
 
         Thread.sleep( PINGPONG_ROUNDTRIP_DURATION );
         

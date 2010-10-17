@@ -8,14 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.store.net;
 
 import java.io.IOException;
-import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
@@ -24,20 +23,17 @@ import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 import org.infogrid.meshbase.IterableMeshBase;
 import org.infogrid.meshbase.IterableMeshBaseDifferencer;
-import org.infogrid.meshbase.Sweeper;
 import org.infogrid.meshbase.net.DefaultNetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-import org.infogrid.meshbase.net.NetSweeper;
 import org.infogrid.meshbase.net.a.AnetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.proxy.DefaultProxyFactory;
 import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
 import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.ProxyFactory;
 import org.infogrid.meshbase.net.security.NetAccessManager;
-import org.infogrid.meshbase.sweeper.SweepStep;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
@@ -352,83 +348,4 @@ public class IterableNetStoreMeshBase
     {
         return new IterableMeshBaseDifferencer( this );
     }
-
-/**
-     * Continually sweep this IterableMeshBase in the background, according to
-     * the configured Sweeper.
-     *
-     * @param scheduleVia the ScheduledExecutorService to use for scheduling
-     * @throws NullPointerException thrown if no Sweeper has been set
-     */
-    
-    public void startBackgroundSweeping(
-            ScheduledExecutorService scheduleVia )
-        throws
-            NullPointerException
-    {
-        Sweeper sweep = theSweeper;
-        if( sweep == null ) {
-            throw new NullPointerException();
-        }
-        theSweeperScheduler = scheduleVia;
-
-        scheduleSweepStep();
-    }
-    
-    /**
-     * Stop the background sweeping.
-     */
-    public void stopBackgroundSweeping()
-    {
-        SweepStep nextStep = theNextSweepStep;
-        if( nextStep == null ) {
-            return;
-        }
-        synchronized( nextStep ) {
-            nextStep.cancel();
-            theNextSweepStep = null;
-        }
-    }
-    
-    /**
-     * Perform a sweep on every single MeshObject in this InterableMeshBase.
-     * This may take a long time; using background sweeping is almost always
-     * a better alternative.
-     */
-    public synchronized void sweepAllNow()
-    {
-        Sweeper sweeper = theSweeper;
-        if( sweeper == null ) {
-            throw new NullPointerException();
-        }
-        for( MeshObject candidate : this ) {
-            boolean done = sweeper.potentiallyDelete( candidate );
-            if( !done && ( sweeper instanceof NetSweeper )) {
-                ((NetSweeper)sweeper).potentiallyPurge( (NetMeshObject) candidate );
-            }
-        }
-    }
-
-    /**
-     * Invoked by the SweepStep, schedule the next SweepStep.
-     */
-    public void scheduleSweepStep()
-    {
-        if( theNextSweepStep != null ) {
-            theNextSweepStep = theNextSweepStep.nextStep();
-        } else {
-            theNextSweepStep = SweepStep.create( this );
-        }
-        theNextSweepStep.scheduleVia( theSweeperScheduler );
-    }
-
-    /**
-     * The Scheduler for the Sweeper, if any.
-     */
-    protected ScheduledExecutorService theSweeperScheduler;
-    
-    /**
-     * The next background Sweep task, if any.
-     */
-    protected SweepStep theNextSweepStep;
 }

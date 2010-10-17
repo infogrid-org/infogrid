@@ -8,21 +8,21 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net;
 
 import org.infogrid.mesh.net.NetMeshObject;
-import org.infogrid.meshbase.Sweeper;
+import org.infogrid.meshbase.sweeper.SweepPolicy;
 
 /**
- * Adds, to the Sweeper, methods specific to NetMeshObjects and NetMeshBases.
+ * Adds, to the SweepPolicy, methods specific to NetMeshObjects and NetMeshBases.
  */
-public interface NetSweeper
+public interface NetSweepPolicy
         extends
-            Sweeper
+            SweepPolicy
 {
     /**
      * Determine whether this candidate NetMeshObject should be purged, according

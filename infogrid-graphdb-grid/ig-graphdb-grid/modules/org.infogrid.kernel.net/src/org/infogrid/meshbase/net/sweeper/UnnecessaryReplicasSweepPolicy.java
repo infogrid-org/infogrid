@@ -8,32 +8,35 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net.sweeper;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.mesh.set.MeshObjectSet;
+import org.infogrid.meshbase.net.proxy.Proxy;
 
 /**
- * A Sweeper that gets rid of unused non-master/non-home-object replicas.
+ * A SweepPolicy that gets rid of unused non-master/non-home-object replicas.
  */
-public class UnnecessaryReplicasSweeper
+public class UnnecessaryReplicasSweepPolicy
         extends
-           AbstractNetSweeper
+           AbstractNetSweepPolicy
 {
     /**
      * Factory method.
      *
      * @param unusedSlaveReplicaExpiration for which a slave replica must be unused until it becomes a candidate for sweeping, in milliseconds
-     * @return the created UnnecessaryReplicasSweeper
+     * @return the created UnnecessaryReplicasSweepPolicy
      */
-    public static UnnecessaryReplicasSweeper create(
+    public static UnnecessaryReplicasSweepPolicy create(
             long unusedSlaveReplicaExpiration )
     {
-        return new UnnecessaryReplicasSweeper( unusedSlaveReplicaExpiration );
+        return new UnnecessaryReplicasSweepPolicy( unusedSlaveReplicaExpiration );
     }
 
     /**
@@ -41,7 +44,7 @@ public class UnnecessaryReplicasSweeper
      * 
      * @param unusedSlaveReplicaExpiration for which a slave replica must be unused until it becomes a candidate for sweeping, in milliseconds
      */
-    protected UnnecessaryReplicasSweeper(
+    protected UnnecessaryReplicasSweepPolicy(
             long unusedSlaveReplicaExpiration )
     {
         theUnusedSlaveReplicaExpiration = unusedSlaveReplicaExpiration;
@@ -70,12 +73,23 @@ public class UnnecessaryReplicasSweeper
     public boolean shouldBePurged(
             NetMeshObject candidate )
     {
-        if( candidate.getProxyTowardsHomeReplica() == null ) {
+        Proxy towardsHome = candidate.getProxyTowardsHomeReplica();
+        if( towardsHome == null ) {
             // we never purge the home replica
             return false;
         }
         if( candidate.hasPropertyChangeListener() ) {
             // we never purge objects that have listeners
+            return false;
+        }
+        MeshObjectIdentifier [] neighbors                = candidate.getNeighborMeshObjectIdentifiers();
+        MeshObjectIdentifier [] neighborsAccordingToHome = candidate.getNeighborMeshObjectIdentifiersAccordingTo( towardsHome );
+
+        if(    neighbors != null
+            && neighborsAccordingToHome != null
+            && neighbors.length > neighborsAccordingToHome.length )
+        {
+            // have relationships that home doesn't know about
             return false;
         }
 

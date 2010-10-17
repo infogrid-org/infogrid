@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -17,8 +17,8 @@ package org.infogrid.meshbase.net.sweeper;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.security.MustNotDeleteHomeObjectException;
 import org.infogrid.meshbase.net.NetMeshBase;
-import org.infogrid.meshbase.net.NetSweeper;
-import org.infogrid.meshbase.sweeper.AbstractSweeper;
+import org.infogrid.meshbase.net.NetSweepPolicy;
+import org.infogrid.meshbase.sweeper.AbstractSweepPolicy;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.util.logging.Log;
@@ -26,18 +26,18 @@ import org.infogrid.util.logging.Log;
 /**
  * Adds sweeping methods specific to NetMeshObjects and NetMeshBases.
  */
-public abstract class AbstractNetSweeper
+public abstract class AbstractNetSweepPolicy
         extends
-            AbstractSweeper
+            AbstractSweepPolicy
         implements
-            NetSweeper
+            NetSweepPolicy
 {
-    private static final Log log = Log.getLogInstance( AbstractNetSweeper.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance( AbstractNetSweepPolicy.class ); // our own, private logger
 
     /**
      * Constructor.
      */
-    protected AbstractNetSweeper()
+    protected AbstractNetSweepPolicy()
     {
         // noop
     }
