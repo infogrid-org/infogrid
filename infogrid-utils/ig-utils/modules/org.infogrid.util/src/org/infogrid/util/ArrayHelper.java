@@ -18,12 +18,9 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
-import java.util.Vector;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 
@@ -150,7 +147,7 @@ public abstract class ArrayHelper
      * @throws ArrayIndexOutOfBoundsException passed-on Exception with better error message
      * @param <T> parameterizes the array
      */
-    public static final <T> void myArrayCopy(
+    public static <T> void myArrayCopy(
             T [] one,
             int  fromOne,
             T    two )
@@ -584,52 +581,6 @@ public abstract class ArrayHelper
             myArrayCopy( ret, i-startIndex, theOldArray[i] );
         }
         return ret;
-    }
-
-    /**
-     * Copy content from one a Vector into a new array.
-     *
-     * @param theVector the Vector from where we take the content
-     * @param arrayComponentType the base type of the to-be-created array that we return
-     * @return a newly created array of arrayComponentType
-     * @param <T> parameterizes the array
-     */
-    public static <T> T [] copyIntoNewArray(
-            Vector<? extends T> theVector,
-            Class<T>            arrayComponentType )
-    {
-        T [] ret = createArray(
-                arrayComponentType,
-                theVector.size() );
-
-        theVector.copyInto( ret );
-        return ret;
-    }
-
-    /**
-     * Copy content from one a Hashtable into a new array.
-     *
-     * @param theTable the Hashtable from where we take the content
-     * @param arrayComponentType the base type of the to-be-created array that we return
-     * @return a newly created array of arrayComponentType
-     * @param <T> parameterizes the array
-     */
-    public static <T> T [] copyIntoNewArray(
-            Hashtable<?,? extends T> theTable,
-            Class<T>                 arrayComponentType )
-    {
-        T [] ret = createArray(
-                arrayComponentType,
-                theTable.size() );
-
-        synchronized( theTable ) {
-            Enumeration<? extends T> theEnum = theTable.elements();
-            int i = 0;
-            while( theEnum.hasMoreElements() ) {
-                myArrayCopy( ret, i++, theEnum.nextElement() );
-            }
-            return ret;
-        }
     }
 
     /**
@@ -1645,6 +1596,27 @@ public abstract class ArrayHelper
         }
         ret.append( postfix );
         return ret.toString();
+    }
+
+    /**
+     * Obtain an array of identifiers from this array of objects having identifiers.
+     *
+     * @param array the objects having identifiers
+     * @return the identifiers
+     */
+    public static Identifier [] identifiersOf(
+            HasIdentifier [] array )
+    {
+        if( array == null ) {
+            return null;
+        }
+        Identifier [] ret = new Identifier[ array.length ];
+        for( int i=0 ; i<array.length ; ++i ) {
+            if( array[i] != null ) {
+                ret[i] = array[i].getIdentifier();
+            }
+        }
+        return ret;
     }
 
     /**
