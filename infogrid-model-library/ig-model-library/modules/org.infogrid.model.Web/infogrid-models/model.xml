@@ -26,6 +26,26 @@ information found on the web.</userdescription>
             <username>Web Resource</username>
             <userdescription>The resource at a URI. The URI is found in the identifier property.</userdescription>
             <maybeusedasforwardreference/>
+
+            <propertytype ID="org.infogrid.model.Web/WebResource_HttpStatusCode">
+                <name>HttpStatusCode</name>
+                <username>HTTP Status Code</username>
+                <userdescription>The HTTP status code</userdescription>
+                <datatype>
+                    <IntegerDataType/>
+                </datatype>
+                <defaultvalue>200</defaultvalue>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.model.Web/WebResource_HttpHeaderLocation">
+                <name>HttpHeaderLocation</name>
+                <username>HTTP Location Header</username>
+                <userdescription>In case of a redirect status code, contains the value of the location header.</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
         </entitytype>
 
         <relationshiptype ID="org.infogrid.model.Web/WebResource_HasLinkTo_WebResource">
