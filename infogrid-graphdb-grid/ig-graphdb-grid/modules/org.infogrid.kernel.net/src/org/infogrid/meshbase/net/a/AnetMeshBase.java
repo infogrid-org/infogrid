@@ -700,7 +700,7 @@ public abstract class AnetMeshBase
                 // now find all that have the same first NetMeshBaseIdentifier element
                 NetMeshBaseAccessSpecification pivot     = correctRemotePaths[ runningIndex ].getAccessPath()[0];
                 NetMeshBaseIdentifier          pivotName = pivot.getNetMeshBaseIdentifier();
-                ProxyParameters                pivotPars = ProxyParameters.create( pivot.getCoherenceSpecification(), correctRemotePaths[ runningIndex ].getFollowRedirects() );
+                ProxyParameters                pivotPars = ProxyParameters.create( pivot.getCoherenceSpecification());
 
                 // obtain a new set of object names that we still need to get
                 NetMeshObjectAccessSpecification [] nextObjectPaths = new NetMeshObjectAccessSpecification[ stillToGet ]; // potentially over-allocated
@@ -868,7 +868,6 @@ public abstract class AnetMeshBase
                 NetMeshObjectAccessSpecification ret = theNetMeshObjectAccessSpecificationFactory.obtain(
                        ArrayHelper.subarray( path, i+1, NetMeshBaseAccessSpecification.class ),
                        raw.getNetMeshObjectIdentifier() );
-                ret.setFollowRedirects( raw.getFollowRedirects() );
                 return ret;
             }
         }

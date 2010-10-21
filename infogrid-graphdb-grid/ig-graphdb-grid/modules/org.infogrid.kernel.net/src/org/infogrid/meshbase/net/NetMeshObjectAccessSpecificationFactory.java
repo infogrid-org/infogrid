@@ -284,27 +284,4 @@ public interface NetMeshObjectAccessSpecificationFactory
             String raw )
         throws
             ParseException;
-
-    /**
-     * Set the value of the defaultFollowRedirects property. If true, created NetMeshObjectAccessSpecifications
-     * will, by default, follow redirects; if false, a redirect will cause a NetMeshObjectAccessException to
-     * be thrown. This default can be changed by setting a different value on the created NetMeshObjectAccessSpecification.
-     *
-     * @param newValue the new value
-     * @see #getDefaultFollowRedirects
-     * @see NetMeshObjectAccessSpecification#setFollowRedirects
-     */
-    public void setDefaultFollowRedirects(
-            boolean newValue );
-
-    /**
-     * Obtain the value of the defaultFollowRedirects property. If true, created NetMeshObjectAccessSpecifications
-     * will, by default, follow redirects; if false, a redirect will cause a NetMeshObjectAccessException to
-     * be thrown. This default can be changed by setting a different value on the created NetMeshObjectAccessSpecification.
-     *
-     * @return the value
-     * @see #setDefaultFollowRedirects
-     * @see NetMeshObjectAccessSpecification#getFollowRedirects
-     */
-    public boolean getDefaultFollowRedirects();
 }

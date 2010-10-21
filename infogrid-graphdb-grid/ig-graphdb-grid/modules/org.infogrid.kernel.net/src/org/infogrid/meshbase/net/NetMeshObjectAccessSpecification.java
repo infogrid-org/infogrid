@@ -48,27 +48,6 @@ public interface NetMeshObjectAccessSpecification
     public NetMeshObjectIdentifier getNetMeshObjectIdentifier();
 
     /**
-     * Set the value of the followRedirects property. If true, redirects will be followed silently; if false, a redirect
-     * will cause a NetMeshObjectAccessException to be thrown.
-     *
-     * @param newValue the new value
-     * @see #getFollowRedirects
-     * @see NetMeshObjectAccessSpecificationFactory#setDefaultFollowRedirects
-     */
-    public void setFollowRedirects(
-            boolean newValue );
-
-    /**
-     * Obtain the value of the followRedirects property. If true, redirects will be followed silently; if false, a redirect
-     * will cause a NetMeshObjectAccessException to be thrown.
-     *
-     * @return the value
-     * @see #setFollowRedirects
-     * @see NetMeshObjectAccessSpecificationFactory#getDefaultFollowRedirects
-     */
-    public boolean getFollowRedirects();
-
-    /**
      * To save memory, this constant is allocated here and used wherever appropriate.
      */
     public static final NetMeshObjectAccessSpecification [] EMPTY_ARRAY = {};

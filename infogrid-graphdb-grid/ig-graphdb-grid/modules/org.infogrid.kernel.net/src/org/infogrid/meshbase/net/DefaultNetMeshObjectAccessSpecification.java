@@ -38,20 +38,17 @@ public class DefaultNetMeshObjectAccessSpecification
      * @param accessPath the sequence of network locations to traverse to find one where we can access the MeshObject
      * @param remoteIdentifier the identifier of the MeshObject there, if different from the default
      * @param asEnteredByUser String form as entered by the user, if any. This helps with error messages.
-     * @param followRedirects if true, redirects will be followed silently; if false, a redirect will cause a NetMeshObjectAccessException to be thrown.
      */
     protected DefaultNetMeshObjectAccessSpecification(
             NetMeshObjectAccessSpecificationFactory factory,
             NetMeshBaseAccessSpecification []       accessPath,
             NetMeshObjectIdentifier                 remoteIdentifier,
-            String                                  asEnteredByUser,
-            boolean                                 followRedirects )
+            String                                  asEnteredByUser )
     {
         theFactory          = factory;
         theAccessPath       = accessPath != null ? accessPath : new NetMeshBaseAccessSpecification[0];
         theRemoteIdentifier = remoteIdentifier;
         theAsEntered        = asEnteredByUser;
-        theFollowRedirects  = followRedirects;
         
         for( int i=0 ; i<theAccessPath.length ; ++i ) {
             if( theAccessPath[i] == null ) {
@@ -200,33 +197,6 @@ public class DefaultNetMeshObjectAccessSpecification
         ret.append( sub );
 
         return ret.toString();
-    }
-
-    /**
-     * Set the value of the followRedirects property. If true, redirects will be followed silently; if false, a redirect
-     * will cause a NetMeshObjectAccessException to be thrown.
-     *
-     * @param newValue the new value
-     * @see #getFollowRedirects
-     * @see NetMeshObjectAccessSpecificationFactory#setDefaultFollowRedirects
-     */
-    public void setFollowRedirects(
-            boolean newValue )
-    {
-        theFollowRedirects = newValue;
-    }
-
-    /**
-     * Obtain the value of the followRedirects property. If true, redirects will be followed silently; if false, a redirect
-     * will cause a NetMeshObjectAccessException to be thrown.
-     *
-     * @return the value
-     * @see #setFollowRedirects
-     * @see NetMeshObjectAccessSpecificationFactory#getDefaultFollowRedirects
-     */
-    public boolean getFollowRedirects()
-    {
-        return theFollowRedirects;
     }
 
     /**
@@ -397,12 +367,6 @@ public class DefaultNetMeshObjectAccessSpecification
      * String form as entered by the user.
      */
     protected String theAsEntered;
-
-    /**
-     * If true, redirects will be followed silently; if false, a redirect
-     * will cause a NetMeshObjectAccessException to be thrown.
-     */
-    protected boolean theFollowRedirects;
 
     /**
      * The escaped hash sign.

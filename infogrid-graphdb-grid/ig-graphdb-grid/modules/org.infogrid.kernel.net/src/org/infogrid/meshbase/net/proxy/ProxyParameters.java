@@ -29,33 +29,18 @@ public class ProxyParameters
     public static ProxyParameters create(
             CoherenceSpecification coherence )
     {
-        return new ProxyParameters( coherence, true ); // FIXME?
-    }
-
-    /**
-     * Factory method with defaults.
-     *
-     * @return the created ProxyParameters
-     */
-    public static ProxyParameters create(
-            CoherenceSpecification coherence,
-            boolean                followRedirects )
-    {
-        return new ProxyParameters( coherence, followRedirects );
+        return new ProxyParameters( coherence );
     }
 
     /**
      * Private constructor, use factory method.
      *
      * @param coherence the requested CoherenceSpecification, if any
-     * @param followRedirects if true, silently follow HTTP redirects
      */
     protected ProxyParameters(
-            CoherenceSpecification coherence,
-            boolean                followRedirects )
+            CoherenceSpecification coherence )
     {
-        theCoherence       = coherence;
-        theFollowRedirects = followRedirects;
+        theCoherence  = coherence;
     }
 
     /**
@@ -69,22 +54,7 @@ public class ProxyParameters
     }
 
     /**
-     * If true, silently follow HTTP redirects.
-     *
-     * @return if true, silently follow HTTP redirects
-     */
-    public boolean getFollowRedirects()
-    {
-        return theFollowRedirects;
-    }
-
-    /**
      * The CoherenceSpecification.
      */
     protected CoherenceSpecification theCoherence;
-
-    /**
-     * The followRedirects property.
-     */
-    protected boolean theFollowRedirects;
 }
