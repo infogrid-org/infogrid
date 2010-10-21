@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,6 +18,7 @@ import java.util.Collection;
 import org.infogrid.meshbase.MeshBaseNameServer;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.probe.manager.ProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 
 /**
@@ -50,6 +51,13 @@ public interface LocalNetMeshBase
      */
     public MeshBaseNameServer getLocalNameServer();
     
+    /**
+     * Obtain the ProbeManager.
+     *
+     * @return the ProbeManager
+     */
+    public ProbeManager getProbeManager();
+
     /**
      * The name of the bound property we use to express "the set of all ShadowMeshBases has changed".
      */
