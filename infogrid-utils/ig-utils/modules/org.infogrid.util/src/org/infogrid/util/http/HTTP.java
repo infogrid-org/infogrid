@@ -466,7 +466,7 @@ public abstract class HTTP
             log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, contentType, payload, followRedirects );
         }
 
-        return http_post( url, contentType, payload, followRedirects );
+        return http_post( url, contentType, payload, null, followRedirects, null, HTTP_CONNECT_TIMEOUT, HTTP_READ_TIMEOUT, null );
     }
 
     /**
@@ -545,13 +545,43 @@ public abstract class HTTP
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
         conn.setInstanceFollowRedirects( followRedirects );
+        if( connectTimeout >= 0 ) {
+            conn.setConnectTimeout( connectTimeout );
+        }
+        if( readTimeout >= 0 ) {
+            conn.setReadTimeout( readTimeout );
+        }
+        if( hostnameVerifier != null && conn instanceof HttpsURLConnection ) {
+            HttpsURLConnection realConn = (HttpsURLConnection) conn;
+            realConn.setHostnameVerifier( hostnameVerifier );
+        }
+
+        if( cookies != null && !cookies.isEmpty() ) {
+            StringBuilder cookieString = new StringBuilder();
+            String       sep = "";
+
+            Iterator<String> iter = cookies.keySet().iterator();
+            while( iter.hasNext() ) {
+                String       key   = iter.next();
+                CharSequence value = cookies.get( key );
+                cookieString.append( sep ).append( encodeCookieName( key ));
+                if( value != null ) {
+                    cookieString.append( "=" ).append( encodeToQuotedString( value.toString() ));
+                }
+                sep = "; ";
+            }
+            conn.setRequestProperty( "Cookie", cookieString.toString() );
+        }
+        if( acceptHeader != null && acceptHeader.length() > 0 ) {
+            conn.setRequestProperty( "Accept", acceptHeader );
+        }
+
         conn.setRequestMethod( "POST" );
         conn.setDoInput( true );
         conn.setDoOutput( true );
 
+
         conn.setRequestProperty( "Host",           netloc );
-        conn.setRequestProperty( "User-Agent",     HTTP.class.getName() );
-        conn.setRequestProperty( "Connection",     "close" );
         conn.setRequestProperty( "Content-Length", String.valueOf( payload.length ));
         conn.setRequestProperty( "Content-Type",   contentType );
 
