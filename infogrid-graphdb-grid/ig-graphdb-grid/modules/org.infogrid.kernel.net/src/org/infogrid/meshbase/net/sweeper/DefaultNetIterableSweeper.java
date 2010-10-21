@@ -39,7 +39,12 @@ public class DefaultNetIterableSweeper
             IterableNetMeshBase      mb,
             NetSweepPolicy           policy )
     {
-        return new DefaultNetIterableSweeper( mb, policy, null );
+        return new DefaultNetIterableSweeper(
+                mb,
+                policy,
+                null,
+                DEFAULT_LOTSIZE,
+                DEFAULT_WAITBETWEENLOTS );
     }
 
     /**
@@ -55,7 +60,12 @@ public class DefaultNetIterableSweeper
             NetSweepPolicy           policy,
             ScheduledExecutorService scheduler )
     {
-        return new DefaultNetIterableSweeper( mb, policy, scheduler );
+        return new DefaultNetIterableSweeper(
+                mb,
+                policy,
+                null,
+                DEFAULT_LOTSIZE,
+                DEFAULT_WAITBETWEENLOTS );
     }
 
     /**
@@ -67,26 +77,26 @@ public class DefaultNetIterableSweeper
     protected DefaultNetIterableSweeper(
             IterableNetMeshBase      mb,
             NetSweepPolicy           policy,
-            ScheduledExecutorService scheduler )
+            ScheduledExecutorService scheduler,
+            int                      lotSize,
+            long                     waitBetweenLots )
     {
-        super( mb, policy, scheduler );
+        super( mb, policy, scheduler, lotSize, waitBetweenLots );
     }
 
     /**
-     * Perform a sweep on every single MeshObject in this InterableMeshBase.
-     * This may take a long time; using background sweeping is almost always
-     * a better alternative.
+     * Perform a sweep on this MeshObject. This method
+     * may be overridden by subclasses.
      */
     @Override
-    public synchronized void sweepAllNow()
+    protected void sweepObject(
+            MeshObject current )
     {
         NetSweepPolicy realPolicy = (NetSweepPolicy) thePolicy;
 
-        for( MeshObject candidate : theMeshBase ) {
-            boolean done = thePolicy.potentiallyDelete( candidate );
-            if( !done ) {
-                realPolicy.potentiallyPurge( (NetMeshObject) candidate );
-            }
+        boolean done = realPolicy.potentiallyDelete( current );
+        if( !done ) {
+            realPolicy.potentiallyPurge( (NetMeshObject) current );
         }
     }
 }
