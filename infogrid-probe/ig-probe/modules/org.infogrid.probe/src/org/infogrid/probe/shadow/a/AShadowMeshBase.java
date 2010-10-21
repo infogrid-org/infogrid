@@ -21,7 +21,6 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
-import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
@@ -40,6 +39,7 @@ import org.infogrid.module.ModuleRegistry;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.ProbeDispatcher;
 import org.infogrid.probe.ProbeException;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.manager.ProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseListener;
@@ -101,6 +101,7 @@ public abstract class AShadowMeshBase
             ProbeDirectory                              directory,
             long                                        timeCreated,
             long                                        timeNotNeededTillExpires,
+            HttpMappingPolicy                           mappingPolicy,
             Context                                     context )
     {
         super(  identifier,
@@ -118,8 +119,7 @@ public abstract class AShadowMeshBase
         theHostnameVerifier = context.findContextObject( HostnameVerifier.class );
 
         ModuleRegistry registry = context.findContextObject( ModuleRegistry.class );
-        theDispatcher = new ProbeDispatcher( this, directory, timeCreated, timeNotNeededTillExpires, registry );
-
+        theDispatcher = new ProbeDispatcher( this, directory, timeCreated, timeNotNeededTillExpires, mappingPolicy, registry );
     }
 
     /**
@@ -184,6 +184,27 @@ public abstract class AShadowMeshBase
     public NetMeshBaseIdentifier getFactoryKey()
     {
         return getIdentifier();
+    }
+
+    /**
+     * Update the HTTP mapping policy.
+     *
+     * @param newValue the new value
+     */
+    public void setHttpMappingPolicy(
+            HttpMappingPolicy newValue )
+    {
+        theDispatcher.setHttpMappingPolicy( newValue );
+    }
+
+    /**
+     * Obtain the current HTTP mapping policy.
+     *
+     * @return the mapping policy
+     */
+    public HttpMappingPolicy getHttpMappingPolicy()
+    {
+        return theDispatcher.getHttpMappingPolicy();
     }
 
     /**

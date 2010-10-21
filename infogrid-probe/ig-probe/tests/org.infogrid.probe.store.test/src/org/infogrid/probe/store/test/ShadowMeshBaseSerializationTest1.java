@@ -34,6 +34,7 @@ import org.infogrid.modelbase.MeshTypeIdentifierFactory;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.m.MMeshTypeIdentifierFactory;
 import org.infogrid.modelbase.m.MModelBase;
+import org.infogrid.probe.httpmapping.TraditionalInfoGridHttpMappingPolicy;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowMeshBase;
 import org.infogrid.probe.shadow.externalized.xml.ExternalizedShadowMeshBaseXmlEncoder;
@@ -243,6 +244,7 @@ public class ShadowMeshBaseSerializationTest1
             null,
             null,
             System.currentTimeMillis(),
+            TraditionalInfoGridHttpMappingPolicy.SINGLETON,
             theApplicationContext );
     
     /**
@@ -250,7 +252,7 @@ public class ShadowMeshBaseSerializationTest1
      */
     protected static class TestCase
     {
-        public TestCase(
+        TestCase(
                 String                       inputFile,
                 NetMeshBaseIdentifier            id,
                 ExternalizedProxy []         proxies,

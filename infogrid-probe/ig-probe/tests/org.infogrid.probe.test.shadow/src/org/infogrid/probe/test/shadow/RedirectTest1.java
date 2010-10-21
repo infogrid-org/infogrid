@@ -42,8 +42,6 @@ public class RedirectTest1
     {
         int nRedirects = 2;
 
-        theMeshBase.getNetMeshObjectAccessSpecificationFactory().setDefaultFollowRedirects( true );
-
         // a bit complicated to get the ONE_TIME_ONLY in here
         NetMeshObjectAccessSpecification path = theMeshBase.getNetMeshObjectAccessSpecificationFactory().obtain(
                 new NetMeshBaseAccessSpecification[] {

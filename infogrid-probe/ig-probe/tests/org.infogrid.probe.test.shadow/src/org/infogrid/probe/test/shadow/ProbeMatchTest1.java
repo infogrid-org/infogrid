@@ -40,7 +40,6 @@ import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.manager.PassiveProbeManager;
 import org.infogrid.probe.manager.m.MPassiveProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
-import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.m.MShadowMeshBaseFactory;
 import org.infogrid.util.logging.Log;
 
@@ -141,15 +140,15 @@ public class ProbeMatchTest1
 
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 
-        ShadowMeshBaseFactory theShadowFactory = MShadowMeshBaseFactory.create(
+        MShadowMeshBaseFactory theShadowFactory = MShadowMeshBaseFactory.create(
                 theMeshBaseIdentifierFactory,
                 shadowEndpointFactory,
                 theModelBase,
-                theProbeDirectory,
                 rootContext );
         
-        theProbeManager1 = MPassiveProbeManager.create( theShadowFactory );
+        theProbeManager1 = MPassiveProbeManager.create( theShadowFactory, theProbeDirectory );
         shadowEndpointFactory.setNameServer( theProbeManager1.getNetMeshBaseNameServer() );
+        theShadowFactory.setProbeManager( theProbeManager1 );
     }
 
     /**

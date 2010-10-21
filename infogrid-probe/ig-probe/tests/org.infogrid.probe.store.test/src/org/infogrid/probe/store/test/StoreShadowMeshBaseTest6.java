@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,7 +16,6 @@ package org.infogrid.probe.store.test;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
@@ -51,12 +50,11 @@ public class StoreShadowMeshBaseTest6
         IterablePrefixingStore theShadowStore      = IterablePrefixingStore.create( "Shadow",      theSqlStore );
         IterablePrefixingStore theShadowProxyStore = IterablePrefixingStore.create( "ShadowProxy", theSqlStore );
 
-        StoreShadowMeshBaseFactory theShadowFactory
+        StoreShadowMeshBaseFactory shadowFactory1
                 = StoreShadowMeshBaseFactory.create(
                         theMeshBaseIdentifierFactory,
                         shadowEndpointFactory,
                         theModelBase,
-                        theProbeDirectory,
                         theShadowStore,
                         theShadowProxyStore,
                         rootContext );
@@ -66,8 +64,9 @@ public class StoreShadowMeshBaseTest6
         
         log.info( "Setting up ProbeManager1" );
         
-        StoreScheduledExecutorProbeManager probeManager1 = StoreScheduledExecutorProbeManager.create( theShadowFactory, theSqlStore );
+        StoreScheduledExecutorProbeManager probeManager1 = StoreScheduledExecutorProbeManager.create( shadowFactory1, theProbeDirectory, theSqlStore );
         shadowEndpointFactory.setNameServer( probeManager1.getNetMeshBaseNameServer() );
+        shadowFactory1.setProbeManager( probeManager1 );
 
         probeManager1.start( exec );
 
@@ -95,22 +94,38 @@ public class StoreShadowMeshBaseTest6
         WeakReference<StoreScheduledExecutorProbeManager> probeManager1Ref = new WeakReference<StoreScheduledExecutorProbeManager>( probeManager1 );
         WeakReference<ShadowMeshBase>                     meshBase1Ref     = new WeakReference<ShadowMeshBase>( meshBase1 );
 
-        probeManager1 = null;
-        meshBase1     = null;
-        home1         = null;
+        shadowFactory1 = null;
+        probeManager1  = null;
+        meshBase1      = null;
+        home1          = null;
         shadowEndpointFactory.setNameServer( null );
         
         sleepUntilIsGone( probeManager1Ref, 4000L, "ProbeManager1 still here, should have been garbage collected" );
         sleepUntilIsGone( meshBase1Ref,     4000L, "ShadowMeshBase1 still here, should have been garbage collected" );
 
         //
-        
+
+        log.info( "Creating new ShadowFactory" );
+
+        StoreShadowMeshBaseFactory shadowFactory2
+                = StoreShadowMeshBaseFactory.create(
+                        theMeshBaseIdentifierFactory,
+                        shadowEndpointFactory,
+                        theModelBase,
+                        theShadowStore,
+                        theShadowProxyStore,
+                        rootContext );
+
+        //
+
         log.info( "Creating new ProbeManager with old data and new feed" );
 
         copyFile( testFile1b, testFile1 );
 
-        StoreScheduledExecutorProbeManager probeManager2 = StoreScheduledExecutorProbeManager.create( theShadowFactory, theSqlStore );
+        StoreScheduledExecutorProbeManager probeManager2 = StoreScheduledExecutorProbeManager.create( shadowFactory2, theProbeDirectory, theSqlStore );
         shadowEndpointFactory.setNameServer( probeManager2.getNetMeshBaseNameServer() );
+        shadowFactory2.setProbeManager( probeManager2 );
+
         probeManager2.start( exec );
 
         sleepUntil( 6500L );

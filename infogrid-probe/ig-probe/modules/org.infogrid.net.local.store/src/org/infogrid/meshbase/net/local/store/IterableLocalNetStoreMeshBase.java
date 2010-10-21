@@ -123,7 +123,6 @@ public class IterableLocalNetStoreMeshBase
      * @param proxyStore the Store in which to store the Proxies
      * @param shadowStore the Store in which to store the managed ShadowMeshBases
      * @param shadowProxyStore the Store in which to store the proxies of the managed ShadowMeshBases
-     * @param probeDirectory the ProbeDirectory to use
      * @param exec the ScheduledExecutorService to use
      * @param doStart if true, start Probe processing. If false, processing needs to be started manually through the ProbeManager
      * @param context the Context in which this NetMeshBase runs.
@@ -151,13 +150,13 @@ public class IterableLocalNetStoreMeshBase
                 netMeshObjectAccessSpecificationFactory.getNetMeshBaseIdentifierFactory(),
                 shadowEndpointFactory,
                 modelBase,
-                probeDirectory,
                 shadowStore,
                 shadowProxyStore,
                 context );
 
-        StoreScheduledExecutorProbeManager probeManager = StoreScheduledExecutorProbeManager.create( delegate, shadowStore );
+        StoreScheduledExecutorProbeManager probeManager = StoreScheduledExecutorProbeManager.create( delegate, probeDirectory, shadowStore );
         shadowEndpointFactory.setNameServer( probeManager.getNetMeshBaseNameServer() );
+        delegate.setProbeManager( probeManager );
 
         MPingPongNetMessageEndpointFactory endpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactory.setNameServer( probeManager.getNetMeshBaseNameServer() );

@@ -8,13 +8,16 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.probe.manager.m;
 
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.probe.ProbeDirectory;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
+import org.infogrid.probe.httpmapping.TraditionalInfoGridHttpMappingPolicy;
 import org.infogrid.probe.manager.AbstractProbeManager;
 import org.infogrid.probe.manager.PassiveProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
@@ -35,14 +38,32 @@ public class MPassiveProbeManager
      * Factory method.
      *
      * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
+     * @param dir the ProbeDirectory to use
      * @return the created MPassiveProbeManager
      */
     public static MPassiveProbeManager create(
-            ShadowMeshBaseFactory delegateFactory )
+            ShadowMeshBaseFactory delegateFactory,
+            ProbeDirectory        dir )
+    {
+        return create( delegateFactory, dir, TraditionalInfoGridHttpMappingPolicy.SINGLETON );
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
+     * @param dir the ProbeDirectory to use
+     * @param httpMappingPolicy the policy by which HTTP responses are mapped into the InfoGrid world
+     * @return the created MPassiveProbeManager
+     */
+    public static MPassiveProbeManager create(
+            ShadowMeshBaseFactory delegateFactory,
+            ProbeDirectory        dir,
+            HttpMappingPolicy     httpMappingPolicy )
     {
         CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = MCachingHashMap.create();
 
-        return new MPassiveProbeManager( delegateFactory, storage );
+        return new MPassiveProbeManager( delegateFactory, storage, dir, httpMappingPolicy );
     }
 
     /**
@@ -50,12 +71,16 @@ public class MPassiveProbeManager
      * 
      * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
      * @param storage the storage to use
+     * @param dir the ProbeDirectory to use
+     * @param httpMappingPolicy the policy by which HTTP responses are mapped into the InfoGrid world
      */
     protected MPassiveProbeManager(
             ShadowMeshBaseFactory                            delegateFactory,
-            CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
+            CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage,
+            ProbeDirectory                                   dir,
+            HttpMappingPolicy                                httpMappingPolicy )
     {
-        super( delegateFactory, storage );
+        super( delegateFactory, storage, dir, httpMappingPolicy );
     }
 
     /**

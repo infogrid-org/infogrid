@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,7 +16,6 @@ package org.infogrid.probe.vcard.test;
 
 import java.io.File;
 import java.util.Iterator;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
@@ -122,37 +121,10 @@ public class VCardProbeTest1
 
         testFile1   = args[0];
         testFile1Id = theMeshBaseIdentifierFactory.obtain( new File( testFile1 ) );
-
-        MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
-
-        ShadowMeshBaseFactory theShadowFactory = MShadowMeshBaseFactory.create(
-                theMeshBaseIdentifierFactory,
-                shadowEndpointFactory,
-                theModelBase,
-                theProbeDirectory,
-                rootContext );
-        
-        theProbeManager1 = MPassiveProbeManager.create( theShadowFactory );
-        shadowEndpointFactory.setNameServer( theProbeManager1.getNetMeshBaseNameServer() );
-    }
-
-    /**
-     * Clean up after the test.
-     */
-    @Override
-    public void cleanup()
-    {
-        theProbeManager1 = null;
-        exec.shutdown();
     }
 
     // Our Logger
     private static Log log = Log.getLogInstance( VCardProbeTest1.class);
-
-    /**
-     * Our ThreadPool.
-     */
-    protected ScheduledExecutorService exec = createThreadPool( 1 );
 
     /**
      * File name of the first test file.
@@ -163,9 +135,4 @@ public class VCardProbeTest1
      * The NetworkIdentifer of the first test file.
      */
     protected NetMeshBaseIdentifier testFile1Id;
-    
-    /**
-     * The ProbeManager that we use for the first Probe.
-     */
-    protected PassiveProbeManager theProbeManager1;
 }

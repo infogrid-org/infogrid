@@ -32,6 +32,7 @@ import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.probe.ProbeDirectory;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.shadow.proxy.DefaultShadowProxyFactory;
 import org.infogrid.probe.shadow.proxy.DefaultShadowProxyPolicyFactory;
 import org.infogrid.probe.shadow.a.AShadowMeshBase;
@@ -77,6 +78,7 @@ public class MShadowMeshBase
             NetAccessManager                        accessMgr,
             ProbeDirectory                          directory,
             long                                    timeNotNeededTillExpires,
+            HttpMappingPolicy                       mappingPolicy,
             Context                                 context )
     {
         DefaultShadowProxyPolicyFactory proxyPolicyFactory = DefaultShadowProxyPolicyFactory.create();
@@ -91,6 +93,7 @@ public class MShadowMeshBase
                 accessMgr,
                 directory,
                 timeNotNeededTillExpires,
+                mappingPolicy,
                 context );
         
         return ret;
@@ -124,6 +127,7 @@ public class MShadowMeshBase
             NetAccessManager                        accessMgr,
             ProbeDirectory                          directory,
             long                                    timeNotNeededTillExpires,
+            HttpMappingPolicy                       mappingPolicy,
             Context                                 context )
     {
         MCachingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = MCachingHashMap.create();
@@ -150,6 +154,7 @@ public class MShadowMeshBase
                 directory,
                 System.currentTimeMillis(), // a memory Shadow could only have been created now
                 timeNotNeededTillExpires,
+                mappingPolicy,
                 context );
 
         setFactory.setMeshBase( ret );
@@ -197,6 +202,7 @@ public class MShadowMeshBase
             ProbeDirectory                              directory,
             long                                        timeCreated,
             long                                        timeNotNeededTillExpires,
+            HttpMappingPolicy                           mappingPolicy,
             Context                                     context )
     {
         super(  identifier,
@@ -212,6 +218,7 @@ public class MShadowMeshBase
                 directory,
                 timeCreated,
                 timeNotNeededTillExpires,
+                mappingPolicy,
                 context );
     }
 

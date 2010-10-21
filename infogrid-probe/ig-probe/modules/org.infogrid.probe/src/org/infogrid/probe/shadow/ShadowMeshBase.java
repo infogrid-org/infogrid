@@ -22,6 +22,7 @@ import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.transaction.ChangeSet;
 import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.manager.ProbeManager;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowMeshBase;
 import org.infogrid.util.FactoryCreatedObject;
@@ -43,6 +44,21 @@ public interface ShadowMeshBase
      */
     public abstract ProbeManager getProbeManager();
     
+    /**
+     * Update the HTTP mapping policy.
+     *
+     * @param newValue the new value
+     */
+    public void setHttpMappingPolicy(
+            HttpMappingPolicy newValue );
+
+    /**
+     * Obtain the current HTTP mapping policy.
+     *
+     * @return the mapping policy
+     */
+    public HttpMappingPolicy getHttpMappingPolicy();
+
     /**
      * Invoke a run now. Note that invoking this method will not change the next time
      * a ScheduledExecutorProbeManager will update the ShadowMeshBase. To impact that,

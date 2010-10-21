@@ -8,18 +8,23 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.probe.vcard.test;
 
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.probe.ProbeDirectory.StreamProbeDescriptor;
 import org.infogrid.probe.m.MProbeDirectory;
+import org.infogrid.probe.manager.PassiveProbeManager;
+import org.infogrid.probe.manager.m.MPassiveProbeManager;
+import org.infogrid.probe.shadow.m.MShadowMeshBaseFactory;
 import org.infogrid.probe.vcard.VCardProbe;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.context.Context;
@@ -44,6 +49,29 @@ public abstract class AbstractVCardProbeTest
         super( localFileName( testClass, "/ResourceHelper" ));
         
         theProbeDirectory.addStreamProbe( new StreamProbeDescriptor( "text/x-vcard", VCardProbe.class ));
+
+        MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
+
+        MShadowMeshBaseFactory theShadowFactory = MShadowMeshBaseFactory.create(
+                theMeshBaseIdentifierFactory,
+                shadowEndpointFactory,
+                theModelBase,
+                rootContext );
+
+        theProbeManager1 = MPassiveProbeManager.create( theShadowFactory, theProbeDirectory );
+        shadowEndpointFactory.setNameServer( theProbeManager1.getNetMeshBaseNameServer() );
+
+        theShadowFactory.setProbeManager( theProbeManager1 );
+    }
+
+    /**
+     * Clean up after the test.
+     */
+    @Override
+    public void cleanup()
+    {
+        theProbeManager1 = null;
+        exec.shutdown();
     }
 
     /**
@@ -65,6 +93,16 @@ public abstract class AbstractVCardProbeTest
      * Factory for NetMeshBaseIdentifiers.
      */
     protected NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create();
+
+    /**
+     * The ProbeManager that we use for the first Probe.
+     */
+    protected PassiveProbeManager theProbeManager1;
+
+    /**
+     * Our ThreadPool.
+     */
+    protected ScheduledExecutorService exec = createThreadPool( 1 );
 }
 
 

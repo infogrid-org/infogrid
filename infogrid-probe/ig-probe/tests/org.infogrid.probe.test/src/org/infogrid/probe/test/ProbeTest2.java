@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -26,7 +26,6 @@ import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.manager.PassiveProbeManager;
 import org.infogrid.probe.manager.m.MPassiveProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
-import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.m.MShadowMeshBaseFactory;
 import org.infogrid.util.logging.Log;
 
@@ -205,24 +204,25 @@ public class ProbeTest2
         MPingPongNetMessageEndpointFactory shadowEndpointFactoryA = MPingPongNetMessageEndpointFactory.create( exec );
         MPingPongNetMessageEndpointFactory shadowEndpointFactoryB = MPingPongNetMessageEndpointFactory.create( exec );
 
-        ShadowMeshBaseFactory theShadowFactoryA = MShadowMeshBaseFactory.create(
+        MShadowMeshBaseFactory shadowFactoryA = MShadowMeshBaseFactory.create(
                 theMeshBaseIdentifierFactory,
                 shadowEndpointFactoryA,
                 theModelBase,
-                theProbeDirectory,
                 rootContext );
-        ShadowMeshBaseFactory theShadowFactoryB = MShadowMeshBaseFactory.create(
+        MShadowMeshBaseFactory shadowFactoryB = MShadowMeshBaseFactory.create(
                 theMeshBaseIdentifierFactory,
                 shadowEndpointFactoryB,
                 theModelBase,
-                theProbeDirectory,
                 rootContext );
         
-        theProbeManagerA = MPassiveProbeManager.create( theShadowFactoryA );
-        theProbeManagerB = MPassiveProbeManager.create( theShadowFactoryB );
+        theProbeManagerA = MPassiveProbeManager.create( shadowFactoryA, theProbeDirectory );
+        theProbeManagerB = MPassiveProbeManager.create( shadowFactoryB, theProbeDirectory );
 
         shadowEndpointFactoryA.setNameServer( theProbeManagerA.getNetMeshBaseNameServer() );
         shadowEndpointFactoryB.setNameServer( theProbeManagerB.getNetMeshBaseNameServer() );
+
+        shadowFactoryA.setProbeManager( theProbeManagerA );
+        shadowFactoryB.setProbeManager( theProbeManagerB );
     }
 
     /**

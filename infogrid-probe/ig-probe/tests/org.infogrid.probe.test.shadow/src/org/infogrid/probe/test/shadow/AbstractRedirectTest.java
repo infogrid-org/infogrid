@@ -30,6 +30,8 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
+import org.infogrid.probe.ProbeDirectory;
+import org.infogrid.probe.blob.BlobProbe;
 import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.context.Context;
@@ -57,6 +59,8 @@ public abstract class AbstractRedirectTest
             Exception
     {
         super( localFileName( testClass, "/ResourceHelper" ));
+
+        theProbeDirectory.addStreamProbe( new ProbeDirectory.StreamProbeDescriptor( "text/html", BlobProbe.class ));
 
         theServer = new HttpServer( SERVER_PORT, NUMBER_THREADS );
         theServer.setResponseFactory( new MyResponseFactory( 1000L, REDIRECT_STATUS ) );

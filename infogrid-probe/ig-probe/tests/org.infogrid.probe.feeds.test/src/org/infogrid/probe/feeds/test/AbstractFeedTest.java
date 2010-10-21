@@ -8,23 +8,28 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.probe.feeds.test;
 
 import java.util.Iterator;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.meshbase.IterableMeshBase;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.IterableNetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.probe.m.MProbeDirectory;
+import org.infogrid.probe.manager.PassiveProbeManager;
+import org.infogrid.probe.manager.m.MPassiveProbeManager;
+import org.infogrid.probe.shadow.m.MShadowMeshBaseFactory;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.context.Context;
@@ -46,6 +51,29 @@ public abstract class AbstractFeedTest
             Class<?> testClass )
     {
         super( localFileName( AbstractFeedTest.class, "/ResourceHelper" ));
+
+        MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
+
+        MShadowMeshBaseFactory shadowFactory = MShadowMeshBaseFactory.create(
+                theMeshBaseIdentifierFactory,
+                shadowEndpointFactory,
+                theModelBase,
+                rootContext );
+
+        theProbeManager1 = MPassiveProbeManager.create( shadowFactory, theProbeDirectory );
+        shadowEndpointFactory.setNameServer( theProbeManager1.getNetMeshBaseNameServer() );
+        shadowFactory.setProbeManager( theProbeManager1 );
+    }
+
+    /**
+     * Clean up after the test.
+     */
+    @Override
+    public void cleanup()
+    {
+        theProbeManager1 = null;
+
+        exec.shutdown();
     }
 
     /**
@@ -80,7 +108,7 @@ public abstract class AbstractFeedTest
             Object current = iter.next();
 
             ++ret;
-            buf.append( "found " + current );
+            buf.append( "found " ).append( current );
         }
 
         if( mylog != null ) {
@@ -157,4 +185,14 @@ public abstract class AbstractFeedTest
      * Factory for NetMeshBaseIdentifiers.
      */
     protected NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create();
+
+    /**
+     * The ProbeManager that we use for the first Probe.
+     */
+    protected PassiveProbeManager theProbeManager1;
+
+    /**
+     * Our ThreadPool.
+     */
+    protected ScheduledExecutorService exec = createThreadPool( 1 );
 }

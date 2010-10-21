@@ -41,9 +41,10 @@ public class AllTests
                 new TestSpec(
                         ShadowTest2.class ),
 
-                new TestSpec(
-                        ShadowTest3.class,
-                        AbstractTest.fileSystemFileName( ShadowTest3.class, "ShadowTest3a.html" )), // ShadowTest3b.xml referenced from ShadowTest3a.html
+//                new TestSpec(
+//                        ShadowTest3.class,
+//                        AbstractTest.fileSystemFileName( ShadowTest3.class, "ShadowTest3a.html" )), // ShadowTest3b.xml referenced from ShadowTest3a.html
+// FIXME: need to move from file: to http: otherwise WebResource not set
 
                 new TestSpec(
                         ShadowTest4.class ),

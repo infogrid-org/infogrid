@@ -18,7 +18,7 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
-import org.infogrid.probe.ProbeDirectory;
+import org.infogrid.probe.manager.ProbeManager;
 import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.context.Context;
 
@@ -36,24 +36,36 @@ public abstract class AbstractShadowMeshBaseFactory
      * 
      * @param endpointFactory the Context to use for created ShadowMeshBases
      * @param modelBase the ModelBase to use for created ShadowMeshBases
-     * @param probeDirectory the ProbeDirectory to use for the created ShadowMeshBases
      * @param timeNotNeededTillExpires the time until unneeded ShadowMeshBases disappear, in milliseconds
      * @param c the Context to use for created ShadowMeshBases
      */
     protected AbstractShadowMeshBaseFactory(
             ProxyMessageEndpointFactory endpointFactory,
             ModelBase                   modelBase,
-            ProbeDirectory              probeDirectory,
             long                        timeNotNeededTillExpires,
             Context                     c )
     {
         theEndpointFactory          = endpointFactory;
         theModelBase                = modelBase;
-        theProbeDirectory           = probeDirectory;
         theTimeNotNeededTillExpires = timeNotNeededTillExpires;
         theMeshBaseContext          = c;
     }
-    
+
+    /**
+     * Tell this MeshBaseFactory on whose behalf it works. This must only be invoked once.
+     *
+     * @param probeManager the ProbeManager
+     * @throws IllegalStateException if invoked more than once
+     */
+    public void setProbeManager(
+            ProbeManager probeManager )
+    {
+        if( theProbeManager != null ) {
+            throw new IllegalStateException( "Have ProbeManager already" );
+        }
+        theProbeManager = probeManager;
+    }
+
     /**
      * Factory for NetMessageEndpoints. This is shared by all created ShadowMeshBases.
      */
@@ -65,9 +77,9 @@ public abstract class AbstractShadowMeshBaseFactory
     protected ModelBase theModelBase;
 
     /**
-     * The ProbeDirectory to use for the created ShadowMeshBases.
+     * The ProbeManager on whose behalf this ShadowMeshBaseFactory works.
      */
-    protected ProbeDirectory theProbeDirectory;
+    protected ProbeManager theProbeManager;
 
     /**
      * The time, in milliseconds, until unused ShadowMeshBases should self-destruct. -1 indicates never.

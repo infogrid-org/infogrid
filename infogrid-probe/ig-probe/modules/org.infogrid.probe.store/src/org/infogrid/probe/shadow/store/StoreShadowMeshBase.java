@@ -33,6 +33,7 @@ import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.store.net.StoreProxyManager;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.probe.ProbeDirectory;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.shadow.a.AShadowMeshBase;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowMeshBase;
 import org.infogrid.probe.shadow.proxy.DefaultShadowProxyFactory;
@@ -82,6 +83,7 @@ public class StoreShadowMeshBase
             NetAccessManager                        accessMgr,
             ProbeDirectory                          directory,
             long                                    timeNotNeededTillExpires,
+            HttpMappingPolicy                       mappingPolicy,
             IterableStore                           proxyStore,
             Context                                 context )
     {
@@ -97,6 +99,7 @@ public class StoreShadowMeshBase
                 accessMgr,
                 directory,
                 timeNotNeededTillExpires,
+                mappingPolicy,
                 proxyStore,
                 context );
         return ret;
@@ -131,6 +134,7 @@ public class StoreShadowMeshBase
             NetAccessManager                        accessMgr,
             ProbeDirectory                          directory,
             long                                    timeNotNeededTillExpires,
+            HttpMappingPolicy                       mappingPolicy,
             IterableStore                           proxyStore,
             Context                                 context )
     {
@@ -160,6 +164,7 @@ public class StoreShadowMeshBase
                 directory,
                 System.currentTimeMillis(),
                 timeNotNeededTillExpires,
+                mappingPolicy,
                 context );
 
         setFactory.setMeshBase( ret );
@@ -208,7 +213,8 @@ public class StoreShadowMeshBase
             StoreProxyManager                           proxyManager,
             ProbeDirectory                              directory,
             long                                        timeCreated,
-            long                                        timeNotNeededTillExpires,    
+            long                                        timeNotNeededTillExpires,
+            HttpMappingPolicy                           mappingPolicy,
             Context                                     context )
     {
         super(  identifier,
@@ -224,6 +230,7 @@ public class StoreShadowMeshBase
                 directory,
                 timeCreated,
                 timeNotNeededTillExpires,
+                mappingPolicy,
                 context );
     }
 

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -43,7 +43,6 @@ import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.manager.ProbeManager;
 import org.infogrid.probe.manager.ScheduledExecutorProbeManager;
 import org.infogrid.probe.manager.m.MScheduledExecutorProbeManager;
-import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.m.MShadowMeshBaseFactory;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CursorIterator;
@@ -118,15 +117,15 @@ public class LocalNetMMeshBase
         
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 
-        ShadowMeshBaseFactory delegate = MShadowMeshBaseFactory.create(
+        MShadowMeshBaseFactory delegate = MShadowMeshBaseFactory.create(
                 netMeshObjectAccessSpecificationFactory.getNetMeshBaseIdentifierFactory(),
                 shadowEndpointFactory,
                 modelBase,
-                probeDirectory,
                 context );
 
-        ScheduledExecutorProbeManager probeManager = MScheduledExecutorProbeManager.create( delegate );
+        ScheduledExecutorProbeManager probeManager = MScheduledExecutorProbeManager.create( delegate, probeDirectory );
         shadowEndpointFactory.setNameServer( probeManager.getNetMeshBaseNameServer() );
+        delegate.setProbeManager( probeManager );
 
         MPingPongNetMessageEndpointFactory endpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactory.setNameServer( probeManager.getNetMeshBaseNameServer() );

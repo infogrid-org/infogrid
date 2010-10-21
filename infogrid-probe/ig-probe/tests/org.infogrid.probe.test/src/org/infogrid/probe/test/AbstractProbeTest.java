@@ -85,7 +85,7 @@ public abstract class AbstractProbeTest
             Object current = iter.next();
 
             ++ret;
-            buf.append( "found " + current );
+            buf.append( "found " ).append( current );
         }
 
         if( mylog != null ) {

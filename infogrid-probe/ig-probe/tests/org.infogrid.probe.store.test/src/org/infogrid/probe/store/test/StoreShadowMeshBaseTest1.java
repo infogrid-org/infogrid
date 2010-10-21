@@ -179,17 +179,17 @@ public class StoreShadowMeshBaseTest1
         NetMeshBaseIdentifier here = theMeshBaseIdentifierFactory.fromExternalForm( "http://here.local" );
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 
-        StoreShadowMeshBaseFactory theShadowFactory = StoreShadowMeshBaseFactory.create(
+        StoreShadowMeshBaseFactory shadowFactory = StoreShadowMeshBaseFactory.create(
                 theMeshBaseIdentifierFactory,
                 shadowEndpointFactory,
                 theModelBase,
-                theProbeDirectory,
                 theShadowStore,
                 theShadowProxyStore,
                 rootContext );
         
-        theProbeManager1 = StorePassiveProbeManager.create( theShadowFactory, theShadowStore );
+        theProbeManager1 = StorePassiveProbeManager.create( shadowFactory, theProbeDirectory, theShadowStore );
         shadowEndpointFactory.setNameServer( theProbeManager1.getNetMeshBaseNameServer() );
+        shadowFactory.setProbeManager( theProbeManager1 );
     }
 
     // Our Logger

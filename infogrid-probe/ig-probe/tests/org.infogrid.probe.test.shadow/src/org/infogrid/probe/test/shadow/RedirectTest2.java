@@ -17,10 +17,12 @@ package org.infogrid.probe.test.shadow;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseAccessSpecification;
-import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseRedirectException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
+import org.infogrid.model.Web.WebSubjectArea;
+import org.infogrid.model.primitives.StringValue;
+import org.infogrid.probe.httpmapping.JustRecordHttpMappingPolicy;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -43,7 +45,7 @@ public class RedirectTest2
     {
         int nRedirects = 2;
 
-        theMeshBase.getNetMeshObjectAccessSpecificationFactory().setDefaultFollowRedirects( false );
+        theMeshBase.getProbeManager().setHttpMappingPolicy( JustRecordHttpMappingPolicy.SINGLETON );
 
         // a bit complicated to get the ONE_TIME_ONLY in here
         NetMeshObjectAccessSpecification path = theMeshBase.getNetMeshObjectAccessSpecificationFactory().obtain(
@@ -55,41 +57,25 @@ public class RedirectTest2
 
         NetMeshObject                shadowHome = null;
         NetMeshBaseRedirectException realCause  = null;
-        NetMeshBaseIdentifier        location   = null;
+        StringValue                  location   = null;
 
         for( int i=nRedirects ; i>=0 ; --i ) {
             log.debug( "Now trying", i, path );
 
-            try {
-                shadowHome = theMeshBase.accessLocally( path );
+            shadowHome = theMeshBase.accessLocally( path );
 
-                if( i > 0 ) {
-                    reportError( "Exception not thrown" );
-                }
-
-            } catch( NetMeshObjectAccessException ex ) {
-
-                Throwable cause = ex.getCauseFor( path.getNetMeshObjectIdentifier() );
-
-                if( !( cause instanceof NetMeshBaseRedirectException )) {
-                    reportError( "Wrong exception", ex );
-                    continue;
-                }
-
-                realCause = (NetMeshBaseRedirectException) cause;
-
-                location = realCause.getNewId();
-                checkObject( location, "no location found" );
-
-                path = ex.getSeeOtherPathFor( path.getNetMeshObjectIdentifier() );
-                checkObject( path, "no new path found" );
+            location = (StringValue) shadowHome.getPropertyValue( WebSubjectArea.WEBRESOURCE_HTTPHEADERLOCATION );
+            if( location != null ) {
+                path = theMeshBase.getNetMeshObjectAccessSpecificationFactory().fromExternalForm( location.getAsString() );
+            } else {
+                path = null;
             }
         }
 
 
         checkEquals( shadowHome.getIdentifier().toExternalForm(), WEB_SERVER_IDENTIFIER + RESULT, "Wrong shadow home identifier" );
-        checkEquals( countRemaining( theMeshBase.proxies()), 1, "Wrong number of proxies" );
-        checkEquals( theMeshBase.getShadowMeshBases().size(), 1, "Wrong number of shadows" );
+        checkEquals( countRemaining( theMeshBase.proxies()), nRedirects+1, "Wrong number of proxies" );
+        checkEquals( theMeshBase.getShadowMeshBases().size(), nRedirects+1, "Wrong number of shadows" );
     }
 
     /**

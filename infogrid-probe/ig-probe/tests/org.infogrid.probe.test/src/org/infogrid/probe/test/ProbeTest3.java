@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -215,32 +215,33 @@ public class ProbeTest3
         MPingPongNetMessageEndpointFactory shadowEndpointFactoryB = MPingPongNetMessageEndpointFactory.create( exec );
         MPingPongNetMessageEndpointFactory shadowEndpointFactoryC = MPingPongNetMessageEndpointFactory.create( exec );
 
-        ShadowMeshBaseFactory theShadowFactoryA = MShadowMeshBaseFactory.create(
+        MShadowMeshBaseFactory shadowFactoryA = MShadowMeshBaseFactory.create(
                 theMeshBaseIdentifierFactory,
                 shadowEndpointFactoryA,
                 theModelBase,
-                theProbeDirectory,
                 rootContext );
-        ShadowMeshBaseFactory theShadowFactoryB = MShadowMeshBaseFactory.create(
+        MShadowMeshBaseFactory shadowFactoryB = MShadowMeshBaseFactory.create(
                 theMeshBaseIdentifierFactory,
                 shadowEndpointFactoryB,
                 theModelBase,
-                theProbeDirectory,
                 rootContext );
-        ShadowMeshBaseFactory theShadowFactoryC = MShadowMeshBaseFactory.create(
+        MShadowMeshBaseFactory shadowFactoryC = MShadowMeshBaseFactory.create(
                 theMeshBaseIdentifierFactory,
                 shadowEndpointFactoryC,
                 theModelBase,
-                theProbeDirectory,
                 rootContext );
         
-        theProbeManagerA = MPassiveProbeManager.create( theShadowFactoryA );
-        theProbeManagerB = MPassiveProbeManager.create( theShadowFactoryB );
-        theProbeManagerC = MPassiveProbeManager.create( theShadowFactoryC );
+        theProbeManagerA = MPassiveProbeManager.create( shadowFactoryA, theProbeDirectory );
+        theProbeManagerB = MPassiveProbeManager.create( shadowFactoryB, theProbeDirectory );
+        theProbeManagerC = MPassiveProbeManager.create( shadowFactoryC, theProbeDirectory );
 
         shadowEndpointFactoryA.setNameServer( theProbeManagerA.getNetMeshBaseNameServer() );
         shadowEndpointFactoryB.setNameServer( theProbeManagerB.getNetMeshBaseNameServer() );
         shadowEndpointFactoryC.setNameServer( theProbeManagerC.getNetMeshBaseNameServer() );
+
+        shadowFactoryA.setProbeManager( theProbeManagerA );
+        shadowFactoryB.setProbeManager( theProbeManagerB );
+        shadowFactoryC.setProbeManager( theProbeManagerC );
     }
 
     /**

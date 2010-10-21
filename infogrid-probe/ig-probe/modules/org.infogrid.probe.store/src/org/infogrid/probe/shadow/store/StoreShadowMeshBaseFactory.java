@@ -14,20 +14,19 @@
 
 package org.infogrid.probe.shadow.store;
 
-import java.text.ParseException;
 import org.infogrid.meshbase.net.DefaultNetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
-import org.infogrid.meshbase.net.NetMeshBaseRedirectException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.probe.ProbeDirectory;
-import org.infogrid.probe.ProbeException;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
+import org.infogrid.probe.httpmapping.TraditionalInfoGridHttpMappingPolicy;
 import org.infogrid.probe.shadow.AbstractShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
+import org.infogrid.probe.shadow.ShadowParameters;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.prefixing.IterablePrefixingStore;
 import org.infogrid.util.FactoryException;
@@ -59,7 +58,6 @@ public class StoreShadowMeshBaseFactory
             NetMeshBaseIdentifierFactory            meshBaseIdentifierFactory,
             ProxyMessageEndpointFactory             endpointFactory,
             ModelBase                               modelBase,
-            ProbeDirectory                          probeDirectory,
             IterableStore                           shadowStore,
             IterableStore                           shadowProxyStore,
             Context                                 context )
@@ -68,7 +66,6 @@ public class StoreShadowMeshBaseFactory
                 meshBaseIdentifierFactory,
                 endpointFactory,
                 modelBase,
-                probeDirectory,
                 shadowStore,
                 shadowProxyStore,
                 context );
@@ -80,7 +77,6 @@ public class StoreShadowMeshBaseFactory
      * @param meshBaseIdentifierFactory the factory for NetMeshBaseIdentifiers
      * @param modelBase the ModelBase containing type information to be used by all created StoreShadowMeshBases
      * @param endpointFactory factory for communications endpoints, to be used by all created StoreShadowMeshBase
-     * @param probeDirectory the ProbeDirectory to use for all Probes
      * @param shadowStore the Store in which the ShadowMeshBases will be stored
      * @param shadowProxyStore the Store in which the ShadowMeshBases' Proxies will be stored
      * @param context the Context in which this all created MShadowMeshBases will run.
@@ -89,14 +85,12 @@ public class StoreShadowMeshBaseFactory
             NetMeshBaseIdentifierFactory            meshBaseIdentifierFactory,
             ProxyMessageEndpointFactory             endpointFactory,
             ModelBase                               modelBase,
-            ProbeDirectory                          probeDirectory,
             IterableStore                           shadowStore,
             IterableStore                           shadowProxyStore,
             Context                                 context )
     {
         super(  endpointFactory,
                 modelBase,
-                probeDirectory,
                 theResourceHelper.getResourceLongOrDefault( "TimeNotNeededTillExpires", 10L * 60L * 1000L ), // 10 minutes
                 context );
         
@@ -119,6 +113,11 @@ public class StoreShadowMeshBaseFactory
         throws
             FactoryException
     {
+        HttpMappingPolicy mappingPolicy
+                = argument instanceof ShadowParameters
+                ? ((ShadowParameters)argument).getHttpMappingPolicy()
+                : theProbeManager.getHttpMappingPolicy();
+
         NetMeshObjectAccessSpecificationFactory theNetMeshObjectAccessSpecificationFactory = DefaultNetMeshObjectAccessSpecificationFactory.create(
                 key,
                 theMeshBaseIdentifierFactory );
@@ -132,8 +131,9 @@ public class StoreShadowMeshBaseFactory
                 theEndpointFactory,
                 theModelBase,
                 null,
-                theProbeDirectory,
+                theProbeManager.getProbeDirectory(),
                 theTimeNotNeededTillExpires,
+                mappingPolicy,
                 thisProxyStore,
                 theMeshBaseContext );
         
@@ -142,16 +142,6 @@ public class StoreShadowMeshBaseFactory
         Long next; // out here for debugging
         try {
             next = ret.doUpdateNow( argument );
-
-        } catch( ProbeException.HttpRedirectResponse ex ) {
-            try {
-                NetMeshBaseIdentifier newLocationIdentifier = theMeshBaseIdentifierFactory.fromExternalForm( key, ex.getLocation() );
-
-                throw new FactoryException( this, new NetMeshBaseRedirectException( key, newLocationIdentifier, ex ) );
-
-            } catch( ParseException ex2 ) {
-                throw new FactoryException( this, ex2 ); // is that the right cause?
-            }
 
         } catch( Throwable ex ) {
             throw new FactoryException( this, ex );
@@ -182,8 +172,9 @@ public class StoreShadowMeshBaseFactory
                 theEndpointFactory,
                 theModelBase,
                 null,
-                theProbeDirectory,
+                theProbeManager.getProbeDirectory(),
                 theTimeNotNeededTillExpires,
+                TraditionalInfoGridHttpMappingPolicy.SINGLETON, // FIXME?
                 thisProxyStore,
                 theMeshBaseContext );
         

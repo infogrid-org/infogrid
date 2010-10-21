@@ -46,6 +46,7 @@ import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.meshbase.MeshObjectsNotFoundException;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.IterableNetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
@@ -76,6 +77,7 @@ import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseEvent;
 import org.infogrid.probe.shadow.ShadowMeshBaseListener;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.shadow.m.MStagingMeshBase;
 import org.infogrid.probe.xml.DomMeshObjectSetProbe;
 import org.infogrid.probe.xml.MeshObjectSetProbeTags;
@@ -116,15 +118,38 @@ public class ProbeDispatcher
             ProbeDirectory        directory,
             long                  timeCreated,
             long                  timeNotNeededTillExpires,
+            HttpMappingPolicy     mappingPolicy,
             ModuleRegistry        registry )
     {
         theShadowMeshBase           = meshBase;
         theProbeDirectory           = directory;
         theTimeCreated              = timeCreated;
         theTimeNotNeededTillExpires = timeNotNeededTillExpires;
+        theMappingPolicy            = mappingPolicy;
         theModuleRegistry           = registry;
     }
-    
+
+    /**
+     * Update the HTTP mapping policy.
+     *
+     * @param newValue the new value
+     */
+    public void setHttpMappingPolicy(
+            HttpMappingPolicy newValue )
+    {
+        theMappingPolicy = newValue;
+    }
+
+    /**
+     * Obtain the current HTTP mapping policy.
+     *
+     * @return the mapping policy
+     */
+    public HttpMappingPolicy getHttpMappingPolicy()
+    {
+        return theMappingPolicy;
+    }
+
     /**
      * Calling this will trigger the Probe to run.
      *
@@ -149,7 +174,6 @@ public class ProbeDispatcher
         NetMeshBaseIdentifier  sourceIdentifier = theShadowMeshBase.getIdentifier();
         ProbeResult            probeResult      = null;
         CoherenceSpecification coherence        = par != null ? par.getCoherenceSpecification() : null;
-        boolean                followRedirects  = par != null ? par.getFollowRedirects() : true; // FIXME? Good default?
 
         theCurrentUpdate = System.currentTimeMillis();
         
@@ -197,7 +221,7 @@ public class ProbeDispatcher
                 if( isDirectory ) {
                     probeResult = handleDirectory( oldBase, newBase, coherence );
                 } else if( isStream ) {
-                    probeResult = handleStream( oldBase, newBase, coherence, followRedirects );
+                    probeResult = handleStream( oldBase, newBase, coherence, theMappingPolicy );
                 } else {
                     probeResult = handleApi( oldBase, newBase, coherence );
                 }
@@ -212,6 +236,14 @@ public class ProbeDispatcher
             } catch( IOException ex ) {
                 problem = ex;
                 throw new ProbeException.IO( sourceIdentifier, ex );
+
+            } catch( MeshObjectsNotFoundException ex ) {
+                problem = ex;
+                throw new ProbeException.Other( sourceIdentifier, ex ); // FIXME
+
+            } catch( NotPermittedException ex ) {
+                problem = ex;
+                throw new ProbeException.Other( sourceIdentifier, ex ); // FIXME
 
             } catch( TransactionException ex ) {
                 problem = ex;
@@ -456,7 +488,6 @@ public class ProbeDispatcher
      * @param oldBase the StagingMeshBase after the most recent successful run, if any
      * @param newBase the new StagingMeshBase into which to instantiate the data
      * @param coherence the CoherenceSpecification specified by the client, if any
-     * @param followRedirects if true, silently follow HTTP redirects; if false, throw ProbeException.HttpRedirectResponse
      * @return the ProbeResult
      * @throws ProbeException thrown if unable to compute a result
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
@@ -467,10 +498,12 @@ public class ProbeDispatcher
             StagingMeshBase        oldBase,
             StagingMeshBase        newBase,
             CoherenceSpecification coherence,
-            boolean                followRedirects )
+            HttpMappingPolicy      mappingPolicy )
         throws
             ProbeException,
+            MeshObjectsNotFoundException,
             TransactionException,
+            NotPermittedException,
             ParseException,
             IOException
     {
@@ -491,6 +524,9 @@ public class ProbeDispatcher
         long streamDataCreated      = 0L;
         long streamDataLastModified = 0L;
 
+        NetMeshObject newHome = newBase.getHomeObject();
+        HTTP.Response httpResponse = null;
+
         if ( "file".equals( protocol )) {
             File dataSourceFile = new File( url.getFile() );
             streamDataCreated      = dataSourceFile.lastModified(); // FIXME? No API for that ...
@@ -501,18 +537,14 @@ public class ProbeDispatcher
 
         } else if( "http".equals( protocol ) || "https".equals( protocol ) ) {
 
-            HTTP.Response httpResponse = HTTP.http_get(
+            httpResponse = HTTP.http_get(
                     url,
                     XRDS_MIME_TYPE + "," + HTTP_GET_ACCEPT_HEADER,
-                    followRedirects,
+                    false,
                     null, // no cookies
                     HTTP.HTTP_CONNECT_TIMEOUT,
                     HTTP.HTTP_READ_TIMEOUT,
                     theShadowMeshBase.getHostnameVerifier() );
-
-            if( httpResponse.isRedirect() ) {
-                throw new ProbeException.HttpRedirectResponse( sourceIdentifier, httpResponse.getResponseCode(), httpResponse.getLocation() );
-            }
 
             if( httpResponse.isSuccess() && XRDS_MIME_TYPE.equals( httpResponse.getContentType() )) {
                 // found XRDS content via MIME type
@@ -524,14 +556,11 @@ public class ProbeDispatcher
                 httpResponse = HTTP.http_get(
                         url,
                         HTTP_GET_ACCEPT_HEADER,
-                        followRedirects,
+                        false,
                         null, // no cookies
                         HTTP.HTTP_CONNECT_TIMEOUT,
                         HTTP.HTTP_READ_TIMEOUT,
                         theShadowMeshBase.getHostnameVerifier() );
-                if( httpResponse.isRedirect() ) {
-                    throw new ProbeException.HttpRedirectResponse( sourceIdentifier, httpResponse.getResponseCode(), httpResponse.getLocation() );
-                }
 
                 if( yadisServicesXml != null && ArrayHelper.equals( yadisServicesXml, httpResponse.getContent() )) {
                     // directly served the XRDS, HTTP_GET_ACCEPT_HEADER made no difference
@@ -544,13 +573,13 @@ public class ProbeDispatcher
                     yadisUrl = httpResponse.getSingleHttpHeaderField( "X-YADIS-Location" );
                 }
             }
+            HTTP.Response newResponse = mappingPolicy.processHttpResponse( newHome, httpResponse );
+            if( newResponse != null ) {
+                httpResponse = newResponse;
+            }
             
             streamDataCreated      = httpResponse.getLastModified(); // FIXME? No API for that ...
             streamDataLastModified = httpResponse.getLastModified();
-
-            if( !httpResponse.isSuccess() && yadisServicesXml == null ) {
-                throw new ProbeException.HttpErrorResponse( sourceIdentifier, httpResponse.getResponseCode() );
-            }
 
             content     = httpResponse.getContent();
             contentType = httpResponse.getContentType();
@@ -577,15 +606,11 @@ public class ProbeDispatcher
         theMostRecentModificationDate = streamDataLastModified;
 
         if( updated ) {
-            if( content == null || content.length == 0 ) {
-                throw new ProbeException.EmptyDataSource( sourceIdentifier );
-            }
-
             if( log.isDebugEnabled() ) {
                 log.debug( this + " in handleStream(): content type is " + contentType );
             }
 
-            if( contentType == null || UNKNOWN_MIME_TYPE.equals( contentType )) {
+            if( contentType  == null || UNKNOWN_MIME_TYPE.equals( contentType )) {
                 contentType = ProbeDispatcher.guessContentTypeFromUrl( url );
 
             } else if( "text/xml".equals( contentType )) {
@@ -608,38 +633,52 @@ public class ProbeDispatcher
                 log.debug( this + " in handleStream(): content type is " + contentType );
             }
 
-            try {
-                newBase.getHomeObject().bless( WebSubjectArea.WEBRESOURCE );
+            if( httpResponse != null ) {
+                try {
+                    newHome.bless( WebSubjectArea.WEBRESOURCE );
+                    newHome.setPropertyValue(
+                            WebSubjectArea.WEBRESOURCE_HTTPSTATUSCODE,
+                            IntegerValue.parseIntegerValue( httpResponse.getResponseCode() ));
+                    if( httpResponse.isRedirect() ) {
+                        newHome.setPropertyValue(
+                                WebSubjectArea.WEBRESOURCE_HTTPHEADERLOCATION,
+                                StringValue.create( httpResponse.getLocation() ));
+                    }
 
-            } catch( EntityBlessedAlreadyException ex ) {
-                log.error( ex );
-            } catch( IsAbstractException ex ) {
-                log.error( ex );
-            } catch( NotPermittedException ex ) {
-                log.error( ex );
+                } catch( EntityBlessedAlreadyException ex ) {
+                    log.error( ex );
+                } catch( IsAbstractException ex ) {
+                    log.error( ex );
+                } catch( IllegalPropertyTypeException ex ) {
+                    log.error( ex );
+                } catch( IllegalPropertyValueException ex ) {
+                    log.error( ex );
+                } catch( NotPermittedException ex ) {
+                    log.error( ex );
+                }
             }
 
-            InputStream inStream = new ByteArrayInputStream( content );
-            try {
-                if( XML_MIME_TYPE_PATTERN.matcher( contentType ).matches()) {
-                    probe = handleXml(
-                            oldBase,
-                            newBase,
-                            coherence,
-                            content,
-                            contentType,
-                            inStream );
-                } else {
-                    probe = handleNonXml(
-                            oldBase,
-                            newBase,
-                            coherence,
-                            contentType,
-                            inStream );
-                }
-            } catch( ProbeException.DontHaveProbe ex ) {
-                if( yadisServicesXml == null && yadisServicesHtml == null && yadisUrl == null ) {
-                    throw ex; // if we have Yadis services, don't throw this exception
+            if( content != null ) {
+                InputStream inStream = new ByteArrayInputStream( content );
+                try {
+                    if( contentType != null && XML_MIME_TYPE_PATTERN.matcher( contentType ).matches()) {
+                        probe = handleXml(
+                                oldBase,
+                                newBase,
+                                coherence,
+                                content,
+                                contentType,
+                                inStream );
+                    } else {
+                        probe = handleNonXml(
+                                oldBase,
+                                newBase,
+                                coherence,
+                                contentType,
+                                inStream );
+                    }
+                } catch( ProbeException ex ) {
+                    mappingPolicy.handleProbeException( ex, newHome, yadisServicesXml != null || yadisServicesHtml != null || yadisUrl != null );
                 }
             }
 
@@ -2008,6 +2047,11 @@ public class ProbeDispatcher
       * The directory of all Probes that we know.
       */
     protected ProbeDirectory theProbeDirectory;
+
+    /**
+     * The policy how to map HTTP status codes into the InfoGrid world.
+     */
+    protected HttpMappingPolicy theMappingPolicy;
 
     /**
      * The registry of all known Modules, or null if not present.

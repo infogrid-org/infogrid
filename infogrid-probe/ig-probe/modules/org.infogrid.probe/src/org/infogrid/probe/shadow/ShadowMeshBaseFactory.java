@@ -16,7 +16,6 @@ package org.infogrid.probe.shadow;
 
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
-
 import org.infogrid.util.Factory;
 
 /**

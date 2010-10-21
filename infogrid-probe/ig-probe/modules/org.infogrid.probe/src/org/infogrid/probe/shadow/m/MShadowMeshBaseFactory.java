@@ -14,19 +14,17 @@
 
 package org.infogrid.probe.shadow.m;
 
-import java.text.ParseException;
 import org.infogrid.meshbase.net.DefaultNetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
-import org.infogrid.meshbase.net.NetMeshBaseRedirectException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.probe.ProbeDirectory;
-import org.infogrid.probe.ProbeException;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.shadow.AbstractShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.ShadowMeshBase;
+import org.infogrid.probe.shadow.ShadowParameters;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.context.Context;
@@ -44,7 +42,6 @@ public class MShadowMeshBaseFactory
      * @param meshBaseIdentifierFactory the factory for NetMeshBaseIdentifiers
      * @param endpointFactory factory for communications endpoints, to be used by all created MShadowMeshBases
      * @param modelBase the ModelBase containing type information to be used by all created MShadowMeshBases
-     * @param probeDirectory the ProbeDirectory to use for all Probes
      * @param context the Context in which this all created MShadowMeshBases will run.
      * @return the created MShadowMeshBaseFactory
      */
@@ -52,14 +49,12 @@ public class MShadowMeshBaseFactory
             NetMeshBaseIdentifierFactory            meshBaseIdentifierFactory,
             ProxyMessageEndpointFactory             endpointFactory,
             ModelBase                               modelBase,
-            ProbeDirectory                          probeDirectory,
             Context                                 context )
     {
         return new MShadowMeshBaseFactory(
                 meshBaseIdentifierFactory,
                 endpointFactory,
                 modelBase,
-                probeDirectory,
                 context );
     }
 
@@ -73,15 +68,13 @@ public class MShadowMeshBaseFactory
      * @param context the Context in which this all created MShadowMeshBases will run.
      */
     protected MShadowMeshBaseFactory(
-            NetMeshBaseIdentifierFactory            meshBaseIdentifierFactory,
-            ProxyMessageEndpointFactory             endpointFactory,
-            ModelBase                               modelBase,
-            ProbeDirectory                          probeDirectory,
-            Context                                 context )
+            NetMeshBaseIdentifierFactory meshBaseIdentifierFactory,
+            ProxyMessageEndpointFactory  endpointFactory,
+            ModelBase                    modelBase,
+            Context                      context )
     {
         super(  endpointFactory,
                 modelBase,
-                probeDirectory,
                 theResourceHelper.getResourceLongOrDefault( "TimeNotNeededTillExpires", 10L * 60L * 1000L ), // 10 minutes
                 context );
         
@@ -101,6 +94,11 @@ public class MShadowMeshBaseFactory
         throws
             FactoryException
     {
+        HttpMappingPolicy mappingPolicy
+                = argument instanceof ShadowParameters
+                ? ((ShadowParameters)argument).getHttpMappingPolicy()
+                : theProbeManager.getHttpMappingPolicy();
+
         NetMeshObjectAccessSpecificationFactory theNetMeshObjectAccessSpecificationFactory = DefaultNetMeshObjectAccessSpecificationFactory.create(
                 key,
                 theMeshBaseIdentifierFactory );
@@ -112,8 +110,9 @@ public class MShadowMeshBaseFactory
                 theEndpointFactory,
                 theModelBase,
                 null,
-                theProbeDirectory,
+                theProbeManager.getProbeDirectory(),
                 theTimeNotNeededTillExpires,
+                mappingPolicy,
                 theMeshBaseContext );
         
         ret.setFactory( this );
@@ -121,16 +120,6 @@ public class MShadowMeshBaseFactory
         Long next; // put out here for easier debugging
         try {
             next = ret.doUpdateNow( argument );
-
-        } catch( ProbeException.HttpRedirectResponse ex ) {
-            try {
-                NetMeshBaseIdentifier newLocationIdentifier = theMeshBaseIdentifierFactory.fromExternalForm( key, ex.getLocation() );
-
-                throw new FactoryException( this, new NetMeshBaseRedirectException( key, newLocationIdentifier, ex ) );
-
-            } catch( ParseException ex2 ) {
-                throw new FactoryException( this, ex2 ); // is that the right cause?
-            }
 
         } catch( Throwable ex ) {
             throw new FactoryException( this, ex );

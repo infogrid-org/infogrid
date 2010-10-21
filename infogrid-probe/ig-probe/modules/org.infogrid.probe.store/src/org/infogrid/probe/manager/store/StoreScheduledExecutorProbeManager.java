@@ -8,13 +8,16 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.probe.manager.store;
 
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.probe.ProbeDirectory;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
+import org.infogrid.probe.httpmapping.TraditionalInfoGridHttpMappingPolicy;
 import org.infogrid.probe.manager.ScheduledExecutorProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.store.StoreShadowMeshBaseFactory;
@@ -34,18 +37,37 @@ public class StoreScheduledExecutorProbeManager
      * Factory method.
      *
      * @param delegate the underlying factory for StoreShadowMeshBases
+     * @param dir the ProbeDirectory to use
      * @param shadowStore the Store in which serialized ShadowMeshBases are kept
      * @return the created StoreScheduledExecutorProbeManager
      */
     public static StoreScheduledExecutorProbeManager create(
             StoreShadowMeshBaseFactory delegate,
+            ProbeDirectory             dir,
             IterableStore              shadowStore )
+    {
+        return create( delegate, shadowStore, dir, TraditionalInfoGridHttpMappingPolicy.SINGLETON );
+    }
+    /**
+     * Factory method.
+     *
+     * @param delegate the underlying factory for StoreShadowMeshBases
+     * @param shadowStore the Store in which serialized ShadowMeshBases are kept
+     * @param dir the ProbeDirectory to use
+     * @param httpMappingPolicy the policy by which HTTP responses are mapped into the InfoGrid world
+     * @return the created StoreScheduledExecutorProbeManager
+     */
+    public static StoreScheduledExecutorProbeManager create(
+            StoreShadowMeshBaseFactory delegate,
+            IterableStore              shadowStore,
+            ProbeDirectory             dir,
+            HttpMappingPolicy          httpMappingPolicy )
     {
         StoreProbeManagerMapper theMapper = new StoreProbeManagerMapper( delegate );
 
         IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = IterableStoreBackedSwappingHashMap.createWeak( theMapper, shadowStore );
 
-        StoreScheduledExecutorProbeManager ret = new StoreScheduledExecutorProbeManager( delegate, storage );
+        StoreScheduledExecutorProbeManager ret = new StoreScheduledExecutorProbeManager( delegate, storage, dir, httpMappingPolicy );
 
         return ret;
     }
@@ -55,12 +77,16 @@ public class StoreScheduledExecutorProbeManager
      * 
      * @param delegate the underlying factory for StoreShadowMeshBases
      * @param storage the storage to use
+     * @param dir the ProbeDirectory to use
+     * @param httpMappingPolicy the policy by which HTTP responses are mapped into the InfoGrid world
      */
     protected StoreScheduledExecutorProbeManager(
             StoreShadowMeshBaseFactory                                               delegate,
-            IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage )
+            IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage,
+            ProbeDirectory                                                           dir,
+            HttpMappingPolicy                                                        httpMappingPolicy )
     {
-        super( delegate, storage );
+        super( delegate, storage, dir, httpMappingPolicy );
 
         theMapListener = new MyMapListener();
         storage.addWeakSwappingHashMapListener( theMapListener ); // this must be weak 

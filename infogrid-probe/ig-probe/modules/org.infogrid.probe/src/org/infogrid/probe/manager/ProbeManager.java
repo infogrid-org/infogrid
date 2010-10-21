@@ -20,6 +20,8 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseNameServer;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.meshbase.net.xpriso.logging.XprisoMessageLogger;
+import org.infogrid.probe.ProbeDirectory;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
 import org.infogrid.util.FactoryException;
@@ -48,6 +50,13 @@ public interface ProbeManager
             FactoryException;
 
     /**
+     * Get the ProbeDirectory for this ProbeManager.
+     *
+     * @return the ProbeDirectory
+     */
+    public ProbeDirectory getProbeDirectory();
+
+    /**
      * Set the main MeshBase for which this ProbeManager manages the Probes.
      *
      * @param main the main MeshBase.
@@ -61,7 +70,22 @@ public interface ProbeManager
      * @return the NameServer
      */
     public NetMeshBaseNameServer<NetMeshBaseIdentifier,NetMeshBase> getNetMeshBaseNameServer();
-    
+
+    /**
+     * Set the policy by which the Probe framework maps HTTP status codes to XPRISO.
+     *
+     * @param newValue the new policy
+     */
+    public void setHttpMappingPolicy(
+            HttpMappingPolicy newValue );
+
+    /**
+     * Obtain the policy by which the Probe framework maps HTTP status codes to XPRISO.
+     *
+     * @return the current policy
+     */
+    public HttpMappingPolicy getHttpMappingPolicy();
+
     /**
      * Tell this ProbeManager that it is not needed any more.
      * 

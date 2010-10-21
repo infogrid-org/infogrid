@@ -41,7 +41,6 @@ import org.infogrid.probe.ApiProbe;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;
-import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.manager.ScheduledExecutorProbeManager;
 import org.infogrid.probe.manager.m.MScheduledExecutorProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
@@ -133,9 +132,16 @@ public class ProbeUpdateCalculatorTest1
             Exception
     {
         theInvokedAt = new ArrayList<Long>();
-        
-        ScheduledExecutorProbeManager noChangeProbeManager = MScheduledExecutorProbeManager.create( theShadowFactory );
+
+        MShadowMeshBaseFactory noChangeShadowFactory = MShadowMeshBaseFactory.create(
+                theMeshBaseIdentifierFactory,
+                theShadowEndpointFactory,
+                theModelBase,
+                rootContext );
+
+        ScheduledExecutorProbeManager noChangeProbeManager = MScheduledExecutorProbeManager.create( noChangeShadowFactory, theProbeDirectory );
         theShadowEndpointFactory.setNameServer( noChangeProbeManager.getNetMeshBaseNameServer() );
+        noChangeShadowFactory.setProbeManager( noChangeProbeManager );
         noChangeProbeManager.start( theExec );
 
         log.info( "Starting NoChange test for " + coherence );
@@ -157,8 +163,15 @@ public class ProbeUpdateCalculatorTest1
         
         theInvokedAt = new ArrayList<Long>();
 
-        ScheduledExecutorProbeManager changeProbeManager = MScheduledExecutorProbeManager.create( theShadowFactory );
+        MShadowMeshBaseFactory changeShadowFactory = MShadowMeshBaseFactory.create(
+                theMeshBaseIdentifierFactory,
+                theShadowEndpointFactory,
+                theModelBase,
+                rootContext );
+
+        ScheduledExecutorProbeManager changeProbeManager = MScheduledExecutorProbeManager.create( noChangeShadowFactory, theProbeDirectory );
         theShadowEndpointFactory.setNameServer( changeProbeManager.getNetMeshBaseNameServer() );
+        changeShadowFactory.setProbeManager( changeProbeManager );
         changeProbeManager.start( theExec );
 
         log.info( "Starting WithChange test for " + coherence );
@@ -248,14 +261,6 @@ public class ProbeUpdateCalculatorTest1
         theProbeDirectory.addExactUrlMatch( new ProbeDirectory.ExactMatchDescriptor(
                 theChangingDataSource.toExternalForm(),
                 ChangingProbe.class ));
-
-        theShadowFactory = MShadowMeshBaseFactory.create(
-                theMeshBaseIdentifierFactory,
-                theShadowEndpointFactory,
-                theModelBase,
-                theProbeDirectory,
-                rootContext );
-        
     }
 
     /**
@@ -270,17 +275,10 @@ public class ProbeUpdateCalculatorTest1
     // Our Logger
     private static Log log = Log.getLogInstance( ProbeUpdateCalculatorTest1.class );
 
-    /**
-     * The ProbeDirectory to use.
-     */
-    protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
-
     protected ScheduledExecutorService theExec = Executors.newSingleThreadScheduledExecutor();
     
     protected MPingPongNetMessageEndpointFactory theShadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( theExec );
 
-    protected ShadowMeshBaseFactory theShadowFactory;
-    
     protected static ArrayList<Long> theInvokedAt;
     protected static long theStartTime;
 

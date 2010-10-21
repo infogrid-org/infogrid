@@ -180,15 +180,15 @@ public class ProbeTest1
 
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 
-        ShadowMeshBaseFactory theShadowFactory = MShadowMeshBaseFactory.create(
+        MShadowMeshBaseFactory theShadowFactory = MShadowMeshBaseFactory.create(
                 theMeshBaseIdentifierFactory,
                 shadowEndpointFactory,
                 theModelBase,
-                theProbeDirectory,
                 rootContext );
         
-        theProbeManager1 = MPassiveProbeManager.create( theShadowFactory );
+        theProbeManager1 = MPassiveProbeManager.create( theShadowFactory, theProbeDirectory );
         shadowEndpointFactory.setNameServer( theProbeManager1.getNetMeshBaseNameServer() );
+        theShadowFactory.setProbeManager( theProbeManager1 );
     }
 
     /**

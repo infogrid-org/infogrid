@@ -46,7 +46,6 @@ import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.manager.ScheduledExecutorProbeManager;
 import org.infogrid.probe.manager.m.MScheduledExecutorProbeManager;
-import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.m.MShadowMeshBaseFactory;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.FactoryException;
@@ -76,14 +75,13 @@ public class ProbeTest7
         // need to instrument the NetMeshBase
         final MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 
-        ShadowMeshBaseFactory delegate = MShadowMeshBaseFactory.create(
+        MShadowMeshBaseFactory delegate = MShadowMeshBaseFactory.create(
                 theMeshBaseIdentifierFactory,
                 shadowEndpointFactory,
                 theModelBase,
-                theProbeDirectory,
                 rootContext );
 
-        ScheduledExecutorProbeManager probeManager = MScheduledExecutorProbeManager.create( delegate );
+        ScheduledExecutorProbeManager probeManager = MScheduledExecutorProbeManager.create( delegate, theProbeDirectory );
 
         shadowEndpointFactory.setNameServer( probeManager.getNetMeshBaseNameServer() );
 
@@ -249,7 +247,7 @@ public class ProbeTest7
     static int probeRunCounter = 0;
 
     // Our Logger
-    private static Log log = Log.getLogInstance(ProbeTest7.class);
+    private static final Log log = Log.getLogInstance(ProbeTest7.class);
 
     /**
      * The ProbeDirectory to use.

@@ -8,31 +8,24 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.probe.feeds.test.rss;
 
 import java.io.File;
-import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.model.Feeds.FeedsSubjectArea;
 import org.infogrid.model.Web.WebSubjectArea;
-import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.Probe.ProbeSubjectArea;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.feeds.test.AbstractFeedTest;
 import org.infogrid.probe.feeds.rss.RssProbe;
-import org.infogrid.probe.manager.PassiveProbeManager;
-import org.infogrid.probe.manager.m.MPassiveProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
-import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
-import org.infogrid.probe.shadow.m.MShadowMeshBaseFactory;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -64,7 +57,6 @@ public class RssTest1
         checkEqualsOutOfSequence(
                 home1.getTypes(),
                 new EntityType[] {
-                        WebSubjectArea.WEBRESOURCE,
                         FeedsSubjectArea.RSSFEED,
                         ProbeSubjectArea.ONETIMEONLYPROBEUPDATESPECIFICATION },
                 "home object has wrong type" );
@@ -137,29 +129,6 @@ public class RssTest1
         testFile1Id = theMeshBaseIdentifierFactory.obtain( new File( testFile1 ) );
 
         theProbeDirectory.addXmlDomProbe( new ProbeDirectory.XmlDomProbeDescriptor( null, null, "rss", RssProbe.class ));
-        
-        MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
-
-        ShadowMeshBaseFactory theShadowFactory = MShadowMeshBaseFactory.create(
-                theMeshBaseIdentifierFactory,
-                shadowEndpointFactory,
-                theModelBase,
-                theProbeDirectory,
-                rootContext );
-        
-        theProbeManager1 = MPassiveProbeManager.create( theShadowFactory );
-        shadowEndpointFactory.setNameServer( theProbeManager1.getNetMeshBaseNameServer() );
-    }
-
-    /**
-     * Clean up after the test.
-     */
-    @Override
-    public void cleanup()
-    {
-        theProbeManager1 = null;
-
-        exec.shutdown();
     }
 
     // Our Logger
@@ -174,14 +143,4 @@ public class RssTest1
      * The NetworkIdentifer of the first test file.
      */
     protected NetMeshBaseIdentifier testFile1Id;
-    
-    /**
-     * The ProbeManager that we use for the first Probe.
-     */
-    protected PassiveProbeManager theProbeManager1;
-
-    /**
-     * Our ThreadPool.
-     */
-    protected ScheduledExecutorService exec = createThreadPool( 1 );
 }

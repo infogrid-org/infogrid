@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -150,13 +150,13 @@ public class LocalNetStoreMeshBase
                 netMeshObjectAccessSpecificationFactory.getNetMeshBaseIdentifierFactory(),
                 shadowEndpointFactory,
                 modelBase,
-                probeDirectory,
                 shadowStore,
                 shadowProxyStore,
                 context );
 
-        StoreScheduledExecutorProbeManager probeManager = StoreScheduledExecutorProbeManager.create( delegate, shadowStore );
+        StoreScheduledExecutorProbeManager probeManager = StoreScheduledExecutorProbeManager.create( delegate, probeDirectory, shadowStore );
         shadowEndpointFactory.setNameServer( probeManager.getNetMeshBaseNameServer() );
+        delegate.setProbeManager( probeManager );
 
         MPingPongNetMessageEndpointFactory endpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactory.setNameServer( probeManager.getNetMeshBaseNameServer() );
