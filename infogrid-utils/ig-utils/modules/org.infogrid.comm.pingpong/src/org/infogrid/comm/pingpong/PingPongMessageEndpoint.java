@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -30,7 +30,7 @@ import org.infogrid.util.logging.Log;
 
 /**
  * <p>Endpoint for bidirectional communications using the ping-pong protocol.
- *    This is abstract: subclasses need to implement the atual message transfer mechanism.</p>
+ *    This is abstract: subclasses need to implement the actual message transfer mechanism.</p>
  * <p>In order to avoid difficult timing conditions, all time constants are continually modified with
  *    a slight, random delta.</p>
  * <p>This class supports a regular and a low-level logger, which reflect application-developer
@@ -254,7 +254,7 @@ public abstract class PingPongMessageEndpoint<T>
 
         } catch( Throwable t ) {
             // catch-all
-            logHigh.error( t );
+            logHigh.error( t, this );
         }
     }
 
@@ -308,11 +308,11 @@ public abstract class PingPongMessageEndpoint<T>
                 fireEvents = true;
 
             } else {
-                logLow.warn( this + " ignoring duplicate incoming message(" + token + "): " + content );
+                logLow.warn( this + " ignoring duplicate incoming message(" + token + "): ", content, this );
             }
 
         } catch( Throwable t ) {
-            logHigh.error( t );
+            logHigh.error( t, this );
 
         } finally {
             boolean slow;

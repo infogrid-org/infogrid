@@ -25,6 +25,7 @@ import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
+import org.infogrid.util.logging.ToStringDumper;
 
 /**
  * In-memory implementation of PingPongMessageEndpoint. This implementation supports
@@ -430,7 +431,8 @@ public class MPingPongMessageEndpoint<T>
                     "theLastReceivedToken",
                     "theLastSentToken",
                     "theFutureTask",
-                    "theMessagesToBeSent"
+                    "theMessagesToBeSent",
+                    "theParter"
                 },
                 new Object[] {
                     theName,
@@ -438,7 +440,8 @@ public class MPingPongMessageEndpoint<T>
                     theLastReceivedToken,
                     theLastSentToken,
                     theFutureTask,
-                    theMessagesToBeSent
+                    theMessagesToBeSent,
+                    thePartner
                 });
     }
 
