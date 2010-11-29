@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -238,4 +238,12 @@ public interface CursorIterator<E>
             CursorIterator<E> position )
         throws
             IllegalArgumentException;
+
+    /**
+     * Determine the type of array that is returned by the iteration methods that
+     * return arrays.
+     *
+     * @return the type of array
+     */
+    public Class<E> getArrayComponentType();
 }

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -580,6 +580,17 @@ public abstract class MapCursorIterator<K,V>
         {
             return iterator();
         }
+
+        /**
+         * Determine the type of array that is returned by the iteration methods that
+         * return arrays.
+         *
+         * @return the type of array
+         */
+        public Class<K> getArrayComponentType()
+        {
+            return theKeyArrayComponentType;
+        }
     }
 
     /**
@@ -796,6 +807,17 @@ public abstract class MapCursorIterator<K,V>
         public final CursorIterator<V> getIterator()
         {
             return iterator();
+        }
+
+        /**
+         * Determine the type of array that is returned by the iteration methods that
+         * return arrays.
+         *
+         * @return the type of array
+         */
+        public Class<V> getArrayComponentType()
+        {
+            return theValueArrayComponentType;
         }
     }
 }
