@@ -123,10 +123,7 @@ public class MysqlStore
             return true;
                     
         } catch( Throwable ex ) {
-            // ignore
-            if( log.isDebugEnabled() ) {
-                log.debug( ex );
-            }
+            log.warn( ex );
         }
         return false;
     }
@@ -154,10 +151,7 @@ public class MysqlStore
             }.execute();
             
         } catch( Throwable ex ) {
-            // ignore
-            if( log.isInfoEnabled() ) {
-                log.info( ex );
-            }
+            log.warn( ex );
         }        
     }
     
