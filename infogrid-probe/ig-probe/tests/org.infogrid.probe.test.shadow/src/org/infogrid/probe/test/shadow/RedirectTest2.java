@@ -18,7 +18,6 @@ import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseRedirectException;
-import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.model.Web.WebSubjectArea;
 import org.infogrid.model.primitives.StringValue;
@@ -45,7 +44,7 @@ public class RedirectTest2
     {
         int nRedirects = 2;
 
-        theMeshBase.getProbeManager().setHttpMappingPolicy( JustRecordHttpMappingPolicy.SINGLETON );
+        theMeshBase.getProbeManager().getProbeDirectory().setHttpMappingPolicy( JustRecordHttpMappingPolicy.SINGLETON );
 
         // a bit complicated to get the ONE_TIME_ONLY in here
         NetMeshObjectAccessSpecification path = theMeshBase.getNetMeshObjectAccessSpecificationFactory().obtain(

@@ -15,6 +15,7 @@
 package org.infogrid.probe;
 
 import java.util.Collection;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.util.StringHelper;
 
 /**
@@ -33,6 +34,7 @@ public abstract class AbstractProbeDirectory
      * @param exactMatches the set of ExactMatchDescriptors to initialize with
      * @param patternMatches the set of PatternMatchDescriptors to initialize with
      * @param defaultStreamProbe identifies the default stream Probe to initialize with
+     * @param mappingPolicy the policy by which the Probe framework maps HTTP status codes to XPRISO
      */
     protected AbstractProbeDirectory(
             Collection<XmlDomProbeDescriptor>  xmlDomProbes,
@@ -40,7 +42,8 @@ public abstract class AbstractProbeDirectory
             Collection<ApiProbeDescriptor>     apiProbes,
             Collection<ExactMatchDescriptor>   exactMatches,
             Collection<PatternMatchDescriptor> patternMatches,
-            StreamProbeDescriptor              defaultStreamProbe )
+            StreamProbeDescriptor              defaultStreamProbe,
+            HttpMappingPolicy                  mappingPolicy )
     {
         theXmlDomProbes   = xmlDomProbes;
         theStreamProbes   = streamProbes;
@@ -49,6 +52,29 @@ public abstract class AbstractProbeDirectory
         thePatternMatches = patternMatches;
         
         theStreamDefaultProbe = defaultStreamProbe;
+
+        theHttpMappingPolicy = mappingPolicy;
+    }
+
+    /**
+     * Set the policy by which the Probe framework maps HTTP status codes to XPRISO.
+     *
+     * @param newValue the new policy
+     */
+    public void setHttpMappingPolicy(
+            HttpMappingPolicy newValue )
+    {
+        theHttpMappingPolicy = newValue;
+    }
+
+    /**
+     * Obtain the policy by which the Probe framework maps HTTP status codes to XPRISO.
+     *
+     * @return the current policy
+     */
+    public HttpMappingPolicy getHttpMappingPolicy()
+    {
+        return theHttpMappingPolicy;
     }
 
     /**
@@ -457,6 +483,11 @@ public abstract class AbstractProbeDirectory
         }
         return false;
     }
+
+    /**
+     * The policy by which HTTP responses are mapped into the InfoGrid world.
+     */
+    protected HttpMappingPolicy theHttpMappingPolicy;
 
     /**
      * The default Probe for streams, if any.

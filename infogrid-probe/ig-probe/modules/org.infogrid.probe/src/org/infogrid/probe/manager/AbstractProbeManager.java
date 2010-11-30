@@ -22,7 +22,6 @@ import org.infogrid.meshbase.net.m.NetMMeshBaseNameServer;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.meshbase.net.xpriso.logging.XprisoMessageLogger;
 import org.infogrid.probe.ProbeDirectory;
-import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
 import org.infogrid.util.CachingMap;
@@ -44,18 +43,15 @@ public abstract class AbstractProbeManager
      * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
      * @param storage the storage to use
      * @param dir the ProbeDirectory to use
-     * @param httpMappingPolicy the policy by which HTTP responses are mapped into the InfoGrid world
      */
     protected AbstractProbeManager(
             ShadowMeshBaseFactory                            delegateFactory,
             CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage,
-            ProbeDirectory                                   dir,
-            HttpMappingPolicy                                httpMappingPolicy )
+            ProbeDirectory                                   dir )
     {
         super( delegateFactory, storage );
 
-        theProbeDirectory    = dir;
-        theHttpMappingPolicy = httpMappingPolicy;
+        theProbeDirectory = dir;
     }
 
     /**
@@ -121,27 +117,6 @@ public abstract class AbstractProbeManager
     }
 
     /**
-     * Set the policy by which the Probe framework maps HTTP status codes to XPRISO.
-     *
-     * @param newValue the new policy
-     */
-    public void setHttpMappingPolicy(
-            HttpMappingPolicy newValue )
-    {
-        theHttpMappingPolicy = newValue;
-    }
-
-    /**
-     * Obtain the policy by which the Probe framework maps HTTP status codes to XPRISO.
-     *
-     * @return the current policy
-     */
-    public HttpMappingPolicy getHttpMappingPolicy()
-    {
-        return theHttpMappingPolicy;
-    }
-
-    /**
      * This overridable method allows our subclasses to invoke particular functionality
      * every time this SmartFactory created a new value by invoking the delegate Factory.
      * It is not invoked for those returned values that are merely retrieved from
@@ -197,11 +172,6 @@ public abstract class AbstractProbeManager
      * The ProbeDirectory to use.
      */
     protected ProbeDirectory theProbeDirectory;
-
-    /**
-     * The policy by which HTTP responses are mapped into the InfoGrid world.
-     */
-    protected HttpMappingPolicy theHttpMappingPolicy;
 
     /**
      * The Xpriso Message Logger to use for all ShadowMeshBases, if any.

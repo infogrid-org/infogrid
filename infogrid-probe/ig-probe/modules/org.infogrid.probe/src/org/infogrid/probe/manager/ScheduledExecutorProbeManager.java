@@ -35,7 +35,6 @@ import org.infogrid.model.Probe.ProbeSubjectArea;
 import org.infogrid.model.Probe.ProbeUpdateSpecification;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.ProbeException;
-import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
 import org.infogrid.util.CachingMap;
@@ -62,15 +61,13 @@ public abstract class ScheduledExecutorProbeManager
      * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
      * @param storage the storage to use
      * @param dir the ProbeDirectory to use
-     * @param httpMappingPolicy the policy by which HTTP responses are mapped into the InfoGrid world
      */
     protected ScheduledExecutorProbeManager(
             ShadowMeshBaseFactory                            delegateFactory,
             CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage,
-            ProbeDirectory                                   dir,
-            HttpMappingPolicy                                httpMappingPolicy )
+            ProbeDirectory                                   dir )
     {
-        super( delegateFactory, storage, dir, httpMappingPolicy );
+        super( delegateFactory, storage, dir );
 
         theExecutorService = null; // must invoke start() to start
     }

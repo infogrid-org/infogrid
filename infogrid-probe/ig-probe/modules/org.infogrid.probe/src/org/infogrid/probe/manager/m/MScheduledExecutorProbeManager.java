@@ -16,8 +16,6 @@ package org.infogrid.probe.manager.m;
 
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.probe.ProbeDirectory;
-import org.infogrid.probe.httpmapping.HttpMappingPolicy;
-import org.infogrid.probe.httpmapping.TraditionalInfoGridHttpMappingPolicy;
 import org.infogrid.probe.manager.ScheduledExecutorProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
@@ -42,24 +40,9 @@ public class MScheduledExecutorProbeManager
             ShadowMeshBaseFactory delegateFactory,
             ProbeDirectory        dir )
     {
-        return create( delegateFactory, dir, TraditionalInfoGridHttpMappingPolicy.SINGLETON );
-    }
-
-    /**
-     * Factory method.
-     *
-     * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
-     * @param httpMappingPolicy the policy by which HTTP responses are mapped into the InfoGrid world
-     * @return the created MPassiveProbeManager
-     */
-    public static MScheduledExecutorProbeManager create(
-            ShadowMeshBaseFactory delegateFactory,
-            ProbeDirectory        dir,
-            HttpMappingPolicy     httpMappingPolicy )
-    {
         CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = MCachingHashMap.create();
 
-        MScheduledExecutorProbeManager ret = new MScheduledExecutorProbeManager( delegateFactory, storage, dir, httpMappingPolicy );
+        MScheduledExecutorProbeManager ret = new MScheduledExecutorProbeManager( delegateFactory, storage, dir );
 
         return ret;
     }
@@ -70,14 +53,12 @@ public class MScheduledExecutorProbeManager
      * @param delegateFactory the delegate ShadowMeshBaseFactory that knows how to instantiate ShadowMeshBases
      * @param storage the storage to use
      * @param dir the ProbeDirectory to use
-     * @param httpMappingPolicy the policy by which HTTP responses are mapped into the InfoGrid world
      */
     protected MScheduledExecutorProbeManager(
             ShadowMeshBaseFactory                            delegateFactory,
             CachingMap<NetMeshBaseIdentifier,ShadowMeshBase> storage,
-            ProbeDirectory                                   dir,
-            HttpMappingPolicy                                httpMappingPolicy )
+            ProbeDirectory                                   dir )
     {
-        super( delegateFactory, storage, dir, httpMappingPolicy );
+        super( delegateFactory, storage, dir );
     }
 }

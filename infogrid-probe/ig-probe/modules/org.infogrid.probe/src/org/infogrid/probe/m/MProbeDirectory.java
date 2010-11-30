@@ -17,6 +17,8 @@ package org.infogrid.probe.m;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.infogrid.probe.AbstractProbeDirectory;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
+import org.infogrid.probe.httpmapping.TraditionalInfoGridHttpMappingPolicy;
 import org.infogrid.probe.yadis.XrdsProbe;
 
 /**
@@ -33,6 +35,18 @@ public class MProbeDirectory
      */
     public static MProbeDirectory create()
     {
+        return create( TraditionalInfoGridHttpMappingPolicy.SINGLETON );
+    }
+
+    /**
+     * Default factory method to create an MProbeDirectory that only knows about XRDS.
+     *
+     * @param mappingPolicy the policy by which the Probe framework maps HTTP status codes to XPRISO
+     * @return the created MProbeDirectory
+     */
+    public static MProbeDirectory create(
+            HttpMappingPolicy mappingPolicy )
+    {
         ArrayList<XmlDomProbeDescriptor> domProbes = new ArrayList<XmlDomProbeDescriptor>();
         domProbes.add( new XmlDomProbeDescriptor(
                 "XRDS",
@@ -46,7 +60,8 @@ public class MProbeDirectory
                 new ArrayList<ApiProbeDescriptor>(),
                 new ArrayList<ExactMatchDescriptor>(),
                 new ArrayList<PatternMatchDescriptor>(),
-                null );
+                null,
+                mappingPolicy );
         return ret;
     }
 
@@ -63,7 +78,8 @@ public class MProbeDirectory
                 new ArrayList<ApiProbeDescriptor>(),
                 new ArrayList<ExactMatchDescriptor>(),
                 new ArrayList<PatternMatchDescriptor>(),
-                null );
+                null,
+                TraditionalInfoGridHttpMappingPolicy.SINGLETON );
         return ret;
     }
 
@@ -76,6 +92,7 @@ public class MProbeDirectory
      * @param exactMatches the set of ExactMatchDescriptors to initialize with
      * @param patternMatches the set of PatternMatchDescriptors to initialize with
      * @param defaultStreamProbe identifies the default stream Probe to initialize with
+     * @param mappingPolicy the policy by which the Probe framework maps HTTP status codes to XPRISO
      * @return the created MProbeDirectory
      */
     public static MProbeDirectory create(
@@ -84,7 +101,8 @@ public class MProbeDirectory
             Collection<ApiProbeDescriptor>     apiProbes,
             Collection<ExactMatchDescriptor>   exactMatches,
             Collection<PatternMatchDescriptor> patternMatches,
-            StreamProbeDescriptor              defaultStreamProbe )
+            StreamProbeDescriptor              defaultStreamProbe,
+            HttpMappingPolicy                  mappingPolicy )
     {
         MProbeDirectory ret = new MProbeDirectory(
                 new ArrayList<XmlDomProbeDescriptor>(),
@@ -92,7 +110,8 @@ public class MProbeDirectory
                 new ArrayList<ApiProbeDescriptor>(),
                 new ArrayList<ExactMatchDescriptor>(),
                 new ArrayList<PatternMatchDescriptor>(),
-                null );
+                null,
+                mappingPolicy );
         return ret;
     }
 
@@ -105,6 +124,7 @@ public class MProbeDirectory
      * @param exactMatches the set of ExactMatchDescriptors to initialize with
      * @param patternMatches the set of PatternMatchDescriptors to initialize with
      * @param defaultStreamProbe identifies the default stream Probe to initialize with
+     * @param mappingPolicy the policy by which the Probe framework maps HTTP status codes to XPRISO
      */
     protected MProbeDirectory(
             Collection<XmlDomProbeDescriptor>  xmlDomProbes,
@@ -112,8 +132,9 @@ public class MProbeDirectory
             Collection<ApiProbeDescriptor>     apiProbes,
             Collection<ExactMatchDescriptor>   exactMatches,
             Collection<PatternMatchDescriptor> patternMatches,
-            StreamProbeDescriptor              defaultStreamProbe )
+            StreamProbeDescriptor              defaultStreamProbe,
+            HttpMappingPolicy                  mappingPolicy )
     {
-        super( xmlDomProbes, streamProbes, apiProbes, exactMatches, patternMatches, defaultStreamProbe );
+        super( xmlDomProbes, streamProbes, apiProbes, exactMatches, patternMatches, defaultStreamProbe, mappingPolicy );
     }
 }

@@ -16,8 +16,6 @@ package org.infogrid.probe.manager.store;
 
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.probe.ProbeDirectory;
-import org.infogrid.probe.httpmapping.HttpMappingPolicy;
-import org.infogrid.probe.httpmapping.TraditionalInfoGridHttpMappingPolicy;
 import org.infogrid.probe.manager.AbstractProbeManager;
 import org.infogrid.store.IterableStore;
 import org.infogrid.probe.manager.PassiveProbeManager;
@@ -49,29 +47,11 @@ public class StorePassiveProbeManager
             ProbeDirectory             dir,
             IterableStore              shadowStore )
     {
-        return create( delegate, shadowStore, dir, TraditionalInfoGridHttpMappingPolicy.SINGLETON );
-    }
-
-    /**
-     * Factory method.
-     *
-     * @param delegate the underlying factory for StoreShadowMeshBases
-     * @param shadowStore the Store in which serialized ShadowMeshBases are kept
-     * @param dir the ProbeDirectory to use
-     * @param httpMappingPolicy the policy by which HTTP responses are mapped into the InfoGrid world
-     * @return the created StorePassiveProbeManager
-     */
-    public static StorePassiveProbeManager create(
-            StoreShadowMeshBaseFactory delegate,
-            IterableStore              shadowStore,
-            ProbeDirectory             dir,
-            HttpMappingPolicy          httpMappingPolicy )
-    {
         StoreProbeManagerMapper theMapper = new StoreProbeManagerMapper( delegate );
 
         IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = IterableStoreBackedSwappingHashMap.createWeak( theMapper, shadowStore );
 
-        StorePassiveProbeManager ret = new StorePassiveProbeManager( delegate, storage, dir, httpMappingPolicy );
+        StorePassiveProbeManager ret = new StorePassiveProbeManager( delegate, storage, dir );
 
         return ret;
     }
@@ -82,15 +62,13 @@ public class StorePassiveProbeManager
      * @param delegate the underlying factory for StoreShadowMeshBases
      * @param storage the storage to use
      * @param dir the ProbeDirectory to use
-     * @param httpMappingPolicy the policy by which HTTP responses are mapped into the InfoGrid world
      */
     protected StorePassiveProbeManager(
             StoreShadowMeshBaseFactory                                               delegate,
             IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage,
-            ProbeDirectory                                                           dir,
-            HttpMappingPolicy                                                        httpMappingPolicy )
+            ProbeDirectory                                                           dir )
     {
-        super( delegate, storage, dir, httpMappingPolicy );
+        super( delegate, storage, dir );
 
         theMapListener = new MyMapListener();
         storage.addWeakSwappingHashMapListener( theMapListener ); // this must be weak 

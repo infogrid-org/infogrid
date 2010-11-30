@@ -64,7 +64,6 @@ public class MShadowMeshBaseFactory
      * @param meshBaseIdentifierFactory the factory for NetMeshBaseIdentifiers
      * @param endpointFactory factory for communications endpoints, to be used by all created MShadowMeshBases
      * @param modelBase the ModelBase containing type information to be used by all created MShadowMeshBases
-     * @param probeDirectory the ProbeDirectory to use for all Probes
      * @param context the Context in which this all created MShadowMeshBases will run.
      */
     protected MShadowMeshBaseFactory(
@@ -97,7 +96,7 @@ public class MShadowMeshBaseFactory
         HttpMappingPolicy mappingPolicy
                 = argument instanceof ShadowParameters
                 ? ((ShadowParameters)argument).getHttpMappingPolicy()
-                : theProbeManager.getHttpMappingPolicy();
+                : theProbeManager.getProbeDirectory().getHttpMappingPolicy();
 
         NetMeshObjectAccessSpecificationFactory theNetMeshObjectAccessSpecificationFactory = DefaultNetMeshObjectAccessSpecificationFactory.create(
                 key,

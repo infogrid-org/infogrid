@@ -22,7 +22,6 @@ import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.probe.httpmapping.HttpMappingPolicy;
-import org.infogrid.probe.httpmapping.TraditionalInfoGridHttpMappingPolicy;
 import org.infogrid.probe.shadow.AbstractShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
@@ -46,9 +45,8 @@ public class StoreShadowMeshBaseFactory
      * Factory method for the StoreShadowMeshBaseFactory itself.
      * 
      * @param meshBaseIdentifierFactory the factory for NetMeshBaseIdentifiers
-     * @param modelBase the ModelBase containing type information to be used by all created StoreShadowMeshBases
      * @param endpointFactory factory for communications endpoints, to be used by all created StoreShadowMeshBase
-     * @param probeDirectory the ProbeDirectory to use for all Probes
+     * @param modelBase the ModelBase containing type information to be used by all created StoreShadowMeshBases
      * @param shadowStore the Store in which the ShadowMeshBases will be stored
      * @param shadowProxyStore the Store in which the ShadowMeshBases' Proxies will be stored
      * @param context the Context in which this all created MShadowMeshBases will run.
@@ -116,7 +114,7 @@ public class StoreShadowMeshBaseFactory
         HttpMappingPolicy mappingPolicy
                 = argument instanceof ShadowParameters
                 ? ((ShadowParameters)argument).getHttpMappingPolicy()
-                : theProbeManager.getHttpMappingPolicy();
+                : theProbeManager.getProbeDirectory().getHttpMappingPolicy();
 
         NetMeshObjectAccessSpecificationFactory theNetMeshObjectAccessSpecificationFactory = DefaultNetMeshObjectAccessSpecificationFactory.create(
                 key,
@@ -174,7 +172,7 @@ public class StoreShadowMeshBaseFactory
                 null,
                 theProbeManager.getProbeDirectory(),
                 theTimeNotNeededTillExpires,
-                TraditionalInfoGridHttpMappingPolicy.SINGLETON, // FIXME?
+                theProbeManager.getProbeDirectory().getHttpMappingPolicy(),
                 thisProxyStore,
                 theMeshBaseContext );
         

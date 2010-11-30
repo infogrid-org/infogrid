@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.xml.XmlProbe;
 import org.infogrid.probe.xml.XmlDOMProbe;
 import org.infogrid.util.StringHelper;
@@ -30,6 +31,21 @@ import org.infogrid.util.logging.Dumper;
  */
 public interface ProbeDirectory
 {
+    /**
+     * Set the policy by which the Probe framework maps HTTP status codes to XPRISO.
+     *
+     * @param newValue the new policy
+     */
+    public void setHttpMappingPolicy(
+            HttpMappingPolicy newValue );
+
+    /**
+     * Obtain the policy by which the Probe framework maps HTTP status codes to XPRISO.
+     *
+     * @return the current policy
+     */
+    public HttpMappingPolicy getHttpMappingPolicy();
+
     /**
      * Obtain the default Probe that reads from a stream. If not other StreamProbe matches
      * a stream data source, this is the one that will be used.
