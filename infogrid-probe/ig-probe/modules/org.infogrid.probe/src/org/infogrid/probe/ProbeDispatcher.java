@@ -640,9 +640,10 @@ public class ProbeDispatcher
                             WebSubjectArea.WEBRESOURCE_HTTPSTATUSCODE,
                             IntegerValue.parseIntegerValue( httpResponse.getResponseCode() ));
                     if( httpResponse.isRedirect() ) {
+                        String redirect = new URL( url, httpResponse.getLocation() ).toExternalForm();
                         newHome.setPropertyValue(
                                 WebSubjectArea.WEBRESOURCE_HTTPHEADERLOCATION,
-                                StringValue.create( httpResponse.getLocation() ));
+                                StringValue.create( redirect ));
                     }
 
                 } catch( EntityBlessedAlreadyException ex ) {
