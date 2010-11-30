@@ -1304,7 +1304,7 @@ public class MysqlStore
      */
     protected static final String CREATE_TABLES_SQL
             = "CREATE TABLE {0} (\n"
-            + "    id                    VARCHAR(511) CHARACTER SET latin1 NOT NULL PRIMARY KEY,\n" // this automatically creates an index
+            + "    id                    VARCHAR(511) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL PRIMARY KEY,\n" // this automatically creates an index
             + "    encodingId            VARCHAR(128),\n"
             + "    timeCreated           DATETIME,\n"
             + "    timeCreatedMillis     SMALLINT,\n"

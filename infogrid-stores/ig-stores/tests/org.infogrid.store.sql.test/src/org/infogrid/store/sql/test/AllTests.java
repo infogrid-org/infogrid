@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -46,6 +46,7 @@ public abstract class AllTests
                     // currently no SqlStoreTest4
                     new TestSpec( SqlStoreTest5.class, dbEngine ),
                     new TestSpec( SqlStoreTest6.class, dbEngine ),
+                    new TestSpec( SqlStoreTest7.class, dbEngine ),
 
                     new TestSpec( SqlStoreIteratorTest1.class, dbEngine ),
                     new TestSpec( SqlStoreIteratorTest2.class, dbEngine ),
