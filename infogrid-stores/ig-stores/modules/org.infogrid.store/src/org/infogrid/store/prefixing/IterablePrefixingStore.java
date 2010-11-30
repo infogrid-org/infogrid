@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -519,6 +519,17 @@ public class IterablePrefixingStore
         public final CursorIterator<StoreValue> getIterator()
         {
             return iterator();
+        }
+
+        /**
+         * Determine the type of array that is returned by the iteration methods that
+         * return arrays.
+         *
+         * @return the type of array
+         */
+        public Class<StoreValue> getArrayComponentType()
+        {
+            return StoreValue.class;
         }
 
         /**

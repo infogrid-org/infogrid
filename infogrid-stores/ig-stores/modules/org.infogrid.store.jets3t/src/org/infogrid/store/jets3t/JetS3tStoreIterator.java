@@ -517,6 +517,17 @@ public class JetS3tStoreIterator
     }
 
     /**
+     * Determine the type of array that is returned by the iteration methods that
+     * return arrays.
+     *
+     * @return the type of array
+     */
+    public Class<StoreValue> getArrayComponentType()
+    {
+        return StoreValue.class;
+    }
+
+    /**
      * The JetS3tStore to iterate over.
      */
     protected JetS3tStore theStore;

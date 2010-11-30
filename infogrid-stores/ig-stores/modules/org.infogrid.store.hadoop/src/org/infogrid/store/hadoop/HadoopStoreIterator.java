@@ -482,6 +482,17 @@ public class HadoopStoreIterator
     }
 
     /**
+     * Determine the type of array that is returned by the iteration methods that
+     * return arrays.
+     *
+     * @return the type of array
+     */
+    public Class<StoreValue> getArrayComponentType()
+    {
+        return StoreValue.class;
+    }
+
+    /**
      * The HadoopStore to iterate over.
      */
     protected HadoopStore theStore;

@@ -486,6 +486,17 @@ public class FilesystemStoreIterator
     }
 
     /**
+     * Determine the type of array that is returned by the iteration methods that
+     * return arrays.
+     *
+     * @return the type of array
+     */
+    public Class<StoreValue> getArrayComponentType()
+    {
+        return StoreValue.class;
+    }
+
+    /**
      * The Store over which we iterate.
      */
     protected FilesystemStore theStore;
