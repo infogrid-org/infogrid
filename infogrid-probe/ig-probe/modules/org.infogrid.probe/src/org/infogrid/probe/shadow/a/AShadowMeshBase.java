@@ -300,13 +300,7 @@ public abstract class AShadowMeshBase
                                     log.debug( AShadowMeshBase.this + ": removing proxy " + current );
                                 }
 
-                                try {
-                                    current.initiateCeaseCommunications();
-
-                                } catch( RemoteQueryTimeoutException ex ) {
-                                    log.warn( ex );
-                                }
-                                theProxyManager.remove( current.getPartnerMeshBaseIdentifier() );
+                                current.die( true );
                             }
                             return null;
                         }
