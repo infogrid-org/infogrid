@@ -17,8 +17,8 @@ package org.infogrid.meshbase.net.sweeper;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
-import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.util.ResourceHelper;
 
 /**
  * A SweepPolicy that gets rid of unused non-master/non-home-object replicas.
@@ -27,6 +27,16 @@ public class UnnecessaryReplicasSweepPolicy
         extends
            AbstractNetSweepPolicy
 {
+    /**
+     * Factory method.
+     *
+     * @return the created UnnecessaryReplicasSweepPolicy
+     */
+    public static UnnecessaryReplicasSweepPolicy create()
+    {
+        return new UnnecessaryReplicasSweepPolicy( DEFAULT_EXPIRATION );
+    }
+
     /**
      * Factory method.
      *
@@ -115,4 +125,12 @@ public class UnnecessaryReplicasSweepPolicy
      * a candidate for sweeping.
      */
     protected long theUnusedSlaveReplicaExpiration;
+
+    /**
+     * The default duration for which a slave replica must be unused until it becomes
+     * a candidate for sweeping.
+     */
+    public static final long DEFAULT_EXPIRATION = ResourceHelper.getInstance( UnnecessaryReplicasSweepPolicy.class ).getResourceLongOrDefault(
+            "DefaultExpiration",
+            24L*60L*60L*1000L ); // 1 day
 }
