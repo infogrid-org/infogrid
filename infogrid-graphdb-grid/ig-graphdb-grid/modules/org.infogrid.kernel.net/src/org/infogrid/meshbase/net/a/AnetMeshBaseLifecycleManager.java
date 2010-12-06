@@ -65,6 +65,7 @@ import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.FactoryException;
+import org.infogrid.util.IsDeadException;
 import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.ReturnSynchronizerException;
 import org.infogrid.util.logging.Log;
@@ -2425,7 +2426,11 @@ public class AnetMeshBaseLifecycleManager
 
             ExternalizedMeshObject externalized = current.asExternalized( true );
 
-            current.delete();
+            try {
+                current.delete();
+            } catch( IsDeadException ex ) {
+                // ignore
+            }
             removeFromMeshBase(
                     current.getIdentifier(),
                     createDeletedEvent( current, currentCanonicalName, externalized, now ));
