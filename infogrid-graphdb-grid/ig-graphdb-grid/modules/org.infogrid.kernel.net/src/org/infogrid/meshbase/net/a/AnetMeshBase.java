@@ -1226,9 +1226,11 @@ public abstract class AnetMeshBase
             Transaction tx )
     {
         super.transactionCommittedHook( tx );
-        
-        for( Proxy current : proxies() ) {
-            current.transactionCommitted( tx );
+
+        if( !isDead() ) {
+            for( Proxy current : proxies() ) {
+                current.transactionCommitted( tx );
+            }
         }
     }
 
