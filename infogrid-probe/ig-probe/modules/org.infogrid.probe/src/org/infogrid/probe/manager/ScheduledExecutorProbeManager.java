@@ -237,7 +237,7 @@ public abstract class ScheduledExecutorProbeManager
         // Apparently a ConcurrentModificationException is possible here. (Why? FIXME)
         // So we do it as two steps:
 
-        ArrayList<ShadowMeshBase> toKill = new ArrayList<ShadowMeshBase>( theKeyValueMap.size() );
+        ArrayList<ShadowMeshBase> toKill = new ArrayList<ShadowMeshBase>();
         for( ShadowMeshBase shadow : theKeyValueMap.values() ) {
             toKill.add( shadow );
         }
