@@ -89,7 +89,7 @@ public class DefaultNetIterableSweeper
      * may be overridden by subclasses.
      */
     @Override
-    protected void sweepObject(
+    public void sweepObject(
             MeshObject current )
     {
         NetSweepPolicy realPolicy = (NetSweepPolicy) thePolicy;
