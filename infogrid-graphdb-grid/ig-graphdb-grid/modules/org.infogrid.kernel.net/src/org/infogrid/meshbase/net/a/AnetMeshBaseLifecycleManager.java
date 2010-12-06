@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -2385,5 +2385,50 @@ public class AnetMeshBaseLifecycleManager
         }
 
         return ret;
+    }
+
+    /**
+     * Kill these NetMeshObjects. This should rarely, if ever, be invoked by the application programmer.
+     * It removes the specified NetMeshObjects from the NetMeshBase regardless of semantic or other
+     * constraints.
+     *
+     * @param toKill the NetMeshObjects to kill
+     */
+    public void kill(
+            NetMeshObject [] toKill )
+        throws
+            TransactionException
+    {
+        AMeshBase realBase = (AMeshBase) theMeshBase;
+        long      now      = System.currentTimeMillis();
+
+        Transaction tx = realBase.checkTransaction();
+
+        MeshObject home = realBase.getHomeObject();
+
+        for( int i=0 ; i<toKill.length ; ++i ) {
+            AnetMeshObject         current              = (AnetMeshObject) toKill[i];
+            MeshObjectIdentifier   currentCanonicalName = current.getIdentifier();
+
+            if( current == null ) {
+                log.error( "MeshObject at index " + i + " is null" );
+                continue;
+            }
+            if( current.getMeshBase() != realBase ) {
+                log.error( "Cannot kill MeshObjects in a different MeshBases" );
+                continue;
+            }
+            if( current == home ) {
+                log.error( "Must not kill home MeshObject" );
+                continue;
+            }
+
+            ExternalizedMeshObject externalized = current.asExternalized( true );
+
+            current.delete();
+            removeFromMeshBase(
+                    current.getIdentifier(),
+                    createDeletedEvent( current, currentCanonicalName, externalized, now ));
+        }
     }
 }

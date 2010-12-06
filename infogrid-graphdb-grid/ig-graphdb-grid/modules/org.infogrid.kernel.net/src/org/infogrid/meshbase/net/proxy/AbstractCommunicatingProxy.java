@@ -327,20 +327,6 @@ public abstract class AbstractCommunicatingProxy
     }
 
     /**
-     * Invoked by the NetMeshBase that this Proxy belongs to,
-     * it causes this Proxy to initiate the "ceasing communication" sequence with
-     * the partner NetMeshBase, and then kill itself.
-     */
-    @SuppressWarnings(value={"unchecked"})
-    public void initiateCeaseCommunications()
-    {
-        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = startCreatingPotentialOutgoingMessage();
-
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForCeaseCommunications( this, perhapsOutgoing );
-        performInstructions( instructions );
-    }
-
-    /**
      * Tell this Proxy that it is not needed any more. This will invoke
      * {@link #initiateCeaseCommunications} if and only if
      * isPermanent is true.
@@ -351,12 +337,17 @@ public abstract class AbstractCommunicatingProxy
     public void die(
             boolean isPermanent )
     {
-        if( isPermanent ) {
-            initiateCeaseCommunications();
-        }
+        CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing = startCreatingPotentialOutgoingMessage();
+
+        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForProxyDeath( this, perhapsOutgoing, isPermanent );
+        performInstructions( instructions );
 
         if( theEndpoint != null ) {
             theEndpoint.gracefulDie();
+        }
+
+        if( isPermanent ) {
+            theFactory.remove( getPartnerMeshBaseIdentifier() );
         }
     }
 
@@ -696,6 +687,13 @@ public abstract class AbstractCommunicatingProxy
                     }
                 }
             }
+
+            NetMeshObject [] toKill = instructions.getToKill();
+            if( toKill != null && toKill.length > 0 ) {
+                perhapsTx.obtain(); // can ignore return value
+                life.kill( toKill );
+            }
+
         } catch( CreateWhenNeededException ex ) {
             log.error( ex.getCause() );
 

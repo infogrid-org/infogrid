@@ -200,15 +200,17 @@ public interface ProxyPolicy
             CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
 
     /**
-     * Determine the ProxyProcessingInstructions for ceasing communications.
+     * Determine the ProxyProcessingInstructions for when a Proxy dies.
      * 
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @param perhapsOutgoing the outgoing message being assembled
+     * @param permanent if true, the Proxy dies permanently
      * @return the calculated ProxyProcessingInstructions, or null
      */
-    public ProxyProcessingInstructions calculateForCeaseCommunications(
+    public ProxyProcessingInstructions calculateForProxyDeath(
             CommunicatingProxy                            proxy,
-            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing );
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing,
+            boolean                                       permanent );
     
     /**
      * Given a committed Transaction, determine the ProxyProcessingInstructions for notifying

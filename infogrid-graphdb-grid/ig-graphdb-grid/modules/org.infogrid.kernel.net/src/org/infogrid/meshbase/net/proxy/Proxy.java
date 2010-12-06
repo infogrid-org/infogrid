@@ -242,17 +242,6 @@ public interface Proxy
             long             duration );
 
     /**
-     * Invoked by the NetMeshBase that this Proxy belongs to,
-     * it causes this Proxy to initiate the "ceasing communication" sequence with
-     * the partner NetMeshBase, and then kill itself.
-     *
-     * @throws RemoteQueryTimeoutException thrown if communications timed out
-     */
-    public abstract void initiateCeaseCommunications()
-        throws
-            RemoteQueryTimeoutException;
-
-    /**
      * Tell this Proxy that it is not needed any more. This will invoke
      * {@link #initiateCeaseCommunications} if and only if
      * isPermanent is true.

@@ -1489,15 +1489,13 @@ public class AnetMeshObject
      * @param isMaster true if this is the master replica
      * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
     @Override
     protected void internalDelete(
             boolean isMaster,
             long    timeUpdated )
         throws
-            TransactionException,
-            NotPermittedException
+            TransactionException
     {
         if( theMeshBase == null ) {
             // this is a loop, do nothing

@@ -17,11 +17,13 @@ package org.infogrid.meshbase.net.proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.infogrid.comm.ReceivingMessageEndpoint;
+import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.IterableNetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
@@ -49,6 +51,7 @@ import org.infogrid.meshbase.transaction.Change;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CreateWhenNeeded;
+import org.infogrid.util.CursorIterator;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.ReturnSynchronizerException;
 import org.infogrid.util.logging.Log;
@@ -122,26 +125,48 @@ public abstract class AbstractProxyPolicy
     }
 
     /**
-     * Determine the ProxyProcessingInstructions for ceasing communications.
-     * This is defined on AbstractPolicyProxy as it is likely the same for all
-     * subclasses; if not, it can be overridden.
-     * 
+     * Determine the ProxyProcessingInstructions for when a Proxy dies.
+     *
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @param perhapsOutgoing the outgoing message being assembled
+     * @param permanent if true, the Proxy dies permanently
      * @return the calculated ProxyProcessingInstructions, or null
      */
-    public ProxyProcessingInstructions calculateForCeaseCommunications(
+    public ProxyProcessingInstructions calculateForProxyDeath(
             CommunicatingProxy                            proxy,
-            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )
+            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing,
+            boolean                                       permanent )
     {
-        ProxyProcessingInstructions ret = createInstructions();
-        
-        ret.setStartCommunicating(  true );
-        ret.setCeaseCommunications( true );
+        ProxyProcessingInstructions ret = null;
+        if( permanent ) {
+            ret = createInstructions();
+
+            ret.setStartCommunicating(  true );
+            ret.setCeaseCommunications( true );
+
+            // FIXME, very inefficient
+            if( proxy.getNetMeshBase() instanceof IterableNetMeshBase ) {
+                IterableNetMeshBase mb = (IterableNetMeshBase) proxy.getNetMeshBase();
+                CursorIterator<MeshObject> iter = mb.iterator();
+                while( iter.hasNext()) {
+                    MeshObject [] batch = iter.next( 100 ); // more efficient
+                    for( int i=0 ; i<batch.length ; ++i ) {
+                        NetMeshObject current = (NetMeshObject) batch[i];
+                        if( current.getProxyTowardsHomeReplica() == proxy ) {
+                            ret.addToKill( current );
+                        }
+                    }
+                }
+
+            } else {
+                log.warn( "Cannot clean up, not IterableNetMeshBase", proxy );
+            }
+
+        }
 
         return ret;
     }
-    
+
     /**
      * Determine the ProxyProcessingInstructions for obtaining one or more
      * replicas via this Proxy.

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -734,4 +734,16 @@ public interface NetMeshBaseLifecycleManager
         throws
             TransactionException,
             NotPermittedException;
+
+    /**
+     * Kill these NetMeshObjects. This should rarely, if ever, be invoked by the application programmer.
+     * It removes the specified NetMeshObjects from the NetMeshBase regardless of semantic or other
+     * constraints.
+     *
+     * @param toKill the NetMeshObjects to kill
+     */
+    public abstract void kill(
+            NetMeshObject [] toKill )
+        throws
+            TransactionException;
 }

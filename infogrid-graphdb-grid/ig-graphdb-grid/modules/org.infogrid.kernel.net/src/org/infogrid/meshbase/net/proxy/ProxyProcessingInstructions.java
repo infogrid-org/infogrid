@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -879,7 +879,28 @@ public class ProxyProcessingInstructions
     {
         return theDeletions;
     }
-    
+
+    /**
+     * Add an MeshObject that needs to be killed regardless.
+     *
+     * @param toAdd
+     */
+    public void addToKill(
+            NetMeshObject toAdd )
+    {
+        theToKill.add( toAdd );
+    }
+
+    /**
+     * Obtain the NetMeshObjects that shall be killed.
+     *
+     * @return the NetMeshObjects
+     */
+    public NetMeshObject [] getToKill()
+    {
+        return ArrayHelper.copyIntoNewArray( theToKill, NetMeshObject.class );
+    }
+
     /**
      * Determine whether these instructions contain no content.
      * 
@@ -923,6 +944,10 @@ public class ProxyProcessingInstructions
         }
         
         if( thePropertyChanges != null && thePropertyChanges.length > 0 ) {
+            return false;
+        }
+
+        if( theToKill != null && !theToKill.isEmpty() ) {
             return false;
         }
         return true;
@@ -971,7 +996,8 @@ public class ProxyProcessingInstructions
                     "theNeighborAdditions",
                     "theNeighborRemovals",
                     "theRoleAdditions",
-                    "theRoleRemovals"
+                    "theRoleRemovals",
+                    "theToKill"
                 },
                 new Object[] {
                     theStartCommunicating,
@@ -995,7 +1021,8 @@ public class ProxyProcessingInstructions
                     theNeighborAdditions,
                     theNeighborRemovals,
                     theRoleAdditions,
-                    theRoleRemovals
+                    theRoleRemovals,
+                    theToKill
                 
                 });
     }
@@ -1137,7 +1164,12 @@ public class ProxyProcessingInstructions
      * The object deletions to ripple.
      */
     protected NetMeshObjectDeletedEvent [] theDeletions = {};
-    
+
+    /**
+     * The NetMeshObjects to kill.
+     */
+    protected ArrayList<NetMeshObject> theToKill = new ArrayList<NetMeshObject>();
+
     protected long theExpectectedObtainReplicasWait = 2000L; // default. FIXME?
     protected long theExpectedObtainLocksWait = 2000L; // default. FIXME?
     protected long theExpectedPushLocksWait = 2000L; // default. FIXME?
