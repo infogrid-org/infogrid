@@ -553,10 +553,12 @@ public abstract class ModuleErrorHandler
     {
         if( errorStream != null ) {
             errorStream.print( "ERROR: " );
+            errorStream.println( ex.getMessage() );
             ex.printStackTrace( errorStream );
         }
         if( errorStream != System.err ) {
             errorStream.print( "ERROR: " );
+            errorStream.println( ex.getMessage() );
             ex.printStackTrace( errorStream );
         }
    }
