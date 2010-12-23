@@ -196,9 +196,6 @@ public class IdentifierStringifier
             if( ret.startsWith( PREFIX )) {
                 ret = ret.substring( PREFIX.length() );
             }
-            if( ret.charAt( ret.length()-1 ) == '/' ) {
-                ret = ret.substring( 0, ret.length()-1 );
-            }
         }
         return ret;
     }
