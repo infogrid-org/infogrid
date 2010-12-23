@@ -47,6 +47,7 @@ import org.infogrid.modelbase.MeshTypeNotFoundException;
 import org.infogrid.modelbase.MeshTypeSynonymDictionary;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.module.ModuleException;
+import org.infogrid.probe.ProbeDispatcher;
 import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.xml.XmlDOMProbe;
@@ -135,7 +136,12 @@ public class XrdsProbe
             URISyntaxException,
             ParseException
     {
-        addYadisServicesFromXml( dataSourceIdentifier, documentBytes, documentMime, theDocument, freshMeshBase );
+        addYadisServicesFromXml(
+                dataSourceIdentifier,
+                documentBytes,
+                ProbeDispatcher.XRDS_MIME_TYPE, // regardless what the original said, let's be clean from here on
+                theDocument,
+                freshMeshBase );
     }
 
     /**

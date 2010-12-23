@@ -2132,8 +2132,9 @@ public class ProbeDispatcher
 
     /**
      * We expect this MIME type to indicate that a stream is XML.
+     * This may be a bit too lenient? 
      */
-    public static final Pattern XML_MIME_TYPE_PATTERN = Pattern.compile( "application/(.+\\+)?xml" );
+    public static final Pattern XML_MIME_TYPE_PATTERN = Pattern.compile( ".*application/(.+\\+)?xml.*" );
 
     /**
      * This MIME type indicates that a stream is unknown.
