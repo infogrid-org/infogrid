@@ -165,7 +165,7 @@ public class DefaultNetMeshBaseIdentifierFactory
                 throw new StringRepresentationParseException( canonical, null, ex );
             }
         }
-        if( canonical.startsWith( theXriResolverPrefix )) {
+        if( canonical.startsWith( theXriResolverPrefix ) && isXriGlobalContextSymbol( canonical.charAt( theXriResolverPrefix.length() ))) {
             canonical = canonical.substring( theXriResolverPrefix.length() );
             try {
                 return new NetMeshBaseIdentifier( this, canonical, new URI( theXriResolverPrefix + canonical ), string, true );
