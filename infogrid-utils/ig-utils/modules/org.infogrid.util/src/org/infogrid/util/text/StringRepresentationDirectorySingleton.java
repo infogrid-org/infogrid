@@ -162,6 +162,14 @@ public class StringRepresentationDirectorySingleton
         // javascript: same as java
         // javadoc:    same as java
 
+        plainMap.put(   "htmlsource",     StringStringifier.create() );
+        htmlMap.put(    "htmlsource",     HtmlifyingDelegatingStringifier.create( StringStringifier.create() ));
+        // url:        same as plain
+        // httpPost:   same as plain
+        // java:       same as plain
+        // javascript: same as java
+        // javadoc:    same as java
+
         plainMap.put(   "stacktrace",     StacktraceStringifier.create() );
         htmlMap.put(    "stacktrace",     HtmlifyingDelegatingStringifier.create( StacktraceStringifier.create() ));
         urlMap.put(     "stacktrace",     InvalidStringifier.create() );
@@ -188,6 +196,14 @@ public class StringRepresentationDirectorySingleton
 
         plainMap.put(   "id",             IdentifierStringifier.create() );
         htmlMap.put(    "id",             HtmlifyingDelegatingStringifier.create( IdentifierStringifier.create() ));
+        // url:        same as plain
+        // httpPost:   same as plain
+        // java:       same as plain
+        // javascript: same as java
+        // javadoc:    same as java
+
+        plainMap.put(   "fullid",         IdentifierStringifier.create( false ));
+        htmlMap.put(    "fullid",         HtmlifyingDelegatingStringifier.create( IdentifierStringifier.create( false ) ));
         // url:        same as plain
         // httpPost:   same as plain
         // java:       same as plain
@@ -228,6 +244,14 @@ public class StringRepresentationDirectorySingleton
 
         plainMap.put(   "hasid",          HasIdentifierStringifier.create( IdentifierStringifier.create() ));
         htmlMap.put(    "hasid",          HtmlifyingDelegatingStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create() )));
+        // url:        same as plain
+        // httpPost:   same as plain
+        // java:       same as plain
+        // javascript: same as java
+        // javadoc:    same as java
+
+        plainMap.put(   "fullhasid",      HasIdentifierStringifier.create( IdentifierStringifier.create( false ) ));
+        htmlMap.put(    "fullhasid",      HtmlifyingDelegatingStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create( false ) )));
         // url:        same as plain
         // httpPost:   same as plain
         // java:       same as plain

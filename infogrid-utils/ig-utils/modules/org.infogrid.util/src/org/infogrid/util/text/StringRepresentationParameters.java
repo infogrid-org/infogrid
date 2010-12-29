@@ -101,6 +101,12 @@ public interface StringRepresentationParameters
     public final String EDIT_VARIABLE = "variable";
 
     /**
+     * The key into this object that identifies the index to a property for the same
+     * MeshObject.
+     */
+    public final String EDIT_INDEX = "index";
+
+    /**
      * The key into this object that identifies the null value to display, if the object to
      * be rendered is null.
      */

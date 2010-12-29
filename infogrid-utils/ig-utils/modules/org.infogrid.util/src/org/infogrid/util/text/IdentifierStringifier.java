@@ -39,6 +39,18 @@ public class IdentifierStringifier
     }
 
     /**
+     * Factory method without prefix or postfix.
+     *
+     * @param processColloquial if true, process the colloquial parameter (if given). If false, leave identifier as is.
+     * @return the created IdentifierStringifier
+     */
+    public static IdentifierStringifier create(
+            boolean processColloquial )
+    {
+        return new IdentifierStringifier( processColloquial, null, null );
+    }
+
+    /**
      * Factory method with prefix or postfix.
      *
      * @param processColloquial if true, process the colloquial parameter (if given). If false, leave identifier as is.
