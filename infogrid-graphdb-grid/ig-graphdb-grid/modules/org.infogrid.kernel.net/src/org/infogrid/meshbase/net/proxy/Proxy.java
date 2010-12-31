@@ -242,9 +242,7 @@ public interface Proxy
             long             duration );
 
     /**
-     * Tell this Proxy that it is not needed any more. This will invoke
-     * {@link #initiateCeaseCommunications} if and only if
-     * isPermanent is true.
+     * Tell this Proxy that it is not needed any more.
      * 
      * @param isPermanent if true, this Proxy will go away permanently; if false,
      *        it may come alive again some time later, e.g. after a reboot
