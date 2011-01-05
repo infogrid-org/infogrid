@@ -107,6 +107,9 @@ public abstract class AbstractCommunicatingProxy
      */
     protected void proxyUpdated()
     {
+        if( log.isDebugEnabled() ) {
+            log.debug( this, "proxyUpdated" );
+        }
         if( theFactory != null ) {
             theFactory.factoryCreatedObjectUpdated( this );
         } else {
