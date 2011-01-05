@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -148,7 +148,8 @@ public abstract class PingPongMessageEndpoint<T>
                 tokenToSend = theLastSentToken;
             } else {
                 logLow.error( "No idea how we got here", this );
-                return;
+                // but we need to move on, not get stuck here, so this is what we do:
+                tokenToSend = Math.max( theLastSentToken, theLastReceivedToken  ) + 10;
             }
 
             if( tokenToSend == theLastSentToken ) {
