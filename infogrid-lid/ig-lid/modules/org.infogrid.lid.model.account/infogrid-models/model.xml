@@ -94,6 +94,17 @@
                 <defaultvalue>Created</defaultvalue>
             </propertytype>
 
+            <propertytype ID="org.infogrid.lid.model.account/Account_LastLoggedIn">
+                <name>LastLoggedIn</name>
+                <username>Last logged in</username>
+                <userdescription>The time when the user last logged into this account. This is the time of log-in, not
+                 the last time the account was used.</userdescription>
+                <datatype>
+                    <TimeStampDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
             <implementsMethod><![CDATA[
     /**
      * User-visible String is the the nickname if there is one.
