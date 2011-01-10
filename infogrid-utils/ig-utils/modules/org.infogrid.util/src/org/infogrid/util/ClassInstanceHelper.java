@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -137,5 +137,46 @@ public abstract class ClassInstanceHelper
             }
         }
         return ret;
+    }
+
+    /**
+     * Determine whether a given instance supports a type with a given name.
+     *
+     * @param obj the instance
+     * @param typeName the name of the type
+     */
+    public static boolean conforms(
+            Object obj,
+            String typeName )
+    {
+        return conforms( obj.getClass(), typeName );
+    }
+
+    /**
+     * Determine whether a given class has a given name, or whether one of its supertypes
+     * has that given name.
+     *
+     * @param clazz the Class
+     * @param typeName the name of the type
+     */
+    public static boolean conforms(
+            Class  clazz,
+            String typeName )
+    {
+        if( typeName.equals( clazz.getName() )) {
+            return true;
+        }
+        Class superClass = clazz.getSuperclass();
+        if( superClass != null ) {
+            if( conforms( superClass, typeName )) {
+                return true;
+            }
+        }
+        for( Class current : clazz.getInterfaces() ) {
+            if( conforms( current, typeName )) {
+                return true;
+            }
+        }
+        return false;
     }
 }
