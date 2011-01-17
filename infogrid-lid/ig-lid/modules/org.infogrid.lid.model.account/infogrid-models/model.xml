@@ -463,7 +463,7 @@
     {
         String ret = org.infogrid.lid.model.account.utils.MeshObjectIdentifierSessionTokenConverter.meshObjectIdentifierToToken(
                 getIdentifier(),
-                getMeshBase().getIdentifier().toExternalForm() + "#" );
+                get_MeshBase().getIdentifier().toExternalForm() + "#" );
 
         return ret;
     }
@@ -527,7 +527,7 @@
     public void renew(
             final long duration )
     {
-        getMeshBase().executeNow( new org.infogrid.meshbase.transaction.TransactionAction<Void>() {
+        get_MeshBase().executeNow( new org.infogrid.meshbase.transaction.TransactionAction<Void>() {
                 public Void execute()
                     throws
                         Throwable
@@ -543,7 +543,7 @@
      */
     public void cancel()
     {
-        getMeshBase().executeNow( new org.infogrid.meshbase.transaction.TransactionAction<Void>() {
+        get_MeshBase().executeNow( new org.infogrid.meshbase.transaction.TransactionAction<Void>() {
                 public Void execute()
                     throws
                         Throwable
