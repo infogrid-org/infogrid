@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -60,6 +60,7 @@ public class InvalidIdentifierException
     {
         return theIdentifier;
     }
+
     /**
      * Obtain resource parameters for the internationalization.
      *
