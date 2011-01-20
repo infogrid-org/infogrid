@@ -74,11 +74,6 @@
                             <userdescription>Account has been applied for, but not approved or rejected yet.</userdescription>
                         </enum>
                         <enum>
-                            <name>Created</name>
-                            <username>Created</username>
-                            <userdescription>Account has been created, but never been used.</userdescription>
-                        </enum>
-                        <enum>
                             <name>Active</name>
                             <username>Active</username>
                             <userdescription>The Account has been in use and can be used again.</userdescription>
@@ -102,7 +97,7 @@
                         </enum>
                     </EnumeratedDataType>
                 </datatype>
-                <defaultvalue>Created</defaultvalue>
+                <defaultvalue>AppliedFor</defaultvalue>
             </propertytype>
 
             <propertytype ID="org.infogrid.lid.model.account/Account_LastLoggedIn">
@@ -159,8 +154,6 @@
                 return org.infogrid.lid.account.LidAccount.LidAccountStatus.APPLIEDFOR;
             } else if( AccountSubjectArea.ACCOUNT_STATUS_type_ACTIVE.equals( status )) {
                 return org.infogrid.lid.account.LidAccount.LidAccountStatus.ACTIVE;
-            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_CREATED.equals( getStatus() )) {
-                return org.infogrid.lid.account.LidAccount.LidAccountStatus.CREATED;
             } else if( AccountSubjectArea.ACCOUNT_STATUS_type_DISABLED.equals( getStatus() )) {
                 return org.infogrid.lid.account.LidAccount.LidAccountStatus.DISABLED;
             } else if( AccountSubjectArea.ACCOUNT_STATUS_type_OBSOLETED.equals( getStatus() )) {

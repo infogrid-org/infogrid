@@ -131,7 +131,6 @@ public interface LidAccount
     public static enum LidAccountStatus
     {
         APPLIEDFOR,
-        CREATED,
         ACTIVE,
         DISABLED,
         OBSOLETED,
