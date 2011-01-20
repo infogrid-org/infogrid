@@ -9,7 +9,7 @@
 
     For more information about InfoGrid go to http://infogrid.org/
 
-    Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+    Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
     All rights reserved.
 -->
 
@@ -69,6 +69,11 @@
                 <datatype>
                     <EnumeratedDataType>
                         <enum>
+                            <name>AppliedFor</name>
+                            <username>Applied for</username>
+                            <userdescription>Account has been applied for, but not approved or rejected yet.</userdescription>
+                        </enum>
+                        <enum>
                             <name>Created</name>
                             <username>Created</username>
                             <userdescription>Account has been created, but never been used.</userdescription>
@@ -88,6 +93,12 @@
                             <name>Obsoleted</name>
                             <username>Obsoleted</username>
                             <userdescription>The Account has been disabled and will never be used again.</userdescription>
+                        </enum>
+                        <enum>
+                            <name>Refused</name>
+                            <username>Refused</username>
+                            <userdescription>Account was applied for, and the site operator decided not to approve the application.
+                            It is unlikely but not impossible that it will be approved in the future.</userdescription>
                         </enum>
                     </EnumeratedDataType>
                 </datatype>
@@ -142,7 +153,11 @@
     public org.infogrid.lid.account.LidAccount.LidAccountStatus getAccountStatus()
     {
         try {
-            if( AccountSubjectArea.ACCOUNT_STATUS_type_ACTIVE.equals( getStatus() )) {
+            EnumeratedValue status = getStatus();
+
+            if( AccountSubjectArea.ACCOUNT_STATUS_type_APPLIEDFOR.equals( status )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.APPLIEDFOR;
+            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_ACTIVE.equals( status )) {
                 return org.infogrid.lid.account.LidAccount.LidAccountStatus.ACTIVE;
             } else if( AccountSubjectArea.ACCOUNT_STATUS_type_CREATED.equals( getStatus() )) {
                 return org.infogrid.lid.account.LidAccount.LidAccountStatus.CREATED;
@@ -150,6 +165,8 @@
                 return org.infogrid.lid.account.LidAccount.LidAccountStatus.DISABLED;
             } else if( AccountSubjectArea.ACCOUNT_STATUS_type_OBSOLETED.equals( getStatus() )) {
                 return org.infogrid.lid.account.LidAccount.LidAccountStatus.OBSOLETED;
+            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_REFUSED.equals( getStatus() )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.REFUSED;
             } else {
                 log.error( "Unexpected value: " + getStatus() );
             }
