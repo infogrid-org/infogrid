@@ -36,15 +36,19 @@ public class AllTests
         TestSpec [] tests = {
 
                 new TestSpec(
+                        "XrdTest1 with XrdTest1a.xml",
                         XrdTest1.class,
                         AbstractTest.fileSystemFileName( XrdTest1.class, "XrdTest1a.xml" ), "6" ),
                 new TestSpec(
+                        "XrdTest1 with XrdTest1b.xml",
                         XrdTest1.class,
                         AbstractTest.fileSystemFileName( XrdTest1.class, "XrdTest1b.xml" ), "6" ),
                 new TestSpec(
+                        "XrdTest1 with XrdTest1c.xml",
                         XrdTest1.class,
                         AbstractTest.fileSystemFileName( XrdTest1.class, "XrdTest1c.xml" ), "14" ),
                 new TestSpec(
+                        "XrdTest1 with XrdTest1d.xml",
                         XrdTest1.class,
                         AbstractTest.fileSystemFileName( XrdTest1.class, "XrdTest1d.xml" ), "2" ),
         };

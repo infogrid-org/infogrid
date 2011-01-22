@@ -19,6 +19,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.net.DefaultNetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.local.LocalNetMeshBase;
@@ -107,7 +108,16 @@ public class XrdTest1
         super( XrdTest1.class );
 
         theTestFileId = theMeshBaseIdentifierFactory.obtain( new File( args[0] ));
-        theMeshBase   = LocalNetMMeshBase.create( theMeshBaseId, theModelBase, null, theProbeDirectory, exec, rootContext );
+        theMeshBase   = LocalNetMMeshBase.create(
+                theMeshBaseId,
+                DefaultNetMeshObjectAccessSpecificationFactory.create(
+                        theMeshBaseId,
+                        theMeshBaseIdentifierFactory ),
+                theModelBase,
+                null,
+                theProbeDirectory,
+                exec,
+                rootContext );
 
         theExpectedNumberMeshObjects = Integer.parseInt( args[1] );
     }
@@ -138,7 +148,7 @@ public class XrdTest1
      */
     protected NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
             new String[] { "http", "file" },
-            new String[] { "test" } );
+            new String[] { "test", "acct" } );
 
     /**
      * The ProbeDirectory.
