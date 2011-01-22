@@ -8,13 +8,14 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.store.net.test;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import java.util.regex.Pattern;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.net.NetMeshObject;
@@ -26,6 +27,9 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.m.NetMMeshBaseNameServer;
 import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.schemes.HttpScheme;
+import org.infogrid.meshbase.net.schemes.Scheme;
+import org.infogrid.meshbase.net.schemes.StrictRegexScheme;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
@@ -259,8 +263,10 @@ public abstract class AbstractStoreNetMeshBaseTest
      * Factory for NetMeshBaseIdentifiers.
      */
     protected static NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
-            new String[] { "http" },
-            new String[] { "test" } );
+            new Scheme[] {
+                    new HttpScheme(),
+                    new StrictRegexScheme( "test", Pattern.compile( "test:.*" ))
+            });
 
     /**
      * The name of the database that we use to store test data.

@@ -16,21 +16,26 @@ package org.infogrid.meshbase.net;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.infogrid.util.ArrayHelper;
+import org.infogrid.meshbase.net.schemes.AcctScheme;
+import org.infogrid.meshbase.net.schemes.FileScheme;
+import org.infogrid.meshbase.net.schemes.HttpScheme;
+import org.infogrid.meshbase.net.schemes.HttpsScheme;
+import org.infogrid.meshbase.net.schemes.Scheme;
+import org.infogrid.meshbase.net.schemes.XriScheme;
 import org.infogrid.util.InvalidObjectNumberFoundParseException;
 import org.infogrid.util.InvalidObjectTypeFoundParseException;
-import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.StringTooShortParseException;
 import org.infogrid.util.text.StringRepresentation;
-import org.infogrid.util.text.StringRepresentationParseException;
 
 /**
- * Default implementation of NetMeshBaseIdentifierFactory.
+ * Default implementation of NetMeshBaseIdentifierFactory. This class uses an array of Schemes
+ * that are supported, such as http, acct, xri and the like. These schemes are tried in
+ * sequence, first strictly, and then with educated guesses (if guessing is enabled). This
+ * sequence is important if an identifier is valid in several schemes (e.g. \@foo could be
+ * both a Twitter handle and an XRI), or could be guessed correctly in several schemes
+ * (e.g. foo@example.com could be an acct, but also http and https).
  */
 public class DefaultNetMeshBaseIdentifierFactory
         implements
@@ -44,25 +49,22 @@ public class DefaultNetMeshBaseIdentifierFactory
     public static DefaultNetMeshBaseIdentifierFactory create()
     {
         DefaultNetMeshBaseIdentifierFactory ret = new DefaultNetMeshBaseIdentifierFactory(
-                DEFAULT_RESTFUL_PROTOCOL_NAMES,
-                DEFAULT_NON_RESTFUL_PROTOCOL_NAMES );
+                DEFAULT_SCHEMES );
         return ret;
     }
     
     /**
-     * Factory method for a specified set of protocols.
+     * Factory method for a specified set of schemes. The schemes array must be ordered
+     * in the series in which the Schemes are tried.
      * 
-     * @param restfulProtocols the supported REST-ful protocols
-     * @param nonRestfulProtocols the supported non-REST-ful protocols
+     * @param schemes the supported Schemes
      * @return the created DefaultNetMeshBaseIdentifierFactory
      */
     public static DefaultNetMeshBaseIdentifierFactory create(
-            String [] restfulProtocols,
-            String [] nonRestfulProtocols )
+            Scheme [] schemes )
     {
-        DefaultNetMeshBaseIdentifierFactory ret = new DefaultNetMeshBaseIdentifierFactory(
-                restfulProtocols,
-                nonRestfulProtocols );
+        DefaultNetMeshBaseIdentifierFactory ret = new DefaultNetMeshBaseIdentifierFactory( schemes );
+
         return ret;
     }
     
@@ -73,11 +75,19 @@ public class DefaultNetMeshBaseIdentifierFactory
      * @param nonRestfulProtocols the supported non-REST-ful protocols
      */
     protected DefaultNetMeshBaseIdentifierFactory(
-            String [] restfulProtocols,
-            String [] nonRestfulProtocols )
+            Scheme [] schemes )
     {
-        theRestfulProtocols    = restfulProtocols;
-        theNonRestfulProtocols = nonRestfulProtocols;
+        theSchemes = schemes;
+    }
+
+    /**
+     * Obtain all Schemes known to this MeshBaseIdentifierFactory.
+     *
+     * @return the schemes
+     */
+    public Scheme [] getKnownSchemes()
+    {
+        return theSchemes;
     }
 
     /**
@@ -133,98 +143,51 @@ public class DefaultNetMeshBaseIdentifierFactory
         if( string == null ) {
             throw new NullPointerException();
         }
-        string = string.trim();
-
-        String canonical = string;
-
-        if( canonical != null ) {
-            Matcher m = thePort80Pattern.matcher( canonical );
-            if( m.matches() ) {
-                String zapped = m.group( 1 ) + m.group( 2 );
-
-                canonical = zapped;
-            } else {
-                m = thePort443Pattern.matcher( canonical );
-                if( m.matches() ) {
-                    String zapped = m.group( 1 ) + m.group( 2 );
-
-                    canonical = zapped;
-                }
-            }
-        }
-
-        if( canonical.length() == 0 ) {
-            throw new StringTooShortParseException( canonical, null, 1 );
-        }
-
-        if( isXriGlobalContextSymbol( canonical.charAt( 0 ))) {
-            try {
-                return new NetMeshBaseIdentifier( this, canonical, new URI( theXriResolverPrefix + canonical ), string, true );
-                
-            } catch( URISyntaxException ex ) {
-                throw new StringRepresentationParseException( canonical, null, ex );
-            }
-        }
-        if( canonical.startsWith( theXriResolverPrefix ) && isXriGlobalContextSymbol( canonical.charAt( theXriResolverPrefix.length() ))) {
-            canonical = canonical.substring( theXriResolverPrefix.length() );
-            try {
-                return new NetMeshBaseIdentifier( this, canonical, new URI( theXriResolverPrefix + canonical ), string, true );
-
-            } catch( URISyntaxException ex ) {
-                throw new StringRepresentationParseException( canonical, null, ex );
-            }
-        }
-
-        String lower = canonical.toLowerCase();
-        
         if( guess ) {
-            if( lower.indexOf( "://" ) < 0 ) {
-                String prefix = null;
-                if( context != null ) {
-                    String contextString = context.toExternalForm();
-                    int lastSlash = contextString.lastIndexOf( '/' );
-                    if( lastSlash > 0 ) {
-                        prefix = contextString.substring( 0, lastSlash );
-                    }
-                }
-                if( prefix != null ) {
-                    canonical = prefix + "/" + canonical;
-                } else if( canonical.contains( "/" )) {
-                    canonical = "http://" + canonical;
-                } else {
-                    canonical = "http://" + canonical + "/"; // example "cnn.com" without trailing slash
-                }
-
-                lower = canonical.toLowerCase();
-            }
+            string = string.trim();
         }
-        
-        for( String p : theRestfulProtocols ) {
-            if( lower.startsWith( p + ":" )) {
-                try {
-                    return new NetMeshBaseIdentifier( this, canonical, new URI( canonical ), string, true );
-
-                } catch( URISyntaxException ex ) {
-                    throw new StringRepresentationParseException( canonical, null, ex );
-                }
-            }
-        }
-        for( String p : theNonRestfulProtocols ) {
-            if( lower.startsWith( p + ":" )) {
-                try {
-                    return new NetMeshBaseIdentifier( this, canonical, new URI( canonical ), string, false );
-
-                } catch( URISyntaxException ex ) {
-                    throw new StringRepresentationParseException( canonical, null, ex );
-                }
-            }
+        if( string.length() == 0 ) {
+            throw new StringTooShortParseException( string, null, 1 );
         }
 
-        throw new UnknownProtocolParseException(
-                canonical,
-                -1,
-                lower,
-                ArrayHelper.append( theRestfulProtocols, theNonRestfulProtocols, String.class ) );
+        String contextString;
+        if( context != null ) {
+            contextString = context.toExternalForm();
+            
+            int startFrom = contextString.indexOf( "//" );
+            if( startFrom >= 0 ) {
+                startFrom += 2; // position after the double slash
+            } else {
+                startFrom = 0; // beginning
+            }
+            
+            int lastSlash = contextString.substring( startFrom ).lastIndexOf( '/' );
+            if( lastSlash > 0 ) {
+                contextString = contextString.substring( 0, startFrom + lastSlash+1 ); // we want the slash
+            } else {
+                contextString = null; // cannot come up with something reasonable
+            }
+        } else {
+            contextString = null;
+        }
+
+        NetMeshBaseIdentifier ret;
+
+        for( Scheme current : theSchemes ) {
+            if( current.matchesStrictly( contextString, string ) != null ) {
+                ret = current.guessAndCreate( contextString, string, this );
+                return ret;
+            }
+        }
+        if( guess ) {
+            for( Scheme current : theSchemes ) {
+                ret = current.guessAndCreate( contextString, string, this );
+                if( ret != null ) {
+                    return ret;
+                }
+            }
+        }
+        throw new UnknownSchemeParseException( string, this );
     }
 
     /**
@@ -342,84 +305,18 @@ public class DefaultNetMeshBaseIdentifierFactory
     }
 
     /**
-     * Determine whether a character is an XRI global context symbol.
-     *
-     * @param c the character
-     * @return true if this character is an XRI global context symbol
+     * The schemes supported by this instance of DefaultNetMeshBaseIdentifierFactory.
      */
-    public static boolean isXriGlobalContextSymbol(
-            char c )
-    {
-        switch( c ) {
-            case '=':
-            case '@':
-            case '+':
-            case '$':
-            case '!':
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    /**
-     * Helper method to remove .. and . from paths.
-     *
-     * @param in the input String
-     * @return the output String
-     */
-    protected static String stripDirectoryPaths(
-            String in )
-    {
-        return in; // FIXME
-    }
-
-    /**
-     * Our ResourceHelper.
-     */
-    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( DefaultNetMeshBaseIdentifierFactory.class );
+    protected Scheme [] theSchemes;
     
     /**
-     * The XRI resolver location.
+     * The default schemes.
      */
-    private static final String theXriResolverPrefix = theResourceHelper.getResourceStringOrDefault(
-            "XriResolverPrefix",
-            "http://xri.net/" );
-
-    /**
-     * The REST-ful protocols for this instance.
-     */
-    protected String [] theRestfulProtocols;
-
-    /*
-     * The non-REST-ful protocols for this instance.
-     */
-    protected String [] theNonRestfulProtocols;
-
-    /**
-     * The pattern that allows us to remove a unnecessary port 80 from a URL spec.
-     */
-    public static final Pattern thePort80Pattern = Pattern.compile(
-            "^(http://[^/:]+):80(/.*)$" );
-
-    /**
-     * The pattern that allows us to remove a unnecessary port 443 from a URL spec.
-     */
-    public static final Pattern thePort443Pattern = Pattern.compile(
-            "^(https://[^/:]+):443(/.*)$" );
-
-    /**
-     * The default REST-ful protocols for this class.
-     */
-    protected static final String [] DEFAULT_RESTFUL_PROTOCOL_NAMES = theResourceHelper.getResourceStringArrayOrDefault(
-            "RestfulProtocolNames",
-            new String [] { "http", "https", "file" } );
-
-    /**
-     * The default non-REST-ful protocol for this class.
-     */
-    protected static final String [] DEFAULT_NON_RESTFUL_PROTOCOL_NAMES = theResourceHelper.getResourceStringArrayOrDefault(
-            "NonRestfulProtocolNames",
-            new String[] { "acct" } );
+    protected static final Scheme [] DEFAULT_SCHEMES = {
+            new HttpScheme(),
+            new HttpsScheme(),
+            new FileScheme(),
+            new AcctScheme(),
+            new XriScheme(),
+    };
 }

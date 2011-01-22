@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -37,6 +37,7 @@ public abstract class AllTests
                 new TestSpec( NetSerializerTest3.class ),
                 new TestSpec( NetSerializerTest4.class ),
                 new TestSpec( NetSerializerTest5.class ),
+                new TestSpec( NetSerializerTest6.class ),
         };
 
         runTests( tests );

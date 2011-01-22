@@ -8,12 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.kernel.net.test.xpriso;
 
+import java.util.regex.Pattern;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.net.NetMeshObject;
@@ -26,6 +27,9 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.m.NetMMeshBaseNameServer;
 import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.schemes.HttpScheme;
+import org.infogrid.meshbase.net.schemes.Scheme;
+import org.infogrid.meshbase.net.schemes.StrictRegexScheme;
 import org.infogrid.meshbase.net.xpriso.logging.LogXprisoMessageLogger;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
@@ -326,8 +330,10 @@ public abstract class AbstractXprisoTest
      * Factory for NetMeshBaseIdentifiers.
      */
     protected NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
-            new String[] { "http" },
-            new String[] { "test" } );
+            new Scheme [] {
+                    new HttpScheme(),
+                    new StrictRegexScheme( "test", Pattern.compile( "test:.*" ))
+             } );
     
     /**
      * The root context for these tests.

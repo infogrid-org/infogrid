@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -42,7 +42,7 @@ public class NetMeshBaseIdentifier
      * @param asEnteredByUser String form as entered by the user, if any. This helps with error messages.
      * @param isRestful if true, this identifier is REST-fully resolvable
      */
-    protected NetMeshBaseIdentifier(
+    public NetMeshBaseIdentifier(
             NetMeshBaseIdentifierFactory fact,
             String                       canonicalForm,
             URI                          uri,

@@ -14,8 +14,16 @@
 
 package org.infogrid.kernel.net.test.mesh.externalized;
 
+import java.util.regex.Pattern;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.net.schemes.AcctScheme;
+import org.infogrid.meshbase.net.schemes.FileScheme;
+import org.infogrid.meshbase.net.schemes.HttpScheme;
+import org.infogrid.meshbase.net.schemes.HttpsScheme;
+import org.infogrid.meshbase.net.schemes.Scheme;
+import org.infogrid.meshbase.net.schemes.StrictRegexScheme;
+import org.infogrid.meshbase.net.schemes.XriScheme;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.m.MModelBase;
 import org.infogrid.testharness.AbstractTest;
@@ -39,11 +47,17 @@ public abstract class AbstractNetSerializerTest
     }
     
     /**
-     * The serializer to be tested.
+     * The MeshBaseIdentifierFactory to be used.
      */
     protected final static NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
-            new String[] { "http", "https" },
-            new String[] { "test", "acct" } );
+            new Scheme [] {
+                    new HttpScheme(),
+                    new HttpsScheme(),
+                    new FileScheme(),
+                    new AcctScheme(),
+                    new XriScheme(),
+                    new StrictRegexScheme( "test", Pattern.compile( "test:.*" ))
+             } );
 
     /**
      * The ModelBase.
