@@ -8,27 +8,26 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.kernel.net.test.mesh.externalized;
 
+import java.util.ArrayList;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.CoherenceSpecification;
+import org.infogrid.meshbase.net.DefaultNetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshBaseAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.ScopeSpecification;
 import org.infogrid.meshbase.net.m.NetMMeshBase;
+import org.infogrid.meshbase.net.proxy.DefaultProxyFactory;
+import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
 import org.infogrid.util.context.SimpleContext;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.logging.Log;
-
-import java.util.ArrayList;
-import org.infogrid.meshbase.net.DefaultNetMeshObjectAccessSpecificationFactory;
-import org.infogrid.meshbase.net.proxy.DefaultProxyFactory;
-import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
 
 /**
  * Tests NetMeshObjectAccessSpecification serialization and deserialization.
@@ -61,6 +60,7 @@ public class NetSerializerTest2
                 theMeshBaseIdentifierFactory.fromExternalForm( "http://www.r-objects.com/" ),
                 theMeshBaseIdentifierFactory.fromExternalForm( "=testing" ),
                 theMeshBaseIdentifierFactory.fromExternalForm( "@testing@abc" ),
+                theMeshBaseIdentifierFactory.fromExternalForm( "acct:foo@bar.com" ),
         };
         NetMeshObjectIdentifier [] testIdentifiers = new NetMeshObjectIdentifier[] {
                 mb.getMeshObjectIdentifierFactory().fromExternalForm( "#xyz" ),
