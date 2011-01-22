@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -95,7 +95,8 @@ public abstract class LocalizedParseException
 
         } catch( StringifierException ex ) {
             log.error( ex );
-            return super.getLocalizedMessage();
+            // now we are in trouble, we can't do super.getLocalizedMessage() because we'd be right back here
+            return getClass().getName() + ": " + getCause().getLocalizedMessage();
         }
     }
 
