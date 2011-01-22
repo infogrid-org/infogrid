@@ -16,6 +16,7 @@ package org.infogrid.probe.xrd.test;
 
 import java.io.File;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.regex.Pattern;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
@@ -24,6 +25,11 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.local.LocalNetMeshBase;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
+import org.infogrid.meshbase.net.schemes.AcctScheme;
+import org.infogrid.meshbase.net.schemes.FileScheme;
+import org.infogrid.meshbase.net.schemes.HttpScheme;
+import org.infogrid.meshbase.net.schemes.Scheme;
+import org.infogrid.meshbase.net.schemes.StrictRegexScheme;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.probe.ProbeDirectory.XmlDomProbeDescriptor;
@@ -147,8 +153,12 @@ public class XrdTest1
      * Factory for NetMeshBaseIdentifiers.
      */
     protected NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
-            new String[] { "http", "file" },
-            new String[] { "test", "acct" } );
+            new Scheme [] {
+                    new HttpScheme(),
+                    new FileScheme(),
+                    new AcctScheme(),
+                    new StrictRegexScheme( "test", Pattern.compile( "test:.*" ))
+             } );
 
     /**
      * The ProbeDirectory.

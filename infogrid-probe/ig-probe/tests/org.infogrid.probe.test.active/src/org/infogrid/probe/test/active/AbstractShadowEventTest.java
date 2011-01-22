@@ -8,14 +8,19 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.probe.test.active;
 
+import java.util.regex.Pattern;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.net.schemes.FileScheme;
+import org.infogrid.meshbase.net.schemes.HttpScheme;
+import org.infogrid.meshbase.net.schemes.Scheme;
+import org.infogrid.meshbase.net.schemes.StrictRegexScheme;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.testharness.AbstractTest;
@@ -62,8 +67,11 @@ public abstract class AbstractShadowEventTest
      * Factory for NetMeshBaseIdentifiers.
      */
     protected static NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
-            new String[] { "http", "file" },
-            new String[] { PROTOCOL_NAME } );
+            new Scheme [] {
+                    new HttpScheme(),
+                    new FileScheme(),
+                    new StrictRegexScheme( PROTOCOL_NAME, Pattern.compile( PROTOCOL_NAME + ":.*" ))
+             } );
 
     /**
      * Expected duration within which at least one ping-pong round trip can be completed.

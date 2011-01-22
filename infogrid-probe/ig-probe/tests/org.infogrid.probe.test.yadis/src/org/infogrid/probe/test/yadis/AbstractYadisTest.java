@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,6 +16,7 @@ package org.infogrid.probe.test.yadis;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.regex.Pattern;
 import org.infogrid.httpd.HttpResponseFactory;
 import org.infogrid.httpd.server.HttpServer;
 import org.infogrid.lid.model.lid.LidSubjectArea;
@@ -27,6 +28,10 @@ import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.local.m.LocalNetMMeshBase;
+import org.infogrid.meshbase.net.schemes.FileScheme;
+import org.infogrid.meshbase.net.schemes.HttpScheme;
+import org.infogrid.meshbase.net.schemes.Scheme;
+import org.infogrid.meshbase.net.schemes.StrictRegexScheme;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.MeshType;
 import org.infogrid.model.Probe.ProbeSubjectArea;
@@ -317,8 +322,11 @@ public abstract class AbstractYadisTest
      * Factory for NetMeshBaseIdentifiers.
      */
     protected static final NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
-            new String[] { "http", "file" },
-            new String[] { PROTOCOL_NAME } );
+            new Scheme [] {
+                    new HttpScheme(),
+                    new FileScheme(),
+                    new StrictRegexScheme( PROTOCOL_NAME, Pattern.compile( PROTOCOL_NAME + ":.*" ))
+             } );
 
     /**
      * Expected duration within which at least one ping-pong round trip can be completed.

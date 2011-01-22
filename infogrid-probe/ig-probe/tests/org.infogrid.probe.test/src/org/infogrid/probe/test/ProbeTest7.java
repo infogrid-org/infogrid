@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -261,7 +261,7 @@ public class ProbeTest7
     static {
         NetMeshBaseIdentifier temp = null;
         try {
-            temp = theMeshBaseIdentifierFactory.fromExternalForm( "http://test_NETWORK_IDENTIFIER.local" );
+            temp = theMeshBaseIdentifierFactory.fromExternalForm( "http://test-network-identifier.local/" );
 
         } catch( Throwable t ) {
             log.error( t );
