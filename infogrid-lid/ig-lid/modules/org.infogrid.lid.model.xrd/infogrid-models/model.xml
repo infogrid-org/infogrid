@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This file is part of InfoGrid(tm). You may not use this file except in
+    compliance with the InfoGrid license. The InfoGrid license and important
+    disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+    have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+    or you do not consent to all aspects of the license and the disclaimers,
+    no license is granted; do not use this file.
+ 
+    For more information about InfoGrid go to http://infogrid.org/
+
+    Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+    All rights reserved.
+-->
+
+<!DOCTYPE model PUBLIC '-//InfoGrid.org//InfoGrid Model//EN' 'http://infogrid.org/dtds/model.dtd'>
+<model>
+    <subjectarea ID="org.infogrid.lid.model.xrd">
+        <name>org.infogrid.lid.model.xrd</name>
+        <username>XRD Subject Area</username>
+        <userdescription>This Subject Area covers the concepts defined by the XRD file format.</userdescription>
+
+        <dependson>
+            <subjectareareference>
+                <name>org.infogrid.model.Web</name>
+            </subjectareareference>
+        </dependson>
+
+        <entitytype ID="org.infogrid.lid.model.xrd/Xrd">
+            <name>Xrd</name>
+            <username>XRD</username>
+            <userdescription>Meta-data about a resource on the web.</userdescription>
+            <supertype>org.infogrid.model.Web/WebResource</supertype>
+
+            <propertytype ID="org.infogrid.lid.model.xrd/Xrd_Id">
+                <name>Id</name>
+                <username>ID</username>
+                <userdescription>This attribute, of type xs:ID, is defined by [xml:id]. It provides a unique
+                 identifier for this XRD, and is used as a signature reference.</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.lid.model.xrd/Xrd_Expires">
+                <name>Expires</name>
+                <username>Expires</username>
+                <userdescription>Specifies when this document expires.</userdescription>
+                <datatype>
+                    <TimeStampDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+        </entitytype>
+
+        <entitytype ID="org.infogrid.lid.model.xrd/AbstractLink">
+            <name>AbstractLink</name>
+            <username>Abstract Link</username>
+            <userdescription>Common traits of Links referring to resources and Link templates.</userdescription>
+            <isabstract/>
+            
+            <propertytype ID="org.infogrid.lid.model.xrd/AbstractLink_Rel">
+                <name>Rel</name>
+                <userdescription>This URI value defines the semantics of the relation between the resource described
+                 by the XRD and the linked resource. This value MUST be an absolute URI or a registered relation type,
+                 as defined in [Web Linking]</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.lid.model.xrd/AbstractLink_Type">
+                <name>Type</name>
+                <username>Type</username>
+                <userdescription>This string value identifies the media type of the linked resource, and MUST be
+                of the form of a media type as defined in [RFC 4288]. The IANA media types registry can be found at
+                http://www.iana.org/assignments/media-types/.</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.lid.model.xrd/AbstractLink_Title">
+                <name>Title</name>
+                <username>Title</username>
+                <userdescription>Provides a human-readable description of the linked resource.</userdescription>
+                <datatype>
+                    <BlobDataType typefield="theTextAnyType" />
+                </datatype>
+                <isoptional/>
+            </propertytype>
+        </entitytype>
+
+        <entitytype ID="org.infogrid.lid.model.xrd/Link">
+            <name>Link</name>
+            <username>Link</username>
+            <userdescription>A link to a resource</userdescription>
+            <supertype>org.infogrid.lid.model.xrd/AbstractLink</supertype>
+        </entitytype>
+
+        <entitytype ID="org.infogrid.lid.model.xrd/LinkTemplate">
+            <name>LinkTemplate</name>
+            <username>Link Template</username>
+            <userdescription>A template for how to find links</userdescription>
+            <supertype>org.infogrid.lid.model.xrd/AbstractLink</supertype>
+
+            <propertytype ID="org.infogrid.lid.model.xrd/LinkTemplate_Template">
+                <name>Template</name>
+                <username>Template</username>
+                <userdescription>The template attribute provides a URI template which can be used to obtain the URI
+                of the linked resource. Templates provide a mechanism for URI construction, taking a list of variables
+                as input, and producing a URI string as an output. The template syntax and vocabulary are determined
+                by the application through which the XRD document is obtained and processed, and MAY be specific to
+                the link relation type indicated by the rel attribute of the corresponding Link element. Applications
+                utilizing the template mechanism MUST define the template syntax and processing rules (including error
+                handling) as well as the variable vocabulary. </userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+        </entitytype>
+
+        <relationshiptype ID="org.infogrid.lid.model.xrd/Xrd_Contains_AbstractLink">
+            <name>Xrd_Contains_AbstractLink</name>
+            <username>Contains</username>
+            <userdescription>Relates the XRD to its Link elements.</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.xrd/Xrd</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.lid.model.xrd/AbstractLink</e>
+              <MultiplicityValue>1:1</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.lid.model.xrd/Xrd_About_WebResource">
+            <name>Xrd_About_WebResource</name>
+            <username>About</username>
+            <userdescription>Relates the XRD to the WebResources that it describes.</userdescription>
+            <isabstract/>
+            <src>
+              <e>org.infogrid.lid.model.xrd/Xrd</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.model.Web/WebResource</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.lid.model.xrd/Xrd_AboutPrimary_WebResource">
+            <name>Xrd_AboutPrimary_WebResource</name>
+            <username>About Primary</username>
+            <userdescription>Relates the XRD to the primary WebResource that it describes, but not the aliases.</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.xrd/Xrd</e>
+              <refines>org.infogrid.lid.model.xrd/Xrd_About_WebResource-S</refines>
+              <MultiplicityValue>0:1</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.model.Web/WebResource</e>
+              <refines>org.infogrid.lid.model.xrd/Xrd_About_WebResource-D</refines>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.lid.model.xrd/Xrd_AboutAlias_WebResource">
+            <name>Xrd_AboutAlias_WebResource</name>
+            <username>About Alias</username>
+            <userdescription>Relates the XRD to the aliased WebResources that it describes, but not the primary one.</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.xrd/Xrd</e>
+              <refines>org.infogrid.lid.model.xrd/Xrd_About_WebResource-S</refines>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.model.Web/WebResource</e>
+              <refines>org.infogrid.lid.model.xrd/Xrd_About_WebResource-D</refines>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.lid.model.xrd/Link_To_WebResource">
+            <name>Link_To_WebResource</name>
+            <username>To</username>
+            <userdescription>Relates the XRD Link element to its destination.</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.xrd/Link</e>
+              <MultiplicityValue>1:1</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.model.Web/WebResource</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+    </subjectarea>
+</model>
