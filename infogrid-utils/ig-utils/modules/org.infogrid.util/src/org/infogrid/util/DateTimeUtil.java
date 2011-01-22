@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -22,8 +22,13 @@ import java.util.TimeZone;
 /**
  * Help with date/time as defined in RFC 3339 section 5.6.
  */
-public abstract class Rfc3339Util
+public abstract class DateTimeUtil
 {
+    /**
+     * Private constructor to keep this abstract.
+     */
+    private DateTimeUtil() {}
+    
     /**
      * Convert a Date to an RFC 3339 String.
      *
@@ -58,15 +63,56 @@ public abstract class Rfc3339Util
     }
 
     /**
+     * Convert a Date to a W3C String.
+     *
+     * @param d the Date
+     * @return the String
+     */
+    public static String dateToW3c(
+            Date d )
+    {
+        String ret = theW3cFormat.format( d );
+
+        return ret;
+    }
+
+    /**
+     * Convert a W3C String to a Date.
+     *
+     * @param s the String
+     * @return the Date
+     * @throws ParseException thrown if a syntax error occurred
+     */
+    public static Date w3cToDate(
+            String s )
+        throws
+            ParseException
+    {
+        s = s.toUpperCase();
+
+        Date ret = theW3cFormat.parse( s );
+
+        return ret;
+    }
+
+    /**
      * The UTC TimeZone.
      */
     public static final TimeZone UTC = TimeZone.getTimeZone( "UTC" );
 
     /**
-     * Date format to use.
+     * Date format to use for RFC 3339.
      */
     public static final SimpleDateFormat theRfc3339Format = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     static {
         theRfc3339Format.setTimeZone( UTC );
+    }
+
+    /**
+     * Date format to use for W3C.
+     */
+    public static final SimpleDateFormat theW3cFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss'Z'");
+    static {
+        theW3cFormat.setTimeZone( UTC );
     }
 }
