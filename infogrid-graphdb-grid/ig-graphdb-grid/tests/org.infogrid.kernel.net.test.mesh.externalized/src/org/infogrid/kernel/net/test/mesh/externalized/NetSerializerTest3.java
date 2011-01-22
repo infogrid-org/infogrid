@@ -18,7 +18,6 @@ import java.text.ParseException;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.util.logging.Log;
 
-
 /**
  * NetMeshBaseIdentifiers can only use protocols that have been specified in the factory.
  */
