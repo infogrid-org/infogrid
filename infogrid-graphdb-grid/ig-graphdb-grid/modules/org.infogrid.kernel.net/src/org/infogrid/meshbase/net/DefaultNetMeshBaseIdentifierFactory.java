@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -421,5 +421,5 @@ public class DefaultNetMeshBaseIdentifierFactory
      */
     protected static final String [] DEFAULT_NON_RESTFUL_PROTOCOL_NAMES = theResourceHelper.getResourceStringArrayOrDefault(
             "NonRestfulProtocolNames",
-            new String[] {} );
+            new String[] { "acct" } );
 }
