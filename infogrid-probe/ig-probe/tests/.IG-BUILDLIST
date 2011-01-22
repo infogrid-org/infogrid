@@ -6,4 +6,5 @@ org.infogrid.probe.test.forwardreference
 org.infogrid.probe.store.test
 org.infogrid.probe.feeds.test
 org.infogrid.probe.vcard.test
+org.infogrid.probe.xrd.test
 org.infogrid.probe.test.active [no-run]

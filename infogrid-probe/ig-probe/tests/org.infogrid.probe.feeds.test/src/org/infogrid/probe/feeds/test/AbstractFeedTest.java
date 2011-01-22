@@ -118,7 +118,7 @@ public abstract class AbstractFeedTest
     }
 
     /**
-     * Dump the content of a MeshBase to log.traceMethodCallEntry().
+     * Dump the content of a MeshBase to log.debug().
      *
      * @param mb the MeshBase whose content we want to dump
      * @param prefix a string to prepend

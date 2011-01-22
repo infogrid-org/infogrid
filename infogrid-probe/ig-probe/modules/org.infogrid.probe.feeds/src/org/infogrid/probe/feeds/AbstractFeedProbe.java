@@ -442,7 +442,7 @@ public abstract class AbstractFeedProbe
                 } else {
                     String content = realChild.getTextContent();
                     try {
-                        PropertyValue ret = TimeStampValue.create( content );
+                        PropertyValue ret = TimeStampValue.createFromRfc3339( content );
                         return ret;
                     } catch( ParseException ex ) {
                         throw new ProbeException.SyntaxError( dataSourceIdentifier, "Invalid RFC 3339 date " + content, ex );

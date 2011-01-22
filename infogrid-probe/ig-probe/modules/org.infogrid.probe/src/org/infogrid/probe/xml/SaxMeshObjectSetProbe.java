@@ -570,7 +570,7 @@ public class SaxMeshObjectSetProbe
                 theObjectBeingParsed.addPropertyValue( theObjectBeingParsed.getCurrentPropertyValue() );
             } else {
                 try {
-                    theObjectBeingParsed.addPropertyValue( TimeStampValue.create( theCharacters.toString().trim() ) );
+                    theObjectBeingParsed.addPropertyValue( TimeStampValue.createFromRfc3339( theCharacters.toString().trim() ) );
                 } catch( ParseException ex ) {
                     throw new SAXParseException( "Cannot parse RFC 3339 String", theLocator, ex );
                 }

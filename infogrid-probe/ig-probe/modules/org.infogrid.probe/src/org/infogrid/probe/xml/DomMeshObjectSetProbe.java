@@ -364,7 +364,7 @@ public class DomMeshObjectSetProbe
                                         Float.parseFloat( sec ));
                             } else {
                                 try {
-                                    propValue = TimeStampValue.create( content.trim() );
+                                    propValue = TimeStampValue.createFromRfc3339( content.trim() );
 
                                 } catch( ParseException ex ) {
                                     throw new ProbeException.SyntaxError( dataSourceIdentifier, ex );
