@@ -512,7 +512,7 @@ public class ProbeDispatcher
         String                contentAsString  = null;
         String                contentType      = null;
         NetMeshBaseIdentifier sourceIdentifier = theShadowMeshBase.getIdentifier();
-        String                protocol         = sourceIdentifier.getUrlProtocol();
+        String                protocol         = sourceIdentifier.toUri().getScheme();
         URL                   url              = sourceIdentifier.toUrl();
         Probe                 probe            = null;
 
@@ -623,7 +623,7 @@ public class ProbeDispatcher
                      || "text/xhtml".equals( contentType )
                      || "application/xhtml+xml".equals( contentType )) )
             {
-                if( contentAsString == null ) {
+                if( contentAsString == null && content != null ) {
                     contentAsString = new String( content );
                 }
                 yadisServicesHtml = contentAsString;
@@ -762,20 +762,16 @@ public class ProbeDispatcher
             }
             
         } else {
-            try {
-                ProbeDirectory.ApiProbeDescriptor desc2 = theProbeDirectory.getApiProbeDescriptorByProtocol( sourceIdentifier.getUrlProtocol() );
+            ProbeDirectory.ApiProbeDescriptor desc2 = theProbeDirectory.getApiProbeDescriptorByProtocol( sourceIdentifier.toUri().getScheme() );
 
-                if( desc2 != null ) {
-                    foundClass      = desc2.getProbeClass();
-                    foundClassName  = desc2.getProbeClassName();
-                    foundParameters = desc2.getParameters();
+            if( desc2 != null ) {
+                foundClass      = desc2.getProbeClass();
+                foundClassName  = desc2.getProbeClassName();
+                foundParameters = desc2.getParameters();
 
-                    if( log.isDebugEnabled() ) {
-                        log.debug( this + ": based on protocol, found name for Probe class: " + foundClassName );
-                    }
+                if( log.isDebugEnabled() ) {
+                    log.debug( this + ": based on protocol, found name for Probe class: " + foundClassName );
                 }
-            } catch( MalformedURLException ex ) {
-                // thrown for unknown protocols. This is fine.
             }
         }
 
@@ -1932,12 +1928,10 @@ public class ProbeDispatcher
             NetMeshBaseIdentifier id )
     {
         try {
-            String proto = id.getUrlProtocol();
+            String proto = id.toUri().getScheme();
 
            return "http".equals( proto ) || "https".equals( proto ) ||"ftp".equals( proto ) || "file".equals( proto );
            
-        } catch( MalformedURLException ex ) {
-            return false;
         } catch( IllegalArgumentException ex ) {
             return false;
         }
