@@ -199,5 +199,18 @@
             </dest>
         </relationshiptype>
 
+        <relationshiptype ID="org.infogrid.lid.model.xrd/MeshObject_Describes_MeshObject">
+            <name>MeshObject_Describes_MeshObject</name>
+            <username>Describes</username>
+            <userdescription>Relates a MeshObject to the XRD that describes it. Given that a MeshObject may turn out
+            to not be blessed with Xrd after the resource is accessed, this has MeshObject on both sides of the RelationshipType.</userdescription>
+            <src>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <MultiplicityValue>0:1</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
     </subjectarea>
 </model>
