@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
@@ -398,7 +399,75 @@ public final class ResourceHelper
         }
         return ret;
     }
-    
+
+    /**
+     * Obtain a resource value as Map<String,String> using the convention
+     * for specifying maps in the resources, or a default. The default
+     * is returned if the resource does not exist, or if it exists but
+     * does not have the right structure.
+     *
+     * @param resourceName the name of the resource we are looking for
+     * @param defaultMap the Map to return if the resource value could not be found, or was incorrect
+     * @return the value of the resource, or a default
+     */
+    public Map<String,String> getResourceStringMapOrDefault(
+            String             resourceName,
+            Map<String,String> defaultMap )
+    {
+        String toParse = getResourceStringOrNull( resourceName );
+        if( toParse == null ) {
+            return defaultMap;
+        }
+        Map<String,String> ret = string2map( toParse );
+        if( ret.isEmpty() ) {
+            ret = defaultMap;
+        }
+        return ret;
+    }
+
+    /**
+     * Obtain a resource value as Map<String,String> using the convention
+     * for specifying maps in the resources, or null if not given.
+     *
+     * @param resourceName the name of the resource we are looking for
+     * @return the value of the resource, or null
+     */
+    public Map<String,String> getResourceStringMapOrNull(
+            String resourceName )
+    {
+        String toParse = getResourceStringOrNull( resourceName );
+        if( toParse == null ) {
+            return null;
+        }
+        Map<String,String> ret = string2map( toParse );
+        return ret;
+    }
+
+    /**
+     * Helper method to parse a String into a Map.
+     *
+     * @param s the String
+     * @return the Map
+     */
+    protected static Map<String,String> string2map(
+            String s )
+    {
+        HashMap<String,String> ret = new HashMap<String,String>();
+
+        String [] entries = StringHelper.tokenize( s );
+        for( String current : entries ) {
+            String [] parts = current.split( "=>" );
+            if( parts.length == 2 ) {
+                String key   = parts[0].trim();
+                String value = parts[1].trim();
+
+                ret.put( key, value );
+            }
+        }
+
+        return ret;
+    }
+
     /**
      * Obtain a resource value, or the default if not given.
      *
