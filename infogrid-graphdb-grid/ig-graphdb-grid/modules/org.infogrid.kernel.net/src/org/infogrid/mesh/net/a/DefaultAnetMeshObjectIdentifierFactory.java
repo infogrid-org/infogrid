@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -187,9 +187,9 @@ public class DefaultAnetMeshObjectIdentifierFactory
             localId  = raw.substring( hash+1 );
         } else if( hash > 0 ) {
             if( guess ) {
-                meshBase = theMeshBaseIdentifierFactory.guessFromExternalForm( raw.substring( 0, hash ));
+                meshBase = theMeshBaseIdentifierFactory.guessFromExternalForm( contextIdentifier, raw.substring( 0, hash ));
             } else {
-                meshBase = theMeshBaseIdentifierFactory.fromExternalForm( raw.substring( 0, hash ));
+                meshBase = theMeshBaseIdentifierFactory.fromExternalForm( contextIdentifier, raw.substring( 0, hash ));
             }
             localId = raw.substring( hash+1 );
         } else if( treatAsGlobalIdentifier( raw )) {

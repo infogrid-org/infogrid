@@ -63,7 +63,7 @@ public abstract class AbstractRegexScheme
             String full = context + candidate;
             m = thePattern.matcher( full );
             if( m.matches() ) {
-                return toCanonicalForm( candidate, m );
+                return toCanonicalForm( full, m );
             }
         }
         return null;
