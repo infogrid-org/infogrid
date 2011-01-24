@@ -20,7 +20,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
-import org.infogrid.model.primitives.StringDataType;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -39,7 +38,8 @@ public class HttpScheme
      */
     public HttpScheme()
     {
-        this( "http", StringDataType.theHttpUrlType.getRegex() );
+        this(   "http",
+                Pattern.compile( "((?i:http://[a-z0-9](?:[a-z0-9\\-.]*[a-z0-9])?))(?::\\d+)?/\\S*" ));
     }
 
     /**

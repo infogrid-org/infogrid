@@ -14,10 +14,14 @@
 
 package org.infogrid.meshbase.net.schemes;
 
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Abstract implementation of Scheme that strictly matches against a regular expression.
+ * All capturing groups of the provided regex will be turned into their lower-case equivalent
+ * in the matchesStrictly method.
  */
 public abstract class AbstractRegexScheme
         extends
@@ -45,22 +49,48 @@ public abstract class AbstractRegexScheme
      *
      * @param context the identifier root that forms the context
      * @param candidate the candidate identifier
-     * @return non-null if the candidate identifier strictly matches this scheme, in the absolute form
+     * @return non-null if the candidate identifier strictly matches this scheme, in its canonical form
      */
     public String matchesStrictly(
             String context,
             String candidate )
     {
-        if( thePattern.matcher( candidate ).matches() ) {
-            return candidate;
+        Matcher m = thePattern.matcher( candidate );
+        if( m.matches() ) {
+            return toCanonicalForm( candidate, m );
         }
-
-        String full = context + candidate;
-        if( context != null && thePattern.matcher( full ).matches() ) {
-            return full;
+        if( context != null ) {
+            String full = context + candidate;
+            m = thePattern.matcher( full );
+            if( m.matches() ) {
+                return toCanonicalForm( candidate, m );
+            }
         }
-
         return null;
+    }
+
+    /**
+     * Convert the matched pattern into the canonical form.
+     *
+     * @param matcher the String that matched the regex
+     * @param m the Matcher that matched
+     * @return the canonical form
+     */
+    protected String toCanonicalForm(
+            String      matched,
+            MatchResult res )
+    {
+        StringBuilder ret = new StringBuilder();
+
+        int nMatches = res.groupCount();
+        int current    = 0;
+        for( int i=1 ; i<=nMatches ; ++i ) {
+            ret.append( matched.substring( current, res.start( i )));
+            ret.append( matched.substring( res.start( i ), res.end( i )).toLowerCase() );
+            current = res.end( i );
+        }
+        ret.append( matched.substring( current ));
+        return ret.toString();
     }
 
     /**

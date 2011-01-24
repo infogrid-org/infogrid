@@ -32,11 +32,11 @@ public abstract class AllTests
             String [] args )
     {
         TestSpec [] tests = {
-                new TestSpec( NetSerializerTest1.class ),
-                new TestSpec( NetSerializerTest2.class ),
-                new TestSpec( NetSerializerTest3.class ),
-                new TestSpec( NetSerializerTest4.class ),
-                new TestSpec( NetSerializerTest5.class ),
+//                new TestSpec( NetSerializerTest1.class ),
+//                new TestSpec( NetSerializerTest2.class ),
+//                new TestSpec( NetSerializerTest3.class ),
+//                new TestSpec( NetSerializerTest4.class ),
+//                new TestSpec( NetSerializerTest5.class ),
                 new TestSpec( NetSerializerTest6.class ),
         };
 

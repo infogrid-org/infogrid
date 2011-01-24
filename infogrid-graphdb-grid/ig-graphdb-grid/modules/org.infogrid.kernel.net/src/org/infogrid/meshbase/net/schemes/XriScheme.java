@@ -43,19 +43,19 @@ public class XriScheme
      *
      * @param context the identifier root that forms the context
      * @param candidate the candidate identifier
-     * @return true if the candidate identifier strictly matches this scheme
+     * @return non-null if the candidate identifier strictly matches this scheme, in its canonical form
      */
     public String matchesStrictly(
             String context,
             String candidate )
     {
         if( isXriGlobalContextSymbol( candidate.charAt( 0 ))) {
-            return candidate;
+            return candidate.toLowerCase();
         }
         if( candidate.startsWith( theXriResolverPrefix )) {
             String xri = candidate.substring( theXriResolverPrefix.length() );
             if( isXriGlobalContextSymbol( xri.charAt( 0 ) )) {
-                return xri;
+                return xri.toLowerCase();
             }
         }
         return null;
@@ -77,14 +77,11 @@ public class XriScheme
             NetMeshBaseIdentifierFactory fact )
     {
         try {
-            if( isXriGlobalContextSymbol( candidate.charAt( 0 ))) {
-                return new NetMeshBaseIdentifier( fact, candidate, new URI( theXriResolverPrefix + candidate ), candidate, true );
+            String canonical = matchesStrictly( context, candidate );
+            if( canonical != null ) {
+                return new NetMeshBaseIdentifier( fact, canonical, new URI( theXriResolverPrefix + canonical ), candidate, true );
             }
 
-            if( candidate.startsWith( theXriResolverPrefix ) && isXriGlobalContextSymbol( candidate.charAt( theXriResolverPrefix.length() ))) {
-                String xri = candidate.substring( theXriResolverPrefix.length() );
-                return new NetMeshBaseIdentifier( fact, xri, new URI( theXriResolverPrefix + candidate ), candidate, true );
-            }
         } catch( URISyntaxException ex ) {
             if( log.isDebugEnabled() ) {
                 log.debug( ex );

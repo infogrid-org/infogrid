@@ -37,7 +37,7 @@ public class FileScheme
      */
     public FileScheme()
     {
-        super( "file", Pattern.compile( "file:/.*" ));
+        super( "file", Pattern.compile( "((?i:file)):/.*" ));
     }
 
     /**

@@ -16,7 +16,6 @@ package org.infogrid.meshbase.net.schemes;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.infogrid.model.primitives.StringDataType;
 
 /**
  * Represents HTTPS for the DefaultNetMeshBaseIdentifierFactory.
@@ -30,7 +29,8 @@ public class HttpsScheme
      */
     public HttpsScheme()
     {
-        super( "https", StringDataType.theHttpsUrlType.getRegex() );
+        super(  "https",
+                Pattern.compile( "((?i:https://[a-z0-9](?:[a-z0-9\\-.]*[a-z0-9])?))(?::\\d+)?/\\S*" ));
     }
 
     /**

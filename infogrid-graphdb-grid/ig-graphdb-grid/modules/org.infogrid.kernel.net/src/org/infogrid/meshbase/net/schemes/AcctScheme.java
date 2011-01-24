@@ -16,9 +16,9 @@ package org.infogrid.meshbase.net.schemes;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.regex.Pattern;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
-import org.infogrid.model.primitives.StringDataType;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -37,7 +37,8 @@ public class AcctScheme
      */
     public AcctScheme()
     {
-        super( "acct", StringDataType.theAcctAddressType.getRegex() );
+        super(  "acct",
+                Pattern.compile( "(acct:[A-Z0-9._%+-]+@[A-Z0-9.-]*[A-Z])", Pattern.CASE_INSENSITIVE ));
     }
 
     /**
@@ -60,7 +61,7 @@ public class AcctScheme
                 return new NetMeshBaseIdentifier( fact, candidate, new URI( candidate ), candidate, false );
 
             }
-            String tryThis = "acct:" + candidate;
+            String tryThis = "acct:" + candidate.toLowerCase(); // might as well turn it lower-case here
             
             if( thePattern.matcher( tryThis ).matches() ) {
                 return new NetMeshBaseIdentifier( fact, tryThis, new URI( tryThis ), candidate, false );

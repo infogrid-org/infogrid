@@ -34,7 +34,7 @@ public interface Scheme
      *
      * @param context the identifier root that forms the context
      * @param candidate the candidate identifier
-     * @return non-null if the candidate identifier strictly matches this scheme, in the absolute form
+     * @return non-null if the candidate identifier strictly matches this scheme, in its canonical form
      */
     public abstract String matchesStrictly(
             String context,
