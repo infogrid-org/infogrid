@@ -30,7 +30,7 @@ public class HttpsScheme
     public HttpsScheme()
     {
         super(  "https",
-                Pattern.compile( "((?i:https://[a-z0-9](?:[a-z0-9\\-.]*[a-z0-9])?))(?::\\d+)?/\\S*" ));
+                Pattern.compile( "((?i:https://[a-z0-9](?:[a-z0-9\\-.]*[a-z0-9])?))(?::\\d+)?/[a-zA-Z0-9*\\$\\-_@.&+!*\"'(),%?=;/]*" ));
     }
 
     /**

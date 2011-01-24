@@ -39,7 +39,7 @@ public class HttpScheme
     public HttpScheme()
     {
         this(   "http",
-                Pattern.compile( "((?i:http://[a-z0-9](?:[a-z0-9\\-.]*[a-z0-9])?))(?::\\d+)?/\\S*" ));
+                Pattern.compile( "((?i:http://[a-z0-9](?:[a-z0-9\\-.]*[a-z0-9])?))(?::\\d+)?/[a-zA-Z0-9*\\$\\-_@.&+!*\"'(),%?=;/]*" ));
     }
 
     /**
