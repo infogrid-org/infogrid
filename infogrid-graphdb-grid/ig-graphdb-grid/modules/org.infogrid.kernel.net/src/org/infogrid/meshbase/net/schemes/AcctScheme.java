@@ -65,8 +65,8 @@ public class AcctScheme
             
             if( thePattern.matcher( tryThis ).matches() ) {
                 return new NetMeshBaseIdentifier( fact, tryThis, new URI( tryThis ), candidate, false );
-
             }
+
         } catch( URISyntaxException ex ) {
             if( log.isDebugEnabled() ) {
                 log.debug( ex );
