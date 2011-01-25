@@ -76,7 +76,7 @@ public abstract class AbstractWebfingerTest
 
         theProbeDirectory.addStreamProbe( new ProbeDirectory.StreamProbeDescriptor( "text/plain", BlobProbe.class ));
         theProbeDirectory.addApiProbe( new ProbeDirectory.ApiProbeDescriptor( "acct", WebfingerAcctProbe.class ));
-        theProbeDirectory.addXmlDomProbe( new ProbeDirectory.XmlDomProbeDescriptor( null, "http://docs.oasis-open.org/ns/xri/xrd-1.0", "XRD", XrdProbe.class ));
+        theProbeDirectory.addXmlDomProbe( new ProbeDirectory.XmlDomProbeDescriptor( "application/xrd+xml", "http://docs.oasis-open.org/ns/xri/xrd-1.0", "XRD", XrdProbe.class ));
 
         // MeshBase
         exec = createThreadPool( 1 );
