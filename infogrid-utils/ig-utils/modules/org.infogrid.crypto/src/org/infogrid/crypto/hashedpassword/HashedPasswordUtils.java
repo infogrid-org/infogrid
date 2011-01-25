@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -17,7 +17,6 @@ package org.infogrid.crypto.hashedpassword;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.infogrid.util.Base64;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -84,32 +83,6 @@ public abstract class HashedPasswordUtils
             }
         }
         return true;
-    }
-
-    /**
-     * Convert a byte array into something that can be stored in most persistent stores.
-     *
-     * @param raw the raw byte array
-     * @return a String
-     */
-    public static String raw2string(
-            byte [] raw )
-    {
-        String ret = Base64.base64encodeNoCr( raw );
-        return ret;
-    }
-
-    /**
-     * Convert a String converted with raw2string back into a byte array.
-     *
-     * @param s the String
-     * @return the byte array
-     */
-    public static byte [] string2raw(
-            String s )
-    {
-        byte [] ret = Base64.base64decode( s );
-        return ret;
     }
 
     /**
