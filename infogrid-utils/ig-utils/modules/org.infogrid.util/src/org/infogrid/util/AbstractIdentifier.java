@@ -56,7 +56,47 @@ public abstract class AbstractIdentifier
     }
 
     /**
+     * Obtain a colloquial external form for this Identifier.
+     * This may be overridden by subclasses.
+     *
+     * @return colloquial external form of this Identifier
+     */
+    public String toColloquialExternalForm()
+    {
+        String ret = toExternalForm();
+
+        for( String current : COLLOQUIAL_REMOVED_PREFIXES ) {
+            if( ret.startsWith( current )) {
+                ret = ret.substring( current.length() );
+                break; // there won't be more than one
+            }
+        }
+        // remove last slash if there isn't any other
+        if( ret.indexOf( '/' ) == ret.length()-1 ) {
+            ret = ret.substring( 0, ret.length()-1 );
+        }
+        return ret;
+    }
+
+    /**
+     * Obtain a colloquial external form for this Identifier.
+     * This is provided to make invocation from JSPs easier.
+     *
+     * @return colloquial external form of this Identifier
+     */
+    public final String getColloquialExternalForm()
+    {
+        return toColloquialExternalForm();
+    }
+
+    /**
      * The String entered by the user, if any
      */
     protected String theAsEntered;
+
+    /**
+     * The prefixes to strip for colloquial external forms.
+     */
+    private static final String [] COLLOQUIAL_REMOVED_PREFIXES
+            = ResourceHelper.getInstance( AbstractIdentifier.class ).getResourceStringArray( "ColloquialRemovedPrefixes" );
 }

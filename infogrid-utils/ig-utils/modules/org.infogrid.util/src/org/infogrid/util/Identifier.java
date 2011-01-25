@@ -40,4 +40,19 @@ public interface Identifier
      * @return external form of this Identifier
      */
     public abstract String getExternalForm();
+
+    /**
+     * Obtain a colloquial external form for this Identifier.
+     *
+     * @return colloquial external form of this Identifier
+     */
+    public abstract String toColloquialExternalForm();
+
+    /**
+     * Obtain a colloquial external form for this Identifier.
+     * This is provided to make invocation from JSPs easier.
+     *
+     * @return colloquial external form of this Identifier
+     */
+    public abstract String getColloquialExternalForm();
 }

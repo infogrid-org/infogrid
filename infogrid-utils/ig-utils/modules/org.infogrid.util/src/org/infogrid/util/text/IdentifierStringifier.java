@@ -100,9 +100,18 @@ public class IdentifierStringifier
             return formatToNull( soFar, pars );
         }
 
-        String ext = arg.toExternalForm();
+        String ext;
+        if( theProcessColloquial && pars != null ) {
+            Boolean colloquial = (Boolean) pars.get( StringRepresentationParameters.COLLOQUIAL );
+            if( colloquial != null && colloquial.booleanValue() ) {
+                ext = arg.toColloquialExternalForm();
+            } else {
+                ext = arg.toExternalForm();
+            }
+        } else {
+            ext = arg.toExternalForm();
+        }
 
-        ext = potentiallyProcessColloquial( ext, pars );
         ext = potentiallyShorten( ext, pars );
         ext = escape( ext );
 
@@ -166,50 +175,6 @@ public class IdentifierStringifier
             StringRepresentationParameters pars )
     {
         return "null"; // FIXME?
-    }
-
-    /**
-     * Process the string according to the value of theProcessColloquial
-     * and the parameter.
-     *
-     * @param in the input String
-     * @param pars collects parameters that may influence the String representation
-     * @return the output String
-     */
-    protected String potentiallyProcessColloquial(
-            String                         in,
-            StringRepresentationParameters pars )
-    {
-        String ret = in;
-
-        if( theProcessColloquial && pars != null ) {
-            Boolean colloquial = (Boolean) pars.get( StringRepresentationParameters.COLLOQUIAL );
-            if( colloquial != null && colloquial.booleanValue() ) {
-
-                ret = toColloquialIdentifier( ret );
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Factored out colloquial processing for easier reusability.
-     *
-     * @param identifier
-     * @return colloquial form of identifier
-     */
-    public static String toColloquialIdentifier(
-            String identifier )
-    {
-        String ret = identifier;
-
-        if( ret != null ) {
-            final String PREFIX = "http://";
-            if( ret.startsWith( PREFIX )) {
-                ret = ret.substring( PREFIX.length() );
-            }
-        }
-        return ret;
     }
 
     /**
