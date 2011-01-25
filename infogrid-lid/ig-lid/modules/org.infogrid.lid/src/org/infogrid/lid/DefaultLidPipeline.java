@@ -110,8 +110,8 @@ public class DefaultLidPipeline
                 realm,
                 clientAuthStatus,
                 requestedResource );
-        LidPipelineStageInstructions instructionsToAdd;
 
+        LidPipelineStageInstructions instructionsToAdd;
         if( theYadisStage != null ) {
             // this also needs to be invoked if requestedResource is null
             instructionsToAdd = theYadisStage.processStage( lidRequest, requestedResource, instructionsSoFar );
