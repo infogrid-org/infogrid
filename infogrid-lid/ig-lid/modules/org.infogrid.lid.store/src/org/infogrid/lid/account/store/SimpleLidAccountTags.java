@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -31,9 +31,6 @@ public interface SimpleLidAccountTags
     /** Tag for an identity attribute. */
     public static final String ATTRIBUTE_TAG = "attribute";
     
-    /** Tag for a credential. */
-    public static final String CREDENTIAL_TAG = "credential";
-
     /** Tag for a group identifier. */
     public static final String GROUP_TAG = "group";
 }

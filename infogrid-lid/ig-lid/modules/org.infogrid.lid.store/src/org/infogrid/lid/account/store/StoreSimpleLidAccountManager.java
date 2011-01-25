@@ -15,6 +15,7 @@
 package org.infogrid.lid.account.store;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import org.infogrid.lid.account.AbstractLidAccountManager;
 import org.infogrid.lid.credential.LidCredentialType;
@@ -90,8 +91,6 @@ public class StoreSimpleLidAccountManager
                                 arg.getStatus(),
                                 ArrayHelper.copyIntoNewArray( arg.getRemoteIdentifiers(), Identifier.class ),
                                 arg.getAttributes(),
-                                arg.getCredentialTypes(),
-                                arg.getCredentialValues(),
                                 arg.getGroupIdentifiers() );
                         return ret;
                     }
@@ -132,7 +131,8 @@ public class StoreSimpleLidAccountManager
     }
 
     /**
-     * Provision a LidAccount.
+     * Provision a LidAccount. This LidAccount will have no credentials associated with it; they need to be
+     * set separately.
      *
      * @param localIdentifier the Identifier for the to-be-created LidAccount. This may be null, in which case
      *        the LidAccountManager assigns a local Identifier
@@ -144,11 +144,10 @@ public class StoreSimpleLidAccountManager
      * @throws LidAccountExistsAlreadyException thrown if a LidAccount with this Identifier exists already
      */
     @Override
-    public LidAccount provisionAccount(
+    public SimpleLidAccount provisionAccount(
             Identifier                    localIdentifier,
             HasIdentifier []              remotePersonas,
             Map<String,String>            attributes,
-            Map<LidCredentialType,String> credentials,
             Identifier []                 groupIdentifiers )
         throws
             LidAccountExistsAlreadyException
@@ -161,19 +160,16 @@ public class StoreSimpleLidAccountManager
         }
         ArrayList<Identifier> groupIds = new ArrayList<Identifier>( groupIdentifiers != null ? groupIdentifiers.length : 0 );
         if( groupIdentifiers != null ) {
-            for( Identifier group : groupIdentifiers ) {
-                groupIds.add( group );
-            }
+            groupIds.addAll( Arrays.asList( groupIdentifiers ) );
         }
         AccountData attCred = new AccountData(
                 LidAccount.LidAccountStatus.ACTIVE,
                 remoteIdentifiers,
                 attributes,
-                credentials,
                 groupIds );
         
         try {
-            LidAccount ret = theDelegateFactory.obtainNewFor( localIdentifier, attCred );
+            SimpleLidAccount ret = theDelegateFactory.obtainNewFor( localIdentifier, attCred );
             localIdentifier = ret.getIdentifier();
 
             if( remotePersonas != null ) {

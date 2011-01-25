@@ -8,20 +8,25 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.account.store;
 
+import java.io.IOException;
 import org.infogrid.lid.credential.LidWrongPasswordException;
 import org.infogrid.crypto.hashedpassword.HashedPasswordUtils;
 import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.credential.AbstractLidPasswordCredentialType;
 import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
+import org.infogrid.store.Store;
+import org.infogrid.store.StoreKeyDoesNotExistException;
+import org.infogrid.store.StoreValue;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.http.SaneRequest;
+import org.infogrid.util.logging.Log;
 
 /**
  * A password LidCredentialType that is validated against hashed passwords contained in a Store.
@@ -30,23 +35,30 @@ public class StoreLidPasswordCredentialType
     extends
         AbstractLidPasswordCredentialType
 {
+    private static final Log log = Log.getLogInstance( StoreLidPasswordCredentialType.class ); // our own, private logger
+
     /**
      * Factory method.
      *
+     * @param the Store that stores the passwords
      * @return the created RegexLidPasswordCredentialType
      */
-    public static StoreLidPasswordCredentialType create()
+    public static StoreLidPasswordCredentialType create(
+            Store passwordStore )
     {
-        StoreLidPasswordCredentialType ret = new StoreLidPasswordCredentialType();
+        StoreLidPasswordCredentialType ret = new StoreLidPasswordCredentialType( passwordStore );
         return ret;
     }
 
     /**
      * Constructor, for subclasses only, use factory method.
+     *
+     * @param the Store that stores the passwords
      */
-    protected StoreLidPasswordCredentialType()
+    protected StoreLidPasswordCredentialType(
+            Store passwordStore )
     {
-        // nothing
+        thePasswordStore = passwordStore;
     }
 
     /**
@@ -65,14 +77,21 @@ public class StoreLidPasswordCredentialType
             LidExpiredCredentialException,
             LidInvalidCredentialException
     {
-        LidAccount realSubject = (LidAccount) subject;
+        StoreValue found = null;
+        try {
+            found = thePasswordStore.get( subject.getIdentifier().toExternalForm() );
 
-        String storedHashedCredential = realSubject.getCredentialFor( this );
+        } catch( IOException ex ) {
+            log.error( ex );
 
-        if( storedHashedCredential == null ) {
+        } catch( StoreKeyDoesNotExistException ex ) {
+            // ignore
+        }
+
+        if( found == null ) {
             throw new LidWrongPasswordException( subject.getIdentifier(), this );
         }
-        byte [] rawHashedCredential = HashedPasswordUtils.string2raw( storedHashedCredential );
+        byte [] rawHashedCredential = found.getData();
 
         String givenPassword = request.getPostedArgument( LID_CREDENTIAL_PARAMETER_NAME );
 
@@ -108,4 +127,9 @@ public class StoreLidPasswordCredentialType
     {
         return getClass().hashCode();
     }
+
+    /**
+     * The Store for passwords.
+     */
+    protected Store thePasswordStore;
 }

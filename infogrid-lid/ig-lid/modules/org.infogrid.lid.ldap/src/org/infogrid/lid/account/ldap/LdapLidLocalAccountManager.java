@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -28,7 +28,6 @@ import javax.naming.directory.InitialDirContext;
 import org.infogrid.lid.account.AbstractLidAccountManager;
 import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.account.SimpleLidAccount;
-import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.CannotFindHasIdentifierException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
@@ -69,7 +68,6 @@ public class LdapLidLocalAccountManager
      * @param ldapContextName name of the LDAP context object in which to search, or null if default
      * @param filter the LDAP filter expression, or null if default
      * @param attributeList the list of attributes to pull out of LDAP. If null, pull out all attributes.
-     * @param credentialTypes the available credential types
      * @return the created LdapLidLocalAccountManager
      * @throws NamingException something went wrong when attempting to bind to
      */
@@ -78,8 +76,7 @@ public class LdapLidLocalAccountManager
             Properties           props,
             String               ldapContextName,
             String               filter,
-            String []            attributeList,
-            LidCredentialType [] credentialTypes )
+            String []            attributeList )
         throws
             NamingException
     {
@@ -89,8 +86,7 @@ public class LdapLidLocalAccountManager
                 ldapContextName,
                 filter,
                 null,
-                attributeList,
-                credentialTypes );
+                attributeList );
     }
 
     /**
@@ -102,7 +98,6 @@ public class LdapLidLocalAccountManager
      * @param filter the LDAP filter expression, or null if default
      * @param controls the SearchControls to use for queries, or null if default
      * @param attributeList the list of attributes to pull out of LDAP. If null, pull out all attributes.
-     * @param credentialTypes the available credential types
      * @return the created LdapLidLocalAccountManager
      * @throws NamingException something went wrong when attempting to bind to
      */
@@ -112,8 +107,7 @@ public class LdapLidLocalAccountManager
             String               ldapContextName,
             String               filter,
             SearchControls       controls,
-            String []            attributeList,
-            LidCredentialType [] credentialTypes )
+            String []            attributeList )
         throws
             NamingException
     {
@@ -134,8 +128,7 @@ public class LdapLidLocalAccountManager
                 ldapContextName,
                 filter,
                 controls,
-                attributeList,
-                credentialTypes );
+                attributeList );
         return ret;
     }
 
@@ -156,8 +149,7 @@ public class LdapLidLocalAccountManager
             String               ldapContextName,
             String               filter,
             SearchControls       controls,
-            String []            attributeList,
-            LidCredentialType [] credentialTypes )
+            String []            attributeList )
     {
         super( siteIdentifier );
 
@@ -167,7 +159,6 @@ public class LdapLidLocalAccountManager
         theFilter           = filter;
         theControls         = controls;
         theAttributeList    = attributeList;
-        theCredentialTypes  = credentialTypes;
     }
 
     /**
@@ -242,8 +233,6 @@ public class LdapLidLocalAccountManager
                             LidAccount.LidAccountStatus.ACTIVE,
                             null,
                             attributes,
-                            theCredentialTypes,
-                            new String[ theCredentialTypes.length ],
                             new Identifier[ 0 ] );
 
                     if( found.hasMore() ) {
@@ -321,11 +310,6 @@ public class LdapLidLocalAccountManager
      * The list of attributes to pull out of LDAP. If null, pull out all attributes.
      */
     protected String [] theAttributeList;
-
-    /**
-     * The CredentialTypes for this LidAccountManager.
-     */
-    protected LidCredentialType [] theCredentialTypes;
 
     /**
      * The default filter.

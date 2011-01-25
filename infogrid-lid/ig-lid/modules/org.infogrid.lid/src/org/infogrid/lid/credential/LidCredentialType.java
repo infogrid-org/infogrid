@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -58,14 +58,6 @@ public interface LidCredentialType
         throws
             LidExpiredCredentialException,
             LidInvalidCredentialException;
-
-    /**
-     * Determine whether this LidCredentialType is a credential type that is about a remote persona.
-     * E.g. an OpenID credential type would return true, while a password credential type would return false.
-     *
-     * @return true if it is about a remote persona
-     */
-    public abstract boolean isRemote();
 
     /**
      * Name of the URL parameter that indicates the LID credential type.

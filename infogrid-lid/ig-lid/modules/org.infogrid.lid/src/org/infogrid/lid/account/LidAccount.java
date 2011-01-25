@@ -16,7 +16,6 @@ package org.infogrid.lid.account;
 
 import java.util.Map;
 import java.util.Set;
-import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 
@@ -75,24 +74,6 @@ public interface LidAccount
      * @return the map of attributes
      */
     public Map<String,String> getAttributes();
-
-    /**
-     * Obtain the subset of credential types applicable to this LidAccount.
-     *
-     * @param set the set of credential types
-     * @return the subset of credential types
-     */
-    public LidCredentialType [] getApplicableCredentialTypes(
-            LidCredentialType [] set );
-
-    /**
-     * Obtain a specific credential.
-     *
-     * @param type the LidCredentialType for which the credential is to be obtained
-     * @return the credential, or null
-     */
-    public String getCredentialFor(
-            LidCredentialType type );
 
     /**
      * Obtain the Identifiers of the set of groups that this LidAccount is a member of.

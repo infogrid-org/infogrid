@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -134,17 +134,6 @@ public class LidGpgClearSignCredentialType
             log.error( ex );
             throw new LidGpgWrongSignatureException( subject.getIdentifier(), this, ex );
         }
-    }
-
-    /**
-     * Determine whether this LidCredentialType is a credential type that is about a remote persona.
-     * E.g. an OpenID credential type would return true, while a password credential type would return false.
-     *
-     * @return true if it is about a remote persona
-     */
-    public boolean isRemote()
-    {
-        return true;
     }
 
     /**

@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -222,7 +222,7 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
                 for( int i=0 ; i<referencedCredentialTypes.length ; ++i ) {
                     LidCredentialType current = referencedCredentialTypes[i];
 
-                    HasIdentifier personaToCheck = current.isRemote() ? clientRemotePersona : clientPersona;
+                    HasIdentifier personaToCheck = clientRemotePersona != null ? clientRemotePersona : clientPersona;
                     try {
                         current.checkCredential( lidRequest, personaToCheck );
 

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -128,8 +128,6 @@ public class SimpleLidAccountMapper
                     theCurrentAccountData.getStatus(),
                     ArrayHelper.copyIntoNewArray( theRemoteIdentifiers, Identifier.class ),
                     theCurrentAccountData.getAttributes(),
-                    theCurrentAccountData.getCredentialTypes(),
-                    theCurrentAccountData.getCredentialValues(),
                     theCurrentAccountData.getGroupIdentifiers() );
             
             return ret;
@@ -218,12 +216,6 @@ public class SimpleLidAccountMapper
             }
             theCurrentAttribute = attrs.getValue( IDENTIFIER_TAG );
             
-        } else if( CREDENTIAL_TAG.equals( qName )) {
-            if( theCurrentCredentialType != null ) {
-                throw new SAXParseException( "Have current " + CREDENTIAL_TAG + " already", theLocator );
-            }
-            theCurrentCredentialType = findCredentialType( attrs.getValue( IDENTIFIER_TAG ));
-
         } else if( GROUP_TAG.equals( qName )) {
             // no op
 
@@ -280,12 +272,6 @@ public class SimpleLidAccountMapper
                     theCurrentAttribute,
                     theCharacters != null ? XmlUtils.cdataDescape( theCharacters.toString()) : "" );
             theCurrentAttribute = null;
-
-        } else if( CREDENTIAL_TAG.equals( qName )) {
-            theCurrentAccountData.addCredential(
-                    theCurrentCredentialType,
-                    theCharacters != null ? XmlUtils.cdataDescape( theCharacters.toString()) : ""  );
-            theCurrentCredentialType = null;
 
         } else if( GROUP_TAG.equals( qName )) {
             theCurrentAccountData.addGroupIdentifier( SimpleStringIdentifier.create( theCharacters.toString() ));
@@ -449,14 +435,6 @@ public class SimpleLidAccountMapper
             buf.append(  " " ).append( IDENTIFIER_TAG ).append( "=\"" ).append( XmlUtils.escape( name )).append( "\">\n");
             buf.append( XmlUtils.escape( value ));
             buf.append( "</" ).append( ATTRIBUTE_TAG ).append( ">" );
-        }
-        for( LidCredentialType type : account.getApplicableCredentialTypes( null ) ) { // for SimpleLidAccount argument null is fine
-            String value = account.getCredentialFor( type );
-            
-            buf.append( "<" ).append( CREDENTIAL_TAG );
-            buf.append(  " " ).append( IDENTIFIER_TAG ).append( "=\"" ).append( XmlUtils.escape( type.getFullName() )).append( "\">\n");
-            buf.append( XmlUtils.escape( value ));
-            buf.append( "</" ).append( CREDENTIAL_TAG ).append( ">" );
         }
         for( Identifier id : account.getGroupIdentifiers() ) {
             buf.append( "<" ).append( GROUP_TAG ).append( ">" );

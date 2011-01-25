@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.infogrid.lid.account.LidAccount;
-import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.logging.Log;
@@ -42,8 +41,6 @@ public class AccountData
         theStatus            = status;
         theRemoteIdentifiers = new ArrayList<Identifier>();
         theAttributes        = new HashMap<String,String>();
-        theCredentialTypes   = new ArrayList<LidCredentialType>();
-        theCredentialValues  = new ArrayList<String>();
         theGroupIdentifiers  = new ArrayList<Identifier>();
     }
 
@@ -60,25 +57,12 @@ public class AccountData
             LidAccount.LidAccountStatus   status,
             ArrayList<Identifier>         remoteIdentifiers,
             Map<String,String>            attributes,
-            Map<LidCredentialType,String> credentials,
             ArrayList<Identifier>         groupIdentifiers )
     {
         theStatus            = status;
         theRemoteIdentifiers = remoteIdentifiers;
         theAttributes        = attributes;
-
-        theCredentialTypes  = new ArrayList<LidCredentialType>();
-        theCredentialValues = new ArrayList<String>();
-
-        if( credentials != null ) {
-            for( LidCredentialType key : credentials.keySet() ) {
-                String value = credentials.get(  key );
-
-                theCredentialTypes.add( key );
-                theCredentialValues.add(  value );
-            }
-        }
-        theGroupIdentifiers = groupIdentifiers;
+        theGroupIdentifiers  = groupIdentifiers;
     }
 
     /**
@@ -112,26 +96,6 @@ public class AccountData
     }
     
     /**
-     * Obtain the LidCredentialTypes of the LidAccount.
-     *
-     * @return the LidCredentialTypes
-     */
-    public LidCredentialType [] getCredentialTypes()
-    {
-        return ArrayHelper.copyIntoNewArray( theCredentialTypes, LidCredentialType.class );
-    }
-
-    /**
-     * Obtain the values of the LidCredentialTypes of the LidAccount.
-     *
-     * @return the value
-     */
-    public String [] getCredentialValues()
-    {
-        return ArrayHelper.copyIntoNewArray( theCredentialValues, String.class );
-    }
-
-    /**
      * Obtain the Identifiers of the set of groups that this LidAccount is a member of.
      *
      * @return the Identifiers
@@ -155,20 +119,6 @@ public class AccountData
         if( ret != null ) {
             log.error( "Overwriting attribute " + name + " with new value " + value + ", was " + ret );
         }
-    }
-
-    /**
-     * Add a credential.
-     * 
-     * @param credentialType the credential type
-     * @param value the value of the attribute
-     */
-    protected void addCredential(
-            LidCredentialType credentialType,
-            String            value )
-    {
-        theCredentialTypes.add( credentialType );
-        theCredentialValues.add( value );
     }
 
     /**
@@ -196,16 +146,6 @@ public class AccountData
      * Attributes of the LidAccount.
      */
     protected Map<String,String> theAttributes;
-
-    /**
-     * LidCredentialTypes of the LidAccount.
-     */
-    protected ArrayList<LidCredentialType> theCredentialTypes;
-
-    /**
-     * Values of the LidCredentialTypes, in the same sequence.
-     */
-    protected ArrayList<String> theCredentialValues;
 
     /**
      * Identifiers of the groups a LidAccount belongs to.

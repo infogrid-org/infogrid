@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,7 +16,6 @@ package org.infogrid.lid.account;
 
 import java.text.ParseException;
 import java.util.Map;
-import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.CannotFindHasIdentifierException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
@@ -78,7 +77,8 @@ public abstract class AbstractLidAccountManager
     }
 
     /**
-     * Provision a LidAccount.
+     * Provision a LidAccount. This LidAccount will have no credentials associated with it; they need to be
+     * set separately.
      *
      * @param localIdentifier the Identifier for the to-be-created LidAccount. This may be null, in which case
      *        the LidAccountManager assigns a localIdentifier
@@ -93,7 +93,6 @@ public abstract class AbstractLidAccountManager
             Identifier                    localIdentifier,
             HasIdentifier []              remotePersonas,
             Map<String,String>            attributes,
-            Map<LidCredentialType,String> credentials,
             Identifier []                 groupIdentifiers )
         throws
             LidAccountExistsAlreadyException
