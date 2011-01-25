@@ -149,6 +149,28 @@ public class DefaultNetMeshObjectAccessSpecification
     }
 
     /**
+     * Obtain a colloquial external form for this Identifier.
+     * This may be overridden by subclasses.
+     *
+     * @return colloquial external form of this Identifier
+     */
+    public String toColloquialExternalForm()
+    {
+        return getExternalForm();
+    }
+
+    /**
+     * Obtain a colloquial external form for this Identifier.
+     * This is provided to make invocation from JSPs easier.
+     *
+     * @return colloquial external form of this Identifier
+     */
+    public final String getColloquialExternalForm()
+    {
+        return toColloquialExternalForm();
+    }
+
+    /**
      * Helper method to escape the hash sign.
      *
      * @param s String with hash
