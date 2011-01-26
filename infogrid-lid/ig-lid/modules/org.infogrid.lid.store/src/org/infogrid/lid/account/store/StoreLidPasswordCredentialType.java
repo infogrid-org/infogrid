@@ -17,7 +17,6 @@ package org.infogrid.lid.account.store;
 import java.io.IOException;
 import org.infogrid.lid.credential.LidWrongPasswordException;
 import org.infogrid.crypto.hashedpassword.HashedPasswordUtils;
-import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.credential.AbstractLidPasswordCredentialType;
 import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
@@ -102,6 +101,32 @@ public class StoreLidPasswordCredentialType
     }
 
     /**
+     * Assign a credential.
+     *
+     * @param subject the subject for which the password is assigned
+     * @param newPassword the new password
+     */
+    public void setPassword(
+            HasIdentifier subject,
+            String        newPassword )
+        throws
+            IOException
+    {
+        long now = System.currentTimeMillis();
+
+        byte [] hashedPassword = HashedPasswordUtils.hash( newPassword );
+
+        thePasswordStore.putOrUpdate(
+                subject.getIdentifier().toExternalForm(),
+                DEFAULT_ENCODING,
+                now,
+                now,
+                now,
+                -1L,
+                hashedPassword );
+    }
+
+    /**
      * Determine equality.
      *
      * @param other the object to compare against
@@ -132,4 +157,9 @@ public class StoreLidPasswordCredentialType
      * The Store for passwords.
      */
     protected Store thePasswordStore;
+
+    /**
+     * Name of the encoding to use in the Store.
+     */
+    protected static final String DEFAULT_ENCODING = "default";
 }
