@@ -697,7 +697,7 @@ public class ProbeDispatcher
 
                 try {
                     NetMeshObject fwdRef = life.createForwardReference(
-                                    newBase.getMeshBaseIdentifierFactory().fromExternalForm( yadisUrl ),
+                                    newBase.getMeshBaseIdentifierFactory().guessFromExternalForm( yadisUrl ),
                                     WebSubjectArea.WEBRESOURCE );
 
                     newBase.getHomeObject().relateAndBless(

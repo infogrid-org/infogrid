@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -73,7 +73,10 @@ public class StoreProbeManagerMapper
         throws
              ParseException
     {
-        NetMeshBaseIdentifier ret = theFactory.getNetMeshBaseIdentifierFactory().fromExternalForm( stringKey );
+        NetMeshBaseIdentifier ret = theFactory.getNetMeshBaseIdentifierFactory().guessFromExternalForm( stringKey );
+                // use the guessFromExternalForm, rather than the more strict fromExternalForm.
+                // this makes it more likely that the NetMeshBase comes up even if there have been changes in
+                // the Schemes supported
         return ret;
     }
 

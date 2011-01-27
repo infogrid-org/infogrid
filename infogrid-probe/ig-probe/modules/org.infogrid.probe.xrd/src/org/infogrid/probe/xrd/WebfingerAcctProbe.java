@@ -114,7 +114,7 @@ public class WebfingerAcctProbe
         }
 
         StagingMeshBaseLifecycleManager life          = freshMeshBase.getMeshBaseLifecycleManager();
-        NetMeshBaseIdentifier           xrdIdentifier = freshMeshBase.getMeshBaseIdentifierFactory().fromExternalForm( xrdIdentifierString );
+        NetMeshBaseIdentifier           xrdIdentifier = freshMeshBase.getMeshBaseIdentifierFactory().guessFromExternalForm( xrdIdentifierString );
 
         NetMeshObject xrd = life.createForwardReference( xrdIdentifier, XrdSubjectArea.XRD );
 

@@ -101,16 +101,27 @@ public abstract class ScheduledExecutorProbeManager
         // re-initialize
         Iterator<NetMeshBaseIdentifier> keyIter = theKeyValueMap.keysIterator( NetMeshBaseIdentifier.class, ShadowMeshBase.class );
         while( keyIter.hasNext() ) {
-            NetMeshBaseIdentifier key   = keyIter.next();
-            ShadowMeshBase        value = theKeyValueMap.get( key );
-            
-            long nextTime = value.getDelayUntilNextUpdate();
-            if( nextTime >= 0 ) {  // allow 0 for immediate execution
-                ScheduledFuture<Long> newFuture = theExecutorService.schedule(
-                        new ExecutorAdapter( new WeakReference<ScheduledExecutorProbeManager>( this ), key, nextTime ),
-                        nextTime,
-                        TimeUnit.MILLISECONDS );
-                theFutures.put( key, newFuture );
+            NetMeshBaseIdentifier key = null;
+
+            try { // try to restart as many as possible
+                key = keyIter.next();
+                log.debug( this, "restarting shadow ", key );
+
+                ShadowMeshBase value = theKeyValueMap.get( key );
+                if( value != null ) {
+                    long nextTime = value.getDelayUntilNextUpdate();
+                    if( nextTime >= 0 ) {  // allow 0 for immediate execution
+                        ScheduledFuture<Long> newFuture = theExecutorService.schedule(
+                                new ExecutorAdapter( new WeakReference<ScheduledExecutorProbeManager>( this ), key, nextTime ),
+                                nextTime,
+                                TimeUnit.MILLISECONDS );
+                        theFutures.put( key, newFuture );
+                    }
+                } else {
+                    log.error( this, "Failed to load ShadowMeshBase with key ", key );
+                }
+            } catch( Throwable t ) {
+                log.error( this, key, t ); // help with debugging
             }
         }
     }
