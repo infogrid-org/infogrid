@@ -209,7 +209,7 @@ public class DefaultAnetMeshObjectIdentifierFactory
         }
 
         if( localId != null && treatAsGlobalIdentifier( localId )) {
-            throw new IllegalArgumentException( "DefaultAnetMeshObjectIdentifier's localId must not contain a period: " + localId );
+            throw new IllegalArgumentException( "DefaultAnetMeshObjectIdentifier's localId must not be a global identifier: " + localId );
         }
 
         if( localId == null ) {
@@ -285,7 +285,7 @@ public class DefaultAnetMeshObjectIdentifierFactory
             return true;
         }
         try {
-            MeshBaseIdentifier found = theMeshBaseIdentifierFactory.fromExternalForm( raw );
+            MeshBaseIdentifier found = theMeshBaseIdentifierFactory.fromExternalForm( raw ); // don't guess here: we need the exact match
             return true;
 
         } catch( ParseException ex ) {

@@ -318,13 +318,16 @@ public class ExternalizedNetMeshObjectXmlEncoder
     {
         ParserFriendlyExternalizedNetMeshObject realObjectBeingParsed = (ParserFriendlyExternalizedNetMeshObject) theMeshObjectBeingParsed;
 
+        // use the guessFromExternalForm, rather than the more strict fromExternalForm.
+        // this makes it more likely that the NetMeshBase comes up even if there have been changes in
+        // the Schemes supported
         if( PROXY_REFERENCE_TAG.equals( qName )) {
             String proxyString = attrs.getValue( PROXY_NETWORK_IDENTIFIER_TAG );
             String homeProxy   = attrs.getValue( PROXY_TOWARDS_HOME_TAG );
             String lockProxy   = attrs.getValue( PROXY_TOWARDS_LOCK_TAG );
 
             try {
-                NetMeshBaseIdentifier proxyId = ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().fromExternalForm( proxyString );
+                NetMeshBaseIdentifier proxyId = ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().guessFromExternalForm( proxyString );
                 realObjectBeingParsed.addProxyNetworkIdentifier( proxyId, YES_TAG.equals( homeProxy ), YES_TAG.equals( lockProxy ));
 
             } catch( ParseException ex ) {
@@ -338,7 +341,7 @@ public class ExternalizedNetMeshObjectXmlEncoder
                     = (ParserFriendlyExternalizedNetMeshObject.RelationshipWithRelationshipProxies) theHasTypesBeingParsed;
 
             try {
-                NetMeshBaseIdentifier proxyId = ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().fromExternalForm( proxyString );
+                NetMeshBaseIdentifier proxyId = ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().guessFromExternalForm( proxyString );
                 realRelationship.addRelationshipProxyIdentifier( proxyId );
 
             } catch( ParseException ex ) {

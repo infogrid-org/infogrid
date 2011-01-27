@@ -1229,7 +1229,12 @@ public abstract class AnetMeshBase
 
         if( !isDead() ) {
             for( Proxy current : proxies() ) {
-                current.transactionCommitted( tx );
+                try {
+                    current.transactionCommitted( tx );
+
+                } catch( Throwable t ) {
+                    log.error( getIdentifier(), t ); // defensively
+                }
             }
         }
     }

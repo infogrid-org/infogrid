@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -130,6 +130,7 @@ public class DefaultNetMeshBaseAccessSpecificationFactory
      * @param raw the external form
      * @return the created NetMeshBaseAccessSpecification
      * @throws ParseException thrown if a parsing error occurred
+     * @see #guessFromExternalForm(java.lang.String)
      */
     public DefaultNetMeshBaseAccessSpecification fromExternalForm(
             String raw )
@@ -139,6 +140,61 @@ public class DefaultNetMeshBaseAccessSpecificationFactory
         int q = raw.indexOf( '?' );
         if( q < 0 ) {
             NetMeshBaseIdentifier netMeshBase = theMeshBaseIdentifierFactory.fromExternalForm( raw );
+            return new DefaultNetMeshBaseAccessSpecification(
+                    netMeshBase,
+                    NetMeshBaseAccessSpecification.DEFAULT_SCOPE,
+                    NetMeshBaseAccessSpecification.DEFAULT_COHERENCE,
+                    raw );
+        }
+        // we need to comb through the URL
+        String [] pairs           = raw.substring( q+1 ).split( "&" );
+        String    coherenceString = null;
+        String    scopeString     = null;
+
+        StringBuilder remainder = new StringBuilder( raw.length() );
+        remainder.append( raw.substring( 0, q ));
+
+        char sep = '?';
+
+        for( int i=0 ; i<pairs.length ; ++i ) {
+            if( scopeString == null && pairs[i].startsWith( NetMeshBaseAccessSpecification.SCOPE_KEYWORD + "=" )) {
+                scopeString = pairs[i].substring( NetMeshBaseAccessSpecification.SCOPE_KEYWORD.length() + 1 );
+                scopeString = HTTP.decodeUrlArgument( scopeString );
+
+            } else if( coherenceString == null && pairs[i].startsWith( NetMeshBaseAccessSpecification.COHERENCE_KEYWORD + "=" )) {
+                coherenceString = pairs[i].substring( NetMeshBaseAccessSpecification.COHERENCE_KEYWORD.length() + 1 );
+                coherenceString = HTTP.decodeUrlArgument( coherenceString );
+
+            } else {
+                remainder.append( sep );
+                remainder.append( pairs[i] );
+                sep = '&';
+            }
+        }
+        return new DefaultNetMeshBaseAccessSpecification(
+                theMeshBaseIdentifierFactory.fromExternalForm( remainder.toString() ),
+                scopeString     != null ? ScopeSpecification.fromExternalForm(     scopeString     ) : NetMeshBaseAccessSpecification.DEFAULT_SCOPE,
+                coherenceString != null ? CoherenceSpecification.fromExternalForm( coherenceString ) : NetMeshBaseAccessSpecification.DEFAULT_COHERENCE,
+                raw );
+    }
+
+    /**
+     * Recreate a NetMeshBaseAccessSpecification from an external form.
+     * This method attempts to guess protocols if none have been provided.
+     *
+     * @param raw the external form
+     * @return the created NetMeshBaseAccessSpecification
+     * @throws ParseException thrown if a parsing error occurred
+     * @see #fromExternalForm(java.lang.String)
+     */
+    public NetMeshBaseAccessSpecification guessFromExternalForm(
+            String raw )
+        throws
+            ParseException
+    {
+        int q = raw.indexOf( '?' );
+        if( q < 0 ) {
+            NetMeshBaseIdentifier netMeshBase = theMeshBaseIdentifierFactory.guessFromExternalForm( raw );
             return new DefaultNetMeshBaseAccessSpecification(
                     netMeshBase,
                     NetMeshBaseAccessSpecification.DEFAULT_SCOPE,

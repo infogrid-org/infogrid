@@ -371,10 +371,14 @@ public class XprisoMessageXmlEncoder
             NetMeshBaseIdentifier senderId   = null;
             NetMeshBaseIdentifier receiverId = null;
             
+            // use the guessFromExternalForm, rather than the more strict fromExternalForm.
+            // this makes it more likely that the NetMeshBase comes up even if there have been changes in
+            // the Schemes supported
+
             try {
                 String sender = attrs.getValue( SENDER_ID_TAG );
                 if( sender != null && sender.length() > 0 ) {
-                    senderId = ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().fromExternalForm( sender );
+                    senderId = ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().guessFromExternalForm( sender );
                 }
             } catch( ParseException ex ) {
                 log.warn( ex );
@@ -382,7 +386,7 @@ public class XprisoMessageXmlEncoder
             try {
                 String receiver = attrs.getValue( RECEIVER_ID_TAG );
                 if( receiver != null && receiver.length() > 0 ) {
-                    receiverId = ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().fromExternalForm( receiver );
+                    receiverId = ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().guessFromExternalForm( receiver );
                 }
             } catch( ParseException ex ) {
                 log.warn( ex );

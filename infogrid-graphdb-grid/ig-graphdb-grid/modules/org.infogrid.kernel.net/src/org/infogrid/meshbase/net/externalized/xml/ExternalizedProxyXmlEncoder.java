@@ -215,9 +215,13 @@ public class ExternalizedProxyXmlEncoder
             String here  = attrs.getValue( HERE_TAG );
             String there = attrs.getValue( THERE_TAG );
 
+            // use the guessFromExternalForm, rather than the more strict fromExternalForm.
+            // this makes it more likely that the NetMeshBase comes up even if there have been changes in
+            // the Schemes supported
+
             if( here != null ) {
                 try {
-                    theProxyBeingParsed.setNetworkIdentifier( ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().fromExternalForm( here ));
+                    theProxyBeingParsed.setNetworkIdentifier( ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().guessFromExternalForm( here ));
                 } catch( ParseException ex ) {
                     log.warn( ex ); // we can do without this one
                 }
@@ -225,7 +229,7 @@ public class ExternalizedProxyXmlEncoder
                 
             if( there != null ) {
                 try {
-                    theProxyBeingParsed.setNetworkIdentifierOfPartner( ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().fromExternalForm( there ));
+                    theProxyBeingParsed.setNetworkIdentifierOfPartner( ((NetMeshBase)theMeshBase).getMeshBaseIdentifierFactory().guessFromExternalForm( there ));
                 } catch( ParseException ex ) {
                     error( ex ); // we cannot do without this one
                 }

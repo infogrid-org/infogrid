@@ -90,7 +90,10 @@ public class StoreProxyEntryMapper
         throws
             ParseException
     {
-        NetMeshBaseIdentifier ret = theMeshBase.getMeshBaseIdentifierFactory().fromExternalForm( stringKey );
+        NetMeshBaseIdentifier ret = theMeshBase.getMeshBaseIdentifierFactory().guessFromExternalForm( stringKey );
+                // use the guessFromExternalForm, rather than the more strict fromExternalForm.
+                // this makes it more likely that the NetMeshBase comes up even if there have been changes in
+                // the Schemes supported
         return ret;
     }
 

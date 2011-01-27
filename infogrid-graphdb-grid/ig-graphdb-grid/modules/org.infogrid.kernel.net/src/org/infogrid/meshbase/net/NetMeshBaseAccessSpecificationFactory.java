@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -74,6 +74,19 @@ public interface NetMeshBaseAccessSpecificationFactory
      * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseAccessSpecification fromExternalForm(
+            String raw )
+        throws
+            ParseException;
+
+    /**
+     * Recreate a NetMeshBaseAccessSpecification from an external form.
+     * This method attempts to guess protocols if none have been provided.
+     *
+     * @param raw the external form
+     * @return the created NetMeshBaseAccessSpecification
+     * @throws ParseException thrown if a parsing error occurred
+     */
+    public NetMeshBaseAccessSpecification guessFromExternalForm(
             String raw )
         throws
             ParseException;
