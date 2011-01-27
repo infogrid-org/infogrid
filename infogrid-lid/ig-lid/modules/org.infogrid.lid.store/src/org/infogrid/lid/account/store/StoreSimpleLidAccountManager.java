@@ -138,7 +138,6 @@ public class StoreSimpleLidAccountManager
      *        the LidAccountManager assigns a local Identifier
      * @param remotePersonas the remote personas to be associated with the locally provisioned LidAccount
      * @param attributes the attributes for the to-be-created LidAccount
-     * @param credentials the credentials for the to-be-created LidAccount
      * @param groupIdentifiers identifiers of the groups the Account belongs to
      * @return the LidAccount that was created
      * @throws LidAccountExistsAlreadyException thrown if a LidAccount with this Identifier exists already

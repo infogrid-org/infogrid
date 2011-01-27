@@ -32,7 +32,6 @@ public class SimpleLidAccount
      * @param status the status of the LidAccount
      * @param remoteIdentifiers set of remote Identifiers that are also associated with this LidAccount
      * @param attributes attributes of the persona, e.g. first name
-     * @param credentials the values for the credentials available to locally authenticate this LidAccount
      * @param groupIdentifiers identifiers of the groups that this LidAccount is a member of
      * @return the created SimpleLidAccount
      */

@@ -39,7 +39,7 @@ public class StoreLidPasswordCredentialType
     /**
      * Factory method.
      *
-     * @param the Store that stores the passwords
+     * @param passwordStore the Store that stores the passwords
      * @return the created RegexLidPasswordCredentialType
      */
     public static StoreLidPasswordCredentialType create(
@@ -52,7 +52,7 @@ public class StoreLidPasswordCredentialType
     /**
      * Constructor, for subclasses only, use factory method.
      *
-     * @param the Store that stores the passwords
+     * @param passwordStore the Store that stores the passwords
      */
     protected StoreLidPasswordCredentialType(
             Store passwordStore )

@@ -81,7 +81,6 @@ public class RegexLidAccountManager
      *
      * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param userNameRegex the user name regular expression
-     * @param credentialType the available LidCredentialType
      * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
      */
     protected RegexLidAccountManager(

@@ -141,7 +141,6 @@ public class LdapLidLocalAccountManager
      * @param filter the LDAP filter expression
      * @param controls the SearchControls to use for queries
      * @param attributeList the list of attributes to pull out of LDAP. If null, pull out all attributes.
-     * @param credentialTypes the LidCredentialTypes for this LidAccountManager
      */
     protected LdapLidLocalAccountManager(
             Identifier           siteIdentifier,

@@ -50,7 +50,6 @@ public class AccountData
      * @param status the status of the Account
      * @param remoteIdentifiers identifiers of the remote personas associated with this Account
      * @param attributes the attributes
-     * @param credentials the credentials
      * @param groupIdentifiers identifiers of the groups the Account belongs to
      */
     public AccountData(
