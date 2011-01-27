@@ -291,6 +291,9 @@ public abstract class StoreBackedSwappingHashMap<K,V>
 
         } catch( StoreKeyDoesNotExistException ex ) {
             // no op
+            if( log.isDebugEnabled() ) {
+                log.debug( ex );
+            }
 
         } catch( StoreValueDecodingException ex ) {
             log.error( ex );
