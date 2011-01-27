@@ -329,7 +329,7 @@ public class XrdProbe
     /**
      * Helper method to get the trimmed text content of a node.
      *
-     * @param node the Node
+     * @param current the Node
      * @return the text content
      */
     protected String getTextContentOf(
