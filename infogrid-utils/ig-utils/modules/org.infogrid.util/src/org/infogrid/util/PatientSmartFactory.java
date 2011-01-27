@@ -147,13 +147,13 @@ public class PatientSmartFactory<K,V,A>
         d.dump( this,
                 new String[] {
                     "theDelegateFactory",
-                    "theKeyValueMap",
-                    "theOngoingObjectCreations"
+                    "theKeyValueMap.size",
+                    "theOngoingObjectCreations.size"
                 },
                 new Object[] {
                     theDelegateFactory,
-                    theKeyValueMap,
-                    theOngoingObjectCreations
+                    theKeyValueMap.size(),
+                    theOngoingObjectCreations.size()
                 } );
     }
 
