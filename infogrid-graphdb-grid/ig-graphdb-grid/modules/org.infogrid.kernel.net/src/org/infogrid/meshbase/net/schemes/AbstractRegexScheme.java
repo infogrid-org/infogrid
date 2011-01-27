@@ -72,8 +72,8 @@ public abstract class AbstractRegexScheme
     /**
      * Convert the matched pattern into the canonical form.
      *
-     * @param matcher the String that matched the regex
-     * @param m the Matcher that matched
+     * @param matched the String that matched the regex
+     * @param res the MatchResult that matched
      * @return the canonical form
      */
     protected String toCanonicalForm(

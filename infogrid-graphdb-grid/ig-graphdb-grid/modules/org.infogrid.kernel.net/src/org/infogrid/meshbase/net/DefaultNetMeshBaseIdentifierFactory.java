@@ -71,8 +71,7 @@ public class DefaultNetMeshBaseIdentifierFactory
     /**
      * Constructor.
      * 
-     * @param restfulProtocols the supported REST-ful protocols
-     * @param nonRestfulProtocols the supported non-REST-ful protocols
+     * @param schemes the supported protocols
      */
     protected DefaultNetMeshBaseIdentifierFactory(
             Scheme [] schemes )
