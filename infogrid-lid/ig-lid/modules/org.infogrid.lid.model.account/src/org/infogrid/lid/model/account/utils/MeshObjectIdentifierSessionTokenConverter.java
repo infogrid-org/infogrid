@@ -56,7 +56,7 @@ public class MeshObjectIdentifierSessionTokenConverter
     {
         String converted = convert( sessionToken );
 
-        MeshObjectIdentifier ret = idFact.fromExternalForm( converted );
+        MeshObjectIdentifier ret = idFact.guessFromExternalForm( converted );
         return ret;
     }
 
