@@ -544,6 +544,61 @@ public abstract class AbstractNetMeshObjectAccessSpecificationFactory
     }
 
     /**
+     * Convert a String into a NetMeshObjectAccessSpecification.
+     * This method attempts to guess protocols if none have been provided.
+     *
+     * @param raw the String
+     * @return the created NetMeshObjectAccessSpecification
+     * @throws ParseException thrown if the String could not be parsed
+     */
+    public NetMeshObjectAccessSpecification guessFromExternalForm(
+            String raw )
+        throws
+            ParseException
+    {
+        if( raw == null ) {
+            return null;
+        }
+
+        // hash means it's the MeshObjectIdentifier's local part, so ignore that for a while.
+        int    hash = raw.indexOf( '#' );
+        String core = hash >= 0 ? raw.substring( 0, hash ) : raw;
+
+        String lastSegment;
+        NetMeshBaseAccessSpecification [] pathElements;
+        if( core != null && core.length() > 0 ) {
+            String [] pathElementStrings = core.split( "!" );
+
+            pathElements = new NetMeshBaseAccessSpecification[ pathElementStrings.length > 1 ? pathElementStrings.length-1 : 1 ]; // treat last one different
+            for( int i=0 ; i<pathElements.length ; ++i ) {
+                pathElements[i] = theNetMeshBaseAccessSpecificationFactory.guessFromExternalForm( pathElementStrings[i] );
+            }
+            lastSegment = pathElementStrings[ pathElementStrings.length-1 ];
+
+        } else {
+            pathElements = new NetMeshBaseAccessSpecification[0];
+            lastSegment  = null;
+        }
+
+        if( lastSegment != null ) {
+            if( hash >= 0 ) {
+                lastSegment += raw.substring( hash );
+            }
+        } else {
+            lastSegment = raw.substring( hash );
+        }
+
+        NetMeshObjectIdentifier object = theMeshObjectIdentifierFactory.guessFromExternalForm( lastSegment );
+
+        NetMeshObjectAccessSpecification ret = new DefaultNetMeshObjectAccessSpecification(
+                this,
+                pathElements,
+                object,
+                raw );
+        return ret;
+    }
+
+    /**
      * The factory for MeshObjectIdentifiers.
      */
     protected NetMeshObjectIdentifierFactory theMeshObjectIdentifierFactory;

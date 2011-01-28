@@ -284,4 +284,17 @@ public interface NetMeshObjectAccessSpecificationFactory
             String raw )
         throws
             ParseException;
+
+    /**
+     * Convert a String into a NetMeshObjectAccessSpecification.
+     * This method attempts to guess protocols if none have been provided.
+     *
+     * @param raw the String
+     * @return the created NetMeshObjectAccessSpecification
+     * @throws ParseException thrown if the String could not be parsed
+     */
+    public NetMeshObjectAccessSpecification guessFromExternalForm(
+            String raw )
+        throws
+            ParseException;
 }
