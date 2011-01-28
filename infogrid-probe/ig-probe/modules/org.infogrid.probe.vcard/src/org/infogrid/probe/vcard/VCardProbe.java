@@ -327,7 +327,7 @@ public class VCardProbe
             // file as an object identifier
 
             MeshObject adr = life.createMeshObject(
-                    freshMeshBase.getMeshObjectIdentifierFactory().fromExternalForm( "ph-" + i ),
+                    freshMeshBase.getMeshObjectIdentifierFactory().guessFromExternalForm( "ph-" + i ),
                     VCardSubjectArea.PHYSICALADDRESS );
 
             if( postOfficeBox != null ) {
@@ -393,7 +393,7 @@ public class VCardProbe
             // file as an object identifier
 
             MeshObject adr = life.createMeshObject(
-                    freshMeshBase.getMeshObjectIdentifierFactory().fromExternalForm( "co-em-" + i ),
+                    freshMeshBase.getMeshObjectIdentifierFactory().guessFromExternalForm( "co-em-" + i ),
                     VCardSubjectArea.COMMUNICATIONADDRESS );
 
             try {
@@ -431,7 +431,7 @@ public class VCardProbe
             // file as an object identifier
 
             MeshObject adr = life.createMeshObject(
-                    freshMeshBase.getMeshObjectIdentifierFactory().fromExternalForm( "co-ph-" + i ),
+                    freshMeshBase.getMeshObjectIdentifierFactory().guessFromExternalForm( "co-ph-" + i ),
                     VCardSubjectArea.COMMUNICATIONADDRESS );
 
             String [] params = telLine.theParams;

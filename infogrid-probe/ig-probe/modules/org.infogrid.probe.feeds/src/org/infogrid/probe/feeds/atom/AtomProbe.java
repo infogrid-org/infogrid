@@ -186,7 +186,7 @@ public class AtomProbe
                     dataSourceIdentifier,
                     theDocument,
                     realItemNode,
-                    freshMeshBase.getMeshObjectIdentifierFactory().fromExternalForm( entryGuid ),
+                    freshMeshBase.getMeshObjectIdentifierFactory().guessFromExternalForm( entryGuid ),
                     FeedsSubjectArea.ATOMFEEDITEM,
                     freshMeshBase );
 

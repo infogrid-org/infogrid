@@ -188,7 +188,7 @@ public class RssProbe
                         dataSourceIdentifier,
                         theDocument,
                         realItemNode,
-                        freshMeshBase.getMeshObjectIdentifierFactory().fromExternalForm( itemGuid ),
+                        freshMeshBase.getMeshObjectIdentifierFactory().guessFromExternalForm( itemGuid ),
                         FeedsSubjectArea.RSSFEEDITEM,
                         freshMeshBase );
                 

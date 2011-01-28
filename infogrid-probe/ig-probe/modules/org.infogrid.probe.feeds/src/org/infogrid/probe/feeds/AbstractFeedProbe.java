@@ -489,7 +489,7 @@ public abstract class AbstractFeedProbe
     {
         NetMeshBase base = current.getMeshBase();
         
-        NetMeshObject partner = base.findMeshObjectByIdentifier( base.getMeshObjectIdentifierFactory().fromExternalForm( partnerId ));
+        NetMeshObject partner = base.findMeshObjectByIdentifier( base.getMeshObjectIdentifierFactory().guessFromExternalForm( partnerId ));
         if( partner == null ) {
             // don't have it (yet?), ignore
             return;

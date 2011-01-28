@@ -365,7 +365,7 @@ public class YadisServiceFactory
 
             try {
                 NetMeshObject serviceMeshObject = base.getMeshBaseLifecycleManager().createMeshObject(
-                        base.getMeshObjectIdentifierFactory().fromExternalForm( "YadisService-" + uniqueIdComponent ),
+                        base.getMeshObjectIdentifierFactory().guessFromExternalForm( "YadisService-" + uniqueIdComponent ),
                         YadisSubjectArea.XRDSSERVICE );
 
                 serviceMeshObject.bless( serviceType );
@@ -378,14 +378,14 @@ public class YadisServiceFactory
                 }
 
                 NetMeshObject serviceMeshObjectType = base.getMeshBaseLifecycleManager().createMeshObject(
-                        base.getMeshObjectIdentifierFactory().fromExternalForm( "YadisService- " + uniqueIdComponent + "-type-0" ),
+                        base.getMeshObjectIdentifierFactory().guessFromExternalForm( "YadisService- " + uniqueIdComponent + "-type-0" ),
                         YadisSubjectArea.XRDSSERVICETYPE );
                 serviceMeshObjectType.setPropertyValue( YadisSubjectArea.XRDSSERVICETYPE_SERVICETYPEIDENTIFIER, serviceTypeIdentifier );
 
                 serviceMeshObject.relateAndBless( YadisSubjectArea.XRDSSERVICE_HASTYPE_XRDSSERVICETYPE.getSource(), serviceMeshObjectType );
 
                 NetMeshObject endpoint = base.getMeshBaseLifecycleManager().createMeshObject(
-                        base.getMeshObjectIdentifierFactory().fromExternalForm( "Endpoint-" + uniqueIdComponent ),
+                        base.getMeshObjectIdentifierFactory().guessFromExternalForm( "Endpoint-" + uniqueIdComponent ),
                         YadisSubjectArea.ENDPOINT );
                 // endpoint.setPropertyValue( ServiceEndPoint.URI_PROPERTYTYPE, StringValue.obtain( identityServer ));
 

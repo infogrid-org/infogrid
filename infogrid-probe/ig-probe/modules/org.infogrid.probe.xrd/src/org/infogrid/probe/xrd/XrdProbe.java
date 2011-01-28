@@ -188,7 +188,7 @@ public class XrdProbe
         NetMeshBase base = home.getMeshBase();
         String      text = getTextContentOf( current );
 
-        NetMeshObjectIdentifier subjectIdentifier = base.getMeshObjectIdentifierFactory().fromExternalForm( text );
+        NetMeshObjectIdentifier subjectIdentifier = base.getMeshObjectIdentifierFactory().guessFromExternalForm( text );
 
         NetMeshObject subject = findOrCreateForwardReferenceAndBless(
                 subjectIdentifier,
@@ -222,7 +222,7 @@ public class XrdProbe
         NetMeshBase base = home.getMeshBase();
         String      text = getTextContentOf( current );
 
-        NetMeshObjectIdentifier aliasIdentifier = base.getMeshObjectIdentifierFactory().fromExternalForm( text );
+        NetMeshObjectIdentifier aliasIdentifier = base.getMeshObjectIdentifierFactory().guessFromExternalForm( text );
 
         NetMeshObject alias = findOrCreateForwardReferenceAndBless(
                 aliasIdentifier,
@@ -296,7 +296,7 @@ public class XrdProbe
         }
 
         NetMeshObject link = life.createMeshObject(
-                idFact.fromExternalForm( "link-" + index ),
+                idFact.guessFromExternalForm( "link-" + index ),
                 templateNode != null ? XrdSubjectArea.LINKTEMPLATE : XrdSubjectArea.LINK );
 
         if( relNode != null ) {
@@ -310,7 +310,7 @@ public class XrdProbe
             link.setPropertyValue( XrdSubjectArea.LINKTEMPLATE_TEMPLATE, StringValue.create( getTextContentOf( templateNode )));
 
         } else if( hrefNode != null ) {
-            NetMeshObjectIdentifier destIdentifier = idFact.fromExternalForm( getTextContentOf( hrefNode ));
+            NetMeshObjectIdentifier destIdentifier = idFact.guessFromExternalForm( getTextContentOf( hrefNode ));
 
             NetMeshObject dest = findOrCreateForwardReferenceAndBless(
                     destIdentifier,

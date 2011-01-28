@@ -172,7 +172,7 @@ public class SaxMeshObjectSetProbe
             
             for( ExternalizedMeshObject currentObject : theBufferedObjects ) {
                 MeshObject realCurrentObject = life.createMeshObject(
-                        freshMeshBase.getMeshObjectIdentifierFactory().fromExternalForm( currentObject.getIdentifier() ),
+                        freshMeshBase.getMeshObjectIdentifierFactory().guessFromExternalForm( currentObject.getIdentifier() ),
                         MeshObjectSetProbeUtils.lookupEntityTypes( currentObject.getMeshTypes(), freshMeshBase.getModelBase() ),
                         currentObject.getTimeCreated(),
                         currentObject.getTimeUpdated(),
@@ -190,11 +190,11 @@ public class SaxMeshObjectSetProbe
 
             for( ExternalizedMeshObject currentObject : theBufferedObjects ) {
                 MeshObject realCurrentObject = freshMeshBase.findMeshObjectByIdentifier(
-                        freshMeshBase.getMeshObjectIdentifierFactory().fromExternalForm( currentObject.getIdentifier() ));
+                        freshMeshBase.getMeshObjectIdentifierFactory().guessFromExternalForm( currentObject.getIdentifier() ));
 
                 for( ExternalizedMeshObject.ExternalizedRelationship currentRelationship : currentObject.theRelationships ) {
                     MeshObject otherSide = freshMeshBase.findMeshObjectByIdentifier(
-                            freshMeshBase.getMeshObjectIdentifierFactory().fromExternalForm( currentRelationship.getIdentifier() ));
+                            freshMeshBase.getMeshObjectIdentifierFactory().guessFromExternalForm( currentRelationship.getIdentifier() ));
 
                     try {
                         realCurrentObject.relate( otherSide );

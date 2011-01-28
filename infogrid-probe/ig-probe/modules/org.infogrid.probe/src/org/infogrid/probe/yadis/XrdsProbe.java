@@ -222,7 +222,7 @@ public class XrdsProbe
                     NetMeshObject serviceMeshObject;
                     try {
                         serviceMeshObject = base.getMeshBaseLifecycleManager().createMeshObject(
-                                base.getMeshObjectIdentifierFactory().fromExternalForm( prefix ),
+                                base.getMeshObjectIdentifierFactory().guessFromExternalForm( prefix ),
                                 YadisSubjectArea.XRDSSERVICE );
                     } catch( IsAbstractException ex ) {
                         log.error( ex );
@@ -329,7 +329,7 @@ public class XrdsProbe
 
                     try {
                         NetMeshObject serviceMeshObjectType = base.getMeshBaseLifecycleManager().createMeshObject(
-                                base.getMeshObjectIdentifierFactory().fromExternalForm( serviceMeshObject.getIdentifier().toExternalForm() + "-type-" + typeCounter ),
+                                base.getMeshObjectIdentifierFactory().guessFromExternalForm( serviceMeshObject.getIdentifier().toExternalForm() + "-type-" + typeCounter ),
                                 YadisSubjectArea.XRDSSERVICETYPE );
                         serviceMeshObjectType.setPropertyValue( YadisSubjectArea.XRDSSERVICETYPE_SERVICETYPEIDENTIFIER, StringValue.create( realFound ));
 
@@ -354,13 +354,13 @@ public class XrdsProbe
                 }
 
                 NetMeshObject endpoint = base.getMeshBaseLifecycleManager().createMeshObject(
-                        base.getMeshObjectIdentifierFactory().fromExternalForm( serviceMeshObject.getIdentifier().toExternalForm() + "-endpoint-" + epCounter ),
+                        base.getMeshObjectIdentifierFactory().guessFromExternalForm( serviceMeshObject.getIdentifier().toExternalForm() + "-endpoint-" + epCounter ),
                         YadisSubjectArea.ENDPOINT );
                 endpoint.setPropertyValue( YadisSubjectArea.ENDPOINT_PRIORITY, decodePriorityValue( infoNode ));
                 ++epCounter;
 
                 String realFound = found.toString().trim();
-                NetMeshObjectIdentifier resourceIdentifier = base.getMeshObjectIdentifierFactory().fromExternalForm( realFound );
+                NetMeshObjectIdentifier resourceIdentifier = base.getMeshObjectIdentifierFactory().guessFromExternalForm( realFound );
 
                 NetMeshObject resource = findOrCreateForwardReferenceAndBless(
                         resourceIdentifier,
