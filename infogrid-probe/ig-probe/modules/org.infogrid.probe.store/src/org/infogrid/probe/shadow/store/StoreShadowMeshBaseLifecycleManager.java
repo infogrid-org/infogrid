@@ -96,7 +96,7 @@ public class StoreShadowMeshBaseLifecycleManager
         for( int i=0 ; i<proxies.length ; ++i ) {
             proxies[i] = realBase.getProxyFor( proxyNames[i] );
             if( proxies[i] == null ) {
-                log.error( "Could not find proxy for " + proxyNames[i] );
+                log.error( "Could not find proxy for", proxyNames[i], "when attempting to restore", externalized );
                 return null;
             }
             if( proxyNames[i].equals( externalized.getProxyTowardsHomeNetworkIdentifier() )) {
