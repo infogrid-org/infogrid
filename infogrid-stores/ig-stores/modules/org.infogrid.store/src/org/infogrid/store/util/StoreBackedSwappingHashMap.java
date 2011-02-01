@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -287,16 +287,16 @@ public abstract class StoreBackedSwappingHashMap<K,V>
             return ret;
 
         } catch( IOException ex ) {
-            log.error( ex );
+            log.error( this, ".loadValueFromStorage", key, ex );
 
         } catch( StoreKeyDoesNotExistException ex ) {
             // no op
             if( log.isDebugEnabled() ) {
-                log.debug( ex );
+                log.debug( this, ".loadValueFromStorage", key, ex );
             }
 
         } catch( StoreValueDecodingException ex ) {
-            log.error( ex );
+            log.error( this, ".loadValueFromStorage", key, ex );
         }
         return null;
     }
