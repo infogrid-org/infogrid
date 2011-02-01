@@ -8,11 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.util.http;
+
+import org.infogrid.util.logging.Dumper;
 
 /**
  * Common functionality for IncomingSimpleSaneCookie and OutgoingSimpleSaneCookie.
@@ -53,6 +55,25 @@ public abstract class AbstractSimpleSaneCookie
     public String getValue()
     {
         return theValue;
+    }
+
+    /**
+     * Dump this object.
+     *
+     * @param d the Dumper to dump to
+     */
+    public void dump(
+            Dumper d )
+    {
+        d.dump( this,
+                new String[] {
+                    "theName",
+                    "theValue"
+                },
+                new Object[] {
+                    theName,
+                    theValue
+                });
     }
 
     /**
