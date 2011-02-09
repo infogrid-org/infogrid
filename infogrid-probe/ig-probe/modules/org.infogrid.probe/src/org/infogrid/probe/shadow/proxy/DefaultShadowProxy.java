@@ -14,6 +14,7 @@
 
 package org.infogrid.probe.shadow.proxy;
 
+import java.util.List;
 import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBase;
@@ -153,12 +154,12 @@ public class DefaultShadowProxy
      * debugging easier.
      *
      * @param endpoint the MessageEndpoint through which the message arrived
-     * @param incoming the incoming message
+     * @param incoming the incoming messages
      */
     @Override
     protected void internalMessageReceived(
             ReceivingMessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                           incoming )
+            List<XprisoMessage>                     incoming )
     {
         theMeshBaseIsDirty = false;
 
@@ -170,17 +171,24 @@ public class DefaultShadowProxy
     }
 
     /**
-     * Prepare for receiving a message.
+     * Prepare for receiving one or more messages.
      *
      * @param endpoint the MessageEndpoint through which the message arrived
-     * @param incoming the incoming message
+     * @param incoming the incoming messages
      */
     @Override
     protected void prepareMessageReceived(
             ReceivingMessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                           incoming )
+            List<XprisoMessage>                     incoming )
     {
-        if( ArrayHelper.arrayHasContent( incoming.getRequestedFreshenReplicas() )) {
+        boolean containsFreshen = false;
+        for( XprisoMessage current : incoming ) {
+            if( ArrayHelper.arrayHasContent( current.getRequestedFreshenReplicas() )) {
+                containsFreshen = true;
+                break;
+            }
+        }
+        if( containsFreshen ) {
             // Doesn't matter what replica was supposed to be freshened
             ShadowMeshBase shadow = (ShadowMeshBase) theMeshBase;
             try {
