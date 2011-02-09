@@ -17,6 +17,7 @@ package org.infogrid.comm;
 import java.util.HashMap;
 import java.util.List;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.ResourceHelper;
@@ -170,35 +171,42 @@ public class WaitForResponseEndpoint<T extends CarriesInvocationId>
     }
 
     /**
-     * Called when an incoming message has arrived.
+     * Called when one or more incoming messages have arrived.
      *
      * @param endpoint the BidirectionalMessageEndpoint that received the message
-     * @param msg the received message
+     * @param msgs the received messages
      */
     public void messageReceived(
             ReceivingMessageEndpoint<T> endpoint,
-            T                           msg )
+            List<T>                     msgs )
     {
-        long responseId = msg.getResponseId();
-        
         if( log.isTraceEnabled() ) {
-            log.traceMethodCallEntry( this, "messageReceived", msg );
+            log.traceMethodCallEntry( this, "messageReceived", msgs );
         }
 
-        Object syncObject;
-        synchronized( theOngoingInvocations ) {
-            syncObject = theOngoingInvocations.remove( responseId );
+        ArrayList<T> otherMessages = new ArrayList<T>( msgs.size() );
+        for( T current : msgs ) {
+            long responseId = current.getResponseId();
+        
+            Object syncObject;
+            synchronized( theOngoingInvocations ) {
+                syncObject = theOngoingInvocations.remove( responseId );
+                if( syncObject != null ) {
+                    theResults.put( responseId, current );
+                }
+            }
+
             if( syncObject != null ) {
-                theResults.put( responseId, msg );
+                synchronized( syncObject ) {
+                    syncObject.notifyAll();
+                }
+            } else {
+                otherMessages.add(  current );
             }
         }
 
-        if( syncObject != null ) {
-            synchronized( syncObject ) {
-                syncObject.notifyAll();
-            }
-        } else {
-            otherMessageReceived( endpoint, msg );
+        if( !otherMessages.isEmpty() ) {
+            otherMessageReceived( endpoint, otherMessages );
         }
     }
 

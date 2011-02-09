@@ -14,6 +14,7 @@
 
 package org.infogrid.comm.pingpong.test;
 
+import java.util.List;
 import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
 import org.infogrid.testharness.AbstractTest;
@@ -43,23 +44,27 @@ public class DelayingMultiplyingResponder
 
 
     /**
-     * Called when an incoming message has arrived.
+     * Called when one or more incoming messages have arrived.
      *
      * @param endpoint the PingPongMessageEndpoint that sent this event
-     * @param msg the received message
+     * @param msgs the received messages
      */
     public void messageReceived(
             ReceivingMessageEndpoint<TestMessage> endpoint,
-            final TestMessage                     msg )
+            List<TestMessage>                     msgs )
     {
-        log.traceMethodCallEntry( this, "messageReceived", endpoint, msg );
+        log.traceMethodCallEntry( this, "messageReceived", endpoint, msgs );
+        if( msgs.size() != 1 ) {
+            log.error( "More than one message arrived", msgs );
+        }
+        final TestMessage msg = msgs.get( 0 );
 
         if( theOldMessage != null ) {
             long ret = theOldMessage.getPayload();
 
             log.debug( "Received message, calculating return for old message " + ret );
 
-            ret = ret * ret;
+            ret *= ret;
 
             TestMessage returnMessage = new TestMessage( ret );
             returnMessage.setResponseId( theOldMessage.getRequestId() );
@@ -104,7 +109,7 @@ public class DelayingMultiplyingResponder
 
             log.debug( "Received token, calculating return for old message " + ret );
 
-            ret = ret * ret;
+            ret *= ret;
 
             TestMessage returnMessage = new TestMessage( ret );
             returnMessage.setResponseId( theOldMessage.getRequestId() );

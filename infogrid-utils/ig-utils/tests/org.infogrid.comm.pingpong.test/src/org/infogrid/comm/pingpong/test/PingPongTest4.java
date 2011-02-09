@@ -172,16 +172,19 @@ public class PingPongTest4
         }
 
         /**
-         * Called when an incoming message has arrived.
+         * Called when one more more incoming messages have arrived.
          *
          * @param endpoint the MessageEndpoint that sent this event
-         * @param msg the received message
+         * @param msgs the received messages
          */
         public void messageReceived(
                 ReceivingMessageEndpoint<String> endpoint,
-                String                           msg )
+                List<String>                     msgs )
         {
-            messages.add( msg );
+            log.traceMethodCallEntry( this, "messageReceived", msgs );
+            checkEquals( msgs.size(), 1, "More than one message" );
+
+            messages.add( msgs.get( 0 ));
             theEndpoint.enqueueMessageForSend( thePrefix + ": responding to messageReceived" );
         }
 

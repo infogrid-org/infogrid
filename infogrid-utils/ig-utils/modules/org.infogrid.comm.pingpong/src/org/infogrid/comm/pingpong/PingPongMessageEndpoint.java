@@ -329,8 +329,10 @@ public abstract class PingPongMessageEndpoint<T>
             if( fireEvents ) {
                 theListeners.fireEvent( token, TOKEN_RECEIVED );
                 if( content != null ) {
-                    for( T current : content ) {
-                        theListeners.fireEvent( current, MESSAGE_RECEIVED );
+                    if( content.isEmpty() ) {
+                        logHigh.error( this, "Content should not be empty", token );
+                    } else {
+                        theListeners.fireEvent( content, MESSAGE_RECEIVED );
                     }
                 }
             }

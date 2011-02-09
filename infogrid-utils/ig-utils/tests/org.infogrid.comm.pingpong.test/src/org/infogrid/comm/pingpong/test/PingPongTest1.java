@@ -158,17 +158,17 @@ public class PingPongTest1
             theP    = p;
         }
 
-       /**
-         * Called when an incoming message has arrived.
+        /**
+         * Called when one more more incoming messages have arrived.
          *
          * @param endpoint the MessageEndpoint that sent this event
-         * @param msg the received message
+         * @param msgs the received messages
          */
         public void messageReceived(
                 ReceivingMessageEndpoint<String> endpoint,
-                String                           msg )
+                List<String>                     msgs )
         {
-            log.traceMethodCallEntry( this, "messageReceived", endpoint, msg );
+            log.traceMethodCallEntry( this, "messageReceived", endpoint, msgs );
         }
 
         /**

@@ -170,22 +170,24 @@ public class PingPongTest6
         }
 
         /**
-         * Called when an incoming message has arrived.
+         * Called when one more more incoming messages have arrived.
          *
          * @param endpoint the MessageEndpoint that sent this event
-         * @param msg the received message
+         * @param msgs the received messages
          */
         public void messageReceived(
                 ReceivingMessageEndpoint<String> endpoint,
-                String                           msg )
+                List<String>                     msgs )
         {
-            log.traceMethodCallEntry( this, "messageReceived", msg );
-            lastMessageReceived     = msg;
+            log.traceMethodCallEntry( this, "messageReceived", msgs );
+            checkEquals( msgs.size(), 1, "More than one message" );
+
+            lastMessageReceived     = msgs.get( 0 );
             timeLastMessageReceived = getRelativeTime();
             ++received;
 
             if( received < MAX_RECEIVED ) {
-                theEndpoint.sendMessageAsap( thePrefix + " " + msg );
+                theEndpoint.sendMessageAsap( thePrefix + " " + lastMessageReceived );
                 ++sent;
             }
         }

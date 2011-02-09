@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -26,14 +26,14 @@ public abstract class AbstractMessageEndpointListener<T>
             MessageEndpointListener<T>
 {
     /**
-     * Called when an incoming message has arrived.
+     * Called when one or more incoming messages have arrived.
      *
      * @param endpoint the MessageEndpoint that sent this event
-     * @param msg the received message
+     * @param msgs the received messages
      */
     public void messageReceived(
             ReceivingMessageEndpoint<T> endpoint,
-            T                           msg )
+            List<T>                     msgs )
     {
         // no op
     }

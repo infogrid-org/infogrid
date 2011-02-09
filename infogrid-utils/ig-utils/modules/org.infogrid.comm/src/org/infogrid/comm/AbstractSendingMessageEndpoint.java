@@ -282,7 +282,7 @@ public abstract class AbstractSendingMessageEndpoint<T>
                     Object                     event )
             {
                 ReceivingMessageEndpoint<T> realSender =(ReceivingMessageEndpoint<T>) sender;
-                listener.messageReceived( realSender, (T) event );
+                listener.messageReceived( realSender, (List<T>) event );
             }
     };
     

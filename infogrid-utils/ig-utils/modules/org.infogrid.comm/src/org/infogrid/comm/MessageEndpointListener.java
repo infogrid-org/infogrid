@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,20 +18,22 @@ import java.util.List;
 
 /**
  * Listener interface for events emitted by a BidirectionalMessageEndpoint.
+ * Messages may have been queued up and be transmitted in bulk; thus the
+ * List of messages parameter instead of just a single message.
  * 
  * @param <T> the message type
  */
 public interface MessageEndpointListener<T>
 {
     /**
-     * Called when an incoming message has arrived.
+     * Called when one or more incoming messages have arrived.
      *
      * @param endpoint the MessageEndpoint that sent this event
-     * @param msg the received message
+     * @param msgs the received messages
      */
     public void messageReceived(
             ReceivingMessageEndpoint<T> endpoint,
-            T                           msg );
+            List<T>                     msgs );
     
     /**
      * Called when an outgoing message has been sent.
@@ -54,7 +56,7 @@ public interface MessageEndpointListener<T>
             T                         msg );
     
     /**
-     * Called when an outoing message failed to be sent.
+     * Called when an outgoing message failed to be sent.
      *
      * @param endpoint the MessageEndpoint that sent this event
      * @param msg the outgoing message

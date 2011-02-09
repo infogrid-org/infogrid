@@ -14,6 +14,7 @@
 
 package org.infogrid.comm.pingpong.test;
 
+import java.util.List;
 import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
 import org.infogrid.testharness.AbstractTest;
@@ -42,20 +43,27 @@ public class MultiplyingResponder
     }
 
     /**
-     * Called when an incoming message has arrived.
+     * Called when one more more incoming messages have arrived.
      *
-     * @param endpoint the PingPongMessageEndpoint that sent this event
-     * @param msg the received message
+     * @param endpoint the MessageEndpoint that sent this event
+     * @param msgs the received messages
      */
     public void messageReceived(
             ReceivingMessageEndpoint<TestMessage> endpoint,
-            TestMessage                           msg )
+            List<TestMessage>                     msgs )
     {
+        log.traceMethodCallEntry( this, "messageReceived", msgs );
+        if( msgs.size() != 1 ) {
+            log.error( "More than one message", msgs );
+        }
+
+        TestMessage msg = msgs.get( 0 );
+
         long ret = msg.getPayload();
 
         log.traceMethodCallEntry( this, "messageReceived", endpoint, msg );
 
-        ret = ret * ret;
+        ret *= ret;
 
         TestMessage returnMessage = new TestMessage( ret );
         returnMessage.setResponseId( msg.getRequestId() );

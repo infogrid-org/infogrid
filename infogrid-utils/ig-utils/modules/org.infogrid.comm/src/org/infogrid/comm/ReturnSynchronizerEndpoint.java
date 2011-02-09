@@ -14,6 +14,7 @@
 
 package org.infogrid.comm;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.ReturnSynchronizer;
@@ -147,27 +148,33 @@ public class ReturnSynchronizerEndpoint<T extends CarriesInvocationId>
     }
 
     /**
-     * Called when an incoming message has arrived.
+     * Called when one or more incoming messages have arrived.
      *
      * @param endpoint the BidirectionalMessageEndpoint that received the message
-     * @param msg the received message
+     * @param msgs the received messages
      */
     public void messageReceived(
             ReceivingMessageEndpoint<T> endpoint,
-            T                           msg )
+            List<T>                     msgs )
     {
-        long responseId = msg.getResponseId();
-
         if( log.isTraceEnabled() ) {
-            log.traceMethodCallEntry( this, "messageReceived", msg );
+            log.traceMethodCallEntry( this, "messageReceived", msgs );
         }
 
-        try {
-            if( theSynchronizer.depositQueryResult( responseId, msg )) {
-                otherMessageReceived( endpoint, msg );
+        ArrayList<T> otherMessages = new ArrayList<T>( msgs.size() );
+        for( T current : msgs ) {
+            long responseId = current.getResponseId();
+
+            try {
+                if( theSynchronizer.depositQueryResult( responseId, current )) {
+                    otherMessages.add( current );
+                }
+            } catch( DuplicateResult ex ) {
+                log.error( ex );
             }
-        } catch( DuplicateResult ex ) {
-            log.error( ex );
+        }
+        if( !otherMessages.isEmpty() ) {
+            otherMessageReceived( endpoint, otherMessages );
         }
     }
 

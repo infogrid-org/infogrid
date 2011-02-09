@@ -14,7 +14,7 @@
 
 package org.infogrid.comm;
 
-import org.infogrid.util.ResourceHelper;
+import java.util.List;
 import org.infogrid.util.SimpleTimeBasedUniqueLongGenerator;
 
 /**
@@ -77,11 +77,11 @@ public abstract class AbstractWaitingEndpoint<T extends CarriesInvocationId>
      * Invoked only for those messages that are not processed as a response.
      *
      * @param endpoint the BidirectionalMessageEndpoint that sent this event
-     * @param msg the received message that was not processed before
+     * @param msgs the received messages that were not processed before
      */
     protected void otherMessageReceived(
             ReceivingMessageEndpoint<T> endpoint,
-            T                           msg )
+            List<T>                     msgs )
     {
         // noop on this level
     }
