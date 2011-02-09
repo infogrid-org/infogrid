@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -296,6 +296,23 @@ public class NetMeshObjectNeighborAddedEvent
             ret[i] = (NetMeshObject) theResolver.findMeshObjectByIdentifier( vid[i] );
         }
         return ret;
+    }
+
+    /**
+     * <p>Create a Change that undoes this Change.</p>
+     *
+     * @return the inverse Change, or null if no inverse Change could be constructed.
+     */
+    @Override
+    public NetMeshObjectNeighborRemovedEvent inverse()
+    {
+        return new NetMeshObjectNeighborRemovedEvent(
+                (NetMeshObject) getSource(),
+                (NetMeshObjectIdentifier []) getNewValueIdentifier(),
+                (NetMeshObjectIdentifier) getDeltaValueIdentifier()[0], // let's hope that's right
+                (NetMeshObjectIdentifier []) getOldValueIdentifier(),
+                getOriginNetworkIdentifier(),
+                getTimeEventOccurred() );
     }
 
     /**

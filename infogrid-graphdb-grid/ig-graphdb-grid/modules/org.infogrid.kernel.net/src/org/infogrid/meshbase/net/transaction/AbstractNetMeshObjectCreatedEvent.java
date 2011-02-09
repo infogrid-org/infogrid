@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -137,6 +137,14 @@ public abstract class AbstractNetMeshObjectCreatedEvent
     {
         return (ExternalizedNetMeshObject) theExternalizedMeshObject;
     }
+
+    /**
+     * <p>Create a Change that undoes this Change.</p>
+     *
+     * @return the inverse Change, or null if no inverse Change could be constructed.
+     */
+    @Override
+    public abstract AbstractNetMeshObjectDeletedEvent inverse();
 
     /**
      * <p>Apply this NetChange to a NetMeshObject in this MeshBase. This method

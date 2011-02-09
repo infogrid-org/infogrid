@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -19,6 +19,7 @@ import java.util.HashMap;
 import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
@@ -49,6 +50,8 @@ import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.meshbase.net.a.AccessLocallySynchronizer;
 import org.infogrid.meshbase.transaction.Change;
 import org.infogrid.meshbase.transaction.Transaction;
+import org.infogrid.model.primitives.MeshTypeUtils;
+import org.infogrid.model.primitives.RoleType;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CreateWhenNeeded;
 import org.infogrid.util.CursorIterator;
@@ -152,7 +155,8 @@ public abstract class AbstractProxyPolicy
                     MeshObject [] batch = iter.next( 100 ); // more efficient
                     for( int i=0 ; i<batch.length ; ++i ) {
                         NetMeshObject current = (NetMeshObject) batch[i];
-                        if( current.getProxyTowardsHomeReplica() == proxy ) {
+                        // current should not be null, but it is if a read error occurred from Store
+                        if( current != null && current.getProxyTowardsHomeReplica() == proxy ) {
                             ret.addToKill( current );
                         }
                     }
@@ -1296,6 +1300,7 @@ public abstract class AbstractProxyPolicy
                 if( acceptRelationshipEvent( incomingProxy, current )) {
                     ret.addNeighborAddition( current );
                 }
+                // else: they can add whatever they want, we don't care
             }
         }
         if( ArrayHelper.arrayHasContent( incoming.getNeighborRemovals())) {
@@ -1304,6 +1309,9 @@ public abstract class AbstractProxyPolicy
             for( NetMeshObjectNeighborRemovedEvent current : events ) {
                 if( acceptRelationshipEvent( incomingProxy, current )) {
                     ret.addNeighborRemoval( current );
+                } else if( current.getNeighborMeshObject() != null && current.getSource().isRelated( current.getNeighborMeshObject() )) {
+                    // we don't let them change our own relationships
+                    perhapsOutgoing.obtain().addNeighborAddition( current.inverse() );
                 }
             }
         }
@@ -1315,6 +1323,7 @@ public abstract class AbstractProxyPolicy
                 if( acceptRelationshipEvent( incomingProxy, current )) {
                     ret.addRoleAddition( current );
                 }
+                // else: they can add whatever they want, we don't care
             }
         }
         if( ArrayHelper.arrayHasContent( incoming.getRoleRemovals())) {
@@ -1323,6 +1332,31 @@ public abstract class AbstractProxyPolicy
             for( NetMeshObjectRoleRemovedEvent current : events ) {
                 if( acceptRelationshipEvent( incomingProxy, current )) {
                     ret.addRoleRemoval( current );
+                } else if( current.getNeighborMeshObject() != null ) {
+                    // we don't want it, send it right back: however, only those that are ours
+                    try {
+                        RoleType [] removed = current.getAffectedRoleTypes();
+                        ArrayList<RoleType> sendBack = new ArrayList<RoleType>( removed.length );
+
+                        for( int i=0 ; i<removed.length ; ++i ) {
+                            if( current.getSource().isRelated( removed[i], current.getNeighborMeshObject() )) {
+                                sendBack.add( removed[i] );
+                            }
+                        }
+                        if( !sendBack.isEmpty() ) {
+                            perhapsOutgoing.obtain().addRoleAddition(
+                                    new NetMeshObjectRoleAddedEvent(
+                                            (NetMeshObjectIdentifier) current.getSourceIdentifier(),
+                                            MeshTypeUtils.meshTypeIdentifiersOrNull( ArrayHelper.copyIntoNewArray( sendBack, RoleType.class )),
+                                            current.getNeighborMeshObjectIdentifier(),
+                                            current.getOriginNetworkIdentifier(),
+                                            current.getTimeEventOccurred(),
+                                            (NetMeshBase) current.getResolver() ));
+                        }
+                    } catch( NotRelatedException ex ) {
+                        // in which case we send all back
+                        perhapsOutgoing.obtain().addRoleAddition( current.inverse() );
+                    }
                 }
             }
         }
@@ -1348,6 +1382,9 @@ public abstract class AbstractProxyPolicy
             for( NetMeshObjectEquivalentsAddedEvent current : events ) {
                 if( acceptRelationshipEvent( incomingProxy, current )) {
                     ret.addEquivalentsAddition( current );
+                } else if( !ArrayHelper.hasNullInArray( current.getDeltaValue())) {
+                    // we don't want it, send it right back
+                    perhapsOutgoing.obtain().addEquivalentRemoval( current.inverse() );
                 }
             }
         }
@@ -1357,6 +1394,9 @@ public abstract class AbstractProxyPolicy
             for( NetMeshObjectEquivalentsRemovedEvent current : events ) {
                 if( acceptRelationshipEvent( incomingProxy, current )) {
                     ret.addEquivalentsRemoval( current );
+                } else if( !ArrayHelper.hasNullInArray( current.getDeltaValue())) {
+                    // we don't want it, send it right back
+                    perhapsOutgoing.obtain().addEquivalentAddition( current.inverse() );
                 }
             }
         }

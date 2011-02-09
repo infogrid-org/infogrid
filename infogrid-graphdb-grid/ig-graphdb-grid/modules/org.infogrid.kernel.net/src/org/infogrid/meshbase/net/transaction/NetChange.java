@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -51,6 +51,13 @@ public interface NetChange<S,SID,V,VID>
      * @return the identifier of the NetMeshObject affected by this Change
      */
     public NetMeshObjectIdentifier getAffectedMeshObjectIdentifier();
+
+    /**
+     * <p>Create a NetChange that undoes this NetChange.</p>
+     *
+     * @return the inverse NetChange, or null if no inverse NetChange could be constructed.
+     */
+    public NetChange inverse();
 
     /**
      * <p>Apply this NetChange to a NetMeshObject in this MeshBase. This method

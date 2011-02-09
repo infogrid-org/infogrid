@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -885,8 +885,8 @@ public class AnetMeshBaseLifecycleManager
 
         for( NetMeshObject current : replicas ) {
             try {
-                NetMeshObjectIdentifier identifier   = current.getIdentifier();
-                ExternalizedMeshObject  externalized = current.asExternalized( true );
+                NetMeshObjectIdentifier   identifier   = current.getIdentifier();
+                ExternalizedNetMeshObject externalized = current.asExternalized( true );
 
                 ((AnetMeshObject) current).purge();
                 
@@ -930,8 +930,8 @@ public class AnetMeshBaseLifecycleManager
         AnetMeshObject theObject = (AnetMeshObject) realBase.findMeshObjectByIdentifier( identifier );
         
         if( theObject != null ) {
-            MeshObjectIdentifier   realIdentifier = theObject.getIdentifier();
-            ExternalizedMeshObject externalized   = theObject.asExternalized( true );
+            NetMeshObjectIdentifier   realIdentifier = theObject.getIdentifier();
+            ExternalizedNetMeshObject externalized   = theObject.asExternalized( true );
 
             Transaction tx = realBase.checkTransaction();
 
@@ -1434,9 +1434,9 @@ public class AnetMeshBaseLifecycleManager
                 getMeshBase(),
                 getMeshBase().getIdentifier(),
                 (NetMeshObject) deletedObject,
-                canonicalIdentifier,
+                (NetMeshObjectIdentifier) canonicalIdentifier,
                 incomingProxyIdentifier,
-                externalized,
+                (ExternalizedNetMeshObject) externalized,
                 timeEventOccurred );
         return ret;
     }

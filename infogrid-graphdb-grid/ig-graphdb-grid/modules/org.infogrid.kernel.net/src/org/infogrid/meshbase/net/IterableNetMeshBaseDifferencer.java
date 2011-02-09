@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -19,6 +19,7 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.IterableMeshBaseDifferencer;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
@@ -115,9 +116,9 @@ public class IterableNetMeshBaseDifferencer
                 (NetMeshBase) obj.getMeshBase(),
                 (NetMeshBaseIdentifier) obj.getMeshBase().getIdentifier(),
                 (NetMeshObject) obj,
-                canonicalIdentifier,
+                (NetMeshObjectIdentifier) canonicalIdentifier,
                 (NetMeshBaseIdentifier) null,
-                externalized,
+                (ExternalizedNetMeshObject) externalized,
                 time );
 
         return ret;

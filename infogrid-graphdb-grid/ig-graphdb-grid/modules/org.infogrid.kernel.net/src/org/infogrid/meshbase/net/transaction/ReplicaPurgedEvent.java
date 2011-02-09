@@ -8,15 +8,15 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net.transaction;
 
-import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
@@ -47,15 +47,31 @@ public class ReplicaPurgedEvent
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public ReplicaPurgedEvent(
-            NetMeshBase             source,
-            NetMeshBaseIdentifier   sourceIdentifier,
-            NetMeshObject           deletedObject,
-            NetMeshObjectIdentifier deletedObjectIdentifier,
-            NetMeshBaseIdentifier   originIdentifier,
-            ExternalizedMeshObject  externalized,
-            long                    timeEventOccurred )
+            NetMeshBase               source,
+            NetMeshBaseIdentifier     sourceIdentifier,
+            NetMeshObject             deletedObject,
+            NetMeshObjectIdentifier   deletedObjectIdentifier,
+            NetMeshBaseIdentifier     originIdentifier,
+            ExternalizedNetMeshObject externalized,
+            long                      timeEventOccurred )
     {
         super( source, sourceIdentifier, deletedObject, deletedObjectIdentifier, originIdentifier, externalized, timeEventOccurred );
+    }
+
+    /**
+     * <p>Create a Change that undoes this Change.</p>
+     *
+     * @return the inverse Change, or null if no inverse Change could be constructed.
+     */
+    @Override
+    public ReplicaCreatedEvent inverse()
+    {
+        return new ReplicaCreatedEvent(
+                (NetMeshBase) getSource(),
+                (NetMeshBaseIdentifier) getSourceIdentifier(),
+                (NetMeshObject) getDeltaValue(),
+                getOriginNetworkIdentifier(),
+                getTimeEventOccurred());
     }
 
     /**

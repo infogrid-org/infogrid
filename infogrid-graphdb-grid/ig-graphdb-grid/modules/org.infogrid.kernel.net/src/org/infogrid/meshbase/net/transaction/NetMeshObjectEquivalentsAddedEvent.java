@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -23,6 +23,7 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.transaction.CannotApplyChangeException;
 import org.infogrid.meshbase.transaction.MeshObjectEquivalentsAddedEvent;
+import org.infogrid.meshbase.transaction.MeshObjectEquivalentsRemovedEvent;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.util.CreateWhenNeeded;
@@ -164,6 +165,23 @@ public class NetMeshObjectEquivalentsAddedEvent
     public NetMeshObjectIdentifier getAffectedMeshObjectIdentifier()
     {
         return (NetMeshObjectIdentifier) super.getAffectedMeshObjectIdentifier();
+    }
+
+    /**
+     * <p>Create a Change that undoes this Change.</p>
+     *
+     * @return the inverse Change, or null if no inverse Change could be constructed.
+     */
+    @Override
+    public NetMeshObjectEquivalentsRemovedEvent inverse()
+    {
+        return new NetMeshObjectEquivalentsRemovedEvent(
+                (NetMeshObject) getSource(),
+                (NetMeshObject []) getNewValue(),
+                (NetMeshObject []) getDeltaValue(),
+                (NetMeshObject []) getOldValue(),
+                getOriginNetworkIdentifier(),
+                getTimeEventOccurred() );
     }
 
     /**
