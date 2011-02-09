@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -52,27 +52,33 @@ public class YadisTest2
 
         theWithYadis = mode;
 
-        NetMeshObject  shadowHome = mb.accessLocally( theIdentityIdentifier, CoherenceSpecification.ONE_TIME_ONLY );
-        ShadowMeshBase shadow     = mb.getShadowMeshBaseFor( theIdentityIdentifier );
+        NetMeshObject  identityShadowHome = mb.accessLocally( theIdentityIdentifier, CoherenceSpecification.ONE_TIME_ONLY );
+        ShadowMeshBase identityShadow     = mb.getShadowMeshBaseFor( theIdentityIdentifier );
 
         if( mode ) {
-            checkYadisResultsIndirect( shadowHome, 3 );
+            checkYadisResultsIndirect( identityShadowHome, 3 );
         } else {
-            checkNoYadisResults( shadowHome );
+            checkNoYadisResults( identityShadowHome );
         }
+
+        // only exists now:
+        ShadowMeshBase xrdsShadow = mb.getShadowMeshBaseFor( mb.getMeshBaseIdentifierFactory().fromExternalForm( XRDS_IDENTIFIER ));
+        checkEquals( xrdsShadow.size(), 11, "Wrong number of objects in XRDS Shadow" );
 
         //
 
         log.info(  "Accessing test data source (2) - " + mode );
 
         theWithYadis = !mode;
-        shadow.doUpdateNow();
+        identityShadow.doUpdateNow();
         sleepFor( PINGPONG_ROUNDTRIP_DURATION );
 
+        checkEquals( xrdsShadow.size(), 11, "Wrong number of objects in XRDS Shadow" );
+
         if( !mode ) {
-            checkYadisResultsIndirect( shadowHome, 3 );
+            checkYadisResultsIndirect( identityShadowHome, 3 );
         } else {
-            checkNoYadisResults( shadowHome );
+            checkNoYadisResults( identityShadowHome );
         }
 
         //
@@ -80,13 +86,13 @@ public class YadisTest2
         log.info( "Accessing test data source (3) - " + mode );
 
         theWithYadis = mode;
-        shadow.doUpdateNow();
+        identityShadow.doUpdateNow();
         sleepFor( PINGPONG_ROUNDTRIP_DURATION );
 
         if( mode ) {
-            checkYadisResultsIndirect( shadowHome, 3 );
+            checkYadisResultsIndirect( identityShadowHome, 3 );
         } else {
-            checkNoYadisResults( shadowHome );
+            checkNoYadisResults( identityShadowHome );
         }
     }
 

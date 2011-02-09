@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -389,7 +389,13 @@ public class DefaultShadowProxyPolicy
         MeshObject source   = e.getAffectedMeshObject();
         MeshObject neighbor = e.getNeighborMeshObject();
         
-        return source != null && neighbor != null;
+        if( source == null || neighbor == null ) {
+            return false;
+        }
+        if( ((ShadowMeshBase)proxy.getNetMeshBase()).usesWritableProbe() ) {
+            return true;
+        }
+        return false;
     }
 
     /**
