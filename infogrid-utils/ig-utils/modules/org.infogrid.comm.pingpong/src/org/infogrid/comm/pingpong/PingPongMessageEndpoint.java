@@ -149,7 +149,7 @@ public abstract class PingPongMessageEndpoint<T>
             } else {
                 logLow.error( "No idea how we got here", this );
                 // but we need to move on, not get stuck here, so this is what we do:
-                tokenToSend = Math.max( theLastSentToken, theLastReceivedToken  ) + 10;
+                tokenToSend = Math.max( theLastSentToken, theLastReceivedToken  ) + 1;
             }
 
             if( tokenToSend == theLastSentToken ) {
