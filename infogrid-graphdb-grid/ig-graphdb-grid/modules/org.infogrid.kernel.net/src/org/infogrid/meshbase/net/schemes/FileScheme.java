@@ -55,26 +55,40 @@ public class FileScheme
             String                       candidate,
             NetMeshBaseIdentifierFactory fact )
     {
-        try {
-            String actual = matchesStrictly( context, candidate );
-            if( actual != null ) {
-                actual = HttpScheme.stripDirectoryPaths( actual );
-
-                return new NetMeshBaseIdentifier( fact, actual, new URI( actual ), candidate, true );
-            }
-            String full = "file:" + candidate;
-            actual = matchesStrictly( context, full );
-            if( actual != null ) {
-                actual = HttpScheme.stripDirectoryPaths( actual );
-
-                return new NetMeshBaseIdentifier( fact, actual, new URI( actual ), candidate, true );
-            }
-
-        } catch( URISyntaxException ex ) {
-            if( log.isDebugEnabled() ) {
-                log.debug( ex );
-            }
+        NetMeshBaseIdentifier ret = strictlyMatchAndCreate( context, candidate, fact );
+        if( ret != null ) {
+            return ret;
         }
+
+        String full = "file:" + candidate;
+        ret = strictlyMatchAndCreate( context, full, fact );
+        if( ret != null ) {
+            return ret;
+        }
+
         return null;
+    }
+
+    /**
+     * Determine whether this Scheme is restful.
+     *
+     * @return true if the Scheme is restful
+     */
+    public boolean isRestful()
+    {
+        return true;
+    }
+
+    /**
+     * Convert a valid candidate to its canonical form. For example, remove redundant "foo/../"
+     *
+     * @param candidate the valid candidate
+     * @return the canonical form
+     */
+    @Override
+    protected String canonisize(
+            String candidate )
+    {
+        return HttpScheme.stripDirectoryPaths( candidate );
     }
 }

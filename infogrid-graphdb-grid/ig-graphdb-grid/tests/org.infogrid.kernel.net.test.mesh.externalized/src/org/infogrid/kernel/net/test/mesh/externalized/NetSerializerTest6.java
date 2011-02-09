@@ -47,7 +47,7 @@ public class NetSerializerTest6
             current   = theMeshBaseIdentifierFactory.guessFromExternalForm( input );
             converted = current.toExternalForm();
 
-            checkEquals( output, converted, "incorrect guessing" );
+            checkEquals( converted, output, "incorrect guessing" );
         }
     }
 
@@ -109,30 +109,33 @@ public class NetSerializerTest6
     static {
         try {
             testData = new Pair [] {
-                    new Pair<String,String>( "http://example.com/",      "http://example.com/" ),
-                    new Pair<String,String>( "htTp://eXample.com/",      "http://example.com/" ),
-                    new Pair<String,String>( "https://example.com/",     "https://example.com/" ),
-                    new Pair<String,String>( "HTtps://EXAMPLE.COM/",     "https://example.com/" ),
-                    new Pair<String,String>( "http://example.com/foo",   "http://example.com/foo" ),
-                    new Pair<String,String>( "http://exAMple.com/fOO",   "http://example.com/fOO" ),
-                    new Pair<String,String>( "https://example.com/foo",  "https://example.com/foo" ),
-                    new Pair<String,String>( "http://example.com/foo/",  "http://example.com/foo/" ),
-                    new Pair<String,String>( "https://example.com/foo/", "https://example.com/foo/" ),
-                    new Pair<String,String>( "http://example.com",       "http://example.com/" ),
-                    new Pair<String,String>( "https://example.com",      "https://example.com/" ),
-                    new Pair<String,String>( "example.com",              "http://example.com/" ),
-                    new Pair<String,String>( "example.com/foo",          "http://example.com/foo" ),
-                    new Pair<String,String>( "example.com/foo/",         "http://example.com/foo/" ),
-                    new Pair<String,String>( "eXAmple.coM/foO/",         "http://example.com/foO/" ),
-                    new Pair<String,String>( "=abc",                     "=abc" ),
-                    new Pair<String,String>( "=abC",                     "=abc" ),
-                    new Pair<String,String>( "abc@def.com",              "acct:abc@def.com" ),
-                    new Pair<String,String>( "abC@deF.cOm",              "acct:abc@def.com" ),
-                    new Pair<String,String>( "test:abc",                 "test:abc" ),
-                    new Pair<String,String>( "test:aBc",                 "test:aBc" ),
-                    new Pair<String,String>( "file:/tmp/foo",            "file:/tmp/foo" ),
-                    new Pair<String,String>( "fiLe:/tmP/foo",            "file:/tmP/foo" ),
-                    new Pair<String,String>( "/tmp/foo",                 "file:/tmp/foo" ),
+                    new Pair<String,String>( "http://example.com/",                         "http://example.com/" ),
+                    new Pair<String,String>( "htTp://eXample.com/",                         "http://example.com/" ),
+                    new Pair<String,String>( "https://example.com/",                        "https://example.com/" ),
+                    new Pair<String,String>( "HTtps://EXAMPLE.COM/",                        "https://example.com/" ),
+                    new Pair<String,String>( "http://example.com/foo",                      "http://example.com/foo" ),
+                    new Pair<String,String>( "http://exAMple.com/fOO",                      "http://example.com/fOO" ),
+                    new Pair<String,String>( "https://example.com/foo",                     "https://example.com/foo" ),
+                    new Pair<String,String>( "http://example.com/foo/",                     "http://example.com/foo/" ),
+                    new Pair<String,String>( "https://example.com/foo/",                    "https://example.com/foo/" ),
+                    new Pair<String,String>( "http://example.com",                          "http://example.com/" ),
+                    new Pair<String,String>( "https://example.com",                         "https://example.com/" ),
+                    new Pair<String,String>( "http://example.com/foo/http://example.net/",  "http://example.com/foo/http%3A//example.net/" ),
+                    new Pair<String,String>( "https://example.com/foo/http://example.net/", "https://example.com/foo/http%3A//example.net/" ),
+                    new Pair<String,String>( "example.com",                                 "http://example.com/" ),
+                    new Pair<String,String>( "example.com/foo",                             "http://example.com/foo" ),
+                    new Pair<String,String>( "example.com/foo/",                            "http://example.com/foo/" ),
+                    new Pair<String,String>( "eXAmple.coM/foO/",                            "http://example.com/foO/" ),
+                    new Pair<String,String>( "example.com/foo/http://example.net/",         "http://example.com/foo/http%3A//example.net/" ),
+                    new Pair<String,String>( "=abc",                                        "=abc" ),
+                    new Pair<String,String>( "=abC",                                        "=abc" ),
+                    new Pair<String,String>( "abc@def.com",                                 "acct:abc@def.com" ),
+                    new Pair<String,String>( "abC@deF.cOm",                                 "acct:abc@def.com" ),
+                    new Pair<String,String>( "test:abc",                                    "test:abc" ),
+                    new Pair<String,String>( "test:aBc",                                    "test:aBc" ),
+                    new Pair<String,String>( "file:/tmp/foo",                               "file:/tmp/foo" ),
+                    new Pair<String,String>( "fiLe:/tmP/foo",                               "file:/tmP/foo" ),
+                    new Pair<String,String>( "/tmp/foo",                                    "file:/tmp/foo" ),
             };
         } catch( Throwable t ) {
             log.error( t );

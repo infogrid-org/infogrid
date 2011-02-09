@@ -14,9 +14,13 @@
 
 package org.infogrid.meshbase.net.schemes;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
+import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 
 /**
  * Abstract implementation of Scheme that strictly matches against a regular expression.
@@ -45,26 +49,36 @@ public abstract class AbstractRegexScheme
     }
 
     /**
-     * Detect whether a candidate identifier String strictly matches this scheme.
+     * Parse a candidate identifier String and create a NetMeshBaseIdentifier. Use strict checking.
      *
      * @param context the identifier root that forms the context
      * @param candidate the candidate identifier
-     * @return non-null if the candidate identifier strictly matches this scheme, in its canonical form
+     * @param fact the NetMeshBaseIdentifierFactory on whose behalf we create this NetMeshBaseIdentifier
+     * @return the successfully created identifier, or null otherwise
      */
-    public String matchesStrictly(
-            String context,
-            String candidate )
+    public NetMeshBaseIdentifier strictlyMatchAndCreate(
+            String                       context,
+            String                       candidate,
+            NetMeshBaseIdentifierFactory fact )
     {
-        Matcher m = thePattern.matcher( candidate );
-        if( m.matches() ) {
-            return toCanonicalForm( candidate, m );
-        }
-        if( context != null ) {
-            String full = context + candidate;
-            m = thePattern.matcher( full );
+        try {
+            Matcher m = thePattern.matcher( candidate );
             if( m.matches() ) {
-                return toCanonicalForm( full, m );
+                String fromRegex = useRegexForCanonicalForm( candidate, m );
+                String canonical = canonisize( fromRegex );
+                return new NetMeshBaseIdentifier( fact, canonical, new URI( canonical ), candidate, isRestful() );
             }
+            if( context != null ) {
+                String full = context + candidate;
+                m = thePattern.matcher( full );
+                if( m.matches() ) {
+                    String fromRegex = useRegexForCanonicalForm( full, m );
+                    String canonical = canonisize( fromRegex );
+                    return new NetMeshBaseIdentifier( fact, canonical, new URI( canonical ), candidate, isRestful() );
+                }
+            }
+        } catch( URISyntaxException ex ) {
+            // ignore
         }
         return null;
     }
@@ -76,7 +90,7 @@ public abstract class AbstractRegexScheme
      * @param res the MatchResult that matched
      * @return the canonical form
      */
-    protected String toCanonicalForm(
+    protected String useRegexForCanonicalForm(
             String      matched,
             MatchResult res )
     {
@@ -91,6 +105,18 @@ public abstract class AbstractRegexScheme
         }
         ret.append( matched.substring( current ));
         return ret.toString();
+    }
+
+    /**
+     * Convert a valid candidate to its canonical form. For example, remove redundant "foo/../"
+     *
+     * @param candidate the valid candidate
+     * @return the canonical form
+     */
+    protected String canonisize(
+            String candidate )
+    {
+        return candidate;
     }
 
     /**

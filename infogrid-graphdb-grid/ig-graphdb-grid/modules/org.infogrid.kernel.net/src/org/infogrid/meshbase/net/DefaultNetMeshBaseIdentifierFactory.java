@@ -173,8 +173,8 @@ public class DefaultNetMeshBaseIdentifierFactory
         NetMeshBaseIdentifier ret;
 
         for( Scheme current : theSchemes ) {
-            if( current.matchesStrictly( contextString, string ) != null ) {
-                ret = current.guessAndCreate( contextString, string, this );
+            ret = current.strictlyMatchAndCreate( contextString, string, this );
+            if( ret != null ) {
                 return ret;
             }
         }

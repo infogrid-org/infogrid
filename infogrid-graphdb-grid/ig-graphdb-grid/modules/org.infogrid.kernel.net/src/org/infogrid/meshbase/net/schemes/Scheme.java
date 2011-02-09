@@ -30,15 +30,17 @@ public interface Scheme
     public abstract String getName();
 
     /**
-     * Detect whether a candidate identifier String strictly matches this scheme.
+     * Parse a candidate identifier String and create a NetMeshBaseIdentifier. Use strict checking.
      *
      * @param context the identifier root that forms the context
      * @param candidate the candidate identifier
-     * @return non-null if the candidate identifier strictly matches this scheme, in its canonical form
+     * @param fact the NetMeshBaseIdentifierFactory on whose behalf we create this NetMeshBaseIdentifier
+     * @return the successfully created identifier, or null otherwise
      */
-    public abstract String matchesStrictly(
-            String context,
-            String candidate );
+    public abstract NetMeshBaseIdentifier strictlyMatchAndCreate(
+            String                       context,
+            String                       candidate,
+            NetMeshBaseIdentifierFactory fact );
 
     /**
      * Attempt to convert this candidate identifier String into an identifier with this
@@ -54,4 +56,11 @@ public interface Scheme
             String                       context,
             String                       candidate,
             NetMeshBaseIdentifierFactory fact );
+
+    /**
+     * Determine whether this Scheme is restful.
+     *
+     * @return true if the Scheme is restful
+     */
+    public abstract boolean isRestful();
 }

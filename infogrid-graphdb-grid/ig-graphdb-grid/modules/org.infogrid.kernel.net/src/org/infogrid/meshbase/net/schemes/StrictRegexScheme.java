@@ -14,12 +14,9 @@
 
 package org.infogrid.meshbase.net.schemes;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.regex.Pattern;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
-import org.infogrid.util.logging.Log;
 
 /**
  * Represents a generic RegexScheme that is strict about guessing for the DefaultNetMeshBaseIdentifierFactory.
@@ -30,10 +27,8 @@ public class StrictRegexScheme
         implements
             Scheme
 {
-    private static final Log log = Log.getLogInstance( HttpScheme.class ); // our own, private logger
-
     /**
-     * Constructor.
+     * Constructor for a non-RESTful Scheme.
      *
      * @param protocolName the name of the protocol, e.g. "foobar"
      * @param regex the pattern to check strictly
@@ -43,6 +38,25 @@ public class StrictRegexScheme
             Pattern regex )
     {
         super( protocolName, regex );
+
+        theIsRestful = false;
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param protocolName the name of the protocol, e.g. "foobar"
+     * @param regex the pattern to check strictly
+     * @param isRestful if true, the Scheme is REST-ful
+     */
+    public StrictRegexScheme(
+            String  protocolName,
+            Pattern regex,
+            boolean isRestful )
+    {
+        super( protocolName, regex );
+
+        theIsRestful = isRestful;
     }
 
     /**
@@ -60,18 +74,22 @@ public class StrictRegexScheme
             String                       candidate,
             NetMeshBaseIdentifierFactory fact )
     {
-        try {
-            String actual = matchesStrictly( context, candidate );
-            if( actual != null ) {
-                return new NetMeshBaseIdentifier( fact, actual, new URI( actual ), candidate, true );
-            }
-
-        } catch( URISyntaxException ex ) {
-            if( log.isDebugEnabled() ) {
-                log.debug( ex );
-            }
-        }
-        return null;
+        NetMeshBaseIdentifier ret = strictlyMatchAndCreate( context, candidate, fact );
+        return ret;
     }
 
+    /**
+     * Determine whether this Scheme is restful.
+     *
+     * @return true if the Scheme is restful
+     */
+    public final boolean isRestful()
+    {
+        return theIsRestful;
+    }
+
+    /**
+     * Is the Scheme REST-ful.
+     */
+    protected boolean theIsRestful;
 }

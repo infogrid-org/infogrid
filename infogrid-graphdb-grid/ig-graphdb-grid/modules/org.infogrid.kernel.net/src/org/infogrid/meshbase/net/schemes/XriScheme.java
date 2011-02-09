@@ -39,23 +39,33 @@ public class XriScheme
     }
 
     /**
-     * Detect whether a candidate identifier String strictly matches this scheme.
+     * Parse a candidate identifier String and create a NetMeshBaseIdentifier. Use strict checking.
      *
      * @param context the identifier root that forms the context
      * @param candidate the candidate identifier
-     * @return non-null if the candidate identifier strictly matches this scheme, in its canonical form
+     * @param fact the NetMeshBaseIdentifierFactory on whose behalf we create this NetMeshBaseIdentifier
+     * @return the successfully created identifier, or null otherwise
      */
-    public String matchesStrictly(
-            String context,
-            String candidate )
+    public NetMeshBaseIdentifier strictlyMatchAndCreate(
+            String                       context,
+            String                       candidate,
+            NetMeshBaseIdentifierFactory fact )
     {
-        if( isXriGlobalContextSymbol( candidate.charAt( 0 ))) {
-            return candidate.toLowerCase();
-        }
-        if( candidate.startsWith( theXriResolverPrefix )) {
-            String xri = candidate.substring( theXriResolverPrefix.length() );
-            if( isXriGlobalContextSymbol( xri.charAt( 0 ) )) {
-                return xri.toLowerCase();
+        try {
+            if( isXriGlobalContextSymbol( candidate.charAt( 0 ))) {
+                String canonical = candidate.toLowerCase();
+                return new NetMeshBaseIdentifier( fact, canonical, new URI( theXriResolverPrefix + canonical ), candidate, true );
+            }
+            if( candidate.startsWith( theXriResolverPrefix )) {
+                String xri = candidate.substring( theXriResolverPrefix.length() );
+                if( isXriGlobalContextSymbol( xri.charAt( 0 ) )) {
+                    String canonical = xri.toLowerCase();
+                    return new NetMeshBaseIdentifier( fact, canonical, new URI( theXriResolverPrefix + canonical ), candidate, true );
+                }
+            }
+        } catch( URISyntaxException ex ) {
+            if( log.isDebugEnabled() ) {
+                log.debug( ex );
             }
         }
         return null;
@@ -76,18 +86,18 @@ public class XriScheme
             String                       candidate,
             NetMeshBaseIdentifierFactory fact )
     {
-        try {
-            String canonical = matchesStrictly( context, candidate );
-            if( canonical != null ) {
-                return new NetMeshBaseIdentifier( fact, canonical, new URI( theXriResolverPrefix + canonical ), candidate, true );
-            }
+        NetMeshBaseIdentifier ret = strictlyMatchAndCreate( context, candidate, fact );
+        return ret;
+    }
 
-        } catch( URISyntaxException ex ) {
-            if( log.isDebugEnabled() ) {
-                log.debug( ex );
-            }
-        }
-        return null;
+    /**
+     * Determine whether this Scheme is restful.
+     *
+     * @return true if the Scheme is restful
+     */
+    public boolean isRestful()
+    {
+        return true;
     }
 
     /**

@@ -14,12 +14,12 @@
 
 package org.infogrid.meshbase.net.schemes;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
+import org.infogrid.util.http.HTTP;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -71,46 +71,62 @@ public class HttpScheme
             NetMeshBaseIdentifierFactory fact )
     {
         try {
-            String actual = matchesStrictly( context, candidate );
-            if( actual != null ) {
-                actual = stripDirectoryPaths( removeUnnecessaryPort( actual ));
-                return new NetMeshBaseIdentifier( fact, actual, new URI( actual ), candidate, true );
-            }
-            if( candidate.indexOf( "://" ) >= 0 ) {
-                String tryThis = appendSlashIfNeeded( candidate );
-                if( tryThis.equals( candidate )) {
-                    return null; // didn't work, it's a different scheme
-                }
-                actual = matchesStrictly( context, tryThis );
-                if( actual != null ) {
-                    actual = stripDirectoryPaths( removeUnnecessaryPort( actual ));
+            int colonDoubleSlash = candidate.indexOf( "://" );
+            if( colonDoubleSlash >= 0 && candidate.startsWith( theName ) && colonDoubleSlash == theName.length() ) {
+                NetMeshBaseIdentifier ret = tryThis( context, candidate, fact );
+                return ret; // may or may not be null
 
-                    return new NetMeshBaseIdentifier( fact, actual, new URI( actual ), candidate, true );
-                }
             } else {
                 String tryThis = theName + "://" + candidate;
-                actual = matchesStrictly( context, tryThis );
-                if( actual != null ) {
-                    actual = stripDirectoryPaths( removeUnnecessaryPort( actual ));
 
-                    return new NetMeshBaseIdentifier( fact, actual, new URI( actual ), candidate, true );
-                }
-                String tryThis2 = appendSlashIfNeeded( tryThis );
-                if( tryThis2.equals( tryThis )) {
-                    return null; // didn't work, has a slash already, must be something else
-                }
-
-                actual = matchesStrictly( context, tryThis2 );
-                if( actual != null ) {
-                    actual = stripDirectoryPaths( removeUnnecessaryPort( actual ));
-
-                    return new NetMeshBaseIdentifier( fact, actual, new URI( actual ), candidate, true );
-                }
+                NetMeshBaseIdentifier ret = tryThis( context, tryThis, fact );
+                return ret; // may or may not be null
             }
 
         } catch( URISyntaxException ex ) {
             if( log.isDebugEnabled() ) {
                 log.debug( ex );
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Determine whether this Scheme is restful.
+     *
+     * @return true if the Scheme is restful
+     */
+    public boolean isRestful()
+    {
+        return true;
+    }
+
+    /**
+     * Helper method to try one attempt.
+     *
+     * @param context the identifier root that forms the context
+     * @param candidate the candidate identifier
+     * @param fact the NetMeshBaseIdentifierFactory on whose behalf we create this NetMeshBaseIdentifier
+     * @return the successfully created identifier, or null otherwise
+     * @throws URISyntaxException thrown if the candidate could not be parsed
+     */
+    protected NetMeshBaseIdentifier tryThis(
+            String                       context,
+            String                       candidate,
+            NetMeshBaseIdentifierFactory fact )
+        throws
+            URISyntaxException
+    {
+        NetMeshBaseIdentifier ret = strictlyMatchAndCreate( context, candidate, fact );
+        if( ret != null ) {
+            return ret;
+        }
+
+        String tryThis = appendSlashEscapeIfNeeded( candidate );
+        if( !tryThis.equals( candidate )) {
+            ret = strictlyMatchAndCreate( context, tryThis, fact );
+            if( ret != null ) {
+                return ret;
             }
         }
         return null;
@@ -137,24 +153,43 @@ public class HttpScheme
     }
 
     /**
-     * Helper method to append a slash if needed.
+     * Helper method to append a slash if needed, or escape characters after the slash.
      *
      * @param candidate the candidate String
-     * @return the candidate, with or without appended slash
+     * @return the candidate, with or without appended slash, and with or without escaped characters
      */
-    protected String appendSlashIfNeeded(
+    protected String appendSlashEscapeIfNeeded(
             String candidate )
     {
         // we know that candidate starts with http:// or https://
         String ret;
         int doubleSlashes = candidate.indexOf( "//" );
-        if( candidate.indexOf( '/', doubleSlashes+2 ) == -1 ) {
+        int singleSlash   = candidate.indexOf( '/', doubleSlashes+2 );
+
+        if( singleSlash == -1 ) {
             // doesn't have a single slash, append one
             ret  = candidate + "/";
-        } else {
+        } else if( singleSlash == candidate.length()-1 ) {
+            // it's the end
             ret = candidate;
+        } else {
+            ret = candidate.substring( 0, singleSlash+1 ) + HTTP.encodeToValidUrl( candidate.substring( singleSlash+1 ));
         }
         return ret;
+    }
+
+
+    /**
+     * Convert a valid candidate to its canonical form. For example, remove redundant "foo/../"
+     *
+     * @param candidate the valid candidate
+     * @return the canonical form
+     */
+    @Override
+    protected String canonisize(
+            String candidate )
+    {
+        return stripDirectoryPaths( removeUnnecessaryPort( candidate ));
     }
 
     /**

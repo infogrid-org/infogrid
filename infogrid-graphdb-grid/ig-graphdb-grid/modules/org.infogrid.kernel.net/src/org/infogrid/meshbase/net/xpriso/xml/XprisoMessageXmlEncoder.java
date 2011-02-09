@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -418,8 +418,8 @@ public class XprisoMessageXmlEncoder
 
         } else if( MESH_OBJECT_DELETED_TAG.equals( qName )) {
             try {
-                MeshObjectIdentifier ref  = theMeshBase.getMeshObjectIdentifierFactory().guessFromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
-                long                 time = parseLong( attrs, TIME_UPDATED_TAG, -1L );
+                NetMeshObjectIdentifier ref  = ((NetMeshObjectIdentifierFactory)theMeshBase.getMeshObjectIdentifierFactory()).guessFromExternalForm( attrs.getValue( IDENTIFIER_TAG ));
+                long                    time = parseLong( attrs, TIME_UPDATED_TAG, -1L );
                 theMessage.addDeleteChange( new NetMeshObjectDeletedEvent( null, theMessage.getSenderIdentifier(), null, ref, theMessage.getSenderIdentifier(), null, time ));
             } catch( ParseException ex ) {
                 log.warn( ex );

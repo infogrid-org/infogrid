@@ -74,4 +74,14 @@ public class AcctScheme
         }
         return null;
     }
+
+    /**
+     * Determine whether this Scheme is restful.
+     *
+     * @return true if the Scheme is restful
+     */
+    public boolean isRestful()
+    {
+        return false;
+    }
 }
