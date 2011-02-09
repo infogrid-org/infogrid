@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.net.xpriso.logging;
 
+import java.util.List;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.util.logging.BufferingDumperFactory;
 import org.infogrid.util.logging.Log;
@@ -70,23 +71,23 @@ public class LogXprisoMessageLogger
     /**
      * Actual logging method.
      *
-     * @param msg the XprisoMessage
+     * @param msgs the XprisoMessages
      * @param args other arguments
      */
     protected void log(
-            XprisoMessage msg,
-            Object...     args )
+            List<XprisoMessage> msgs,
+            Object...           args )
     {
         if( args != null && args.length > 0 ) {
             Object [] realArgs = new Object[ args.length + 2 ];
             realArgs[0] = theMessageDumperFactory;
-            realArgs[1] = msg;
+            realArgs[1] = msgs;
             for( int i=0 ; i<args.length ; ++i ) {
                 realArgs[i+2] = args[i];
             }
             theLog.info( realArgs );
         } else {
-            theLog.info( theMessageDumperFactory, msg );
+            theLog.info( theMessageDumperFactory, msgs );
         }
     }
 

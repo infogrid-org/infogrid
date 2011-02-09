@@ -8,12 +8,13 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net.xpriso.logging;
 
+import java.util.List;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 
@@ -23,14 +24,14 @@ import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 public interface XprisoMessageLogger
 {
     /**
-     * An XprisoMessage has arrived.
+     * One ore more XprisoMessages have arrived.
      *
      * @param base the NetMeshBase at which the XprisoMessage has arrived
-     * @param msg the XprisoMessage that arrived
+     * @param msgs the XprisoMessages that arrived
      */
     public void messageArrived(
-            NetMeshBase   base,
-            XprisoMessage msg );
+            NetMeshBase         base,
+            List<XprisoMessage> msgs );
 
     /**
      * An XprisoMessage is about to be sent.

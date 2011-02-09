@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.net.proxy;
 
+import java.util.List;
 import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
@@ -135,12 +136,12 @@ public class DefaultProxy
      * debugging easier as we only get breakpoints from instances of this class.
      *
      * @param endpoint the MessageEndpoint sending this event
-     * @param incoming the incoming message
+     * @param incoming the incoming messages
      */
     @Override
     protected void internalMessageReceived(
             ReceivingMessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                           incoming )
+            List<XprisoMessage>                     incoming )
     {
         super.internalMessageReceived( endpoint, incoming );
     }

@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.net.xpriso.logging;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
@@ -35,12 +36,12 @@ public abstract class AbstractXprisoMessageLogger
     /**
      * Actual logging method.
      *
-     * @param msg the XprisoMessage
+     * @param msgs the XprisoMessages
      * @param args other arguments
      */
     protected abstract void log(
-            XprisoMessage msg,
-            Object...     args );
+            List<XprisoMessage> msgs,
+            Object...           args );
 
     /**
      * Logging method for errors.
@@ -53,26 +54,26 @@ public abstract class AbstractXprisoMessageLogger
             String        error );
 
     /**
-     * An XprisoMessage has arrived.
+     * One ore more XprisoMessages have arrived.
      *
      * @param base the NetMeshBase at which the XprisoMessage has arrived
-     * @param msg the XprisoMessage that arrived
+     * @param msgs the XprisoMessages that arrived
      */
     public void messageArrived(
-            NetMeshBase   base,
-            XprisoMessage msg )
+            NetMeshBase         base,
+            List<XprisoMessage> msgs )
     {
-        if( !checkReceiverOk( base, msg )) {
-            logError( msg, "Received at invalid NetMeshBase " + base.getIdentifier().toExternalForm() );
+        for( XprisoMessage current : msgs ) {
+            if( !checkReceiverOk( base, current )) {
+                logError( current, "Received at invalid NetMeshBase " + base.getIdentifier().toExternalForm() );
+            }
+            if( notYetSuccessfullyArrived.contains( current )) {
+                notYetSuccessfullyArrived.remove( current );
+            }
         }
 
-        if( notYetSuccessfullyArrived.contains( msg )) {
-            notYetSuccessfullyArrived.remove( msg );
-//        } else {
-//            logError( msg, "Message arrived that had not been sent" );
-        }
 
-        log( msg );
+        log( msgs );
     }
 
     /**

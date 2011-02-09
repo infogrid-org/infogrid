@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.net.proxy;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.infogrid.comm.MessageEndpoint;
 import org.infogrid.comm.MessageEndpointIsDeadException;
@@ -43,6 +44,7 @@ import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeRemovedEvent;
 import org.infogrid.meshbase.net.xpriso.ParserFriendlyXprisoMessage;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
+import org.infogrid.meshbase.net.xpriso.XprisoMessageHelper;
 import org.infogrid.meshbase.net.xpriso.logging.XprisoMessageLogger;
 import org.infogrid.meshbase.transaction.CannotApplyChangeException;
 import org.infogrid.meshbase.transaction.Transaction;
@@ -373,14 +375,14 @@ public abstract class AbstractCommunicatingProxy
     }
 
     /**
-     * Called when an incoming message has arrived.
+     * Called when one or more incoming messages have arrived.
      *
      * @param endpoint the MessageEndpoint sending this event
-     * @param incoming the incoming message
+     * @param incoming the incoming messages
      */
     public final void messageReceived(
             ReceivingMessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                           incoming )
+            List<XprisoMessage>                     incoming )
     {
         if( log.isTraceEnabled() ) {
             log.traceMethodCallEntry( this, "messageReceived", incoming );
@@ -416,14 +418,14 @@ public abstract class AbstractCommunicatingProxy
     }
 
     /**
-     * Prepare for receiving a message.
+     * Prepare for receiving one or more messages.
      *
      * @param endpoint the MessageEndpoint through which the message arrived
-     * @param incoming the incoming message
+     * @param incoming the incoming messages
      */
     protected void prepareMessageReceived(
             ReceivingMessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                           incoming )
+            List<XprisoMessage>                     incoming )
     {
         // do nothing on this level
     }
@@ -433,31 +435,35 @@ public abstract class AbstractCommunicatingProxy
      * easier.
      *
      * @param endpoint the MessageEndpoint sending this event
-     * @param incoming the incoming message
+     * @param incoming the incoming messages
      */
     protected void internalMessageReceived(
             ReceivingMessageEndpoint<XprisoMessage> endpoint,
-            XprisoMessage                           incoming )
+            List<XprisoMessage>                     incoming )
     {
-        long    responseId    = incoming.getResponseId();
-        boolean callIsWaiting = theWaitEndpoint.isCallWaitingFor( responseId );
+        List<XprisoMessage> consolidated = XprisoMessageHelper.consolidate( incoming );
 
-        ProxyProcessingInstructions instructions = theProxyPolicy.calculateForIncomingMessage( endpoint, incoming, callIsWaiting, this, thePotentialOutgoingMessage );
+        for( XprisoMessage current : consolidated ) {
+            long    responseId    = current.getResponseId();
+            boolean callIsWaiting = theWaitEndpoint.isCallWaitingFor( responseId );
 
-        AccessLocallySynchronizer synchronizer = theMeshBase.getAccessLocallySynchronizer();
-        try {
-            synchronizer.beginTransaction();
+            ProxyProcessingInstructions instructions = theProxyPolicy.calculateForIncomingMessage( endpoint, current, callIsWaiting, this, thePotentialOutgoingMessage );
 
-            performInstructions( instructions, callIsWaiting ? responseId : null );
+            AccessLocallySynchronizer synchronizer = theMeshBase.getAccessLocallySynchronizer();
+            try {
+                synchronizer.beginTransaction();
 
-            synchronizer.join();
+                performInstructions( instructions, callIsWaiting ? responseId : null );
 
-            synchronizer.endTransaction();
+                synchronizer.join();
 
-        } catch( ReturnSynchronizerException ex ) {
-            log.error( ex );
-        } catch( InterruptedException ex ) {
-            log.error( ex );
+                synchronizer.endTransaction();
+
+            } catch( ReturnSynchronizerException ex ) {
+                log.error( ex );
+            } catch( InterruptedException ex ) {
+                log.error( ex );
+            }
         }
     }
 
@@ -784,7 +790,9 @@ public abstract class AbstractCommunicatingProxy
             }
         }
         if( incoming != null ) {
-            theWaitEndpoint.messageReceived( instructions.getIncomingXprisoMessageEndpoint(), incoming );
+            List<XprisoMessage> l = new ArrayList<XprisoMessage>( 1 );
+            l.add( incoming );
+            theWaitEndpoint.messageReceived( instructions.getIncomingXprisoMessageEndpoint(), l );
         }
         theTimeRead = now;
 
