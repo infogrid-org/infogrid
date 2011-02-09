@@ -61,9 +61,11 @@ public class YadisTest2
             checkNoYadisResults( identityShadowHome );
         }
 
-        // only exists now:
+        // only exists now if Yadis
         ShadowMeshBase xrdsShadow = mb.getShadowMeshBaseFor( mb.getMeshBaseIdentifierFactory().fromExternalForm( XRDS_IDENTIFIER ));
-        checkEquals( xrdsShadow.size(), 11, "Wrong number of objects in XRDS Shadow" );
+        if( xrdsShadow != null ) {
+            checkEquals( xrdsShadow.size(), 11, "Wrong number of objects in XRDS Shadow" );
+        }
 
         //
 
@@ -73,7 +75,9 @@ public class YadisTest2
         identityShadow.doUpdateNow();
         sleepFor( PINGPONG_ROUNDTRIP_DURATION );
 
-        checkEquals( xrdsShadow.size(), 11, "Wrong number of objects in XRDS Shadow" );
+        if( xrdsShadow != null ) {
+            checkEquals( xrdsShadow.size(), 11, "Wrong number of objects in XRDS Shadow" );
+        }
 
         if( !mode ) {
             checkYadisResultsIndirect( identityShadowHome, 3 );
