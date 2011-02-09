@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -128,6 +128,24 @@ public abstract class ArrayHelper
                 if( array[i] != null ) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Helper method to determine whether at least one of the elements in the array
+     * has a null value.
+     *
+     * @param array the array
+     * @return true if at least one of the elements in the array is null
+     */
+    public static boolean hasNullInArray(
+            Object [] array )
+    {
+        for( int i=0 ; i<array.length ; ++i ) {
+            if( array[i] == null ) {
+                return true;
             }
         }
         return false;
