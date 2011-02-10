@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -522,6 +522,15 @@ public abstract class AbstractCommunicatingProxy
             }
         }
 
+        for( NetMeshObject current : instructions.getSurrenderLocks() ) {
+            current.proxyOnlySurrenderLock( this );
+            meshObjectModifiedDuringMessageProcessing( current );
+        }
+        for( NetMeshObject current : instructions.getSurrenderHomes() ) {
+            current.proxyOnlySurrenderHomeReplica( this );
+            meshObjectModifiedDuringMessageProcessing( current );
+        }
+
         CreateWhenNeeded<Transaction> perhapsTx = new CreateWhenNeeded<Transaction>() {
                 /**
                  * Instantiation method.
@@ -712,14 +721,6 @@ public abstract class AbstractCommunicatingProxy
             }
         }
 
-        for( NetMeshObject current : instructions.getSurrenderLocks() ) {
-            current.proxyOnlySurrenderLock( this );
-            meshObjectModifiedDuringMessageProcessing( current );
-        }
-        for( NetMeshObject current : instructions.getSurrenderHomes() ) {
-            current.proxyOnlySurrenderHomeReplica( this );
-            meshObjectModifiedDuringMessageProcessing( current );
-        }
         for( NetMeshObject current : instructions.getCancels() ) {
             current.proxyOnlyUnregisterReplicationTowards( this );
             meshObjectModifiedDuringMessageProcessing( current );
