@@ -156,7 +156,9 @@ public class ExternalizedShadowMeshBaseXmlEncoder
         theMeshBase = shadow;
 
         try {
-            theParser.parse( contentAsStream, this );
+            synchronized( theParser ) {
+                theParser.parse( contentAsStream, this );
+            }
 
             return this.theParsedShadowMeshBase;
             
