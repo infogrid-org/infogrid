@@ -336,7 +336,9 @@ public class XprisoMessageXmlEncoder
         theMeshBase = mb;
         
         try {
-            theParser.parse( contentAsStream, this );
+            synchronized( theParser ) {
+                theParser.parse( contentAsStream, this );
+            }
             return theMessage;
 
         } catch( SAXException ex ) {

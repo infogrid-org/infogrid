@@ -138,71 +138,151 @@ public abstract class XprisoMessageHelper
 
             ExternalizedNetMeshObject [] firstConveyed  = first.getConveyedMeshObjects();
             ExternalizedNetMeshObject [] secondConveyed = second.getConveyedMeshObjects();
-            ret.addConveyedMeshObjects( firstConveyed );
-            ret.addConveyedMeshObjects( secondConveyed ); // will complain if we have it already
+            try {
+                ret.addConveyedMeshObjects( firstConveyed );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addConveyedMeshObjects( secondConveyed ); // will complain if we have it already
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             //
 
             NetMeshObjectAccessSpecification [] firstRequestedFirstTime  = first.getRequestedFirstTimeObjects();
             NetMeshObjectAccessSpecification [] secondRequestedFirstTime = second.getRequestedFirstTimeObjects();
-            ret.addRequestedFirstTimeObjects( firstRequestedFirstTime );
-            ret.addRequestedFirstTimeObjects( secondRequestedFirstTime );
+            try {
+                ret.addRequestedFirstTimeObjects( firstRequestedFirstTime );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addRequestedFirstTimeObjects( secondRequestedFirstTime );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             //
 
             NetMeshObjectIdentifier [] firstRequestedCanceled  = first.getRequestedCanceledObjects();
             NetMeshObjectIdentifier [] secondRequestedCanceled = second.getRequestedCanceledObjects();
-            ret.addRequestedCanceledObjects( firstRequestedCanceled );
-            ret.addRequestedCanceledObjects( secondRequestedCanceled );
+            try {
+                ret.addRequestedCanceledObjects( firstRequestedCanceled );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addRequestedCanceledObjects( secondRequestedCanceled );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             //
 
             NetMeshObjectIdentifier [] firstRequestedFreshen  = first.getRequestedFreshenReplicas();
             NetMeshObjectIdentifier [] secondRequestedFreshen = second.getRequestedFreshenReplicas();
-            ret.addRequestedFreshenReplicas( firstRequestedFreshen );
-            ret.addRequestedFreshenReplicas( secondRequestedFreshen );
+            try {
+                ret.addRequestedFreshenReplicas( firstRequestedFreshen );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addRequestedFreshenReplicas( secondRequestedFreshen );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             //
 
             NetMeshObjectIdentifier [] firstRequestedResync  = first.getRequestedResynchronizeReplicas();
             NetMeshObjectIdentifier [] secondRequestedResync = second.getRequestedResynchronizeReplicas();
-            ret.addRequestedResynchronizeReplicas( firstRequestedResync );
-            ret.addRequestedResynchronizeReplicas( secondRequestedResync );
+            try {
+                ret.addRequestedResynchronizeReplicas( firstRequestedResync );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addRequestedResynchronizeReplicas( secondRequestedResync );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             //
 
             NetMeshObjectIdentifier [] firstRequestedLocks  = first.getRequestedLockObjects();
             NetMeshObjectIdentifier [] secondRequestedLocks = second.getRequestedLockObjects();
-            ret.addRequestedLockObjects( firstRequestedLocks );
-            ret.addRequestedLockObjects( secondRequestedLocks );
+            try {
+                ret.addRequestedLockObjects( firstRequestedLocks );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addRequestedLockObjects( secondRequestedLocks );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             //
 
             NetMeshObjectIdentifier [] firstPushLocks  = first.getPushLockObjects();
             NetMeshObjectIdentifier [] secondPushLocks = second.getPushLockObjects();
-            ret.addPushLockObjects( firstPushLocks );
-            ret.addPushLockObjects( secondPushLocks );
+            try {
+                ret.addPushLockObjects( firstPushLocks );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addPushLockObjects( secondPushLocks );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             //
 
             NetMeshObjectIdentifier [] firstReclaimedLocks  = first.getReclaimedLockObjects();
             NetMeshObjectIdentifier [] secondReclaimedLocks = second.getReclaimedLockObjects();
-            ret.addReclaimedLockObjects( firstReclaimedLocks );
-            ret.addReclaimedLockObjects( secondReclaimedLocks );
+            try {
+                ret.addReclaimedLockObjects( firstReclaimedLocks );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addReclaimedLockObjects( secondReclaimedLocks );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             //
 
             NetMeshObjectIdentifier [] firstRequestedHome  = first.getRequestedHomeReplicas();
             NetMeshObjectIdentifier [] secondRequestedHome = second.getRequestedHomeReplicas();
-            ret.addRequestedHomeReplicas( firstRequestedHome );
-            ret.addRequestedHomeReplicas( secondRequestedHome );
+            try {
+                ret.addRequestedHomeReplicas( firstRequestedHome );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addRequestedHomeReplicas( secondRequestedHome );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             //
 
             NetMeshObjectIdentifier [] firstPushHome  = first.getPushHomeReplicas();
             NetMeshObjectIdentifier [] secondPushHome = second.getPushHomeReplicas();
-            ret.addPushHomeReplicas( firstPushHome );
-            ret.addPushHomeReplicas( secondPushHome );
+            try {
+                ret.addPushHomeReplicas( firstPushHome );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addPushHomeReplicas( secondPushHome );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             // only added types that aren't being removed again later.
             // The inverse is not true because it would reset properties
@@ -224,16 +304,32 @@ public abstract class XprisoMessageHelper
                     }
                 }
                 if( inverse == null ) {
-                    ret.addTypeAddition( currentAdded );
+                    try {
+                        ret.addTypeAddition( currentAdded );
+                    } catch( IllegalStateException ex ) {
+                        log.warn( ex );
+                    }
                 } else {
                     secondTypesRemovedDontAdd.add( inverse );
                 }
             }
-            ret.addTypeAdditions( secondTypesAdded );
-            ret.addTypeRemovals( firstTypesRemoved );
+            try {
+                ret.addTypeAdditions( secondTypesAdded );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addTypeRemovals( firstTypesRemoved );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
             for( NetMeshObjectTypeRemovedEvent current : secondTypesRemoved ) {
                 if( !secondTypesRemovedDontAdd.contains( current )) {
-                    ret.addTypeRemoval( current );
+                    try {
+                        ret.addTypeRemoval( current );
+                    } catch( IllegalStateException ex ) {
+                        log.warn( ex );
+                    }
                 }
             }
 
@@ -251,10 +347,18 @@ public abstract class XprisoMessageHelper
                     }
                 }
                 if( !skip ) {
-                    ret.addPropertyChange( currentFirst );
+                    try {
+                        ret.addPropertyChange( currentFirst );
+                    } catch( IllegalStateException ex ) {
+                        log.warn( ex );
+                    }
                 }
             }
-            ret.addPropertyChanges( secondPropertyChanges );
+            try {
+                ret.addPropertyChanges( secondPropertyChanges );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             // only neighbor additions that aren't removed again later
 
@@ -273,16 +377,32 @@ public abstract class XprisoMessageHelper
                     }
                 }
                 if( inverse == null ) {
-                    ret.addNeighborAddition( currentFirst );
+                    try {
+                        ret.addNeighborAddition( currentFirst );
+                    } catch( IllegalStateException ex ) {
+                        log.warn( ex );
+                    }
                 } else {
                     secondRemovalsDontAdd.add( inverse );
                 }
             }
-            ret.addNeighborRemovals( firstNeighborRemovals );
-            ret.addNeighborAdditions( secondNeighborAdditions );
+            try {
+                ret.addNeighborRemovals( firstNeighborRemovals );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addNeighborAdditions( secondNeighborAdditions );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
             for( NetMeshObjectNeighborRemovedEvent current : secondNeighborRemovals ) {
                 if( !secondRemovalsDontAdd.contains( current )) {
-                    ret.addNeighborRemoval( current );
+                    try {
+                        ret.addNeighborRemoval( current );
+                    } catch( IllegalStateException ex ) {
+                        log.warn( ex );
+                    }
                 }
             }
 
@@ -314,16 +434,32 @@ public abstract class XprisoMessageHelper
                     }
                 }
                 if( inverse == null ) {
-                    ret.addRoleAddition( currentFirst );
+                    try {
+                        ret.addRoleAddition( currentFirst );
+                    } catch( IllegalStateException ex ) {
+                        log.warn( ex );
+                    }
                 } else {
                     secondRoleRemovalsDontAdd.add( inverse );
                 }
             }
-            ret.addRoleRemovals( firstRoleRemovals );
-            ret.addRoleAdditions( secondRoleAdditions );
+            try {
+                ret.addRoleRemovals( firstRoleRemovals );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addRoleAdditions( secondRoleAdditions );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
             for( NetMeshObjectRoleRemovedEvent current : secondRoleRemovals ) {
                 if( !secondRoleRemovalsDontAdd.contains( current )) {
-                    ret.addRoleRemoval( current );
+                    try {
+                        ret.addRoleRemoval( current );
+                    } catch( IllegalStateException ex ) {
+                        log.warn( ex );
+                    }
                 }
             }
 
@@ -331,8 +467,16 @@ public abstract class XprisoMessageHelper
 
             NetMeshObjectDeletedEvent [] firstDeletions  = first.getDeletions();
             NetMeshObjectDeletedEvent [] secondDeletions = second.getDeletions();
-            ret.addDeleteChanges( firstDeletions );
-            ret.addDeleteChanges( secondDeletions );
+            try {
+                ret.addDeleteChanges( firstDeletions );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
+            try {
+                ret.addDeleteChanges( secondDeletions );
+            } catch( IllegalStateException ex ) {
+                log.warn( ex );
+            }
 
             //
 
