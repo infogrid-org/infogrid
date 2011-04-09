@@ -19,7 +19,6 @@ import java.util.HashMap;
 import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotPermittedException;
-import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
@@ -1334,28 +1333,23 @@ public abstract class AbstractProxyPolicy
                     ret.addRoleRemoval( current );
                 } else if( current.getNeighborMeshObject() != null ) {
                     // we don't want it, send it right back: however, only those that are ours
-                    try {
-                        RoleType [] removed = current.getAffectedRoleTypes();
-                        ArrayList<RoleType> sendBack = new ArrayList<RoleType>( removed.length );
+                    RoleType [] removed = current.getAffectedRoleTypes();
+                    ArrayList<RoleType> sendBack = new ArrayList<RoleType>( removed.length );
 
-                        for( int i=0 ; i<removed.length ; ++i ) {
-                            if( current.getSource().isRelated( removed[i], current.getNeighborMeshObject() )) {
-                                sendBack.add( removed[i] );
-                            }
+                    for( int i=0 ; i<removed.length ; ++i ) {
+                        if( current.getSource().isRelated( removed[i], current.getNeighborMeshObject() )) {
+                            sendBack.add( removed[i] );
                         }
-                        if( !sendBack.isEmpty() ) {
-                            perhapsOutgoing.obtain().addRoleAddition(
-                                    new NetMeshObjectRoleAddedEvent(
-                                            (NetMeshObjectIdentifier) current.getSourceIdentifier(),
-                                            MeshTypeUtils.meshTypeIdentifiersOrNull( ArrayHelper.copyIntoNewArray( sendBack, RoleType.class )),
-                                            current.getNeighborMeshObjectIdentifier(),
-                                            current.getOriginNetworkIdentifier(),
-                                            current.getTimeEventOccurred(),
-                                            (NetMeshBase) current.getResolver() ));
-                        }
-                    } catch( NotRelatedException ex ) {
-                        // in which case we send all back
-                        perhapsOutgoing.obtain().addRoleAddition( current.inverse() );
+                    }
+                    if( !sendBack.isEmpty() ) {
+                        perhapsOutgoing.obtain().addRoleAddition(
+                                new NetMeshObjectRoleAddedEvent(
+                                        (NetMeshObjectIdentifier) current.getSourceIdentifier(),
+                                        MeshTypeUtils.meshTypeIdentifiersOrNull( ArrayHelper.copyIntoNewArray( sendBack, RoleType.class )),
+                                        current.getNeighborMeshObjectIdentifier(),
+                                        current.getOriginNetworkIdentifier(),
+                                        current.getTimeEventOccurred(),
+                                        (NetMeshBase) current.getResolver() ));
                     }
                 }
             }
