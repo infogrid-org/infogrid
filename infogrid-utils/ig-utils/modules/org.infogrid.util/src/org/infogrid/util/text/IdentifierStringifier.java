@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -88,7 +88,7 @@ public class IdentifierStringifier
      *
      * @param soFar the String so far, if any
      * @param arg the Object to format, or null
-     * @param pars collects parameters that may influence the String representation
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @return the formatted String
      */
     public String format(
@@ -101,7 +101,7 @@ public class IdentifierStringifier
         }
 
         String ext;
-        if( theProcessColloquial && pars != null ) {
+        if( theProcessColloquial ) {
             Boolean colloquial = (Boolean) pars.get( StringRepresentationParameters.COLLOQUIAL );
             if( colloquial != null && colloquial.booleanValue() ) {
                 ext = arg.toColloquialExternalForm();
@@ -124,7 +124,7 @@ public class IdentifierStringifier
      *
      * @param soFar the String so far, if any
      * @param arg the Object to format, or null
-     * @param pars collects parameters that may influence the String representation
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @return the formatted String
      * @throws ClassCastException thrown if this Stringifier could not format the provided Object
      *         because the provided Object was not of a type supported by this Stringifier
@@ -167,7 +167,7 @@ public class IdentifierStringifier
      * Format an a null Object using this Stringifier.
      *
      * @param soFar the String so far, if any
-     * @param pars collects parameters that may influence the String representation
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @return the formatted String
      */
     protected String formatToNull(

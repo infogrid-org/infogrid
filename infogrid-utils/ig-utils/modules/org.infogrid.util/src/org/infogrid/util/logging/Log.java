@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -677,7 +677,7 @@ public abstract class Log
      * @param parentComponent center a possible dialog against this parent component
      * @param t               Throwable to be logged
      * @param rep             the StringRepresentation to use
-     * @param pars collects parameters that may influence the String representation
+     * @param pars collects parameters that may influence the String representation. Always provided.
      */
     public final void userFatal(
             Object                         parentComponent,
@@ -810,7 +810,7 @@ public abstract class Log
      * @param parentComponent center a possible dialog against this parent component
      * @param t               Throwable to be logged
      * @param rep             the StringRepresentation to use
-     * @param pars            collects parameters that may influence the String representation
+     * @param pars collects parameters that may influence the String representation. Always provided.
      */
     public final void userError(
             Object                         parentComponent,
@@ -942,7 +942,7 @@ public abstract class Log
      * @param parentComponent center a possible dialog against this parent component
      * @param t               Throwable to be logged
      * @param rep             the StringRepresentation to use
-     * @param pars collects parameters that may influence the String representation
+     * @param pars collects parameters that may influence the String representation. Always provided.
      */
     public final void userWarn(
             Object                         parentComponent,

@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -32,18 +32,35 @@ public class UniqueStringGenerator
     public static UniqueStringGenerator create(
             int length )
     {
-        return new UniqueStringGenerator( length );
+        return new UniqueStringGenerator( DEFAULT_ALLOWED_CHARS, length );
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param alphabet the alphabet to use for the generated Strings
+     * @param length the length of the generated Strings
+     * @return the created UniqueStringGenerator
+     */
+    public static UniqueStringGenerator create(
+            char [] alphabet,
+            int     length )
+    {
+        return new UniqueStringGenerator( alphabet, length );
     }
 
     /**
      * Private constructor, use factory method.
      *
+     * @param alphabet the alphabet to use for the generated Strings
      * @param length the length of the generated Strings
      */
     protected UniqueStringGenerator(
-            int length )
+            char [] alphabet,
+            int     length )
     {
-        theLength = length;
+        theAlphabet = alphabet;
+        theLength   = length;
 
         theRandom = new Random( theSeedGenerator.createUniqueToken() );
     }
@@ -58,13 +75,18 @@ public class UniqueStringGenerator
         char [] buf = new char[ theLength ];
 
         for( int i=0 ; i<theLength ; ++i ) {
-            int  value = theRandom.nextInt( ALLOWED_CHARS.length );
-            char c     = ALLOWED_CHARS[ value ];
+            int  value = theRandom.nextInt( theAlphabet.length );
+            char c     = theAlphabet[ value ];
 
             buf[i]  = c;
         }
         return new String( buf );
     }
+
+    /**
+     * The alphabet to use for generating the Strings.
+     */
+    protected char [] theAlphabet;
 
     /**
      * The length of Strings being generated.
@@ -89,7 +111,7 @@ public class UniqueStringGenerator
     /**
      * The characters that are allowed in the token.
      */
-    protected static final char [] ALLOWED_CHARS = theResourceHelper.getResourceStringOrDefault(
-            "AllowedChars",
+    protected static final char [] DEFAULT_ALLOWED_CHARS = theResourceHelper.getResourceStringOrDefault(
+            "DefaultAllowedChars",
             "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-~" ).toCharArray();
 }

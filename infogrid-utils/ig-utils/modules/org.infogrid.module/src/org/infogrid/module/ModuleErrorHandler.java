@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -553,13 +553,11 @@ public abstract class ModuleErrorHandler
     {
         if( errorStream != null ) {
             errorStream.print( "ERROR: " );
-            errorStream.println( ex.getMessage() );
             ex.printStackTrace( errorStream );
         }
         if( errorStream != System.err ) {
-            errorStream.print( "ERROR: " );
-            errorStream.println( ex.getMessage() );
-            ex.printStackTrace( errorStream );
+            System.err.print( "ERROR: " );
+            ex.printStackTrace( System.err );
         }
    }
 
@@ -576,8 +574,8 @@ public abstract class ModuleErrorHandler
             errorStream.println( msg );
         }
         if( errorStream != System.err ) {
-            errorStream.print( "ERROR: " );
-            errorStream.println( msg );
+            System.err.print( "ERROR: " );
+            System.err.println( msg );
         }
     }
 

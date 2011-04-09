@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -138,6 +138,7 @@ public class SimpleStringRepresentation
      * 
      * @param classOfFormattedObject the class of the to-be-formatted object
      * @param entry the entry in the ResourceHelper (but qualified by the prefix of this StringRepresentation)
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @param args the arguments for the entry in the ResourceHelper
      * @return the formatted String
      * @throws StringifierException thrown if there was a problem when attempting to
@@ -163,11 +164,9 @@ public class SimpleStringRepresentation
             return theDelegate.formatEntry( classOfFormattedObject, entry, pars, args );
         }
         String ret = rh.getResourceString( theName + entry ); // will emit warning
-        if( pars != null ) {
-            Number n = (Number) pars.get( StringRepresentationParameters.MAX_LENGTH );
-            if( n != null ) {
-                ret = StringHelper.potentiallyShorten( ret, n.intValue() );
-            }
+        Number n   = (Number) pars.get( StringRepresentationParameters.MAX_LENGTH );
+        if( n != null ) {
+            ret = StringHelper.potentiallyShorten( ret, n.intValue() );
         }
         return ret;
     }
@@ -219,7 +218,7 @@ public class SimpleStringRepresentation
      * Format a Throwable about which nothing else is known.
      * 
      * @param t the Throwable
-     * @param pars collects parameters that may influence the String representation
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
@@ -243,7 +242,7 @@ public class SimpleStringRepresentation
      * Format a Throwable that has a StringRepresentation per declared interface.
      * 
      * @param t the Throwable
-     * @param pars collects parameters that may influence the String representation
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
@@ -261,7 +260,7 @@ public class SimpleStringRepresentation
      * Format a Throwable that does not have a StringRepresentation per declared interface.
      * By default, we format 
      * @param t the Throwable
-     * @param pars collects parameters that may influence the String representation
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @return String representation
      */
     public String formatNoStringRepresentationThrowable(

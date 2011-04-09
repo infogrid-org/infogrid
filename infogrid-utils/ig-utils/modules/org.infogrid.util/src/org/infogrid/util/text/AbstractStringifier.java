@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -31,7 +31,7 @@ public abstract class AbstractStringifier<T>
      * potentially contained in the StringRepresentationParameters.
      *
      * @param s the String potentially to be shortened
-     * @param pars the StringRepresentationParameters, if any
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @return the potentially shortened String
      */
     protected String potentiallyShorten(
