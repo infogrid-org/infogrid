@@ -22,9 +22,6 @@
         Local and/or remote personas may be associated with the account.</userdescription>
 
         <dependson>
-            <subjectareareference>
-                <name>org.infogrid.model.Web</name>
-            </subjectareareference>
             <modulereference>
                 <name>org.infogrid.lid</name>
             </modulereference>
@@ -136,7 +133,7 @@
      */
     public org.infogrid.util.Identifier getSiteIdentifier()
     {
-        org.infogrid.mesh.MeshObject site = traverse( AccountSubjectArea.ACCOUNT_ATSITE_WEBRESOURCE.getSource() ).getSingleMember();
+        org.infogrid.mesh.MeshObject site = traverse( AccountSubjectArea.ACCOUNT_ATSITE_MESHOBJECT.getSource() ).getSingleMember();
         return site.getIdentifier();
     }
 
@@ -381,7 +378,7 @@
     public org.infogrid.util.Identifier getSiteIdentifier()
     {
         MeshObject found = traverse(
-                AccountSubjectArea.SESSION_ATSITE_WEBRESOURCE.getSource() ).getSingleMember();
+                AccountSubjectArea.SESSION_ATSITE_MESHOBJECT.getSource() ).getSingleMember();
         if( found == null ) {
             return null;
         } else {
@@ -679,22 +676,22 @@
             </dest>
         </relationshiptype>
 
-        <relationshiptype ID="org.infogrid.lid.model.account/Account_AtSite_WebResource">
-            <name>Account_AtSite_WebResource</name>
+        <relationshiptype ID="org.infogrid.lid.model.account/Account_AtSite_MeshObject">
+            <name>Account_AtSite_MeshObject</name>
             <username>At site</username>
-            <userdescription>Identifies the website where the Account is hosted</userdescription>
+            <userdescription>Identifies the site where the Account is hosted. The site is now represented as a MeshObject
+            in order to reduce dependencies.</userdescription>
             <src>
               <e>org.infogrid.lid.model.account/Account</e>
               <MultiplicityValue>1:1</MultiplicityValue>
             </src>
             <dest>
-              <e>org.infogrid.model.Web/WebResource</e>
               <MultiplicityValue>0:n</MultiplicityValue>
             </dest>
         </relationshiptype>
 
-        <relationshiptype ID="org.infogrid.lid.model.account/Session_AtSite_WebResource">
-            <name>Session_AtSite_WebResource</name>
+        <relationshiptype ID="org.infogrid.lid.model.account/Session_AtSite_MeshObject">
+            <name>Session_AtSite_MeshObject</name>
             <username>At site</username>
             <userdescription>Identifies the website where the session is taking place</userdescription>
             <src>
@@ -702,7 +699,6 @@
               <MultiplicityValue>1:1</MultiplicityValue>
             </src>
             <dest>
-              <e>org.infogrid.model.Web/WebResource</e>
               <MultiplicityValue>0:n</MultiplicityValue>
             </dest>
         </relationshiptype>

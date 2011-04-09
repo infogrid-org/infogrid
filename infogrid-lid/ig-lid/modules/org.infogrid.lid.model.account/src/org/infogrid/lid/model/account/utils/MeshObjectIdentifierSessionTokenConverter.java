@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -37,7 +37,7 @@ public class MeshObjectIdentifierSessionTokenConverter
      */
     private MeshObjectIdentifierSessionTokenConverter()
     {
-        super( 64 );
+        super( DEFAULT_ALLOWED_CHARS, 64 );
     }
 
     /**
@@ -104,8 +104,8 @@ public class MeshObjectIdentifierSessionTokenConverter
             char c1    = in.charAt( i );
             int  c2    = -1;
 
-            for( int j=0 ; j<ALLOWED_CHARS.length ; ++j ) {
-                if( c1 == ALLOWED_CHARS[j] ) {
+            for( int j=0 ; j<DEFAULT_ALLOWED_CHARS.length ; ++j ) {
+                if( c1 == DEFAULT_ALLOWED_CHARS[j] ) {
                     c2 = j;
                     break;
                 }
@@ -118,7 +118,7 @@ public class MeshObjectIdentifierSessionTokenConverter
 
             int c4 = c3 & 63;
 
-            char c5 = ALLOWED_CHARS[c4];
+            char c5 = DEFAULT_ALLOWED_CHARS[c4];
 
             converted.append( c5 );
         }
