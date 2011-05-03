@@ -70,11 +70,23 @@ public class UniqueStringGenerator
      *
      * @return the unique token
      */
-    public synchronized String createUniqueToken()
+    public String createUniqueToken()
     {
-        char [] buf = new char[ theLength ];
+        return createUniqueToken( theLength );
+    }
 
-        for( int i=0 ; i<theLength ; ++i ) {
+    /**
+     * Create a unique token with a given length.;
+     *
+     * @param length the desired length
+     * @return the unique token
+     */
+    public synchronized String createUniqueToken(
+            int length )
+    {
+        char [] buf = new char[ length ];
+
+        for( int i=0 ; i<length ; ++i ) {
             int  value = theRandom.nextInt( theAlphabet.length );
             char c     = theAlphabet[ value ];
 
