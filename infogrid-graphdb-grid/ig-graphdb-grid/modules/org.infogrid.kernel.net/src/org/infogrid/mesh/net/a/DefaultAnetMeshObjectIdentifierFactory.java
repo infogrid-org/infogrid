@@ -27,6 +27,7 @@ import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
 import org.infogrid.util.InvalidCharacterParseException;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.StringTooShortParseException;
+import org.infogrid.util.UniqueStringGenerator;
 import org.infogrid.util.text.StringRepresentation;
 
 /**
@@ -49,21 +50,45 @@ public class DefaultAnetMeshObjectIdentifierFactory
             NetMeshBaseIdentifier        meshBaseIdentifier,
             NetMeshBaseIdentifierFactory meshBaseIdentifierFactory )
     {
+        UniqueStringGenerator generator = UniqueStringGenerator.create( DEFAULT_ID_LENGTH );
+
         DefaultAnetMeshObjectIdentifierFactory ret
-                = new DefaultAnetMeshObjectIdentifierFactory( meshBaseIdentifier, meshBaseIdentifierFactory );
+                = new DefaultAnetMeshObjectIdentifierFactory( generator, meshBaseIdentifier, meshBaseIdentifierFactory );
+        return ret;
+    }
+
+    /**
+     * Factory method, specify the UniqueStringGenerator to use for automatic identifier generation.
+     *
+     * @param generator the UniqueStringGenerator to use
+     * @param meshBaseIdentifier the NetMeshBaseIdentifier of the owning NetMeshBase
+     * @param meshBaseIdentifierFactory factory for NetMeshBaseIdentifiers
+     * @return the created DefaultAMeshObjectIdentifierFactory
+     */
+    public static DefaultAnetMeshObjectIdentifierFactory create(
+            UniqueStringGenerator        generator,
+            NetMeshBaseIdentifier        meshBaseIdentifier,
+            NetMeshBaseIdentifierFactory meshBaseIdentifierFactory )
+    {
+        DefaultAnetMeshObjectIdentifierFactory ret
+                = new DefaultAnetMeshObjectIdentifierFactory( generator, meshBaseIdentifier, meshBaseIdentifierFactory );
         return ret;
     }
 
     /**
      * Constructor.
-     * 
+     *
+     * @param generator the UniqueStringGenerator to use
      * @param meshBaseIdentifier the NetMeshBaseIdentifier of the owning NetMeshBase
      * @param meshBaseIdentifierFactory factory for NetMeshBaseIdentifiers
      */
     protected DefaultAnetMeshObjectIdentifierFactory(
+            UniqueStringGenerator        generator,
             NetMeshBaseIdentifier        meshBaseIdentifier,
             NetMeshBaseIdentifierFactory meshBaseIdentifierFactory )
     {
+        super( generator );
+
         theMeshBaseIdentifier        = meshBaseIdentifier;
         theMeshBaseIdentifierFactory = meshBaseIdentifierFactory;
 
@@ -79,6 +104,20 @@ public class DefaultAnetMeshObjectIdentifierFactory
     public NetMeshObjectIdentifier createMeshObjectIdentifier()
     {
         return (NetMeshObjectIdentifier) super.createMeshObjectIdentifier();
+    }
+
+    /**
+     * Create a unique MeshObjectIdentifier of a certain length for a MeshObject that can be used to create a MeshObject
+     * with the associated MeshBaseLifecycleManager.
+     *
+     * @param length the desired length of the MeshObjectIdentifier
+     * @return the created Identifier
+     */
+    @Override
+    public NetMeshObjectIdentifier createMeshObjectIdentifier(
+            int length )
+    {
+        return (NetMeshObjectIdentifier) super.createMeshObjectIdentifier( length );
     }
 
     /**

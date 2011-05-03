@@ -110,6 +110,19 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
     }
 
     /**
+     * Create a unique MeshObjectIdentifier of a certain length for a MeshObject that can be used to create a MeshObject
+     * with the associated MeshBaseLifecycleManager.
+     *
+     * @param length the desired length of the MeshObjectIdentifier
+     * @return the created Identifier
+     */
+    public NetMeshObjectIdentifier createMeshObjectIdentifier(
+            int length )
+    {
+        return theDelegate.createMeshObjectIdentifier( length );
+    }
+
+    /**
      * Create an identifier for a MeshObject held locally at this MeshBase.
      *
      * @param raw the identifier String
