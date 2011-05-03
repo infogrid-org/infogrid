@@ -93,7 +93,7 @@ public class LidGpgClearSignCredentialType
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
-            SaneRequest      request,
+            SaneRequest   request,
             HasIdentifier subject )
         throws
             LidInvalidCredentialException

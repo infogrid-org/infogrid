@@ -314,5 +314,4 @@ public abstract class AbstractOpenIdCredentialType
      * The NonceManager to use.
      */
     protected LidNonceManager theNonceManager;
-
 }

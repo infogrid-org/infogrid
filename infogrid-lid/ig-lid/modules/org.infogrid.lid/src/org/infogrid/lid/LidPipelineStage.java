@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -31,8 +31,8 @@ public interface LidPipelineStage
      * @return the instructions for constructing a response to the client, if any
      */
     public LidPipelineStageInstructions processStage(
-            SaneRequest                       lidRequest,
-            HasIdentifier                     requestedResource,
+            SaneRequest             lidRequest,
+            HasIdentifier           requestedResource,
             LidPipelineInstructions instructionsSoFar );
 
     /**

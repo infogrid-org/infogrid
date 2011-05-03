@@ -8,13 +8,12 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.nonce.store;
 
-import org.infogrid.lid.nonce.store.StoreLidNonceMapper;
 import org.infogrid.lid.nonce.AbstractLidNonceManager;
 import org.infogrid.lid.nonce.LidInvalidNonceException;
 import org.infogrid.lid.credential.LidCredentialType;

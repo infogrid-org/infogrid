@@ -38,7 +38,7 @@ public class TranslatingLidCredentialType
      */
     public static TranslatingLidCredentialType create(
             TranslatingLidAccountManager bridge,
-            LidCredentialType                 delegate )
+            LidCredentialType            delegate )
     {
         return new TranslatingLidCredentialType( bridge, delegate );
     }
@@ -51,7 +51,7 @@ public class TranslatingLidCredentialType
      */
     protected TranslatingLidCredentialType(
             TranslatingLidAccountManager bridge,
-            LidCredentialType                 delegate )
+            LidCredentialType            delegate )
     {
         theBridge   = bridge;
         theDelegate = delegate;
