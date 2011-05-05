@@ -271,7 +271,17 @@ public abstract class AbstractTest
             int min = Math.min( one.length, two.length );
             for( int i=0 ; i<min ; ++i ) {
                 if( one[i] != two[i] ) {
-                    reportError( msg, "byte arrays differ at index " + i + ": " + Integer.toHexString( one[i] ) + " vs. " + Integer.toHexString( two[i] ));
+                    if( one.length != two.length ) {
+                        reportError(
+                                msg,
+                                "byte arrays differ in length ("
+                                + one.length
+                                + " vs. "
+                                + two.length
+                                + ") and also at index " + i + ": " + Integer.toHexString( one[i] ) + " vs. " + Integer.toHexString( two[i] ));
+                    } else {
+                        reportError( msg, "byte arrays of same length differ at index " + i + ": " + Integer.toHexString( one[i] ) + " vs. " + Integer.toHexString( two[i] ));
+                    }
                     return false;
                 }
             }
