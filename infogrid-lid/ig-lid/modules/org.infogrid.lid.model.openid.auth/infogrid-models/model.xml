@@ -65,7 +65,6 @@
     public String determineRedirectUrl(
             String                            clientIdentifier,
             String                            returnToUrl,
-            String                            realm,
             org.infogrid.util.context.Context context )
         throws
             org.infogrid.util.FactoryException
@@ -96,10 +95,6 @@
             return null;
         }
 
-        if( realm == null ) {
-            realm = returnToUrl;
-        }
-
         StringBuilder ret = new StringBuilder();
         ret.append( endpointUrl );
         org.infogrid.util.http.HTTP.appendArgumentPairToUrl( ret, "openid.mode=checkid_setup" );
@@ -115,7 +110,7 @@
         returnToUrl = org.infogrid.util.http.HTTP.appendArgumentToUrl( returnToUrl, "lid-nonce", nonce );
 
         org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.return_to",  returnToUrl );
-        org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.trust_root", realm );
+        // org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.trust_root", realm );
 
         org.infogrid.lid.openid.OpenIdRpSideAssociation association = assocMgr.obtainFor( endpointUrl );
                 // may throw exception
@@ -142,7 +137,6 @@
     public String determineRedirectUrl(
             String                            clientIdentifier,
             String                            returnToUrl,
-            String                            realm,
             org.infogrid.util.context.Context context )
         throws
             org.infogrid.util.FactoryException
@@ -173,10 +167,6 @@
             return null;
         }
 
-        if( realm == null ) {
-            realm = returnToUrl;
-        }
-
         StringBuilder ret = new StringBuilder();
         ret.append( endpointUrl );
         org.infogrid.util.http.HTTP.appendArgumentPairToUrl( ret, "openid.mode=checkid_setup" );
@@ -192,7 +182,7 @@
         returnToUrl = org.infogrid.util.http.HTTP.appendArgumentToUrl( returnToUrl, "lid-nonce", nonce );
 
         org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.return_to",  returnToUrl );
-        org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.trust_root", realm );
+        // org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.trust_root", realm );
 
         org.infogrid.lid.openid.OpenIdRpSideAssociation association = assocMgr.obtainFor( endpointUrl );
                 // may throw exception
@@ -219,7 +209,6 @@
     public String determineRedirectUrl(
             String                            clientIdentifier,
             String                            returnToUrl,
-            String                            realm,
             org.infogrid.util.context.Context context )
         throws
             org.infogrid.util.FactoryException
@@ -251,10 +240,6 @@
             return null;
         }
 
-        if( realm == null ) {
-            realm = returnToUrl;
-        }
-
         StringBuilder ret = new StringBuilder();
         ret.append( endpointUrl );
         org.infogrid.util.http.HTTP.appendArgumentToUrl(     ret, "openid.ns", "http://specs.openid.net/auth/2.0" );
@@ -273,8 +258,8 @@
         returnToUrl = org.infogrid.util.http.HTTP.appendArgumentToUrl( returnToUrl, "lid-nonce", nonce );
 
         org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.return_to",  returnToUrl );
-        org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.trust_root", realm );
-        org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.realm",      realm );
+        // org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.trust_root", realm );
+        // org.infogrid.util.http.HTTP.appendArgumentToUrl( ret, "openid.realm",      realm );
 
         org.infogrid.lid.openid.OpenIdRpSideAssociation association = assocMgr.obtainFor( endpointUrl );
                 // may throw exception

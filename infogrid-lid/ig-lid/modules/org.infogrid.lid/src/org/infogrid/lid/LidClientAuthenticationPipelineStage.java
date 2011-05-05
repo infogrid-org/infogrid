@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -27,13 +27,11 @@ public interface LidClientAuthenticationPipelineStage
      * 
      * @param lidRequest the incoming request
      * @param siteIdentifier identifies this site
-     * @param realm the authentication realm
      * @return the LidClientAuthenticationStatus
      */
     public LidClientAuthenticationStatus determineAuthenticationStatus(
             SaneRequest        lidRequest,
-            Identifier         siteIdentifier,
-            String             realm );
+            Identifier         siteIdentifier );
 
     /**
      * Name of the LID argument for the identifier.

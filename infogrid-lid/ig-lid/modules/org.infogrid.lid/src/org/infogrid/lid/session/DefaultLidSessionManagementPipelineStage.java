@@ -8,14 +8,13 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.session;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.infogrid.lid.LidClientAuthenticationStatus;
 import org.infogrid.lid.LidCookies;
@@ -67,12 +66,11 @@ public class DefaultLidSessionManagementPipelineStage
      * @return the instructions for constructing a response to the client, if any
      */
     public LidPipelineStageInstructions processStage(
-            SaneRequest                       lidRequest,
-            HasIdentifier                     requestedResource,
+            SaneRequest             lidRequest,
+            HasIdentifier           requestedResource,
             LidPipelineInstructions instructionsSoFar )
     {
         LidClientAuthenticationStatus clientAuthStatus = instructionsSoFar.getClientAuthenticationStatus();
-        String                        realm            = instructionsSoFar.getRealm();
 
         Boolean deleteLidCookie; // using Boolean instead of boolean to detect if we don't catch a case
         Boolean deleteSessionCookie;
@@ -224,22 +222,9 @@ public class DefaultLidSessionManagementPipelineStage
         String cookieDomain = "";
         String cookiePath   = "/";
         
-        if( clientAuthStatus.getSiteIdentifier() != null ) {
-            // if localhost has been requested, at developer is running the app, and we don't send the domain or path
-            String siteString = clientAuthStatus.getSiteIdentifier().toExternalForm();
-            
-            Matcher m = theUrlPattern.matcher( siteString );
-            if( m.find() ) {
-                if( !"localhost".equals( lidRequest.getServer())) {
-                    cookieDomain = m.group( 1 );
-                }
-                cookiePath   = m.group( 2 );
-            }
-        }
-
         // delete cookies if needed, but only if they have been sent in the request
-        String lidCookieName     = determineLidCookieName( realm );
-        String sessionCookieName = determineSessionCookieName( realm );
+        String lidCookieName     = determineLidCookieName();
+        String sessionCookieName = determineSessionCookieName();
 
         if( deleteLidCookie && lidRequest.getCookie( lidCookieName ) != null ) {
             ret.addCookieToRemove( lidCookieName, cookieDomain, cookiePath );
@@ -268,50 +253,26 @@ public class DefaultLidSessionManagementPipelineStage
     }
 
     /**
-     * Given a realm, determine the LID cookie's name.
+     * Determine the LID cookie's name.
      *
-     * @param realm the name of the realm
      * @return name of the LID cookie
      * @see #determineSessionCookieName
      */
-    protected String determineLidCookieName(
-            String realm )
+    protected String determineLidCookieName()
     {
-        String ret;
-        if( realm == null ) {
-            ret = LidCookies.LID_IDENTIFIER_COOKIE_NAME;
-        } else {
-            StringBuilder buf = new StringBuilder();
-            buf.append( LidCookies.LID_IDENTIFIER_COOKIE_NAME );
-            buf.append( '-' );
-            buf.append( realm );
-            ret = buf.toString();
-        }
-        ret = ret.toLowerCase();
+        String ret = LidCookies.LID_IDENTIFIER_COOKIE_NAME;
         return ret;
     }
 
     /**
-     * Given a realm, determine the LID session cookie's name.
+     * Determine the LID session cookie's name.
      *
-     * @param realm the name of the realm
      * @return name of the LID session cookie
      * @see #determineSessionCookieName
      */
-    protected String determineSessionCookieName(
-            String realm )
+    protected String determineSessionCookieName()
     {
-        String ret;
-        if( realm == null ) {
-            ret = LidCookies.LID_SESSION_COOKIE_NAME;
-        } else {
-            StringBuilder buf = new StringBuilder();
-            buf.append( LidCookies.LID_SESSION_COOKIE_NAME );
-            buf.append( '-' );
-            buf.append( realm );
-            ret = buf.toString();
-        }
-        ret = ret.toLowerCase();
+        String ret = LidCookies.LID_SESSION_COOKIE_NAME;
         return ret;
     }
 

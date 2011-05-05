@@ -63,30 +63,18 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
      *
      * @param lidRequest the incoming request
      * @param siteIdentifier identifies this site
-     * @param realm the authentication realm
      * @return the LidClientAuthenticationStatus
      */
     public LidClientAuthenticationStatus determineAuthenticationStatus(
-            SaneRequest        lidRequest,
-            Identifier         siteIdentifier,
-            String             realm )
+            SaneRequest lidRequest,
+            Identifier  siteIdentifier )
     {
         if( log.isTraceEnabled() ) {
             log.traceMethodCallEntry( this, "determineAuthenticationStatus", lidRequest, siteIdentifier );
         }
 
-        String lidCookieString     = null;
-        String sessionCookieString = null;
-
-        if( realm != null ) {
-            lidCookieString = lidRequest.getCookieValue( determineLidCookieName( realm ));
-        }
-        if( lidCookieString != null ) { // make sure we pair them right
-            sessionCookieString = lidRequest.getCookieValue( determineSessionCookieName( realm ));
-        } else {
-            lidCookieString     = lidRequest.getCookieValue( LidCookies.LID_IDENTIFIER_COOKIE_NAME );
-            sessionCookieString = lidRequest.getCookieValue( LidCookies.LID_SESSION_COOKIE_NAME );
-        }
+        String lidCookieString     = lidRequest.getCookieValue( determineLidCookieName());
+        String sessionCookieString = lidRequest.getCookieValue( determineSessionCookieName());
 
         // cleanup cookie values first
         sessionCookieString = cleanupCookieValue( sessionCookieString );
@@ -352,46 +340,26 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
     }
 
     /**
-     * Given a realm, determine the LID cookie's name.
+     * Determine the LID cookie's name.
      *
-     * @param realm the name of the realm
      * @return name of the LID cookie
      * @see #determineSessionCookieName
      */
-    protected String determineLidCookieName(
-            String realm )
+    protected String determineLidCookieName()
     {
-        if( realm == null ) {
-            return LidCookies.LID_IDENTIFIER_COOKIE_NAME;
-        } else {
-            StringBuilder buf = new StringBuilder();
-            buf.append( LidCookies.LID_IDENTIFIER_COOKIE_NAME );
-            buf.append( '-' );
-            buf.append( realm );
-            return buf.toString();
-        }
+        return LidCookies.LID_IDENTIFIER_COOKIE_NAME;
     }
 
     /**
-     * Given a realm, determine the LID session cookie's name.
+     * Determine the LID session cookie's name.
      *
-     * @param realm the name of the realm
      * @return name of the LID session cookie
      * @see #determineSessionCookieName
-     * @see AbstractLidClientAuthenticationPipelineStage#determineSessionCookieName
+     * @see #determineLidCookieName
      */
-    protected String determineSessionCookieName(
-            String realm )
+    protected String determineSessionCookieName()
     {
-        if( realm == null ) {
-            return LidCookies.LID_SESSION_COOKIE_NAME;
-        } else {
-            StringBuilder buf = new StringBuilder();
-            buf.append( LidCookies.LID_SESSION_COOKIE_NAME );
-            buf.append( '-' );
-            buf.append( realm );
-            return buf.toString();
-        }
+        return LidCookies.LID_SESSION_COOKIE_NAME;
     }
 
     /**

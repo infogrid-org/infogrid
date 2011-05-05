@@ -68,7 +68,6 @@ are provided for specific authentication protocols.</userdescription>
     public String determineRedirectUrl(
             String                            clientIdentifier,
             String                            returnToUrl,
-            String                            realm,
             org.infogrid.util.context.Context context )
         throws
             org.infogrid.util.FactoryException

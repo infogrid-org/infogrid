@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -30,36 +30,31 @@ public class LidPipelineInstructions
      * Factory method.
      *
      * @param siteIdentifier identifier of the site for which these instructions apply
-     * @param realm the realm that the incoming request is part of
      * @param clientAuthStatus the authentication status of the client
      * @param requestedResource the resource requested by the client
      * @return the created LidPipelineInstructions
      */
     public static LidPipelineInstructions create(
             Identifier                    siteIdentifier,
-            String                        realm,
             LidClientAuthenticationStatus clientAuthStatus,
             HasIdentifier                 requestedResource )
     {
-        return new LidPipelineInstructions( siteIdentifier, realm, clientAuthStatus, requestedResource );
+        return new LidPipelineInstructions( siteIdentifier, clientAuthStatus, requestedResource );
     }
 
     /**
      * Constructor.
      *
      * @param siteIdentifier identifier of the site for which these instructions apply
-     * @param realm the realm that the incoming request is part of
      * @param clientAuthStatus the authentication status of the client
      * @param requestedResource the resource requested by the client
      */
     protected LidPipelineInstructions(
             Identifier                    siteIdentifier,
-            String                        realm,
             LidClientAuthenticationStatus clientAuthStatus,
             HasIdentifier                 requestedResource )
     {
         theSiteIdentifier    = siteIdentifier;
-        theRealm             = realm;
         theClientAuthStatus  = clientAuthStatus;
         theRequestedResource = requestedResource;
     }
@@ -72,16 +67,6 @@ public class LidPipelineInstructions
     public Identifier getSiteIdentifier()
     {
         return theSiteIdentifier;
-    }
-
-    /**
-     * Obtain the realm that the incoming request is part of.
-     *
-     * @return the realm
-     */
-    public String getRealm()
-    {
-        return theRealm;
     }
 
     /**
@@ -182,11 +167,6 @@ public class LidPipelineInstructions
      * Identifier of the site for which these instructions apply.
      */
     protected Identifier theSiteIdentifier;
-
-    /**
-     * The realm.
-     */
-    protected String theRealm;
 
     /**
      * The requested resource.

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -27,11 +27,9 @@ public interface LidPipeline
      * 
      * @param lidRequest the incoming request
      * @param siteIdentifier identifies this site
-     * @param realm the realm of the authentication
      * @return the compound instructions
      */
     public LidPipelineInstructions processPipeline(
             SaneRequest        lidRequest,
-            Identifier         siteIdentifier,
-            String             realm );
+            Identifier         siteIdentifier );
 }
