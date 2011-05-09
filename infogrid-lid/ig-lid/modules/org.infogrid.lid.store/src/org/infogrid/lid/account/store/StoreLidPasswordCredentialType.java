@@ -23,7 +23,10 @@ import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.store.Store;
 import org.infogrid.store.StoreKeyDoesNotExistException;
 import org.infogrid.store.StoreValue;
+import org.infogrid.util.FactoryException;
 import org.infogrid.util.HasIdentifier;
+import org.infogrid.util.Identifier;
+import org.infogrid.util.NameServer;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
 
@@ -39,46 +42,54 @@ public class StoreLidPasswordCredentialType
     /**
      * Factory method.
      *
-     * @param passwordStore the Store that stores the passwords
+     * @param passwordStores gives access to the Store that stores the passwords, keyed by the site identifier
      * @return the created RegexLidPasswordCredentialType
      */
     public static StoreLidPasswordCredentialType create(
-            Store passwordStore )
+            NameServer<Identifier,Store> passwordStores )
     {
-        StoreLidPasswordCredentialType ret = new StoreLidPasswordCredentialType( passwordStore );
+        StoreLidPasswordCredentialType ret = new StoreLidPasswordCredentialType( passwordStores );
         return ret;
     }
 
     /**
      * Constructor, for subclasses only, use factory method.
      *
-     * @param passwordStore the Store that stores the passwords
+     * @param passwordStores gives access to the Store that stores the passwords, keyed by the site identifier
      */
     protected StoreLidPasswordCredentialType(
-            Store passwordStore )
+            NameServer<Identifier,Store> passwordStores )
     {
-        thePasswordStore = passwordStore;
+        thePasswordStores = passwordStores;
     }
 
     /**
      * Determine whether the request contains a valid LidCredentialType of this type
-     * for the given subject.
+     * for the given subject at the site with the given Identifier.
      *
      * @param request the request
      * @param subject the subject
+     * @param siteIdentifier identifies the site
      * @throws LidExpiredCredentialException thrown if the contained LidCdedentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
             SaneRequest   request,
-            HasIdentifier subject )
+            HasIdentifier subject,
+            Identifier    siteIdentifier )
         throws
             LidExpiredCredentialException,
             LidInvalidCredentialException
     {
+        Store passwordStore = thePasswordStores.get( siteIdentifier );
+
+        if( passwordStore == null ) {
+            throw new LidWrongPasswordException( subject.getIdentifier(), siteIdentifier, this );
+        }
+
         StoreValue found = null;
         try {
-            found = thePasswordStore.get( subject.getIdentifier().toExternalForm() );
+            found = passwordStore.get( subject.getIdentifier().toExternalForm() );
 
         } catch( IOException ex ) {
             log.error( ex );
@@ -88,35 +99,41 @@ public class StoreLidPasswordCredentialType
         }
 
         if( found == null ) {
-            throw new LidWrongPasswordException( subject.getIdentifier(), this );
+            throw new LidWrongPasswordException( subject.getIdentifier(), siteIdentifier, this );
         }
         byte [] rawHashedCredential = found.getData();
 
         String givenPassword = request.getPostedArgument( LID_CREDENTIAL_PARAMETER_NAME );
 
         if( !HashedPasswordUtils.isValid( givenPassword, rawHashedCredential )) {
-            throw new LidWrongPasswordException( subject.getIdentifier(), this );
+            throw new LidWrongPasswordException( subject.getIdentifier(), siteIdentifier, this );
         }
         // else return without further complications
     }
 
     /**
-     * Assign a credential.
+     * Assign a credential for a particular subject at a particular site.
      *
      * @param subject the subject for which the password is assigned
+     * @param siteIdentifier identifies the site
      * @param newPassword the new password
+     * @throws IOException thrown if the password could not be written
+     * @throws FactoryException thrown if the Store could not be found or created
      */
     public void setPassword(
             HasIdentifier subject,
+            Identifier    siteIdentifier,
             String        newPassword )
         throws
-            IOException
+            IOException,
+            FactoryException
     {
         long now = System.currentTimeMillis();
 
         byte [] hashedPassword = HashedPasswordUtils.hash( newPassword );
 
-        thePasswordStore.putOrUpdate(
+        Store passwordStore = thePasswordStores.get( siteIdentifier );
+        passwordStore.putOrUpdate(
                 subject.getIdentifier().toExternalForm(),
                 DEFAULT_ENCODING,
                 now,
@@ -154,9 +171,9 @@ public class StoreLidPasswordCredentialType
     }
 
     /**
-     * The Store for passwords.
+     * How we find the Store for passwords.
      */
-    protected Store thePasswordStore;
+    protected NameServer<Identifier,Store> thePasswordStores;
 
     /**
      * Name of the encoding to use in the Store.

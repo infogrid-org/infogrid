@@ -212,7 +212,7 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
 
                     HasIdentifier personaToCheck = clientRemotePersona != null ? clientRemotePersona : clientPersona;
                     try {
-                        current.checkCredential( lidRequest, personaToCheck );
+                        current.checkCredential( lidRequest, personaToCheck, siteIdentifier );
 
                         validCredentialTypes.add( current );
 

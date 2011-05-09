@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -32,15 +32,17 @@ public abstract class LidInvalidNonceException
      * Constructor.
      *
      * @param identifier the identifier for which an invalid credential was provided
+     * @param siteIdentifier the site at which the invalid credential was provided
      * @param type the type of credential that was invalid
      * @param invalidNonce the invalid nonce
      */
     protected LidInvalidNonceException(
             Identifier        identifier,
+            Identifier        siteIdentifier,
             LidCredentialType type,
             String            invalidNonce )
     {
-        super( identifier, type );
+        super( identifier, siteIdentifier, type );
 
         theInvalidNonce = invalidNonce;
     }
@@ -118,13 +120,15 @@ public abstract class LidInvalidNonceException
          * Constructor.
          *
          * @param identifier the identifier for which an invalid credential was provided
+         * @param siteIdentifier the site at which the invalid credential was provided
          * @param type the type of credential that was invalid
          */
         public Empty(
                 Identifier        identifier,
+                Identifier        siteIdentifier,
                 LidCredentialType type )
         {
-            super( identifier, type, null );
+            super( identifier, siteIdentifier, type, null );
         }
     }
 
@@ -141,15 +145,17 @@ public abstract class LidInvalidNonceException
          * Constructor.
          *
          * @param identifier the identifier for which an invalid credential was provided
+         * @param siteIdentifier the site at which the invalid credential was provided
          * @param type the type of credential that was invalid
          * @param invalidNonce the invalid nonce
          */
         public InvalidTimeRange(
                 Identifier        identifier,
+                Identifier        siteIdentifier,
                 LidCredentialType type,
                 String            invalidNonce )
         {
-            super( identifier, type, invalidNonce );
+            super( identifier, siteIdentifier, type, invalidNonce );
         }
     }
 
@@ -166,15 +172,17 @@ public abstract class LidInvalidNonceException
          * Constructor.
          *
          * @param identifier the identifier for which an invalid credential was provided
+         * @param siteIdentifier the site at which the invalid credential was provided
          * @param type the type of credential that was invalid
          * @param invalidNonce the invalid nonce
          */
         public NotKnown(
                 Identifier        identifier,
+                Identifier        siteIdentifier,
                 LidCredentialType type,
                 String            invalidNonce )
         {
-            super( identifier, type, invalidNonce );
+            super( identifier, siteIdentifier, type, invalidNonce );
         }
     }
 
@@ -196,10 +204,11 @@ public abstract class LidInvalidNonceException
          */
         public UsedAlready(
                 Identifier        identifier,
+                Identifier        siteIdentifier,
                 LidCredentialType type,
                 String            invalidNonce )
         {
-            super( identifier, type, invalidNonce );
+            super( identifier, siteIdentifier, type, invalidNonce );
         }
     }
 }

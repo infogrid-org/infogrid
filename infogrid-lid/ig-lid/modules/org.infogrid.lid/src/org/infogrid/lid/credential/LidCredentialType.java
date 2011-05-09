@@ -15,6 +15,7 @@
 package org.infogrid.lid.credential;
 
 import org.infogrid.util.HasIdentifier;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.text.HasStringRepresentation;
 
@@ -45,16 +46,18 @@ public interface LidCredentialType
 
     /**
      * Determine whether the request contains a valid LidCredentialType of this type
-     * for the given subject.
+     * for the given subject at the site with the given Identifier.
      *
      * @param request the request
      * @param subject the subject
+     * @param siteIdentifier identifies the site
      * @throws LidExpiredCredentialException thrown if the contained LidCredentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public abstract void checkCredential(
             SaneRequest   request,
-            HasIdentifier subject )
+            HasIdentifier subject,
+            Identifier    siteIdentifier )
         throws
             LidExpiredCredentialException,
             LidInvalidCredentialException;

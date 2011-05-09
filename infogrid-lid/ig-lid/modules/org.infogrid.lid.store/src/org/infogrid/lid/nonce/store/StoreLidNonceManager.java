@@ -81,6 +81,7 @@ public class StoreLidNonceManager
      *
      * @param request the request
      * @param identifier identifier of the client on whose behalf the nonce is checked
+     * @param siteIdentifier the site at which the invalid credential was provided
      * @param type the LidCredentialType that used this nonce
      * @param name the name of the URL parameter
      * @throws LidInvalidNonceException thrown if the nonce was unacceptable
@@ -88,6 +89,7 @@ public class StoreLidNonceManager
     public void validateNonce(
             SaneRequest       request,
             Identifier        identifier,
+            Identifier        siteIdentifier,
             LidCredentialType type,
             String            name )
         throws
@@ -96,15 +98,15 @@ public class StoreLidNonceManager
         String nonce = request.getUrlArgument( name );
 
         if( nonce == null || nonce.length() == 0 ) {
-            throw new LidInvalidNonceException.Empty( identifier, type );
+            throw new LidInvalidNonceException.Empty( identifier, siteIdentifier, type );
         }
         if( !validateNonceTimeRange( nonce )) {
-            throw new LidInvalidNonceException.InvalidTimeRange( identifier, type, nonce );
+            throw new LidInvalidNonceException.InvalidTimeRange( identifier, siteIdentifier, type, nonce );
         }
         
         String found = theStorage.put( nonce, nonce );
         if( found != null ) {
-            throw new LidInvalidNonceException.UsedAlready( identifier, type, nonce );
+            throw new LidInvalidNonceException.UsedAlready( identifier, siteIdentifier, type, nonce );
         }
     }
 

@@ -33,6 +33,7 @@ import org.infogrid.lid.openid.OpenIdRpSideAssociationNegotiationParameters;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.Base64;
 import org.infogrid.util.HasIdentifier;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.http.HTTP;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
@@ -64,10 +65,11 @@ public abstract class AbstractOpenIdCredentialType
 
     /**
      * Determine whether the request contains a valid LidCredentialType of this type
-     * for the given subject.
+     * for the given subject at the site with the given Identifier.
      *
      * @param request the request
      * @param subject the subject
+     * @param siteIdentifier identifies the site
      * @param mandatoryFields set of fields that are mandatory
      * @param nonceParameterName name of the parameter representing the nonce
      * @throws LidExpiredCredentialException thrown if the contained LidCdedentialType has expired
@@ -76,6 +78,7 @@ public abstract class AbstractOpenIdCredentialType
     protected void checkCredential(
             SaneRequest     request,
             HasIdentifier   subject,
+            Identifier      siteIdentifier,
             HashSet<String> mandatoryFields,
             String          nonceParameterName )
         throws
@@ -86,13 +89,13 @@ public abstract class AbstractOpenIdCredentialType
 
         if( associationHandle == null || associationHandle.length() == 0 ) {
             // we don't do dumb mode
-            throw new OpenIdNoAssociationException( subject.getIdentifier(), this );
+            throw new OpenIdNoAssociationException( subject.getIdentifier(), siteIdentifier, this );
         }
 
         if( nonceParameterName != null ) {
-            theNonceManager.validateNonce( request, subject.getIdentifier(), this, nonceParameterName ); // throws LidInvalidNonceException
+            theNonceManager.validateNonce( request, subject.getIdentifier(), siteIdentifier, this, nonceParameterName ); // throws LidInvalidNonceException
         } else {
-            theNonceManager.validateNonce( request, subject.getIdentifier(), this ); // throws LidInvalidNonceException
+            theNonceManager.validateNonce( request, subject.getIdentifier(), siteIdentifier, this ); // throws LidInvalidNonceException
         }
 
         String []               endpointCandidates = determineOpenIdEndpointsFor( subject );
@@ -122,13 +125,13 @@ public abstract class AbstractOpenIdCredentialType
             if( specifiedEndpoint != null ) {
                 if( !ArrayHelper.isIn( specifiedEndpoint, endpointCandidates, true )) {
                     log.error( "Cannot find specified endpoint in OpenID request", request, specifiedEndpoint, endpointCandidates );
-                    throw new OpenIdInvalidSignatureException( subject.getIdentifier(), this );
+                    throw new OpenIdInvalidSignatureException( subject.getIdentifier(), siteIdentifier, this );
                 }
             } else {
                 // try all endpoints
                 for( String epCandidate : endpointCandidates ) {
                     try {
-                        checkCredentialStatelessMode( request, subject, epCandidate ); // aka dumb
+                        checkCredentialStatelessMode( request, subject, siteIdentifier, epCandidate ); // aka dumb
 
                         t = null; // we found one that worked
                         break;
@@ -152,7 +155,7 @@ public abstract class AbstractOpenIdCredentialType
                 theAssociationManager.remove( association.getServerUrl() );
                 throw new OpenIdAssociationExpiredException( subject.getIdentifier(), this );
             }
-            checkCredentialStatefulMode( request, subject, mandatoryFields, association ); // aka not dumb
+            checkCredentialStatefulMode( request, subject, siteIdentifier, mandatoryFields, association ); // aka not dumb
         }
     }
 
@@ -162,6 +165,7 @@ public abstract class AbstractOpenIdCredentialType
      *
      * @param request the request
      * @param subject the subject
+     * @param siteIdentifier the site at which the invalid credential was provided
      * @param epUrl the endpoint URL
      * @throws LidExpiredCredentialException thrown if the contained LidCdedentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
@@ -169,6 +173,7 @@ public abstract class AbstractOpenIdCredentialType
     protected void checkCredentialStatelessMode(
             SaneRequest    request,
             HasIdentifier  subject,
+            Identifier     siteIdentifier,
             String         epUrl )
         throws
             LidInvalidCredentialException
@@ -196,7 +201,7 @@ public abstract class AbstractOpenIdCredentialType
             response = HTTP.http_post( epUrl, "application/x-www-form-urlencoded", payload, false );
 
         } catch( IOException ex ) {
-            throw new OpenIdCannotValidateStatelessException( subject.getIdentifier(), this, ex );
+            throw new OpenIdCannotValidateStatelessException( subject.getIdentifier(), siteIdentifier, this, ex );
         }
 
         String  mode              = null;
@@ -225,7 +230,7 @@ public abstract class AbstractOpenIdCredentialType
         }
         if( ( mode != null && !"id_res".equals( mode )) || !is_valid ) {
             // OpenID V1 says mode=id_res, V2 does not mention mode
-            throw new OpenIdInvalidSignatureException( subject.getIdentifier(), this );
+            throw new OpenIdInvalidSignatureException( subject.getIdentifier(), siteIdentifier, this );
         }
         if( invalidate_handle != null ) {
             OpenIdRpSideAssociation assocCandidate = theAssociationManager.get( epUrl );
@@ -241,6 +246,7 @@ public abstract class AbstractOpenIdCredentialType
      *
      * @param request the request
      * @param subject the subject
+     * @param siteIdentifier the site at which the invalid credential was provided
      * @param mandatoryFields set of fields that are mandatory
      * @param association the found, valid association
      * @throws LidExpiredCredentialException thrown if the contained LidCdedentialType has expired
@@ -249,6 +255,7 @@ public abstract class AbstractOpenIdCredentialType
     protected void checkCredentialStatefulMode(
             SaneRequest             request,
             HasIdentifier           subject,
+            Identifier              siteIdentifier,
             HashSet<String>         mandatoryFields,
             OpenIdRpSideAssociation association )
         throws
@@ -279,6 +286,7 @@ public abstract class AbstractOpenIdCredentialType
             throw new OpenIdMandatorySignedFieldMissingException(
                     ArrayHelper.copyIntoNewArray( mandatory, String.class ),
                     subject.getIdentifier(),
+                    siteIdentifier,
                     this );
         }
         String toSign1String = toSign1.toString();
@@ -292,7 +300,7 @@ public abstract class AbstractOpenIdCredentialType
         String locallySigned = Base64.base64encodeNoCr( hmac );
 
         if( !locallySigned.equals( signature )) {
-            throw new OpenIdInvalidSignatureException( subject.getIdentifier(), this );
+            throw new OpenIdInvalidSignatureException( subject.getIdentifier(), siteIdentifier, this );
         }
     }
 

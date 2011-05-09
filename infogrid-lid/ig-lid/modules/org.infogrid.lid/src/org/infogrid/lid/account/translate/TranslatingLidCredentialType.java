@@ -20,6 +20,7 @@ import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.HasIdentifier;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.http.SaneRequest;
 
 /**
@@ -71,16 +72,18 @@ public class TranslatingLidCredentialType
 
     /**
      * Determine whether the request contains a valid LidCredentialType of this type
-     * for the given subject.
+     * for the given subject at the site with the given Identifier.
      *
      * @param request the request
      * @param subject the subject
+     * @param siteIdentifier identifies the site
      * @throws LidExpiredCredentialException thrown if the contained LidCdedentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
             SaneRequest   request,
-            HasIdentifier subject )
+            HasIdentifier subject,
+            Identifier    siteIdentifier )
         throws
             LidExpiredCredentialException,
             LidInvalidCredentialException
@@ -88,9 +91,9 @@ public class TranslatingLidCredentialType
         if( subject instanceof TranslatingLidAccount ) {
             LidAccount delegate = theBridge.translateAccountForward( (TranslatingLidAccount) subject );
 
-            theDelegate.checkCredential( request, delegate ); // pass-through LidInvalidCredentialException (FIXME?)
+            theDelegate.checkCredential( request, delegate, siteIdentifier ); // pass-through LidInvalidCredentialException (FIXME?)
         } else {
-            theDelegate.checkCredential( request, subject ); // pass-through LidInvalidCredentialException (FIXME?)
+            theDelegate.checkCredential( request, subject, siteIdentifier ); // pass-through LidInvalidCredentialException (FIXME?)
         }
     }
 

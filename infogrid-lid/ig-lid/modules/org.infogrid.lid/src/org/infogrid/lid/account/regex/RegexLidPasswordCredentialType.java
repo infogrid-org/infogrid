@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,9 +16,11 @@ package org.infogrid.lid.account.regex;
 
 import java.util.regex.Pattern;
 import org.infogrid.lid.credential.AbstractLidPasswordCredentialType;
+import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.lid.credential.LidWrongPasswordException;
 import org.infogrid.util.HasIdentifier;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.http.SaneRequest;
 
 /**
@@ -67,24 +69,29 @@ public class RegexLidPasswordCredentialType
 
     /**
      * Determine whether the request contains a valid LidCredentialType of this type
-     * for the given subject.
+     * for the given subject at the site with the given Identifier.
      *
      * @param request the request
      * @param subject the subject
+     * @param siteIdentifier identifies the site
+     * @throws LidExpiredCredentialException thrown if the contained LidCdedentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
             SaneRequest   request,
-            HasIdentifier subject )
+            HasIdentifier subject,
+            Identifier    siteIdentifier )
         throws
             LidInvalidCredentialException
     {
+        // siteIdentifier ignored
+        
         String givenPassword = request.getPostedArgument( LID_CREDENTIAL_PARAMETER_NAME );
 
         if( thePasswordRegex.matcher( givenPassword ).matches()) {
             return;
         }
-        throw new LidWrongPasswordException( subject.getIdentifier(), this );
+        throw new LidWrongPasswordException( subject.getIdentifier(), siteIdentifier, this );
     }
 
     /**

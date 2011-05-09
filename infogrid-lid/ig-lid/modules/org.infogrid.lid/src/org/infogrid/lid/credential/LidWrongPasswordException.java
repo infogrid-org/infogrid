@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -29,27 +29,31 @@ public class LidWrongPasswordException
      * Constructor.
      *
      * @param identifier the identifier for which an invalid credential was provided
+     * @param siteIdentifier the site at which the invalid credential was provided
      * @param type the type of credential that was invalid
      */
     public LidWrongPasswordException(
             Identifier        identifier,
+            Identifier        siteIdentifier,
             LidCredentialType type )
     {
-        super( identifier, type );
+        super( identifier, siteIdentifier, type );
     }
 
     /**
      * Constructor.
      *
      * @param identifier the identifier for which an invalid credential was provided
+     * @param siteIdentifier the site at which the invalid credential was provided
      * @param type the type of credential that was invalid
      * @param cause the underlying cause for the Exception
      */
     public LidWrongPasswordException(
             Identifier        identifier,
+            Identifier        siteIdentifier,
             LidCredentialType type,
             Throwable         cause )
     {
-        super( identifier, type, cause );
+        super( identifier, siteIdentifier, type, cause );
     }
 }

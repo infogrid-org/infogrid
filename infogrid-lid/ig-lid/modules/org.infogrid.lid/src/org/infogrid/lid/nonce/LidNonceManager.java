@@ -35,12 +35,14 @@ public interface LidNonceManager
      *
      * @param request the request
      * @param identifier identifier of the client on whose behalf the nonce is checked
+     * @param siteIdentifier the site at which the nonce is checked
      * @param type the LidCredentialType that used this nonce
      * @throws LidInvalidNonceException thrown if the nonce was unacceptable
      */
     public void validateNonce(
             SaneRequest       request,
             Identifier        identifier,
+            Identifier        siteIdentifier,
             LidCredentialType type )
         throws
             LidInvalidNonceException;
@@ -50,6 +52,7 @@ public interface LidNonceManager
      *
      * @param request the request
      * @param identifier identifier of the client on whose behalf the nonce is checked
+     * @param siteIdentifier the site at which the nonce is checked
      * @param type the LidCredentialType that used this nonce
      * @param name the name of the URL parameter
      * @throws LidInvalidNonceException thrown if the nonce was unacceptable
@@ -57,6 +60,7 @@ public interface LidNonceManager
     public void validateNonce(
             SaneRequest       request,
             Identifier        identifier,
+            Identifier        siteIdentifier,
             LidCredentialType type,
             String            name )
         throws

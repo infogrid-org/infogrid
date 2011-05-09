@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -73,17 +73,19 @@ public abstract class AbstractLidNonceManager
      *
      * @param request the request
      * @param identifier identifier of the client on whose behalf the nonce is checked
+     * @param siteIdentifier the site at which the nonce is checked
      * @param type the LidCredentialType that used this nonce
      * @throws LidInvalidNonceException thrown if the nonce was unacceptable
      */
     public void validateNonce(
             SaneRequest       request,
             Identifier        identifier,
+            Identifier        siteIdentifier,
             LidCredentialType type )
         throws
             LidInvalidNonceException
     {
-        validateNonce( request, identifier, type, LID_NONCE_PARAMETER_NAME );
+        validateNonce( request, identifier, siteIdentifier, type, LID_NONCE_PARAMETER_NAME );
     }
 
     /**

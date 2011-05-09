@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -32,14 +32,16 @@ public class OpenIdMandatorySignedFieldMissingException
      *
      * @param missingFields the one or more missing fields
      * @param identifier the identifier for which an invalid credential was provided
+     * @param siteIdentifier the site at which the invalid credential was provided
      * @param type the type of credential that was invalid
      */
     public OpenIdMandatorySignedFieldMissingException(
             String []                    missingFields,
             Identifier                   identifier,
+            Identifier                   siteIdentifier,
             AbstractOpenIdCredentialType type )
     {
-        super( identifier, type );
+        super( identifier, siteIdentifier, type );
 
         theMissingFields = missingFields;
     }

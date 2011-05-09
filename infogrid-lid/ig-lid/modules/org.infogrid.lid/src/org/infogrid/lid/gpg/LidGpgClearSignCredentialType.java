@@ -20,6 +20,7 @@ import org.infogrid.lid.credential.AbstractLidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.HasIdentifier;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
 
@@ -90,14 +91,18 @@ public class LidGpgClearSignCredentialType
      *
      * @param request the request
      * @param subject the subject
+     * @param siteIdentifier identifies the site
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
             SaneRequest   request,
-            HasIdentifier subject )
+            HasIdentifier subject,
+            Identifier    siteIdentifier )
         throws
             LidInvalidCredentialException
     {
+        // siteIdentifier can be ignored -- GPG is the same regardless of site
+        
         SaneRequest originalRequest   = request.getOriginalSaneRequest();
         String      personaIdentifier = subject.getIdentifier().toExternalForm();
 
@@ -110,14 +115,14 @@ public class LidGpgClearSignCredentialType
         }
         if( thePublicKey == null ) {
             // can't do anything here
-            throw new LidGpgNoPublicKeyException( subject.getIdentifier(), this );
+            throw new LidGpgNoPublicKeyException( subject.getIdentifier(), siteIdentifier, this );
         }
 
-        theNonceManager.validateNonce( originalRequest, subject.getIdentifier(), this ); // throws LidInvalidNonceException
+        theNonceManager.validateNonce( originalRequest, subject.getIdentifier(), siteIdentifier, this ); // throws LidInvalidNonceException
 
         String credential = originalRequest.getUrlArgument( LID_CREDENTIAL_PARAMETER_NAME );
         if( credential == null || credential.length() == 0 ) {
-            throw new LidGpgWrongSignatureException( subject.getIdentifier(), this );
+            throw new LidGpgWrongSignatureException( subject.getIdentifier(), siteIdentifier, this );
         }
 
         String  fullUri    = originalRequest.getAbsoluteFullUri();
@@ -128,11 +133,11 @@ public class LidGpgClearSignCredentialType
 
             boolean ret = theGpg.validateSignedText( personaIdentifier, signedText, thePublicKey );
             if( !ret ) {
-                throw new LidGpgWrongSignatureException( subject.getIdentifier(), this );
+                throw new LidGpgWrongSignatureException( subject.getIdentifier(), siteIdentifier, this );
             }
         } catch( IOException ex ) {
             log.error( ex );
-            throw new LidGpgWrongSignatureException( subject.getIdentifier(), this, ex );
+            throw new LidGpgWrongSignatureException( subject.getIdentifier(), siteIdentifier, this, ex );
         }
     }
 

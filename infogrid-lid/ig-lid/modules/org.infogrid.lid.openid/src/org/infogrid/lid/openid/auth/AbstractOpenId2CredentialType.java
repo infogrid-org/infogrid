@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -20,6 +20,7 @@ import org.infogrid.lid.nonce.LidNonceManager;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.lid.openid.OpenIdRpSideAssociationManager;
 import org.infogrid.util.HasIdentifier;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.http.SaneRequest;
 
 /**
@@ -65,21 +66,23 @@ public abstract class AbstractOpenId2CredentialType
 
     /**
      * Determine whether the request contains a valid LidCredentialType of this type
-     * for the given subject.
+     * for the given subject at the site with the given Identifier.
      *
      * @param request the request
      * @param subject the subject
+     * @param siteIdentifier identifies the site
      * @throws LidExpiredCredentialException thrown if the contained LidCdedentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
             SaneRequest   request,
-            HasIdentifier subject )
+            HasIdentifier subject,
+            Identifier    siteIdentifier )
         throws
             LidExpiredCredentialException,
             LidInvalidCredentialException
     {
-        checkCredential( request, subject, MANDATORY_FIELDS, OPENID_NONCE_PARAMETER_NAME );
+        checkCredential( request, subject, siteIdentifier, MANDATORY_FIELDS, OPENID_NONCE_PARAMETER_NAME );
     }
 
     /**

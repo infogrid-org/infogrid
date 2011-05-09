@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -34,33 +34,39 @@ public abstract class LidInvalidCredentialException
      * Constructor.
      * 
      * @param identifier the identifier for which an invalid credential was provided
+     * @param siteIdentifier the site at which the invalid credential was provided
      * @param type the type of credential that was invalid
      */
     protected LidInvalidCredentialException(
             Identifier        identifier,
+            Identifier        siteIdentifier,
             LidCredentialType type )
     {
         super( null, null );
         
-        theIdentifier = identifier;
+        theIdentifier     = identifier;
+        theSiteIdentifier = siteIdentifier;
     }
     
     /**
      * Constructor.
      * 
      * @param identifier the identifier for which an invalid credential was provided
+     * @param siteIdentifier the site at which the invalid credential was provided
      * @param type the type of credential that was invalid
      * @param cause the underlying cause, if any
      */
     protected LidInvalidCredentialException(
             Identifier        identifier,
+            Identifier        siteIdentifier,
             LidCredentialType type,
             Throwable         cause )
     {
         super( null, cause );
 
-        theIdentifier = identifier;
-        theType       = type;
+        theIdentifier     = identifier;
+        theSiteIdentifier = siteIdentifier;
+        theType           = type;
     }
     
     /**
@@ -72,7 +78,17 @@ public abstract class LidInvalidCredentialException
     {
         return theIdentifier;
     }
-    
+
+    /**
+     * Obtain the identifier for the site at which an invalid credential was provided.
+     *
+     * @return the identifier
+     */
+    public Identifier getSiteIdentifier()
+    {
+        return theSiteIdentifier;
+    }
+
     /**
      * Obtain the type of credential that was invalid.
      * 
@@ -104,10 +120,12 @@ public abstract class LidInvalidCredentialException
         d.dump( this,
                 new String[] {
                         "theIdentifier",
+                        "theSiteIdentifier",
                         "theType"
                 },
                 new Object[] {
                         theIdentifier,
+                        theSiteIdentifier,
                         theType,
                 } );
     }
@@ -116,7 +134,12 @@ public abstract class LidInvalidCredentialException
      * The identifier for which an invalid credential was provided.
      */
     protected Identifier theIdentifier;
-    
+
+    /**
+     * The identifier of the site at which an invalid credential was provided.
+     */
+    protected Identifier theSiteIdentifier;
+
     /**
      * The type of credential that was invalid.
      */

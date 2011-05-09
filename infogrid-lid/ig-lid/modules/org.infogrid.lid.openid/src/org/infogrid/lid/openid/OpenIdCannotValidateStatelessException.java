@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -31,13 +31,15 @@ public class OpenIdCannotValidateStatelessException
      * Constructor.
      *
      * @param identifier the identifier for which an invalid credential was provided
+     * @param siteIdentifier the site at which the invalid credential was provided
      * @param type the type of credential that was invalid
      */
     public OpenIdCannotValidateStatelessException(
             Identifier                   identifier,
+            Identifier                   siteIdentifier,
             AbstractOpenIdCredentialType type )
     {
-        super( identifier, type );
+        super( identifier, siteIdentifier, type );
     }
 
     /**
@@ -49,10 +51,11 @@ public class OpenIdCannotValidateStatelessException
      */
     public OpenIdCannotValidateStatelessException(
             Identifier                   identifier,
+            Identifier                   siteIdentifier,
             AbstractOpenIdCredentialType type,
             Throwable                    cause )
     {
-        super( identifier, type, cause );
+        super( identifier, siteIdentifier, type, cause );
     }
 }
 
