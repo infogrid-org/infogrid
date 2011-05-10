@@ -474,6 +474,23 @@ public abstract class StringHelper
     }
 
     /**
+     * If a String contains a prefix, strip the prefix. Otherwise return the original String.
+     *
+     * @param s the String
+     * @param prefix the prefix
+     * @return the String without the prefix
+     */
+    public static String stripPrefixIfPresent(
+            String s,
+            String prefix )
+    {
+        if( s != null && s.startsWith( prefix )) {
+            return s.substring( prefix.length() );
+        }
+        return s;
+    }
+
+    /**
      * The set of characters we replace in HTML.
      */
     protected static final char [] htmlChars = {
