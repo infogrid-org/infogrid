@@ -79,6 +79,8 @@ public abstract class AbstractForwardReferenceTest
     public void cleanup()
     {
         base.die();
+
+        exec.shutdown();
     }
 
     /**
