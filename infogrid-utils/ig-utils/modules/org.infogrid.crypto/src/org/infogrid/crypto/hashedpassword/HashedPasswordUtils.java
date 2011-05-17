@@ -69,6 +69,12 @@ public abstract class HashedPasswordUtils
             String  password,
             byte [] hashed )
     {
+        if( password == null ) {
+            return false;
+        }
+        if( hashed == null || hashed.length == 0 ) {
+            return false; // never permit if no password is set
+        }
         byte [] found = hash( password );
 
         if( found == null || hashed == null ) {
