@@ -14,11 +14,16 @@
 
 package org.infogrid.comm.smtp;
 
+import org.infogrid.util.logging.CanBeDumped;
+import org.infogrid.util.logging.Dumper;
+
 /**
  * A simple implementation of SmtpSendableMessage.
  */
 public class SimpleSmtpSendableMessage
-        implements SmtpSendableMessage
+        implements
+            SmtpSendableMessage,
+            CanBeDumped
 {
     /**
      * Factory method.
@@ -98,6 +103,29 @@ public class SimpleSmtpSendableMessage
         return thePayload;
     }
     
+    /**
+     * Dump this object.
+     *
+     * @param d the Dumper to dump to
+     */
+    public void dump(
+            Dumper d )
+    {
+        d.dump( this,
+                new String[] {
+                        "sender",
+                        "receiver",
+                        "subject",
+                        "payload"
+                },
+                new Object[] {
+                        theSender,
+                        theReceiver,
+                        theSubject,
+                        thePayload
+                });
+    }
+
     /**
      * Sender identifier.
      */
