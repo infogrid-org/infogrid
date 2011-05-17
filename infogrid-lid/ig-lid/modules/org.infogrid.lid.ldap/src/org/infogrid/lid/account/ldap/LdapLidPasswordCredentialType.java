@@ -123,6 +123,17 @@ public class LdapLidPasswordCredentialType
     }
 
     /**
+     * Determine whether this LidCredentialType is a one-time token credential, e.g.
+     * a one-time password.
+     *
+     * @return true if this is a one-time token credential
+     */
+    public boolean isOneTimeToken()
+    {
+        return false;
+    }
+
+    /**
      * Determine equality.
      *
      * @param other the objects to compare against

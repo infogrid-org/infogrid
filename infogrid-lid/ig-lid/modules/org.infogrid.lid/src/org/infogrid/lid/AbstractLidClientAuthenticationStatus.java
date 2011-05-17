@@ -424,6 +424,25 @@ public abstract class AbstractLidClientAuthenticationStatus
     }
 
     /**
+     * Determine whether the client has just successfully presented a one-time token, such as one sent
+     * by e-mail during a password reset.
+     *
+     * @return true if the client has successfully presented a one-time token
+     */
+    public boolean clientPresentsOneTimeToken()
+    {
+        if( theCarriedValidCredentialTypes == null ) {
+            return false;
+        }
+        for( int i=0 ; i<theCarriedValidCredentialTypes.length ; ++i ) {
+            if( theCarriedValidCredentialTypes[i].isOneTimeToken() ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get the client session, if any.
      *
      * @return the client session, if any
@@ -484,6 +503,32 @@ public abstract class AbstractLidClientAuthenticationStatus
             return true;
         }
         return false;
+    }
+
+    /**
+     * Convenience method to determine whether the client has been authenticated within a certain time period.
+     * This aggregates information from the other calls.
+     *
+     * @param period the time period in milliseconds
+     * @return true if the client has been authenticated within the time period
+     */
+    public boolean isAuthenticatedWithin(
+            long period )
+    {
+        if( !isAuthenticated() ) {
+            return false;
+        }
+
+        if( thePreexistingClientSession == null ) {
+            return true; // new authentication
+        }
+
+        long lastTime = thePreexistingClientSession.getTimeLastAuthenticated();
+        long now      = System.currentTimeMillis();
+        if( lastTime < now + period ) {
+            return false;
+        }
+        return true;
     }
 
     /**

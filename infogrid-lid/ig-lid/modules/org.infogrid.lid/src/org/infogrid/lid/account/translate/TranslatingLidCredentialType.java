@@ -98,6 +98,17 @@ public class TranslatingLidCredentialType
     }
 
     /**
+     * Determine whether this LidCredentialType is a one-time token credential, e.g.
+     * a one-time password.
+     *
+     * @return true if this is a one-time token credential
+     */
+    public boolean isOneTimeToken()
+    {
+        return theDelegate.isOneTimeToken();
+    }
+
+    /**
      * Determine equality.
      *
      * @param other the objects to compare against

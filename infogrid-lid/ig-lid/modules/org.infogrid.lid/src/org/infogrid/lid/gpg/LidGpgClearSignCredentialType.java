@@ -142,6 +142,17 @@ public class LidGpgClearSignCredentialType
     }
 
     /**
+     * Determine whether this LidCredentialType is a one-time token credential, e.g.
+     * a one-time password.
+     *
+     * @return true if this is a one-time token credential
+     */
+    public boolean isOneTimeToken()
+    {
+        return true; // it is because of the nonce
+    }
+
+    /**
      * Determine equality.
      *
      * @param other the objects to compare against

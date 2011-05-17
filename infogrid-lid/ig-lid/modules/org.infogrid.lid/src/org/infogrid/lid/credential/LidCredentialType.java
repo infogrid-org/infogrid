@@ -63,6 +63,14 @@ public interface LidCredentialType
             LidInvalidCredentialException;
 
     /**
+     * Determine whether this LidCredentialType is a one-time token credential, e.g.
+     * a one-time password.
+     *
+     * @return true if this is a one-time token credential
+     */
+    public abstract boolean isOneTimeToken();
+
+    /**
      * Name of the URL parameter that indicates the LID credential type.
      */
     public static final String LID_CREDTYPE_PARAMETER_NAME = "lid-credtype";

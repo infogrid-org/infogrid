@@ -237,6 +237,14 @@ public interface LidClientAuthenticationStatus
     public abstract boolean clientWishesToLogout();
 
     /**
+     * Determine whether the client has just successfully presented a one-time token, such as one sent
+     * by e-mail during a password reset.
+     *
+     * @return true if the client has successfully presented a one-time token
+     */
+    public abstract boolean clientPresentsOneTimeToken();
+    
+    /**
      * Get the pre-existing client session, if any. This is only set if the session is owned by a client other than
      * the current client (e.g. if a new user uses a browser with an existing valid session cookie). The
      * session may be valid or expired. It may be null.
@@ -254,10 +262,20 @@ public interface LidClientAuthenticationStatus
     public abstract LidAuthenticationService [] getAuthenticationServices();
 
     /**
-     * Convenience method to determine whether the client is authenticated. This aggregates information
-     * from the other calls.
+     * Convenience method to determine whether the client is authenticated.
+     * This aggregates information from the other calls.
      *
      * @return true if the client is authenticated
      */
     public abstract boolean isAuthenticated();
+
+    /**
+     * Convenience method to determine whether the client has been authenticated within a certain time period.
+     * This aggregates information from the other calls.
+     *
+     * @param period the time period in milliseconds
+     * @return true if the client has been authenticated within the time period
+     */
+    public abstract boolean isAuthenticatedWithin(
+            long period );
 }

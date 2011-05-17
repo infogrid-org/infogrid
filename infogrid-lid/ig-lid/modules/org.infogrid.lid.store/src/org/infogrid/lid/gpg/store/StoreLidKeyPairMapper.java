@@ -97,15 +97,16 @@ public class StoreLidKeyPairMapper
             StoreValueDecodingException
     {
         try {
+            // poor man's parser
             String buf = new String( value.getData(), CHARSET );
 
-            int from = buf.indexOf(  "\"" )+1;
-            int to   = buf.indexOf( "\"", from );
+            int from = buf.indexOf(  '"' )+1;
+            int to   = buf.indexOf( '"', from );
 
             String pub = buf.substring( from, to );
 
-            from = buf.indexOf( "\"", to+1 );
-            to   = buf.indexOf( "\"", from );
+            from = buf.indexOf( '"', to+1 )+1;
+            to   = buf.indexOf( '"', from );
 
             String priv = buf.substring( from, to );
 

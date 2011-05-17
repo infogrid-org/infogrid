@@ -114,7 +114,7 @@ public class CommandLineWrapperLidGpg
                         + "Key-Length: 1024\n"
                         + "Subkey-Type: ELG-E\n"
                         + "Subkey-Length: 1024\n"
-                        + "Name-Real: $lid\n"
+                        + "Name-Real: " + key.toExternalForm() + "\n"
                         + "Expire-Date: 0\n"
                         + "%commit\n";
 
@@ -132,13 +132,13 @@ public class CommandLineWrapperLidGpg
                 // now construct return values
 
                 StringBuilder output = new StringBuilder();
-                command = theFullExecutable + " --export --armor =" + key;
+                command = theFullExecutable + " --export --armor =" + key.toExternalForm();
                 execute( command, null, output, null );
 
                 String publicKey = output.toString();
 
                 output = new StringBuilder();
-                command = theFullExecutable + " --export-secret-keys --armor =" + key;
+                command = theFullExecutable + " --export-secret-keys --armor =" + key.toExternalForm();
                 execute( command, null, output, null );
 
                 String privateKey = output.toString();
@@ -251,6 +251,7 @@ public class CommandLineWrapperLidGpg
                 execute( command, privateKey, null, errorData );
 
                 StringBuilder append = new StringBuilder();
+                append.append( url );
                 if( url.indexOf( '?' ) >= 0 ) {
                     append.append( '&' );
                 } else {
@@ -267,7 +268,7 @@ public class CommandLineWrapperLidGpg
 
                 command = theFullExecutable + " --clearsign -u =" + lid;
                 StringBuilder output = new StringBuilder( 256 );
-                execute( command, url + append, output, null );
+                execute( command, append.toString(), output, null );
 
                 String outputString = output.toString();
 

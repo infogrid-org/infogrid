@@ -305,6 +305,17 @@ public abstract class AbstractOpenIdCredentialType
     }
 
     /**
+     * Determine whether this LidCredentialType is a one-time token credential, e.g.
+     * a one-time password.
+     *
+     * @return true if this is a one-time token credential
+     */
+    public boolean isOneTimeToken()
+    {
+        return true; // because of the nonce
+    }
+
+    /**
      * Determine the endpoint URLs that support authentication for this credential type, for this subject.
      *
      * @param subject the subject
