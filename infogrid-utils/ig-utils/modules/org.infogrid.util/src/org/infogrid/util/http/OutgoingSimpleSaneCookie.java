@@ -160,8 +160,17 @@ public class OutgoingSimpleSaneCookie
      */
     public String getAsHttpValue()
     {
+        return "Set-Cookie: " + getAsJavascriptValue();
+    }
+
+    /**
+     * Convert into a String that is useful for assigning to document.cookie in Javascript.
+     *
+     * @return the String
+     */
+    public String getAsJavascriptValue()
+    {
         StringBuilder buf = new StringBuilder();
-        buf.append( "Set-Cookie: " );
         buf.append( HTTP.encodeCookieName( theName ));
         buf.append( '=' );
         buf.append( HTTP.encodeToQuotedString( theValue ));
