@@ -163,7 +163,7 @@ public abstract class CommandlineBootLoader
             return ret;
 
         } catch( StandardModuleRunException ex ) {
-            return error( ex );
+            return error( ex.getCause() );
 
         } catch( Throwable ex ) {
             return fatal( null, ex );
