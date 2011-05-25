@@ -509,6 +509,27 @@ public final class ResourceHelper
     }
 
     /**
+     * Obtain a resource value as a L10Map<String>, using the convention
+     * for specifying L10Maps in the resources, or the defaultMap if not given.
+     *
+     * @param resourceName the name of the resource we are looking for
+     * @param defaultMap the map returned if the resource could not be found
+     * @return the value of the resource, or the default
+     * @return 
+     */
+    public L10Map<String> getResourceL10MapOrDefault(
+            String         resourceName,
+            L10Map<String> defaultMap )
+    {
+        String toParse = getResourceStringOrNull( resourceName );
+        if( toParse == null ) {
+            return defaultMap;
+        }
+
+        return L10StringMapImpl.create( toParse );
+    }
+
+    /**
      * Implementation of obtaining a resource.
      *
      * @param resourceName name of the resource to obtain
