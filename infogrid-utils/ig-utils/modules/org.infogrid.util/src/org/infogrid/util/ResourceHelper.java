@@ -515,7 +515,6 @@ public final class ResourceHelper
      * @param resourceName the name of the resource we are looking for
      * @param defaultMap the map returned if the resource could not be found
      * @return the value of the resource, or the default
-     * @return 
      */
     public L10Map<String> getResourceL10MapOrDefault(
             String         resourceName,

@@ -46,7 +46,6 @@ public class L10StringMapImpl
      *
      * @param theMap the HashMap with the Locale keys and the corresponding T
      * @param secondDefaultValue the default value of this L10Map if none was found in theMap
-     * @param fact factory for the appropriate subclass
      * @return the created L10MapImpl
      */
      public static L10StringMapImpl create(
