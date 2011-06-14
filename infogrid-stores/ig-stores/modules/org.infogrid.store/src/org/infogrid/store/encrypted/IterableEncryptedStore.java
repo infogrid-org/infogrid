@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -23,7 +23,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.IterableStoreCursor;
-import org.infogrid.store.Store;
 import org.infogrid.store.StoreValue;
 import org.infogrid.util.CursorIterator;
 
@@ -42,16 +41,16 @@ public class IterableEncryptedStore
      *
      * @param transformation the name of the transformation, e.g., DES/CBC/PKCS5Padding, see <code>javax.crypto.Cipher.getInstance(String)</code>
      * @param key the secret key to be used for encryption and decryption
-     * @param delegate the Store that does the actual storing
+     * @param delegate the IterableStore that does the actual storing
      * @return the created IterableEncryptedStore
      * @throws InvalidKeyException thrown if the key is invalid or does not match the specified transformation
      * @throws NoSuchAlgorithmException thrown if the specified transformation is not available in the default provider package or any of the other provider packages that were searched. 
      * @throws NoSuchPaddingException thrown if transformation contains a padding scheme that is not available.
      */
     public static IterableEncryptedStore create(
-            String    transformation,
-            SecretKey key,
-            Store     delegate )
+            String        transformation,
+            SecretKey     key,
+            IterableStore delegate )
         throws
             InvalidKeyException,
             NoSuchPaddingException,
@@ -71,12 +70,12 @@ public class IterableEncryptedStore
      *
      * @param encCipher the Cipher to use for encryption
      * @param decCipher the Cipher to use for decryption
-     * @param delegate the Store that does the actual storing
+     * @param delegate the IterableStore that does the actual storing
      */
     protected IterableEncryptedStore(
-            Cipher    encCipher,
-            Cipher    decCipher,
-            Store     delegate )
+            Cipher        encCipher,
+            Cipher        decCipher,
+            IterableStore delegate )
     {
         super( encCipher, decCipher, delegate );
     }
