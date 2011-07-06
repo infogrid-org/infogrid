@@ -1503,6 +1503,8 @@ public abstract class ArrayHelper
      *
      * @param data the data elements
      * @return the joined String
+     * @see ArrayHelper#join(long[])
+     * @see StringHelper#join(java.util.Iterator)
      */
     public static String join(
             Object [] data )
@@ -1516,6 +1518,8 @@ public abstract class ArrayHelper
      * @param separator the separator between the data elements
      * @param data the data elements
      * @return the joined String
+     * @see ArrayHelper#join(java.lang.String, long[])
+     * @see StringHelper#join(java.lang.String, java.util.Iterator)
      */
     public static String join(
             String    separator,
@@ -1533,6 +1537,8 @@ public abstract class ArrayHelper
      * @param ifNull to be written if the data is null
      * @param data the data elements
      * @return the joined String
+     * @see ArrayHelper#join(java.lang.String, java.lang.String, java.lang.String, java.lang.String, long[])
+     * @see StringHelper#join(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Iterator)
      */
     public static String join(
             String    separator,
@@ -1562,6 +1568,8 @@ public abstract class ArrayHelper
      *
      * @param data the data elements
      * @return the joined String
+     * @see ArrayHelper#join(java.lang.Object[])
+     * @see StringHelper#join(java.util.Iterator)
      */
     public static String join(
             long [] data )
@@ -1575,6 +1583,8 @@ public abstract class ArrayHelper
      * @param separator the separator between the data elements
      * @param data the data elements
      * @return the joined String
+     * @see ArrayHelper#join(java.lang.String, java.lang.Object[])
+     * @see StringHelper#join(java.lang.String, java.util.Iterator)
      */
     public static String join(
             String  separator,
@@ -1592,6 +1602,8 @@ public abstract class ArrayHelper
      * @param ifNull to be written if the data is null
      * @param data the data elements
      * @return the joined String
+     * @see ArrayHelper#join(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Object[])
+     * @see StringHelper#join(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Iterator)
      */
     public static String join(
             String  separator,

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,6 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -55,6 +56,70 @@ public abstract class StringHelper
             ret = one.compareTo( two );
         }
         return ret;
+    }
+
+    /**
+     * Join the elements returned by an Iterator in String form, like Perl.
+     *
+     * @param iter the Iterator returning the elements
+     * @return the joined String
+     * @see org.infogrid.util.ArrayHelper#join(java.lang.Object[])
+     */
+    public static String join(
+            Iterator<?> iter )
+    {
+        return join( ", ", iter );
+    }
+
+    /**
+     * Join the elements returned by an Iterator in String form, like Perl.
+     *
+     * @param separator the separator between the data elements
+     * @param iter the Iterator returning the elements
+     * @return the joined String
+     * @see org.infogrid.util.ArrayHelper#join(java.lang.String, java.lang.Object[])
+     */
+    public static String join(
+            String      separator,
+            Iterator<?> iter )
+    {
+        return join( separator, "", "", "null", iter );
+    }
+
+    /**
+     * Join the elements returned by an Iterator in String form, like Perl.
+     *
+     * @param separator the separator between the data elements
+     * @param prefix the prefix, if the data is non-null
+     * @param postfix the prefix, if the data is non-null
+     * @param ifNull to be written if the data is null
+     * @param iter the Iterator returning the elements
+     * @return the joined String
+     * @see org.infogrid.util.ArrayHelper#join(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Object[])
+     */
+    public static String join(
+            String      separator,
+            String      prefix,
+            String      postfix,
+            String      ifNull,
+            Iterator<?> iter )
+    {
+        if( !iter.hasNext() ) {
+            return ifNull;
+        }
+        String       sep = "";
+        StringBuilder ret = new StringBuilder();
+
+        ret.append( prefix );
+        while( iter.hasNext() ) {
+            Object current = iter.next();
+
+            ret.append( sep );
+            ret.append( current );
+            sep = separator;
+        }
+        ret.append( postfix );
+        return ret.toString();
     }
 
     /**
