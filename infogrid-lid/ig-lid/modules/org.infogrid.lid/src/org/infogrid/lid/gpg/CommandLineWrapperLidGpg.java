@@ -17,13 +17,12 @@ package org.infogrid.lid.gpg;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.infogrid.lid.nonce.LidNonceManager;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.ExternalCommand;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.ResourceHelper;
@@ -83,11 +82,6 @@ public class CommandLineWrapperLidGpg
                 throw new IOException( "Cannot create GPG working directory, tried: " + ArrayHelper.join( theGpgHomeDirChoices ));
             }
         }
-        if( theGpgHomeDir != null ) {
-            theFullExecutable = theExecutable + " --homedir " + theGpgHomeDir.getAbsolutePath();
-        } else {
-            theFullExecutable = theExecutable; // use default homedir
-        }
     }
 
     /**
@@ -125,21 +119,17 @@ public class CommandLineWrapperLidGpg
                 batchFileWriter.write( batchFileContent );
                 batchFileWriter.close();
 
-                String command = theFullExecutable + " --batch --gen-key " + batchFile.getAbsolutePath();
-
-                execute( command, null, null, null );
+                exec( new ProcessBuilder( theExecutable, "--batch", "--gen-key", batchFile.getAbsolutePath()));
 
                 // now construct return values
 
                 StringBuilder output = new StringBuilder();
-                command = theFullExecutable + " --export --armor =" + key.toExternalForm();
-                execute( command, null, output, null );
+                exec( new ProcessBuilder( theExecutable, "--export", "--armor", "=" + key.toExternalForm()), null, output, null );
 
                 String publicKey = output.toString();
 
                 output = new StringBuilder();
-                command = theFullExecutable + " --export-secret-keys --armor =" + key.toExternalForm();
-                execute( command, null, output, null );
+                exec( new ProcessBuilder( theExecutable, "--export-secret-keys", "--armor", "=" + key.toExternalForm()), null, output, null );
 
                 String privateKey = output.toString();
 
@@ -173,21 +163,17 @@ public class CommandLineWrapperLidGpg
         throws
             IOException
     {
+        if( log.isDebugEnabled() ) {
+            log.debug( "Signed text:\n" + signedText );
+        }
+
         synchronized( SYNC ) {
             try {
-                String command = theFullExecutable + " --import";
-
-                execute( command, publicKey, null, null );
+                exec( new ProcessBuilder( theExecutable, "--import" ), publicKey, null, null );
 
                 StringBuilder output = new StringBuilder();
 
-                command = theFullExecutable + " --verify";
-
-                if( log.isDebugEnabled() ) {
-                    log.debug( "Signed text:\n" + signedText );
-                }
-
-                int result = execute( command, signedText, null, output );
+                int result = exec( new ProcessBuilder( theExecutable, "--verify" ), signedText, null, output );
                 // Note that result == 0 means *good*, not bad
 
                 if( result>0 ) {
@@ -245,10 +231,9 @@ public class CommandLineWrapperLidGpg
             try {
                 // amazingly enough, there does not seem to be a difference between importing
                 // public and private keys in GPG.
-                String command = theFullExecutable + " --import";
                 StringBuilder errorData = new StringBuilder();
 
-                execute( command, privateKey, null, errorData );
+                exec( new ProcessBuilder( theExecutable, "--import" ), privateKey, null, errorData );
 
                 StringBuilder append = new StringBuilder();
                 append.append( url );
@@ -266,9 +251,8 @@ public class CommandLineWrapperLidGpg
                 append.append( "&" ).append( LidNonceManager.LID_NONCE_PARAMETER_NAME ).append(  "=" );
                 append.append( HTTP.encodeToValidUrlArgument( nonce ));
 
-                command = theFullExecutable + " --clearsign -u =" + lid;
                 StringBuilder output = new StringBuilder( 256 );
-                execute( command, append.toString(), output, null );
+                exec( new ProcessBuilder( theExecutable, "--clearsign", "-u", "=" + lid ), append.toString(), output, null );
 
                 String outputString = output.toString();
 
@@ -291,7 +275,9 @@ public class CommandLineWrapperLidGpg
                                 + "', lid is '"
                                 + lid
                                 + "', gpg is "
-                                + theFullExecutable
+                                + theExecutable
+                                + ", gpgHomeDir is "
+                                + theGpgHomeDir
                                 + ", thePgpSignedPattern is '"
                                 + thePgpSignedPattern
                                 + "'" );
@@ -322,148 +308,44 @@ public class CommandLineWrapperLidGpg
             }
         }
     }
-
+    
     /**
-     * Internal helper that knows how to execute a shell command with data that
-     * we provide and that we can get back.
-     *
-     * This is an implementation with a lot of overhead (3 Threads plus the
-     * one Thread that the JDK creates itself!) but I can't quite think of
-     * anything that is reasonably simple and likely to work.
-     *
-     * @param command the command to execute
-     * @param inputData if given, contains input data that shall be piped into command
-     * @param outputData if given, command's standard output will be redirected into outputData
-     * @param errorData if given, command's error output will be redirected into errorData
-     * @return exit code of the child process
-     * @throws IOException thrown if an input/output error occurred
+     * Execute the command in the correct environment.
+     * 
+     * @param builder the ProcessBuilder holding the command, arguments, environment etc.
+     * @return exit code
+     * @throws IOException thrown if an I/O problem occurred
      */
-    protected static int execute(
-            String             command,
-            final String       inputData,
-            final StringBuilder outputData,
-            final StringBuilder errorData )
+    protected int exec(
+            ProcessBuilder builder )
         throws
             IOException
     {
-        if( log.isDebugEnabled() ) {
-            log.debug( "about to execute: " + command );
-        }
+        return ExternalCommand.execute( builder );
+    }
 
-        final Process p = Runtime.getRuntime().exec( command );
-
-        Thread inputThread  = null;
-        Thread outputThread = null;
-        Thread errorThread  = null;
-
-        if( inputData != null ) {
-            inputThread = new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            OutputStreamWriter writer = new OutputStreamWriter( p.getOutputStream());
-                            writer.write( inputData );
-                            writer.close();
-                        } catch( IOException ex ) {
-                            log.error( ex );
-                        }
-                    }
-            };
+    /**
+     * Execute the command in the correct environment.
+     *
+     * @param builder the ProcessBuilder holding the command, arguments, environment etc.
+     * @param stdinContent if given, contains input data that shall be piped into command
+     * @param stdoutBuf if given, command's standard output will be redirected into this buffer
+     * @param stderrBuf if given, command's error output will be redirected into this buffer
+     * @return exit code
+     * @throws IOException thrown if an I/O problem occurred
+     */
+    protected int exec(
+            ProcessBuilder builder,
+            String         stdinContent,
+            StringBuilder  stdoutBuf,
+            StringBuilder  stderrBuf )
+        throws
+            IOException
+    {
+        if( theGpgHomeDir != null ) {
+            builder.environment().put( "GNUPGHOME", theGpgHomeDir.getAbsolutePath() );
         }
-        if( outputData != null ) {
-            outputThread = new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            InputStreamReader reader = new InputStreamReader( p.getInputStream());
-                            int cc = 0;
-                            while( ( cc = reader.read()) >= 0 ) {
-                                char c = (char) cc;
-                                outputData.append( c );
-                            }
-                        } catch( IOException ex ) {
-                            log.error( ex );
-                        }
-                    }
-            };
-        }
-        if( errorData != null ) {
-            errorThread = new Thread() {
-                    @Override
-                    public void run()
-                    {
-                        try {
-                            InputStreamReader reader = new InputStreamReader( p.getErrorStream());
-                            int cc = 0;
-                            while( ( cc = reader.read()) >= 0 )
-                            {
-                                char c = (char) cc;
-                                errorData.append( c );
-                            }
-
-                        } catch( IOException ex ) {
-                            log.error( ex );
-                        }
-                    }
-            };
-        }
-        else if( log.isDebugEnabled() ) {
-            errorThread = new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            int cc = 0;
-                            InputStreamReader errorReader = new InputStreamReader( p.getErrorStream());
-                            StringBuilder buf = new StringBuilder();
-                            while( ( cc = errorReader.read()) >= 0  ) {
-                                char c = (char) cc;
-                                buf.append( c );
-                                if( c == '\n' ) {
-                                    log.debug( "Process reported: " + buf );
-                                    buf = new StringBuilder();
-                                }
-                            }
-                            if( buf.length() > 0 ) {
-                                log.debug( "Process reported: " + buf );
-                            }
-                        } catch( IOException ex ) {
-                            log.error( ex );
-                        }
-                    }
-                };
-        }
-
-        if( inputThread != null ) {
-            inputThread.start();
-        }
-        if( outputThread != null ) {
-            outputThread.start();
-        }
-        if( errorThread != null ) {
-            errorThread.start();
-        }
-
-        try {
-            int returnValue = p.waitFor();
-
-            if( inputThread != null ) {
-                inputThread.join();
-            }
-            if( outputThread != null ) {
-                outputThread.join();
-            }
-            if( errorThread != null ) {
-                errorThread.join();
-            }
-
-            if( log.isDebugEnabled() ) {
-                log.debug( "execution returned " + returnValue );
-            }
-            return returnValue;
-        } catch( InterruptedException ex ) {
-            log.error( ex );
-        }
-        return -1;
+        return ExternalCommand.execute( builder, stdinContent, stdoutBuf, stderrBuf );
     }
 
     /**
@@ -487,11 +369,6 @@ public class CommandLineWrapperLidGpg
      * The actual Gpg home directory.
      */
     protected File theGpgHomeDir;
-
-    /**
-     * The full-qualified executable.
-     */
-    protected String theFullExecutable;
 
     /**
      * The pattern in the gpg output that contains our LID.
