@@ -37,8 +37,7 @@ public class AcctScheme
      */
     public AcctScheme()
     {
-        super(  "acct",
-                Pattern.compile( "(acct:[A-Z0-9._%+-]+@[A-Z0-9.-]*[A-Z])", Pattern.CASE_INSENSITIVE ));
+        super( "acct", ACCT_PATTERN );
     }
 
     /**
@@ -84,4 +83,9 @@ public class AcctScheme
     {
         return false;
     }
+
+    /**
+     * The Pattern that we use for this scheme.
+     */
+    public static final Pattern ACCT_PATTERN = Pattern.compile( "(acct:[A-Z0-9._%+-]+@[A-Z0-9.-]*[A-Z])", Pattern.CASE_INSENSITIVE );
 }

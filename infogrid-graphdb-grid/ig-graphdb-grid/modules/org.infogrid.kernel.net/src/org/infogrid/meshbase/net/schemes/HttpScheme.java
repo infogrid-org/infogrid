@@ -38,8 +38,7 @@ public class HttpScheme
      */
     public HttpScheme()
     {
-        this(   "http",
-                Pattern.compile( "((?i:http://[a-z0-9](?:[a-z0-9\\-.]*[a-z0-9])?))(?::\\d+)?/[a-zA-Z0-9*\\$\\-_@.&+!*\"'(),%?=;/]*" ));
+        this("http", HTTP_PATTERN );
     }
 
     /**
@@ -209,4 +208,9 @@ public class HttpScheme
      */
     public static final Pattern thePort80Pattern = Pattern.compile(
             "^(http://[^/:]+):80(/.*)$" );
+
+    /**
+     * The Pattern that we use for this scheme.
+     */
+    public static final Pattern HTTP_PATTERN = Pattern.compile( "((?i:http://[a-z0-9](?:[a-z0-9\\-.]*[a-z0-9])?))(?::\\d+)?/[a-zA-Z0-9*\\$\\-_@.&+!*\"'(),%?=;/]*" );
 }

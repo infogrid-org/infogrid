@@ -133,5 +133,4 @@ public class XriScheme
     private static final String theXriResolverPrefix = theResourceHelper.getResourceStringOrDefault(
             "XriResolverPrefix",
             "http://xri.net/" );
-
 }

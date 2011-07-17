@@ -29,8 +29,7 @@ public class HttpsScheme
      */
     public HttpsScheme()
     {
-        super(  "https",
-                Pattern.compile( "((?i:https://[a-z0-9](?:[a-z0-9\\-.]*[a-z0-9])?))(?::\\d+)?/[a-zA-Z0-9*\\$\\-_@.&+!*\"'(),%?=;/]*" ));
+        super( "https", HTTPS_PATTERN );
     }
 
     /**
@@ -57,7 +56,11 @@ public class HttpsScheme
     /**
      * The pattern that allows us to remove a unnecessary port 443 from a URL spec.
      */
-    public static final Pattern thePort443Pattern = Pattern.compile(
+    protected static final Pattern thePort443Pattern = Pattern.compile(
             "^(https://[^/:]+):443(/.*)$" );
 
+    /**
+     * The Pattern that we use for this scheme.
+     */
+    public static final Pattern HTTPS_PATTERN = Pattern.compile( "((?i:https://[a-z0-9](?:[a-z0-9\\-.]*[a-z0-9])?))(?::\\d+)?/[a-zA-Z0-9*\\$\\-_@.&+!*\"'(),%?=;/]*" );
 }

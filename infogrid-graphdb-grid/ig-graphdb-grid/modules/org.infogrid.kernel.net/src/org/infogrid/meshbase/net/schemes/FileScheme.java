@@ -14,12 +14,9 @@
 
 package org.infogrid.meshbase.net.schemes;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.regex.Pattern;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
-import org.infogrid.util.logging.Log;
 
 /**
  * Represents the "file" protocol for the DefaultNetMeshBaseIdentifierFactory.
@@ -30,14 +27,12 @@ public class FileScheme
         implements
             Scheme
 {
-    private static final Log log = Log.getLogInstance( FileScheme.class ); // our own, private logger
-
     /**
      * Constructor.
      */
     public FileScheme()
     {
-        super( "file", Pattern.compile( "((?i:file)):/.*" ));
+        super( "file", FILE_PATTERN );
     }
 
     /**
@@ -91,4 +86,9 @@ public class FileScheme
     {
         return HttpScheme.stripDirectoryPaths( candidate );
     }
+
+    /**
+     * The Pattern that we use for this scheme.
+     */
+    public static final Pattern FILE_PATTERN = Pattern.compile( "((?i:file)):/.*" );
 }
