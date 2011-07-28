@@ -599,10 +599,13 @@ public final class ResourceHelper
             if( end < 0 ) {
                 break;
             }
+            ret.append( s.substring( current, start ));
             String var      = s.substring( start+2, end );
             String expanded = internalGetResourceString( var );
 
-            ret.append( expanded );
+            if( expanded != null ) {
+                ret.append( expanded );
+            } // in case of null, we just drop it
             
             current = end+1;
         }
