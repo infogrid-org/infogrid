@@ -34,7 +34,7 @@ public class ExternalCommand
      * Constructor, for the case the ExternalCommand is run as a Runnable.
      *
      * @param builder the ProcessBuilder holding the command, arguments, environment etc.
-     * @param s if given, contains input data that shall be piped into command
+     * @param stdinContent if given, contains input data that shall be piped into command
      */
     public ExternalCommand(
             ProcessBuilder builder,
