@@ -53,8 +53,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 /**
- *
- * @author jernst
+ * A Probe for XRD files.
  */
 public class XrdProbe
         implements
