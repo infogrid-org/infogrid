@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -50,6 +50,16 @@ public interface SaneUrl
     public abstract String getAbsoluteBaseUri();
 
     /**
+     * Determine the requested, contextual base URI.
+     * In a request to URL <code>http://example.com:123/foo/bar?abc=def</code>,
+     * if the context is <code>/foo</code>,
+     * that would be <code>/bar</code>.
+     *
+     * @return the requested absolute base URI
+     */
+    public String getContextualBaseUri();
+
+    /**
      * Determine the requested, relative full URI.
      * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
      * that would be <code>/foo/bar?abc=def</code>.
@@ -66,6 +76,16 @@ public interface SaneUrl
      * @return the requested absolute full URI
      */
     public abstract String getAbsoluteFullUri();
+
+    /**
+     * Determine the requested, contextual full URI.
+     * In a request to URL <code>http://example.com:123/foo/bar?abc=def</code>,
+     * if the context is <code>/foo</code>,
+     * that would be <code>/bar?abc=def</code>.
+     *
+     * @return the requested contextual full URI
+     */
+    public String getContextualFullUri();
 
     /**
      * Get the name of the server.

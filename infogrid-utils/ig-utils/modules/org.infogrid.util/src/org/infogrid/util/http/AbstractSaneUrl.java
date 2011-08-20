@@ -8,12 +8,13 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.util.http;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -163,7 +164,7 @@ public abstract class AbstractSaneUrl
 
     /**
      * Determine the requested, absolute base URI.
-     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
+     * In a request to URL <code>http://example.com:123/foo/bar?abc=def</code>
      * that would be <code>http://example.com:123/foo/bar</code>.
      *
      * @return the requested absolute base URI
@@ -174,6 +175,26 @@ public abstract class AbstractSaneUrl
             theAbsoluteBaseUri = getRootUri() + getRelativeBaseUri();
         }
         return theAbsoluteBaseUri;
+    }
+
+    /**
+     * Determine the requested, contextual base URI.
+     * In a request to URL <code>http://example.com:123/foo/bar?abc=def</code>,
+     * if the context is <code>/foo</code>,
+     * that would be <code>/bar</code>.
+     *
+     * @return the requested absolute base URI
+     */
+    public String getContextualBaseUri()
+    {
+        String abs = getAbsoluteBaseUri();
+        String ctx = getAbsoluteContextUri();
+
+        if( !abs.startsWith( ctx ) ) {
+            log.error( "Absolute URI does not start with context URI", abs, ctx );
+            return abs;
+        }
+        return abs.substring( ctx.length() );
     }
 
     /**
@@ -194,7 +215,7 @@ public abstract class AbstractSaneUrl
 
     /**
      * Determine the requested, absolute full URI.
-     * In a Request to URL <code>http://example.com:123/foo/bar?abc=def</code>
+     * In a request to URL <code>http://example.com:123/foo/bar?abc=def</code>
      * that would be <code>http://example.com:123/foo/bar?abc=def</code>.
      *
      * @return the requested absolute full URI
@@ -205,6 +226,26 @@ public abstract class AbstractSaneUrl
             theAbsoluteFullUri = getRootUri() + getRelativeFullUri();
         }
         return theAbsoluteFullUri;
+    }
+
+    /**
+     * Determine the requested, contextual full URI.
+     * In a request to URL <code>http://example.com:123/foo/bar?abc=def</code>,
+     * if the context is <code>/foo</code>,
+     * that would be <code>/bar?abc=def</code>.
+     *
+     * @return the requested contextual full URI
+     */
+    public String getContextualFullUri()
+    {
+        String abs = getAbsoluteFullUri();
+        String ctx = getAbsoluteContextUri();
+
+        if( !abs.startsWith( ctx ) ) {
+            log.error( "Absolute URI does not start with context URI", abs, ctx );
+            return abs;
+        }
+        return abs.substring( ctx.length() );
     }
 
     /**
@@ -326,7 +367,7 @@ public abstract class AbstractSaneUrl
      */
     public Map<String,String[]> getUrlArguments()
     {
-        return theUrlArguments;
+        return Collections.unmodifiableMap( theUrlArguments );
     }
 
     /**
