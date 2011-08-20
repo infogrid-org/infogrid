@@ -30,7 +30,5 @@
   <requires name="org.infogrid.store.keystore"/>
   <requires name="org.infogrid.store.test"/>
   <requires name="org.infogrid.testharness"/>
-  <requires name="org.infogrid.vendors.com.mysql.jdbc"/>
-  <requires name="org.infogrid.vendors.org.postgresql.jdbc"/>
  </dependencies>
 </standardmodule>

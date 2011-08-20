@@ -1,7 +1,5 @@
 org.infogrid.store
 org.infogrid.store.filesystem
-org.infogrid.store.hadoop
-org.infogrid.store.jets3t
 org.infogrid.store.keystore
 org.infogrid.store.sql
 org.infogrid.store.sql.mysql
