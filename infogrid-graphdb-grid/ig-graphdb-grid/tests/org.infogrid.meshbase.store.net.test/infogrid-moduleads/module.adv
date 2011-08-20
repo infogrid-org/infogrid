@@ -31,6 +31,5 @@
   <requires name="org.infogrid.meshbase.store.net"/>
   <requires name="org.infogrid.store.sql.mysql"/>
   <requires name="org.infogrid.testharness"/>
-  <requires name="org.infogrid.vendors.com.mysql.jdbc"/>
  </dependencies>
 </standardmodule>
