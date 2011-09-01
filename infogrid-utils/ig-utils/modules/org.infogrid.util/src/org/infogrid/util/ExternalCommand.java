@@ -109,7 +109,7 @@ public class ExternalCommand
             IOException
     {
         if( log.isDebugEnabled() ) {
-            log.debug( "about to execute", builder );
+            log.debug( "about to execute", builder.command(), stdinContent );
         }
 
         final Process p = builder.start();
