@@ -91,7 +91,7 @@ public class PrePostfixTranslatingAccountManager
             String            postfix,
             LidAccountManager delegate )
     {
-        super( siteIdentifier, delegate );
+        super( siteIdentifier, delegate.getIdentifierFactory(), delegate );
         
         thePrefix  = prefix;
         thePostfix = postfix;

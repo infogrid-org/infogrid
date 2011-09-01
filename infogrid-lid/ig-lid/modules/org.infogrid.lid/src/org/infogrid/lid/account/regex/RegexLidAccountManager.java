@@ -23,6 +23,7 @@ import org.infogrid.lid.account.SimpleLidAccount;
 import org.infogrid.util.CannotFindHasIdentifierException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
+import org.infogrid.util.IdentifierFactory;
 import org.infogrid.util.InvalidIdentifierException;
 
 /**
@@ -39,18 +40,21 @@ public class RegexLidAccountManager
      *
      * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param userNameRegex the user name regular expression
-     * @return the created RegexLidAccountManager
      * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
+     * @param identifierFactory the IdentifierFactory to use
+     * @return the created RegexLidAccountManager
      */
     public static RegexLidAccountManager create(
-            Identifier                     siteIdentifier,
-            String                         userNameRegex,
-            Identifier []                  groupIdentifiers )
+            Identifier        siteIdentifier,
+            String            userNameRegex,
+            Identifier []     groupIdentifiers,
+            IdentifierFactory identifierFactory )
     {
         RegexLidAccountManager ret = new RegexLidAccountManager(
                 siteIdentifier,
                 Pattern.compile( userNameRegex ),
-                groupIdentifiers );
+                groupIdentifiers,
+                identifierFactory );
 
         return ret;
     }
@@ -60,18 +64,21 @@ public class RegexLidAccountManager
      *
      * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param userNameRegex the user name regular expression
-     * @return the created RegexLidAccountManager
      * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
+     * @param identifierFactory the IdentifierFactory to use
+     * @return the created RegexLidAccountManager
      */
     public static RegexLidAccountManager create(
-            Identifier                     siteIdentifier,
-            Pattern                        userNameRegex,
-            Identifier []                  groupIdentifiers )
+            Identifier        siteIdentifier,
+            Pattern           userNameRegex,
+            Identifier []     groupIdentifiers,
+            IdentifierFactory identifierFactory )
     {
         RegexLidAccountManager ret = new RegexLidAccountManager(
                 siteIdentifier,
                 userNameRegex,
-                groupIdentifiers );
+                groupIdentifiers,
+                identifierFactory );
 
         return ret;
     }
@@ -82,13 +89,15 @@ public class RegexLidAccountManager
      * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param userNameRegex the user name regular expression
      * @param groupIdentifiers identifiers of the groups this LidAccount is a member of
+     * @param identifierFactory the IdentifierFactory to use
      */
     protected RegexLidAccountManager(
-            Identifier                     siteIdentifier,
-            Pattern                        userNameRegex,
-            Identifier []                  groupIdentifiers )
+            Identifier        siteIdentifier,
+            Pattern           userNameRegex,
+            Identifier []     groupIdentifiers,
+            IdentifierFactory identifierFactory )
     {
-        super( siteIdentifier );
+        super( siteIdentifier, identifierFactory );
 
         theUserNameRegex    = userNameRegex;
         theGroupIdentifiers = groupIdentifiers;

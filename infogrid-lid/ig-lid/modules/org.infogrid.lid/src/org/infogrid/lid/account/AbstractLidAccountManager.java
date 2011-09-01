@@ -21,7 +21,6 @@ import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.IdentifierFactory;
 import org.infogrid.util.InvalidIdentifierException;
-import org.infogrid.util.SimpleStringIdentifierFactory;
 import org.infogrid.util.http.SaneRequest;
 
 /**
@@ -31,17 +30,6 @@ public abstract class AbstractLidAccountManager
         implements
             LidAccountManager
 {
-    /**
-     * Constructor for subclasses only.
-     *
-     * @param siteIdentifier identifier of the site at which the accounts are managed
-     */
-    protected AbstractLidAccountManager(
-            Identifier siteIdentifier )
-    {
-        this( siteIdentifier, SimpleStringIdentifierFactory.create());
-    }
-
     /**
      * Constructor for subclasses only.
      *
@@ -74,6 +62,16 @@ public abstract class AbstractLidAccountManager
         Identifier    realId     = theIdentifierFactory.fromExternalForm( identifier );
         HasIdentifier ret        = find( realId );
         return ret;
+    }
+
+    /**
+     * Obtain the IdentifierFactory used by this LidResourceFinder.
+     *
+     * @return the IdentifierFactory
+     */
+    public IdentifierFactory getIdentifierFactory()
+    {
+        return theIdentifierFactory;
     }
 
     /**

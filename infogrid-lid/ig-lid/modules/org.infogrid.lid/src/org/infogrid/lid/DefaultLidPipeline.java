@@ -20,6 +20,7 @@ import org.infogrid.lid.session.LidSessionManagementInstructions;
 import org.infogrid.lid.session.LidSessionManagementPipelineStage;
 import org.infogrid.lid.yadis.YadisPipelineStage;
 import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.CannotFindHasIdentifierException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.context.AbstractObjectInContext;
@@ -47,32 +48,84 @@ public class DefaultLidPipeline
     public static DefaultLidPipeline create(
             Context c )
     {
-        DefaultLidPipeline ret = new DefaultLidPipeline( c );
+        LidResourceFinder                    resourceFinder         = c.findContextObject( LidResourceFinder.class );
+        LidAccountManager                    accountManager         = c.findContextObject( LidAccountManager.class );
+        YadisPipelineStage                   yadisStage             = c.findContextObject( YadisPipelineStage.class );
+        LidClientAuthenticationPipelineStage authenticationStage    = c.findContextObject( LidClientAuthenticationPipelineStage.class );
+        LidSessionManagementPipelineStage    sessionManagementStage = c.findContextObject( LidSessionManagementPipelineStage.class );
+        LidSsoPipelineStage[]                ssoStages              = new LidSsoPipelineStage[0]; // inefficient but will do
+
+        Iterator<LidSsoPipelineStage> iter = c.contextObjectIterator( LidSsoPipelineStage.class );
+        while( iter.hasNext() ) {
+            LidSsoPipelineStage current = iter.next();
+            ssoStages = ArrayHelper.append( ssoStages, current, LidSsoPipelineStage.class );
+        }
+
+        DefaultLidPipeline ret = new DefaultLidPipeline(
+                resourceFinder,
+                accountManager,
+                yadisStage,
+                authenticationStage,
+                sessionManagementStage,
+                ssoStages,
+                c );
+        return ret;
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param c the Context in which this object operates
+     * @return the created LidPipeline
+     */
+    public static DefaultLidPipeline create(
+            LidResourceFinder                    resourceFinder,
+            LidAccountManager                    accountManager,
+            YadisPipelineStage                   yadisStage,
+            LidClientAuthenticationPipelineStage authenticationStage,
+            LidSessionManagementPipelineStage    sessionManagementStage,
+            LidSsoPipelineStage[]                ssoStages,
+            Context                              c )
+    {
+        DefaultLidPipeline ret = new DefaultLidPipeline(
+                resourceFinder,
+                accountManager,
+                yadisStage,
+                authenticationStage,
+                sessionManagementStage,
+                ssoStages,
+                c );
         return ret;
     }
 
     /**
      * Constructor for subclasses only, use factory method.
-     * 
+     *
+     * @param resourceFinder how to find resources
+     * @param accountManager how to manage accounts
+     * @param yadisStage Yadis processing
+     * @param authenticationStage authentication processing
+     * @param sessionManagementStage session processing
+     * @param ssoStages SSO processing
      * @param c the Context in which this object operates
      */
     protected DefaultLidPipeline(
-            Context c )
+            LidResourceFinder                    resourceFinder,
+            LidAccountManager                    accountManager,
+            YadisPipelineStage                   yadisStage,
+            LidClientAuthenticationPipelineStage authenticationStage,
+            LidSessionManagementPipelineStage    sessionManagementStage,
+            LidSsoPipelineStage[]                ssoStages,
+            Context                              c )
     {
         super( c );
 
-        theResourceFinder         = c.findContextObject( LidResourceFinder.class );
-        theAccountManager         = c.findContextObject( LidAccountManager.class );
-        theYadisStage             = c.findContextObject( YadisPipelineStage.class );
-        theAuthenticationStage    = c.findContextObject( LidClientAuthenticationPipelineStage.class );
-        theSessionManagementStage = c.findContextObject( LidSessionManagementPipelineStage.class );
-        
-        theSsoStages = new LidSsoPipelineStage[0]; // inefficient but will do
-        Iterator<LidSsoPipelineStage> iter = c.contextObjectIterator( LidSsoPipelineStage.class );
-        while( iter.hasNext() ) {
-            LidSsoPipelineStage current = iter.next();
-            theSsoStages = ArrayHelper.append( theSsoStages, current, LidSsoPipelineStage.class );
-        }
+        theResourceFinder         = resourceFinder;
+        theAccountManager         = accountManager;
+        theYadisStage             = yadisStage;
+        theAuthenticationStage    = authenticationStage;
+        theSessionManagementStage = sessionManagementStage;
+        theSsoStages              = ssoStages;
     }
     
     /**
@@ -91,10 +144,12 @@ public class DefaultLidPipeline
             try {
                 requestedResource = theResourceFinder.findFromRequest( lidRequest );
 
-            } catch( Exception ex ) {
+            } catch( CannotFindHasIdentifierException ex ) {
                 if( log.isInfoEnabled() ) {
                     log.info( ex );
                 }
+            } catch( Throwable ex ) {
+                log.error( ex );
             }
         }
 

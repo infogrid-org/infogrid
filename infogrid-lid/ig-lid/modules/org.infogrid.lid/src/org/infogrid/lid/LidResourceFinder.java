@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,6 +18,7 @@ import java.text.ParseException;
 import org.infogrid.util.CannotFindHasIdentifierException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.HasIdentifierFinder;
+import org.infogrid.util.IdentifierFactory;
 import org.infogrid.util.InvalidIdentifierException;
 import org.infogrid.util.http.SaneRequest;
 
@@ -43,4 +44,11 @@ public interface LidResourceFinder
             CannotFindHasIdentifierException,
             InvalidIdentifierException,
             ParseException;
+
+    /**
+     * Obtain the IdentifierFactory used by this LidResourceFinder.
+     *
+     * @return the IdentifierFactory
+     */
+    public IdentifierFactory getIdentifierFactory();
 }

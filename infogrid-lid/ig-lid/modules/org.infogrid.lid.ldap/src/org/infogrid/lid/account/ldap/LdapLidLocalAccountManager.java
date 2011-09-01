@@ -31,6 +31,7 @@ import org.infogrid.lid.account.SimpleLidAccount;
 import org.infogrid.util.CannotFindHasIdentifierException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
+import org.infogrid.util.IdentifierFactory;
 import org.infogrid.util.InvalidIdentifierException;
 import org.infogrid.util.logging.Log;
 
@@ -68,15 +69,17 @@ public class LdapLidLocalAccountManager
      * @param ldapContextName name of the LDAP context object in which to search, or null if default
      * @param filter the LDAP filter expression, or null if default
      * @param attributeList the list of attributes to pull out of LDAP. If null, pull out all attributes.
+     * @param identifierFactory the IdentifierFactory to use
      * @return the created LdapLidLocalAccountManager
      * @throws NamingException something went wrong when attempting to bind to
      */
     public static LdapLidLocalAccountManager create(
-            Identifier           siteIdentifier,
-            Properties           props,
-            String               ldapContextName,
-            String               filter,
-            String []            attributeList )
+            Identifier        siteIdentifier,
+            Properties        props,
+            String            ldapContextName,
+            String            filter,
+            String []         attributeList,
+            IdentifierFactory identifierFactory )
         throws
             NamingException
     {
@@ -86,7 +89,8 @@ public class LdapLidLocalAccountManager
                 ldapContextName,
                 filter,
                 null,
-                attributeList );
+                attributeList,
+                identifierFactory );
     }
 
     /**
@@ -98,16 +102,18 @@ public class LdapLidLocalAccountManager
      * @param filter the LDAP filter expression, or null if default
      * @param controls the SearchControls to use for queries, or null if default
      * @param attributeList the list of attributes to pull out of LDAP. If null, pull out all attributes.
+     * @param identifierFactory the IdentifierFactory to use
      * @return the created LdapLidLocalAccountManager
      * @throws NamingException something went wrong when attempting to bind to
      */
     public static LdapLidLocalAccountManager create(
-            Identifier           siteIdentifier,
-            Properties           props,
-            String               ldapContextName,
-            String               filter,
-            SearchControls       controls,
-            String []            attributeList )
+            Identifier        siteIdentifier,
+            Properties        props,
+            String            ldapContextName,
+            String            filter,
+            SearchControls    controls,
+            String []         attributeList,
+            IdentifierFactory identifierFactory )
         throws
             NamingException
     {
@@ -128,7 +134,8 @@ public class LdapLidLocalAccountManager
                 ldapContextName,
                 filter,
                 controls,
-                attributeList );
+                attributeList,
+                identifierFactory );
         return ret;
     }
 
@@ -141,16 +148,18 @@ public class LdapLidLocalAccountManager
      * @param filter the LDAP filter expression
      * @param controls the SearchControls to use for queries
      * @param attributeList the list of attributes to pull out of LDAP. If null, pull out all attributes.
+     * @param identifierFactory the IdentifierFactory to use
      */
     protected LdapLidLocalAccountManager(
-            Identifier           siteIdentifier,
-            Properties           props,
-            String               ldapContextName,
-            String               filter,
-            SearchControls       controls,
-            String []            attributeList )
+            Identifier        siteIdentifier,
+            Properties        props,
+            String            ldapContextName,
+            String            filter,
+            SearchControls    controls,
+            String []         attributeList,
+            IdentifierFactory identifierFactory )
     {
-        super( siteIdentifier );
+        super( siteIdentifier, identifierFactory );
 
         theLdapProperties   = props;
         theManagerDir       = null;

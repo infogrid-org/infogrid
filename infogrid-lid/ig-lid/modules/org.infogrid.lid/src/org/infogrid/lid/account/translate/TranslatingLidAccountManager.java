@@ -36,21 +36,6 @@ public abstract class TranslatingLidAccountManager
 {
     /**
      * Constructor for subclasses only.
-     *
-     * @param siteIdentifier identifier of the site at which the accounts are managed
-     * @param delegate the delegate LidIdentityManager
-     */
-    protected TranslatingLidAccountManager(
-            Identifier        siteIdentifier,
-            LidAccountManager delegate )
-    {
-        super( siteIdentifier );
-
-        theDelegate = delegate;
-    }
-
-    /**
-     * Constructor for subclasses only.
      * 
      * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param identifierFactory the IdentifierFactory to use
