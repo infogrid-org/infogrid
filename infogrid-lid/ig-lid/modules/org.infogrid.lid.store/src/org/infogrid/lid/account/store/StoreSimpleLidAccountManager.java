@@ -35,6 +35,7 @@ import org.infogrid.util.Identifier;
 import org.infogrid.util.InvalidIdentifierException;
 import org.infogrid.util.ObjectExistsAlreadyFactoryException;
 import org.infogrid.util.PatientSmartFactory;
+import org.infogrid.util.SimpleStringIdentifierFactory;
 import org.infogrid.util.SmartFactory;
 
 /**
@@ -124,7 +125,7 @@ public class StoreSimpleLidAccountManager
             SmartFactory<Identifier,SimpleLidAccount,AccountData> delegateFactory,
             Map<Identifier,Identifier>                            remoteLocalMap )
     {
-        super( siteIdentifier );
+        super( siteIdentifier, SimpleStringIdentifierFactory.create() );
 
         theDelegateFactory = delegateFactory;
         theRemoteLocalMap  = remoteLocalMap;
