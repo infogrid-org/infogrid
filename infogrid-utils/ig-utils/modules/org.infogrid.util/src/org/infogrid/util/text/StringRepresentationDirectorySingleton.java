@@ -74,6 +74,7 @@ public class StringRepresentationDirectorySingleton
         HashMap<String,Stringifier<? extends Object>> javaMap       = new HashMap<String,Stringifier<? extends Object>>();
         HashMap<String,Stringifier<? extends Object>> javascriptMap = new HashMap<String,Stringifier<? extends Object>>();
         HashMap<String,Stringifier<? extends Object>> javadocMap    = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> jsonMap       = new HashMap<String,Stringifier<? extends Object>>();
 
         plainMap.put(   "int",            LongStringifier.create() );
         // html:       same as plain
@@ -82,6 +83,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "int2",           LongStringifier.create( 2 ) );
         // html:       same as plain
@@ -90,6 +92,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "int3",           LongStringifier.create( 3 ) );
         // html:       same as plain
@@ -98,6 +101,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "int4",           LongStringifier.create( 4 ) );
         // html:       same as plain
@@ -106,6 +110,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "hex",            LongStringifier.create( -1, 16 ) );
         // html:       same as plain
@@ -114,6 +119,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "hex2",           LongStringifier.create( 2, 16 ) );
         // html:       same as plain
@@ -121,6 +127,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "hex4",           LongStringifier.create( 4, 16 ) );
         // html:       same as plain
@@ -129,6 +136,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "float",          FloatStringifier.create() );
         // html:       same as plain
@@ -137,6 +145,7 @@ public class StringRepresentationDirectorySingleton
         javaMap.put(    "float",          JavaFloatStringifier.create() );
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "double",         DoubleStringifier.create() );
         // html:       same as plain
@@ -145,6 +154,7 @@ public class StringRepresentationDirectorySingleton
         javaMap.put(    "double",         JavaDoubleStringifier.create() );
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "string",         StringStringifier.create() );
         htmlMap.put(    "string",         HtmlifyingDelegatingStringifier.create( StringStringifier.create() ));
@@ -153,6 +163,7 @@ public class StringRepresentationDirectorySingleton
         javaMap.put(    "string",         JavaStringStringifier.create() );
         // javascript: same as java
         javadocMap.put( "string",         JavadocDelegatingStringifier.create( StringStringifier.create() ));
+        // json:       same as javascript
 
         plainMap.put(   "verbatim",       StringStringifier.create() );
         // html:       same as plain -- don't Htmlify
@@ -161,6 +172,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "htmlsource",     StringStringifier.create() );
         htmlMap.put(    "htmlsource",     HtmlifyingDelegatingStringifier.create( StringStringifier.create() ));
@@ -169,6 +181,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "stacktrace",     StacktraceStringifier.create() );
         htmlMap.put(    "stacktrace",     HtmlifyingDelegatingStringifier.create( StacktraceStringifier.create() ));
@@ -177,6 +190,7 @@ public class StringRepresentationDirectorySingleton
         javaMap.put(    "stacktrace",     InvalidStringifier.create() );
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "urlappend",      AppendToUrlStringifier.create() );
         htmlMap.put(    "urlappend",      HtmlifyingDelegatingStringifier.create( AppendToUrlStringifier.create() ));
@@ -185,6 +199,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "urlArgument",    ToValidUrlArgumentStringifier.create( StringStringifier.create() ) );
         htmlMap.put(    "urlArgument",    HtmlifyingDelegatingStringifier.create( ToValidUrlArgumentStringifier.create( StringStringifier.create() )));
@@ -193,6 +208,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "id",             IdentifierStringifier.create() );
         htmlMap.put(    "id",             HtmlifyingDelegatingStringifier.create( IdentifierStringifier.create() ));
@@ -201,6 +217,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "fullid",         IdentifierStringifier.create( false ));
         htmlMap.put(    "fullid",         HtmlifyingDelegatingStringifier.create( IdentifierStringifier.create( false ) ));
@@ -209,6 +226,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "idAsUrlArgument", ToValidUrlArgumentStringifier.create( IdentifierStringifier.create() ));
         htmlMap.put(    "idAsUrlArgument", HtmlifyingDelegatingStringifier.create( ToValidUrlArgumentStringifier.create( IdentifierStringifier.create() )));
@@ -217,6 +235,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "hasIdAsUrlArgument", ToValidUrlArgumentStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create() )));
         htmlMap.put(    "hasIdAsUrlArgument", HtmlifyingDelegatingStringifier.create( ToValidUrlArgumentStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create() ))));
@@ -225,6 +244,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "stringarray",    ArrayStringifier.create( ", ", StringStringifier.create() ));
         htmlMap.put(    "stringarray",    ArrayStringifier.create( "<li>", "</li>\n<li>", "</li>", "", HtmlifyingDelegatingStringifier.create( StringStringifier.create() ) ));
@@ -233,6 +253,7 @@ public class StringRepresentationDirectorySingleton
         javaMap.put(    "stringarray",    InvalidStringifier.create() );
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "idarray",        ArrayStringifier.create( ", ", IdentifierStringifier.create() ));
         htmlMap.put(    "idarray",        ArrayStringifier.create( "<li>", "</li>\n<li>", "</li>", "", HtmlifyingDelegatingStringifier.create( IdentifierStringifier.create() ) ));
@@ -241,6 +262,7 @@ public class StringRepresentationDirectorySingleton
         javaMap.put(    "idarray",        InvalidStringifier.create() );
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "hasid",          HasIdentifierStringifier.create( IdentifierStringifier.create() ));
         htmlMap.put(    "hasid",          HtmlifyingDelegatingStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create() )));
@@ -249,6 +271,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "fullhasid",      HasIdentifierStringifier.create( IdentifierStringifier.create( false ) ));
         htmlMap.put(    "fullhasid",      HtmlifyingDelegatingStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create( false ) )));
@@ -257,6 +280,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "hasidarray",     ArrayStringifier.create( ", ", HasIdentifierStringifier.create( IdentifierStringifier.create() ) ));
         htmlMap.put(    "hasidarray",     ArrayStringifier.create( "<li>", "</li>\n<li>", "</li>", "", HtmlifyingDelegatingStringifier.create( HasIdentifierStringifier.create( IdentifierStringifier.create() ) )));
@@ -265,6 +289,7 @@ public class StringRepresentationDirectorySingleton
         javaMap.put(    "hasidarray",     InvalidStringifier.create() );
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "class",          ClassStringifier.create() );
         htmlMap.put(    "class",          PrePostfixDelegatingStringifier.create( "<code>", "</code>", ClassStringifier.create() ));
@@ -273,6 +298,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "list",           ListStringifier.create( ", ", StringStringifier.create() ));
         htmlMap.put(    "list",           ListStringifier.create( "<li>", "</li>\n<li>", "</li>", "", StringStringifier.create() ));
@@ -281,6 +307,7 @@ public class StringRepresentationDirectorySingleton
         javaMap.put(    "idarray",        InvalidStringifier.create() );
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "as-entered",     AsEnteredStringifier.create() );
         htmlMap.put(    "as-entered",     HtmlifyingDelegatingStringifier.create( AsEnteredStringifier.create() ));
@@ -289,6 +316,7 @@ public class StringRepresentationDirectorySingleton
         // java:       same as plain
         // javascript: same as java
         // javadoc:    same as java
+        // json:       same as javascript
 
         plainMap.put(   "as-entered-array", ArrayStringifier.create( ", ", AsEnteredStringifier.create() ));
         htmlMap.put(    "as-entered-array", HtmlifyingDelegatingStringifier.create( ArrayStringifier.create( ", ", AsEnteredStringifier.create() )));
@@ -297,7 +325,7 @@ public class StringRepresentationDirectorySingleton
         javaMap.put(    "as-entered-array", InvalidStringifier.create() );
         // javascript: same as java
         // javadoc:    same as java
-
+        // json:       same as javascript
 
         theSingleton = new StringRepresentationDirectorySingleton(); // not the factory method here
 
@@ -354,6 +382,12 @@ public class StringRepresentationDirectorySingleton
                 javaMap,
                 java );
 
+        SimpleStringRepresentation json = SimpleStringRepresentation.create(
+                theSingleton,
+                StringRepresentationDirectory.TEXT_JSON_NAME,
+                jsonMap,
+                javascript );
+
         theSingleton.put(      plain.getName(), plain );
         theSingleton.put(  editPlain.getName(), editPlain );
         theSingleton.put(       html.getName(), html );
@@ -363,6 +397,7 @@ public class StringRepresentationDirectorySingleton
         theSingleton.put(       java.getName(), java );
         theSingleton.put( javascript.getName(), javascript );
         theSingleton.put(    javadoc.getName(), javadoc );
+        theSingleton.put(       json.getName(), json );
 
         theSingleton.setFallback( plain );
 

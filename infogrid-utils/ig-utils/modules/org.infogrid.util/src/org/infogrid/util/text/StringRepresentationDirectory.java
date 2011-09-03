@@ -89,4 +89,10 @@ public interface StringRepresentationDirectory
      * belong to the "Java" formatting and start with "Script".
      */
     public static final String TEXT_JAVASCRIPT_NAME = "Javascript";
+
+    /**
+     * Name of the StringRepresentation, contained in this StringRepresentationDirectory, that contains
+     * the default JSON formatting.
+     */
+    public static final String TEXT_JSON_NAME = "Json";
 }
