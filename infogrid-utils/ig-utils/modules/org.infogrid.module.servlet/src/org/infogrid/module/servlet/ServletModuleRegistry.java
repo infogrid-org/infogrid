@@ -37,12 +37,14 @@ public class ServletModuleRegistry
       *
       * @param theInstallation the SoftwareInstallation that knows all the parameters
       * @return the created ModuleRegistry
+      * @throws CannotFindRootModuleAdvertisementException thrown if the root ModuleAdvertisement cannot be found
       * @throws IOException thrown when we were unsuccessful reading a specified ModuleAdvertisement file
       * @throws ClassNotFoundException thrown when we were trying to read a ModuleAdvertisement subclass that was not available locally
       */
     public static ServletModuleRegistry create(
             ServletSoftwareInstallation theInstallation )
         throws
+            CannotFindRootModuleAdvertisementException,
             IOException,
             ClassNotFoundException
     {
@@ -50,7 +52,10 @@ public class ServletModuleRegistry
 
         ModuleAdvertisement rootAd = registry.loadModuleAdvertisementRecursively( theInstallation.getRootModuleRequirement() );
         // rootAd only there for debugging
-        
+
+        if( rootAd == null ) {
+            throw new CannotFindRootModuleAdvertisementException( theInstallation.getRootModuleRequirement() );
+        }
         return registry;
     }
 

@@ -5,20 +5,23 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
-package org.infogrid.module;
+package org.infogrid.module.servlet;
+
+import org.infogrid.module.ModuleException;
+import org.infogrid.module.ModuleRequirement;
 
 /**
- * This exception indicates that a ModuleRequirement could not be resolved into
- * a single resolution candidate.
+ * This exception indicates that the root ModuleAdvertisement could not be found.
+ * This usually indicates a problem in the the build settings of the root Module.
  */
-public class ModuleResolutionCandidateNotUniqueException
+public class CannotFindRootModuleAdvertisementException
         extends
             ModuleException
 {
@@ -30,14 +33,12 @@ public class ModuleResolutionCandidateNotUniqueException
       * @param req the ModuleRequirement that could not be met
       * @param foundAdvertisements the zero or more than one ModuleAdvertisements found
       */
-    public ModuleResolutionCandidateNotUniqueException(
-             ModuleRequirement      req,
-             ModuleAdvertisement [] foundAdvertisements )
+    public CannotFindRootModuleAdvertisementException(
+             ModuleRequirement req )
     {
         super( null, null );
 
         theRequirement = req;
-        theFound       = foundAdvertisements;
     }
 
     /**
@@ -50,7 +51,7 @@ public class ModuleResolutionCandidateNotUniqueException
     public String getMessage()
     {
         StringBuilder buf = new StringBuilder( 100 ); // fudge
-        buf.append( "Could not resolve ModuleRequirement " );
+        buf.append( "Could not resolve root ModuleRequirement " );
         if( theRequirement != null ) {
             buf.append( theRequirement.getRequiredModuleName() );
             if( theRequirement.getRequiredModuleVersion() != null ) {
@@ -61,23 +62,12 @@ public class ModuleResolutionCandidateNotUniqueException
         } else {
             buf.append( "null" );
         }
-        if( theFound == null || theFound.length == 0 ) {
-            buf.append( ". Found none" );
-        } else {
-            buf.append( " unambiguously: found " );
-            buf.append(  theFound.length );
-        }
         buf.append( "." );
         return buf.toString();
     }
 
     /**
-     * The ModuleRequirement that could not be met unambiguously.
+     * The ModuleRequirement that could not be met.
      */
     protected ModuleRequirement theRequirement;
-    
-    /**
-     * The ModuleAdvertisements that were found.
-     */
-    protected ModuleAdvertisement [] theFound;
 }
