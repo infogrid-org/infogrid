@@ -404,25 +404,11 @@ public abstract class HTTP
        throws
            IOException
     {
-        String           sep       = "";
-        StringBuilder    parBuffer = new StringBuilder();
-        Iterator<String> iter      = pars.keySet().iterator();
-
-        while( iter.hasNext() ) {
-            String key   = iter.next();
-            String value = pars.get( key );
-
-            parBuffer.append( sep );
-            parBuffer.append( encodeToValidUrl( key ));
-            parBuffer.append( "=" );
-            parBuffer.append( encodeToValidUrl( value ));
-            sep = "&";
-        }
         if( log.isTraceEnabled() ) {
-            log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, pars, followRedirects, parBuffer );
+            log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, pars, followRedirects );
         }
 
-        return http_post( url, "application/x-www-form-urlencoded", parBuffer.toString().getBytes(), followRedirects );
+        return http_post( url, FORMENCODED_MIME, parsToString( pars ).getBytes(), followRedirects );
     }
 
     /**
@@ -488,6 +474,108 @@ public abstract class HTTP
            IOException
     {
         return http_post( new URL( url ), contentType, payload, followRedirects );
+    }
+
+    /**
+     * Perform an HTTP POST. Specify the POST payload, cookies, and whether to follow redirects.
+     *
+     * @param url the URL on which to perform the HTTP POST
+     * @param contentType the MIME type of the content to be posted to the URL
+     * @param payload the content to be posted to the URL
+     * @param followRedirects if true, we follow redirects and post the content there instead
+     * @return the Response obtained from that URL
+     * @throws IOException thrown if the content could not be obtained
+     */
+    public static PostResponse http_post(
+            URL                                url,
+            Map<String,String>                 pars,
+            boolean                            followRedirects,
+            Map<String,? extends CharSequence> cookies )
+       throws
+           IOException
+    {
+        if( log.isTraceEnabled() ) {
+            log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, pars, followRedirects, cookies );
+        }
+
+        return http_post( url, FORMENCODED_MIME, parsToString( pars ).getBytes(), null, followRedirects, cookies, HTTP_CONNECT_TIMEOUT, HTTP_READ_TIMEOUT, null );
+    }
+
+    /**
+     * Perform an HTTP POST. Specify the POST payload, cookies, and whether to follow redirects.
+     *
+     * @param url the URL on which to perform the HTTP POST
+     * @param contentType the MIME type of the content to be posted to the URL
+     * @param payload the content to be posted to the URL
+     * @param followRedirects if true, we follow redirects and post the content there instead
+     * @return the Response obtained from that URL
+     * @throws IOException thrown if the content could not be obtained
+     */
+    public static PostResponse http_post(
+            String                             url,
+            Map<String,String>                 pars,
+            boolean                            followRedirects,
+            Map<String,? extends CharSequence> cookies )
+       throws
+           IOException
+    {
+        if( log.isTraceEnabled() ) {
+            log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, pars, followRedirects, cookies );
+        }
+
+        return http_post( new URL( url ), FORMENCODED_MIME, parsToString( pars ).getBytes(), null, followRedirects, cookies, HTTP_CONNECT_TIMEOUT, HTTP_READ_TIMEOUT, null );
+    }
+
+    /**
+     * Perform an HTTP POST. Specify the POST payload, cookies, and whether to follow redirects.
+     *
+     * @param url the URL on which to perform the HTTP POST
+     * @param contentType the MIME type of the content to be posted to the URL
+     * @param payload the content to be posted to the URL
+     * @param followRedirects if true, we follow redirects and post the content there instead
+     * @return the Response obtained from that URL
+     * @throws IOException thrown if the content could not be obtained
+     */
+    public static PostResponse http_post(
+            URL                                url,
+            String                             contentType,
+            byte []                            payload,
+            boolean                            followRedirects,
+            Map<String,? extends CharSequence> cookies )
+       throws
+           IOException
+    {
+        if( log.isTraceEnabled() ) {
+            log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, contentType, payload, followRedirects, cookies );
+        }
+
+        return http_post( url, contentType, payload, null, followRedirects, cookies, HTTP_CONNECT_TIMEOUT, HTTP_READ_TIMEOUT, null );
+    }
+
+    /**
+     * Perform an HTTP POST. Specify the POST payload, cookies, and whether to follow redirects.
+     *
+     * @param url the URL on which to perform the HTTP POST
+     * @param contentType the MIME type of the content to be posted to the URL
+     * @param payload the content to be posted to the URL
+     * @param followRedirects if true, we follow redirects and post the content there instead
+     * @return the Response obtained from that URL
+     * @throws IOException thrown if the content could not be obtained
+     */
+    public static PostResponse http_post(
+            String                             url,
+            String                             contentType,
+            byte []                            payload,
+            boolean                            followRedirects,
+            Map<String,? extends CharSequence> cookies )
+       throws
+           IOException
+    {
+        if( log.isTraceEnabled() ) {
+            log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, contentType, payload, followRedirects, cookies );
+        }
+
+        return http_post( new URL( url ), contentType, payload, null, followRedirects, cookies, HTTP_CONNECT_TIMEOUT, HTTP_READ_TIMEOUT, null );
     }
 
     /**
@@ -1078,6 +1166,34 @@ public abstract class HTTP
     }
 
     /**
+     * Helper method to convert a Map of parameters into a POST'able String.
+     *
+     * @param pars the parameters
+     * @return the String
+     */
+    protected static String parsToString(
+            Map<String,String> pars )
+    {
+        String           sep       = "";
+        StringBuilder    parBuffer = new StringBuilder();
+
+        Iterator<String> iter      = pars.keySet().iterator();
+
+        while( iter.hasNext() ) {
+            String key   = iter.next();
+            String value = pars.get( key );
+
+            parBuffer.append( sep );
+            parBuffer.append( encodeToValidUrl( key ));
+            parBuffer.append( "=" );
+            parBuffer.append( encodeToValidUrl( value ));
+            sep = "&";
+        }
+
+        return parBuffer.toString();
+    }
+
+    /**
      * Our ResourceHelper.
      */
     private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( HTTP.class );
@@ -1118,6 +1234,11 @@ public abstract class HTTP
      * Only allocate the charset once.
      */
     public static final String UTF8 = "utf-8";
+
+    /**
+     * MIME type for POST'd forms.
+     */
+    public static final String FORMENCODED_MIME = "application/x-www-form-urlencoded";
 
     /**
      * Encapsulates the response from an HTTP request.
