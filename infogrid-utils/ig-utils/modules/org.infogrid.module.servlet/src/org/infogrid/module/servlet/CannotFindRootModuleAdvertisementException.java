@@ -31,7 +31,6 @@ public class CannotFindRootModuleAdvertisementException
       * Construct one.
       *
       * @param req the ModuleRequirement that could not be met
-      * @param foundAdvertisements the zero or more than one ModuleAdvertisements found
       */
     public CannotFindRootModuleAdvertisementException(
              ModuleRequirement req )

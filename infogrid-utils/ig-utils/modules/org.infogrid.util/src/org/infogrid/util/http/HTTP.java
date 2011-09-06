@@ -30,6 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -480,8 +481,7 @@ public abstract class HTTP
      * Perform an HTTP POST. Specify the POST payload, cookies, and whether to follow redirects.
      *
      * @param url the URL on which to perform the HTTP POST
-     * @param contentType the MIME type of the content to be posted to the URL
-     * @param payload the content to be posted to the URL
+     * @param pars the name-value pairs such as from an HTML form
      * @param followRedirects if true, we follow redirects and post the content there instead
      * @return the Response obtained from that URL
      * @throws IOException thrown if the content could not be obtained
@@ -505,8 +505,7 @@ public abstract class HTTP
      * Perform an HTTP POST. Specify the POST payload, cookies, and whether to follow redirects.
      *
      * @param url the URL on which to perform the HTTP POST
-     * @param contentType the MIME type of the content to be posted to the URL
-     * @param payload the content to be posted to the URL
+     * @param pars the name-value pairs such as from an HTML form
      * @param followRedirects if true, we follow redirects and post the content there instead
      * @return the Response obtained from that URL
      * @throws IOException thrown if the content could not be obtained
@@ -1531,7 +1530,7 @@ public abstract class HTTP
          */
         public Map<String,List<String>> getHttpHeaderFields()
         {
-            return theReceivedHeaderFields;
+            return Collections.unmodifiableMap( theReceivedHeaderFields );
         }
 
         /**
@@ -1574,7 +1573,7 @@ public abstract class HTTP
          */
         public Set<OutgoingSaneCookie> getCookies()
         {
-            return theReceivedCookies;
+            return Collections.unmodifiableSet( theReceivedCookies );
         }
 
         /**
