@@ -15,8 +15,10 @@
 package org.infogrid.lid.account.store;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import org.infogrid.lid.credential.LidWrongPasswordException;
-import org.infogrid.crypto.hashedpassword.HashedPasswordUtils;
 import org.infogrid.lid.credential.AbstractLidPasswordCredentialType;
 import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
@@ -128,7 +130,7 @@ public class StoreLidPasswordCredentialType
         }
         byte [] rawHashedCredential = found.getData();
 
-        if( !HashedPasswordUtils.isValid( givenCredential, rawHashedCredential )) {
+        if( !isValid( givenCredential, rawHashedCredential )) {
             throw new LidWrongPasswordException( subject.getIdentifier(), siteIdentifier, this );
         }
         // else return without further complications
@@ -187,7 +189,7 @@ public class StoreLidPasswordCredentialType
     {
         long now = System.currentTimeMillis();
 
-        byte [] hashedPassword = HashedPasswordUtils.hash( newPassword );
+        byte [] hashedPassword = hash( newPassword );
 
         Store passwordStore = thePasswordStores.get( siteIdentifier );
         passwordStore.putOrUpdate(
@@ -290,6 +292,63 @@ public class StoreLidPasswordCredentialType
     }
 
     /**
+     * Construct the hash of a String.
+     *
+     * @param s the String
+     * @return the hash of the String
+     */
+    protected static byte [] hash(
+            String s )
+    {
+        try {
+            MessageDigest md = MessageDigest.getInstance( DIGEST_ALGORITHM  );
+            md.update( s.getBytes( "UTF-8" ));
+
+            byte ret [] = md.digest();
+            return ret;
+
+        } catch ( NoSuchAlgorithmException ex ) {
+            log.error( ex );
+        } catch ( UnsupportedEncodingException ex ) {
+            log.error( ex );
+        }
+        return null;
+    }
+
+    /**
+     * Validate a hash.
+     *
+     * @param s the String in clear text
+     * @param hashed the hashed form
+     * @return true if the hash is the hash of the String
+     */
+    protected static boolean isValid(
+            String  s,
+            byte [] hashed )
+    {
+        if( s == null ) {
+            return false;
+        }
+        if( hashed == null || hashed.length == 0 ) {
+            return false; // never permit if no password is set
+        }
+        byte [] found = hash( s );
+
+        if( found == null || hashed == null ) {
+            return false;
+        }
+        if( found.length != hashed.length ) {
+            return false;
+        }
+        for( int i=0 ; i<found.length ; ++i ) {
+            if( found[i] != hashed[i] ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * How we find the Store for passwords.
      */
     protected NameServer<Identifier,Store> thePasswordStores;
@@ -298,4 +357,9 @@ public class StoreLidPasswordCredentialType
      * Name of the encoding to use in the Store.
      */
     protected static final String DEFAULT_ENCODING = "default";
+
+    /**
+     * The Digest algorithm to use.
+     */
+    public static final String DIGEST_ALGORITHM = "SHA-512";
 }
