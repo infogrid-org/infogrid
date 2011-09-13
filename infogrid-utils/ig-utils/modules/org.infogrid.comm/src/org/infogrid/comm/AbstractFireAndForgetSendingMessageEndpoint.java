@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -78,9 +78,8 @@ public abstract class AbstractFireAndForgetSendingMessageEndpoint<T>
     {
         List<T> toSend = new ArrayList<T>();
         
-        synchronized( this ) {
+        synchronized( theMessagesToBeSent ) {
             toSend.addAll( theMessagesToBeSent );
-            theMessagesToBeSent.clear();
         }
 
         // we can send messages out of order with SMTP
@@ -88,21 +87,24 @@ public abstract class AbstractFireAndForgetSendingMessageEndpoint<T>
         for( T current : toSend ) {
 
             try {
+                if( log.isDebugEnabled() ) {
+                    log.debug( "Attempting to send", current );
+                }
                 attemptSend( current );
+
+                synchronized( theMessagesToBeSent ) {
+                    theMessagesToBeSent.remove( current );
+                }
 
             } catch( IOException ex ) {
                 failed.add( current );
                 
-                if( log.isInfoEnabled() ) {
-                    log.info( "Could not send message " + current );
-                }
+                log.warn( "Could not send", current, ex );
             }
         }
         
         if( !failed.isEmpty() ) {
             synchronized( this ) {
-                theMessagesToBeSent.addAll( 0, failed ); // prepending at the beginning
-        
                 if( theFutureTask == null || theFutureTask.isCancelled() ) {
                     schedule( new ResendTask( this ), 0 );
                 }

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.comm.AbstractFireAndForgetSendingMessageEndpoint;
 import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.logging.Log;
 import sun.net.smtp.SmtpClient;
 
 /**
@@ -32,6 +33,8 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
         extends
             AbstractFireAndForgetSendingMessageEndpoint<T>
 {
+    private static final Log log = Log.getLogInstance( SmtpSendingMessageEndpoint.class ); // our own, private logger
+
     /**
      * Factory method.
      *
@@ -140,6 +143,16 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
     }
 
     /**
+     * Determine the mail host.
+     *
+     * @return the mail host
+     */
+    public String getMailHost()
+    {
+        return theMailHost;
+    }
+
+    /**
      * Attempt to send one message.
      * 
      * @param msg the Message to send.
@@ -150,6 +163,14 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
         throws
             IOException
     {
+        if( msg.getRemainingSendingAttempts() <= 0 ) {
+            if( log.isDebugEnabled() ) {
+                log.debug( "Giving up on", msg );
+            }
+            return; // pretend it worked
+        }
+        msg.setRemainingSendingAttempts( msg.getRemainingSendingAttempts()-1 );
+
         SmtpClient smtp = new SmtpClient( theMailHost );
 
         if( msg.getSenderString() != null ) {

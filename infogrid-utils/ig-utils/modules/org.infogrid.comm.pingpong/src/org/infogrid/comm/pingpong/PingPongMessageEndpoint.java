@@ -162,7 +162,6 @@ public abstract class PingPongMessageEndpoint<T>
                     if( !theMessagesToBeSent.isEmpty() ) {
                         toBeSent = new LinkedList<T>();
                         toBeSent.addAll( theMessagesToBeSent );
-                        theMessagesToBeSent.clear(); // we do this so the synchronized statement always works on the same object
                     }
                 }
             }
@@ -204,6 +203,10 @@ public abstract class PingPongMessageEndpoint<T>
 
             if( logHigh.isDebugEnabled() ) {
                 logHigh.debug( this + " sent message (" + tokenToSend + ") successfully: " + ( toBeSent != null ? toBeSent : "<empty>" ));
+            }
+
+            synchronized( theMessagesToBeSent ) {
+                theMessagesToBeSent.removeAll( toBeSent );
             }
 
             theListeners.fireEvent( tokenToSend, TOKEN_SENT );

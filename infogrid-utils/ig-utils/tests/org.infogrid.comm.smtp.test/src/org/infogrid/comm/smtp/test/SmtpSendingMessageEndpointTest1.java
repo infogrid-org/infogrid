@@ -55,11 +55,18 @@ public class SmtpSendingMessageEndpointTest1
             
             endpoint.sendMessageAsap( testMessages[i] );
         }
-        
-        Thread.sleep( 1000L );
-        
-        List<SimpleSmtpSendableMessage> leftover = endpoint.messagesToBeSent();
-        checkEquals( leftover.size(), 0, "still messages left to send" );
+
+        for( int i=0 ; i<10 ; ++i ) {
+            Thread.sleep( 1000L );
+
+            List<SimpleSmtpSendableMessage> leftover = endpoint.messagesToBeSent();
+            if( leftover.isEmpty() ) {
+                break;
+            }
+        }
+
+        List<SimpleSmtpSendableMessage> leftover2 = endpoint.messagesToBeSent();
+        checkEquals( leftover2.size(), 0, "still messages left to send, even after waiting extra long" );
     }
 
     /**
@@ -111,6 +118,15 @@ public class SmtpSendingMessageEndpointTest1
         super();
 
         log = Log.getLogInstance( getClass() );
+    }
+
+    /**
+     * Clean up after test.
+     */
+    @Override
+    public void cleanup()
+    {
+        exec.shutdown();
     }
 
     // Our Logger

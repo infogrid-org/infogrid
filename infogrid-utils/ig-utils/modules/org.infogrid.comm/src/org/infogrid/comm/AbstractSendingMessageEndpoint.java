@@ -100,10 +100,11 @@ public abstract class AbstractSendingMessageEndpoint<T>
      */
     public List<T> messagesToBeSent()
     {
-        ArrayList<T> ret = new ArrayList<T>( theMessagesToBeSent.size() );
-        ret.addAll( theMessagesToBeSent );
-
-        return ret;
+        synchronized( theMessagesToBeSent ) {
+            ArrayList<T> ret = new ArrayList<T>( theMessagesToBeSent.size() );
+            ret.addAll( theMessagesToBeSent );
+            return ret;
+        }
     }
     
     /**
@@ -217,7 +218,7 @@ public abstract class AbstractSendingMessageEndpoint<T>
      * The outgoing queue of Messages to send.
      */
     protected final List<T> theMessagesToBeSent;
-    
+
     /**
      * The means by which to execute tasks.
      */
