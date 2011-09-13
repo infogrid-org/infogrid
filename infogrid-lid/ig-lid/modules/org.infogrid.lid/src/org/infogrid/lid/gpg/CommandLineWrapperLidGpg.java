@@ -119,7 +119,7 @@ public class CommandLineWrapperLidGpg
                 batchFileWriter.write( batchFileContent );
                 batchFileWriter.close();
 
-                exec( new ProcessBuilder( theExecutable, "--batch", "--gen-key", batchFile.getAbsolutePath()));
+                exec( new ProcessBuilder( theExecutable, "--batch", "--gen-key", batchFile.getAbsolutePath()), null, null, null );
 
                 // now construct return values
 
@@ -309,21 +309,6 @@ public class CommandLineWrapperLidGpg
         }
     }
     
-    /**
-     * Execute the command in the correct environment.
-     * 
-     * @param builder the ProcessBuilder holding the command, arguments, environment etc.
-     * @return exit code
-     * @throws IOException thrown if an I/O problem occurred
-     */
-    protected int exec(
-            ProcessBuilder builder )
-        throws
-            IOException
-    {
-        return ExternalCommand.execute( builder );
-    }
-
     /**
      * Execute the command in the correct environment.
      *
