@@ -14,6 +14,7 @@
 
 package org.infogrid.comm.smtp;
 
+import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 
@@ -40,7 +41,27 @@ public class SimpleSmtpSendableMessage
             String subject,
             String payload )
     {
-        return new SimpleSmtpSendableMessage( sender, receiver, subject, payload );
+        return new SimpleSmtpSendableMessage( sender, receiver, subject, payload, DEFAULT_ATTEMPTS );
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param sender the sender identifier as a String
+     * @param receiver the receiver identifier as a String
+     * @param subject the message subject
+     * @param payload the message payload
+     * @param remainingSendingAttempts the number of (remaining) attempts to send until giving up
+     * @return the created SimpleSmtpSendableMessage
+     */
+    public static SimpleSmtpSendableMessage create(
+            String sender,
+            String receiver,
+            String subject,
+            String payload,
+            int    remainingSendingAttempts )
+    {
+        return new SimpleSmtpSendableMessage( sender, receiver, subject, payload, remainingSendingAttempts );
     }
 
     /**
@@ -50,17 +71,20 @@ public class SimpleSmtpSendableMessage
      * @param receiver the receiver identifier as a String
      * @param subject the message subject
      * @param payload the message payload
+     * @param remainingSendingAttempts the number of (remaining) attempts to send until giving up
      */
     protected SimpleSmtpSendableMessage(
             String sender,
             String receiver,
             String subject,
-            String payload )
+            String payload,
+            int    remainingSendingAttempts )
     {
         theSender   = sender;
         theReceiver = receiver;
         theSubject  = subject;
         thePayload  = payload;
+        theRemainingSendingAttempts = remainingSendingAttempts;
     }
 
     /**
@@ -104,6 +128,27 @@ public class SimpleSmtpSendableMessage
     }
     
     /**
+     * Obtain the remaining number of sending attempts until giving up.
+     *
+     * @return the number of sending attempts
+     */
+    public int getRemainingSendingAttempts()
+    {
+        return theRemainingSendingAttempts;
+    }
+
+    /**
+     * Set the remaining number of sending attempts until giving up.
+     *
+     * @param newValue the new value
+     */
+    public void setRemainingSendingAttempts(
+            int newValue )
+    {
+        theRemainingSendingAttempts = newValue;
+    }
+
+    /**
      * Dump this object.
      *
      * @param d the Dumper to dump to
@@ -116,13 +161,15 @@ public class SimpleSmtpSendableMessage
                         "sender",
                         "receiver",
                         "subject",
-                        "payload"
+                        "payload",
+                        "remainingSendingAttempts"
                 },
                 new Object[] {
                         theSender,
                         theReceiver,
                         theSubject,
-                        thePayload
+                        thePayload,
+                        theRemainingSendingAttempts
                 });
     }
 
@@ -145,4 +192,16 @@ public class SimpleSmtpSendableMessage
      * Message payload, if any.
      */
     protected String thePayload;
+
+    /**
+     * Remaining number of attempts to send.
+     */
+    protected int theRemainingSendingAttempts;
+
+    /**
+     * The default number of sending attempts.
+     */
+    public static final int DEFAULT_ATTEMPTS = ResourceHelper.getInstance( SimpleSmtpSendableMessage.class ).getResourceIntegerOrDefault(
+            "DefaultAttempts",
+            4 );
 }

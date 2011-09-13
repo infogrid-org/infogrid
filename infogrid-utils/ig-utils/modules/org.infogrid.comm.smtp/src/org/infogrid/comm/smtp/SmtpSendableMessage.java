@@ -46,4 +46,19 @@ public interface SmtpSendableMessage
      * @return the payload of the message
      */
     public String getPayload();
+
+    /**
+     * Obtain the remaining number of sending attempts until giving up.
+     *
+     * @return the number of sending attempts
+     */
+    public int getRemainingSendingAttempts();
+
+    /**
+     * Set the remaining number of sending attempts until giving up.
+     *
+     * @param newValue the new value
+     */
+    public void setRemainingSendingAttempts(
+            int newValue );
 }
