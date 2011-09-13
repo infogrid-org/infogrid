@@ -224,7 +224,9 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
                         invalidCredentialTypes.add( current );
                         invalidCredentialExceptions.add( ex );
 
-                        log.warn( ex );
+                        if( log.isDebugEnabled() ) {
+                            log.debug( ex );
+                        }
                     }
                 }
                 if( !validCredentialTypes.isEmpty() && invalidCredentialTypes.isEmpty() ) {
