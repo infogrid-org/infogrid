@@ -258,7 +258,7 @@ public abstract class PingPongMessageEndpoint<T>
 
         } catch( Throwable t ) {
             // catch-all
-            logHigh.error( t, this );
+            logHigh.error( this, t );
         }
     }
 
