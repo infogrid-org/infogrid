@@ -385,7 +385,9 @@ public final class ResourceHelper
             String resourceName )
     {
         String found = internalGetResourceString( resourceName );
-        
+        if( found == null ) {
+            return null;
+        }
         String [] ret = StringHelper.tokenize( found );
 
         for( int i=0 ; i<ret.length ; ++i ) {
@@ -655,6 +657,37 @@ public final class ResourceHelper
     }
 
     /**
+     * Obtain a resource value as int[] using the convention
+     * for specifying arrays in the resources, or a default. The default
+     * is returned if the resource does not exist.
+     *
+     * @param resourceName the name of the resource we are looking for
+     * @param defaultIntArray the int[] to return if the resource value could not be found
+     * @return the value of the resource, or a default
+     */
+    public int [] getResourceIntegerArrayOrDefault(
+            String resourceName,
+            int [] defaultIntArray )
+    {
+        String [] value = getResourceStringArrayOrNull( resourceName );
+        if( value == null ) {
+            return defaultIntArray;
+        }
+
+        int [] ret = new int[ value.length ];
+        try {
+            for( int i=0 ; i<ret.length ; ++i ) {
+                ret[i] = Integer.parseInt( value[i] );
+            }
+            return ret;
+
+        } catch( Exception ex ) {
+            log.error( ex );
+            return defaultIntArray;
+        }
+    }
+
+    /**
      * Obtain a resource whose value is of type long. If not present, return default.
      *
      * @param resourceName the name of the resource we are looking for
@@ -674,6 +707,37 @@ public final class ResourceHelper
         } catch( Exception ex ) {
             log.error( ex );
             return defaultLong;
+        }
+    }
+
+    /**
+     * Obtain a resource value as long[] using the convention
+     * for specifying arrays in the resources, or a default. The default
+     * is returned if the resource does not exist.
+     *
+     * @param resourceName the name of the resource we are looking for
+     * @param defaultLongArray the long[] to return if the resource value could not be found
+     * @return the value of the resource, or a default
+     */
+    public long [] getResourceLongArrayOrDefault(
+            String  resourceName,
+            long [] defaultIntArray )
+    {
+        String [] value = getResourceStringArrayOrNull( resourceName );
+        if( value == null ) {
+            return defaultIntArray;
+        }
+
+        long [] ret = new long[ value.length ];
+        try {
+            for( int i=0 ; i<ret.length ; ++i ) {
+                ret[i] = Long.parseLong( value[i] );
+            }
+            return ret;
+
+        } catch( Exception ex ) {
+            log.error( ex );
+            return defaultIntArray;
         }
     }
 
@@ -733,6 +797,37 @@ public final class ResourceHelper
     }
 
     /**
+     * Obtain a resource value as float[] using the convention
+     * for specifying arrays in the resources, or a default. The default
+     * is returned if the resource does not exist.
+     *
+     * @param resourceName the name of the resource we are looking for
+     * @param defaultFloatArray the float[] to return if the resource value could not be found
+     * @return the value of the resource, or a default
+     */
+    public float [] getResourceFloatArrayOrDefault(
+            String   resourceName,
+            float [] defaultFloatArray )
+    {
+        String [] value = getResourceStringArrayOrNull( resourceName );
+        if( value == null ) {
+            return defaultFloatArray;
+        }
+
+        float [] ret = new float[ value.length ];
+        try {
+            for( int i=0 ; i<ret.length ; ++i ) {
+                ret[i] = Integer.parseInt( value[i] );
+            }
+            return ret;
+
+        } catch( Exception ex ) {
+            log.error( ex );
+            return defaultFloatArray;
+        }
+    }
+
+    /**
      * Obtain a resource whose value is of type double. If not present, return default.
      *
      * @param resourceName the name of the resource we are looking for
@@ -752,6 +847,37 @@ public final class ResourceHelper
         } catch( Exception ex ) {
             log.error( ex );
             return defaultDouble;
+        }
+    }
+
+    /**
+     * Obtain a resource value as double[] using the convention
+     * for specifying arrays in the resources, or a default. The default
+     * is returned if the resource does not exist.
+     *
+     * @param resourceName the name of the resource we are looking for
+     * @param defaultDoubleArray the double[] to return if the resource value could not be found
+     * @return the value of the resource, or a default
+     */
+    public double [] getResourceDoubleArrayOrDefault(
+            String    resourceName,
+            double [] defaultDoubleArray )
+    {
+        String [] value = getResourceStringArrayOrNull( resourceName );
+        if( value == null ) {
+            return defaultDoubleArray;
+        }
+
+        double [] ret = new double[ value.length ];
+        try {
+            for( int i=0 ; i<ret.length ; ++i ) {
+                ret[i] = Double.parseDouble( value[i] );
+            }
+            return ret;
+
+        } catch( Exception ex ) {
+            log.error( ex );
+            return defaultDoubleArray;
         }
     }
 
