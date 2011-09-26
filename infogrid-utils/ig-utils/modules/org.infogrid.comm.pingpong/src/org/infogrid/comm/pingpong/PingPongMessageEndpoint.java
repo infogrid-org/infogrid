@@ -205,8 +205,10 @@ public abstract class PingPongMessageEndpoint<T>
                 logHigh.debug( this + " sent message (" + tokenToSend + ") successfully: " + ( toBeSent != null ? toBeSent : "<empty>" ));
             }
 
-            synchronized( theMessagesToBeSent ) {
-                theMessagesToBeSent.removeAll( toBeSent );
+            if( toBeSent != null ) {
+                synchronized( theMessagesToBeSent ) {
+                    theMessagesToBeSent.removeAll( toBeSent );
+                }
             }
 
             theListeners.fireEvent( tokenToSend, TOKEN_SENT );
