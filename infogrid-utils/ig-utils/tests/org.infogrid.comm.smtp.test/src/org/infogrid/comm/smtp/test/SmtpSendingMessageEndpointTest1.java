@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -37,8 +37,6 @@ public class SmtpSendingMessageEndpointTest1
             throws
                 Exception
     {
-        String MAILHOST = "smtp"; // WARNING: This will only work if you have a mailhost called smtp (in the default domain)
-                
         SimpleSmtpSendableMessage [] testMessages = {
                 SimpleSmtpSendableMessage.create(
                         "testuser1@infogrid.org",
@@ -47,8 +45,7 @@ public class SmtpSendingMessageEndpointTest1
                         "first line\n  second line\n\tthird line" )
         };
         
-        SmtpSendingMessageEndpoint<SimpleSmtpSendableMessage> endpoint
-                = SmtpSendingMessageEndpoint.create( exec, MAILHOST );
+        SmtpSendingMessageEndpoint<SimpleSmtpSendableMessage> endpoint = SmtpSendingMessageEndpoint.create( exec );
         
         for( int i=0 ; i<testMessages.length ; ++i ) {
             log.info( "About to send message " + i );

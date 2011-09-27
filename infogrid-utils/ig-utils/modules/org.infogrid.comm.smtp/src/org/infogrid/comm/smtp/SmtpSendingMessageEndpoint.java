@@ -15,14 +15,15 @@
 package org.infogrid.comm.smtp;
 
 import java.io.IOException;
-import java.io.PrintStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import javax.smartcardio.CommandAPDU;
 import org.infogrid.comm.AbstractFireAndForgetSendingMessageEndpoint;
+import org.infogrid.util.ExternalCommand;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
-import sun.net.smtp.SmtpClient;
 
 /**
  * A message endpoint for sending messages via SMTP.
@@ -45,52 +46,11 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
     public static <T extends SmtpSendableMessage> SmtpSendingMessageEndpoint<T> create(
             ScheduledExecutorService exec )
     {
-        String name            = null;
-        double randomVariation = theResourceHelper.getResourceDoubleOrDefault( "RandomVariation", 0.02 ); // 2%
-        String mailHost        = theResourceHelper.getResourceStringOrNull( "MailHost" );
-        
-        if( mailHost == null ) {
-            throw new IllegalArgumentException( "No mailhost specified in " + theResourceHelper );
-        }
-
-        List<T> messagesToBeSent = new ArrayList<T>();
-        
         SmtpSendingMessageEndpoint<T> ret = new SmtpSendingMessageEndpoint<T>(
-                name,
-                randomVariation,
+                null,
+                DEFAULT_RANDOM_VARIATION,
                 exec,
-                messagesToBeSent,
-                mailHost );
-        return ret;
-    }
-
-    /**
-     * Factory method.
-     *
-     * @param exec the ScheduledExecutorService to schedule timed tasks
-     * @return the created SmtpSendingMessageEndpoint
-     * @param mailHost host that runs the SMTP server
-     * @param <T> the message type
-     */
-    public static <T extends SmtpSendableMessage> SmtpSendingMessageEndpoint<T> create(
-            ScheduledExecutorService exec,
-            String                   mailHost )
-    {
-        String name            = null;
-        double randomVariation = theResourceHelper.getResourceDoubleOrDefault( "RandomVariation", 0.02 ); // 2%
-        
-        if( mailHost == null ) {
-            throw new IllegalArgumentException( "No mailhost specified in " + theResourceHelper );
-        }
-
-        List<T> messagesToBeSent = new ArrayList<T>();
-        
-        SmtpSendingMessageEndpoint<T> ret = new SmtpSendingMessageEndpoint<T>(
-                name,
-                randomVariation,
-                exec,
-                messagesToBeSent,
-                mailHost );
+                new ArrayList<T>() );
         return ret;
     }
 
@@ -101,7 +61,6 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
      * @param randomVariation the random component to add to the various times
      * @param exec the ScheduledExecutorService to schedule timed tasks
      * @param messagesToBeSent outgoing message queue (may or may not be empty)
-     * @param mailHost host that runs the SMTP server
      * @return the created SmtpSendingMessageEndpoint
      * @param <T> the message type
      */
@@ -109,15 +68,13 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
             String                   name,
             double                   randomVariation,
             ScheduledExecutorService exec,
-            List<T>                  messagesToBeSent,
-            String                   mailHost )
+            List<T>                  messagesToBeSent )
     {
         SmtpSendingMessageEndpoint<T> ret = new SmtpSendingMessageEndpoint<T>(
                 name,
                 randomVariation,
                 exec,
-                messagesToBeSent,
-                mailHost );
+                messagesToBeSent );
         return ret;
     }
 
@@ -128,28 +85,14 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
      * @param randomVariation the random component to add to the various times
      * @param exec the ScheduledExecutorService to schedule timed tasks
      * @param messagesToBeSent outgoing message queue (may or may not be empty)
-     * @param mailHost host that runs the SMTP server
      */
     protected SmtpSendingMessageEndpoint(
             String                   name,
             double                   randomVariation,
             ScheduledExecutorService exec,
-            List<T>                  messagesToBeSent,
-            String                   mailHost )
+            List<T>                  messagesToBeSent )
     {
         super( name, randomVariation, exec, messagesToBeSent );
-        
-        theMailHost = mailHost;
-    }
-
-    /**
-     * Determine the mail host.
-     *
-     * @return the mail host
-     */
-    public String getMailHost()
-    {
-        return theMailHost;
     }
 
     /**
@@ -171,47 +114,40 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
         }
         msg.setRemainingSendingAttempts( msg.getRemainingSendingAttempts()-1 );
 
-        SmtpClient smtp = new SmtpClient( theMailHost );
-
-        if( msg.getSenderString() != null ) {
-            smtp.from( msg.getSenderString() );
-        }
-        if( msg.getReceiverString() != null ) {
-            smtp.to( msg.getReceiverString() );
+        String [] commandLine = new String[ SEND_MAIL_COMMAND.length ] ;
+        for( int i=0 ; i<commandLine.length ; ++i ) {
+            commandLine[i] = MessageFormat.format( SEND_MAIL_COMMAND[i], msg.getSenderString(), msg.getReceiverString(), msg.getSubject() );
         }
 
-        PrintStream stream = smtp.startMessage();
+        ProcessBuilder pb = new ProcessBuilder( commandLine );
 
-        if( msg.getReceiverString() != null ) {
-            stream.println( "To: "      + msg.getReceiverString() );
+        int status = ExternalCommand.execute( pb, msg.getPayload(), null, null );
+        if( status != 0 ) {
+            log.error( "Cannot send mail", status, pb );
+            throw new IOException( "Failed to execute mail-sending command" );
         }
-        if( msg.getSenderString() != null ) {
-            stream.println( "From: "    + msg.getSenderString() );
-        }
-        if( msg.getSubject() != null ) {
-            stream.println( "Subject: " + msg.getSubject() );
-        }
-        // stream.println( "Reply-To: " + $from );
-        // stream.println( "X-org-netmesh-lid-lid: " + identityUrlString );
-        // if( target != null ) {
-        //     stream.println( "X-org-netmesh-lid-target: " + target );
-        // }
-        stream.println();
 
-        if( msg.getPayload() != null ) {
-            stream.print( msg.getPayload() );
-        }
-        stream.flush();
-        smtp.closeServer();
     }
-    
-    /**
-     * IP of the mail host on which SMTP is running.
-     */
-    protected String theMailHost;
-    
+
     /**
      * Our ResourceHelper.
      */
     private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( SmtpSendingMessageEndpoint.class );
+
+    /**
+     * Default random variation in message sending times.
+     */
+    public static final double DEFAULT_RANDOM_VARIATION = theResourceHelper.getResourceDoubleOrDefault(  "RandomVariation", 0.02 ); // 2%
+
+    /**
+     * Executable to run to actually send the message.
+     * This should usually be overridden
+     */
+    public static final String [] SEND_MAIL_COMMAND = theResourceHelper.getResourceStringArrayOrDefault(
+            "SendMailCommand",
+            new String [] {
+                    "sh",
+                    "-c",
+                    "( cat && echo \"\\n.\" ) | mail -s '{2}' '{1}'"
+            } ); // make sure there's always a single-period line at the end
 }
