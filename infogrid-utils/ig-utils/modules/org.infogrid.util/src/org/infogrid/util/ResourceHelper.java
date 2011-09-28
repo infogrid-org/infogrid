@@ -721,11 +721,11 @@ public final class ResourceHelper
      */
     public long [] getResourceLongArrayOrDefault(
             String  resourceName,
-            long [] defaultIntArray )
+            long [] defaultLongArray )
     {
         String [] value = getResourceStringArrayOrNull( resourceName );
         if( value == null ) {
-            return defaultIntArray;
+            return defaultLongArray;
         }
 
         long [] ret = new long[ value.length ];
@@ -737,7 +737,7 @@ public final class ResourceHelper
 
         } catch( Exception ex ) {
             log.error( ex );
-            return defaultIntArray;
+            return defaultLongArray;
         }
     }
 
