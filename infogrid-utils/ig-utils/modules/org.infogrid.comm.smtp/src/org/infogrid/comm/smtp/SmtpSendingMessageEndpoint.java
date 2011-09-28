@@ -19,7 +19,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
-import javax.smartcardio.CommandAPDU;
 import org.infogrid.comm.AbstractFireAndForgetSendingMessageEndpoint;
 import org.infogrid.util.ExternalCommand;
 import org.infogrid.util.ResourceHelper;
@@ -121,9 +120,12 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
 
         ProcessBuilder pb = new ProcessBuilder( commandLine );
 
-        int status = ExternalCommand.execute( pb, msg.getPayload(), null, null );
+        StringBuilder stdoutBuf = new StringBuilder();
+        StringBuilder stderrBuf = new StringBuilder();
+
+        int status = ExternalCommand.execute( pb, msg.getPayload(), stdoutBuf, stderrBuf );
         if( status != 0 ) {
-            log.error( "Cannot send mail", status, pb );
+            log.error( "Cannot send mail", status, commandLine, msg.getPayload(), stdoutBuf.toString(), stderrBuf.toString() );
             throw new IOException( "Failed to execute mail-sending command" );
         }
 
@@ -148,6 +150,6 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
             new String [] {
                     "sh",
                     "-c",
-                    "( cat && echo \"\\n.\" ) | mail -s '{2}' '{1}'"
+                    "( cat && echo \"\\n.\" ) | mail -s ''{2}'' ''{1}''" // note that '' means ' according to MessageFormat rules
             } ); // make sure there's always a single-period line at the end
 }
