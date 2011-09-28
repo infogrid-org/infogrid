@@ -26,6 +26,7 @@ import org.infogrid.store.StoreValueEncodingException;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.MapCursorIterator;
 import org.infogrid.util.SwappingHashMap;
+import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
 
@@ -39,6 +40,8 @@ import org.infogrid.util.logging.Log;
 public abstract class StoreBackedSwappingHashMap<K,V>
         extends
             SwappingHashMap<K,V>
+        implements
+            CanBeDumped
 {
     private static final Log log = Log.getLogInstance( StoreBackedSwappingHashMap.class  );
 
