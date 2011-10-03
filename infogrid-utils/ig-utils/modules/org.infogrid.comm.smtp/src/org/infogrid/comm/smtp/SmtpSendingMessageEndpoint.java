@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.comm.AbstractFireAndForgetSendingMessageEndpoint;
+import org.infogrid.comm.MessageSendException;
 import org.infogrid.util.ExternalCommand;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
@@ -47,6 +48,7 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
     {
         SmtpSendingMessageEndpoint<T> ret = new SmtpSendingMessageEndpoint<T>(
                 null,
+                DEFAULT_DELTA_RESEND,
                 DEFAULT_RANDOM_VARIATION,
                 exec,
                 new ArrayList<T>() );
@@ -57,6 +59,7 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
      * Factory method.
      *
      * @param name the name of the MessageEndpoint (for debugging only)
+     * @param deltaResend  the number of milliseconds until this endpoint resends the message if sending the message failed
      * @param randomVariation the random component to add to the various times
      * @param exec the ScheduledExecutorService to schedule timed tasks
      * @param messagesToBeSent outgoing message queue (may or may not be empty)
@@ -65,12 +68,14 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
      */
     public static <T extends SmtpSendableMessage> SmtpSendingMessageEndpoint<T> create(
             String                   name,
+            long                     deltaResend,
             double                   randomVariation,
             ScheduledExecutorService exec,
             List<T>                  messagesToBeSent )
     {
         SmtpSendingMessageEndpoint<T> ret = new SmtpSendingMessageEndpoint<T>(
                 name,
+                deltaResend,
                 randomVariation,
                 exec,
                 messagesToBeSent );
@@ -81,29 +86,31 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
      * Constructor for subclasses only, use factory method.
      * 
      * @param name the name of the MessageEndpoint (for debugging only)
+     * @param deltaResend  the number of milliseconds until this endpoint resends the message if sending the message failed
      * @param randomVariation the random component to add to the various times
      * @param exec the ScheduledExecutorService to schedule timed tasks
      * @param messagesToBeSent outgoing message queue (may or may not be empty)
      */
     protected SmtpSendingMessageEndpoint(
             String                   name,
+            long                     deltaResend,
             double                   randomVariation,
             ScheduledExecutorService exec,
             List<T>                  messagesToBeSent )
     {
-        super( name, randomVariation, exec, messagesToBeSent );
+        super( name, deltaResend, randomVariation, exec, messagesToBeSent );
     }
 
     /**
-     * Attempt to send one message.
-     * 
-     * @param msg the Message to send.
-     * @throws IOException the message send failed
+     * This performs the actual message send.
+     *
+     * @param content the payload
+     * @throws MessageSendException thrown if the message could not be sent
      */
-    protected void attemptSend(
+    protected void sendMessage(
             T msg )
         throws
-            IOException
+            MessageSendException
     {
         if( msg.getRemainingSendingAttempts() <= 0 ) {
             if( log.isDebugEnabled() ) {
@@ -123,18 +130,31 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
         StringBuilder stdoutBuf = new StringBuilder();
         StringBuilder stderrBuf = new StringBuilder();
 
-        int status = ExternalCommand.execute( pb, msg.getPayload(), stdoutBuf, stderrBuf );
-        if( status != 0 ) {
-            log.error( "Cannot send mail", status, commandLine, msg.getPayload(), stdoutBuf.toString(), stderrBuf.toString() );
-            throw new IOException( "Failed to execute mail-sending command" );
+        int status;
+        try {
+            status = ExternalCommand.execute( pb, msg.getPayload(), stdoutBuf, stderrBuf );
+            if( status != 0 ) {
+                log.error( "Cannot send mail", status, commandLine, msg.getPayload(), stdoutBuf.toString(), stderrBuf.toString() );
+                ArrayList<T> msgs = new ArrayList<T>();
+                msgs.add( msg );
+                throw new MessageSendException( msgs, "Failed to execute mail-sending command (status: " + status + "): " + stderrBuf );
+            }
+        } catch( IOException ex ) {
+            ArrayList<T> msgs = new ArrayList<T>();
+            msgs.add( msg );
+            throw new MessageSendException( msgs, ex );
         }
-
     }
 
     /**
      * Our ResourceHelper.
      */
     private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( SmtpSendingMessageEndpoint.class );
+
+    /**
+     * Default duration between message sending attempts for failed messages.
+     */
+    public static final long DEFAULT_DELTA_RESEND = theResourceHelper.getResourceLongOrDefault( "DeltaResend", 10000L );
 
     /**
      * Default random variation in message sending times.

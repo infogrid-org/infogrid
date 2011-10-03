@@ -14,7 +14,6 @@
 
 package org.infogrid.comm;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,17 +35,21 @@ public abstract class AbstractFireAndForgetSendingMessageEndpoint<T>
      * Constructor for subclasses only.
      * 
      * @param name the name of the MessageEndpoint (for debugging only)
+     * @param deltaResend  the number of milliseconds until this endpoint resends the message if sending the message failed
      * @param randomVariation the random component to add to the various times
      * @param exec the ScheduledExecutorService to schedule timed tasks
      * @param messagesToBeSent outgoing message queue (may or may not be empty)
      */
     protected AbstractFireAndForgetSendingMessageEndpoint(
             String                   name,
+            long                     deltaResend,
             double                   randomVariation,
             ScheduledExecutorService exec,
             List<T>                  messagesToBeSent )
     {
         super( name, randomVariation, exec, messagesToBeSent );
+
+        theDeltaResend = deltaResend;
     }
 
     /**
@@ -90,15 +93,18 @@ public abstract class AbstractFireAndForgetSendingMessageEndpoint<T>
                 if( log.isDebugEnabled() ) {
                     log.debug( "Attempting to send", current );
                 }
-                attemptSend( current );
+                sendMessage( current );
 
                 synchronized( theMessagesToBeSent ) {
                     theMessagesToBeSent.remove( current );
                 }
+                theListeners.fireEvent( current, MESSAGE_SENT );
 
-            } catch( IOException ex ) {
+            } catch( MessageSendException ex ) {
                 failed.add( current );
                 
+                theListeners.fireEvent( current, MESSAGE_SENDING_FAILED );
+
                 log.warn( "Could not send", current, ex );
             }
         }
@@ -106,22 +112,27 @@ public abstract class AbstractFireAndForgetSendingMessageEndpoint<T>
         if( !failed.isEmpty() ) {
             synchronized( this ) {
                 if( theFutureTask == null || theFutureTask.isCancelled() ) {
-                    schedule( new ResendTask( this ), 0 );
+                    schedule( new ResendTask( this ), theDeltaResend );
                 }
             }
         }
     }
 
     /**
-     * Attempt to send one message.
-     * 
-     * @param msg the Message to send.
-     * @throws IOException the message send failed
+     * Implemented by subclasses, this performs the actual message send.
+     *
+     * @param content the payload
+     * @throws MessageSendException thrown if the message could not be sent
      */
-    protected abstract void attemptSend(
+    protected abstract void sendMessage(
             T msg )
         throws
-            IOException;
+            MessageSendException;
+
+    /**
+     * The time until we retry to send the message if sending the message failed.
+     */
+    protected long theDeltaResend;
 
     /**
      * The send task.
