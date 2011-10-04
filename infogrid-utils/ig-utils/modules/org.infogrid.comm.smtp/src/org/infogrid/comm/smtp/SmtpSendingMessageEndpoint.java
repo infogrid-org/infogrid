@@ -144,6 +144,7 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
             msgs.add( msg );
             throw new MessageSendException( msgs, ex );
         }
+        msg.setRemainingSendingAttempts( 0 ); // we were successful
     }
 
     /**
