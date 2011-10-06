@@ -96,6 +96,10 @@ public class StoreLidOtpManager
             IOException,
             FactoryException
     {
+        if( log.isTraceEnabled() ) {
+            log.traceMethodCallEntry( this, "attachOtp", lid, siteIdentifier, url );
+        }
+
         long   now       = System.currentTimeMillis();
         long   then      = now + theExpirationDuration;
         String lidString = lid.toExternalForm();
@@ -126,6 +130,9 @@ public class StoreLidOtpManager
             Identifier siteIdentifier,
             String     otpCandidate )
     {
+        if( log.isTraceEnabled() ) {
+            log.traceMethodCallEntry( this, "validateOtp", lid, siteIdentifier, otpCandidate );
+        }
         String lidString = lid.toExternalForm();
         Store  siteStore = PrefixingStore.create( siteIdentifier.toExternalForm(), theStore );
 
