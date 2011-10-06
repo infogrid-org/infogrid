@@ -410,6 +410,8 @@ public abstract class StringHelper
                     lastWasBlankChar = true;
                     sb.append(' ');
                 }
+            } else if( c == '\n' ) {
+                sb.append( "<br />\n" );
             } else {
                 lastWasBlankChar = false;
 
