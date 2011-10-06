@@ -104,7 +104,7 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
     /**
      * This performs the actual message send.
      *
-     * @param content the payload
+     * @param msg the payload
      * @throws MessageSendException thrown if the message could not be sent
      */
     protected void sendMessage(
