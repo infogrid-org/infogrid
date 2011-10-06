@@ -66,6 +66,11 @@
                 <datatype>
                     <EnumeratedDataType>
                         <enum>
+                            <name>Invited</name>
+                            <username>Invited</username>
+                            <userdescription>A user has been invited to create the Account.</userdescription>
+                        </enum>
+                        <enum>
                             <name>AppliedFor</name>
                             <username>Applied for</username>
                             <userdescription>Account has been applied for, but not approved or rejected yet.</userdescription>
