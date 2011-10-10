@@ -14,6 +14,7 @@
 
 package org.infogrid.util.http;
 
+import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 
 /**
@@ -22,6 +23,8 @@ import org.infogrid.util.logging.Dumper;
 public abstract class AbstractSimpleSaneCookie
         extends
             AbstractSaneCookie
+        implements
+            CanBeDumped
 {
     /**
      * Constructor.
