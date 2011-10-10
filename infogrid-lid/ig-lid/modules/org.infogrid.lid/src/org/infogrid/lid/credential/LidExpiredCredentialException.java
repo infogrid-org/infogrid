@@ -34,33 +34,39 @@ public abstract class LidExpiredCredentialException
      * Constructor.
      *
      * @param identifier the identifier for which an expired credential was provided
+     * @param siteIdentifier the site at which the expired credential was provided
      * @param type the type of credential that was expired
      */
     protected LidExpiredCredentialException(
             Identifier        identifier,
+            Identifier        siteIdentifier,
             LidCredentialType type )
     {
         super( null, null );
 
-        theIdentifier = identifier;
+        theIdentifier     = identifier;
+        theSiteIdentifier = siteIdentifier;
     }
 
     /**
      * Constructor.
      *
      * @param identifier the identifier for which an expired credential was provided
+     * @param siteIdentifier the site at which the expired credential was provided
      * @param type the type of credential that was expired
      * @param cause the underlying cause, if any
      */
     protected LidExpiredCredentialException(
             Identifier        identifier,
+            Identifier        siteIdentifier,
             LidCredentialType type,
             Throwable         cause )
     {
         super( null, cause );
 
-        theIdentifier = identifier;
-        theType       = type;
+        theIdentifier     = identifier;
+        theSiteIdentifier = siteIdentifier;
+        theType           = type;
     }
 
     /**
@@ -71,6 +77,16 @@ public abstract class LidExpiredCredentialException
     public Identifier getIdentifier()
     {
         return theIdentifier;
+    }
+
+    /**
+     * Obtain the identifier for the site at which an invalid credential was provided.
+     *
+     * @return the identifier
+     */
+    public Identifier getSiteIdentifier()
+    {
+        return theSiteIdentifier;
     }
 
     /**
@@ -104,10 +120,12 @@ public abstract class LidExpiredCredentialException
         d.dump( this,
                 new String[] {
                         "theIdentifier",
+                        "theSiteIdentifier",
                         "theType"
                 },
                 new Object[] {
                         theIdentifier,
+                        theSiteIdentifier,
                         theType,
                 } );
     }
@@ -116,6 +134,11 @@ public abstract class LidExpiredCredentialException
      * The identifier for which an expired credential was provided.
      */
     protected Identifier theIdentifier;
+
+    /**
+     * The identifier of the site at which an expired credential was provided.
+     */
+    protected Identifier theSiteIdentifier;
 
     /**
      * The type of credential that was expired.

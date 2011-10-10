@@ -15,6 +15,7 @@
 package org.infogrid.lid.otp;
 
 import org.infogrid.lid.credential.AbstractLidCredentialType;
+import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
@@ -80,6 +81,7 @@ public class LidOtpCredentialType
      * @param request the request
      * @param subject the subject
      * @param siteIdentifier identifies the site
+     * @throws LidExpiredCredentialException thrown if the contained LidCredentialType has expired
      * @throws LidInvalidCredentialException thrown if the contained LidCdedentialType is not valid for this subject
      */
     public void checkCredential(
@@ -87,6 +89,7 @@ public class LidOtpCredentialType
             HasIdentifier subject,
             Identifier    siteIdentifier )
         throws
+            LidExpiredCredentialException,
             LidInvalidCredentialException
     {
         SaneRequest originalRequest = request.getOriginalSaneRequest();
@@ -96,9 +99,7 @@ public class LidOtpCredentialType
             throw new LidWrongOtpException( subject.getIdentifier(), siteIdentifier, this );
         }
 
-        if( !theOtpManager.validateOtp( subject.getIdentifier(), siteIdentifier, credential )) {
-            throw new LidWrongOtpException( subject.getIdentifier(), siteIdentifier, this );
-        }
+        theOtpManager.validateOtp( subject.getIdentifier(), siteIdentifier, credential, this );
     }
 
     /**

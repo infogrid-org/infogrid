@@ -19,7 +19,9 @@ import java.util.Arrays;
 import org.infogrid.lid.LidClientAuthenticationPipelineStage;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.otp.LidOtpCredentialType;
+import org.infogrid.lid.otp.LidOtpExpiredException;
 import org.infogrid.lid.otp.LidOtpManager;
+import org.infogrid.lid.otp.LidWrongOtpException;
 import org.infogrid.store.Store;
 import org.infogrid.store.StoreKeyDoesNotExistException;
 import org.infogrid.store.StoreValue;
@@ -123,12 +125,18 @@ public class StoreLidOtpManager
      * @param lid identifier of the user submitting the OTP
      * @param siteIdentifier identifier of the site to which the OTP was submitted
      * @param otpCandidate the submitted OTP
-     * @return true if the OTP is valid
+     * @param credentialType the LidCredentialType being checked
+     * @throws LidWrongOtpException thrown if an invalid OTP was provided
+     * @throws LidOtpExpiredException thrown if the OTP was correct but expired
      */
-    public boolean validateOtp(
-            Identifier lid,
-            Identifier siteIdentifier,
-            String     otpCandidate )
+    public void validateOtp(
+            Identifier           lid,
+            Identifier           siteIdentifier,
+            String               otpCandidate,
+            LidOtpCredentialType credentialType )
+        throws
+            LidWrongOtpException,
+            LidOtpExpiredException
     {
         if( log.isTraceEnabled() ) {
             log.traceMethodCallEntry( this, "validateOtp", lid, siteIdentifier, otpCandidate );
@@ -139,21 +147,21 @@ public class StoreLidOtpManager
         try {
             StoreValue found = siteStore.get( lidString );
             if( found.isExpired() ) {
-                return false;
+                throw new LidOtpExpiredException( lid, siteIdentifier, credentialType );
             }
             if( !Arrays.equals( found.getData(), otpCandidate.getBytes() )) {
-                return false;
+                throw new LidWrongOtpException( lid, siteIdentifier, credentialType );
             }
             // delete only if the OTP is valid
             siteStore.delete( lidString );
-            return true;
+            return;
 
         } catch( StoreKeyDoesNotExistException ex ) {
-            return false;
+            throw new LidWrongOtpException( lid, siteIdentifier, credentialType );
 
         } catch( IOException ex ) {
             log.error( ex );
-            return false;
+            throw new LidWrongOtpException( lid, siteIdentifier, credentialType );
         }
     }
 
@@ -177,7 +185,7 @@ public class StoreLidOtpManager
      */
     protected static final long theDefaultExpirationDuration
             = ResourceHelper.getInstance( StoreLidOtpManager.class ).getResourceLongOrDefault(
-                    "DefaultExpirationDuration", 8 * 60 * 60 * 1000L ); // 8 hours
+                    "DefaultExpirationDuration", 7L * 24L * 60L * 60L * 1000L ); // 1 week
 
     /**
      * The encoding.

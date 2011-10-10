@@ -15,7 +15,6 @@
 package org.infogrid.lid.otp;
 
 import java.io.IOException;
-import org.infogrid.lid.credential.LidInvalidCredentialException;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.Identifier;
 
@@ -46,11 +45,17 @@ public interface LidOtpManager
      * @param lid identifier of the user submitting the OTP
      * @param siteIdentifier identifier of the site to which the OTP was submitted
      * @param otpCandidate the submitted OTP
-     * @return true if the OTP is valid
+     * @param credentialType the LidCredentialType being checked
+     * @throws LidWrongOtpException thrown if an invalid OTP was provided
+     * @throws LidOtpExpiredException thrown if the OTP was correct but expired
      */
-    public boolean validateOtp(
-            Identifier lid,
-            Identifier siteIdentifier,
-            String     otpCandidate );
+    public void validateOtp(
+            Identifier           lid,
+            Identifier           siteIdentifier,
+            String               otpCandidate,
+            LidOtpCredentialType credentialType )
+        throws
+            LidWrongOtpException,
+            LidOtpExpiredException;
 }
 

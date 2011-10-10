@@ -8,20 +8,19 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
-package org.infogrid.lid.openid;
+package org.infogrid.lid.otp;
 
 import org.infogrid.lid.credential.LidExpiredCredentialException;
-import org.infogrid.lid.openid.auth.AbstractOpenIdCredentialType;
 import org.infogrid.util.Identifier;
 
 /**
- * Thrown if an association could be found, but it was expired.
+ * Thrown if a one-time password was valid but expired.
  */
-public class OpenIdAssociationExpiredException
+public class LidOtpExpiredException
         extends
             LidExpiredCredentialException
 {
@@ -31,13 +30,13 @@ public class OpenIdAssociationExpiredException
      * Constructor.
      *
      * @param identifier the identifier for which an invalid credential was provided
-     * @param siteIdentifier the site at which the expired credential was provided
+     * @param siteIdentifier the site at which the invalid credential was provided
      * @param type the type of credential that was invalid
      */
-    public OpenIdAssociationExpiredException(
-            Identifier                   identifier,
-            Identifier                   siteIdentifier,
-            AbstractOpenIdCredentialType type )
+    public LidOtpExpiredException(
+            Identifier           identifier,
+            Identifier           siteIdentifier,
+            LidOtpCredentialType type )
     {
         super( identifier, siteIdentifier, type );
     }

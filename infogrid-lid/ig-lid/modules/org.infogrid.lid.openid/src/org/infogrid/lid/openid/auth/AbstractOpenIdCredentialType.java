@@ -153,7 +153,7 @@ public abstract class AbstractOpenIdCredentialType
         } else {
             if( !association.isCurrentlyValid() ) {
                 theAssociationManager.remove( association.getServerUrl() );
-                throw new OpenIdAssociationExpiredException( subject.getIdentifier(), this );
+                throw new OpenIdAssociationExpiredException( subject.getIdentifier(), siteIdentifier, this );
             }
             checkCredentialStatefulMode( request, subject, siteIdentifier, mandatoryFields, association ); // aka not dumb
         }
