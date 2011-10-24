@@ -41,7 +41,7 @@ public class SimpleStringRepresentationDirectory
 
     /**
      * Constructor for subclasses only, use factory method.
-\     */
+     */
     protected SimpleStringRepresentationDirectory()
     {
         super( );
