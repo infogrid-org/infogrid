@@ -121,7 +121,7 @@ public abstract class AbstractFireAndForgetSendingMessageEndpoint<T>
     /**
      * Implemented by subclasses, this performs the actual message send.
      *
-     * @param content the payload
+     * @param msg the payload
      * @throws MessageSendException thrown if the message could not be sent
      */
     protected abstract void sendMessage(
