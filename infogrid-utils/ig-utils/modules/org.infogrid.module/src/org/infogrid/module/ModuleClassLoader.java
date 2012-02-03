@@ -148,7 +148,7 @@ public class ModuleClassLoader
      * @throws ClassNotFoundException loading the class failed, it could not be found
      */
     @Override
-    protected synchronized Class loadClass(
+    public synchronized Class loadClass(
             String  name,
             boolean resolve )
         throws
@@ -238,7 +238,7 @@ public class ModuleClassLoader
      * @return the URL of the resource, if found
      */
     @Override
-    protected synchronized URL findResource(
+    public synchronized URL findResource(
             String name )
     {
         File [] files = theModule.getModuleJars();

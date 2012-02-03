@@ -8,24 +8,17 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.module;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * A software installation, i.e. a number of Modules and activation meta-data.
@@ -41,9 +34,6 @@ public abstract class SoftwareInstallation
      * @param rootModuleName the name of the root Module to run
      * @param activationClassName the name of the class to invoke to activate the root Module (overrides default specified in ModuleAdvertisement)
      * @param activationMethodName the name of the method to invoke to activate the root Module (overrides default specified in ModuleAdvertisement)
-     * @param log4jconfigUrlName the URL to a log4j configuration file, if any
-     * @param productName the product name
-     * @param productId the product id
      * @param useModuleClassLoaders if true, use ModuleClassLoaders to load the Modules
      * @param allowDefaultClassPathForRootModule if true, enable the default ClassLoader for the root Module
      * @param isDeveloper if true, run in developer mode
@@ -58,16 +48,12 @@ public abstract class SoftwareInstallation
             String      rootModuleName,
             String      activationClassName,
             String      activationMethodName,
-            String      log4jconfigUrlName,
-            String      productName,
-            String      productId,
             boolean     useModuleClassLoaders,
             boolean     allowDefaultClassPathForRootModule,
             boolean     isDeveloper,
             boolean     isDemo,
             boolean     isShowModuleRegistry,
-            PrintStream moduleDebugStream,
-            String []   remainingArguments )
+            PrintStream moduleDebugStream )
         throws
             SoftwareInstallationException
     {
@@ -76,9 +62,6 @@ public abstract class SoftwareInstallation
         theRootModuleRequirement              = ModuleRequirement.create1( rootModuleName );
         theActivationClassName                = activationClassName;
         theActivationMethodName               = activationMethodName;
-        theLog4jconfigUrlName                 = log4jconfigUrlName;
-        theProductName                        = productName;
-        theProductId                          = productId;
         theUseModuleClassLoaders              = useModuleClassLoaders;
         theAllowDefaultClassPathForRootModule = allowDefaultClassPathForRootModule;
 
@@ -92,8 +75,6 @@ public abstract class SoftwareInstallation
         if( moduleDebugStream != null ) {
             ModuleErrorHandler.setDebugStream( moduleDebugStream );
         }
-
-        theRemainingArguments = remainingArguments;
 
         synchronized( SoftwareInstallation.class ) {
             if( theSingleton != null ) {
@@ -122,44 +103,6 @@ public abstract class SoftwareInstallation
     public final String getPlatform()
     {
         return thePlatform;
-    }
-
-    /**
-     * Obtain the properties for the log4j logger.
-     *
-     * @param relativeTo the ClassLoader to use when attempting the load the property file
-     * @return the log4j properties
-     * @throws IOException could not read the properties
-     */
-    public Properties getLog4jProperties(
-            ClassLoader relativeTo )
-        throws
-            IOException
-    {
-        Properties ret = new Properties();
-
-        URL log4jconfigUrl;
-        try {
-            log4jconfigUrl = new URL( theLog4jconfigUrlName );
-        } catch( MalformedURLException ex ) {
-            log4jconfigUrl = relativeTo.getResource( theLog4jconfigUrlName );
-        }
-        if( log4jconfigUrl != null ) {
-            ret.load( new BufferedInputStream( log4jconfigUrl.openStream() ));
-        }
-
-        Enumeration theEnum = ret.propertyNames();
-        while( theEnum.hasMoreElements() ) {
-            String currentKey    = (String) theEnum.nextElement();
-            String currentValue  = ret.getProperty( currentKey );
-
-            String modifiedValue = replaceVariables( currentValue );
-
-            if( (Object) currentValue != (Object) modifiedValue ) { // typecast to avoid String == comparison warning
-                ret.setProperty( currentKey, modifiedValue );
-            }
-        }
-        return ret;
     }
 
     /**
@@ -231,90 +174,6 @@ public abstract class SoftwareInstallation
     {
         return theDeactivationMethodName;
     }
-
-    /**
-     * Obtain the product name.
-     *
-     * @return the product name
-     */
-    public final String getProductName()
-    {
-        return theProductName;
-    }
-
-    /**
-     * Obtain the product id.
-     *
-     * @return the product id
-     */
-    public final String getProductId()
-    {
-        return theProductId;
-    }
-
-    /**
-     * Determine whether we are only supposed to print, to the terminal, error messages in the BootLoader.
-     * This returns true by default.
-     *
-     * @return if true, only print to the terminal
-     */
-    public boolean isErrorTextOnly()
-    {
-        return true;
-    }
-
-    /**
-     * Obtain an "About" text that describes this piece of software.
-     *
-     * @return the "about" text
-     */
-    public abstract String getAboutText();
-
-    /**
-     * Obtain the arguments passed when running the root Module.
-     *
-     * @return the arguments passed when running the root Module
-     */
-    public final String [] getRemainingArguments()
-    {
-        return theRemainingArguments;
-    }
-
-    /**
-     * This helper method replaces installation-specific parameters in the passed-in string.
-     * For example, it replaces @VERSIONID@ with the value of the version id.
-     *
-     * @param raw the string with variables still in it
-     * @return the string with variables replaced
-     */
-    public String replaceVariables(
-            String raw )
-    {
-        String ret = raw;
-
-        if( theTokenConversionMap == null ) {
-            theTokenConversionMap = getTokenConversionMap();
-        }
-        Iterator<String> keyIter = theTokenConversionMap.keySet().iterator();
-        while( keyIter.hasNext() ) {
-            String key   = keyIter.next();
-            String value = theTokenConversionMap.get( key );
-
-            int index;
-            while( ( index = raw.indexOf( key )) >= 0 ) {
-                ret = ret.substring( 0, index ) + value + ret.substring( index + key.length() );
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Obtain the token conversion map from our subclass. This is invoked only once
-     * and then buffered by the caller.
-     *
-     * @return a Map of tokens in the config files that must be replaced before using their data
-     */
-    protected abstract Map<String,String> getTokenConversionMap();
 
     /**
      * Determine our host name as well as we can. Otherwise return null.
@@ -420,28 +279,9 @@ public abstract class SoftwareInstallation
     }
 
     /**
-     * Start this platform's browser. By default, this throws an Exception.
-     *
-     * @param u the URL we want to open in the browser
-     * @throws IOException if we can't start the browser
-     */
-    public void openInBrowser(
-            URL u )
-        throws
-            IOException
-    {
-        throw new IOException( "Browser not available in this configuration" );
-    }
-
-    /**
      * The platform -- one of the values in RECOGNIZED_PLATFORMS.
      */
     protected String thePlatform;
-
-    /**
-     * The path (fully-qualified URL or local to the class loader) of the log4j config file.
-     */
-    private String theLog4jconfigUrlName = "org/infogrid/module/log4jconfig.properties";
 
     /**
      * The ModuleRequirement for our root Module.
@@ -469,16 +309,6 @@ public abstract class SoftwareInstallation
     protected String theHostName;
 
     /**
-     * The product name.
-     */
-    protected String theProductName;
-
-    /**
-     * The product id for this version.
-     */
-    protected String theProductId;
-
-    /**
      * Do we want to use ModuleClassLoaders.
      */
     protected boolean theUseModuleClassLoaders;
@@ -504,34 +334,9 @@ public abstract class SoftwareInstallation
     protected boolean theIsShowModuleRegistry;
 
     /**
-     * The arguments not used by SoftwareInstallation itself.
-     */
-    protected String [] theRemainingArguments;
-
-    /**
-     * The token conversion map.
-     */
-    protected Map<String,String> theTokenConversionMap;
-
-    /**
      * The singleton instance of this class.
      */
     protected static SoftwareInstallation theSingleton;
-
-    /**
-     * The default location of the log4j configuration file.
-     */
-    public static final String DEFAULT_LOG4J_CONFIG_FILE = "org/infogrid/module/log4jconfig.properties";;
-
-    /**
-     * This String indicates the product id.
-     */
-    public static final String PRODUCTID_TOKEN = "@PRODUCTID@";
-
-    /**
-     * Use this text instead of a product id if it cannot be determined.
-     */
-    protected final static String UNKNOWN_PRODUCT_ID = "<unknown product id>";
 
     /**
      * Identifies the Mac OSX platform.
@@ -556,14 +361,4 @@ public abstract class SoftwareInstallation
             WINDOWS_PLATFORM,
             OTHER_PLATFORM
     };
-
-    /**
-     * Name of the system property that may contain the product id.
-     */
-    public static final String PRODUCT_ID_PROPERTY = "product.id";
-
-    /**
-     * Name of the system property that may contain the product name.
-     */
-    public static final String PRODUCT_NAME_PROPERTY = "product.name";
 }

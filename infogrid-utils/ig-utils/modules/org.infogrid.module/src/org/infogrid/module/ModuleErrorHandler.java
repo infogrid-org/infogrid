@@ -288,7 +288,7 @@ public abstract class ModuleErrorHandler
     public static void informModuleDeactivateStart(
             Module mod )
     {
-        if( logModuleActivate && errorStream != null ) {
+        if( logModuleDeactivate && errorStream != null ) {
             errorStream.print( "<moduledeactivate module=\"" );
             errorStream.print(  mod.getModuleName() );
             errorStream.print( "\" version=\"" );
@@ -327,7 +327,7 @@ public abstract class ModuleErrorHandler
     public static void informModuleDeactivateSucceeded(
             Module mod )
     {
-        if( logModuleActivate && errorStream != null ) {
+        if( logModuleDeactivate && errorStream != null ) {
             errorStream.print( " <succeeded>" );
             errorStream.print( "Module deactivate succeeded. Module: " );
             errorStream.print( mod.getModuleName() );
@@ -348,7 +348,7 @@ public abstract class ModuleErrorHandler
             Module mod,
             Method meth )
     {
-        if( logModuleActivate && errorStream != null ) {
+        if( logModuleDeactivate && errorStream != null ) {
             errorStream.print( "<moduleactivatedeactivate module=\"" );
             errorStream.print(  mod.getModuleName() );
             errorStream.print( "\" version=\"" );
@@ -753,33 +753,6 @@ public abstract class ModuleErrorHandler
         if( errorStream != System.err ) {
             System.err.println( userMessage );
             System.err.println( postfix );
-        }
-
-        if( theInstallation != null && ! theInstallation.isErrorTextOnly() ) {
-            // try Swing first, then AWT
-            try {
-                Class<?> optionPaneClass = Class.forName( "javax.swing.JOptionPane" );
-                Method showMessageDialogMessage = optionPaneClass.getMethod(
-                        "showMessageDialog",
-                        new Class[] {
-                            Class.forName( "java.awt.Component" ),
-                            Object.class,
-                            String.class,
-                            Integer.TYPE } );
-
-                showMessageDialogMessage.invoke(
-                        null,
-                        new Object[] {
-                                null,
-                                userMessage,
-                                "Fatal error",
-                                new Integer( 0 ) // JOptionPane.ERROR_MESSAGE
-                        } );
-            } catch( Exception ex2 ) {
-                System.err.println( "Exception2: " );
-                ex2.printStackTrace();
-                // FIXME: add AWT error message
-            }
         }
     }
 

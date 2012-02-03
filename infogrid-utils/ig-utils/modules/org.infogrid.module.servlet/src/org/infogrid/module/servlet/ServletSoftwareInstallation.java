@@ -18,12 +18,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import org.infogrid.module.ModuleErrorHandler;
 import org.infogrid.module.SoftwareInstallation;
 import org.infogrid.module.SoftwareInstallationException;
@@ -93,9 +89,7 @@ public class ServletSoftwareInstallation
         String      activationClassName        = null;
         String      activationMethodName       = null;
         String      platform                   = null;
-        String      log4jconfigUrlName         = DEFAULT_LOG4J_CONFIG_FILE;
         PrintStream moduleDebugStream          = null;
-        String []   remainingArguments         = null;
         boolean     isDeveloper                = false;
         boolean     isDemo                     = false;
         boolean     isShowModuleRegistry       = false;
@@ -115,9 +109,6 @@ public class ServletSoftwareInstallation
                 activationMethodName = value;
 
             // no run class here
-            } else if ( "log4j".equalsIgnoreCase( key )) {
-                log4jconfigUrlName = value;
-
             } else if ( "moduledebug".equalsIgnoreCase( key )) {
                 String moduleDebugStreamName = value;
                 if( "System.err".equalsIgnoreCase( moduleDebugStreamName )) {
@@ -137,15 +128,6 @@ public class ServletSoftwareInstallation
                 isDeveloper = true;
             } else if( "showmoduleregistry".equalsIgnoreCase( key )) {
                 isShowModuleRegistry = true;
-            } else if( "args".equalsIgnoreCase( key )) {
-                StringTokenizer   token = new StringTokenizer( value );
-                ArrayList<String> temp  = new ArrayList<String>();
-                while( token.hasMoreElements() ) {
-                    temp.add( token.nextToken());
-                }
-                // all other arguments are remaining arguments
-                remainingArguments = new String[ temp.size() ];
-                temp.toArray( remainingArguments );
             } else {
                 usageJspThrow( "Unknown property " + key );
             }
@@ -155,42 +137,18 @@ public class ServletSoftwareInstallation
             usageJspThrow( "no rootmodule argument given" );
         }
 
-        // determine product name and version
-        String productName = "unknown";
-        String productId   = "unknown";
-
-        // This does not actually occur in a typical JEE environment. It also throws
-        // java.security.AccessControlException: access denied (java.util.PropertyPermission
-        // product.name read). So I'm commenting it out.
-//        try {
-//            productName = System.getProperty( PRODUCT_NAME_PROPERTY );
-//            productId   = System.getProperty( PRODUCT_ID_PROPERTY );
-//
-//        } catch( AccessControlException ex ) {
-//            ModuleErrorHandler.informThrowable( ex );
-//        }
-
         // determine platform
         platform = determinePlatform();
-
-        // fix remaining arguments
-        if( remainingArguments == null ) {
-            remainingArguments = new String[0];
-        }
 
         return new ServletSoftwareInstallation(
                 platform,
                 rootModuleName,
                 activationClassName,
                 activationMethodName,
-                log4jconfigUrlName,
-                productName,
-                productId,
                 isDeveloper,
                 isDemo,
                 isShowModuleRegistry,
-                moduleDebugStream,
-                remainingArguments );
+                moduleDebugStream );
     }
 
     /**
@@ -200,14 +158,10 @@ public class ServletSoftwareInstallation
      * @param rootModuleName the name of the root Module to run
      * @param activationClassName the name of the class to invoke to activate the root Module (overrides default specified in ModuleAdvertisement)
      * @param activationMethodName the name of the method to invoke to activate the root Module (overrides default specified in ModuleAdvertisement)
-     * @param log4jconfigUrlName the URL to a log4j configuration file, if any
-     * @param productName the product name
-     * @param productId the product id
      * @param isDeveloper if true, run in developer mode
      * @param isDemo if true, run in demo mode
      * @param isShowModuleRegistry if true, print the content of the ModuleRegistry to the terminal
      * @param moduleDebugStream a stream for Module-related debug information (may be null)
-     * @param remainingArguments the arguments on the command line not used by SoftwareInstallation itself
      * @throws SoftwareInstallationException if this software installation is incorrect, inconsistent or incomplete
      */
     protected ServletSoftwareInstallation(
@@ -215,14 +169,10 @@ public class ServletSoftwareInstallation
             String      rootModuleName,
             String      activationClassName,
             String      activationMethodName,
-            String      log4jconfigUrlName,
-            String      productName,
-            String      productId,
             boolean     isDeveloper,
             boolean     isDemo,
             boolean     isShowModuleRegistry,
-            PrintStream moduleDebugStream,
-            String []   remainingArguments )
+            PrintStream moduleDebugStream )
         throws
             SoftwareInstallationException
     {
@@ -230,16 +180,12 @@ public class ServletSoftwareInstallation
                 rootModuleName,
                 activationClassName,
                 activationMethodName,
-                log4jconfigUrlName,
-                productName,
-                productId,
                 false, // never use ModuleClassLoaders in J2EE mode
                 false, // allowDefaultClassPathForRootModule
                 isDeveloper,
                 isDemo,
                 isShowModuleRegistry,
-                moduleDebugStream,
-                remainingArguments );
+                moduleDebugStream );
     }
 
     /**
@@ -250,22 +196,6 @@ public class ServletSoftwareInstallation
     public final String getAboutText()
     {
         return theAboutText;
-    }
-
-    /**
-     * Obtain the token conversion map from our subclass. This is invoked only once
-     * and then buffered by the caller.
-     *
-     * @return a Map of tokens in the config files that must be replaced before using their data
-     */
-    @Override
-    protected Map<String,String> getTokenConversionMap()
-    {
-        HashMap<String,String> ret = new HashMap<String,String>();
-
-        ret.put( PRODUCTID_TOKEN, getProductId() );
-
-        return ret;
     }
 
     /**
