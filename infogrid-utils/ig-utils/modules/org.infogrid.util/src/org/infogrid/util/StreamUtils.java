@@ -294,7 +294,11 @@ public abstract class StreamUtils
             }
             int count = inReader.read( buf, offset, toRead );
 
-            if( count == 0 ) {
+            if( count == -1 ) {
+                // end of stream
+                return null;
+
+            } else if( count == 0 ) {
                 return new String( buf );
 
             } else if( count < buf.length-offset ) {
