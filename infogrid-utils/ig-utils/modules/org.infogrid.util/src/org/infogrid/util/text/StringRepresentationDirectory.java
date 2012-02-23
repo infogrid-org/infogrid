@@ -56,6 +56,18 @@ public interface StringRepresentationDirectory
 
     /**
      * Name of the StringRepresentation, contained in this StringRepresentationDirectory, that contains
+     * the text/html formatting for passwords that need to be blanked out.
+     */
+    public static final String TEXT_HTML_PASSWORD_NAME = "HtmlPassword";
+
+    /**
+     * Name of the StringRepresentation, contained in this StringRepresentationDirectory, that contains
+     * the text/html formatting for passwords that need to be blanked out for edit mode.
+     */
+    public static final String EDIT_TEXT_HTML_PASSWORD_NAME = "EditHtmlPassword";
+
+    /**
+     * Name of the StringRepresentation, contained in this StringRepresentationDirectory, that contains
      * the default formatting for URLs.
      */
     public static final String TEXT_URL_NAME = "Url";

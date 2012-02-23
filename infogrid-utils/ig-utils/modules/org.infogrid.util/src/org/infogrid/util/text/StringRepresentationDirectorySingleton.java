@@ -65,16 +65,18 @@ public class StringRepresentationDirectorySingleton
      */
     protected static StringRepresentationDirectory instantiateDefaultSingleton()
     {
-        HashMap<String,Stringifier<? extends Object>> plainMap      = new HashMap<String,Stringifier<? extends Object>>();
-        HashMap<String,Stringifier<? extends Object>> editPlainMap  = new HashMap<String,Stringifier<? extends Object>>();
-        HashMap<String,Stringifier<? extends Object>> htmlMap       = new HashMap<String,Stringifier<? extends Object>>();
-        HashMap<String,Stringifier<? extends Object>> editHtmlMap   = new HashMap<String,Stringifier<? extends Object>>();
-        HashMap<String,Stringifier<? extends Object>> urlMap        = new HashMap<String,Stringifier<? extends Object>>();
-        HashMap<String,Stringifier<? extends Object>> httpPostMap   = new HashMap<String,Stringifier<? extends Object>>();
-        HashMap<String,Stringifier<? extends Object>> javaMap       = new HashMap<String,Stringifier<? extends Object>>();
-        HashMap<String,Stringifier<? extends Object>> javascriptMap = new HashMap<String,Stringifier<? extends Object>>();
-        HashMap<String,Stringifier<? extends Object>> javadocMap    = new HashMap<String,Stringifier<? extends Object>>();
-        HashMap<String,Stringifier<? extends Object>> jsonMap       = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> plainMap            = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> editPlainMap        = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> htmlMap             = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> editHtmlMap         = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> htmlPasswordMap     = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> editHtmlPasswordMap = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> urlMap              = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> httpPostMap         = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> javaMap             = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> javascriptMap       = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> javadocMap          = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> jsonMap             = new HashMap<String,Stringifier<? extends Object>>();
 
         plainMap.put(   "int",            LongStringifier.create() );
         // html:       same as plain
@@ -352,6 +354,18 @@ public class StringRepresentationDirectorySingleton
                 editHtmlMap,
                 editPlain );
 
+        SimpleStringRepresentation htmlPassword = SimpleStringRepresentation.create(
+                theSingleton,
+                StringRepresentationDirectory.TEXT_HTML_PASSWORD_NAME,
+                htmlPasswordMap,
+                html );
+
+        SimpleStringRepresentation editHtmlPassword = SimpleStringRepresentation.create(
+                theSingleton,
+                StringRepresentationDirectory.EDIT_TEXT_HTML_PASSWORD_NAME,
+                editHtmlPasswordMap,
+                editHtml );
+
         SimpleStringRepresentation url = SimpleStringRepresentation.create(
                 theSingleton,
                 StringRepresentationDirectory.TEXT_URL_NAME,
@@ -388,16 +402,18 @@ public class StringRepresentationDirectorySingleton
                 jsonMap,
                 javascript );
 
-        theSingleton.put(      plain.getName(), plain );
-        theSingleton.put(  editPlain.getName(), editPlain );
-        theSingleton.put(       html.getName(), html );
-        theSingleton.put(   editHtml.getName(), editHtml );
-        theSingleton.put(        url.getName(), url );
-        theSingleton.put(   httpPost.getName(), httpPost );
-        theSingleton.put(       java.getName(), java );
-        theSingleton.put( javascript.getName(), javascript );
-        theSingleton.put(    javadoc.getName(), javadoc );
-        theSingleton.put(       json.getName(), json );
+        theSingleton.put(              plain.getName(), plain );
+        theSingleton.put(          editPlain.getName(), editPlain );
+        theSingleton.put(               html.getName(), html );
+        theSingleton.put(           editHtml.getName(), editHtml );
+        theSingleton.put(       htmlPassword.getName(), htmlPassword );
+        theSingleton.put(   editHtmlPassword.getName(), editHtmlPassword );
+        theSingleton.put(                url.getName(), url );
+        theSingleton.put(           httpPost.getName(), httpPost );
+        theSingleton.put(               java.getName(), java );
+        theSingleton.put(         javascript.getName(), javascript );
+        theSingleton.put(            javadoc.getName(), javadoc );
+        theSingleton.put(               json.getName(), json );
 
         theSingleton.setFallback( plain );
 
