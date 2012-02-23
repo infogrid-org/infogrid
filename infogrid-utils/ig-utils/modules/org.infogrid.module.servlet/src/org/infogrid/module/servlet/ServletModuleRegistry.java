@@ -81,7 +81,7 @@ public class ServletModuleRegistry
     {
         ModuleAdvertisement ret = null;
         Class               theClass;
-        StringBuilder        className = new StringBuilder();
+        StringBuilder       className = new StringBuilder();
         try {
 
             className.append( req.getRequiredModuleName() );
