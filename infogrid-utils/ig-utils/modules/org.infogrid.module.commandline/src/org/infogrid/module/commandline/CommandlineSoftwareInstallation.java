@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -216,9 +216,8 @@ public class CommandlineSoftwareInstallation
      * @param showSplash if true, show splash screen
      * @param isDeveloper if true, run in developer mode
      * @param isDemo if true, run in demo mode
-     * @param isErrorTextOnly if true, do not pop up dialog for module error messages
-     * @param sleepPeriodBeforeExit the number of milliseconds to sleep prior to exiting the VM
      * @param isShowModuleRegistry if true, print the content of the ModuleRegistry to the terminal
+     * @param sleepPeriodBeforeExit the number of milliseconds to sleep prior to exiting the VM
      * @param moduleDebugStream a stream for Module-related debug information (may be null)
      * @param remainingArguments the arguments on the command line not used by SoftwareInstallation itself
      * @throws SoftwareInstallationException if this software installation is incorrect, inconsistent or incomplete

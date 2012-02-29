@@ -40,7 +40,6 @@ public abstract class SoftwareInstallation
      * @param isDemo if true, run in demo mode
      * @param isShowModuleRegistry if true, print the content of the ModuleRegistry to the terminal
      * @param moduleDebugStream a stream for Module-related debug information (may be null)
-     * @param remainingArguments the arguments on the command line not used by SoftwareInstallation itself
      * @throws SoftwareInstallationException if this software installation is incorrect, inconsistent or incomplete
      */
     protected SoftwareInstallation(
