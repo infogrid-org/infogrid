@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -162,9 +162,9 @@ public class ModuleAdvertisementSerializer
     {
         ModuleAdvertisementXmlParser theParser = new ModuleAdvertisementXmlParser();
 
-        InputStream fromStream = new FileInputStream( inputFile );
+        InputStream fromStream = new BufferedInputStream( new FileInputStream( inputFile ));
 
-        ModuleAdvertisement theAdv = theParser.readAdvertisement( fromStream, inputFile.getAbsoluteFile(), now );
+        ModuleAdvertisement theAdv = theParser.readAdvertisement( fromStream, inputFile, now );
 
         String moduleName    = theAdv.getModuleName();
         String moduleVersion = theAdv.getModuleVersion();
@@ -284,7 +284,7 @@ public class ModuleAdvertisementSerializer
         out.println( "//" );
         out.println( "// For more information about InfoGrid go to http://infogrid.org/" );
         out.println( "//" );
-        out.println( "// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst" );
+        out.println( "// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst" );
         out.println( "// All rights reserved." );
         out.println( "//" );
         out.println();
