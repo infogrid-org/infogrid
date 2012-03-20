@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -32,24 +32,11 @@ public abstract class ModuleRegistry
      * Private constructor, use factory method.
      *
      * @param ads the ModuleAdvertisements found
-     * @param installation the SoftwareInstallation
      */
     protected ModuleRegistry(
-            ArrayList<ModuleAdvertisement> ads,
-            SoftwareInstallation           installation)
+            ArrayList<ModuleAdvertisement> ads )
     {
         theAdvertisements = ads;
-        theInstallation   = installation;
-    }
-
-    /**
-     * Obtain the SoftwareInstallation whose parameters are used for this ModuleRegistry.
-     *
-     * @return the SoftwareInstallation whose parameters are used for this ModuleRegistry
-     */
-    public final SoftwareInstallation getSoftwareInstallation()
-    {
-        return theInstallation;
     }
 
     /**
@@ -77,11 +64,7 @@ public abstract class ModuleRegistry
     public final ModuleAdvertisement [] determineResolutionCandidates(
             ModuleRequirement req )
     {
-        String moduleName    = req.getRequiredModuleName();
-        String moduleVersion = req.getRequiredModuleVersion();
-
         // we are creating a snapshot of ModuleAdvertisements here in case a concurrent Thread adds some
-
         ModuleAdvertisement [] adsSnapshot;
         synchronized( theAdvertisements ) {
             adsSnapshot = theAdvertisements.toArray( new ModuleAdvertisement[ theAdvertisements.size() ]);
@@ -90,11 +73,7 @@ public abstract class ModuleRegistry
         int        count  = 0;
         boolean [] marker = new boolean[ adsSnapshot.length ];
         for( int i=0 ; i<adsSnapshot.length ; ++i ) {
-            if(    moduleName.equals( adsSnapshot[i].getModuleName() )
-                && (    moduleVersion == null
-                     || adsSnapshot[i].getModuleVersion() == null
-                     || moduleVersion.equals( adsSnapshot[i].getModuleVersion() )))
-            {
+            if( req.matches( adsSnapshot[i] )) {
                 marker[i] = true;
                 ++count;
             }
@@ -264,8 +243,6 @@ public abstract class ModuleRegistry
         synchronized( RESOLVE_LOCK ) {
             Module ret = theModules.get( adv );
             if( ret == null ) {
-                File [] jarFiles = adv.getProvidesJars();
-
                 Module [] dependentModules = null;
                 if( recursive ) {
                     ModuleRequirement [] reqs = adv.getRunTimeModuleRequirements();
@@ -294,7 +271,7 @@ public abstract class ModuleRegistry
                         }
                     }
                 }
-                ret = adv.createModule( this, jarFiles, getClass().getClassLoader() );
+                ret = adv.createModule( this, getClass().getClassLoader() );
 
                 if( ret != null ) {
                     theModules.put( adv, ret );
@@ -455,6 +432,17 @@ public abstract class ModuleRegistry
     }
 
     /**
+     * ModuleRegistry also acts as a factory for the Modules' ClassLoaders.
+     *
+     * @param module the Module for which to create a ClassLoader
+     * @param parentClassLoader the ClassLoader to use as the parent ClassLoader
+     * @return the ClassLoader to use with the Module
+     */
+    public abstract ClassLoader createClassLoader(
+            Module      module,
+            ClassLoader parentClassLoader );
+
+    /**
      * Add a ModuleRegistry listener to be notified when new Modules become available etc.
      *
      * @param newListener the new listener to add
@@ -575,11 +563,6 @@ public abstract class ModuleRegistry
      * captured in theForwardDependencies.
      */
     private HashMap<Module,Module[]> theUses = new HashMap<Module,Module[]>();
-
-    /**
-     * The SoftwareInstallation with which we have to work.
-     */
-    private SoftwareInstallation theInstallation;
 
     /**
      * The set of currently subscribed ModuleRegistryListeners. Allocated as needed.

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -28,12 +28,9 @@ import java.util.Iterator;
 import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * This helper program takes XML advertisements and instantiates them.
@@ -42,7 +39,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class ModuleAdvertisementXmlParser
         extends
-            DefaultHandler
+            AbstractModuleDependenciesXmlParser
         implements
             ModuleXmlTags
 {
@@ -51,8 +48,7 @@ public class ModuleAdvertisementXmlParser
      */
     public ModuleAdvertisementXmlParser()
     {
-        theFactory = SAXParserFactory.newInstance();
-        theFactory.setValidating( false );
+        super();
     }
 
     /**
@@ -140,27 +136,16 @@ public class ModuleAdvertisementXmlParser
     /**
      * Initialize local variables.
      */
+    @Override
     protected void initialize()
     {
-        lastString                        = null;
         keyword                           = null;
         name                              = null;
         version                           = null;
         usernames                         = new HashMap<String,String>();
         userdescriptions                  = new HashMap<String,String>();
         buildDate                         = null;
-        buildTimeDependencies             = new ArrayList<ModuleRequirement>();
-        runTimeDependencies               = new ArrayList<ModuleRequirement>();
         jars                              = new ArrayList<File>();
-        moduleParameterValues             = null;
-        moduleParameterDefaults           = null;
-        requirementParameterValues        = null;
-        requirementParameterDefaults      = null;
-        currentModuleRequirementBuildTime = false;
-        currentModuleRequirementRunTime   = false;
-        currentModuleRequirementName      = null;
-        currentModuleRequirementVersion   = null;
-        inDependenciesSection             = false;
         activationClassName               = null;
         activationMethodName              = "activate";
         deactivationMethodName            = "deactivate";
@@ -174,25 +159,7 @@ public class ModuleAdvertisementXmlParser
         interfaceNames                    = null;
         implementationName                = null;
 
-        theLocator = new MyLocator();
-    }
-
-    /**
-     * Receive a Locator object for document events.
-     *
-     * @param locator A locator for all SAX document events.
-     * @see org.xml.sax.ContentHandler#setDocumentLocator
-     * @see org.xml.sax.Locator
-     */
-    @Override
-    public void setDocumentLocator(
-            Locator locator )
-    {
-        theLocator.update(
-                locator.getPublicId(),
-                locator.getSystemId(),
-                locator.getLineNumber(),
-                locator.getColumnNumber());
+        super.initialize();
     }
 
     /**
@@ -213,7 +180,7 @@ public class ModuleAdvertisementXmlParser
      * @see #endElement
      */
     @Override
-    public void startElement(
+    public void startElement1(
             String     namespaceURI,
             String     sName,
             String     qName,
@@ -221,8 +188,6 @@ public class ModuleAdvertisementXmlParser
         throws
             SAXException
     {
-        lastString = null;
-
         if( STANDARDMODULE_TAG.equals( qName ) ) {
             keyword = qName;
 
@@ -259,37 +224,6 @@ public class ModuleAdvertisementXmlParser
         } else if( RUNCLASS_TAG.equals( qName )) {
             // no op
 
-        } else if( DEPENDENCIES_TAG.equals( qName )) {
-
-            inDependenciesSection = true;
-
-        } else if( REQUIRES_TAG.equals( qName )) {
-            requirementParameterValues   = new HashMap<String,String>();
-            requirementParameterDefaults = new HashMap<String,String>();
-
-            currentModuleRequirementName = attrs.getValue( NAME_PAR );
-            if( currentModuleRequirementName == null ) {
-                throw new SAXParseException( "ModuleRequirement cannot have empty name", theLocator );
-            }
-            currentModuleRequirementVersion = attrs.getValue( VERSION_PAR ); // may or may not be given
-
-            String mode = attrs.getValue( MODE_PAR );
-            if( mode == null || "".equals( mode ) || MODE_PAR_BOTH.equalsIgnoreCase( mode )) {
-                currentModuleRequirementBuildTime = true;
-                currentModuleRequirementRunTime   = true;
-
-            } else if( MODE_PAR_BUILDTIME.equalsIgnoreCase( mode )) {
-                currentModuleRequirementBuildTime = true;
-                currentModuleRequirementRunTime   = false;
-
-            } else if( MODE_PAR_RUNTIME.equalsIgnoreCase( mode )) {
-                currentModuleRequirementBuildTime = false;
-                currentModuleRequirementRunTime   = true;
-
-            } else {
-                 throw new SAXParseException( "Cannot understand mode of dependency: " + mode, theLocator );
-            }
-
         } else if( CAPABILITY_TAG.equals( qName )) {
             implementationName   = null;
             argumentCombinations = new ArrayList<ModuleCapability.ArgumentCombination>();
@@ -307,81 +241,8 @@ public class ModuleAdvertisementXmlParser
         } else if( ARG_TAG.equals( qName )) {
             // no op
 
-        } else if( PARAMETER_TAG.equals( qName )) {
-            String parName    = attrs.getValue( NAME_PAR );
-            String parDefault = attrs.getValue( DEFAULT_PAR );
-            String parValue   = attrs.getValue( VALUE_PAR );
-
-            if( parName == null ) {
-                throw new SAXParseException( "No name was given in the parameter tag", theLocator );
-
-            } else if( !inDependenciesSection ) {
-                if( parDefault == null ) {
-                    if( parValue != null ) {
-                        if( moduleParameterValues == null ) {
-                            moduleParameterValues = new HashMap<String,String>();
-                        }
-                        moduleParameterValues.put( parName, parValue );
-
-                    } else {
-                        throw new SAXParseException( "No value or default was given for parameter " + parName, theLocator );
-
-                    }
-                } else if( parValue == null ) {
-                    if( moduleParameterDefaults == null ) {
-                        moduleParameterDefaults = new HashMap<String,String>();
-                    }
-                    moduleParameterDefaults.put( parName, parDefault );
-
-                } else {
-                    throw new SAXParseException( "Specify either value or default, not both, for parameter " + parName, theLocator );
-                }
-
-            } else {
-                // this is for a Module Requirement
-                if( parDefault == null ) {
-                    if( parValue != null ) {
-                        if( requirementParameterValues == null ) {
-                            requirementParameterValues = new HashMap<String,String>();
-                        }
-                        requirementParameterValues.put( parName, parValue );
-
-                    } else {
-                        throw new SAXParseException( "No value or default was given for parameter " + parName, theLocator );
-                    }
-
-                } else if( parValue == null ) {
-                    if( requirementParameterDefaults == null ) {
-                        requirementParameterDefaults = new HashMap<String,String>();
-                    }
-                    requirementParameterDefaults.put( parName, parDefault );
-
-                } else {
-                    throw new SAXParseException( "Specify either value or default, not both, for parameter " + parName, theLocator );
-                }
-            }
         } else {
             throw new SAXParseException( "Don't know anything about opening tag " + qName, theLocator );
-        }
-    }
-
-    /**
-     * Callback indicating that we found some characters.
-     *
-     * @param ch The characters from the XML document.
-     * @param start The start position in the array.
-     * @param length The number of characters to read from the array.
-     */
-    @Override
-    public void characters(
-            char [] ch,
-            int     start,
-            int     length )
-    {
-        if( lastString == null ) {
-            lastString = new String( ch, start, length );
-        } else {
-            lastString = lastString + new String( ch, start, length );
         }
     }
 
@@ -399,7 +260,7 @@ public class ModuleAdvertisementXmlParser
      * @throws SAXException a parse error occurred
      */
     @Override
-    public void endElement(
+    public void endElement1(
             String namespaceURI,
             String sName,
             String qName )
@@ -448,25 +309,6 @@ public class ModuleAdvertisementXmlParser
         } else if( RUNCLASS_TAG.equals( qName )) {
             runClassName = lastString;
 
-        } else if( DEPENDENCIES_TAG.equals( qName )) {
-            inDependenciesSection = false;
-
-        } else if( REQUIRES_TAG.equals( qName )) {
-            if( currentModuleRequirementName != null ) {
-                ModuleRequirement req = ModuleRequirement.create1(
-                        currentModuleRequirementName,
-                        currentModuleRequirementVersion,
-                        requirementParameterValues,
-                        requirementParameterDefaults );
-
-                if( currentModuleRequirementBuildTime ) {
-                    buildTimeDependencies.add( req );
-                }
-                if( currentModuleRequirementRunTime ) {
-                    // this is NOT an "else", it can be both
-                    runTimeDependencies.add( req );
-                }
-            }
 
         } else if( CAPABILITY_TAG.equals( qName )) {
             ModuleCapability currentCapability = ModuleCapability.create1(
@@ -541,11 +383,18 @@ public class ModuleAdvertisementXmlParser
         try {
             File ret;
 
+            // FIXME this looks like a mess
             if( string.startsWith( "/" )) {
                 ret = new File( string );
             } else {
-                File distDir = new File( theFile.getCanonicalFile().getParentFile().getParentFile(), "dist" );
-                ret = new File( distDir, string );
+                File candidate = new File( theFile.getCanonicalFile().getParentFile(), string );
+
+                if( candidate.canRead() ) {
+                    ret = candidate;
+                } else {
+                    File distDir = new File( theFile.getCanonicalFile().getParentFile().getParentFile(), "dist" );
+                    ret = new File( distDir, string );
+                }
             }
             return ret;
 
@@ -553,21 +402,6 @@ public class ModuleAdvertisementXmlParser
             throw new SAXException( ex );
         }
     }
-
-    /**
-     * The ParserFactory that we use.
-     */
-    protected SAXParserFactory theFactory;
-
-    /**
-     * File that is being parsed.
-     */
-    protected File theFile;
-
-    /**
-     * The last string we found during parsing.
-     */
-    protected String lastString;
 
     /**
      * The outermost keyword indicating what type of Module it is.
@@ -605,64 +439,9 @@ public class ModuleAdvertisementXmlParser
     protected Date buildDate;
 
     /**
-     * The build-time dependencies, as ArrayList<ModuleRequirement>.
-     */
-    protected ArrayList<ModuleRequirement> buildTimeDependencies = new ArrayList<ModuleRequirement>();
-
-    /**
-     * The run-time dependencies, as ArrayList<ModuleRequirement>.
-     */
-    protected ArrayList<ModuleRequirement> runTimeDependencies = new ArrayList<ModuleRequirement>();
-
-    /**
      * The JAR files that we provide.
      */
     protected ArrayList<File> jars = new ArrayList<File>();
-
-    /**
-     * The parameter-value pairs for this Module that cannot be overridden.
-     */
-    protected Map<String,String> moduleParameterValues;
-
-    /**
-     * The parameter-value pairs for this Module that may be overridden.
-     */
-    protected Map<String,String> moduleParameterDefaults;
-
-    /**
-     * The parameter-value pairs for this ModuleRequirement that cannot be overridden.
-     */
-    protected Map<String,String> requirementParameterValues;
-
-    /**
-     * The parameter-value pairs for this ModuleRequirement that may be overridden.
-     */
-    protected Map<String,String> requirementParameterDefaults;
-
-    /**
-     * Is the current ModuleRequirement a build-time requirement.
-     */
-    protected boolean currentModuleRequirementBuildTime;
-
-    /**
-     * Is the current ModuleRequirement a run-time requirement.
-     */
-    protected boolean currentModuleRequirementRunTime;
-
-    /**
-     * The name of the current ModuleRequirement.
-     */
-    protected String currentModuleRequirementName;
-
-    /**
-     * The version of the current ModuleRequirement.
-     */
-    protected String currentModuleRequirementVersion;
-
-    /**
-     * True when we are inside the dependencies section
-     */
-    protected boolean inDependenciesSection = false;
 
     /**
      * Name of the activation class.
@@ -723,103 +502,4 @@ public class ModuleAdvertisementXmlParser
      * The implementation name of the currently parsed capability. Only important during parsing.
      */
     protected String implementationName;
-
-    /**
-     * Where are we in parsing the stream.
-     */
-    protected MyLocator theLocator;
-
-    /**
-     * Simple Locator implementation.
-     */
-    protected static class MyLocator
-        implements
-            Locator
-    {
-        /**
-         * Return the public identifier for the current document event.
-         *
-         * @return A string containing the public identifier, or
-         *         null if none is available.
-         * @see #getSystemId
-         */
-        public String getPublicId()
-        {
-            return thePublicId;
-        }
-
-        /**
-         * Return the system identifier for the current document event.
-         *
-         * @return A string containing the system identifier, or null
-         *         if none is available.
-         * @see #getPublicId
-         */
-        public String getSystemId()
-        {
-            return theSystemId;
-        }
-
-        /**
-         * Return the line number where the current document event ends.
-         *
-         * @return The line number, or -1 if none is available.
-         * @see #getColumnNumber
-         */
-        public int getLineNumber()
-        {
-            return theLineNumber;
-        }
-
-        /**
-         * Return the column number where the current document event ends.
-         *
-         * @return The column number, or -1 if none is available.
-         * @see #getLineNumber
-         */
-        public int getColumnNumber()
-        {
-            return theColumnNumber;
-        }
-
-        /**
-         * This allows us to update what is held by this object.
-         *
-         * @param newPublicId the new public ID
-         * @param newSystemId the new system ID
-         * @param newLineNumber the new line number
-         * @param newColumnNumber the new column number
-         */
-        void update(
-                String newPublicId,
-                String newSystemId,
-                int newLineNumber,
-                int newColumnNumber )
-        {
-            thePublicId     = newPublicId;
-            theSystemId     = newSystemId;
-            theLineNumber   = newLineNumber;
-            theColumnNumber = newColumnNumber;
-        }
-
-        /**
-         * The XML public ID.
-         */
-        protected String thePublicId;
-
-        /**
-         * The XML system ID.
-         */
-        protected String theSystemId;
-
-        /**
-         * The current line number.
-         */
-        protected int theLineNumber;
-
-        /**
-         * The current column number.
-         */
-        protected int theColumnNumber;
-    }
 }

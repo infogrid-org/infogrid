@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -31,17 +31,14 @@ public abstract class Module
      * Protected constructor.
      *
      * @param registry the registry of Modules in which we try to find dependent Modules
-     * @param moduleJars the JAR files belonging to this Module
      * @param parentClassLoader the class loader of our parent Module
      */
     protected Module(
-            ModuleRegistry      registry,
-            File []             moduleJars,
-            ClassLoader         parentClassLoader )
+            ModuleRegistry registry,
+            ClassLoader    parentClassLoader )
     {
-        theRegistry            = registry;
-        theModuleJars          = moduleJars;
-        theParentClassLoader   = parentClassLoader;
+        theRegistry          = registry;
+        theParentClassLoader = parentClassLoader;
     }
 
     /**
@@ -93,17 +90,7 @@ public abstract class Module
             MalformedURLException
     {
         if( theClassLoader == null ) {
-            if( theRegistry.getSoftwareInstallation().useModuleClassLoaders() ) {
-                try {
-                    theClassLoader = new ModuleClassLoader( this, theParentClassLoader );
-                } catch( ModuleNotFoundException ex ) {
-                    ex.printStackTrace();
-                } catch( ModuleResolutionException ex ) {
-                    ex.printStackTrace();
-                }
-            } else {
-                theClassLoader = theParentClassLoader;
-            }
+            theClassLoader = theRegistry.createClassLoader( this, theParentClassLoader );
         }
 
         return theClassLoader;
@@ -114,10 +101,7 @@ public abstract class Module
      *
      * @return the JAR files provided by this Module
      */
-    public final File [] getModuleJars()
-    {
-        return theModuleJars;
-    }
+    public abstract File [] getModuleJars();
 
     /**
      * Determine whether this Module is active. A Module is active if it has been
@@ -507,11 +491,6 @@ public abstract class Module
      * The ModuleRegistry in which this Module is registered.
      */
     protected ModuleRegistry theRegistry;
-
-    /**
-     * The JAR files that contain the code for this Module.
-     */
-    protected File [] theModuleJars;
 
     /**
      * This Module's ClassLoader. Allocated as needed.

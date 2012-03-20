@@ -14,7 +14,6 @@
 
 package org.infogrid.module.commandline;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -55,8 +54,6 @@ public class CommandlineSoftwareInstallation
         String            platform                           = null;
         PrintStream       moduleDebugStream                  = null;
         String []         remainingArguments                 = null;
-        boolean           useModuleClassLoaders              = true;
-        boolean           allowDefaultClassPathForRootModule = false;
         boolean           showSplash                         = false;
         boolean           isDeveloper                        = false;
         boolean           isDemo                             = false;
@@ -137,10 +134,6 @@ public class CommandlineSoftwareInstallation
                     usageCommandLineThrow( "argument missing after -moduledebug" );
                 }
 
-            } else if ( "-nomoduleclassloaders".equalsIgnoreCase( args[i] )) {
-                useModuleClassLoaders = false;
-            } else if ( "-allowdefaultclasspathforrootmodule".equalsIgnoreCase( args[i] )) {
-                allowDefaultClassPathForRootModule = true;
             } else if ( "-splash".equalsIgnoreCase( args[i] )) {
                 showSplash = true;
             } else if ( "-demo".equalsIgnoreCase( args[i] )) {
@@ -189,8 +182,6 @@ public class CommandlineSoftwareInstallation
                 activationMethodName,
                 runClassName,
                 runMethodName,
-                useModuleClassLoaders,
-                allowDefaultClassPathForRootModule,
                 showSplash,
                 isDeveloper,
                 isDemo,
@@ -211,8 +202,6 @@ public class CommandlineSoftwareInstallation
      * @param activationMethodName the name of the method to invoke to activate the root Module (overrides default specified in ModuleAdvertisement)
      * @param runClassName the name of the class to run in the root Module (overrides default specified in ModuleAdvertisement)
      * @param runMethodName the name of the method to run in the root Module (overrides default specified in ModuleAdvertisement)
-     * @param useModuleClassLoaders if true, use ModuleClassLoaders to load the Modules
-     * @param allowDefaultClassPathForRootModule if true, allow the default ClassLoader for the root Module (only)
      * @param showSplash if true, show splash screen
      * @param isDeveloper if true, run in developer mode
      * @param isDemo if true, run in demo mode
@@ -231,8 +220,6 @@ public class CommandlineSoftwareInstallation
             String       activationMethodName,
             String       runClassName,
             String       runMethodName,
-            boolean      useModuleClassLoaders,
-            boolean      allowDefaultClassPathForRootModule,
             boolean      showSplash,
             boolean      isDeveloper,
             boolean      isDemo,
@@ -247,8 +234,6 @@ public class CommandlineSoftwareInstallation
                 rootModuleName,
                 activationClassName,
                 activationMethodName,
-                useModuleClassLoaders,
-                allowDefaultClassPathForRootModule,
                 isDeveloper,
                 isDemo,
                 isShowModuleRegistry,
@@ -272,7 +257,7 @@ public class CommandlineSoftwareInstallation
      *
      * @return the paths, potentially with wildcards
      */
-    public List<String> getModuleAdvertisementPaths()
+    public Iterable<String> getModuleAdvertisementPaths()
     {
         return theModuleAdPaths;
     }
@@ -337,7 +322,6 @@ public class CommandlineSoftwareInstallation
         fullMsg.append( "    [ -userdir <dir> ]              directory for user data instead of the default\n" );
         fullMsg.append( "    [ -homeurl <url> ]              url of an object to be opened instead of the default\n" );
         fullMsg.append( "    [ -moduledebug <stream> ]       debug module loading to System.out or System.err\n" );
-        fullMsg.append( "    [ -nomoduleclassloaders ]       do not use ModuleClassLoaders (default is on)\n" );
         fullMsg.append( "    -moduleadvertisementpath <path> path where ModuleAdvertisements can be found. May be repeated and may contain wildcards.\n" );
         fullMsg.append( "    -rootmodule <name>              name of the root module to start\n" );
         fullMsg.append( "    [ -activationclass <class> ]    override the activation class specified for the root module\n" );
@@ -390,7 +374,6 @@ public class CommandlineSoftwareInstallation
         buf.append( "    theActivationClassName:   " ).append( theActivationClassName ).append( "\n" );
         buf.append( "    theActivationMethodName:  " ).append( theActivationMethodName ).append( "\n" );
         buf.append( "    theHostName:              " ).append( theHostName ).append( "\n" );
-        buf.append( "    theUseModuleClassLoaders: " ).append( theUseModuleClassLoaders ).append( "\n" );
         buf.append( "    theIsDeveloper:           " ).append( theIsDeveloper ).append( "\n" );
         buf.append( "    theIsDemo:                " ).append( theIsDemo ).append( "\n" );
         buf.append( "    theIsShowModuleRegistry:  " ).append( theIsShowModuleRegistry ).append( "\n" );

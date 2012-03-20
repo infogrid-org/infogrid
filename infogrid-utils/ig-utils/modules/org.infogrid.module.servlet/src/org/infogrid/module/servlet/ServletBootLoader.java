@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -183,7 +183,7 @@ public abstract class ServletBootLoader
         throws
             RuntimeException
     {
-        ModuleErrorHandler.fatal( null, ex, ServletSoftwareInstallation.getSoftwareInstallation() );
+        ModuleErrorHandler.fatal( null, ex, theInstallation );
         
         if( ex instanceof RuntimeException ) {
             throw (RuntimeException) ex;
@@ -200,7 +200,7 @@ public abstract class ServletBootLoader
     protected static void fatal(
             String msg )
     {
-        ModuleErrorHandler.fatal( msg, null, ServletSoftwareInstallation.getSoftwareInstallation() );
+        ModuleErrorHandler.fatal( msg, null, theInstallation );
 
         throw new RuntimeException( msg );
     }
@@ -218,7 +218,7 @@ public abstract class ServletBootLoader
        throws
            RuntimeException
     {
-        ModuleErrorHandler.fatal( msg, ex, ServletSoftwareInstallation.getSoftwareInstallation() );
+        ModuleErrorHandler.fatal( msg, ex, theInstallation );
 
         throw new RuntimeException( msg );
     }

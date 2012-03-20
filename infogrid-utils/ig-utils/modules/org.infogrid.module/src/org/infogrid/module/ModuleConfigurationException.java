@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -91,6 +91,10 @@ public class ModuleConfigurationException
         if( theMessage != null ) {
             buf.append( ", message: " );
             buf.append( theMessage );
+        }
+        if( getCause() != null ) {
+            buf.append( ", cause: " );
+            buf.append( getCause().getLocalizedMessage() );
         }
         return buf.toString();
     }

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -38,10 +38,9 @@ public class StandardModule
     StandardModule(
             StandardModuleAdvertisement adv,
             ModuleRegistry              registry,
-            File []                     moduleJars,
             ClassLoader                 parentClassLoader )
     {
-        super( registry, moduleJars, parentClassLoader );
+        super( registry, parentClassLoader );
         
         theModuleAdvertisement = adv;
     }
@@ -54,6 +53,16 @@ public class StandardModule
     public final StandardModuleAdvertisement getModuleAdvertisement()
     {
         return theModuleAdvertisement;
+    }
+
+    /**
+     * Obtain the JAR files provided by this Module.
+     *
+     * @return the JAR files provided by this Module
+     */
+    public final File [] getModuleJars()
+    {
+        return theModuleAdvertisement.getProvidesJars();
     }
 
     /**

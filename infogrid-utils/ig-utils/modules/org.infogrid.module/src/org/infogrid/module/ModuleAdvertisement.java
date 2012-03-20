@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -354,13 +354,11 @@ public abstract class ModuleAdvertisement
      * by the user of this framework.
      *
      * @param registry the ModuleRegistry in which the to-be-created Module will look for dependent Modules
-     * @param jars the JAR files of this Module
      * @param parentClassLoader the ClassLoader of our parent Module
      * @return the created Module
      */
     protected abstract Module createModule(
             ModuleRegistry registry,
-            File []        jars,
             ClassLoader    parentClassLoader );
 
     /**

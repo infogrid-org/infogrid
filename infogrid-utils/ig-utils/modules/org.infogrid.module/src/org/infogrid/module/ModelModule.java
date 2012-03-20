@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -29,16 +29,14 @@ public class ModelModule
      *
      * @param adv the Module Advertisement describing this Module
      * @param registry the registry of Modules in which we try to find dependent Modules
-     * @param moduleJars the JAR files belonging to this Module
      * @param parentClassLoader the class loader of our parent Module
      */
     ModelModule(
             ModelModuleAdvertisement adv,
             ModuleRegistry           registry,
-            File []                  moduleJars,
             ClassLoader              parentClassLoader )
     {
-        super( registry, moduleJars, parentClassLoader );
+        super( registry, parentClassLoader );
 
         theModuleAdvertisement = adv;
     }
@@ -51,6 +49,16 @@ public class ModelModule
     public final ModelModuleAdvertisement getModuleAdvertisement()
     {
         return theModuleAdvertisement;
+    }
+
+    /**
+     * Obtain the JAR files provided by this Module.
+     *
+     * @return the JAR files provided by this Module
+     */
+    public final File [] getModuleJars()
+    {
+        return theModuleAdvertisement.getProvidesJars();
     }
 
     /**

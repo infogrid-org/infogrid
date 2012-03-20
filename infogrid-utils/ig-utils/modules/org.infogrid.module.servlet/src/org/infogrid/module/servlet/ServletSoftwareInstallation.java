@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Properties;
+import org.infogrid.module.Module;
 import org.infogrid.module.ModuleErrorHandler;
 import org.infogrid.module.SoftwareInstallation;
 import org.infogrid.module.SoftwareInstallationException;
@@ -180,8 +181,6 @@ public class ServletSoftwareInstallation
                 rootModuleName,
                 activationClassName,
                 activationMethodName,
-                false, // never use ModuleClassLoaders in J2EE mode
-                false, // allowDefaultClassPathForRootModule
                 isDeveloper,
                 isDemo,
                 isShowModuleRegistry,

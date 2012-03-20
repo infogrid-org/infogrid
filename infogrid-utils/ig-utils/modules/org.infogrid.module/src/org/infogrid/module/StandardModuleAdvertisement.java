@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -323,16 +323,15 @@ public class StandardModuleAdvertisement
      * by the user of this framework.
      *
      * @param registry the ModuleRegistry in which the Module will be created
-     * @param jars the set of JAR files for this Module
      * @param loader the ClassLoader of our parent Module
      * @return Module the newly created Module
      */
+    @Override
     protected Module createModule(
             ModuleRegistry registry,
-            File []        jars,
             ClassLoader    loader )
     {
-        return new StandardModule( this, registry, jars, loader );
+        return new StandardModule( this, registry, loader );
     }
 
     /**

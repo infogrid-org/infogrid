@@ -5,14 +5,14 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
-package org.infogrid.module.commandline;
+package org.infogrid.module.tomcat;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.infogrid.module.Module;
@@ -36,43 +35,75 @@ import org.infogrid.module.ModuleRegistry;
 import org.infogrid.module.ModuleResolutionException;
 
 /**
- * A ModuleRegistry particularly appropriate for the CommandlineBootLoader.
+ * A ModuleRegistry particularly appropriate for use with Tomcat. This ModuleRegistry is a singleton, but it
+ * can be used with multiple web apps. Each web app may provide additional paths where ModuleAdvertisements
+ * may be found.
  */
-public class CommandlineModuleRegistry
+public class TomcatModuleRegistry
     extends
         ModuleRegistry
 {
-    /**
-      * Factory method to construct a ModuleRegistry from the information provided
-      * by this SoftwareInstallation.
-      *
-      * @param theInstallation the SoftwareInstallation that knows all the parameters
-      * @return the created ModuleRegistry
-      * @throws IOException thrown when we were unsuccessful reading a specified ModuleAdvertisement file
-      * @throws ClassNotFoundException thrown when we were trying to read a ModuleAdvertisement subclass that was not available locally
-      */
-    public static CommandlineModuleRegistry create(
-            CommandlineSoftwareInstallation theInstallation )
-        throws
-            IOException,
-            ClassNotFoundException
-    {
-        ArrayList<ModuleAdvertisement> ads = new ArrayList<ModuleAdvertisement>( 64 );
 
-        ModuleAdvertisementXmlParser theParser = null;
+    public static TomcatModuleRegistry create(
+            File settingsPath )
+        throws
+            ModuleRegistryMetaParseException,
+            IOException
+    {
+        ModuleRegistryMetaXmlParser  theSettingsParser = null;
+        ModuleAdvertisementXmlParser theAdParser       = null;
+        BufferedInputStream          theStream         = null;
+        ModuleRegistryMeta           settings          = null;
+
         try {
-           theParser = new ModuleAdvertisementXmlParser();
+           theSettingsParser = new ModuleRegistryMetaXmlParser();
            // this will throw an exception in a non-JDK 1.4 environment where XML is not built into the JDK
         } catch( Throwable t ) {
             ModuleErrorHandler.informThrowable( t );
         }
 
-        if( theParser != null ) {
+        try {
+           theAdParser = new ModuleAdvertisementXmlParser();
+           // this will throw an exception in a non-JDK 1.4 environment where XML is not built into the JDK
+        } catch( Throwable t ) {
+            ModuleErrorHandler.informThrowable( t );
+        }
+
+        try {
+            theStream = new BufferedInputStream( new FileInputStream( settingsPath ));
+
+            settings = theSettingsParser.readRegistrySettings( theStream, settingsPath );
+
+        } catch( IOException ex ) {
+            ModuleErrorHandler.warn( "Could not read ModuleRegistrySettings from " + settingsPath.getCanonicalPath(), ex );
+            throw ex;
+
+        } finally {
+            if( theStream != null ) {
+                try {
+                    theStream.close();
+                } catch( IOException ex2 ) {
+                    // no op
+                }
+            }
+        }
+
+        ArrayList<ModuleAdvertisement> ads = new ArrayList<ModuleAdvertisement>( 64 );
+        if( settings != null ) {
             // Load the ModuleAdvertisements
-            Iterable<String> moduleAdPaths = theInstallation.getModuleAdvertisementPaths();
+            Iterable<String> moduleAdPaths = settings.getModuleAdvertisementPaths();
             Set<File>        moduleAdFiles = new HashSet<File>();
+            String           context       = settings.getSource().getCanonicalPath();
+            int              lastSlash     = context.lastIndexOf( '/' );
+
+            if( lastSlash > 0 ) {
+                context = context.substring( 0, lastSlash+1 );
+            }
 
             for( String currentPath : moduleAdPaths ) {
+                if( !currentPath.startsWith( "/" )) {
+                    currentPath = context + currentPath;
+                }
                 addFilesAtPath( currentPath, moduleAdFiles );
             }
 
@@ -82,11 +113,11 @@ public class CommandlineModuleRegistry
                     continue;
                 }
 
-                BufferedInputStream theStream = null;
+                theStream = null;
                 try {
                     theStream = new BufferedInputStream( new FileInputStream( candidateFile ));
 
-                    ModuleAdvertisement ad = theParser.readAdvertisement( theStream, candidateFile, null );
+                    ModuleAdvertisement ad = theAdParser.readAdvertisement( theStream, candidateFile, null );
                     if( !ads.contains( ad )) {
                         ads.add( ad );
                     }
@@ -106,9 +137,9 @@ public class CommandlineModuleRegistry
                 }
             }
         }
-
-        return new CommandlineModuleRegistry( ads );
+        return new TomcatModuleRegistry( settingsPath, ads );
     }
+
 
     /**
      * Helper method to add the files found at a path, potentially with wildcards.
@@ -134,6 +165,8 @@ public class CommandlineModuleRegistry
         }
 
         String [] pathComponents = path.split( "/" );
+
+        System.err.println( "Now attempting to add files relative to " + start.getAbsolutePath() );
 
         addFilesAtPath( pathComponents, 0, start, found );
     }
@@ -163,9 +196,10 @@ public class CommandlineModuleRegistry
                 addFilesAtPath( pathComponents, here+1, currentLocation.getParentFile(), found ); // one up
             }
         } else {
-            final String  regex  = pathComponents[here].replace( ".", "\\." ).replace( "*" , ".*" ).replace( "?", "." ); // good enough
+            final String  regex = pathComponents[here].replace( ".", "\\." ).replace( "*" , ".*" ).replace( "?", "." ); // good enough
 
             File [] foundHere = currentLocation.listFiles( new FilenameFilter() {
+                    @Override
                     public boolean accept(
                             File   dir,
                             String name )
@@ -197,14 +231,27 @@ public class CommandlineModuleRegistry
      *
      * @param ads the ModuleAdvertisements found
      */
-    protected CommandlineModuleRegistry(
+    protected TomcatModuleRegistry(
+            File                           settingsPath,
             ArrayList<ModuleAdvertisement> ads )
     {
         super( ads );
+
+        theSettingsPath = settingsPath;
     }
 
     /**
-     * ModuleRegistry also acts as a factory for the Modules' ClassLoaders.
+     * Obtain the location of the settings file.
+     *
+     * @return the location
+     */
+    public File getSettingsPath()
+    {
+        return theSettingsPath;
+    }
+
+    /**
+     * SoftwareInstallation also acts as a factory for the Modules' ClassLoaders.
      *
      * @param module the Module for which to create a ClassLoader
      * @param parentClassLoader the ClassLoader to use as the parent ClassLoader
@@ -235,4 +282,6 @@ public class CommandlineModuleRegistry
         }
         return ret;
     }
+
+    protected File theSettingsPath;
 }

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -149,6 +149,30 @@ public class ModuleRequirement
     public final Map<String,String> getLocalParameterDefaults()
     {
         return theLocalParameterDefaults;
+    }
+
+    /**
+     * Determine whether a ModuleAdvertisement meets this ModuleRequirement.
+     *
+     * @param candidate the candidate ModuleAdvertisement
+     * @return true if the ModuleAdvertisement matches this ModuleRequirement
+     */
+    public boolean matches(
+            ModuleAdvertisement candidate )
+    {
+        if( theRequiredModuleName != null ) {
+            if( !theRequiredModuleName.equals( candidate.getModuleName() ) ) {
+                return false;
+            }
+            if( theRequiredModuleVersion == null ) {
+                return true;
+            }
+            if( candidate.getModuleVersion() == null ) {
+                return true;
+            }
+            return theRequiredModuleVersion.equals( candidate.getModuleVersion() );
+        }
+        return false;
     }
 
     /**

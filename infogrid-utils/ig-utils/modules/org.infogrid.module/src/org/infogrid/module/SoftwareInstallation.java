@@ -34,8 +34,6 @@ public abstract class SoftwareInstallation
      * @param rootModuleName the name of the root Module to run
      * @param activationClassName the name of the class to invoke to activate the root Module (overrides default specified in ModuleAdvertisement)
      * @param activationMethodName the name of the method to invoke to activate the root Module (overrides default specified in ModuleAdvertisement)
-     * @param useModuleClassLoaders if true, use ModuleClassLoaders to load the Modules
-     * @param allowDefaultClassPathForRootModule if true, enable the default ClassLoader for the root Module
      * @param isDeveloper if true, run in developer mode
      * @param isDemo if true, run in demo mode
      * @param isShowModuleRegistry if true, print the content of the ModuleRegistry to the terminal
@@ -47,8 +45,6 @@ public abstract class SoftwareInstallation
             String      rootModuleName,
             String      activationClassName,
             String      activationMethodName,
-            boolean     useModuleClassLoaders,
-            boolean     allowDefaultClassPathForRootModule,
             boolean     isDeveloper,
             boolean     isDemo,
             boolean     isShowModuleRegistry,
@@ -61,8 +57,6 @@ public abstract class SoftwareInstallation
         theRootModuleRequirement              = ModuleRequirement.create1( rootModuleName );
         theActivationClassName                = activationClassName;
         theActivationMethodName               = activationMethodName;
-        theUseModuleClassLoaders              = useModuleClassLoaders;
-        theAllowDefaultClassPathForRootModule = allowDefaultClassPathForRootModule;
 
         theIsDeveloper          = isDeveloper;
         theIsDemo               = isDemo;
@@ -74,23 +68,6 @@ public abstract class SoftwareInstallation
         if( moduleDebugStream != null ) {
             ModuleErrorHandler.setDebugStream( moduleDebugStream );
         }
-
-        synchronized( SoftwareInstallation.class ) {
-            if( theSingleton != null ) {
-                throw new IllegalStateException( "Have singleton already: " + theSingleton );
-            }
-            theSingleton = this;
-        }
-    }
-
-    /**
-     * Obtain the singleton instance of this class.
-     *
-     * @return the singleton instance of this class, if any
-     */
-    public static SoftwareInstallation getSoftwareInstallation()
-    {
-        return theSingleton;
     }
 
     /**
@@ -212,32 +189,6 @@ public abstract class SoftwareInstallation
     }
 
     /**
-     * Determine whether or not we use ModuleClassLoaders to load code from individual Modules
-     * using ModuleClassLoaders. We'd like to use ModuleClassLoaders as often as we can, but
-     * two known conditions prevent that: 1) running under J2EE, where it seems to be simply
-     * impossible to "insert" a ModuleClassLoader into the parent hierarchy of a ClassLoader
-     * loading JSPs, and 2) running under JNLP.
-     *
-     * @return if true, we want to use ModuleClassLoaders
-     */
-    public final boolean useModuleClassLoaders()
-    {
-        return theUseModuleClassLoaders;
-    }
-
-    /**
-     * Determine whether or not we also consult the default Java classpath for the root Module.
-     * If this is true, it helps with some IDEs (NetBeans) that don't fully rebuild the current module
-     * when you select Run.
-     *
-     * @return true if we consult the default classpath as well
-     */
-    public final boolean allowDefaultClassPathForRootModule()
-    {
-        return theAllowDefaultClassPathForRootModule;
-    }
-
-    /**
      * Create a temp file at a suitable place. This can be used by any Module.
      *
      * @param suffix suffix to use
@@ -308,16 +259,6 @@ public abstract class SoftwareInstallation
     protected String theHostName;
 
     /**
-     * Do we want to use ModuleClassLoaders.
-     */
-    protected boolean theUseModuleClassLoaders;
-
-    /**
-     * Do we want to consult the standard Java classpath for the root Module.
-     */
-    protected boolean theAllowDefaultClassPathForRootModule;
-
-    /**
      * Indicates whether we are running in developer mode.
      */
     protected boolean theIsDeveloper;
@@ -331,11 +272,6 @@ public abstract class SoftwareInstallation
      * Indicates whether we are dumping the content of the ModuleRegistry to the terminal.
      */
     protected boolean theIsShowModuleRegistry;
-
-    /**
-     * The singleton instance of this class.
-     */
-    protected static SoftwareInstallation theSingleton;
 
     /**
      * Identifies the Mac OSX platform.

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -129,12 +129,7 @@ public abstract class CommandlineBootLoader
         }
 
         try {
-            StandardModule theRootModule         = (StandardModule) theModuleRegistry.resolve( rootModuleAdv );
-            ClassLoader    rootModuleClassLoader = theRootModule.getClassLoader();
-
-            if( ( rootModuleClassLoader instanceof ModuleClassLoader ) && theInstallation.allowDefaultClassPathForRootModule() ) {
-                ((ModuleClassLoader) rootModuleClassLoader).setConsultDefaultClassLoaderFirst( true );
-            }
+            StandardModule theRootModule = (StandardModule) theModuleRegistry.resolve( rootModuleAdv );
 
             StandardModuleActivator act = theRootModule.getDefaultModuleActivator();
             if(    theInstallation.getOverriddenActivationClassName() != null

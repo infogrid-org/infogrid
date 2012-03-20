@@ -8,13 +8,14 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.module;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Date;
 import java.util.Map;
 
@@ -27,22 +28,22 @@ public class ModelModuleAdvertisement
     private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
-     * Factory method that constructs a ModuleAdvertisement from specified data.
-     *
-     * @param moduleName the programmatic name of the to-be-created Module
-     * @param moduleVersion the version of the to-be-created Module
-     * @param moduleUserNames the name shown to the user of the to-be-created Module, keyed by locale
-     * @param moduleUserDescriptions the description shown to the user of the to-be-created Module, keyed by the locale
-     * @param moduleBuildDate the time when this Module was built
-     * @param license the license for the to-be-created Module
-     * @param file the File that contains this ModuleAdvertisement, if available
-     * @param buildTimeModuleRequirements the ModuleRequirements of this Module at build time
-     * @param runTimeModuleRequirements the ModuleRequirements of this Module at run time
-     * @param moduleJars JAR files provided by this Module
-     * @param localParameterValues the parameter-value paris of parameters that cannot be overridden by inherited values
-     * @param localParameterDefaults the parameter-value paris of parameters that are overridden by inherited values
-     * @return the created ModelModuleAdvertisement
-     */
+      * Factory method that constructs a ModuleAdvertisement from specified data.
+      *
+      * @param moduleName the programmatic name of the to-be-created Module
+      * @param moduleVersion the version of the to-be-created Module
+      * @param moduleUserNames the name shown to the user of the to-be-created Module, keyed by locale
+      * @param moduleUserDescriptions the description shown to the user of the to-be-created Module, keyed by the locale
+      * @param moduleBuildDate the time when this Module was built
+      * @param license the license for the to-be-created Module
+      * @param file the File that contains this ModuleAdvertisement, if available
+      * @param buildTimeModuleRequirements the ModuleRequirements of this Module at build time
+      * @param runTimeModuleRequirements the ModuleRequirements of this Module at run time
+      * @param moduleJars JAR files provided by this Module
+      * @param localParameterValues the parameter-value pairs of parameters that cannot be overridden by inherited values
+      * @param localParameterDefaults the parameter-value pairs of parameters that are overridden by inherited values
+      * @return the created ModelModuleAdvertisement
+      */
     public static ModelModuleAdvertisement create1(
             String               moduleName,
             String               moduleVersion,
@@ -91,8 +92,8 @@ public class ModelModuleAdvertisement
       * @param buildTimeModuleRequirements the ModuleRequirements of this Module at build time
       * @param runTimeModuleRequirements the ModuleRequirements of this Module at run time
       * @param moduleJars JAR files provided by this Module
-      * @param localParameterValues the parameter-value paris of parameters that cannot be overridden by inherited values
-      * @param localParameterDefaults the parameter-value paris of parameters that are overridden by inherited values
+      * @param localParameterValues the parameter-value pairs of parameters that cannot be overridden by inherited values
+      * @param localParameterDefaults the parameter-value pairs of parameters that are overridden by inherited values
       */
     protected ModelModuleAdvertisement(
             String               moduleName,
@@ -127,16 +128,14 @@ public class ModelModuleAdvertisement
      * by the user of this framework.
      *
      * @param registry the ModuleRegistry in which the to-be-created Module will look for dependent Modules
-     * @param jars the JAR files of this Module
      * @param parentClassLoader the ClassLoader of our parent Module
      * @return the created Module
      */
     protected Module createModule(
             ModuleRegistry registry,
-            File []        jars,
             ClassLoader    parentClassLoader )
     {
-        return new ModelModule( this, registry, jars, parentClassLoader );
+        return new ModelModule( this, registry, parentClassLoader );
     }
 
     /**

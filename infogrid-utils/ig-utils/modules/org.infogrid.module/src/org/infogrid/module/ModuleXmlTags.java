@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,21 +21,13 @@ import java.text.SimpleDateFormat;
  * Collects the tag names in the ModuleAdvertisements' XML format.
  */
 public interface ModuleXmlTags
+        extends
+            ModuleDependenciesXmlTags
 {
     /**
      * The default DateFormat.
      */
     public static final DateFormat theDefaultDateFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); /// RC 3339
-
-    /**
-     * XML tag: dependencies.
-     */
-    public static final String DEPENDENCIES_TAG = "dependencies";
-
-    /**
-     * XML tag: requires.
-     */
-    public static final String REQUIRES_TAG = "requires";
 
     /**
      * XML tag: capability.
@@ -121,51 +113,6 @@ public interface ModuleXmlTags
      * XML tag: arg.
      */
     public static final String ARG_TAG = "arg";
-
-    /**
-     * XML tag: parameter.
-     */
-    public static final String PARAMETER_TAG = "parameter";
-
-    /**
-     * XML parameter: name.
-     */
-    public static final String NAME_PAR = "name";
-
-    /**
-     * XML parameter: version.
-     */
-    public static final String VERSION_PAR = "version";
-
-    /**
-     * XML parameter: mode.
-     */
-    public static final String MODE_PAR = "mode";
-
-    /**
-     * XML parameter value: both.
-     */
-    public static final String MODE_PAR_BOTH = "both";
-
-    /**
-     * XML parameter value: buildtime.
-     */
-    public static final String MODE_PAR_BUILDTIME = "buildtime";
-
-    /**
-     * XML parameter value: runtime.
-     */
-    public static final String MODE_PAR_RUNTIME = "runtime";
-
-    /**
-     * XML parameter: default.
-     */
-    public static final String DEFAULT_PAR = "default";
-
-    /**
-     * XML parameter: value.
-     */
-    public static final String VALUE_PAR = "value";
 
     /**
      * XML parameter: locale
