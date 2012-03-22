@@ -35,8 +35,6 @@ public class TomcatWebAppClassLoader
             ClassLoader parent )
     {
         super( parent );
-
-        TomcatModuleLoader.dump( "created", this );
     }
 
     /**
