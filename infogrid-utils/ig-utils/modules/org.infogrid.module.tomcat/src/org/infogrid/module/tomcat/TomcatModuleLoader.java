@@ -18,7 +18,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
@@ -75,8 +74,6 @@ public class TomcatModuleLoader
         super( parent );
 
         setLoaderClass( TomcatWebAppClassLoader.class.getName() );
-
-        TomcatModuleLoader.dump( "created", this );
     }
 
     /**
@@ -110,8 +107,6 @@ public class TomcatModuleLoader
         throws
             LifecycleException
     {
-        dump( "start", this );
-
         if( theModuleConfigFile == null ) {
             throw new LifecycleException( "moduleConfigFile parameter not set" );
         }
@@ -119,10 +114,10 @@ public class TomcatModuleLoader
         // I would have liked to invoke super.start() last but that's the only way I can get at our ClassLoader.
         super.start();
 
-        TomcatWebAppClassLoader       myClassLoader          = (TomcatWebAppClassLoader) super.getClassLoader();
-        ModuleConfigurationXmlParser  theConfigurationParser = null;
-        ModuleRequirementsConfiguration           configuration          = null;
-        InputStream                   theStream              = null;
+        TomcatWebAppClassLoader         myClassLoader          = (TomcatWebAppClassLoader) super.getClassLoader();
+        ModuleConfigurationXmlParser    theConfigurationParser = null;
+        ModuleRequirementsConfiguration configuration          = null;
+        InputStream                     theStream              = null;
 
         try {
            theConfigurationParser = new ModuleConfigurationXmlParser();
@@ -132,7 +127,7 @@ public class TomcatModuleLoader
         }
 
         try {
-            URL moduleConfigUrl = myClassLoader.findResource( theModuleConfigFile );
+            URL moduleConfigUrl = myClassLoader.getResource( theModuleConfigFile );
             theStream = new BufferedInputStream( moduleConfigUrl.openStream() );
 
             configuration = theConfigurationParser.readConfiguration( theStream, null ); // FIXME?
@@ -200,8 +195,6 @@ public class TomcatModuleLoader
 
         } catch( Throwable ex ) {
             throw new LifecycleException( ex );
-        } finally {
-            dump( "start-complete", this );
         }
     }
 
@@ -213,8 +206,6 @@ public class TomcatModuleLoader
         throws
             LifecycleException
     {
-        dump( "stop", this );
-
         super.stop();
     }
 
@@ -238,28 +229,4 @@ public class TomcatModuleLoader
      * Keep a reference to the ModuleRegistryDirectory so it won't be garbage collected.
      */
     protected Class keep = ModuleRegistryDirectory.class;
-
-    static PrintWriter w;
-    static {
-        try {
-            w = new PrintWriter( "/tmp/tomcatloader.out" );
-        } catch( IOException ex ) {
-            throw new ExceptionInInitializerError( ex );
-        }
-    }
-    public static void dump(
-            String msg,
-            Object o )
-    {
-        if( o != null ) {
-            w.print( "** Object " );
-            w.print( o );
-            w.print( " " );
-        }
-        w.print( msg );
-        w.print( " (thread " );
-        w.print( Thread.currentThread().getName() );
-        w.println( ")");
-        w.flush();
-    }
 }

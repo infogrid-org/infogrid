@@ -165,9 +165,6 @@ public class TomcatModuleRegistry
         }
 
         String [] pathComponents = path.split( "/" );
-
-        System.err.println( "Now attempting to add files relative to " + start.getAbsolutePath() );
-
         addFilesAtPath( pathComponents, 0, start, found );
     }
 

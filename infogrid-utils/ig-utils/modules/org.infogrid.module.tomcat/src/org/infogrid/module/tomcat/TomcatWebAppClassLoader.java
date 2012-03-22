@@ -102,15 +102,17 @@ public class TomcatWebAppClassLoader
     public URL getResource(
             String name )
     {
-        URL ret = findResource( name );
+        URL ret = super.getResource( name );
         if( ret != null ) {
             return ret;
         }
 
-        for( int i=0 ; i<theDependencyClassLoaders.length ; ++i ) {
-            ret = theDependencyClassLoaders[i].getResource( name );
-            if( ret != null ) {
-                return ret;
+        if( theDependencyClassLoaders != null ) {
+            for( int i=0 ; i<theDependencyClassLoaders.length ; ++i ) {
+                ret = theDependencyClassLoaders[i].getResource( name );
+                if( ret != null ) {
+                    return ret;
+                }
             }
         }
         return null;

@@ -18,6 +18,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * A singleton that can be used for multiple apps to share information across application boundaries.
@@ -33,13 +34,17 @@ public abstract class SharedSpace
      * Obtain a named object from the SharedSpace. If the named object does not exist yet,
      * invoke the factory to create it.
      *
+     * @param caller the Object that checks out the Object
      * @param name the name of the shared object
-     * @param factory the factory to create the shared object if it does not exist yet
+     * @param factory the factory to create the shared object if it does not exist yet, if any
+     * @param lastReturned callback to invoke when the last caller has returned the shared object, if any
      * @return the found object, or the created object
      */
     public static synchronized Object checkoutObject(
-            String  name,
-            Factory factory )
+            Object       caller,
+            String       name,
+            Factory      factory,
+            LastReturned lastReturned )
     {
         Reference<Object> ref = theObjects.get( name );
         Object            ret = ( ref != null ) ? ref.get() : null;
@@ -54,6 +59,16 @@ public abstract class SharedSpace
             }
             if( ret != null ) { // factory may return null
                 theObjects.put( name, new NamedReference( name, ret ));
+            }
+        }
+        if( ret != null ) {
+            HashSet<Object> callers = theNameToCallersMap.get( name );
+            if( callers == null ) {
+                callers = new HashSet<Object>();
+                theNameToCallersMap.put( name, callers );
+            }
+            if( !callers.add( caller ) ) {
+                throw new IllegalStateException( "Caller " + caller + " has already checked out object named " + name + " from SharedSpace" );
             }
         }
         return ret;
@@ -77,18 +92,37 @@ public abstract class SharedSpace
     }
 
     /**
-     * Remove a named object from the SharedSpace.
+     * Opposite operation to checkoutObject.
      *
+     * @param caller the object that releases the object. Must be the same as given during checkoutObject
      * @param name the name of the shared object
-     * @return the released object, if it exists
+     * @return returns the named object, but only if this is the last caller returning the object
      */
-    public static synchronized Object releaseObject(
+    public static synchronized Object returnObject(
+            Object caller,
             String name )
     {
         checkQueue();
 
-        Reference<Object> ref = theObjects.remove( name );
-        Object            ret = ( ref != null ) ? ref.get() : null;
+        HashSet<Object> callers = theNameToCallersMap.get( name );
+        if( !callers.remove( caller )) {
+            throw new IllegalStateException( "Caller " + caller + " cannot return object named " + name + ": not checked out" );
+        }
+
+        Object ret;
+        if( callers.isEmpty() ) {
+            Reference<Object> ref = theObjects.remove( name );
+            theNameToCallersMap.remove( name );
+            ret = ( ref != null ) ? ref.get() : null;
+            
+            LastReturned callback = theLastReturneds.remove( name );
+            if( callback != null ) {
+                callback.lastReturned( name, ret );
+            }
+
+        } else {
+            ret = null;
+        }
 
         return ret;
     }
@@ -103,7 +137,14 @@ public abstract class SharedSpace
             if( current == null ) {
                 return;
             }
-            theObjects.remove( current.getName() );
+            String name = current.getName();
+
+            theObjects.remove( name );
+            theNameToCallersMap.remove( name );
+            LastReturned callback = theLastReturneds.remove( name );
+            if( callback != null ) {
+                callback.lastReturned( name, current.get() );
+            }
         }
     }
 
@@ -116,6 +157,16 @@ public abstract class SharedSpace
      * The ReferenceQueue into which garbage-collected References have been inserted.
      */
     private static final ReferenceQueue<Object> theQueue = new ReferenceQueue<Object>();
+
+    /**
+     * Maps the names of the checked-out objects to the callers that checked them out.
+     */
+    private static final HashMap<String,HashSet<Object>> theNameToCallersMap = new HashMap<String,HashSet<Object>>();
+
+    /**
+     * Maps the names of the checked-out objects to the LastReturned objects, if any.
+     */
+    private static final HashMap<String,LastReturned> theLastReturneds = new HashMap<String,LastReturned>();
 
     /**
      * Helper class that allows to remove named entries from the map whose values have expired.
@@ -170,5 +221,22 @@ public abstract class SharedSpace
         public Object create()
                 throws
                     Throwable;
+    }
+
+    /**
+     * This interface must be implemented by users of SharedSpace that wish to obtain a callback when a shared
+     * object is returned by the last caller. This enables cleanup operations, for example.
+     */
+    public static interface LastReturned
+    {
+        /**
+         * Invoked when a shared object has been returned by the last caller.
+         *
+         * @param name the name of the shared object
+         * @param sharedObject the shared object
+         */
+        public void lastReturned(
+                String name,
+                Object sharedObject );
     }
 }
