@@ -104,7 +104,9 @@ public class TomcatModuleRegistry
                 if( !currentPath.startsWith( "/" )) {
                     currentPath = context + currentPath;
                 }
-                addFilesAtPath( currentPath, moduleAdFiles );
+                if( addFilesAtPath( currentPath, moduleAdFiles ) == 0 ) {
+                    System.err.println( "WARN: TomcatModuleRegistry failed to find any ModuleAdvertisements at path " + currentPath );
+                }
             }
 
             for( File candidateFile : moduleAdFiles ) {
@@ -146,8 +148,9 @@ public class TomcatModuleRegistry
      *
      * @param path path, potentially with wildcards
      * @param found the collection of Files found so far
+     * @return the number of files found at this path
      */
-    protected static void addFilesAtPath(
+    protected static int addFilesAtPath(
             String    path,
             Set<File> found )
     {
@@ -165,7 +168,9 @@ public class TomcatModuleRegistry
         }
 
         String [] pathComponents = path.split( "/" );
-        addFilesAtPath( pathComponents, 0, start, found );
+        int ret = addFilesAtPath( pathComponents, 0, start, found );
+
+        return ret;
     }
 
     /**
@@ -175,8 +180,9 @@ public class TomcatModuleRegistry
      * @param here index into the pathComponents
      * @param currentLocation the current location in the file system
      * @param found the collection of Files found so far
+     * @return the number of files found at this path
      */
-    protected static void addFilesAtPath(
+    protected static int addFilesAtPath(
             String [] pathComponents,
             int       here,
             File      currentLocation,
@@ -184,13 +190,15 @@ public class TomcatModuleRegistry
     {
         final boolean isLast = here == pathComponents.length-1;
 
+        int ret = 0;
+
         if( ".".equals( pathComponents[ here ] )) {
             if( !isLast ) {
-                addFilesAtPath( pathComponents, here+1, currentLocation, found ); // same location
+                ret += addFilesAtPath( pathComponents, here+1, currentLocation, found ); // same location
             }
         } else if( "..".equals( pathComponents[ here ] )) {
             if( !isLast ) {
-                addFilesAtPath( pathComponents, here+1, currentLocation.getParentFile(), found ); // one up
+                ret += addFilesAtPath( pathComponents, here+1, currentLocation.getParentFile(), found ); // one up
             }
         } else {
             final String  regex = pathComponents[here].replace( ".", "\\." ).replace( "*" , ".*" ).replace( "?", "." ); // good enough
@@ -215,12 +223,14 @@ public class TomcatModuleRegistry
                 for( int i=0 ; i<foundHere.length ; ++i ) {
                     found.add( foundHere[i] );
                 }
+                ret += foundHere.length;
             } else {
                 for( int i=0 ; i<foundHere.length ; ++i ) {
-                    addFilesAtPath( pathComponents, here+1, foundHere[i], found );
+                    ret += addFilesAtPath( pathComponents, here+1, foundHere[i], found );
                 }
             }
         }
+        return ret;
     }
 
     /**
