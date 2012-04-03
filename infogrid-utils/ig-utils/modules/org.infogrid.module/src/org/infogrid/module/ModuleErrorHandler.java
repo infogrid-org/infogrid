@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -580,7 +580,32 @@ public abstract class ModuleErrorHandler
     }
 
     /**
-     * Report a warning
+     * Report an error.
+     *
+     * @param msg the error
+     */
+    public static void error(
+            String    msg,
+            Throwable t )
+    {
+        if( errorStream != null ) {
+            errorStream.print( "ERROR: " );
+            errorStream.println( msg );
+            if( t != null ) {
+                t.printStackTrace( errorStream );
+            }
+        }
+        if( errorStream != System.err ) {
+            System.err.print( "ERROR: " );
+            System.err.println( msg );
+            if( t != null ) {
+                t.printStackTrace( System.err );
+            }
+        }
+    }
+
+    /**
+     * Report a warning.
      *
      * @param msg the warning
      */
@@ -598,24 +623,28 @@ public abstract class ModuleErrorHandler
     }
 
     /**
-     * Report a warning
+     * Report a warning.
      *
      * @param msg the warning message, if any
-     * @param ex the Exception, if any
+     * @param t the Exception, if any
      */
     public static void warn(
             String    msg,
-            Exception ex )
+            Throwable t )
     {
         if( errorStream != null ) {
             errorStream.print( "WARN: " );
             errorStream.println( msg );
-            ex.printStackTrace( errorStream );
+            if( t != null ) {
+                t.printStackTrace( errorStream );
+            }
         }
         if( errorStream != System.err ) {
             System.err.print( "WARN: " );
             System.err.println( msg );
-            ex.printStackTrace( System.err );
+            if( t != null ) {
+                t.printStackTrace( System.err );
+            }
         }
     }
 

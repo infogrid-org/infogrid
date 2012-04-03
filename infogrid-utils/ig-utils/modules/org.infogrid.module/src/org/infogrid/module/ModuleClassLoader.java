@@ -22,7 +22,6 @@ import java.net.URL;
 import java.net.URLStreamHandler;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -288,7 +287,20 @@ public class ModuleClassLoader
                     theJars[i] = new JarFile( files[i] );
                 }
             } catch( IOException ex ) {
-                ModuleErrorHandler.error( ex );
+                StringBuilder buf = new StringBuilder();
+                buf.append( "When trying to find " );
+                buf.append( name );
+                buf.append( ", failed to read file " );
+                buf.append( files[i] );
+                buf.append( " as JAR file: " );
+                if( !files[i].exists() ) {
+                    buf.append( "does not exist." );
+                } else if( !files[i].canRead() ) {
+                    buf.append( "exists but cannot read." );
+                } else {
+                    buf.append( "exists and has length " ).append( String.valueOf( files[i].length() ));
+                }
+                ModuleErrorHandler.warn( buf.toString(), ex );
             }
             if( theJars[i] != null ) {
                 try {
