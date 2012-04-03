@@ -601,10 +601,11 @@ public abstract class StringHelper
         }
 
         final String insert = "...";
-        final int    fromEnd = 5; // how many characters we leave at the end
+        int          fromEnd = 5; // how many characters we leave at the end
 
         String ret = in;
         if( maxLength > 0 && ret.length() > maxLength ) {
+            fromEnd = Math.min( fromEnd, ret.length() - maxLength );
             ret = ret.substring( 0, maxLength-fromEnd-insert.length() ) + insert + ret.substring( ret.length() - fromEnd );
         }
         return ret;
