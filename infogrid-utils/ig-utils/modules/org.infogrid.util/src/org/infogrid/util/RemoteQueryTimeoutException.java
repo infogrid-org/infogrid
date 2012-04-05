@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -240,7 +240,7 @@ public abstract class RemoteQueryTimeoutException
         }
 
         /**
-         * dDtermine whether the complete result is now available.
+         * Determine whether the complete result is now available.
          *
          * @return true if the complete result is now available
          */
