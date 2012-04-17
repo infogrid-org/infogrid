@@ -28,10 +28,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- *
- * @author jernst
+ * Parser for ModuleRequirementsConfiguration XML files.
  */
-public class ModuleConfigurationXmlParser
+public class ModuleRequirementsConfigurationXmlParser
         extends
             AbstractModuleDependenciesXmlParser
         implements
@@ -40,11 +39,20 @@ public class ModuleConfigurationXmlParser
     /**
      * Constructor.
      */
-    public ModuleConfigurationXmlParser()
+    public ModuleRequirementsConfigurationXmlParser()
     {
         super();
     }
 
+    /**
+     * Read a ModuleConfiguration from a stream.
+     *
+     * @param stream the stream to read from
+     * @param file the file from which the stream was created, for error reporting purposes
+     * @return the read ModuleRequirementsConfiguration
+     * @throws ModuleConfigurationException thrown if parsing failed
+     * @throws IOException thrown if an I/O error occurred
+     */
     public ModuleRequirementsConfiguration readConfiguration(
             InputStream stream,
             File        file )
@@ -86,7 +94,7 @@ public class ModuleConfigurationXmlParser
     }
 
     /**
-     * Allows subclasses to add to parsing.
+     * Callback indicating that a new XML element starts with a tag not known in the superclass.
      *
      * @param namespaceURI The Namespace URI, or the empty string if the
      *        element has no Namespace URI or if Namespace
@@ -131,7 +139,7 @@ public class ModuleConfigurationXmlParser
     }
 
     /**
-     * Callback indicating that an XML element starts.
+     * Callback indicating that a new XML element ends with a tag not known in the superclass.
      *
      * @param namespaceURI The Namespace URI, or the empty string if the
      *        element has no Namespace URI or if Namespace
@@ -165,5 +173,8 @@ public class ModuleConfigurationXmlParser
         }
     }
 
+    /**
+     * The required repositories.
+     */
     protected HashMap<String,File> repositories;
 }

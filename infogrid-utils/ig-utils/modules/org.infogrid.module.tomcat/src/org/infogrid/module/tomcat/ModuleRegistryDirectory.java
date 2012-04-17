@@ -1,7 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+//
+// This file is part of InfoGrid(tm). You may not use this file except in
+// compliance with the InfoGrid license. The InfoGrid license and important
+// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+// or you do not consent to all aspects of the license and the disclaimers,
+// no license is granted; do not use this file.
+//
+// For more information about InfoGrid go to http://infogrid.org/
+//
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// All rights reserved.
+//
+
 package org.infogrid.module.tomcat;
 
 import java.io.File;
@@ -12,17 +22,21 @@ import org.infogrid.module.ModuleRegistry;
 import org.infogrid.module.SharedSpace;
 
 /**
+ * A directory of ModuleRegistries.
  *
  * This can't implement SmartFactory because this project cannot depend on org.infogrid.util.
  */
 public abstract class ModuleRegistryDirectory
 {
+    /**
+     * Private constructor to keep this abstract.
+     */
     private ModuleRegistryDirectory() {}
 
     /**
      * Obtain a newly created ModuleRegistry that is private.
      *
-     * @param settingsPath
+     * @param settingsPath the path containing the settings
      * @return a newly created ModuleRegistry
      */
     public static ModuleRegistry obtainFor(
@@ -71,7 +85,7 @@ public abstract class ModuleRegistryDirectory
     }
 
     /**
-     *
+     * The known ModuleRegistries, keyed by their share name.
      */
     protected static HashMap<String,WeakReference<TomcatModuleRegistry>> theModuleRegistries
             = new HashMap<String,WeakReference<TomcatModuleRegistry>>();

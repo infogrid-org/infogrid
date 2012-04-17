@@ -15,13 +15,18 @@
 package org.infogrid.module.tomcat;
 
 /**
- *
- * @author jernst
+ * Thrown if the ModuleRegistryMeta file cannot be parsed.
  */
 public class ModuleRegistryMetaParseException
     extends
         Exception
 {
+    /**
+     * Constructor.
+     *
+     * @param msg the message
+     * @param cause the underlying cause
+     */
     public ModuleRegistryMetaParseException(
             String    msg,
             Throwable cause )

@@ -43,7 +43,14 @@ public class TomcatModuleRegistry
     extends
         ModuleRegistry
 {
-
+    /**
+     * Factory method.
+     *
+     * @param settingsPath the File containing the settings
+     * @return the created TomcatModuleRegistry
+     * @throws ModuleRegistryMetaParseException thrown if parsing the settings file failed
+     * @throws IOException thrown if an I/O error occurred.
+     */
     public static TomcatModuleRegistry create(
             File settingsPath )
         throws
@@ -290,5 +297,8 @@ public class TomcatModuleRegistry
         return ret;
     }
 
+    /**
+     * Location of the settings file.
+     */
     protected File theSettingsPath;
 }

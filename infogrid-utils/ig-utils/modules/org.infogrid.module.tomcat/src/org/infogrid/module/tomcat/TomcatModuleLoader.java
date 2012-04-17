@@ -66,7 +66,7 @@ public class TomcatModuleLoader
     /**
      * Constructor.
      *
-     * @param
+     * @param parent the parent ClassLoader
      */
     public TomcatModuleLoader(
             ClassLoader parent )
@@ -100,7 +100,9 @@ public class TomcatModuleLoader
     }
 
     /**
+     * Start it.
      *
+     * @throws LifecycleException thrown if this TomcatModuleLoader cannot be started
      */
     @Override
     public void start()
@@ -115,12 +117,12 @@ public class TomcatModuleLoader
         super.start();
 
         TomcatWebAppClassLoader         myClassLoader          = (TomcatWebAppClassLoader) super.getClassLoader();
-        ModuleConfigurationXmlParser    theConfigurationParser = null;
+        ModuleRequirementsConfigurationXmlParser    theConfigurationParser = null;
         ModuleRequirementsConfiguration configuration          = null;
         InputStream                     theStream              = null;
 
         try {
-           theConfigurationParser = new ModuleConfigurationXmlParser();
+           theConfigurationParser = new ModuleRequirementsConfigurationXmlParser();
            // this will throw an exception in a non-JDK 1.4 environment where XML is not built into the JDK
         } catch( Throwable t ) {
             ModuleErrorHandler.informThrowable( t );
@@ -199,7 +201,9 @@ public class TomcatModuleLoader
     }
 
     /**
+     * Stop it.
      *
+     * @throws LifecycleException thrown if this TomcatModuleLoader cannot be stopped
      */
     @Override
     public void stop()
@@ -209,6 +213,11 @@ public class TomcatModuleLoader
         super.stop();
     }
 
+    /**
+     * Convert to String, for debugging.
+     *
+     * @return String form
+     */
     @Override
     public String toString()
     {

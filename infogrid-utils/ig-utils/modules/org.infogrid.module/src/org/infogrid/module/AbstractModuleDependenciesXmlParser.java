@@ -232,7 +232,7 @@ public abstract class AbstractModuleDependenciesXmlParser
     }
 
     /**
-     * Callback indicating that an XML element starts.
+     * Callback indicating that an XML element ends.
      *
      * @param namespaceURI The Namespace URI, or the empty string if the
      *        element has no Namespace URI or if Namespace
@@ -281,7 +281,7 @@ public abstract class AbstractModuleDependenciesXmlParser
     }
 
     /**
-     * Callback indicating that an XML element starts.
+     * Allows subclasses to add to parsing.
      *
      * @param namespaceURI The Namespace URI, or the empty string if the
      *        element has no Namespace URI or if Namespace
@@ -366,12 +366,12 @@ public abstract class AbstractModuleDependenciesXmlParser
     protected MyLocator theLocator;
 
     /**
-     * The build-time dependencies, as ArrayList<ModuleRequirement>.
+     * The build-time dependencies.
      */
     protected ArrayList<ModuleRequirement> buildTimeDependencies = new ArrayList<ModuleRequirement>();
 
     /**
-     * The run-time dependencies, as ArrayList<ModuleRequirement>.
+     * The run-time dependencies.
      */
     protected ArrayList<ModuleRequirement> runTimeDependencies = new ArrayList<ModuleRequirement>();
 

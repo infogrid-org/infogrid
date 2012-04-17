@@ -25,7 +25,7 @@ import org.infogrid.module.Module;
 import org.infogrid.module.ModuleClassLoader;
 
 /**
- * ClassLoader that acts as the ClassLoader for the root Module.
+ * The ClassLoader for the root Module.
  */
 public class TomcatWebAppClassLoader
         extends
@@ -40,9 +40,8 @@ public class TomcatWebAppClassLoader
     /**
      * Initialize with the parameters given.
      *
-     * @param name
-     * @return
-     * @throws ClassNotFoundException
+     * @param dependencies the list of Module dependencies for this web app
+     * @throws MalformedURLException thrown if one of the URLs identifying the Module's JAR files is malformed
      */
     public void initialize(
             Module [] dependencies )
@@ -57,7 +56,10 @@ public class TomcatWebAppClassLoader
     }
 
     /**
-     * Override so Tomcat can pass the right classpaths on to Jasper and javac.
+     * Obtain the JAR URLs for this ClassLoader.
+     * This is overriden so Tomcat can pass the right classpaths on to Jasper and javac.
+     *
+     * @return the JAR URLs
      */
     @Override
     public URL [] getURLs()
@@ -141,12 +143,10 @@ public class TomcatWebAppClassLoader
 
     /**
      * Find the resource with the given name, and return an input stream
-     * that can be used for reading it.  The search order is as described
-     * for <code>getResource()</code>, after checking to see if the resource
-     * data has been previously cached.  If the resource cannot be found,
-     * return <code>null</code>.
+     * that can be used for reading it.
      *
      * @param name Name of the resource to return an input stream for
+     * @return the InputStream, or null
      */
     @Override
     public InputStream getResourceAsStream(
@@ -173,7 +173,8 @@ public class TomcatWebAppClassLoader
     }
 
     /**
-     * Override loadClass() per comment above.
+     * Load a Class. First we examine the local cache, then we use the default algorithm, and finally we ask
+     * our dependency ClassLoaders.
      *
      * @param name name of the to-be-loaded class
      * @param resolve do we also resolve the class
@@ -233,6 +234,11 @@ public class TomcatWebAppClassLoader
         return ret;
     }
 
+    /**
+     * For debugging.
+     *
+     * @return String representation.
+     */
     @Override
     public String toString()
     {

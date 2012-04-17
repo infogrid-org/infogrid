@@ -48,10 +48,9 @@ public class ModuleRegistryMetaXmlParser
     /**
      * Parse the XML file.
      *
-     * @param theStream the stream from which we read the ModuleAdvertisement
-     * @param file the file that is being parsed, for relative path construction and error reporting
-     * @param defaultBuildDate if given, use this Date as the buildDate for the ModuleAdvertisement if none is given
-     * @return the read ModuleAdvertisement (may be subclass)
+     * @param theStream the stream from which we read the XML file
+     * @param source the file that is being parsed, for relative path construction and error reporting
+     * @return the read ModuleRegistryMeta
      * @throws IOException an input/output error occurred
      */
     public synchronized ModuleRegistryMeta readRegistrySettings(
@@ -178,7 +177,7 @@ public class ModuleRegistryMetaXmlParser
     }
 
     /**
-     * Callback indicating that an XML element starts.
+     * Callback indicating that an XML element ends.
      *
      * @param namespaceURI The Namespace URI, or the empty string if the
      *        element has no Namespace URI or if Namespace
@@ -249,6 +248,7 @@ public class ModuleRegistryMetaXmlParser
          *         null if none is available.
          * @see #getSystemId
          */
+        @Override
         public String getPublicId()
         {
             return thePublicId;
@@ -261,6 +261,7 @@ public class ModuleRegistryMetaXmlParser
          *         if none is available.
          * @see #getPublicId
          */
+        @Override
         public String getSystemId()
         {
             return theSystemId;
@@ -272,6 +273,7 @@ public class ModuleRegistryMetaXmlParser
          * @return The line number, or -1 if none is available.
          * @see #getColumnNumber
          */
+        @Override
         public int getLineNumber()
         {
             return theLineNumber;
@@ -283,6 +285,7 @@ public class ModuleRegistryMetaXmlParser
          * @return The column number, or -1 if none is available.
          * @see #getLineNumber
          */
+        @Override
         public int getColumnNumber()
         {
             return theColumnNumber;

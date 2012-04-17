@@ -39,7 +39,7 @@ public class ModuleRequirementsConfiguration
     }
 
     /**
-     * Private onstructor, use factory method.
+     * Private constructor, use factory method.
      *
      * @param repositories map of share name to location of a Module repository
      * @param requirements the set of ModuleRequirements
