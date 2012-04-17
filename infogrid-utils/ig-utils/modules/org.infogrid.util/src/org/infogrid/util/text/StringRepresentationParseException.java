@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -43,6 +43,19 @@ public class StringRepresentationParseException
     }
 
     /**
+     * Constructor for the case that no format String could be found.
+     *
+     * @param string the text that could not be parsed
+     */
+    public StringRepresentationParseException(
+            String string )
+    {
+        super( string, null, 0, null );
+
+        theFormatString = null;
+    }
+
+    /**
      * Obtain the format String.
      *
      * @return the format String
@@ -50,6 +63,21 @@ public class StringRepresentationParseException
     public String getFormatString()
     {
         return theFormatString;
+    }
+
+    /**
+     * Allow subclasses to override which key to use in the Resource file for the string representation.
+     *
+     * @return the key
+     */
+    @Override
+    protected String findStringRepresentationParameter()
+    {
+        if( theFormatString != null ) {
+            return "WithFormatString";
+        } else {
+            return "WithoutFormatString";
+        }
     }
 
     /**
