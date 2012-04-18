@@ -45,6 +45,7 @@ public class ModuleClassLoader
       * @param mod the Module whose classes we load
       * @param parent the ClassLoader of this ClassLoader
       * @param dependencyClassLoaders  the ModuleClassLoaders of the dependencies of this Module
+      * @param reportMissingJars if true, report missing JARs
       * @throws MalformedURLException thrown if we can't convert the JAR file names to URLs
       * @throws ModuleNotFoundException a dependent Module could not be found
       * @throws ModuleResolutionException a dependent Module could not be resolved
@@ -52,7 +53,8 @@ public class ModuleClassLoader
     public ModuleClassLoader(
             Module               mod,
             ClassLoader          parent,
-            ModuleClassLoader [] dependencyClassLoaders )
+            ModuleClassLoader [] dependencyClassLoaders,
+            boolean              reportMissingJars )
     {
         super( parent );
 
@@ -60,6 +62,7 @@ public class ModuleClassLoader
 
         theModule                 = mod;
         theDependencyClassLoaders = dependencyClassLoaders;
+        theReportMissingJars      = reportMissingJars;
     }
 
     /**
@@ -73,7 +76,31 @@ public class ModuleClassLoader
     }
 
     /**
+     * Set whether to report missing JARs.
+     *
+     * @param newValue if true, report missing JARs
+     */
+    public void setReportMissingJars(
+            boolean newValue )
+    {
+        theReportMissingJars = newValue;
+    }
+
+    /**
+     * Determine whether to report missing JARs.
+     *
+     * @return true if missing JARs are reported
+     */
+    public boolean getReportMissingJars()
+    {
+        return theReportMissingJars;
+    }
+
+    /**
      * Add, to this set, all URLs to module JARs, of this ModuleClassLoader and all dependent ClassLoaders.
+     *
+     * @param set the set to add
+     * @throws MalformedURLException thrown if a URL was invalid
      */
     public void addModuleJarUrls(
             Set<URL> set )
@@ -287,20 +314,22 @@ public class ModuleClassLoader
                     theJars[i] = new JarFile( files[i] );
                 }
             } catch( IOException ex ) {
-                StringBuilder buf = new StringBuilder();
-                buf.append( "When trying to find " );
-                buf.append( name );
-                buf.append( ", failed to read file " );
-                buf.append( files[i] );
-                buf.append( " as JAR file: " );
-                if( !files[i].exists() ) {
-                    buf.append( "does not exist." );
-                } else if( !files[i].canRead() ) {
-                    buf.append( "exists but cannot read." );
-                } else {
-                    buf.append( "exists and has length " ).append( String.valueOf( files[i].length() ));
+                if( theReportMissingJars ) {
+                    StringBuilder buf = new StringBuilder();
+                    buf.append( "When trying to find " );
+                    buf.append( name );
+                    buf.append( ", failed to read file " );
+                    buf.append( files[i] );
+                    buf.append( " as JAR file: " );
+                    if( !files[i].exists() ) {
+                        buf.append( "does not exist." );
+                    } else if( !files[i].canRead() ) {
+                        buf.append( "exists but cannot read." );
+                    } else {
+                        buf.append( "exists and has length " ).append( String.valueOf( files[i].length() ));
+                    }
+                    ModuleErrorHandler.warn( buf.toString(), ex );
                 }
-                ModuleErrorHandler.warn( buf.toString(), ex );
             }
             if( theJars[i] != null ) {
                 try {
@@ -450,6 +479,11 @@ public class ModuleClassLoader
      * Our StreamHandler, allocated as needed.
      */
     protected URLStreamHandler theStreamHandler;
+
+    /**
+     * If true, report missing JARs.
+     */
+    protected boolean theReportMissingJars;
 
     /**
      * This map maps names of resources that we know for sure we can't load to a

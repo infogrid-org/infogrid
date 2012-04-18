@@ -285,7 +285,7 @@ public class TomcatModuleRegistry
             for( int i=0 ; i<dependencies.length ; ++i ) {
                 dependencyClassLoaders[i] = (ModuleClassLoader)dependencies[i].getClassLoader();
             }
-            ret = new ModuleClassLoader( module, parentClassLoader, dependencyClassLoaders );
+            ret = new ModuleClassLoader( module, parentClassLoader, dependencyClassLoaders, true );
 
         } catch( MalformedURLException ex ) {
             ex.printStackTrace();

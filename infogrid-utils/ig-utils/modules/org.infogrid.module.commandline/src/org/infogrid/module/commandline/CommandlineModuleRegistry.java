@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.infogrid.module.Module;
@@ -224,7 +223,7 @@ public class CommandlineModuleRegistry
             for( int i=0 ; i<dependencies.length ; ++i ) {
                 dependencyClassLoaders[i] = (ModuleClassLoader)dependencies[i].getClassLoader();
             }
-            ret = new ModuleClassLoader( module, parentClassLoader, dependencyClassLoaders );
+            ret = new ModuleClassLoader( module, parentClassLoader, dependencyClassLoaders, true );
 
         } catch( MalformedURLException ex ) {
             ex.printStackTrace();
