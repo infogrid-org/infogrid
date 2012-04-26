@@ -62,12 +62,12 @@ public abstract class SharedSpace
             }
         }
         if( ret != null ) {
-            HashSet<Object> callers = theNameToCallersMap.get( name );
+            HashMap<Object,LastReturned> callers = theNameToCallersMap.get( name );
             if( callers == null ) {
-                callers = new HashSet<Object>();
+                callers = new HashMap<Object,LastReturned>();
                 theNameToCallersMap.put( name, callers );
             }
-            if( !callers.add( caller ) ) {
+            if( callers.put( caller, lastReturned ) != null ) {
                 throw new IllegalStateException( "Caller " + caller + " has already checked out object named " + name + " from SharedSpace" );
             }
         }
@@ -104,10 +104,11 @@ public abstract class SharedSpace
     {
         checkQueue();
 
-        HashSet<Object> callers = theNameToCallersMap.get( name );
-        if( !callers.remove( caller )) {
+        HashMap<Object,LastReturned> callers = theNameToCallersMap.get( name );
+        if( !callers.containsKey( caller )) {
             throw new IllegalStateException( "Caller " + caller + " cannot return object named " + name + ": not checked out" );
         }
+        LastReturned callback = callers.remove( caller );
 
         Object ret;
         if( callers.isEmpty() ) {
@@ -115,7 +116,6 @@ public abstract class SharedSpace
             theNameToCallersMap.remove( name );
             ret = ( ref != null ) ? ref.get() : null;
             
-            LastReturned callback = theLastReturneds.remove( name );
             if( callback != null ) {
                 callback.lastReturned( name, ret );
             }
@@ -140,10 +140,14 @@ public abstract class SharedSpace
             String name = current.getName();
 
             theObjects.remove( name );
-            theNameToCallersMap.remove( name );
-            LastReturned callback = theLastReturneds.remove( name );
-            if( callback != null ) {
-                callback.lastReturned( name, current.get() );
+            HashMap<Object,LastReturned> callers = theNameToCallersMap.remove( name );
+            if( callers != null ) {
+                for( LastReturned callback : callers.values() ) {
+                    if( callback != null ) {
+                        callback.lastReturned( name, current.get() );
+                        return; // just execute one of them
+                    }
+                }
             }
         }
     }
@@ -161,12 +165,7 @@ public abstract class SharedSpace
     /**
      * Maps the names of the checked-out objects to the callers that checked them out.
      */
-    private static final HashMap<String,HashSet<Object>> theNameToCallersMap = new HashMap<String,HashSet<Object>>();
-
-    /**
-     * Maps the names of the checked-out objects to the LastReturned objects, if any.
-     */
-    private static final HashMap<String,LastReturned> theLastReturneds = new HashMap<String,LastReturned>();
+    private static final HashMap<String,HashMap<Object,LastReturned>> theNameToCallersMap = new HashMap<String,HashMap<Object,LastReturned>>();
 
     /**
      * Helper class that allows to remove named entries from the map whose values have expired.
