@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -233,6 +233,12 @@ public final class ResourceHelper
             ClassLoader    loader,
             ResourceHelper del )
     {
+        if( theHelpers == null ) {
+            // as unlikely as it sounds, this can happen when Tomcat's WebappClassLoader undeploys an
+            // app: it attempts to null all static class variables. So theHelpers may already have been set
+            // to null, while something else is still being cleared
+            return null;
+        }
         Key            myKey = new Key( channelName, del );
         ResourceHelper obj   = theHelpers.get( myKey );
         if( obj == null ) {
@@ -1151,7 +1157,7 @@ public final class ResourceHelper
     /**
       * The set of currently known ResourceHelpers.
       */
-    protected static HashMap<Key,ResourceHelper> theHelpers = new HashMap<Key,ResourceHelper>();
+    protected static final HashMap<Key,ResourceHelper> theHelpers = new HashMap<Key,ResourceHelper>();
 
     /**
      * This is a key into our big table of ResourceHelpers. It contains the name of the channel,
