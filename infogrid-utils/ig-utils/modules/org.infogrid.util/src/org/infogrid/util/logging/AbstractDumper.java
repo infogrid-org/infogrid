@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -129,6 +129,9 @@ public abstract class AbstractDumper
 
         } else if( obj instanceof Reference ) {
             dumpReference( (Reference) obj );
+
+        } else if( obj instanceof Throwable ) {
+            dumpThrowable( (Throwable) obj );
 
         } else {
             dumpObject( obj );
@@ -756,6 +759,35 @@ public abstract class AbstractDumper
         Object found = obj.get();
 
         dump( obj, new String[] { "ref" }, new Object[] { found } );
+    }
+
+    /**
+     * Dump an exception.
+     *
+     * @param obj the object to dump
+     */
+    public void dumpThrowable(
+            Throwable obj )
+    {
+        if( obj == null ) {
+            dumpNull();
+
+        } else {
+            // don't register as dumped -- it's short enough to do it again
+            String message = obj.getMessage();
+            if( message == null ) {
+                message = obj.getLocalizedMessage();
+            }
+
+            emit( obj.getClass().getName() );
+            emit( ": " );
+            if( message != null ) {
+                emit( message );
+            } else {
+                emit( "<empty message>" );
+            }
+            emit( "\"" );
+        }
     }
 
     /**
