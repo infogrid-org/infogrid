@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -95,7 +95,7 @@ public class XprisoMessageSerializationTest1
         
         log.debug( "Serialized message: " + encodedMessage );
         
-        ByteArrayInputStream inStream = new ByteArrayInputStream( encodedMessage.getBytes());
+        ByteArrayInputStream inStream = new ByteArrayInputStream( encodedMessage.getBytes( "UTF-8" ));
         
         XprisoMessage recovered = encoder.decodeXprisoMessage(
                 inStream,
