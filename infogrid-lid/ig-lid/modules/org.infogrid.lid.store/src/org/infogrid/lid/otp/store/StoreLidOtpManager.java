@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -108,7 +108,7 @@ public class StoreLidOtpManager
         Store  siteStore = PrefixingStore.create( siteIdentifier.toExternalForm(), theStore );
         String otp       = theGenerator.createUniqueToken();
 
-        siteStore.putOrUpdate( lidString, ENCODING, now, now, -1L, then, otp.getBytes() );
+        siteStore.putOrUpdate( lidString, ENCODING, now, now, -1L, then, otp.getBytes( "UTF-8" ) );
 
         StringBuilder ret = new StringBuilder();
         ret.append( url );
@@ -149,7 +149,7 @@ public class StoreLidOtpManager
             if( found.isExpired() ) {
                 throw new LidOtpExpiredException( lid, siteIdentifier, credentialType );
             }
-            if( !Arrays.equals( found.getData(), otpCandidate.getBytes() )) {
+            if( !Arrays.equals( found.getData(), otpCandidate.getBytes( "UTF-8" ) )) {
                 throw new LidWrongOtpException( lid, siteIdentifier, credentialType );
             }
             // delete only if the OTP is valid

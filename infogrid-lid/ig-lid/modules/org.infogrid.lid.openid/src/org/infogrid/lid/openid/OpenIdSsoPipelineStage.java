@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -423,23 +423,27 @@ public class OpenIdSsoPipelineStage
                 }
             }
 
-            byte [] bytesToSign   = toSign.toString().getBytes();
-            byte [] hmacSha1      = CryptUtils.calculateHmacSha1( assoc.getSharedSecret(), bytesToSign );
-            String  locallySigned = Base64.base64encode( hmacSha1 );
+            try {
+                byte [] bytesToSign   = toSign.toString().getBytes( "UTF-8" );
+                byte [] hmacSha1      = CryptUtils.calculateHmacSha1( assoc.getSharedSecret(), bytesToSign );
+                String  locallySigned = Base64.base64encode( hmacSha1 );
 
-            if( locallySigned.equals( sig )) {
-                valid = true;
-            } else {
-                log.warn(
-                        "Error comparing sig '"
-                        + sig
-                        + "' with locally computed '"
-                        + locallySigned
-                        + "', toSign was '"
-                        + toSign
-                        + "'"
-                        + " for request "
-                        + lidRequest );
+                if( locallySigned.equals( sig )) {
+                    valid = true;
+                } else {
+                    log.warn(
+                            "Error comparing sig '"
+                            + sig
+                            + "' with locally computed '"
+                            + locallySigned
+                            + "', toSign was '"
+                            + toSign
+                            + "'"
+                            + " for request "
+                            + lidRequest );
+                }
+            } catch( UnsupportedEncodingException ex ) {
+                log.error( ex );
             }
         }
 

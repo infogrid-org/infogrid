@@ -8,13 +8,14 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.openid.auth;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
@@ -292,10 +293,15 @@ public abstract class AbstractOpenIdCredentialType
         String toSign1String = toSign1.toString();
 
         byte [] hmac;
-        if( OpenIdRpSideAssociationNegotiationParameters.DH_SHA256.equals( association.getSessionType() )) {
-            hmac = CryptUtils.calculateHmacSha256( association.getSharedSecret(), toSign1String.getBytes() );
-        } else {
-            hmac = CryptUtils.calculateHmacSha1( association.getSharedSecret(), toSign1String.getBytes() );
+        try {
+            if( OpenIdRpSideAssociationNegotiationParameters.DH_SHA256.equals( association.getSessionType() )) {
+                hmac = CryptUtils.calculateHmacSha256( association.getSharedSecret(), toSign1String.getBytes( "UTF-8" ));
+            } else {
+                hmac = CryptUtils.calculateHmacSha1( association.getSharedSecret(), toSign1String.getBytes( "UTF-8" ));
+            }
+        } catch( UnsupportedEncodingException ex ) {
+            log.error( ex );
+            throw new OpenIdInvalidSignatureException( subject.getIdentifier(), siteIdentifier, this ); // gotta do something
         }
         String locallySigned = Base64.base64encodeNoCr( hmac );
 
