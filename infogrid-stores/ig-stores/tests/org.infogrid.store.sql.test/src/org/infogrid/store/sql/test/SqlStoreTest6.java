@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,7 +16,6 @@ package org.infogrid.store.sql.test;
 
 import org.infogrid.store.StoreValue;
 import org.infogrid.store.prefixing.IterablePrefixingStore;
-
 import org.infogrid.util.logging.Log;
 
 /**
@@ -226,17 +225,17 @@ public class SqlStoreTest6
      */
     protected static final long now = System.currentTimeMillis();
     protected static final TestData[] firstSet = new TestData[] {
-        new TestData( "a", "enc1",           12345L, 67890L, 10111213L,     -1L, "some data".getBytes() ),
-        new TestData( "b", "other encoding",    11L,    22L,       33L,     12L, "some longer data, but not very long".getBytes() ),
-        new TestData( "c", "Shakespeare's collected cucumbers", now,    now+1,  now+10000L, 99999L, "other data".getBytes() ),
-        new TestData( "d", "enc1", 0L, 0L, 0L, -1L, "aliergaierbg".getBytes() ),
+        new TestData( "a", "enc1",           12345L, 67890L, 10111213L,     -1L, bytes( "some data" )),
+        new TestData( "b", "other encoding",    11L,    22L,       33L,     12L, bytes( "some longer data, but not very long" )),
+        new TestData( "c", "Shakespeare's collected cucumbers", now,    now+1,  now+10000L, 99999L, bytes( "other data" )),
+        new TestData( "d", "enc1", 0L, 0L, 0L, -1L, bytes( "aliergaierbg" )),
     };
     protected static final TestData[] secondSet = new TestData[] {
-        new TestData( "e", "enc1", 0L, 0L, 0L, -1L, "aqertghaqer".getBytes() ),
-        new TestData( "f", "enc1", 0L, 0L, 0L, -1L, "qewrgqergqer".getBytes() ),
-        new TestData( "g", "enc1", 0L, 0L, 0L, -1L, "zsdbgadgb".getBytes() ),
-        new TestData( "h", "enc1", 0L, 0L, 0L, -1L, "afgae".getBytes() ),
-        new TestData( "i", "enc1", 0L, 0L, 0L, -1L, "qerg".getBytes() ),
+        new TestData( "e", "enc1", 0L, 0L, 0L, -1L, bytes( "aqertghaqer" )),
+        new TestData( "f", "enc1", 0L, 0L, 0L, -1L, bytes( "qewrgqergqer" )),
+        new TestData( "g", "enc1", 0L, 0L, 0L, -1L, bytes( "zsdbgadgb" )),
+        new TestData( "h", "enc1", 0L, 0L, 0L, -1L, bytes( "afgae"  )),
+        new TestData( "i", "enc1", 0L, 0L, 0L, -1L, bytes( "qerg" )),
     };
 
     protected static class TestData

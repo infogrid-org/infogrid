@@ -8,12 +8,13 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.store.test;
 
+import java.io.UnsupportedEncodingException;
 import java.util.NoSuchElementException;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.StoreValue;
@@ -207,7 +208,8 @@ public abstract class AbstractStoreIteratorTest2
     /**
      * Test data.
      */
+
     protected static final long now = System.currentTimeMillis();
     protected static final StoreValue testData =
-        new StoreValue( "a", "enc1",           12345L, 67890L, 10111213L,     -1L, "some data".getBytes() );
+        new StoreValue( "a", "enc1",           12345L, 67890L, 10111213L,     -1L, bytes( "some data" ) );
 }

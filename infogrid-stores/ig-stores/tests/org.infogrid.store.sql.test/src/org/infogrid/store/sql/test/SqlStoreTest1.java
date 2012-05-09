@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -276,15 +276,15 @@ public class SqlStoreTest1
         testImage = data;
     }
     protected static final TestData[] one = new TestData[] {
-        new TestData( "/x/abc",       "enc1",           12345L, 67890L, 10111213L,     -1L, "some data".getBytes() ),
-        new TestData( "/x/def",       "other encoding",    11L,    22L,       33L,     12L, "some longer data, but not very long".getBytes() ),
+        new TestData( "/x/abc",       "enc1",           12345L, 67890L, 10111213L,     -1L, bytes( "some data" )),
+        new TestData( "/x/def",       "other encoding",    11L,    22L,       33L,     12L, bytes( "some longer data, but not very long" )),
         new TestData( "/x",           "third encoding",      1,      2,         3, 123456L, testImage )
     };
     protected static final TestData[] two = new TestData[] {
-        new TestData( "/x/abc", "testing", 5555L, 666L, 1111L,  -1L, "some changed data".getBytes() ),
+        new TestData( "/x/abc", "testing", 5555L, 666L, 1111L,  -1L, bytes( "some changed data" )),
     };
     protected static final TestData[] three = new TestData[] {
-        new TestData( "/x/ghi", "Shakespeare's collected cucumbers", now,    now+1,  now+10000L, 99999L, "Some <b>HTML</b> data".getBytes() )
+        new TestData( "/x/ghi", "Shakespeare's collected cucumbers", now,    now+1,  now+10000L, 99999L, bytes( "Some <b>HTML</b> data" ) )
     };
     protected static final TestData[] firstSet  = ArrayHelper.append( one, three, TestData.class );
     protected static final TestData[] secondSet = two;

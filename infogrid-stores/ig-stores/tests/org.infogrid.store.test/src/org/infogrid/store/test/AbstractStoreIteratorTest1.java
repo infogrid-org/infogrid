@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -299,22 +299,22 @@ public abstract class AbstractStoreIteratorTest1
      */
     protected static final long now = System.currentTimeMillis();
     protected static final StoreValue[] testData = new StoreValue[] {
-        new StoreValue( "a", "enc1",           12345L, 67890L, 10111213L,     -1L, "some data".getBytes() ),
-        new StoreValue( "b", "other encoding",    11L,    22L,       33L,     12L, "some longer data, but not very long".getBytes() ),
-        new StoreValue( "c", "Shakespeare's collected cucumbers", now,    now+1,  now+10000L, 99999L, "other data".getBytes() ),
-        new StoreValue( "d", "enc1", 0L, 0L, 0L, -1L, "aliergaierbg".getBytes() ),
-        new StoreValue( "e", "enc1", 0L, 0L, 0L, -1L, "aqertghaqer".getBytes() ),
-        new StoreValue( "f", "enc1", 0L, 0L, 0L, -1L, "qewrgqergqer".getBytes() ),
-        new StoreValue( "g", "enc1", 0L, 0L, 0L, -1L, "zsdbgadgb".getBytes() ),
-        new StoreValue( "h", "enc1", 0L, 0L, 0L, -1L, "afgae".getBytes() ),
-        new StoreValue( "i", "enc1", 0L, 0L, 0L, -1L, "qerg".getBytes() ),
-        new StoreValue( "j", "enc1", 0L, 0L, 0L, -1L, "adfga".getBytes() ),
-        new StoreValue( "k", "enc1", 0L, 0L, 0L, -1L, "qergafg".getBytes() ),
-        new StoreValue( "l", "enc1", 0L, 0L, 0L, -1L, "qergqerg".getBytes() ),
-        new StoreValue( "m", "enc1", 0L, 0L, 0L, -1L, "erthwrthaegrae".getBytes() ),
-        new StoreValue( "n", "enc1", 0L, 0L, 0L, -1L, "bg".getBytes() ),
-        new StoreValue( "o", "enc1", 0L, 0L, 0L, -1L, "egtaerg".getBytes() ),
-        new StoreValue( "p", "enc1", 0L, 0L, 0L, -1L, "ryhwretgWRGwfrgae".getBytes() ),
-        new StoreValue( "q", "enc1", 0L, 0L, 0L, -1L, "sfgaetghserthgas".getBytes() ),
+        new StoreValue( "a", "enc1",           12345L, 67890L, 10111213L,     -1L, bytes( "some data" )),
+        new StoreValue( "b", "other encoding",    11L,    22L,       33L,     12L, bytes( "some longer data, but not very long"  )),
+        new StoreValue( "c", "Shakespeare's collected cucumbers", now,    now+1,  now+10000L, 99999L, bytes( "other data" )),
+        new StoreValue( "d", "enc1", 0L, 0L, 0L, -1L, bytes( "aliergaierbg" )),
+        new StoreValue( "e", "enc1", 0L, 0L, 0L, -1L, bytes( "aqertghaqer" )),
+        new StoreValue( "f", "enc1", 0L, 0L, 0L, -1L, bytes( "qewrgqergqer" )),
+        new StoreValue( "g", "enc1", 0L, 0L, 0L, -1L, bytes( "zsdbgadgb" )),
+        new StoreValue( "h", "enc1", 0L, 0L, 0L, -1L, bytes( "afgae" )),
+        new StoreValue( "i", "enc1", 0L, 0L, 0L, -1L, bytes( "qerg" )),
+        new StoreValue( "j", "enc1", 0L, 0L, 0L, -1L, bytes( "adfga" )),
+        new StoreValue( "k", "enc1", 0L, 0L, 0L, -1L, bytes( "qergafg" )),
+        new StoreValue( "l", "enc1", 0L, 0L, 0L, -1L, bytes( "qergqerg" )),
+        new StoreValue( "m", "enc1", 0L, 0L, 0L, -1L, bytes( "erthwrthaegrae" )),
+        new StoreValue( "n", "enc1", 0L, 0L, 0L, -1L, bytes( "bg" )),
+        new StoreValue( "o", "enc1", 0L, 0L, 0L, -1L, bytes( "egtaerg" )),
+        new StoreValue( "p", "enc1", 0L, 0L, 0L, -1L, bytes( "ryhwretgWRGwfrgae" )),
+        new StoreValue( "q", "enc1", 0L, 0L, 0L, -1L, bytes( "sfgaetghserthgas" ))
     };
 }
