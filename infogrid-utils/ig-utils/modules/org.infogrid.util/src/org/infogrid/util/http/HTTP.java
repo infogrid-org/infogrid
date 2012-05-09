@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -409,7 +409,7 @@ public abstract class HTTP
             log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, pars, followRedirects );
         }
 
-        return http_post( url, FORMENCODED_MIME, parsToString( pars ).getBytes(), followRedirects );
+        return http_post( url, FORMENCODED_MIME, parsToString( pars ).getBytes( "UTF-8" ), followRedirects );
     }
 
     /**
@@ -498,7 +498,7 @@ public abstract class HTTP
             log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, pars, followRedirects, cookies );
         }
 
-        return http_post( url, FORMENCODED_MIME, parsToString( pars ).getBytes(), null, followRedirects, cookies, HTTP_CONNECT_TIMEOUT, HTTP_READ_TIMEOUT, null );
+        return http_post( url, FORMENCODED_MIME, parsToString( pars ).getBytes( "UTF-8" ), null, followRedirects, cookies, HTTP_CONNECT_TIMEOUT, HTTP_READ_TIMEOUT, null );
     }
 
     /**
@@ -522,7 +522,7 @@ public abstract class HTTP
             log.traceMethodCallEntry( HTTP.class.getName(), "http_post", url, pars, followRedirects, cookies );
         }
 
-        return http_post( new URL( url ), FORMENCODED_MIME, parsToString( pars ).getBytes(), null, followRedirects, cookies, HTTP_CONNECT_TIMEOUT, HTTP_READ_TIMEOUT, null );
+        return http_post( new URL( url ), FORMENCODED_MIME, parsToString( pars ).getBytes( "UTF-8" ), null, followRedirects, cookies, HTTP_CONNECT_TIMEOUT, HTTP_READ_TIMEOUT, null );
     }
 
     /**

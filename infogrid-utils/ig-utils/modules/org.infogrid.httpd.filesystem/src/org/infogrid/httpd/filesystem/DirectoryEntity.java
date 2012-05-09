@@ -8,15 +8,11 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.httpd.filesystem;
-
-import org.infogrid.httpd.HttpEntity;
-import org.infogrid.httpd.HttpRequest;
-import org.infogrid.util.ResourceHelper;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -25,7 +21,9 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Date;
-
+import org.infogrid.httpd.HttpEntity;
+import org.infogrid.httpd.HttpRequest;
+import org.infogrid.util.ResourceHelper;
 
 /**
  * An HttpEntity that is backed by a Directory in the file system.
@@ -130,7 +128,7 @@ public class DirectoryEntity
 
         data.append( MessageFormat.format( directoryPostfixString, outerPars ));
 
-        return new ByteArrayInputStream( data.toString().getBytes() );
+        return new ByteArrayInputStream( data.toString().getBytes( "UTF-8" ) );
     }
 
     /**

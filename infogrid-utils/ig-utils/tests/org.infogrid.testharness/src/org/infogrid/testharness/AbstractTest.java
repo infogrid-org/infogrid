@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -37,7 +38,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.infogrid.module.ModuleClassLoader;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.NamedThreadFactory;
@@ -87,7 +87,9 @@ public abstract class AbstractTest
 
         ResourceHelper.initializeLogging();
 
-        log = Log.getLogInstance( AbstractTest.class );
+        if( log == null ) {
+            log = Log.getLogInstance( AbstractTest.class );
+        }
     }
 
     /**
@@ -1370,8 +1372,25 @@ public abstract class AbstractTest
         return createThreadPool( testClass.getName(), nThreads );
     }
 
+    /**
+     * Helper method to convert a String to bytes.
+     *
+     * @param arg the String
+     * @return the created array
+     */
+    protected static byte [] bytes(
+            String arg )
+    {
+        try {
+            return arg.getBytes( "UTF-8" );
+        } catch( UnsupportedEncodingException ex ) {
+            log.error( ex );
+            return null;
+        }
+    }
+
     // Our Logger
-    private Log log;
+    private static Log log;
 
     /**
      * The absolute time in millis when the timer was started.

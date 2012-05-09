@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,8 +16,10 @@ package org.infogrid.httpd;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.logging.Log;
 
 /**
  * A very simple default implementation of the HttpErrorHandler.
@@ -26,6 +28,8 @@ public class DefaultHttpErrorHandler
     implements
         HttpErrorHandler
 {
+    private static final Log log = Log.getLogInstance( DefaultHttpErrorHandler.class ); // our own, private logger
+
     /**
      * Singleton instance of this class.
      */
@@ -44,7 +48,12 @@ public class DefaultHttpErrorHandler
     {
         String content = MessageFormat.format( errorString, new Object[] { statusCode } );
 
-        return new ByteArrayInputStream( content.getBytes() );
+        try {
+            return new ByteArrayInputStream( content.getBytes( "UTF-8" ) );
+        } catch( UnsupportedEncodingException ex ) {
+            log.error( ex );
+            return null;
+        }
     }
 
     /**
