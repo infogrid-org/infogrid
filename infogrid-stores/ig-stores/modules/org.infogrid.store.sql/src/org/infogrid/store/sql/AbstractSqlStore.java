@@ -92,7 +92,7 @@ public abstract class AbstractSqlStore
      *
      * @return true if it uses auto-commit
      */
-    public boolean getAutoCommit()
+    public Boolean getAutoCommit()
     {
         return theAutoCommit;
     }
