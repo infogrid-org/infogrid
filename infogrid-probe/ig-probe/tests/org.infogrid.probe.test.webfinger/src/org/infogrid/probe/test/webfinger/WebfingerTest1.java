@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,6 +16,7 @@ package org.infogrid.probe.test.webfinger;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import org.infogrid.httpd.HttpEntity;
 import org.infogrid.httpd.HttpEntityResponse;
 import org.infogrid.httpd.HttpErrorResponse;
@@ -158,7 +159,12 @@ public class WebfingerTest1
                             return true;
                         }
                         public InputStream getAsStream() {
-                            return new ByteArrayInputStream( IDENTITY_XRD.getBytes() );
+                            try {
+                                return new ByteArrayInputStream( IDENTITY_XRD.getBytes( "UTF-8" ) );
+                            } catch( UnsupportedEncodingException ex ) {
+                                log.error( ex );
+                                return null;
+                            }
                         }
                         public String getMime() {
                             return "application/xml";

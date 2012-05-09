@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,6 +16,7 @@ package org.infogrid.probe.test.yadis;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import org.infogrid.httpd.HttpEntity;
 import org.infogrid.httpd.HttpEntityResponse;
 import org.infogrid.httpd.HttpErrorResponse;
@@ -175,10 +176,15 @@ public class YadisTest4
                             return true;
                         }
                         public InputStream getAsStream() {
-                            if( theWithYadis ) {
-                                return new ByteArrayInputStream( HTML_WITH_OPENID_LINK_REL.getBytes() );
-                            } else {
-                                return new ByteArrayInputStream( HTML.getBytes() );
+                            try {
+                                if( theWithYadis ) {
+                                    return new ByteArrayInputStream( HTML_WITH_OPENID_LINK_REL.getBytes( "UTF-8" ));
+                                } else {
+                                    return new ByteArrayInputStream( HTML.getBytes( "UTF-8" ));
+                                }
+                            } catch( UnsupportedEncodingException ex ) {
+                                log.error( ex );
+                                return null;
                             }
                         }
                         public String getMime() {
