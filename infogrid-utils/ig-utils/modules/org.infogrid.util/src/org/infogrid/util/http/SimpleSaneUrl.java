@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -27,6 +27,21 @@ public class SimpleSaneUrl
         extends
             AbstractSaneUrl
 {
+    /**
+     * Factory method.
+     *
+     * @param s the absolute URL in String form
+     * @return the created SimpleSaneUrl
+     * @throws MalformedURLException thrown if the URL is malformed
+     */
+    public static SimpleSaneUrl create(
+            String s )
+        throws
+            MalformedURLException
+    {
+        return create( s, null );
+    }
+
     /**
      * Factory method.
      *
@@ -77,6 +92,9 @@ public class SimpleSaneUrl
                     contextPath );
             
             return ret;
+        }
+        if( contextPath == null ) {
+            throw new MalformedURLException( "Cannot parse relative URL without a context path: " + s );
         }
 
         // try relative instead -- for that, we first parse the context path
