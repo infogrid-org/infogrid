@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -32,34 +32,39 @@ public class SqlStoreIOException
     /**
      * Constructor.
      *
+     * @param store the SqlStore that threw the exception
      * @param operation name of the operation, such as "put"
      * @param cause the cause
      */
     public SqlStoreIOException(
-            String       operation,
-            SQLException cause )
+            AbstractSqlStore store,
+            String           operation,
+            SQLException     cause )
     {
-        this( operation, null, null, null, cause );
+        this( store, operation, null, null, null, cause );
     }
     
     /**
      * Constructor.
      *
+     * @param store the SqlStore that threw the exception
      * @param operation name of the operation, such as "put"
      * @param key key of the data element involved in the operation, if any
      * @param cause the cause
      */
     public SqlStoreIOException(
-            String       operation,
-            String       key,
-            SQLException cause )
+            AbstractSqlStore store,
+            String           operation,
+            String           key,
+            SQLException     cause )
     {
-        this( operation, key, null, null, cause );
+        this( store, operation, key, null, null, cause );
     }
 
     /**
      * Constructor.
      *
+     * @param store the SqlStore that threw the exception
      * @param operation name of the operation, such as "put"
      * @param key key of the data element involved in the operation, if any
      * @param encodingId the id of the encoding that was used to encode the data element, if any
@@ -67,14 +72,16 @@ public class SqlStoreIOException
      * @param cause the cause
      */
     public SqlStoreIOException(
-            String       operation,
-            String       key,
-            String       encodingId,
-            byte []      data,
-            SQLException cause )
+            AbstractSqlStore store,
+            String           operation,
+            String           key,
+            String           encodingId,
+            byte []          data,
+            SQLException     cause )
     {
         super( "SQL Exception", cause );
 
+        theStore      = store;
         theOperation  = operation;
         theKey        = key;
         theEncodingId = encodingId;
@@ -90,6 +97,16 @@ public class SqlStoreIOException
     public SQLException getCause()
     {
         return (SQLException) super.getCause();
+    }
+
+    /**
+     * Obtain the AbstractSqlStore that threw the Exception.
+     *
+     * @return the AbstractSqlStore
+     */
+    public AbstractSqlStore getStore()
+    {
+        return theStore;
     }
 
     /**
@@ -109,6 +126,11 @@ public class SqlStoreIOException
                 getCause().getLocalizedMessage() };
     }
 
+    /**
+     * The AbstractSqlStore that threw this exception.
+     */
+    protected AbstractSqlStore theStore;
+    
     /**
      * The name of the operation that produced this exception.
      */

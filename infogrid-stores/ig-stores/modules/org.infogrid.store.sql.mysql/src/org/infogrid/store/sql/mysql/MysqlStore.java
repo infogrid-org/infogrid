@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -182,7 +182,7 @@ public class MysqlStore
             }.execute();
             
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( "createTables", ex );
+            throw new SqlStoreIOException( this, "createTables", ex );
         }
     }
 
@@ -284,7 +284,7 @@ public class MysqlStore
                 throw new StoreKeyExistsAlreadyException( this, key );
             }
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( "put", key, encodingId, data, ex );
+            throw new SqlStoreIOException( this, "put", key, encodingId, data, ex );
 
         } finally {
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
@@ -390,7 +390,7 @@ public class MysqlStore
                 throw new StoreKeyDoesNotExistException( MysqlStore.this, key  );
             }
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( "update", key, encodingId, data, ex );
+            throw new SqlStoreIOException( this, "update", key, encodingId, data, ex );
 
         } finally {
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
@@ -515,7 +515,7 @@ public class MysqlStore
             return ret;
 
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( "putOrUpdate", key, encodingId, data, ex );
+            throw new SqlStoreIOException( this, "putOrUpdate", key, encodingId, data, ex );
 
         } finally {
             StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
@@ -602,7 +602,7 @@ public class MysqlStore
             return ret;
 
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( "get", key, ex );
+            throw new SqlStoreIOException( this, "get", key, ex );
 
         } finally {
             if( ret != null ) {
@@ -653,7 +653,7 @@ public class MysqlStore
             }
 
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( "delete", key, ex );
+            throw new SqlStoreIOException( this, "delete", key, ex );
 
         } finally {
             fireDeletePerformed( key );
@@ -691,7 +691,7 @@ public class MysqlStore
             }.execute();
             
         } catch( SQLException ex ) {
-            throw new SqlStoreIOException( "deleteAll", startsWith, ex );
+            throw new SqlStoreIOException( this, "deleteAll", startsWith, ex );
         }
     }
     
