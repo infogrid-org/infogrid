@@ -52,28 +52,28 @@ public class LdapLidPasswordCredentialType
      * Factory method.
      *
      * @param passwordDirProps properties for directory access
-     * @param identifierSuffix to append to the identifier when attempting to check a password, if any
+     * @param identifierPrefix to append to the identifier when attempting to check a password, if any
      * @return the created LdapLidPasswordCredentialType
      */
     public static LdapLidPasswordCredentialType create(
             Properties passwordDirProps,
-            String     identifierSuffix )
+            String     identifierPrefix )
     {
-        return new LdapLidPasswordCredentialType( passwordDirProps, identifierSuffix );
+        return new LdapLidPasswordCredentialType( passwordDirProps, identifierPrefix );
     }
 
     /**
      * Constructor, for package and subclasses only.
      *
      * @param passwordDirProps properties for directory access
-     * @param identifierSuffix to append to the identifier when attempting to check a password, if any.
+     * @param identifierPrefix to append to the identifier when attempting to check a password, if any.
      */
     protected LdapLidPasswordCredentialType(
             Properties passwordDirProps,
-            String     identifierSuffix )
+            String     identifierPrefix )
     {
         thePasswordDirProps = passwordDirProps;
-        theIdentifierSuffix = identifierSuffix;
+        theIdentifierPrefix = identifierPrefix;
     }
 
     /**
@@ -94,14 +94,14 @@ public class LdapLidPasswordCredentialType
             LidInvalidCredentialException
     {
         // siteIdentifier ignored
-        
+
         String givenPassword = request.getPostedArgument( LID_CREDENTIAL_PARAMETER_NAME );
 
         Properties props = (Properties) thePasswordDirProps.clone();
 
         String identifier;
-        if( theIdentifierSuffix != null ) {
-            identifier = subject.getIdentifier().toExternalForm() + theIdentifierSuffix;
+        if( theIdentifierPrefix != null ) {
+            identifier = theIdentifierPrefix + subject.getIdentifier().toExternalForm();
         } else {
             identifier = subject.getIdentifier().toExternalForm();
         }
@@ -150,7 +150,7 @@ public class LdapLidPasswordCredentialType
                 return false;
             }
 
-            return theIdentifierSuffix.equals( realOther.theIdentifierSuffix );
+            return theIdentifierPrefix.equals( realOther.theIdentifierPrefix );
         }
         return false;
     }
@@ -163,7 +163,7 @@ public class LdapLidPasswordCredentialType
     @Override
     public int hashCode()
     {
-        return thePasswordDirProps.hashCode() ^ theIdentifierSuffix.hashCode();
+        return thePasswordDirProps.hashCode() ^ theIdentifierPrefix.hashCode();
     }
 
     /**
@@ -172,7 +172,7 @@ public class LdapLidPasswordCredentialType
     protected Properties thePasswordDirProps;
 
     /**
-     * Suffix to append to the identifier when attempting to check a password, if any.
+     * Prefix to append to the identifier when attempting to check a password, if any.
      */
-    protected String theIdentifierSuffix;
+    protected String theIdentifierPrefix;
 }
