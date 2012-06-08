@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
@@ -37,7 +37,7 @@ import org.infogrid.util.logging.Log;
 
 /**
  * A LidAccountManager implemented using LDAP.
- * 
+ *
  * <p>Invoke similar to this:</p>
  * <pre>
  * Properties prop = new Properties();
@@ -53,7 +53,7 @@ import org.infogrid.util.logging.Log;
  * <p>When running against ActiveDirectory, an additional property may be needed:</p>
  * <pre>
  * </pre>
- * 
+ *
  */
 public class LdapLidLocalAccountManager
         extends
@@ -141,7 +141,7 @@ public class LdapLidLocalAccountManager
 
     /**
      * Constructor for subclasses only, use factory method.
-     * 
+     *
      * @param siteIdentifier identifier of the site at which the accounts are managed
      * @param props Properties to use to connect to the directory
      * @param ldapContextName name of the LDAP context object in which to search
@@ -228,10 +228,12 @@ public class LdapLidLocalAccountManager
                             Attribute att = currentAttributes.next();
 
                             Object value = att.get();
-                            if( value != null && value instanceof String ) {
-                                attributes.put( att.getID(), (String) value );
+                            if (value != null && value instanceof String) {
+                                attributes.put(att.getID(), (String) value);
+                            } else if (value != null && value instanceof byte[]) {
+                                attributes.put(att.getID(), binaryToString((byte[]) value));
                             } else {
-                                attributes.put( att.getID(), null );
+                                attributes.put(att.getID(), null);
                             }
                         }
                     }
@@ -274,6 +276,22 @@ public class LdapLidLocalAccountManager
     }
 
     /**
+     * Converts a binary attribute to a readable string format
+     * @param inArr
+     * @return the formatted GUID
+     */
+    private static String binaryToString(byte[] inArr) {
+        StringBuilder theStringRep = new StringBuilder();
+        for (int i = 0; i < inArr.length; i++) {
+            StringBuffer dblByte = new StringBuffer(Integer.toHexString(inArr[ i] & 0xff));
+            if (dblByte.length() == 1) {
+                theStringRep.append("0");
+            }
+            theStringRep.append(dblByte);
+        }
+        return theStringRep.toString();
+    }
+    /**
      * Given a remote persona and a site, determine the LidAccount that has been provisioned for
      * the remote persona at the site. May return null if none has been provisioned.
      *
@@ -308,7 +326,7 @@ public class LdapLidLocalAccountManager
      * The LDAP filter expression to use.
      */
     protected String theFilter;
-    
+
     /**
      * The search controls.
      */
