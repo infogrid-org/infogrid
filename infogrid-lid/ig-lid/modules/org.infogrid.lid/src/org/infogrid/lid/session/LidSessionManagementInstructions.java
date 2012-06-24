@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,6 +16,7 @@ package org.infogrid.lid.session;
 
 import org.infogrid.lid.LidClientAuthenticationStatus;
 import org.infogrid.lid.LidPipelineStageInstructions;
+import org.infogrid.lid.account.LidAccount;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 
@@ -60,6 +61,13 @@ public interface LidSessionManagementInstructions
      * @return the site Identifier
      */
     public Identifier getSiteIdentifierForNewSession();
+
+    /**
+     * Obtain the account for which a new session shall be created, if any.
+     * 
+     * @return the account
+     */
+    public LidAccount getAccountForNewSession();
 
     /**
      * Obtain the initial token for the to-be-created new session, if any.

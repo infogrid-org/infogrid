@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,13 +18,13 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Properties;
 import javax.naming.CommunicationException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 import org.infogrid.lid.account.AbstractLidAccountManager;
 import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.account.SimpleLidAccount;
@@ -243,7 +243,8 @@ public class LdapLidLocalAccountManager
                             LidAccount.LidAccountStatus.ACTIVE,
                             null,
                             attributes,
-                            new Identifier[ 0 ] );
+                            new Identifier[ 0 ],
+                            0 ); // infinitely old? FIXME?
 
                     if( found.hasMore() ) {
                         SearchResult current2 = (SearchResult) found.next();
@@ -291,15 +292,16 @@ public class LdapLidLocalAccountManager
         }
         return theStringRep.toString();
     }
+    
     /**
-     * Given a remote persona and a site, determine the LidAccount that has been provisioned for
+     * Given a remote persona and a site, determine the LidAccounts that are accessible by
      * the remote persona at the site. May return null if none has been provisioned.
-     *
+     * 
      * @param remote the remote persona
      * @param siteIdentifier identifier of the site at which the account has been provisioned
-     * @return the found LidAccount, or null
+     * @return the found LidAccounts, or null
      */
-    public LidAccount determineLidAccountFromRemotePersona(
+    public LidAccount [] determineLidAccountsFromRemotePersona(
             HasIdentifier remote,
             Identifier    siteIdentifier )
     {

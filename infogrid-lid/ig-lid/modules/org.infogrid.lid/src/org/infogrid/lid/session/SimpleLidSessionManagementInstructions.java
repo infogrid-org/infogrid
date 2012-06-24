@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -20,6 +20,7 @@ import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import org.infogrid.lid.LidClientAuthenticationStatus;
+import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.FactoryException;
@@ -48,6 +49,7 @@ public class SimpleLidSessionManagementInstructions
      * @param sessionToRenew all sessions to renew
      * @param clientForNewSession the client for which a new session shall be created
      * @param siteIdentifierForNewSession Identifier of the site for which a new session shall be created
+     * @param account the account for which the new session shall be created
      * @param tokenForNewSession token for the new session
      * @param durationForNewSession duration for the new session, in milliseconds
      * @param sessionManager the LidSessionManager to use
@@ -59,6 +61,7 @@ public class SimpleLidSessionManagementInstructions
             LidSession []                 sessionToRenew,
             HasIdentifier                 clientForNewSession,
             Identifier                    siteIdentifierForNewSession,
+            LidAccount                    account,
             String                        tokenForNewSession,
             long                          durationForNewSession,
             LidSessionManager             sessionManager )
@@ -69,6 +72,7 @@ public class SimpleLidSessionManagementInstructions
                 sessionToRenew,
                 clientForNewSession,
                 siteIdentifierForNewSession,
+                account,
                 tokenForNewSession,
                 durationForNewSession,
                 sessionManager );
@@ -96,6 +100,7 @@ public class SimpleLidSessionManagementInstructions
                 null,
                 null,
                 null,
+                null,
                 -1L,
                 sessionManager );
     }
@@ -108,6 +113,7 @@ public class SimpleLidSessionManagementInstructions
      * @param sessionToRenew all sessions to renew
      * @param clientForNewSession the client for which a new session shall be created
      * @param siteIdentifierForNewSession Identifier of the site for which a new session shall be created
+     * @param account the account for which the new session shall be created
      * @param tokenForNewSession token for the new session
      * @param durationForNewSession duration for the new session, in milliseconds
      * @param sessionManager the LidSessionManager to use
@@ -118,6 +124,7 @@ public class SimpleLidSessionManagementInstructions
             LidSession []                 sessionToRenew,
             HasIdentifier                 clientForNewSession,
             Identifier                    siteIdentifierForNewSession,
+            LidAccount                    account,
             String                        tokenForNewSession,
             long                          durationForNewSession,
             LidSessionManager             sessionManager )
@@ -129,6 +136,7 @@ public class SimpleLidSessionManagementInstructions
 
         theClientForNewSession         = clientForNewSession;
         theSiteIdentifierForNewSession = siteIdentifierForNewSession;
+        theAccount                     = account;
 
         theTokenForNewSession    = tokenForNewSession;
         theDurationForNewSession = durationForNewSession;
@@ -204,6 +212,16 @@ public class SimpleLidSessionManagementInstructions
     public Identifier getSiteIdentifierForNewSession()
     {
         return theSiteIdentifierForNewSession;
+    }
+
+    /**
+     * Obtain the account for which a new session shall be created, if any.
+     * 
+     * @return the account
+     */
+    public LidAccount getAccountForNewSession()
+    {
+        return theAccount;
     }
 
     /**
@@ -343,6 +361,7 @@ public class SimpleLidSessionManagementInstructions
                                 theSessionManager.getDefaultSessionDuration(),
                                 theClientForNewSession,
                                 theSiteIdentifierForNewSession,
+                                theAccount,
                                 request.getClientIp() ));
 
             } catch( FactoryException ex ) {
@@ -415,7 +434,7 @@ public class SimpleLidSessionManagementInstructions
                 }
             }
             buf.append( "\n        clientIdentifier: " ).append( theClientAuthenticationStatus.getClientIdentifier() );
-            buf.append( "\n        clientPersona: "    ).append( theClientAuthenticationStatus.getClientAccount() );
+            buf.append( "\n        clientAccounts: "   ).append( theClientAuthenticationStatus.getClientAccounts() );
             // theClientAuthenticationStatus.getInvalidCredentialExceptions();
             buf.append( "\n        preexistingClientSession: " ).append( theClientAuthenticationStatus.getPreexistingClientSession() );
             if( theClientAuthenticationStatus.getSiteIdentifier() != null ) {
@@ -496,6 +515,11 @@ public class SimpleLidSessionManagementInstructions
      */
     protected Identifier theSiteIdentifierForNewSession;
 
+    /**
+     * The account for which a new session shall be created.
+     */
+    protected LidAccount theAccount;
+    
     /**
      * Token for the new session.
      */

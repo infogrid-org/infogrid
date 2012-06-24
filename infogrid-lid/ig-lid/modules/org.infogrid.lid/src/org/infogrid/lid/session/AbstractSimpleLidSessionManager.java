@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -137,7 +137,20 @@ public abstract class AbstractSimpleLidSessionManager
             long timeLastUsed      = timeCreated;
             long timeValidUntil    = timeExpires;
 
-            LidAccount account = theSessionManager.theAccountManager.determineLidAccountFromRemotePersona( argument.getClient(), argument.getSiteIdentifier() );
+            LidAccount    account = null;
+            LidAccount [] candidateAccounts
+                    = theSessionManager.theAccountManager.determineLidAccountsFromRemotePersona(
+                            argument.getClient(),
+                            argument.getSiteIdentifier() );
+            
+            if( candidateAccounts != null ) {
+                for( int i=0 ; i<candidateAccounts.length ; ++i ) {
+                    if( argument.getAccount().isIdentifiedBy( candidateAccounts[i].getIdentifier() )) {
+                        account = candidateAccounts[i];
+                        break;
+                    }
+                }
+            }
 
             SimpleLidSession ret = SimpleLidSession.create(
                     key,

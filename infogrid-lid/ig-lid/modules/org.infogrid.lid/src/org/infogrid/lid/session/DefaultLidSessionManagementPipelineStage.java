@@ -8,20 +8,24 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.session;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import org.infogrid.lid.LidClientAuthenticationStatus;
 import org.infogrid.lid.LidCookies;
 import org.infogrid.lid.LidPipelineInstructions;
 import org.infogrid.lid.LidPipelineStageInstructions;
+import org.infogrid.lid.account.LidAccount;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.HasIdentifier;
+import org.infogrid.util.Identifier;
+import org.infogrid.util.IdentifierFactory;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
 
@@ -38,23 +42,28 @@ public class DefaultLidSessionManagementPipelineStage
      * Factory method.
      *
      * @param sessionMgr the LidSessionManager to use
+     * @param idFact factory for LidAccount identifiers
      * @return the created DefaultLidSessionManagementPipelineStage
      */
     public static DefaultLidSessionManagementPipelineStage create(
-            LidSessionManager sessionMgr )
+            LidSessionManager sessionMgr,
+            IdentifierFactory idFact )
     {
-        return new DefaultLidSessionManagementPipelineStage( sessionMgr );
+        return new DefaultLidSessionManagementPipelineStage( sessionMgr, idFact );
     }
 
     /**
      * Constructor, for subclasses only, use factory method.
      *
      * @param sessionMgr the LidSessionManager to use
+     * @param idFact factory for LidAccount identifiers
      */
     protected DefaultLidSessionManagementPipelineStage(
-            LidSessionManager sessionMgr )
+            LidSessionManager sessionMgr,
+            IdentifierFactory idFact )
     {
-        theSessionManager = sessionMgr;
+        theSessionManager    = sessionMgr;
+        theIdentifierFactory = idFact;
     }
 
     /**
@@ -76,11 +85,36 @@ public class DefaultLidSessionManagementPipelineStage
         Boolean deleteSessionCookie;
         Boolean createNewSession;
 
-        HasIdentifier personaToSet       = null;
+        HasIdentifier clientToSet        = null;
+        LidAccount    accountToSet       = null;
         LidSession    preexistingSession = clientAuthStatus.getPreexistingClientSession();
 
         ArrayList<LidSession> sessionsToCancel = new ArrayList<LidSession>();
         ArrayList<LidSession> sessionsToRenew  = new ArrayList<LidSession>();
+
+        String accountName = lidRequest.getUrlArgument( LID_ACCOUNT_PARAMETER_NAME );
+        if( accountName == null ) {
+            accountName = lidRequest.getPostedArgument( LID_ACCOUNT_PARAMETER_NAME );
+        }
+        if( accountName != null ) {
+            // make sure account is valid
+            try {
+                Identifier accountId = theIdentifierFactory.guessFromExternalForm( accountName );
+
+                LidAccount [] availableAccounts = clientAuthStatus.getClientAccounts();
+                if( availableAccounts != null ) {
+                    for( LidAccount currentAccount : availableAccounts ) {
+                        if( currentAccount.isIdentifiedBy( accountId )) {
+                            accountToSet = currentAccount;
+                            break;
+                        }
+                    }
+                }
+            } catch( ParseException ex ) {
+                log.info( "Invalid LidAccount identifier", accountName );
+            }
+        }
+        
 
         if( clientAuthStatus.isAnonymous() )  {
             // anonymous
@@ -140,11 +174,7 @@ public class DefaultLidSessionManagementPipelineStage
                 createNewSession = Boolean.TRUE;
             }
 
-            // preferably set the remote persona: that's what the user thinks themselves as
-            personaToSet = clientAuthStatus.getClient();
-            if( personaToSet == null ) {
-                personaToSet = clientAuthStatus.getClientAccount();
-            }
+            clientToSet = clientAuthStatus.getClient();
 
         } else if( clientAuthStatus.clientWishesToLogin() ) {
             // valid user, but no valid session
@@ -174,9 +204,20 @@ public class DefaultLidSessionManagementPipelineStage
 
         } else if( clientAuthStatus.isValidSessionOnly() ) {
             // still valid session
-            deleteLidCookie     = Boolean.FALSE;
-            deleteSessionCookie = Boolean.FALSE;
-            createNewSession    = Boolean.FALSE;
+            if( accountToSet == null || accountToSet.equals( preexistingSession.getAccount() )) {
+                deleteLidCookie     = Boolean.FALSE;
+                deleteSessionCookie = Boolean.FALSE;
+                createNewSession    = Boolean.FALSE;
+            } else {
+                // switching accounts
+                sessionsToCancel.add( preexistingSession );
+                
+                deleteLidCookie     = Boolean.FALSE;
+                deleteSessionCookie = Boolean.FALSE;
+                createNewSession    = Boolean.TRUE;
+                
+                clientToSet = clientAuthStatus.getClient();
+            }
 
         } else if(    clientAuthStatus.isClaimedOnly()
                    || clientAuthStatus.isExpiredSessionOnly() )
@@ -200,15 +241,39 @@ public class DefaultLidSessionManagementPipelineStage
         if( createNewSession ) {
             sessionCookieStringToSet = theSessionManager.createNewSessionToken();
 
-            ret = SimpleLidSessionManagementInstructions.create(
-                    clientAuthStatus,
-                    ArrayHelper.copyIntoNewArray( sessionsToCancel, LidSession.class ),
-                    ArrayHelper.copyIntoNewArray( sessionsToRenew, LidSession.class ),
-                    personaToSet,
-                    clientAuthStatus.getSiteIdentifier(),
-                    sessionCookieStringToSet,
-                    theSessionManager.getDefaultSessionDuration(),
-                    theSessionManager );
+            if( accountToSet == null ) {
+                // use oldest as default
+                LidAccount [] availableAccounts = clientAuthStatus.getClientAccounts();
+                if( availableAccounts != null && availableAccounts.length > 0 ) {
+                    accountToSet = availableAccounts[0];
+                    for( int i=1 ; i<availableAccounts.length ; ++i ) {
+                        if( accountToSet.getTimeCreated() > availableAccounts[i].getTimeCreated() ) {
+                            accountToSet = availableAccounts[i];
+                        }
+                    }
+                }
+            }
+            if( accountToSet != null ) {
+                ret = SimpleLidSessionManagementInstructions.create(
+                        clientAuthStatus,
+                        ArrayHelper.copyIntoNewArray( sessionsToCancel, LidSession.class ),
+                        ArrayHelper.copyIntoNewArray( sessionsToRenew, LidSession.class ),
+                        clientToSet,
+                        clientAuthStatus.getSiteIdentifier(),
+                        accountToSet,
+                        sessionCookieStringToSet,
+                        theSessionManager.getDefaultSessionDuration(),
+                        theSessionManager );
+            } else {
+                log.error( "Failed to create session, have no account", clientAuthStatus );
+
+                // gotta do something: maintain status, see next else section
+                ret = SimpleLidSessionManagementInstructions.create(
+                        clientAuthStatus,
+                        ArrayHelper.copyIntoNewArray( sessionsToCancel, LidSession.class ),
+                        ArrayHelper.copyIntoNewArray( sessionsToRenew, LidSession.class ),
+                        theSessionManager );
+            }
         } else {
             sessionCookieStringToSet = null;
             
@@ -233,10 +298,10 @@ public class DefaultLidSessionManagementPipelineStage
             ret.addCookieToRemove( sessionCookieName, cookieDomain, cookiePath );
         }
 
-        if( personaToSet != null ) {
+        if( clientToSet != null ) {
             ret.addCookieToSet(
                     lidCookieName,
-                    personaToSet.getIdentifier().toExternalForm(),
+                    clientToSet.getIdentifier().toExternalForm(),
                     cookieDomain,
                     cookiePath,
                     LidCookies.LID_IDENTIFIER_COOKIE_DEFAULT_MAX_AGE );
@@ -281,6 +346,11 @@ public class DefaultLidSessionManagementPipelineStage
      */
     protected LidSessionManager theSessionManager;
 
+    /**
+     * Factory for LidAccount Identifiers.
+     */
+    protected IdentifierFactory theIdentifierFactory;
+    
     /**
      * Pattern to help extract cookie domain and path from a URL.
      */

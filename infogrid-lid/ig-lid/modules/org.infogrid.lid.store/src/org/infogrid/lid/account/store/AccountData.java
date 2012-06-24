@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -34,14 +34,17 @@ public class AccountData
      * Constructor.
      *
      * @param status the status of the Account
+     * @param timeCreated the time the Account was created, in System.currentTimeMillis() format
      */
     public AccountData(
-            LidAccount.LidAccountStatus status )
+            LidAccount.LidAccountStatus status,
+            long                        timeCreated )
     {
         theStatus            = status;
         theRemoteIdentifiers = new ArrayList<Identifier>();
         theAttributes        = new HashMap<String,String>();
         theGroupIdentifiers  = new ArrayList<Identifier>();
+        theTimeCreated       = timeCreated;
     }
 
     /**
@@ -51,17 +54,20 @@ public class AccountData
      * @param remoteIdentifiers identifiers of the remote personas associated with this Account
      * @param attributes the attributes
      * @param groupIdentifiers identifiers of the groups the Account belongs to
+     * @param timeCreated the time the Account was created, in System.currentTimeMillis() format
      */
     public AccountData(
             LidAccount.LidAccountStatus   status,
             ArrayList<Identifier>         remoteIdentifiers,
             Map<String,String>            attributes,
-            ArrayList<Identifier>         groupIdentifiers )
+            ArrayList<Identifier>         groupIdentifiers,
+            long                          timeCreated )
     {
         theStatus            = status;
         theRemoteIdentifiers = remoteIdentifiers;
         theAttributes        = attributes;
         theGroupIdentifiers  = groupIdentifiers;
+        theTimeCreated       = timeCreated;
     }
 
     /**
@@ -132,6 +138,16 @@ public class AccountData
     }
 
     /**
+     * Determine when the account was created.
+     * 
+     * @return the time the account was created, in System.currentTimeMillis() format
+     */
+    public long getTimeCreated()
+    {
+        return theTimeCreated;
+        
+    }
+    /**
      * The account status.
      */
     protected LidAccount.LidAccountStatus theStatus;
@@ -150,4 +166,9 @@ public class AccountData
      * Identifiers of the groups a LidAccount belongs to.
      */
     protected ArrayList<Identifier> theGroupIdentifiers;
+    
+    /**
+     * The time the account was created.
+     */
+    protected long theTimeCreated;
 }

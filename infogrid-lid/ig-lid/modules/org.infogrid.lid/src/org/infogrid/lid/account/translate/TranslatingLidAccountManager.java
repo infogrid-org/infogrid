@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,9 +16,9 @@ package org.infogrid.lid.account.translate;
 
 import java.util.Map;
 import org.infogrid.lid.account.AbstractLidAccountManager;
+import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.account.LidAccountExistsAlreadyException;
 import org.infogrid.lid.account.LidAccountManager;
-import org.infogrid.lid.account.LidAccount;
 import org.infogrid.util.CannotFindHasIdentifierException;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
@@ -83,24 +83,27 @@ public abstract class TranslatingLidAccountManager
 
         }
     }
-    
+
     /**
-     * Given a remote persona and a site, determine the LidAccount that has been provisioned for
+     * Given a remote persona and a site, determine the LidAccounts that are accessible by
      * the remote persona at the site. May return null if none has been provisioned.
-     *
+     * 
      * @param remote the remote persona
      * @param siteIdentifier identifier of the site at which the account has been provisioned
-     * @return the found LidAccount, or null
+     * @return the found LidAccounts, or null
      */
-    public LidAccount determineLidAccountFromRemotePersona(
+    public LidAccount [] determineLidAccountsFromRemotePersona(
             HasIdentifier remote,
             Identifier    siteIdentifier )
     {
-        LidAccount delegateAccount = theDelegate.determineLidAccountFromRemotePersona( remote, siteIdentifier );
-        if( delegateAccount == null ) {
+        LidAccount [] delegateAccounts = theDelegate.determineLidAccountsFromRemotePersona( remote, siteIdentifier );
+        if( delegateAccounts == null ) {
             return null;
         }
-        LidAccount ret = translateAccountBackward( delegateAccount );
+        LidAccount [] ret = new LidAccount[ delegateAccounts.length ];
+        for( int i=0 ; i<delegateAccounts.length ; ++i ) {
+            ret[i] = translateAccountBackward( delegateAccounts[i] );
+        }
         return ret;
     }
 

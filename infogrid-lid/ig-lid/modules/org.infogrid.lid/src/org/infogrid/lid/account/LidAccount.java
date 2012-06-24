@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -95,6 +95,14 @@ public interface LidAccount
      * @return the LidAccount's status
      */
     public LidAccountStatus getAccountStatus();
+
+    /**
+     * Obtain the time of creation of this LidAccount. This is immutable for the
+     * lifetime of the LidAccount.
+     *
+     * @return the time this LidAccount was created in <code>System.currentTimeMillis()</code> format
+     */
+    public long getTimeCreated();
 
     /**
      * Name of the attribute that contains the persona's identifier.

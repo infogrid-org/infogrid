@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -29,6 +29,7 @@ import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.IdentifierFactory;
 import org.infogrid.util.InvalidIdentifierException;
+import org.infogrid.util.logging.Log;
 
 /**
  * Maps session cookies into the Store.
@@ -37,6 +38,8 @@ public class StoreLidSessionMapper
         implements
             StoreEntryMapper<String,LidSession>
 {
+    private static final Log log = Log.getLogInstance( StoreLidSessionMapper.class ); // our own, private logger
+    
     /**
      * Constructor.
      *
@@ -102,6 +105,7 @@ public class StoreLidSessionMapper
             long   timeLastAuthenticated;
             long   timeLastUsedSuccessfully;
             long   timeValidUntil;
+            String currentAccountId;
 
             if( components.length >= 1 ) {
                 sessionToken = components[0];
@@ -138,15 +142,37 @@ public class StoreLidSessionMapper
             } else {
                 timeValidUntil = -1L;
             }
+            if( components.length >= 8 ) {
+                currentAccountId = components[7];
+            } else {
+                currentAccountId = null;
+            }
 
-            HasIdentifier client = theAccountManager.find( theIdentifierFactory.fromExternalForm( clientIdentifier ));
+            HasIdentifier client         = theAccountManager.find( theIdentifierFactory.fromExternalForm( clientIdentifier ));
             Identifier    siteIdentifier = siteIdentifierString != null ? theIdentifierFactory.fromExternalForm( siteIdentifierString ) : null;
-            LidAccount    account;
+            LidAccount    account        = null;
 
             if( client instanceof LidAccount ) {
                 account = (LidAccount) client;
             } else {
-                account = theAccountManager.determineLidAccountFromRemotePersona( client, siteIdentifier );
+                LidAccount [] localAccounts = theAccountManager.determineLidAccountsFromRemotePersona( client, siteIdentifier );
+                if( localAccounts != null && localAccounts.length >= 1 ) {
+                    if( currentAccountId != null ) {
+                        for( int i=0 ; i<localAccounts.length ; ++i ) {
+                            if( localAccounts[i].getIdentifier().equals( currentAccountId )) {
+                                account = localAccounts[i];
+                                break;
+                            }
+                        }
+                    }
+                    if( account == null ) {
+                        log.error( "Could not find account", currentAccountId, "in alternatives", localAccounts );
+                        account = localAccounts[0];
+                    }
+                }
+            }
+            if( account == null ) {
+                log.error( "Could not find account", currentAccountId );
             }
 
             SimpleLidSession ret = SimpleLidSession.create(
@@ -264,6 +290,8 @@ public class StoreLidSessionMapper
             buf.append( value.getTimeLastUsedSuccessfully() );
             buf.append( SEPARATOR );
             buf.append( value.getTimeValidUntil() );
+            buf.append( SEPARATOR );
+            buf.append( value.getAccount().getIdentifier().toExternalForm() );
             
             byte [] ret = buf.toString().getBytes( CHARSET );
             return ret;

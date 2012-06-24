@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -35,7 +35,7 @@ public interface LidAccountManager
      * or not. If it returns a LidAccount, the identifier referred to that locally provisioned
      * LidAccount. If it returns something other than a LidAccount, it refers to a remote
      * persona. To determine the LidAccount that may be associated with the remote persona,
-     * call determineLidAccountFromRemotePersona.
+     * call determineLidAccountsFromRemotePersona.
      *
      * @param identifier the Identifier for which the HasIdentifier will be retrieved
      * @return the found HasIdentifier
@@ -49,14 +49,14 @@ public interface LidAccountManager
             InvalidIdentifierException;
 
     /**
-     * Given a remote persona and a site, determine the LidAccount that has been provisioned for
+     * Given a remote persona and a site, determine the LidAccounts that are accessible by
      * the remote persona at the site. May return null if none has been provisioned.
      * 
      * @param remote the remote persona
      * @param siteIdentifier identifier of the site at which the account has been provisioned
-     * @return the found LidAccount, or null
+     * @return the found LidAccounts, or null
      */
-    public abstract LidAccount determineLidAccountFromRemotePersona(
+    public abstract LidAccount [] determineLidAccountsFromRemotePersona(
             HasIdentifier remote,
             Identifier    siteIdentifier );
 

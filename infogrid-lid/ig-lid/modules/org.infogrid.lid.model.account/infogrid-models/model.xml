@@ -9,7 +9,7 @@
 
     For more information about InfoGrid go to http://infogrid.org/
 
-    Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+    Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
     All rights reserved.
 -->
 
@@ -306,6 +306,20 @@
     }
     ]]></implementsMethod>
 
+
+            <implementsMethod><![CDATA[
+    /**
+     * Cascading delete.
+     */
+    public void cascadingDelete()
+        throws
+            org.infogrid.meshbase.transaction.TransactionException,
+            NotPermittedException
+    {
+        org.infogrid.mesh.set.MeshObjectSet sessions = traverse( AccountSubjectArea.SESSION_FOR_ACCOUNT.getDestination() );
+        get_Delegate().getMeshBase().getMeshBaseLifecycleManager().deleteMeshObjects( sessions );
+    }
+            ]]></implementsMethod>
         </entitytype>
 
         <relationshiptype ID="org.infogrid.lid.model.account/AccountCollection_Collects_Account">

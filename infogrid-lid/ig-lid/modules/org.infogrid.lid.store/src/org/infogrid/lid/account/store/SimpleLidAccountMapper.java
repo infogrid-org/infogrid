@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -128,7 +128,8 @@ public class SimpleLidAccountMapper
                     theCurrentAccountData.getStatus(),
                     ArrayHelper.copyIntoNewArray( theRemoteIdentifiers, Identifier.class ),
                     theCurrentAccountData.getAttributes(),
-                    theCurrentAccountData.getGroupIdentifiers() );
+                    theCurrentAccountData.getGroupIdentifiers(),
+                    theCurrentAccountData.getTimeCreated() );
             
             return ret;
 
@@ -208,7 +209,9 @@ public class SimpleLidAccountMapper
                 throw new SAXParseException( "Repeated tag " + ACCOUNT_TAG, theLocator );
             }
             theCurrentIdentifier = SimpleStringIdentifier.create( attrs.getValue( IDENTIFIER_TAG ));
-            theCurrentAccountData = new AccountData( LidAccount.LidAccountStatus.valueOf( attrs.getValue( STATUS_TAG )));
+            theCurrentAccountData = new AccountData(
+                    LidAccount.LidAccountStatus.valueOf( attrs.getValue( STATUS_TAG )),
+                    Long.parseLong( attrs.getValue( CREATED_TAG ) ));
 
         } else if( ATTRIBUTE_TAG.equals( qName )) {
             if( theCurrentAttribute != null ) {
@@ -426,6 +429,7 @@ public class SimpleLidAccountMapper
         StringBuilder buf = new StringBuilder();
         buf.append( "<" ).append( ACCOUNT_TAG );
         buf.append(  " " ).append( IDENTIFIER_TAG ).append( "=\"" ).append( XmlUtils.escape( account.getIdentifier().toExternalForm() )).append( "\"");
+        buf.append(  " " ).append( CREATED_TAG ).append( "=\"" ).append( account.getTimeCreated() ).append( "\"");
         buf.append(  " " ).append( STATUS_TAG ).append( "=\"" ).append( XmlUtils.escape( account.getAccountStatus().name() )).append( "\">\n");
 
         for( String name : account.getAttributeKeys() ) {

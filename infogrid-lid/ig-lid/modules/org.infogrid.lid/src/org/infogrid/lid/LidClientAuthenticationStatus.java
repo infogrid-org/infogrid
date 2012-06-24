@@ -8,16 +8,16 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid;
 
 import org.infogrid.lid.account.LidAccount;
-import org.infogrid.lid.session.LidSession;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
+import org.infogrid.lid.session.LidSession;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 
@@ -189,21 +189,21 @@ public interface LidClientAuthenticationStatus
     public abstract HasIdentifier getClient();
 
     /**
-     * Obtain the client's local LidAccount, if there is one. If there is none, or if the LidAccount
+     * Obtain the client's possible local LidAccounts, if there are any. If there is none, or if the LidAccount
      * could not be resolved, this will return <code>null</code>.
      *
-     * @return the LidAccount
+     * @return the LidAccounts
      * @see #getClientIdentifier
      */
-    public abstract LidAccount getClientAccount();
+    public abstract LidAccount [] getClientAccounts();
 
     /**
-     * Obtain the client's local LidAccount's identifier, if there is one. If there is no LidAccount, or the
+     * Obtain the client's possible local LidAccounts' identifiers, if there are any. If there is no LidAccount, or the
      * LidAccount could not be resolved, this will return <code>null</code>.
      *
      * @return the LidAccount's identifier
      */
-    public abstract Identifier getClientAccountIdentifier();
+    public abstract Identifier [] getClientAccountsIdentifiers();
 
     /**
      * Determine whether the client has indicated its desire to log in.

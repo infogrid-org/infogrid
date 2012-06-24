@@ -8,12 +8,13 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid.session;
 
+import org.infogrid.lid.account.LidAccount;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 
@@ -28,6 +29,7 @@ public class LidSessionManagerArguments
      * @param sessionDuration the session duration, in milliseconds
      * @param client the client whose session it is
      * @param siteIdentifier identifier of the site where the session takes place
+     * @param account the account where the session takes place
      * @param clientIp IP address of the client that created the session
      * @return the created LidSessionManagerArguments
      */
@@ -35,9 +37,10 @@ public class LidSessionManagerArguments
             long          sessionDuration,
             HasIdentifier client,
             Identifier    siteIdentifier,
+            LidAccount    account,
             String        clientIp )
     {
-        return new LidSessionManagerArguments( sessionDuration, client, siteIdentifier, clientIp );
+        return new LidSessionManagerArguments( sessionDuration, client, siteIdentifier, account, clientIp );
     }
 
     /**
@@ -46,18 +49,21 @@ public class LidSessionManagerArguments
      * @param sessionDuration the session duration, in milliseconds
      * @param client the client whose session it is
      * @param siteIdentifier identifier of the site where the session takes place
+     * @param account the account where the session takes place
      * @param clientIp IP address of the client that created the session
      */
     protected LidSessionManagerArguments(
             long          sessionDuration,
             HasIdentifier client,
             Identifier    siteIdentifier,
+            LidAccount    account,
             String        clientIp )
     {
-        theSessionDuration  = sessionDuration;
-        theClient           = client;
-        theSiteIdentifier   = siteIdentifier;
-        theClientIp         = clientIp;
+        theSessionDuration = sessionDuration;
+        theClient          = client;
+        theSiteIdentifier  = siteIdentifier;
+        theAccount         = account;
+        theClientIp        = clientIp;
     }
 
     /**
@@ -91,6 +97,16 @@ public class LidSessionManagerArguments
     }
 
     /**
+     * Obtain the account where the session takes place.
+     *
+     * @return the account
+     */
+    public LidAccount getAccount()
+    {
+        return theAccount;
+    }
+
+    /**
      * Obtain the IP address of the client that originally created the session.
      *
      * @return the IP address
@@ -114,6 +130,11 @@ public class LidSessionManagerArguments
      * Identifier of the site whose session it is.
      */
     protected Identifier theSiteIdentifier;
+    
+    /**
+     * Account at the site whose session it is.
+     */
+    protected LidAccount theAccount;
 
     /**
      * The IP address of the client that originally created the session.

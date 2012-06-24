@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -33,6 +33,7 @@ public class SimpleLidAccount
      * @param remoteIdentifiers set of remote Identifiers that are also associated with this LidAccount
      * @param attributes attributes of the persona, e.g. first name
      * @param groupIdentifiers identifiers of the groups that this LidAccount is a member of
+     * @param timeCreated the time at which this LidAccount was created, in System.getTimeMillis() format.
      * @return the created SimpleLidAccount
      */
     public static SimpleLidAccount create(
@@ -41,7 +42,8 @@ public class SimpleLidAccount
             LidAccountStatus     status,
             Identifier []        remoteIdentifiers,
             Map<String,String>   attributes,
-            Identifier []        groupIdentifiers )
+            Identifier []        groupIdentifiers,
+            long                 timeCreated )
     {
         return new SimpleLidAccount(
                 identifier,
@@ -49,7 +51,8 @@ public class SimpleLidAccount
                 status,
                 remoteIdentifiers,
                 attributes,
-                groupIdentifiers );
+                groupIdentifiers,
+                timeCreated );
     }
 
     /**
@@ -61,6 +64,7 @@ public class SimpleLidAccount
      * @param remoteIdentifiers set of remote Identifiers that are also associated with this LidAccount
      * @param attributes attributes of the persona, e.g. first name
      * @param groupIdentifiers identifiers of the groups that this LidAccount is a member of
+     * @param timeCreated the time at which this LidAccount was created, in System.getTimeMillis() format.
      */
     protected SimpleLidAccount(
             Identifier           identifier,
@@ -68,9 +72,10 @@ public class SimpleLidAccount
             LidAccountStatus     status,
             Identifier []        remoteIdentifiers,
             Map<String,String>   attributes,
-            Identifier []        groupIdentifiers )
+            Identifier []        groupIdentifiers,
+            long                 timeCreated )
     {
-        super( identifier, siteIdentifier );
+        super( identifier, siteIdentifier, timeCreated );
 
         theStatus            = status;
         theRemoteIdentifiers = remoteIdentifiers;

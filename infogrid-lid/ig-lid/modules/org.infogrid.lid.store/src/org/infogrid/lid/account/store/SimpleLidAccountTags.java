@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -25,6 +25,9 @@ public interface SimpleLidAccountTags
     /** Tag for an identifier. */
     public static final String IDENTIFIER_TAG = "id";
 
+    /** Tag for when the LidAccount was created. */
+    public static final String CREATED_TAG = "created";
+    
     /** Tag for the LidAccount status. */
     public static final String STATUS_TAG = "status";
     

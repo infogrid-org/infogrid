@@ -8,16 +8,16 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid;
 
 import org.infogrid.lid.account.LidAccount;
-import org.infogrid.lid.session.LidSession;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
+import org.infogrid.lid.session.LidSession;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.logging.CanBeDumped;
@@ -38,7 +38,7 @@ public abstract class AbstractLidClientAuthenticationStatus
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientRemotePersona the client's remote persona, if used
-     * @param clientPersona the client's LidAccount that was found locally, if any
+     * @param clientAccounts the client's locally available LidAccounts, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
      * @param carriedExpiredCredentialTypes the credential types carried as part of this request that were expired, if any
@@ -55,7 +55,7 @@ public abstract class AbstractLidClientAuthenticationStatus
             String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
             HasIdentifier                    clientRemotePersona,
-            LidAccount                       clientPersona,
+            LidAccount []                    clientAccounts,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
             LidCredentialType []             carriedExpiredCredentialTypes,
@@ -71,7 +71,7 @@ public abstract class AbstractLidClientAuthenticationStatus
         theClientIdentifierAsEntered = clientIdentifierAsEntered;
         theClientIdentifier          = clientIdentifier;
         theClient                    = clientRemotePersona;
-        theClientAccount             = clientPersona;
+        theClientAccounts            = clientAccounts;
 
         thePreexistingClientSession = preexistingClientSession;
         
@@ -121,7 +121,7 @@ public abstract class AbstractLidClientAuthenticationStatus
     {
         boolean ret;
 
-        if( theClientIdentifier != null && theClient == null && theClientAccount == null ) {
+        if( theClientIdentifier != null && theClient == null && ( theClientAccounts == null || theClientAccounts.length == 0 )) {
             ret = true;
         } else {
             ret = false;
@@ -351,29 +351,31 @@ public abstract class AbstractLidClientAuthenticationStatus
     }
     
     /**
-     * Obtain the client's local LidAccount, if there is one. If there is none, or if the LidAccount
+     * Obtain the client's possible local LidAccounts, if there are any. If there is none, or if the LidAccount
      * could not be resolved, this will return <code>null</code>.
      *
-     * @return the LidAccount
+     * @return the LidAccounts
      * @see #getClientIdentifier
-     * @see #getClientAccountIdentifier
      */
-    public LidAccount getClientAccount()
+    public LidAccount [] getClientAccounts()
     {
-        return theClientAccount;
+        return theClientAccounts;
     }
-    
+
     /**
-     * Obtain the identifier of the client's local LidAccount, if there is one. If there is none, or if the LidAccount
-     * could not be resolved, this will return <code>null</code>.
+     * Obtain the client's possible local LidAccounts' identifiers, if there are any. If there is no LidAccount, or the
+     * LidAccount could not be resolved, this will return <code>null</code>.
      *
      * @return the LidAccount's identifier
-     * @see #getClientAccount
      */
-    public Identifier getClientAccountIdentifier()
+    public Identifier [] getClientAccountsIdentifiers()
     {
-        if( theClientAccount != null ) {
-            return theClientAccount.getIdentifier();
+        if( theClientAccounts != null ) {
+            Identifier [] ret = new Identifier[ theClientAccounts.length ];
+            for( int i=0 ; i<theClientAccounts.length ; ++i ) {
+                ret[i] = theClientAccounts[i].getIdentifier();
+            }
+            return ret;
         } else {
             return null;
         }
@@ -543,7 +545,7 @@ public abstract class AbstractLidClientAuthenticationStatus
                 new String[] {
                     "theClientIdentifierAsEntered",
                     "theClientIdentifier",
-                    "theClientPersona",
+                    "theClientAccounts",
                     "thePreexistingClientSession",
                     "theCarriedValidCredentialTypes",
                     "theCarriedInvalidCredentialTypes",
@@ -555,7 +557,7 @@ public abstract class AbstractLidClientAuthenticationStatus
                 }, new Object[] {
                     theClientIdentifierAsEntered,
                     theClientIdentifier,
-                    theClientAccount,
+                    theClientAccounts,
                     thePreexistingClientSession,
                     theCarriedValidCredentialTypes,
                     theCarriedInvalidCredentialTypes,
@@ -583,9 +585,9 @@ public abstract class AbstractLidClientAuthenticationStatus
     protected HasIdentifier theClient;
 
     /**
-     * The client's local LidAccount, if there is one.
+     * The client's local LidAccounts, if there are any.
      */
-    protected LidAccount theClientAccount;
+    protected LidAccount [] theClientAccounts;
 
     /**
      * The credential types that were provided by the client as part of this request and that

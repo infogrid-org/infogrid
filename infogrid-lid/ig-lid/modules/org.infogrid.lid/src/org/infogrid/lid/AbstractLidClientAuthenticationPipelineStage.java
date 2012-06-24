@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,11 +18,12 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.account.LidAccountManager;
-import org.infogrid.lid.session.LidSession;
-import org.infogrid.lid.session.LidSessionManager;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidExpiredCredentialException;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
+import org.infogrid.lid.session.LidSession;
+import org.infogrid.lid.session.LidSessionManagementPipelineStage;
+import org.infogrid.lid.session.LidSessionManager;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CannotFindHasIdentifierException;
 import org.infogrid.util.HasIdentifier;
@@ -73,6 +74,8 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
             log.traceMethodCallEntry( this, "determineAuthenticationStatus", lidRequest, siteIdentifier );
         }
 
+    // first look at cookies
+        
         String lidCookieString     = lidRequest.getCookieValue( determineLidCookieName());
         String sessionCookieString = lidRequest.getCookieValue( determineSessionCookieName());
 
@@ -96,6 +99,8 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
             }
         }
 
+    // determine LID value
+        
         if( lidArgumentString != null && lidArgumentString.length() > 0 ) {
             try {
                 lidArgumentIdentifier = correctIdentifier( lidRequest.getAbsoluteContextUri(), lidArgumentString );
@@ -124,6 +129,8 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
             clientIdentifier = null;
         }
 
+    // look for an account that goes with the LID
+        
         LidAccount    clientPersona = null;
         HasIdentifier clientRemotePersona = null;
 
@@ -149,11 +156,16 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
                 }
             }
         }
+        
+        LidAccount [] clientAccounts = null;
+        
         if( clientPersona == null && clientRemotePersona != null ) {
             // check whether there's a LidAccount for it
-            clientPersona = theAccountManager.determineLidAccountFromRemotePersona( clientRemotePersona, siteIdentifier );
+            clientAccounts = theAccountManager.determineLidAccountsFromRemotePersona( clientRemotePersona, siteIdentifier );
         }
 
+    // determine whether client wants to logout or cancel
+        
         boolean clientLoggedOn            = false;
         boolean clientWishesToLogin       = false;
         boolean clientWishesCancelSession = false;
@@ -167,6 +179,8 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
             clientWishesToLogout = true;
         }
 
+    // look for session
+        
         LidSession preexistingClientSession;
         if( sessionClientIdentifier != null && sessionCookieString != null ) {
             preexistingClientSession = theSessionManager.get( sessionCookieString );
@@ -191,6 +205,8 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
             preexistingClientSession = null;
         }
 
+    // now look at credentials
+        
         ArrayList<LidCredentialType>             validCredentialTypes        = null;
         ArrayList<LidCredentialType>             expiredCredentialTypes      = null;
         ArrayList<LidCredentialType>             invalidCredentialTypes      = null;
@@ -236,6 +252,9 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
                 }
             }
         }
+
+    // determine login event
+        
         if(    lidArgumentString != null
             && lidArgumentString.length() > 0
             && ( validCredentialTypes == null   || validCredentialTypes.isEmpty() )
@@ -250,7 +269,7 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
                 lidArgumentString != null && lidArgumentString.length() > 0 ? lidArgumentString : null,
                 clientIdentifier,
                 clientRemotePersona,
-                clientPersona,
+                clientAccounts,
                 preexistingClientSession,
                 validCredentialTypes,
                 expiredCredentialTypes,
@@ -285,6 +304,26 @@ public abstract class AbstractLidClientAuthenticationPipelineStage
 
         } else {
             lidArgumentString = lidRequest.getUrlArgument( LidClientAuthenticationPipelineStage.LID_PARAMETER_NAME );
+        }
+
+        return lidArgumentString;
+    }
+
+    /**
+     * Overridable method to determine the LID Account argument String.
+     * @param lidRequest the incoming request
+     * @return the LID argument String, if any
+     */
+    protected String determineLidAccountArgumentString(
+            SaneRequest lidRequest )
+    {
+        String lidArgumentString;
+
+        if( "POST".equalsIgnoreCase( lidRequest.getMethod() )) {
+            lidArgumentString = lidRequest.getPostedArgument( LidSessionManagementPipelineStage.LID_ACCOUNT_PARAMETER_NAME );
+
+        } else {
+            lidArgumentString = lidRequest.getUrlArgument( LidSessionManagementPipelineStage.LID_ACCOUNT_PARAMETER_NAME );
         }
 
         return lidArgumentString;

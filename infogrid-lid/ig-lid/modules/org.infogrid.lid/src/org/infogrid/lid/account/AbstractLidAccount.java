@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -33,14 +33,17 @@ public abstract class AbstractLidAccount
      * 
      * @param identifier the unique identifier of the LidAccount, e.g. their local handle.
      * @param siteIdentifier the identifier of the site at which the LidAccount exists
+     * @param timeCreated the time at which this LidAccount was created, in System.getTimeMillis() format.
      */
     protected AbstractLidAccount(
             Identifier identifier,
-            Identifier siteIdentifier )
+            Identifier siteIdentifier,
+            long       timeCreated )
     {
         super( identifier );
 
         theSiteIdentifier = siteIdentifier;
+        theTimeCreated    = timeCreated;
     }
 
     /**
@@ -112,7 +115,23 @@ public abstract class AbstractLidAccount
     }
 
     /**
+     * Obtain the time of creation of this LidAccount. This is immutable for the
+     * lifetime of the LidAccount.
+     *
+     * @return the time this LidAccount was created in <code>System.currentTimeMillis()</code> format
+     */
+    public long getTimeCreated()
+    {
+        return theTimeCreated;
+    }
+
+    /**
      * The Identifier of the site at which this LidAccount exists.
      */
     protected Identifier theSiteIdentifier;
+    
+    /*
+     * The time at which this LidAccount was created, in System.getTimeMillis() format.
+     */
+    protected long theTimeCreated;
 }

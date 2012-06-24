@@ -8,17 +8,17 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.lid;
 
-import org.infogrid.lid.account.LidAccount;
-import org.infogrid.lid.session.LidSession;
 import java.util.Collection;
+import org.infogrid.lid.account.LidAccount;
 import org.infogrid.lid.credential.LidCredentialType;
 import org.infogrid.lid.credential.LidInvalidCredentialException;
+import org.infogrid.lid.session.LidSession;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
@@ -36,7 +36,7 @@ public class SimpleLidClientAuthenticationStatus
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientRemotePersona the client's remote persona, if used
-     * @param clientPersona the client LidAccount that was found, if any
+     * @param clientAccounts the client's locally available LidAccounts, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
      * @param carriedExpiredCredentialTypes the credential types carried as part of this request that were expired, if any
@@ -54,7 +54,7 @@ public class SimpleLidClientAuthenticationStatus
             String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
             HasIdentifier                    clientRemotePersona,
-            LidAccount                       clientPersona,
+            LidAccount []                    clientAccounts,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
             LidCredentialType []             carriedExpiredCredentialTypes,
@@ -71,7 +71,7 @@ public class SimpleLidClientAuthenticationStatus
                 clientIdentifierAsEntered,
                 clientIdentifier,
                 clientRemotePersona,
-                clientPersona,
+                clientAccounts,
                 preexistingClientSession,
                 carriedValidCredentialTypes,
                 carriedExpiredCredentialTypes,
@@ -93,7 +93,7 @@ public class SimpleLidClientAuthenticationStatus
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientRemotePersona the client's remote persona, if used
-     * @param clientPersona the client LidAccount that was found, if any
+     * @param clientAccounts the client's locally available LidAccounts, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
      * @param carriedExpiredCredentialTypes the credential types carried as part of this request that were expired, if any
@@ -111,7 +111,7 @@ public class SimpleLidClientAuthenticationStatus
             String                                    clientIdentifierAsEntered,
             Identifier                                clientIdentifier,
             HasIdentifier                             clientRemotePersona,
-            LidAccount                                clientPersona,
+            LidAccount []                             clientAccounts,
             LidSession                                preexistingClientSession,
             Collection<LidCredentialType>             carriedValidCredentialTypes,
             Collection<LidCredentialType>             carriedExpiredCredentialTypes,
@@ -128,7 +128,7 @@ public class SimpleLidClientAuthenticationStatus
                 clientIdentifierAsEntered,
                 clientIdentifier,
                 clientRemotePersona,
-                clientPersona,
+                clientAccounts,
                 preexistingClientSession,
                 carriedValidCredentialTypes != null
                         ? ArrayHelper.copyIntoNewArray( carriedValidCredentialTypes,   LidCredentialType.class )
@@ -158,7 +158,7 @@ public class SimpleLidClientAuthenticationStatus
      * @param clientIdentifierAsEntered String that was entered as the client identifier by the client, if any
      * @param clientIdentifier the normalized identifier provided by the client, if any
      * @param clientRemotePersona the client's remote persona, if used
-     * @param clientPersona the client's LidAccount that was found locally, if any
+     * @param clientAccounts the client's locally available LidAccounts, if any
      * @param preexistingClientSession the LidSession that existed prior to this request, if any
      * @param carriedValidCredentialTypes the credential types carried as part of this request that validated successfully, if any
      * @param carriedExpiredCredentialTypes the credential types carried as part of this request that were expired, if any
@@ -175,7 +175,7 @@ public class SimpleLidClientAuthenticationStatus
             String                           clientIdentifierAsEntered,
             Identifier                       clientIdentifier,
             HasIdentifier                    clientRemotePersona,
-            LidAccount                       clientPersona,
+            LidAccount []                    clientAccounts,
             LidSession                       preexistingClientSession,
             LidCredentialType []             carriedValidCredentialTypes,
             LidCredentialType []             carriedExpiredCredentialTypes,
@@ -191,7 +191,7 @@ public class SimpleLidClientAuthenticationStatus
         super(  clientIdentifierAsEntered,
                 clientIdentifier,
                 clientRemotePersona,
-                clientPersona,
+                clientAccounts,
                 preexistingClientSession,
                 carriedValidCredentialTypes,
                 carriedExpiredCredentialTypes,
