@@ -253,27 +253,18 @@ public class DefaultLidSessionManagementPipelineStage
                     }
                 }
             }
-            if( accountToSet != null ) {
-                ret = SimpleLidSessionManagementInstructions.create(
-                        clientAuthStatus,
-                        ArrayHelper.copyIntoNewArray( sessionsToCancel, LidSession.class ),
-                        ArrayHelper.copyIntoNewArray( sessionsToRenew, LidSession.class ),
-                        clientToSet,
-                        clientAuthStatus.getSiteIdentifier(),
-                        accountToSet,
-                        sessionCookieStringToSet,
-                        theSessionManager.getDefaultSessionDuration(),
-                        theSessionManager );
-            } else {
-                log.error( "Failed to create session, have no account", clientAuthStatus );
+            // if accountToSet is null, it only means we need to create an account later
+            ret = SimpleLidSessionManagementInstructions.create(
+                    clientAuthStatus,
+                    ArrayHelper.copyIntoNewArray( sessionsToCancel, LidSession.class ),
+                    ArrayHelper.copyIntoNewArray( sessionsToRenew, LidSession.class ),
+                    clientToSet,
+                    clientAuthStatus.getSiteIdentifier(),
+                    accountToSet,
+                    sessionCookieStringToSet,
+                    theSessionManager.getDefaultSessionDuration(),
+                    theSessionManager );
 
-                // gotta do something: maintain status, see next else section
-                ret = SimpleLidSessionManagementInstructions.create(
-                        clientAuthStatus,
-                        ArrayHelper.copyIntoNewArray( sessionsToCancel, LidSession.class ),
-                        ArrayHelper.copyIntoNewArray( sessionsToRenew, LidSession.class ),
-                        theSessionManager );
-            }
         } else {
             sessionCookieStringToSet = null;
             
