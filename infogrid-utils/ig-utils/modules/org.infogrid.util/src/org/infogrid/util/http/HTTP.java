@@ -587,7 +587,7 @@ public abstract class HTTP
      * @return the Response obtained from that URL
      * @throws IOException thrown if the content could not be obtained
      */
-    protected static PostResponse http_post(
+    public static PostResponse http_post(
             URL                                url,
             String                             contentType,
             byte []                            payload,
