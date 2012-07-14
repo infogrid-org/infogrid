@@ -166,17 +166,21 @@ public interface LidClientAuthenticationStatus
      * was successful, getClientIdentifier() will also return non-null.
      *
      * @return the claimed client identifier as entered by the client
+     * @see #getClientIdentifier
      */
     public abstract String getClientIdentifierAsEntered();
 
     /**
      * Obtain the identifier provided by the client. To determine whether to trust that the client indeed
      * owns this identifier, other methods need to be consulted. This method makes no statement 
-     * about trustworthiness. If this returns a non-null value, and {@link #getClientAccount} returns
+     * about trustworthiness. If this returns a non-null value, and {@link #getClientAccounts} returns
      * <code>null</code>, this indicates that the client persona is not known or not valid.
      * 
      * @return the claimed client identifier
-     * @see #getClientAccount
+     * @see #getClient
+     * @see #getClientAccounts
+     * @see #getClientAccountsIdentifiers
+     * @see #getClientIdentifierAsEntered
      */
     public abstract Identifier getClientIdentifier();
 
@@ -185,6 +189,9 @@ public interface LidClientAuthenticationStatus
      * or if the remote persona could not be resolved, this will return <code>null</code>.
      *
      * @return the remote persona
+     * @see #getClientIdentifier
+     * @see #getClientAccounts
+     * @see #getClientAccountsIdentifiers
      */
     public abstract HasIdentifier getClient();
 
@@ -193,7 +200,9 @@ public interface LidClientAuthenticationStatus
      * could not be resolved, this will return <code>null</code>.
      *
      * @return the LidAccounts
+     * @see #getClient
      * @see #getClientIdentifier
+     * @see #getClientAccountsIdentifiers
      */
     public abstract LidAccount [] getClientAccounts();
 
@@ -202,6 +211,9 @@ public interface LidClientAuthenticationStatus
      * LidAccount could not be resolved, this will return <code>null</code>.
      *
      * @return the LidAccount's identifier
+     * @see #getClient
+     * @see #getClientIdentifier
+     * @see #getClientAccounts
      */
     public abstract Identifier [] getClientAccountsIdentifiers();
 
