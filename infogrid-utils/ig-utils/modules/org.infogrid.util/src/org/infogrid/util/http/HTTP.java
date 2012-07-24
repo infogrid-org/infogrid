@@ -672,7 +672,7 @@ public abstract class HTTP
         conn.setRequestProperty( "Content-Length", String.valueOf( payload.length ));
         conn.setRequestProperty( "Content-Type",   contentType );
 
-        OutputStream outStream = new BufferedOutputStream( conn.getOutputStream());
+        OutputStream outStream = new BufferedOutputStream( conn.getOutputStream()); // throws SSL exceptions if there are any
 
         outStream.write( payload );
         outStream.flush();
