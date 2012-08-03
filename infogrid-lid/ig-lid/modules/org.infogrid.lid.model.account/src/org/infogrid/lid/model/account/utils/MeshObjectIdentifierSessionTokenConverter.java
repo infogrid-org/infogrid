@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -37,7 +37,7 @@ public class MeshObjectIdentifierSessionTokenConverter
      */
     private MeshObjectIdentifierSessionTokenConverter()
     {
-        super( DEFAULT_ALLOWED_CHARS, 64 );
+        super( DEFAULT_ALLOWED_FIRST_CHARS, DEFAULT_ALLOWED_CHARS, 64 );
     }
 
     /**
