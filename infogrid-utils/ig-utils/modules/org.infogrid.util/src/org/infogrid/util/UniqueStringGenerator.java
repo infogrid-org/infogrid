@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -17,7 +17,7 @@ package org.infogrid.util;
 import java.util.Random;
 
 /**
- * Generates unique Strings.
+ * Generates unique String tokens.
  */
 public class UniqueStringGenerator
         implements
@@ -26,41 +26,60 @@ public class UniqueStringGenerator
     /**
      * Factory method.
      *
-     * @param length the length of the generated Strings
+     * @param length the length of the generated token
      * @return the created UniqueStringGenerator
      */
     public static UniqueStringGenerator create(
             int length )
     {
-        return new UniqueStringGenerator( DEFAULT_ALLOWED_CHARS, length );
+        return new UniqueStringGenerator( DEFAULT_ALLOWED_FIRST_CHARS, DEFAULT_ALLOWED_CHARS, length );
     }
 
     /**
      * Factory method.
      *
-     * @param alphabet the alphabet to use for the generated Strings
-     * @param length the length of the generated Strings
+     * @param alphabet the alphabet to use for the generated token
+     * @param length the length of the generated token
      * @return the created UniqueStringGenerator
      */
     public static UniqueStringGenerator create(
             char [] alphabet,
             int     length )
     {
-        return new UniqueStringGenerator( alphabet, length );
+        return new UniqueStringGenerator( alphabet, alphabet, length );
+    }
+
+    /**
+     * Factory method.
+     *
+     * @param firstCharAlphabet the alphabet to use for the first letter in the generated token
+     * @param alphabet the alphabet to use for the generated token
+     * @param length the length of the generated token, including first character
+     * @return the created UniqueStringGenerator
+     */
+    public static UniqueStringGenerator create(
+            char [] firstCharAlphabet,
+            char [] alphabet,
+            int     length )
+    {
+        return new UniqueStringGenerator( firstCharAlphabet, alphabet, length );
     }
 
     /**
      * Private constructor, use factory method.
      *
-     * @param alphabet the alphabet to use for the generated Strings
-     * @param length the length of the generated Strings
+     * @param firstCharAlphabet the alphabet to use for the first letter in the generated token
+     * @param alphabet the alphabet to use for the generated token
+     * @param length the length of the generated token, including first character
      */
     protected UniqueStringGenerator(
+            char [] firstCharAlphabet,
             char [] alphabet,
             int     length )
     {
-        theAlphabet = alphabet;
-        theLength   = length;
+        theFirstCharAlphabet = firstCharAlphabet;
+        theAlphabet          = alphabet;
+        theLength            = length;
 
         theRandom = new Random( theSeedGenerator.createUniqueToken() );
     }
@@ -86,7 +105,13 @@ public class UniqueStringGenerator
     {
         char [] buf = new char[ length ];
 
-        for( int i=0 ; i<length ; ++i ) {
+        if( length > 0 ) {
+            int  value = theRandom.nextInt( theFirstCharAlphabet.length );
+            char c     = theFirstCharAlphabet[ value ];
+
+            buf[0]  = c;
+        }
+        for( int i=1 ; i<length ; ++i ) {
             int  value = theRandom.nextInt( theAlphabet.length );
             char c     = theAlphabet[ value ];
 
@@ -96,12 +121,17 @@ public class UniqueStringGenerator
     }
 
     /**
-     * The alphabet to use for generating the Strings.
+     * The alphabet to use for generating the first character in a token.
+     */
+    protected char [] theFirstCharAlphabet;
+
+    /**
+     * The alphabet to use for generating a token.
      */
     protected char [] theAlphabet;
 
     /**
-     * The length of Strings being generated.
+     * The length of a token being generated.
      */
     protected int theLength;
 
@@ -119,6 +149,13 @@ public class UniqueStringGenerator
      * Our ResourceHelper.
      */
     private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( UniqueStringGenerator.class );
+
+    /**
+     * The characters that are allowed in the first character in the token.
+     */
+    protected static final char [] DEFAULT_ALLOWED_FIRST_CHARS = theResourceHelper.getResourceStringOrDefault(
+            "DefaultAllowedFirstChar",
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ).toCharArray();
 
     /**
      * The characters that are allowed in the token.
