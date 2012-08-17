@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.loader.WebappLoader;
 import org.infogrid.module.Module;
 import org.infogrid.module.ModuleAdvertisement;
@@ -105,7 +106,7 @@ public class TomcatModuleLoader
      * @throws LifecycleException thrown if this TomcatModuleLoader cannot be started
      */
     @Override
-    public void start()
+    public void startInternal()
         throws
             LifecycleException
     {
@@ -198,6 +199,8 @@ public class TomcatModuleLoader
         } catch( Throwable ex ) {
             throw new LifecycleException( ex );
         }
+        
+        super.setState( LifecycleState.STARTING );
     }
 
     /**
@@ -206,11 +209,11 @@ public class TomcatModuleLoader
      * @throws LifecycleException thrown if this TomcatModuleLoader cannot be stopped
      */
     @Override
-    public void stop()
+    public void stopInternal()
         throws
             LifecycleException
     {
-        super.stop();
+        super.setState( LifecycleState.STOPPING );
     }
 
     /**
