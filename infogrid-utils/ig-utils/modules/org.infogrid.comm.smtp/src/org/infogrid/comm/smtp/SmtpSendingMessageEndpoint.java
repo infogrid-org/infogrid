@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -160,17 +160,17 @@ public class SmtpSendingMessageEndpoint<T extends SmtpSendableMessage>
     /**
      * Default random variation in message sending times.
      */
-    public static final double DEFAULT_RANDOM_VARIATION = theResourceHelper.getResourceDoubleOrDefault(  "RandomVariation", 0.02 ); // 2%
+    public static final double DEFAULT_RANDOM_VARIATION = theResourceHelper.getResourceDoubleOrDefault( "RandomVariation", 0.02 ); // 2%
 
     /**
      * Executable to run to actually send the message.
-     * This should usually be overridden
+     * This should usually be overridden: this works for Linux if the gnu mails package is installed ("apt-get install mailutils" on debian/Ubuntu)
      */
     public static final String [] SEND_MAIL_COMMAND = theResourceHelper.getResourceStringArrayOrDefault(
             "SendMailCommand",
             new String [] {
                     "sh",
                     "-c",
-                    "( cat && echo \"\\n.\" ) | mail -s ''{2}'' ''{1}''" // note that '' means ' according to MessageFormat rules
-            } ); // make sure there's always a single-period line at the end
+                    "mail -s ''{2}'' ''{1}'' ''-aFrom:{0}''" // note that '' means ' according to MessageFormat rules
+            } );
 }
