@@ -329,6 +329,8 @@ public class StringRepresentationDirectorySingleton
         // javadoc:    same as java
         // json:       same as javascript
 
+        editHtmlMap.put( "escapequotestring", EscapeQuoteStringStringifier.create() );
+        
         theSingleton = new StringRepresentationDirectorySingleton(); // not the factory method here
 
         SimpleStringRepresentation plain = SimpleStringRepresentation.create(
