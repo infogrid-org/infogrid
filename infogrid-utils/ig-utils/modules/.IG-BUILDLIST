@@ -6,6 +6,7 @@ org.infogrid.module.servlet
 org.infogrid.util
 org.infogrid.util.instrument
 org.infogrid.util.logging.log4j
+org.infogrid.util.sql
 org.infogrid.comm
 org.infogrid.comm.pingpong
 org.infogrid.comm.smtp
