@@ -27,11 +27,12 @@ import org.infogrid.store.StoreKeyDoesNotExistException;
 import org.infogrid.store.StoreKeyExistsAlreadyException;
 import org.infogrid.store.StoreValue;
 import org.infogrid.store.sql.AbstractSqlStore;
-import org.infogrid.store.sql.SqlExecutionAction;
 import org.infogrid.store.sql.SqlStoreIOException;
-import org.infogrid.store.sql.SqlStorePreparedStatement;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.logging.Log;
+import org.infogrid.util.sql.SqlDatabase;
+import org.infogrid.util.sql.SqlExecutionAction;
+import org.infogrid.util.sql.SqlPreparedStatement;
 
 /**
  * SqlStore implementation using MySQL.
@@ -53,43 +54,45 @@ public class MysqlStore
             DataSource ds,
             String     tableName )
     {
-        return new MysqlStore( ds, tableName );
+        SqlDatabase db = SqlDatabase.create( ds );
+        
+        return new MysqlStore( db, tableName );
     }
 
     /**
      * Constructor for subclasses only, use factory method.
      *
-     * @param ds the SQL DataSource 
+     * @param db the SQL Database
      * @param tableName the name of the table in the SQL DataSource in which the data will be stored
      */
     protected MysqlStore(
-            DataSource ds,
-            String     tableName )
+            SqlDatabase db,
+            String      tableName )
     {
-        super( ds, tableName, null );
+        super( db, tableName );
         
-        theCreateTablesPreparedStatement           = new SqlStorePreparedStatement( this, CREATE_TABLES_SQL,             tableName );
-        theDropTablesPreparedStatement             = new SqlStorePreparedStatement( this, DROP_TABLES_SQL,               tableName );
-        theHasTablesPreparedStatement              = new SqlStorePreparedStatement( this, HAS_TABLES_SQL,                tableName );
-        thePutPreparedStatement                    = new SqlStorePreparedStatement( this, PUT_SQL,                       tableName );
-        theUpdatePreparedStatement                 = new SqlStorePreparedStatement( this, UPDATE_SQL,                    tableName );
-        thePutOrUpdatePreparedStatement            = new SqlStorePreparedStatement( this, PUT_OR_UPDATE_SQL,             tableName );
-        theGetPreparedStatement                    = new SqlStorePreparedStatement( this, GET_SQL,                       tableName );
-        theDeletePreparedStatement                 = new SqlStorePreparedStatement( this, DELETE_SQL,                    tableName );
-        theDeleteAllPreparedStatement              = new SqlStorePreparedStatement( this, DELETE_ALL_SQL,                tableName );
-        theSizePreparedStatement                   = new SqlStorePreparedStatement( this, SIZE_SQL,                      tableName );
+        theCreateTablesPreparedStatement           = new SqlPreparedStatement( theDatabase, CREATE_TABLES_SQL,             tableName );
+        theDropTablesPreparedStatement             = new SqlPreparedStatement( theDatabase, DROP_TABLES_SQL,               tableName );
+        theHasTablesPreparedStatement              = new SqlPreparedStatement( theDatabase, HAS_TABLES_SQL,                tableName );
+        thePutPreparedStatement                    = new SqlPreparedStatement( theDatabase, PUT_SQL,                       tableName );
+        theUpdatePreparedStatement                 = new SqlPreparedStatement( theDatabase, UPDATE_SQL,                    tableName );
+        thePutOrUpdatePreparedStatement            = new SqlPreparedStatement( theDatabase, PUT_OR_UPDATE_SQL,             tableName );
+        theGetPreparedStatement                    = new SqlPreparedStatement( theDatabase, GET_SQL,                       tableName );
+        theDeletePreparedStatement                 = new SqlPreparedStatement( theDatabase, DELETE_SQL,                    tableName );
+        theDeleteAllPreparedStatement              = new SqlPreparedStatement( theDatabase, DELETE_ALL_SQL,                tableName );
+        theSizePreparedStatement                   = new SqlPreparedStatement( theDatabase, SIZE_SQL,                      tableName );
 
-        theFindNextIncludingPreparedStatement      = new SqlStorePreparedStatement( this, FIND_NEXT_INCLUDING_SQL,       tableName );
-        theFindPreviousExcludingPreparedStatement  = new SqlStorePreparedStatement( this, FIND_PREVIOUS_EXCLUDING_SQL,   tableName );
-        theFindLastValuesPreparedStatement         = new SqlStorePreparedStatement( this, FIND_LAST_VALUES_SQL,          tableName );
-        theHasNextIncludingPreparedStatement       = new SqlStorePreparedStatement( this, HAS_NEXT_INCLUDING_SQL,        tableName );
-        theHasPreviousExcludingPreparedStatement   = new SqlStorePreparedStatement( this, HAS_PREVIOUS_EXCLUDING_SQL,    tableName );
-        theFindFirstKeyPreparedStatement           = new SqlStorePreparedStatement( this, FIND_FIRST_KEY_SQL,            tableName );
-        theFindKeyAtPositivePreparedStatement      = new SqlStorePreparedStatement( this, FIND_KEY_AT_POSITIVE_SQL,      tableName );
-        theFindKeyAtNegativePreparedStatement      = new SqlStorePreparedStatement( this, FIND_KEY_AT_NEGATIVE_SQL,      tableName );
-        theFindKeyAtEndPreparedStatement           = new SqlStorePreparedStatement( this, FIND_KEY_AT_END_SQL,           tableName );
-        theDetermineDistancePreparedStatement      = new SqlStorePreparedStatement( this, DETERMINE_DISTANCE_SQL,        tableName );
-        theDetermineDistanceToEndPreparedStatement = new SqlStorePreparedStatement( this, DETERMINE_DISTANCE_TO_END_SQL, tableName );
+        theFindNextIncludingPreparedStatement      = new SqlPreparedStatement( theDatabase, FIND_NEXT_INCLUDING_SQL,       tableName );
+        theFindPreviousExcludingPreparedStatement  = new SqlPreparedStatement( theDatabase, FIND_PREVIOUS_EXCLUDING_SQL,   tableName );
+        theFindLastValuesPreparedStatement         = new SqlPreparedStatement( theDatabase, FIND_LAST_VALUES_SQL,          tableName );
+        theHasNextIncludingPreparedStatement       = new SqlPreparedStatement( theDatabase, HAS_NEXT_INCLUDING_SQL,        tableName );
+        theHasPreviousExcludingPreparedStatement   = new SqlPreparedStatement( theDatabase, HAS_PREVIOUS_EXCLUDING_SQL,    tableName );
+        theFindFirstKeyPreparedStatement           = new SqlPreparedStatement( theDatabase, FIND_FIRST_KEY_SQL,            tableName );
+        theFindKeyAtPositivePreparedStatement      = new SqlPreparedStatement( theDatabase, FIND_KEY_AT_POSITIVE_SQL,      tableName );
+        theFindKeyAtNegativePreparedStatement      = new SqlPreparedStatement( theDatabase, FIND_KEY_AT_NEGATIVE_SQL,      tableName );
+        theFindKeyAtEndPreparedStatement           = new SqlPreparedStatement( theDatabase, FIND_KEY_AT_END_SQL,           tableName );
+        theDetermineDistancePreparedStatement      = new SqlPreparedStatement( theDatabase, DETERMINE_DISTANCE_SQL,        tableName );
+        theDetermineDistanceToEndPreparedStatement = new SqlPreparedStatement( theDatabase, DETERMINE_DISTANCE_TO_END_SQL, tableName );
         
         if( log.isTraceEnabled() ) {
             log.traceConstructor( this );
@@ -791,7 +794,7 @@ public class MysqlStore
      * @return the found StoreValues
      */
     protected StoreValue [] findValues(
-            SqlStorePreparedStatement stm,
+            SqlPreparedStatement stm,
             final String              key,
             final int                 n )
     {
@@ -898,7 +901,7 @@ public class MysqlStore
      * @return the number of rows
      */
     protected int countRows(
-            SqlStorePreparedStatement stm,
+            SqlPreparedStatement stm,
             final String              key )
     {
         try {
@@ -992,7 +995,7 @@ public class MysqlStore
     {
         if( key != null ) {
 
-            SqlStorePreparedStatement stm;
+            SqlPreparedStatement stm;
             final int distance;
             if( delta >= 0 ) {
                 stm = theFindKeyAtPositivePreparedStatement;
@@ -1197,107 +1200,107 @@ public class MysqlStore
     /**
      * The createTables PreparedStatement.
      */
-    protected SqlStorePreparedStatement theCreateTablesPreparedStatement;
+    protected SqlPreparedStatement theCreateTablesPreparedStatement;
 
     /**
      * The dropTables PreparedStatement.
      */
-    protected SqlStorePreparedStatement theDropTablesPreparedStatement;
+    protected SqlPreparedStatement theDropTablesPreparedStatement;
 
     /**
      * The hasTables PreparedStatement.
      */
-    protected SqlStorePreparedStatement theHasTablesPreparedStatement;
+    protected SqlPreparedStatement theHasTablesPreparedStatement;
     
     /**
      * The put PreparedStatement.
      */
-    protected SqlStorePreparedStatement thePutPreparedStatement;
+    protected SqlPreparedStatement thePutPreparedStatement;
 
     /**
      * The update PreparedStatement.
      */
-    protected SqlStorePreparedStatement theUpdatePreparedStatement;
+    protected SqlPreparedStatement theUpdatePreparedStatement;
 
     /**
      * The putOrUpdate PreparedStatement.
      */
-    protected SqlStorePreparedStatement thePutOrUpdatePreparedStatement;
+    protected SqlPreparedStatement thePutOrUpdatePreparedStatement;
 
     /**
      * The get PreparedStatement.
      */
-    protected SqlStorePreparedStatement theGetPreparedStatement;
+    protected SqlPreparedStatement theGetPreparedStatement;
 
     /**
      * The delete PreparedStatement.
      */
-    protected SqlStorePreparedStatement theDeletePreparedStatement;
+    protected SqlPreparedStatement theDeletePreparedStatement;
 
     /**
      * The delete-all PreparedStatement.
      */
-    protected SqlStorePreparedStatement theDeleteAllPreparedStatement;
+    protected SqlPreparedStatement theDeleteAllPreparedStatement;
 
     /**
      * The size PreparedStatement.
      */
-    protected SqlStorePreparedStatement theSizePreparedStatement;
+    protected SqlPreparedStatement theSizePreparedStatement;
 
     /**
      * The PreparedStatement to obtain the next N rows including the specified key's.
      */
-    protected SqlStorePreparedStatement theFindNextIncludingPreparedStatement;
+    protected SqlPreparedStatement theFindNextIncludingPreparedStatement;
 
     /**
      * The PreparedStatement to obtain the previous N rows excluding the specified key's.
      */
-    protected SqlStorePreparedStatement theFindPreviousExcludingPreparedStatement;
+    protected SqlPreparedStatement theFindPreviousExcludingPreparedStatement;
     
     /**
      * The PreparedStatement to obtain the last N rows in the table.
      */
-    protected SqlStorePreparedStatement theFindLastValuesPreparedStatement;
+    protected SqlPreparedStatement theFindLastValuesPreparedStatement;
     
     /**
      * The PreparedStatement to obtain the number of rows including and after this key.
      */
-    protected SqlStorePreparedStatement theHasNextIncludingPreparedStatement;
+    protected SqlPreparedStatement theHasNextIncludingPreparedStatement;
     
     /**
      * The PreparedStatement to obtain the number of rows excluding and before this key.
      */
-    protected SqlStorePreparedStatement theHasPreviousExcludingPreparedStatement;
+    protected SqlPreparedStatement theHasPreviousExcludingPreparedStatement;
 
     /**
      * The PreparedStatement to find the first key.
      */
-    protected SqlStorePreparedStatement theFindFirstKeyPreparedStatement;
+    protected SqlPreparedStatement theFindFirstKeyPreparedStatement;
 
     /**
      * The PreparedStatement to find the key of N rows ahead.
      */
-    protected SqlStorePreparedStatement theFindKeyAtPositivePreparedStatement;
+    protected SqlPreparedStatement theFindKeyAtPositivePreparedStatement;
     
     /**
      * The PreparedStatement to find the key of N rows back.
      */
-    protected SqlStorePreparedStatement theFindKeyAtNegativePreparedStatement;
+    protected SqlPreparedStatement theFindKeyAtNegativePreparedStatement;
     
     /**
      * The PreparedStatement to find the key of N rows from the end of the table;
      */
-    protected SqlStorePreparedStatement theFindKeyAtEndPreparedStatement;
+    protected SqlPreparedStatement theFindKeyAtEndPreparedStatement;
     
     /**
      * The PreparedStatement to find the number of rows between two keys.
      */
-    protected SqlStorePreparedStatement theDetermineDistancePreparedStatement;
+    protected SqlPreparedStatement theDetermineDistancePreparedStatement;
 
     /**
      * The PreparedStatement to find the number of rows from a key to the end of the table.
      */
-    protected SqlStorePreparedStatement theDetermineDistanceToEndPreparedStatement;
+    protected SqlPreparedStatement theDetermineDistanceToEndPreparedStatement;
 
     /**
      * The SQL to create the tables in the database.

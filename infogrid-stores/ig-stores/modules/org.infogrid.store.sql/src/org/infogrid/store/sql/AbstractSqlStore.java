@@ -15,11 +15,8 @@
 package org.infogrid.store.sql;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.NoSuchElementException;
-import javax.sql.DataSource;
 import org.infogrid.store.AbstractIterableStore;
 import org.infogrid.store.IterableStoreCursor;
 import org.infogrid.store.StoreKeyDoesNotExistException;
@@ -28,6 +25,7 @@ import org.infogrid.store.StoreValue;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
+import org.infogrid.util.sql.SqlDatabase;
 
 /**
  * SQL implementation of the Store interface.
@@ -43,18 +41,33 @@ public abstract class AbstractSqlStore
     /**
      * Constructor for subclasses only.
      *
-     * @param ds the SQL DataSource 
+     * @param db the Database object to delegate to
      * @param tableName the name of the table in the SQL DataSource in which the data will be stored
-     * @param autoCommit the value for new connection's autoCommit property. If null, will not be set
      */
     protected AbstractSqlStore(
-            DataSource ds,
-            String     tableName,
-            Boolean    autoCommit )
+            SqlDatabase db,
+            String   tableName )
     {
-        theDataSource = ds;
-        theTableName  = tableName;
-        theAutoCommit = autoCommit;
+        theDatabase  = db;
+        theTableName = tableName;
+    }
+
+    /**
+     * Obtain the Database that this AbstractSqlStore works on.
+     * 
+     * @return the Database
+     */
+    public SqlDatabase getDatabase()
+    {
+        return theDatabase;
+    }
+    
+    /**
+     * Obtain the name of the table in the SQL DataSource in which the data will be stored
+     */
+    public String getTableName()
+    {
+        return theTableName;
     }
 
     /**
@@ -85,16 +98,6 @@ public abstract class AbstractSqlStore
         if( !hasTables() ) {
             createTables();
         }
-    }
-
-    /**
-     * Determine whether this Store uses auto commit.
-     *
-     * @return true if it uses auto-commit
-     */
-    public Boolean getAutoCommit()
-    {
-        return theAutoCommit;
     }
 
     /**
@@ -353,69 +356,6 @@ public abstract class AbstractSqlStore
     }
 
     /**
-     * Obtain a connection to the database. This is a smart factory method,
-     * returning an already-existing one if there is one instead of creating
-     * a new one.
-     *
-     * @return the Connection
-     * @throws SQLException thrown if the database could not be contacted
-     */
-    protected synchronized Connection obtainConnection()
-        throws
-            SQLException
-    {
-        if( theConnection == null ) {
-            theConnection = theDataSource.getConnection();
-
-            if( theConnection != null && theAutoCommit != null ) {
-                theConnection.setAutoCommit( theAutoCommit.booleanValue() );
-            }
-        }
-        return theConnection;
-    }
-
-    /**
-     * Obtain a new connection to the database. This discards whatever old
-     * Connection there may be already.
-     *
-     * @return the Connection
-     * @throws SQLException thrown if the database could not be contacted
-     */
-    protected synchronized Connection obtainNewConnection()
-        throws
-            SQLException
-    {
-        if( theConnection != null ) {
-            try {
-                theConnection.close();
-            } catch( Throwable t ) {
-                // might be closed already -- ignore
-            }
-        }
-        theConnection = theDataSource.getConnection();
-
-        if( theConnection != null && theAutoCommit != null ) {
-            theConnection.setAutoCommit( theAutoCommit.booleanValue() );
-        }
-        return theConnection;
-    }
-
-    /**
-     * Close the connection to the database.
-     */
-    public void closeConnection()
-    {
-        if( theConnection != null ) {
-            try {
-                theConnection.close();
-            } catch( SQLException ex2 ) {
-                // noop
-            }
-            theConnection = null;
-        }        
-    }
-
-    /**
      * Dump this object.
      *
      * @param d the Dumper to dump to
@@ -425,34 +365,23 @@ public abstract class AbstractSqlStore
     {
         d.dump( this,
                 new String[] {
-                    "dataSource",
+                    "database",
                     "tableName"
                 },
                 new Object[] {
-                    theDataSource,
+                    theDatabase,
                     theTableName
                 });
     }
 
     /**
-     * The JDBC data source.
+     * The Database that this AbstractSqlStore stores data in.
      */
-    protected DataSource theDataSource;
-    
+    protected SqlDatabase theDatabase;
+
     /**
      * Name of the table in the JDBC data source. While we don't need this, it is
      * very useful in debugging.
      */
     protected String theTableName;
-
-    /**
-     * The most-recently used Connection, if any. This is private, so we are forced to
-     * go through factory methods.
-     */
-    private Connection theConnection;
-    
-    /**
-     * The value for the autoCommit property on Connections. If this is null, we do not set it.
-     */
-    protected Boolean theAutoCommit;
 }

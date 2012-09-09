@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -62,7 +62,7 @@ public class SqlStoreTest3
                     current.theData );
             
             if( i % 2 == 1 ) {
-                theSqlStore.closeConnection();
+                theSqlStore.getDatabase().closeConnection();
             }
         }
 
@@ -85,7 +85,7 @@ public class SqlStoreTest3
             checkEqualByteArrays( current.theData,            value.getData(),            "not the same content" );
 
             if( i % 3 == 2 ) {
-                theSqlStore.closeConnection();
+                theSqlStore.getDatabase().closeConnection();
             }
         }
 
@@ -132,7 +132,7 @@ public class SqlStoreTest3
                     current.theData );
 
             if( i % 4 == 3 ) {
-                theSqlStore.closeConnection();
+                theSqlStore.getDatabase().closeConnection();
             }
         }
 
@@ -155,7 +155,7 @@ public class SqlStoreTest3
             checkEqualByteArrays( current.theData,            value.getData(),            "not the same content" );
 
             if( i % 2 == 1 ) {
-                theSqlStore.closeConnection();
+                theSqlStore.getDatabase().closeConnection();
             }
         }
 
@@ -175,7 +175,7 @@ public class SqlStoreTest3
             theTestStore.delete( current.theKey );
 
             if( i % 2 == 1 ) {
-                theSqlStore.closeConnection();
+                theSqlStore.getDatabase().closeConnection();
             }
         }
 
@@ -194,7 +194,7 @@ public class SqlStoreTest3
                 reportError( "delete was unsuccessful", current );
 
                 if( i % 3 == 2 ) {
-                    theSqlStore.closeConnection();
+                    theSqlStore.getDatabase().closeConnection();
                 }
 
             } catch( StoreKeyDoesNotExistException ex ) {
