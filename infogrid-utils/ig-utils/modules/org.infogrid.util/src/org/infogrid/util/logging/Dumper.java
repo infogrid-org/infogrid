@@ -45,6 +45,31 @@ public interface Dumper
             Object [] fieldValues );
 
     /**
+     * Dump an object by dumping its named fields.
+     *
+     * @param obj the object to dump
+     * @param namedFields a Map of the fields values keyed by the field names
+     */
+    public void dump(
+            Object        obj,
+            Map<String,?> namedFields );
+    
+    /**
+     * Dump an object by dumping its named fields, provided either as an array
+     * of names and values, or a map, or both.
+     *
+     * @param obj the object to dump
+     * @param fieldNames the fields of the object to dump
+     * @param fieldValues the values of the fields of the object to dump
+     * @param namedFields a Map of the fields values keyed by the field names
+     */
+    public void dump(
+            Object        obj,
+            String []     fieldNames,
+            Object []     fieldValues,
+            Map<String,?> namedFields );
+
+    /**
      * Dump a null value.
      */
     public void dumpNull();

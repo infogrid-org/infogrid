@@ -201,6 +201,37 @@ public abstract class AbstractDumper
             String [] fieldNames,
             Object [] fieldValues )
     {
+        dump( obj, fieldNames, fieldValues, null );
+    }
+    
+    /**
+     * Dump an object by dumping its named fields.
+     *
+     * @param obj the object to dump
+     * @param namedFields a Map of the fields values keyed by the field names
+     */
+    public void dump(
+            Object        obj,
+            Map<String,?> namedFields )
+    {
+        dump( obj, null, null, namedFields );
+    }
+    
+    /**
+     * Dump an object by dumping its named fields, provided either as an array
+     * of names and values, or a map, or both.
+     *
+     * @param obj the object to dump
+     * @param fieldNames the fields of the object to dump
+     * @param fieldValues the values of the fields of the object to dump
+     * @param namedFields a Map of the fields values keyed by the field names
+     */
+    public void dump(
+            Object        obj,
+            String []     fieldNames,
+            Object []     fieldValues,
+            Map<String,?> namedFields )
+    {
         if( obj == null ) {
             dumpNull();
 
@@ -216,18 +247,17 @@ public abstract class AbstractDumper
             try {
                 ++theLevel;
 
+                String sep = "";
                 for( int i=0 ; i<min ; ++i ) {
                     Object value = fieldValues[i];
 
+                    emit( sep );
+                    sep = ",";
                     if( shouldBeDumpedFull( value )) {
                         emit( '\n' );
                         emit( fieldNames[i] );
                         emit( ": ");
                         dump( value );
-
-                        if( i<min-1 ) {
-                            emit( ',' );
-                        }
 
                     } else if( shouldBeDumpedShort( value )) {
                         emit( '\n' );
@@ -235,12 +265,30 @@ public abstract class AbstractDumper
                         emit( ": ");
                         emitObjectId( value );
                         emit( "..." );
+                    }
+                }
+                if( namedFields != null ) {
+                    for( Map.Entry<String,?> namedField : namedFields.entrySet() ) {
+                        Object value = namedField.getValue();
 
-                        if( i<min-1 ) {
-                            emit( ',' );
+                        emit( sep );
+                        sep = ",";
+                        if( shouldBeDumpedFull( value )) {
+                            emit( '\n' );
+                            emit( namedField.getKey() );
+                            emit( ": ");
+                            dump( value );
+
+                        } else if( shouldBeDumpedShort( value )) {
+                            emit( '\n' );
+                            emit( namedField.getKey() );
+                            emit( ": ");
+                            emitObjectId( value );
+                            emit( "..." );
                         }
                     }
                 }
+                
             } finally {
                 --theLevel;
             }
@@ -252,7 +300,7 @@ public abstract class AbstractDumper
             emit( "\n}" );
         }
     }
-
+    
     /**
      * Dump a null value.
      */
@@ -320,7 +368,7 @@ public abstract class AbstractDumper
         } else {
             registerAsDumped( obj );
             emitObjectId( obj );
-            if( obj.size() == 0 ) {
+            if( obj.isEmpty() ) {
                 emit( "[0] = {}" );
             } else {
                 emit( '[' );
@@ -367,7 +415,7 @@ public abstract class AbstractDumper
             registerAsDumped( obj );
             emitObjectId( obj );
 
-            if( obj.size() == 0 ) {
+            if( obj.isEmpty() ) {
                 emit( "[0] = {}" );
             } else {
                 emit( '[' );
