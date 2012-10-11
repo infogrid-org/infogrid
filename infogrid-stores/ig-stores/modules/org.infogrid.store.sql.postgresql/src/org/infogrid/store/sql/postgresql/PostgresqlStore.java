@@ -46,6 +46,20 @@ public class PostgresqlStore
     /**
      * Factory method.
      *
+     * @param db the SqlDatabase
+     * @param tableName the name of the table in the SQL DataSource in which the data will be stored
+     * @return the created AbstractSqlStore
+     */
+    public static PostgresqlStore create(
+            SqlDatabase db,
+            String      tableName )
+    {
+        return new PostgresqlStore( db, tableName );
+    }
+
+    /**
+     * Factory method.
+     *
      * @param ds the SQL DataSource
      * @param tableName the name of the table in the SQL DataSource in which the data will be stored
      * @return the created AbstractSqlStore
@@ -54,7 +68,7 @@ public class PostgresqlStore
             DataSource ds,
             String     tableName )
     {
-        SqlDatabase db = SqlDatabase.create( ds, Boolean.FALSE );
+        SqlDatabase db = SqlDatabase.create( "PostgresqlStore of " + ds.toString() + ", table " + tableName, ds, Boolean.FALSE );
         
         return new PostgresqlStore( db, tableName );
     }

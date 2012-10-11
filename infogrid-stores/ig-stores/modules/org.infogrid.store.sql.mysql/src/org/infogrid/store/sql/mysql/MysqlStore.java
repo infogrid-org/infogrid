@@ -46,6 +46,20 @@ public class MysqlStore
     /**
      * Factory method.
      *
+     * @param db the SqlDatabase
+     * @param tableName the name of the table in the SQL DataSource in which the data will be stored
+     * @return the created AbstractSqlStore
+     */
+    public static MysqlStore create(
+            SqlDatabase db,
+            String      tableName )
+    {
+        return new MysqlStore( db, tableName );
+    }
+
+    /**
+     * Factory method.
+     *
      * @param ds the SQL DataSource
      * @param tableName the name of the table in the SQL DataSource in which the data will be stored
      * @return the created AbstractSqlStore
@@ -54,7 +68,7 @@ public class MysqlStore
             DataSource ds,
             String     tableName )
     {
-        SqlDatabase db = SqlDatabase.create( ds );
+        SqlDatabase db = SqlDatabase.create( "MysqlStore of " + ds.toString() + ", table " + tableName, ds );
         
         return new MysqlStore( db, tableName );
     }
