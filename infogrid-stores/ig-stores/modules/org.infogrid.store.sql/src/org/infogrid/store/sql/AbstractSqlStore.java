@@ -46,7 +46,7 @@ public abstract class AbstractSqlStore
      */
     protected AbstractSqlStore(
             SqlDatabase db,
-            String   tableName )
+            String      tableName )
     {
         theDatabase  = db;
         theTableName = tableName;
