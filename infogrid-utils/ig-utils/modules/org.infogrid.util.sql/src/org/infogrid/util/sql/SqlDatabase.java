@@ -14,8 +14,6 @@ package org.infogrid.util.sql;
 // All rights reserved.
 //
 
-
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
@@ -29,27 +27,31 @@ public class SqlDatabase
     /**
      * Factory method.
      * 
+     * @param name the name of the SqlDatabase, for debugging purposes
      * @param ds the DataSource to the database
      * @return the created SqlDatabase
      */
     public static SqlDatabase create(
+            String     name,
             DataSource ds )
     {
-        return new SqlDatabase( ds, null );
+        return new SqlDatabase( name, ds, null );
     }
     
     /**
      * Factory method.
      * 
+     * @param name the name of the SqlDatabase, for debugging purposes
      * @param ds the DataSource to the database
      * @param autoCommit set auto-commit on the Connection, don't set it, or leave default
      * @return the created SqlDatabase
      */
     public static SqlDatabase create(
+            String     name,
             DataSource ds,
             Boolean    autoCommit )
     {
-        return new SqlDatabase( ds, autoCommit );
+        return new SqlDatabase( name, ds, autoCommit );
     }
     
     /**
@@ -59,13 +61,25 @@ public class SqlDatabase
      * @param autoCommit set auto-commit on the Connection, don't set it, or leave default
      */
     protected SqlDatabase(
+            String     name,
             DataSource ds,
             Boolean    autoCommit )
     {
+        theName       = name;
         theDataSource = ds;
         theAutoCommit = autoCommit;
     }
     
+    /**
+     * Get the name of this SqlDatabase, for debugging purposes.
+     * 
+     * @return the name
+     */
+    public String getName()
+    {
+        return theName;
+    }
+
     /**
      * Determine whether this Database uses auto-commit.
      *
@@ -138,6 +152,11 @@ public class SqlDatabase
             theConnection = null;
         }        
     }
+    
+    /**
+     * Name of this instance, for debugging purposes.
+     */
+    protected String theName;
     
     /**
      * The JDBC data source.
