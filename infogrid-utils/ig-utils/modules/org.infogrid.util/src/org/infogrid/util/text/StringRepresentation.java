@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -69,6 +69,7 @@ public interface StringRepresentation
      *
      * @param classOfFormattedObject the class of the formatted object
      * @param entry the entry (prefixed by theName) of the resource
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @param s the to-be-parsed String
      * @param factory optional factory object that may be required to instantiate one or more of the values. This is highly
      *        dependent on the context of use of this method.
@@ -78,6 +79,7 @@ public interface StringRepresentation
     public Object [] parseEntry(
             Class<? extends HasStringRepresentation> classOfFormattedObject,
             String                                   entry,
+            StringRepresentationParameters           pars,
             String                                   s,
             StringifierUnformatFactory               factory )
         throws

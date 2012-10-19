@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -140,6 +140,8 @@ public class StringRepresentationDirectorySingleton
         // javadoc:    same as java
         // json:       same as javascript
 
+        plainMap.put(   "intwithmultiplier", LongStringifierWithMultiplier.create() );
+        
         plainMap.put(   "float",          FloatStringifier.create() );
         // html:       same as plain
         // url:        same as plain

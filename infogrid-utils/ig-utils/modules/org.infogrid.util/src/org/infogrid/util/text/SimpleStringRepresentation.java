@@ -151,10 +151,17 @@ public class SimpleStringRepresentation
         throws
             StringifierException
     {
-        ResourceHelper rh           = ResourceHelper.getInstance( classOfFormattedObject, true );
-        String         formatString = rh.getResourceStringOrDefault( theName + entry, null );
+        String formatString = (String) pars.get( StringRepresentationParameters.FORMAT_STRING );
+        if( formatString == null ) {
+            ResourceHelper rh = ResourceHelper.getInstance( classOfFormattedObject, true );
+            formatString      = rh.getResourceStringOrDefault( theName + entry, null );
+        }
 
         if( formatString != null ) {
+            String addText = (String) pars.get( StringRepresentationParameters.ADD_TEXT );
+            if( addText != null ) {
+                formatString += addText;
+            }
             AnyMessageStringifier stringifier = AnyMessageStringifier.create( formatString, getRecursiveStringifierMap() );
 
             String ret = stringifier.format( null, ArrayFacade.<Object>create( args ), pars );
@@ -163,6 +170,9 @@ public class SimpleStringRepresentation
         if( theDelegate != null ) {
             return theDelegate.formatEntry( classOfFormattedObject, entry, pars, args );
         }
+        
+        // fallback
+        ResourceHelper rh = ResourceHelper.getInstance( classOfFormattedObject, true );
         String ret = rh.getResourceString( theName + entry ); // will emit warning
         Number n   = (Number) pars.get( StringRepresentationParameters.MAX_LENGTH );
         if( n != null ) {
@@ -176,6 +186,7 @@ public class SimpleStringRepresentation
      *
      * @param classOfFormattedObject the class of the formatted object
      * @param entry the entry (prefixed by theName) of the resource
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @param s the to-be-parsed String
      * @param factory optional factory object that may be required to instantiate one or more of the values. This is highly
      *        dependent on the context of use of this method.
@@ -185,13 +196,17 @@ public class SimpleStringRepresentation
     public Object [] parseEntry(
             Class<? extends HasStringRepresentation> classOfFormattedObject,
             String                                   entry,
+            StringRepresentationParameters           pars,
             String                                   s,
             StringifierUnformatFactory               factory )
         throws
             ParseException
     {
-        ResourceHelper rh           = ResourceHelper.getInstance( classOfFormattedObject );
-        String         formatString = rh.getResourceStringOrDefault( theName + entry, null );
+        String formatString = (String) pars.get( StringRepresentationParameters.FORMAT_STRING );
+        if( formatString == null ) {
+            ResourceHelper rh = ResourceHelper.getInstance( classOfFormattedObject, true );
+            formatString      = rh.getResourceStringOrDefault( theName + entry, null );
+        }
 
         if( formatString != null ) {
             try {
@@ -208,9 +223,12 @@ public class SimpleStringRepresentation
             }
         }
         if( theDelegate != null ) {
-            return theDelegate.parseEntry( classOfFormattedObject, entry, s, factory );
+            return theDelegate.parseEntry( classOfFormattedObject, entry, pars, s, factory );
         }
-        Object ignore = rh.getResourceString( theName + entry ); // will emit warning
+        // fallback
+        ResourceHelper rh = ResourceHelper.getInstance( classOfFormattedObject, true );
+        String ignore = rh.getResourceString( theName + entry ); // will emit warning
+
         throw new StringRepresentationParseException( s, null, null );
     }
 

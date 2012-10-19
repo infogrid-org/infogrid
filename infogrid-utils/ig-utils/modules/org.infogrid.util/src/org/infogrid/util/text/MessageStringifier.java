@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -78,7 +78,7 @@ public abstract class MessageStringifier
         
         int           len           = theFormatString.length();
         int           bracketCount  = 0;
-        StringBuilder  currentBuffer = new StringBuilder();
+        StringBuilder currentBuffer = new StringBuilder();
         boolean       isEscape      = false;
 
         for( int i=0 ; i<len ; ++i ) {
