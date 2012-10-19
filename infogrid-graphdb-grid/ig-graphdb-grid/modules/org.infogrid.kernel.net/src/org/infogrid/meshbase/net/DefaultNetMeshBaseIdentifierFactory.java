@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -28,6 +28,7 @@ import org.infogrid.util.InvalidObjectNumberFoundParseException;
 import org.infogrid.util.InvalidObjectTypeFoundParseException;
 import org.infogrid.util.StringTooShortParseException;
 import org.infogrid.util.text.StringRepresentation;
+import org.infogrid.util.text.StringRepresentationParameters;
 
 /**
  * Default implementation of NetMeshBaseIdentifierFactory. This class uses an array of Schemes
@@ -270,18 +271,20 @@ public class DefaultNetMeshBaseIdentifierFactory
      * Convert this StringRepresentation back to a NetMeshBaseIdentifier.
      *
      * @param representation the StringRepresentation in which this String is represented
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @param s the String to parse
      * @return the created NetMeshBaseIdentifier
      * @throws ParseException thrown if a parsing error occurred
      */
     public NetMeshBaseIdentifier fromStringRepresentation(
-            StringRepresentation representation,
-            String               s )
+            StringRepresentation           representation,
+            StringRepresentationParameters pars,
+            String                         s )
         throws
             ParseException
     {
         try {
-            Object [] found = representation.parseEntry( NetMeshBaseIdentifier.class, StringRepresentation.DEFAULT_ENTRY, s, this );
+            Object [] found = representation.parseEntry( NetMeshBaseIdentifier.class, StringRepresentation.DEFAULT_ENTRY, pars, s, this );
 
             NetMeshBaseIdentifier ret;
             switch( found.length ) {

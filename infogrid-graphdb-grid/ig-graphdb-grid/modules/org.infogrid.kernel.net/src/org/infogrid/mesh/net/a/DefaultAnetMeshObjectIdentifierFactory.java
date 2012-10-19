@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -29,6 +29,7 @@ import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.StringTooShortParseException;
 import org.infogrid.util.UniqueStringGenerator;
 import org.infogrid.util.text.StringRepresentation;
+import org.infogrid.util.text.StringRepresentationParameters;
 
 /**
  * The default NetMeshObjectIdentifierFactory in the "A" implementation.
@@ -337,18 +338,20 @@ public class DefaultAnetMeshObjectIdentifierFactory
      * Convert this StringRepresentation back to an Identifier.
      *
      * @param representation the StringRepresentation in which this String is represented
+     * @param pars collects parameters that may influence the String representation. Always provided.
      * @param s the String to parse
      * @return the created MeshObjectIdentifier
      * @throws ParseException thrown if a parsing error occurred
      */
     @Override
     public DefaultAnetMeshObjectIdentifier fromStringRepresentation(
-            StringRepresentation representation,
-            String               s )
+            StringRepresentation           representation,
+            StringRepresentationParameters pars,
+            String                         s )
         throws
             ParseException
     {
-        Object [] found = representation.parseEntry( DefaultAnetMeshObjectIdentifier.class, StringRepresentation.DEFAULT_ENTRY, s, this );
+        Object [] found = representation.parseEntry( DefaultAnetMeshObjectIdentifier.class, StringRepresentation.DEFAULT_ENTRY, pars, s, this );
         return (DefaultAnetMeshObjectIdentifier) found[0];
     }
 
