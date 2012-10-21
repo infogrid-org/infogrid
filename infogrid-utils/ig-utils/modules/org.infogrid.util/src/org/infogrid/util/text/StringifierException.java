@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -29,7 +29,7 @@ public abstract class StringifierException
      * @param source the Stringifier that raised this exception
      */
     public StringifierException(
-            Stringifier source )
+            Stringifier<?> source )
     {
         theSource = source;
     }
@@ -41,8 +41,8 @@ public abstract class StringifierException
      * @param cause the underlying cause
      */
     public StringifierException(
-            Stringifier source,
-            Throwable   cause )
+            Stringifier<?> source,
+            Throwable      cause )
     {
         super( cause );
         theSource = source;
@@ -51,5 +51,5 @@ public abstract class StringifierException
     /**
      * The Stringifier that raised this exception.
      */    
-    protected Stringifier theSource;
+    protected Stringifier<?> theSource;
 }

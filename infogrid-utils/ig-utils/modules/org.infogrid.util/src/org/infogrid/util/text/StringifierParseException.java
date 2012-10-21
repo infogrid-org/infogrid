@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2008 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -30,8 +30,8 @@ public class StringifierParseException
      * @param s the String that could not be parsed
      */
     public StringifierParseException(
-            Stringifier source,
-            String      s )
+            Stringifier<?> source,
+            String         s )
     {
         super( source );
         
