@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -73,7 +73,14 @@ public abstract class AbstractDelegatingLocalizedRuntimeException
      */
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { getCause().getLocalizedMessage() };
+        String delegateMessage = getCause().getLocalizedMessage();
+        if( delegateMessage == null ) {
+            delegateMessage = getCause().getMessage();
+        }
+        if( delegateMessage == null ) {
+            delegateMessage = getCause().getClass().getName();
+        }
+        return new Object[] { delegateMessage };
     }
 
     /**
