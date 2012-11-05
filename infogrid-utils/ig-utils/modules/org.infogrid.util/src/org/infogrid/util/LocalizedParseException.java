@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,6 +16,7 @@ package org.infogrid.util;
 
 import java.text.ParseException;
 import org.infogrid.util.logging.Log;
+import org.infogrid.util.text.SimpleStringRepresentationParameters;
 import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationDirectory;
 import org.infogrid.util.text.StringRepresentationDirectorySingleton;
@@ -91,7 +92,7 @@ public abstract class LocalizedParseException
         try {
             return toStringRepresentation(
                     StringRepresentationDirectorySingleton.getSingleton().get( StringRepresentationDirectory.TEXT_PLAIN_NAME ),
-                    null );
+                    StringRepresentationParameters.EMPTY );
 
         } catch( StringifierException ex ) {
             log.error( ex );

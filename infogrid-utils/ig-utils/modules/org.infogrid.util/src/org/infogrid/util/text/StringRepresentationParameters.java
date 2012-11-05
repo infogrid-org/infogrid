@@ -148,4 +148,74 @@ public interface StringRepresentationParameters
      */
     public static final String HTML_URL_ADDITIONAL_ARGUMENTS = "html-url-additional-arguments";
 
+    /**
+     * An empty instance of this interface.
+     */
+    public static final StringRepresentationParameters EMPTY = new StringRepresentationParameters() {
+
+        /**
+         * {@inheritDoc}
+         */
+        public int size()
+        {
+            return 0;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean isEmpty()
+        {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Object get(
+                String key )
+        {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public StringRepresentationParameters with(
+                String key,
+                Object value )
+        {
+            SimpleStringRepresentationParameters ret = SimpleStringRepresentationParameters.create();
+            ret.put( key, value );
+            return ret;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public StringRepresentationParameters with(
+                Map<String, ?> map )
+        {
+            SimpleStringRepresentationParameters ret = SimpleStringRepresentationParameters.create( map );
+            return ret;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public StringRepresentationParameters without(
+                String key )
+        {
+            return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public StringRepresentationParameters without(
+                String[] keys )
+        {
+            return this;
+        }
+    };
 }
