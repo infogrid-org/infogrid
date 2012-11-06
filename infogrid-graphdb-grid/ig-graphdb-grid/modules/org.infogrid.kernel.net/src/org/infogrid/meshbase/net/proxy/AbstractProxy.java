@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -286,11 +286,7 @@ public abstract class AbstractProxy
         throws
             StringifierException
     {
-        boolean isDefaultMeshBase = true;
-
-        if( pars != null ) {
-            isDefaultMeshBase = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
-        }
+        boolean isDefaultMeshBase = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
 
         String key;
         if( isDefaultMeshBase ) {
@@ -324,19 +320,11 @@ public abstract class AbstractProxy
         throws
             StringifierException
     {
-        boolean isDefaultMeshBase   = true;
-        String  contextPath         = null;
-        String  additionalArguments = null;
-        String  target              = null;
-        String  title               = null;
-
-        if( pars != null ) {
-            isDefaultMeshBase = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
-            contextPath = (String) pars.get(  StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
-            target              = (String) pars.get( StringRepresentationParameters.LINK_TARGET_KEY );
-            title               = (String) pars.get( StringRepresentationParameters.LINK_TITLE_KEY );
-            additionalArguments = (String) pars.get( StringRepresentationParameters.HTML_URL_ADDITIONAL_ARGUMENTS );
-        }
+        boolean isDefaultMeshBase  = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
+        String contextPath         = (String) pars.get(  StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
+        String target              = (String) pars.get( StringRepresentationParameters.LINK_TARGET_KEY );
+        String title               = (String) pars.get( StringRepresentationParameters.LINK_TITLE_KEY );
+        String additionalArguments = (String) pars.get( StringRepresentationParameters.HTML_URL_ADDITIONAL_ARGUMENTS );
 
         String key;
         if( isDefaultMeshBase ) {
@@ -374,13 +362,8 @@ public abstract class AbstractProxy
         throws
             StringifierException
     {
-        boolean isDefaultMeshBase   = true;
-        String  contextPath         = null;
-
-        if( pars != null ) {
-            isDefaultMeshBase = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
-            contextPath       = (String) pars.get(  StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
-        }
+        boolean isDefaultMeshBase   = getNetMeshBase().equals( pars.get( MeshStringRepresentationParameters.DEFAULT_MESHBASE_KEY ));
+        String  contextPath         = (String) pars.get(  StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
 
         String key;
         if( isDefaultMeshBase ) {

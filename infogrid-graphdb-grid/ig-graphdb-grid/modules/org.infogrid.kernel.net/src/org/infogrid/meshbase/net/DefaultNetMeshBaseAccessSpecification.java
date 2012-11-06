@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -193,12 +193,8 @@ public class DefaultNetMeshBaseAccessSpecification
         throws
             StringifierException
     {
-        String contextPath = null;
+        String contextPath  = (String) pars.get( StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
         String externalForm = toExternalForm();
-
-        if( pars != null ) {
-            contextPath = (String) pars.get( StringRepresentationParameters.WEB_RELATIVE_CONTEXT_KEY );
-        }
 
         String ret = rep.formatEntry(
                 getClass(), // dispatch to the right subtype
