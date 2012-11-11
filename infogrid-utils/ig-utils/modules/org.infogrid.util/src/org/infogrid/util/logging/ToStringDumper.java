@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -43,7 +43,7 @@ public class ToStringDumper
      * Factory method.
      *
      * @param maxLevel the number of object levels to dump
-     * @param maxArraylength the maximum number of array entries to dump
+     * @param maxArrayLength the maximum number of array entries to dump
      * @return the created ToStringDumper
      */
     public static ToStringDumper create(
@@ -57,7 +57,7 @@ public class ToStringDumper
      * Constructor.
      *
      * @param maxLevel the number of object levels to dump
-     * @param maxArraylength the maximum number of array entries to dump
+     * @param maxArrayLength the maximum number of array entries to dump
      */
     protected ToStringDumper(
             int maxLevel,
