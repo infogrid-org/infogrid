@@ -40,12 +40,15 @@ public abstract class AbstractDumper
      * Constructor, for subclasses only.
      *
      * @param maxLevel the number of object levels to dump
+     * @param maxArrayLength the maximum number of array entries to dump
      */
     protected AbstractDumper(
-            int maxLevel )
+            int maxLevel,
+            int maxArrayLength )
     {
-        theLevel    = 0;
-        theMaxLevel = maxLevel;
+        theLevel          = 0;
+        theMaxLevel       = maxLevel;
+        theMaxArrayLength = maxArrayLength;
     }
 
     /**
@@ -333,7 +336,7 @@ public abstract class AbstractDumper
                 try {
                     ++theLevel;
 
-                    int max = Math.min( 8, obj.length );
+                    int max = Math.min( theMaxArrayLength, obj.length );
 
                     for( int j=0 ; j<max ; ++j ) {
                         emit( '\n' );
@@ -378,7 +381,7 @@ public abstract class AbstractDumper
                 try {
                     ++theLevel;
 
-                    int max = Math.min( 8, obj.size() );
+                    int max = Math.min( theMaxArrayLength, obj.size() );
                     int j   = 0;
 
                     for( Object current : obj ) {
@@ -425,7 +428,7 @@ public abstract class AbstractDumper
                 try {
                     ++theLevel;
 
-                    int max = Math.min( 8, obj.size() );
+                    int max = Math.min( theMaxArrayLength, obj.size() );
                     int j   = 0;
                     for( Object from : obj.keySet() ) {
                         emit( '\n' );
@@ -467,7 +470,7 @@ public abstract class AbstractDumper
             emit( String.valueOf( obj.length ));
             emit( "] = { " );
 
-            int max = Math.min( 8, obj.length );
+            int max = Math.min( theMaxArrayLength, obj.length );
             for( int j=0 ; j<max ; ++j ) {
                 emit( obj[j] ? "true" : "false" );
                 if( j < max-1 ) {
@@ -498,7 +501,7 @@ public abstract class AbstractDumper
             emit( String.valueOf( obj.length ));
             emit( "] = " );
 
-            int max = Math.min( 8, obj.length );
+            int max = Math.min( theMaxArrayLength, obj.length );
             for( int j=0 ; j<max ; ++j ) {
                 emit( Character.forDigit( ( obj[j] >> 4 ) & 0xf, 16 ));
                 emit( Character.forDigit( obj[j] & 0xf, 16 ));
@@ -526,7 +529,7 @@ public abstract class AbstractDumper
             emit( String.valueOf( obj.length ));
             emit( "] = { " );
 
-            int max = Math.min( 8, obj.length );
+            int max = Math.min( theMaxArrayLength, obj.length );
             for( int j=0 ; j<max ; ++j ) {
                 emit( String.valueOf( obj[j] ));
                 if( j < max-1 ) {
@@ -558,7 +561,7 @@ public abstract class AbstractDumper
             emit( String.valueOf( obj.length ));
             emit( "] = { " );
 
-            int max = Math.min( 8, obj.length );
+            int max = Math.min( theMaxArrayLength, obj.length );
             for( int j=0 ; j<max ; ++j ) {
                 emit( String.valueOf( obj[j] ));
                 if( j < max-1 ) {
@@ -589,7 +592,7 @@ public abstract class AbstractDumper
             emit( String.valueOf( obj.length ));
             emit( "] = { " );
 
-            int max = Math.min( 8, obj.length );
+            int max = Math.min( theMaxArrayLength, obj.length );
             for( int j=0 ; j<max ; ++j ) {
                 emit( String.valueOf( obj[j] ));
                 if( j < max-1 ) {
@@ -621,7 +624,7 @@ public abstract class AbstractDumper
             emit( String.valueOf( obj.length ));
             emit( "] = { " );
 
-            int max = Math.min( 8, obj.length );
+            int max = Math.min( theMaxArrayLength, obj.length );
             for( int j=0 ; j<max ; ++j ) {
                 emit( String.valueOf( obj[j] ));
                 if( j < max-1 ) {
@@ -652,7 +655,7 @@ public abstract class AbstractDumper
             emit( String.valueOf( obj.length ));
             emit( "] = { " );
 
-            int max = Math.min( 8, obj.length );
+            int max = Math.min( theMaxArrayLength, obj.length );
             for( int j=0 ; j<max ; ++j ) {
                 emit( String.valueOf( obj[j] ));
                 if( j < max-1 ) {
@@ -683,7 +686,7 @@ public abstract class AbstractDumper
             emit( String.valueOf( obj.length ));
             emit( "] = { " );
 
-            int max = Math.min( 8, obj.length );
+            int max = Math.min( theMaxArrayLength, obj.length );
             for( int j=0 ; j<max ; ++j ) {
                 emit( '\'' );
                 emit( obj[j] );
@@ -942,6 +945,11 @@ public abstract class AbstractDumper
      */
     protected int theMaxLevel;
 
+    /**
+     * The maximum number of array entries to dump.
+     */
+    protected int theMaxArrayLength;
+    
     /**
      * The level of dumping at which the Dumper is currently operating.
      */

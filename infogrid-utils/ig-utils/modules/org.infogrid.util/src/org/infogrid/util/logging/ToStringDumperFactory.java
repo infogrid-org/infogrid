@@ -28,7 +28,7 @@ public class ToStringDumperFactory
      */
     public static ToStringDumperFactory create()
     {
-        return new ToStringDumperFactory( ToStringDumper.DEFAULT_MAXLEVEL );
+        return new ToStringDumperFactory( ToStringDumper.DEFAULT_MAXLEVEL, ToStringDumper.DEFAULT_MAXARRAYLENGTH );
     }
 
     /**
@@ -36,22 +36,27 @@ public class ToStringDumperFactory
      *
      * @param maxLevel the number of object levels to dump
      * @return the created ToStringDumperFactory
+     * @param maxArrayLength the maximum number of array entries to dump
      */
     public static ToStringDumperFactory create(
-            int maxLevel )
+            int maxLevel,
+            int maxArrayLength )
     {
-        return new ToStringDumperFactory( maxLevel );
+        return new ToStringDumperFactory( maxLevel, maxArrayLength );
     }
 
     /**
      * Constructor.
      *
      * @param maxLevel the number of object levels to dump
+     * @param maxArrayLength the maximum number of array entries to dump
      */
     protected ToStringDumperFactory(
-            int maxLevel )
+            int maxLevel,
+            int maxArrayLength )
     {
-        theMaxLevel = maxLevel;
+        theMaxLevel       = maxLevel;
+        theMaxArrayLength = maxArrayLength;
     }
 
     /**
@@ -63,11 +68,16 @@ public class ToStringDumperFactory
     public ToStringDumper obtainFor(
             Object key )
     {
-        return ToStringDumper.create( theMaxLevel );
+        return ToStringDumper.create( theMaxLevel, theMaxArrayLength );
     }
 
     /**
      * The maximum number of object levels to dump.
      */
     protected int theMaxLevel;
+    
+    /**
+     * The maximum number of array entries to dump.
+     */
+    protected int theMaxArrayLength;
 }
