@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -31,30 +31,34 @@ public class XprisoMessageDumperFactory
      */
     public static XprisoMessageDumperFactory create()
     {
-        return new XprisoMessageDumperFactory( ToStringDumper.DEFAULT_MAXLEVEL );
+        return new XprisoMessageDumperFactory( ToStringDumper.DEFAULT_MAXLEVEL, ToStringDumper.DEFAULT_MAXARRAYLENGTH );
     }
 
     /**
      * Factory method.
      *
      * @param maxLevel the number of object levels to dump
+     * @param maxArrayLength the maximum number of array entries to dump
      * @return the created XprisoMessageDumperFactory
      */
     public static XprisoMessageDumperFactory create(
-            int maxLevel )
+            int maxLevel,
+            int maxArrayLength )
     {
-        return new XprisoMessageDumperFactory( maxLevel );
+        return new XprisoMessageDumperFactory( maxLevel, maxArrayLength );
     }
 
     /**
      * Constructor.
      *
      * @param maxLevel the number of object levels to dump
+     * @param maxArrayLength the maximum number of array entries to dump
      */
     protected XprisoMessageDumperFactory(
-            int maxLevel )
+            int maxLevel,
+            int maxArrayLength )
     {
-        super( maxLevel );
+        super( maxLevel, maxArrayLength );
     }
 
     /**
@@ -67,6 +71,6 @@ public class XprisoMessageDumperFactory
     public XprisoMessageDumper obtainFor(
             Object key )
     {
-        return XprisoMessageDumper.create( theMaxLevel );
+        return XprisoMessageDumper.create( theMaxLevel, theMaxArrayLength );
     }
 }

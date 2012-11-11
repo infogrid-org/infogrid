@@ -48,7 +48,7 @@ public class XprisoMessageDumper
      */
     public static XprisoMessageDumper create()
     {
-        return new XprisoMessageDumper( DEFAULT_MAXLEVEL );
+        return new XprisoMessageDumper( DEFAULT_MAXLEVEL, DEFAULT_MAXARRAYLENGTH );
     }
 
     /**
@@ -58,20 +58,23 @@ public class XprisoMessageDumper
      * @return the created XprisoMessageDumper
      */
     public static XprisoMessageDumper create(
-            int maxLevel )
+            int maxLevel,
+            int maxArrayLength )
     {
-        return new XprisoMessageDumper( maxLevel );
+        return new XprisoMessageDumper( maxLevel, maxArrayLength );
     }
 
     /**
      * Constructor.
      *
      * @param maxLevel the number of object levels to dump
+     * @param maxArrayLength the maximum number of array elements to dump
      */
     protected XprisoMessageDumper(
-            int maxLevel )
+            int maxLevel,
+            int maxArrayLength )
     {
-        super( maxLevel );
+        super( maxLevel, maxArrayLength );
     }
 
     /**
