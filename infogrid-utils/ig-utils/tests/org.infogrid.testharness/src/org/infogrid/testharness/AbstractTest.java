@@ -26,6 +26,8 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.Reference;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -890,6 +892,48 @@ public abstract class AbstractTest
     }
 
     /**
+     * Check that a Collection contains the correct items, regardless in which sequence.
+     * 
+     * @param collection the Collection whose content to test
+     * @param selectors a collection of selector, each of which must match exactly once, with no members of the collection left over
+     * @param msg the message to print in case of an error
+     * @return true if check passed
+     */
+    public final <T> boolean checkContains(
+            Collection<? extends T>           collection,
+            Collection<? extends Selector<T>> selectors,
+            String                            msg )
+    {
+        if( collection.size() != selectors.size() ) {
+            reportError( msg + ": incorrect number of elements: " + collection.size() + " vs. " + selectors.size() );
+            return false;
+        }
+        HashSet<Selector<T>> usedAlready = new HashSet<Selector<T>>();
+        for( T candidate : collection ) {
+            boolean found = false;
+            for( Selector<T> selector : selectors ) {
+                if( usedAlready.contains( selector )) {
+                    continue;
+                }
+                if( selector.selects( candidate )) {
+                    usedAlready.add( selector );
+                    found = true;
+                    break;
+                }
+            }
+            if( !found ) {
+                reportError( msg + ": candidate " + candidate + " does not match any selector" );
+                return false;
+            }
+        }
+        if( selectors.size() != usedAlready.size() ) {
+            reportError( msg + ": " + ( selectors.size() - usedAlready.size() ) + " selectors left over" );
+            return false;
+        }
+        return true;
+    }
+    
+    /**
      * Count the number of elements remaining on this Iterator.
      *
      * @param iter the Iterator
@@ -1458,5 +1502,20 @@ public abstract class AbstractTest
          *
          */
         protected String theName;
+    }
+    
+    /**
+     * Must be subclassed to use #checkContains.
+     */
+    public static interface Selector<T>
+    {
+        /**
+         * Returns true if this selector selects the candidate.
+         * 
+         * @param candidate the candidate
+         * @return true of the candidate is selected by the Selector
+         */
+        public boolean selects(
+                T candidate );
     }
 }
