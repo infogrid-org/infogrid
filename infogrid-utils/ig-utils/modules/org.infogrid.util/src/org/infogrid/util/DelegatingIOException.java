@@ -89,7 +89,7 @@ public class DelegatingIOException
         try {
             return toStringRepresentation(
                     StringRepresentationDirectorySingleton.getSingleton().get( StringRepresentationDirectory.TEXT_PLAIN_NAME ),
-                    null );
+                    StringRepresentationParameters.EMPTY );
 
         } catch( StringifierException ex ) {
             log.error( ex );
