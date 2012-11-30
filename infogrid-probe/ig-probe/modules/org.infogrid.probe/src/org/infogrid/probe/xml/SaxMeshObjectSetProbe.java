@@ -526,7 +526,11 @@ public class SaxMeshObjectSetProbe
             theObjectBeingParsed.addPropertyValue( theObjectBeingParsed.getCurrentPropertyValue() );
 
         } else if( CURRENCY_VALUE_TAG.equals( qName )) {
-            theObjectBeingParsed.addPropertyValue( CurrencyValue.parseCurrencyValue( theCharacters.toString() ));
+            try {
+                theObjectBeingParsed.addPropertyValue( CurrencyValue.parseCurrencyValue( theCharacters.toString() ));
+            } catch( ParseException ex ) {
+                log.error( "Failed to parse CurrencyValue ", theCharacters.toString(), ex );
+            }
 
         } else if( ENUMERATED_VALUE_TAG.equals( qName )) {
             MeshTypeIdentifier propertyTypeName = theObjectBeingParsed.getPropertyTypes()[ theObjectBeingParsed.getPropertyTypes().length-1 ];

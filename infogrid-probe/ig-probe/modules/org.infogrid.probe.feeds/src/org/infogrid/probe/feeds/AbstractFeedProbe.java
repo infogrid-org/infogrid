@@ -328,8 +328,12 @@ public abstract class AbstractFeedProbe
             } else if( MeshObjectSetProbeTags.CURRENCY_VALUE_TAG.equals( localName )) {
                 String content = realChild.getTextContent();
 
-                PropertyValue ret = CurrencyValue.parseCurrencyValue( content );
-                return ret;
+                try {
+                    PropertyValue ret = CurrencyValue.parseCurrencyValue( content );
+                    return ret;
+                } catch( ParseException ex ) {
+                    throw new ProbeException.SyntaxError(  dataSourceIdentifier, "Failed to parse CurrencyValue " + content );
+                }
 
             } else if( MeshObjectSetProbeTags.ENUMERATED_VALUE_TAG.equals( localName )) {
                 if( !( type.getDataType() instanceof EnumeratedDataType )) {

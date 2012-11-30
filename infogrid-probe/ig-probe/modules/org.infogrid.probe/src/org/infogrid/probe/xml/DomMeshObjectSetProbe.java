@@ -247,7 +247,11 @@ public class DomMeshObjectSetProbe
                                     Float.parseFloat( alpha ));
                             
                         } else if( CURRENCY_VALUE_TAG.equals( grandNodeName )) {
-                            propValue = CurrencyValue.parseCurrencyValue( content );
+                            try {
+                                propValue = CurrencyValue.parseCurrencyValue( content );
+                            } catch( ParseException ex ) {
+                                throw new ProbeException.SyntaxError( dataSourceIdentifier, "Failed to parse CurrencyValue " + content );
+                            }
 
                         } else if( ENUMERATED_VALUE_TAG.equals( grandNodeName )) {
                             try {
