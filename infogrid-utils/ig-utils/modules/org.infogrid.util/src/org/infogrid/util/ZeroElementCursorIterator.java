@@ -32,7 +32,7 @@ public final class ZeroElementCursorIterator<T>
      */
     public static <T> ZeroElementCursorIterator<T> create()
     {
-        return new ZeroElementCursorIterator<T>();
+        return new ZeroElementCursorIterator<>();
     }
     
     /**
