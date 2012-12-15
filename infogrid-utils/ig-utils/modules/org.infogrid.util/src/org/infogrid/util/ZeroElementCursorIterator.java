@@ -35,6 +35,14 @@ public final class ZeroElementCursorIterator<T>
         return new ZeroElementCursorIterator<>();
     }
     
+
+    /**
+     * The empty array to iterate over. Apparently I need to put this PRIOR to the constructor,
+     * in order to avoid the "unchecked cast" warning per
+     * http://stackoverflow.com/questions/13829753/java-generics-suppresswarningsunchecked-mystery
+     */
+    private static final Object [] EMPTY_ARRAY = {};
+
     /**
      * Constructor.
      */
@@ -43,9 +51,4 @@ public final class ZeroElementCursorIterator<T>
     {
         super( (T []) EMPTY_ARRAY, (Class<T>) Object.class, 0, 0, 0 );
     }
-
-    /**
-     * The empty array to iterate over.
-     */
-    protected static final Object [] EMPTY_ARRAY = {};
 }
