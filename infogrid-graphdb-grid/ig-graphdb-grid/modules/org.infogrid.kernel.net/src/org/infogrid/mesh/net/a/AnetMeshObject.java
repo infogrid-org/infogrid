@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -35,22 +35,23 @@ import org.infogrid.mesh.RoleTypeRequiresEntityTypeException;
 import org.infogrid.mesh.a.AMeshObject;
 import org.infogrid.mesh.net.DoNotHaveLockException;
 import org.infogrid.mesh.net.HomeReplicaChangedEvent;
+import org.infogrid.mesh.net.LockChangedEvent;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.mesh.net.NotHomeReplicaException;
 import org.infogrid.mesh.net.externalized.SimpleExternalizedNetMeshObject;
+import org.infogrid.mesh.net.proxy.ReplicaProxyInterface;
 import org.infogrid.mesh.net.security.CannotObtainLockException;
 import org.infogrid.meshbase.MeshBase;
-import org.infogrid.mesh.net.LockChangedEvent;
-import org.infogrid.mesh.net.NotHomeReplicaException;
-import org.infogrid.mesh.net.proxy.ReplicaProxyInterface;
 import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
-import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.a.AccessLocallySynchronizer;
 import org.infogrid.meshbase.net.a.AnetMeshBase;
+import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectBecameDeadStateEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectBecamePurgedStateEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
@@ -60,7 +61,6 @@ import org.infogrid.meshbase.net.transaction.NetMeshObjectRoleAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectRoleRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeRemovedEvent;
-import org.infogrid.meshbase.net.a.AccessLocallySynchronizer;
 import org.infogrid.meshbase.transaction.MeshObjectStateEvent;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
@@ -2296,6 +2296,7 @@ public class AnetMeshObject
                         oldTypes,
                         addedTypes,
                         newTypes,
+                        null,
                         determineIncomingProxyIdentifier( theMeshBase ),
                         theTimeUpdated );
 
@@ -2314,10 +2315,11 @@ public class AnetMeshObject
      */
     @Override
     protected void fireTypesRemoved(
-            EntityType [] oldTypes,
-            EntityType [] removedTypes,
-            EntityType [] newTypes,
-            MeshBase      mb )
+            EntityType []                   oldTypes,
+            EntityType []                   removedTypes,
+            EntityType []                   newTypes,
+            Map<PropertyType,PropertyValue> removedProperties,
+            MeshBase                        mb )
     {
         NetMeshObjectTypeRemovedEvent theEvent
                 = new NetMeshObjectTypeRemovedEvent(
@@ -2325,6 +2327,7 @@ public class AnetMeshObject
                         oldTypes,
                         removedTypes,
                         newTypes,
+                        removedProperties,
                         determineIncomingProxyIdentifier( theMeshBase ),
                         theTimeUpdated );
 

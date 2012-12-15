@@ -8,12 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net.transaction;
 
+import java.util.Map;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
@@ -25,6 +26,8 @@ import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
+import org.infogrid.model.primitives.PropertyType;
+import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.util.CreateWhenNeeded;
 
 /**
@@ -45,21 +48,24 @@ public class NetMeshObjectTypeAddedEvent
      * @param oldValues the old EntityTypes, prior to the event
      * @param deltaValues the EntityTypes that were added
      * @param newValues the new EntityTypes, after the event
+     * @param initialProperties if given, set the newly created properties to these values. This is used for undoing NetMeshObjectTypeRemovedEvents
      * @param originIdentifier identifier of the NetMeshBase from where this NetChange arrived, if any
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
      */
     public NetMeshObjectTypeAddedEvent(
-            NetMeshObject         source,
-            EntityType []         oldValues,
-            EntityType []         deltaValues,
-            EntityType []         newValues,
-            NetMeshBaseIdentifier originIdentifier,
-            long                  timeEventOccurred )
+            NetMeshObject                   source,
+            EntityType []                   oldValues,
+            EntityType []                   deltaValues,
+            EntityType []                   newValues,
+            Map<PropertyType,PropertyValue> initialProperties,
+            NetMeshBaseIdentifier           originIdentifier,
+            long                            timeEventOccurred )
     {
         super(  source,
                 oldValues,
                 deltaValues,
                 newValues,
+                initialProperties,
                 timeEventOccurred );
         
         theOriginNetworkIdentifier = originIdentifier;
@@ -156,6 +162,7 @@ public class NetMeshObjectTypeAddedEvent
                 getNewValue(),
                 getDeltaValue(),
                 getOldValue(),
+                null,
                 getOriginNetworkIdentifier(),
                 getTimeEventOccurred() );
     }

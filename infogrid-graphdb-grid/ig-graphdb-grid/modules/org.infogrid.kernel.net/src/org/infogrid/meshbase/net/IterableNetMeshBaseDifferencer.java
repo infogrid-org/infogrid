@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -145,6 +145,7 @@ public class IterableNetMeshBaseDifferencer
                 oldTypes,
                 addedTypes,
                 newTypes,
+                null,
                 (NetMeshBaseIdentifier) null,
                 meshObjectInComparison.getTimeUpdated() );
 
@@ -172,6 +173,7 @@ public class IterableNetMeshBaseDifferencer
                 oldTypes,
                 removedTypes,
                 newTypes,
+                null,
                 (NetMeshBaseIdentifier) null,
                 meshObjectInComparison.getTimeUpdated() );
 
