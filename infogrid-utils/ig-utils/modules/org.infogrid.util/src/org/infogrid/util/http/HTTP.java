@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2013 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -987,6 +987,50 @@ public abstract class HTTP
         return appendArgumentToUrl( url, name, value );
     }
 
+    /**
+     * Append an argument to a URL if it does not exist yet; replace if it exists already.
+     *
+     * @param url the URL to which we append the argument
+     * @param name the name of the argument, not escaped yet
+     * @param value the value of the argument, not escaped yet
+     * @return the result
+     */
+    public static void replaceOrAppendArgumentToUrl(
+            StringBuilder url,
+            String        name,
+            String        value )
+    {
+        int q = url.indexOf( "?" );
+        if( q < 0 ) {
+            appendArgumentToUrl( url, name, value );
+            return;
+        }
+        String    query      = url.substring( q+1 );
+        String [] args       = query.split( "&" );
+        String    nameEquals = name + "=";
+        
+        for( int i=0 ; i<args.length ; ++i ) {
+            if( args[i].startsWith( nameEquals )) {
+                // replace
+                url.delete( q+1, url.length() );
+                for( int j=0 ; j<args.length ; ++j ) {
+                    if( j == i ) {
+                        url.append( encodeToValidUrlArgument( name ));
+                        if( value != null ) {
+                            url.append( '=' );
+                            url.append( encodeToValidUrlArgument( value ));
+                        }
+                    } else {
+                        url.append( args[j] );
+                    }
+                }
+                return;
+            }
+        }
+
+        appendArgumentToUrl( url, name, value );
+    }
+    
     /**
      * Obtain a named argument from a URL.
      *
