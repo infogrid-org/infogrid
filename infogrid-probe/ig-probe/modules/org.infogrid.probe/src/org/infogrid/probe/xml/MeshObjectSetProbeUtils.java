@@ -35,43 +35,9 @@ import org.w3c.dom.Node;
 public abstract class MeshObjectSetProbeUtils
 {
     /**
-     * This helper takes a String escaped according to escape and undos the escape.
-     * FIXME This is not complete at all.
-     *
-     * @param enc the escaped String
-     * @return the original String
-     * @see #escape
+     * Keep this class abstract.
      */
-    @SuppressWarnings( "fallthrough" )
-    static String descape(
-            String enc )
-    {
-        StringBuilder ret = new StringBuilder( enc.length() ); // same length
-
-        for( int i=0 ; i<enc.length() ; ++i ) {
-            char c = enc.charAt( i );
-            switch( c ) {
-                case '&':
-                    if( enc.charAt( i+1 ) == '#' ) {
-                        i += 3; // we simply believe that the next two are going to be #x. FIXME?
-                        String s = enc.substring( i );
-                        int colonIndex = s.indexOf( ';' );
-                        int v = Integer.parseInt( s.substring( 0, colonIndex ), 16 );
-
-                        ret.append( new Character( (char) v ));
-
-                        i += colonIndex;
-                        break;
-                    }
-                    // else run-through
-
-                default:
-                    ret.append( c );
-                    break;
-            }
-        }
-        return ret.toString();
-    }
+    private MeshObjectSetProbeUtils() {}
 
     /**
      * Helper to parse an ISO time to a long.
