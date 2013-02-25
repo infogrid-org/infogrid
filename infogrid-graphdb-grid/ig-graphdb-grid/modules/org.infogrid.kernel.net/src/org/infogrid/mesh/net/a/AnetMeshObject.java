@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2013 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -1935,7 +1935,7 @@ public class AnetMeshObject
             IllegalPropertyValueException,
             TransactionException
     {
-        internalSetPropertyValues( types, values, false, timeUpdated );
+        internalSetPropertyValues( types, values, false, true, timeUpdated );
     }
     
     /**
@@ -1970,7 +1970,7 @@ public class AnetMeshObject
             values[i] = currentValue;
             ++i;
         }
-        internalSetPropertyValues( types, values, false, timeUpdated );
+        internalSetPropertyValues( types, values, false, true, timeUpdated );
     }
     
     /**
@@ -2065,6 +2065,7 @@ public class AnetMeshObject
      * @param newValues the sequence of PropertyValues for the PropertyTypes
      * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @param isMaster if true, check permissions
+     * @param generateEvents if false, do not generate PropertyChangeEvents. This is only false in initializers.
      * @return the old values of the Properties
      * @throws IllegalPropertyTypeException thrown if one PropertyType does not exist on this MeshObject
      *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
@@ -2077,6 +2078,7 @@ public class AnetMeshObject
             PropertyType []  thePropertyTypes,
             PropertyValue [] newValues,
             boolean          isMaster,
+            boolean          generateEvents,
             long             timeUpdated )
         throws
             IllegalPropertyTypeException,
@@ -2084,7 +2086,7 @@ public class AnetMeshObject
             IllegalPropertyValueException,
             TransactionException
     {
-        return super.internalSetPropertyValues( thePropertyTypes, newValues, isMaster, timeUpdated );
+        return super.internalSetPropertyValues( thePropertyTypes, newValues, isMaster, generateEvents, timeUpdated );
     }
 
     /**

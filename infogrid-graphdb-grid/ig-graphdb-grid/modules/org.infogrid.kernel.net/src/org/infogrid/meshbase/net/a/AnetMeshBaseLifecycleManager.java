@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2013 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -1217,7 +1217,7 @@ public class AnetMeshBaseLifecycleManager
         }
         
         try {
-            ret.internalSetPropertyValues( propertyTypes, propertyValues, false, externalized.getTimeUpdated() );
+            ret.internalSetPropertyValues( propertyTypes, propertyValues, false, true, externalized.getTimeUpdated() );
         } catch( IllegalPropertyTypeException ex ) {
             log.error( ex );
         } catch( IllegalPropertyValueException ex ) {
