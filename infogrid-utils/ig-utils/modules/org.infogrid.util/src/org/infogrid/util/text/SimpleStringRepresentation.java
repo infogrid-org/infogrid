@@ -164,7 +164,12 @@ public class SimpleStringRepresentation
             }
             AnyMessageStringifier stringifier = AnyMessageStringifier.create( formatString, getRecursiveStringifierMap() );
 
-            String ret = stringifier.format( null, ArrayFacade.<Object>create( args ), pars );
+            String ret;
+            try {
+                ret = stringifier.format( null, ArrayFacade.<Object>create( args ), pars );
+            } catch( RuntimeException ex ) {
+                ret = theResourceHelper.getResourceString( "FormatError" );
+            }
             return ret;
         }
         if( theDelegate != null ) {
