@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2011 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2013 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -451,6 +451,23 @@ public abstract class AbstractSaneUrl
     }
 
     /**
+     * Return this absolute full URL but with all URL arguments stripped whose names meet
+     * the provided Pattern.
+     * For example, http://example.com/?abc=def&abcd=ef&abcde=f&x=y would become http://example.com?abc=def&x=y
+     * if invoked with Pattern "^abcd.*$".
+     *
+     * @param pattern the Pattern
+     * @return the absolute full URL without the matched URL arguments
+     */
+    public String getAbsoluteFullUriWithoutMatchingArgument(
+            Pattern pattern )
+    {
+        String in = getAbsoluteFullUri();
+        
+        return urlWithoutMatchingArguments( in, new Pattern[] { pattern } );
+    }
+    
+    /**
      * Return this absolute full URL but with all URL arguments stripped whose names meet at least
      * one of the provided Patterns.
      * For example, http://example.com/?abc=def&abcd=ef&abcde=f&x=y would become http://example.com?abc=def&x=y
@@ -462,7 +479,7 @@ public abstract class AbstractSaneUrl
     public String getAbsoluteFullUriWithoutMatchingArguments(
             Pattern [] patterns )
     {
-        String        in  = getAbsoluteFullUri();
+        String in  = getAbsoluteFullUri();
 
         return urlWithoutMatchingArguments( in, patterns );
     }

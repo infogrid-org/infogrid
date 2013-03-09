@@ -201,6 +201,18 @@ public interface SaneUrl
     public abstract String getQueryString();
 
     /**
+     * Return this absolute full URL but with all URL arguments stripped whose names meet
+     * the provided Pattern.
+     * For example, http://example.com/?abc=def&abcd=ef&abcde=f&x=y would become http://example.com?abc=def&x=y
+     * if invoked with Pattern "^abcd.*$".
+     *
+     * @param pattern the Pattern
+     * @return the absolute full URL without the matched URL arguments
+     */
+    public abstract String getAbsoluteFullUriWithoutMatchingArgument(
+            Pattern pattern );
+    
+    /**
      * Return this absolute full URL but with all URL arguments stripped whose names meet at least
      * one of the provided Patterns.
      * For example, http://example.com/?abc=def&abcd=ef&abcde=f&x=y would become http://example.com?abc=def&x=y
