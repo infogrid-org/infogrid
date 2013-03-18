@@ -180,6 +180,7 @@ public class StringRepresentationDirectorySingleton
 
         plainMap.put(   "htmlsource",     StringStringifier.create() );
         htmlMap.put(    "htmlsource",     HtmlifyingDelegatingStringifier.create( StringStringifier.create() ));
+        editHtmlMap.put("htmlsource",     HtmlifyingDelegatingStringifier.create( StringStringifier.create() ));
         // url:        same as plain
         // httpPost:   same as plain
         // java:       same as plain
