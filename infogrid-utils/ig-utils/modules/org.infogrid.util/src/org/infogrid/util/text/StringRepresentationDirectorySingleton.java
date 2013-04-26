@@ -72,6 +72,7 @@ public class StringRepresentationDirectorySingleton
         HashMap<String,Stringifier<? extends Object>> htmlPasswordMap     = new HashMap<String,Stringifier<? extends Object>>();
         HashMap<String,Stringifier<? extends Object>> editHtmlPasswordMap = new HashMap<String,Stringifier<? extends Object>>();
         HashMap<String,Stringifier<? extends Object>> urlMap              = new HashMap<String,Stringifier<? extends Object>>();
+        HashMap<String,Stringifier<? extends Object>> svgMap              = new HashMap<String,Stringifier<? extends Object>>();
         HashMap<String,Stringifier<? extends Object>> httpPostMap         = new HashMap<String,Stringifier<? extends Object>>();
         HashMap<String,Stringifier<? extends Object>> javaMap             = new HashMap<String,Stringifier<? extends Object>>();
         HashMap<String,Stringifier<? extends Object>> javascriptMap       = new HashMap<String,Stringifier<? extends Object>>();
@@ -377,6 +378,12 @@ public class StringRepresentationDirectorySingleton
                 urlMap,
                 plain );
 
+        SimpleStringRepresentation svg = SimpleStringRepresentation.create(
+                theSingleton,
+                StringRepresentationDirectory.SVG_PLUS_XML_NAME,
+                svgMap,
+                html );
+
         SimpleStringRepresentation httpPost = SimpleStringRepresentation.create(
                 theSingleton,
                 StringRepresentationDirectory.TEXT_HTTP_POST_NAME,
@@ -414,6 +421,7 @@ public class StringRepresentationDirectorySingleton
         theSingleton.put(       htmlPassword.getName(), htmlPassword );
         theSingleton.put(   editHtmlPassword.getName(), editHtmlPassword );
         theSingleton.put(                url.getName(), url );
+        theSingleton.put(                svg.getName(), svg );
         theSingleton.put(           httpPost.getName(), httpPost );
         theSingleton.put(               java.getName(), java );
         theSingleton.put(         javascript.getName(), javascript );

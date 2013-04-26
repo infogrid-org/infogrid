@@ -74,6 +74,12 @@ public interface StringRepresentationDirectory
 
     /**
      * Name of the StringRepresentation, contained in this StringRepresentationDirectory, that contains
+     * the default image/svg+xml formatting.
+     */
+    public static final String SVG_PLUS_XML_NAME = "Svg";
+    
+    /**
+     * Name of the StringRepresentation, contained in this StringRepresentationDirectory, that contains
      * the default formatting for conveying values in an HTTP POST.
      */
     public static final String TEXT_HTTP_POST_NAME = "HttpPost";
