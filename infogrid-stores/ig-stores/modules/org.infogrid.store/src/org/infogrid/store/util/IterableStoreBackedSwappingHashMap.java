@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2013 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -73,6 +73,7 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
             IterableStore         store )
     {
         return new IterableStoreBackedSwappingHashMap<K,V>( initialSize, mapper, store ) {
+                @Override
                 protected Reference<V> createReference(
                         K key,
                         V value )
@@ -115,6 +116,7 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
             IterableStore         store )
     {
         return new IterableStoreBackedSwappingHashMap<K,V>( initialSize, mapper, store ) {
+                @Override
                 protected Reference<V> createReference(
                         K key,
                         V value )
@@ -199,7 +201,7 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
         cleanup();
 
         if( theKeySet == null ) {
-            theKeySet = new MyKeySet<K,V>( this );
+            theKeySet = new MyKeySet<K,V>( (IterableStore) theStore, theMapper );
         }
         return theKeySet;
     }
@@ -251,19 +253,22 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
      * @param <K> the type of key
      * @param <V> the type of value
      */
-    protected static class MyKeySet<K,V>
+    public static class MyKeySet<K,V>
             extends
                 AbstractSet<K>
     {
         /**
          * Constructor.
          *
-         * @param map the underlying map
+         * @param store the underlying Store
+         * @param mapper   the StoreEntryMapper to use
          */
         public MyKeySet(
-                IterableStoreBackedSwappingHashMap<K,V> map  )
+                IterableStore         store ,
+                StoreEntryMapper<K,V> mapper )
         {
-            theDelegate = map;
+            theStore  = store;
+            theMapper = mapper;
         }
         
         /**
@@ -271,9 +276,10 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
          *
          * @return an Iterator over the elements contained in this collection.
          */
+        @Override
         public Iterator<K> iterator()
         {
-            return new MyKeyIterator<K,V>( theDelegate );
+            return new MyKeyIterator<K,V>( theStore.iterator(), theMapper );
         }
 
         /**
@@ -281,11 +287,11 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
          *
          * @return the number of elements in this collection.
          */
+        @Override
         public int size()
         {
             try {
-                IterableStore store = (IterableStore) theDelegate.theStore;
-                return store.size();
+                return theStore.size();
 
             } catch( IOException ex ) {
                 log.error( ex );
@@ -297,6 +303,16 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
          * The underlying IterableStoreBackedSwappingHashMap.
          */
         protected IterableStoreBackedSwappingHashMap<K,V> theDelegate;
+        
+        /**
+         * The underlying Store.
+         */
+        protected IterableStore theStore;
+
+        /**
+         * The underlying Mapper.
+         */
+        protected StoreEntryMapper<K,V> theMapper;
     }
 
     /**
@@ -305,20 +321,22 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
      * @param <K> the type of key
      * @param <V> the type of value
      */
-    static class MyKeyIterator<K,V>
+    public static class MyKeyIterator<K,V>
             implements
                 Iterator<K>
     {
         /**
          * Constructor.
          *
-         * @param map the SwappingHashMap over whose values we iterate
+         * @param delegate the IterableStoreCursor on the underlying Store
+         * @param mapper   the StoreEntryMapper to use
          */
         public MyKeyIterator(
-                IterableStoreBackedSwappingHashMap<K,V> map  )
+                IterableStoreCursor   delegate,
+                StoreEntryMapper<K,V> mapper )
         {
-            theMap      = map;
-            theDelegate = theMap.getStore().iterator();
+            theDelegate = delegate;
+            theMapper   = mapper;
         }
 
         /**
@@ -326,6 +344,7 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
          *
          * @return true if there are
          */
+        @Override
         public boolean hasNext()
         {
             return theDelegate.hasNext();
@@ -336,11 +355,12 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
          *
          * @return the next element
          */
+        @Override
         public K next()
         {
             try {
                 StoreValue value = theDelegate.next();
-                K          ret   = theMap.theMapper.stringToKey( value.getKey() );
+                K          ret   = theMapper.stringToKey( value.getKey() );
                 return ret;
 
             } catch( ParseException ex ) {
@@ -354,6 +374,7 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
          *
          * @throws UnsupportedOperationException
          */
+        @Override
         public void remove()
         {
             throw new UnsupportedOperationException();
@@ -365,8 +386,8 @@ public abstract class IterableStoreBackedSwappingHashMap<K,V>
         protected IterableStoreCursor theDelegate;
 
         /**
-         * The underlying IterableStoreBackedSwappingHashMap.
+         * The underlying Mapper.
          */
-        protected IterableStoreBackedSwappingHashMap<K,V> theMap;
+        protected StoreEntryMapper<K,V> theMapper;
     }
 }
