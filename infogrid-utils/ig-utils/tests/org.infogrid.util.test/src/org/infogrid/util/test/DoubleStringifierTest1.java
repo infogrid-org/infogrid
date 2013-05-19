@@ -109,7 +109,7 @@ public class DoubleStringifierTest1
     {
         if( in.endsWith( "." )) {
             return in + "0";
-        } else if( in.indexOf( "." ) >= 0 ) {
+        } else if( in.indexOf( '.' ) >= 0 ) {
             return in;
         } else {
             return in + ".0";

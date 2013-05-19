@@ -124,6 +124,7 @@ public abstract class SwappingHashMap<K,V>
      * @param key the key
      * @return true if this SwappingHashMap contains a mapping for this key
      */
+    @Override
     @SuppressWarnings(value={"unchecked"})
     public synchronized boolean containsKey(
             Object key )
