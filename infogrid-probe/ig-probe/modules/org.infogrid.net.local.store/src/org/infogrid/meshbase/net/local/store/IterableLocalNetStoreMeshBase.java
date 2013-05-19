@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2013 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -38,6 +38,7 @@ import org.infogrid.meshbase.net.proxy.ProxyMessageEndpointFactory;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
 import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.meshbase.net.security.NetAccessManager;
+import org.infogrid.meshbase.store.StoreMeshBaseSwappingHashMap;
 import org.infogrid.meshbase.store.net.NetStoreMeshBaseEntryMapper;
 import org.infogrid.meshbase.store.net.StoreProxyEntryMapper;
 import org.infogrid.meshbase.store.net.StoreProxyManager;
@@ -298,8 +299,8 @@ public class IterableLocalNetStoreMeshBase
         NetStoreMeshBaseEntryMapper objectMapper = new NetStoreMeshBaseEntryMapper();
         StoreProxyEntryMapper       proxyMapper  = new StoreProxyEntryMapper( proxyFactory );
 
-        IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = IterableStoreBackedSwappingHashMap.createWeak( objectMapper, meshObjectStore );
-        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy>     proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( proxyMapper, proxyStore );
+        StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>   objectStorage = new StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>( objectMapper, meshObjectStore );
+        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( proxyMapper, proxyStore );
         
         StoreProxyManager              proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
         AnetMeshBaseLifecycleManager   life         = AnetMeshBaseLifecycleManager.create();
@@ -362,8 +363,8 @@ public class IterableLocalNetStoreMeshBase
         NetStoreMeshBaseEntryMapper objectMapper = new NetStoreMeshBaseEntryMapper();
         StoreProxyEntryMapper       proxyMapper  = new StoreProxyEntryMapper( proxyFactory );
 
-        IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = IterableStoreBackedSwappingHashMap.createWeak( objectMapper, meshObjectStore );
-        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy>     proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( proxyMapper, proxyStore );
+        StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>   objectStorage = new StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>( objectMapper, meshObjectStore );
+        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( proxyMapper, proxyStore );
 
         StoreProxyManager            proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
         AnetMeshBaseLifecycleManager life         = AnetMeshBaseLifecycleManager.create();
@@ -413,18 +414,18 @@ public class IterableLocalNetStoreMeshBase
      * @param context the Context in which this NetMeshBase runs.
      */
     protected IterableLocalNetStoreMeshBase(
-            NetMeshBaseIdentifier                                               identifier,
-            NetMeshObjectIdentifierFactory                                      identifierFactory,
-            NetMeshBaseIdentifierFactory                                        meshBaseIdentifierFactory,
-            NetMeshObjectAccessSpecificationFactory                             netMeshObjectAccessSpecificationFactory,
-            MeshObjectSetFactory                                                setFactory,
-            ModelBase                                                           modelBase,
-            AnetMeshBaseLifecycleManager                                        life,
-            NetAccessManager                                                    accessMgr,
-            IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> cache,
-            StoreProxyManager                                                   proxyManager,
-            ProbeManager                                                        probeManager,
-            Context                                                             context )
+            NetMeshBaseIdentifier                                         identifier,
+            NetMeshObjectIdentifierFactory                                identifierFactory,
+            NetMeshBaseIdentifierFactory                                  meshBaseIdentifierFactory,
+            NetMeshObjectAccessSpecificationFactory                       netMeshObjectAccessSpecificationFactory,
+            MeshObjectSetFactory                                          setFactory,
+            ModelBase                                                     modelBase,
+            AnetMeshBaseLifecycleManager                                  life,
+            NetAccessManager                                              accessMgr,
+            StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject> cache,
+            StoreProxyManager                                             proxyManager,
+            ProbeManager                                                  probeManager,
+            Context                                                       context )
     {
         super(  identifier,
                 identifierFactory,
