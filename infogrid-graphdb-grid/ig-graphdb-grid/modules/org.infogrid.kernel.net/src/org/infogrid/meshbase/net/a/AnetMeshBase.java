@@ -8,18 +8,20 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2013 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.net.a;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.mesh.net.a.AnetMeshObject;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.meshbase.MeshObjectsNotFoundException;
 import org.infogrid.meshbase.a.AMeshBase;
@@ -1308,6 +1310,18 @@ public abstract class AnetMeshBase
         NetMeshObject           ret        = findMeshObjectByIdentifier( identifier );
 
         return ret;
+    }
+
+    /**
+     * Tell the MeshBase that this AMeshObject needs to be saved into persistent
+     * storage (if applicable per AMeshBase implementation). Nothing on this level.
+     * 
+     * @param obj the AbstractMeshObject to be saved
+     */
+    public void addReplicationChangedObject(
+            AnetMeshObject obj )
+    {
+        // nothing
     }
 
     /**

@@ -8,14 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2013 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.meshbase.store.net.test;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
@@ -26,13 +25,11 @@ import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
 import org.infogrid.meshbase.store.net.NetStoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
+import org.infogrid.model.primitives.StringValue;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.Store;
-import org.infogrid.store.StoreListener;
-import org.infogrid.store.StoreValue;
 import org.infogrid.store.prefixing.IterablePrefixingStore;
 import org.infogrid.store.prefixing.PrefixingStore;
-import org.infogrid.model.primitives.StringValue;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -47,6 +44,7 @@ public class StoreNetMeshBaseTest1
      *
      * @throws Exception thrown if an Exception occurred during the test
      */
+    @Override
     public void run()
         throws
             Exception
@@ -56,7 +54,7 @@ public class StoreNetMeshBaseTest1
         Store         meshObjectStore = PrefixingStore.create(         "mesh", theSqlStore );
         IterableStore proxyStore      = IterablePrefixingStore.create( "proxy", theSqlStore );
         
-        MyListener listener = new MyListener();
+        RecordingStoreListener listener = new RecordingStoreListener();
         theSqlStore.addDirectStoreListener( listener );
 
         //
@@ -102,7 +100,6 @@ public class StoreNetMeshBaseTest1
         MeshObject []           mesh  = new MeshObject[ theTestSize ];
         MeshObjectIdentifier [] names = new MeshObjectIdentifier[ theTestSize ];
         
-        int updateCount = 0;
         for( int i=0 ; i<mesh.length ; ++i ) {
             mesh[i] = life.createMeshObject();
             
@@ -110,18 +107,16 @@ public class StoreNetMeshBaseTest1
             
             if( i % 3 == 1 ) {
                 mesh[i].bless( TestSubjectArea.AA );
-                ++updateCount;
             } else if( i % 3 == 2 ) {
                 mesh[i].bless( TestSubjectArea.AA );
                 mesh[i].setPropertyValue( TestSubjectArea.A_X, StringValue.create( "Testing ... " + i ));
-                ++updateCount;
             }
         }
 
         tx.commitTransaction();
 
         checkEquals( listener.thePuts.size(),       theTestSize, "Wrong number of puts" );
-        checkEquals( listener.theUpdates.size(),    updateCount, "Wrong number of updates" );
+        checkEquals( listener.theUpdates.size(),    0,           "Wrong number of updates" );
         checkEquals( listener.theGets.size(),       0,           "Wrong number of gets" );
         checkEquals( listener.theFailedGets.size(), theTestSize, "Wrong number of failedGets" );
         checkEquals( listener.theDeletes.size(),    0,           "Wrong number of deletes" );
@@ -216,7 +211,7 @@ public class StoreNetMeshBaseTest1
     /**
      * The NetMeshBaseIdentifier for the NetMeshBase.
      */
-    protected static NetMeshBaseIdentifier theNetworkIdentifier;
+    protected static final NetMeshBaseIdentifier theNetworkIdentifier;
     static {
         NetMeshBaseIdentifier id;
         try {
@@ -228,115 +223,5 @@ public class StoreNetMeshBaseTest1
         }
         
         theNetworkIdentifier = id;
-    }
-
-    /**
-     * Test listener.
-     */
-    static class MyListener
-            implements
-                StoreListener
-    {
-        /**
-         * A put operation was performed. This indicates either a
-         * <code>Store.put</code> or a <code>Store.putOrUpdate</code> operation
-         * in which an actual <code>put</code> was performed.
-         *
-         * @param store the Store that emitted this event
-         * @param value the StoreValue that was put
-         */
-        public void putPerformed(
-                Store      store,
-                StoreValue value )
-        {
-            thePuts.add( value.getKey() );
-        }
-
-        /**
-         * An update operation was performed. This indicates either a
-         * <code>Store.update</code> or a <code>Store.putOrUpdate</code> operation
-         * in which an actual <code>update</code> was performed.
-         *
-         * @param store the Store that emitted this event
-         * @param value the StoreValue that was updated
-         */
-        public void updatePerformed(
-                Store      store,
-                StoreValue value )
-        {
-            theUpdates.add( value.getKey() );
-        }
-
-        /**
-         * A get operation was performed.
-         *
-         * @param store the Store that emitted this event
-         * @param value the StoreValue that was obtained
-         */
-        public void getPerformed(
-                Store      store,
-                StoreValue value )
-        {            
-            theGets.add( value.getKey() );
-        }                
-
-        /**
-         * A get operation was attempted but not value could be found.
-         *
-         * @param store the Store that emitted this event
-         * @param key the key that was attempted
-         */
-        public void getFailed(
-                Store  store,
-                String key )
-        {
-            theFailedGets.add( key );
-        }
-
-        /**
-         * A delete operation was performed.
-         *
-         * @param store the Store that emitted this event
-         * @param key the key with which the data element was stored
-         */
-        public void deletePerformed(
-                Store  store,
-                String key )
-        {
-            theDeletes.add( key );
-        }
-
-        /**
-         * A delete-all operation was performed.
-         *
-         * @param store the Store that emitted this event
-         * @param prefix if given, indicates the prefix of all keys that were deleted. If null, indicates &quot;all&quot;.
-         */
-        public void deleteAllPerformed(
-                Store  store,
-                String prefix )
-        {
-            theAllDeletes.add( prefix );
-        }
-
-        /**
-         * Reset the listener.
-         */
-        public void reset()
-        {
-            thePuts.clear();
-            theUpdates.clear();
-            theGets.clear();
-            theFailedGets.clear();
-            theDeletes.clear();
-            theAllDeletes.clear();
-        }
-
-        protected ArrayList<String> thePuts       = new ArrayList<String>();
-        protected ArrayList<String> theUpdates    = new ArrayList<String>();
-        protected ArrayList<String> theGets       = new ArrayList<String>();
-        protected ArrayList<String> theFailedGets = new ArrayList<String>();
-        protected ArrayList<String> theDeletes    = new ArrayList<String>();
-        protected ArrayList<String> theAllDeletes = new ArrayList<String>();
     }
 }

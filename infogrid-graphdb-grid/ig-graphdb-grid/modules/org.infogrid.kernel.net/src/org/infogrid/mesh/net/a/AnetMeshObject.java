@@ -311,7 +311,7 @@ public class AnetMeshObject
         
         if( theProxyTowardsLockIndex == HERE_CONSTANT ) {
             AnetMeshBase realBase = (AnetMeshBase) theMeshBase;                
-            realBase.flushMeshObject( this );
+            realBase.addReplicationChangedObject( this );
 
             fireLockGainedEvent();
 
@@ -387,7 +387,7 @@ public class AnetMeshObject
                 theProxyTowardsLockIndex = theProxies.length - 1;
 
                 AnetMeshBase realBase = (AnetMeshBase) theMeshBase;                
-                realBase.flushMeshObject( this );
+                realBase.addReplicationChangedObject( this );
             }
         }
 
@@ -450,7 +450,7 @@ public class AnetMeshObject
         }
 
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;                
-        realBase.flushMeshObject( this );
+        realBase.addReplicationChangedObject( this );
 
         fireLockGainedEvent();
     }
@@ -485,7 +485,7 @@ public class AnetMeshObject
             theGiveUpLock = yesNo; // currently does not generate events
             
             AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
-            realBase.flushMeshObject( this );
+            realBase.addReplicationChangedObject( this );
         }        
     }
 
@@ -567,7 +567,7 @@ public class AnetMeshObject
         
         if( theHomeProxyIndex == HERE_CONSTANT ) {
             AnetMeshBase realBase = (AnetMeshBase) theMeshBase;                
-            realBase.flushMeshObject( this );
+            realBase.addReplicationChangedObject( this );
 
             fireHomeReplicaGainedEvent();
 
@@ -642,7 +642,7 @@ public class AnetMeshObject
                 theHomeProxyIndex = theProxies.length - 1;
 
                 AnetMeshBase realBase = (AnetMeshBase) theMeshBase;                
-                realBase.flushMeshObject( this );
+                realBase.addReplicationChangedObject( this );
             }
         }
 
@@ -700,7 +700,7 @@ public class AnetMeshObject
             theGiveUpHomeReplica = yesNo; // currently does not generate events
             
             AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
-            realBase.flushMeshObject( this );
+            realBase.addReplicationChangedObject( this );
         }        
     }
 
@@ -1182,7 +1182,7 @@ public class AnetMeshObject
             }
         }
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
-        realBase.flushMeshObject( this );
+        realBase.addReplicationChangedObject( this );
     }
 
     /**
@@ -1243,7 +1243,7 @@ public class AnetMeshObject
             }
         }
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
-        realBase.flushMeshObject( this );
+        realBase.addReplicationChangedObject( this );
     }
     
     /**
@@ -1593,7 +1593,7 @@ public class AnetMeshObject
             }
         }
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
-        realBase.flushMeshObject( this );
+        realBase.addReplicationChangedObject( this );
     }
     
     /**
@@ -2117,7 +2117,7 @@ public class AnetMeshObject
         LockChangedEvent.GainedLock theEvent = new LockChangedEvent.GainedLock( this, System.currentTimeMillis() );
 
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
-        realBase.flushMeshObject( this );
+        realBase.addReplicationChangedObject( this );
 
         firePropertyChange( theEvent );
     }
@@ -2130,7 +2130,7 @@ public class AnetMeshObject
         LockChangedEvent.LostLock theEvent = new LockChangedEvent.LostLock( this, System.currentTimeMillis() );
 
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
-        realBase.flushMeshObject( this );
+        realBase.addReplicationChangedObject( this );
 
         firePropertyChange( theEvent );
     }
@@ -2144,7 +2144,7 @@ public class AnetMeshObject
                 = new HomeReplicaChangedEvent.GainedHomeReplica( this, System.currentTimeMillis() );
 
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
-        realBase.flushMeshObject( this );
+        realBase.addReplicationChangedObject( this );
 
         firePropertyChange( theEvent );
     }
@@ -2158,7 +2158,7 @@ public class AnetMeshObject
                 = new HomeReplicaChangedEvent.LostHomeReplica( this, System.currentTimeMillis() );
 
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
-        realBase.flushMeshObject( this );
+        realBase.addReplicationChangedObject( this );
 
         firePropertyChange( theEvent );
     }

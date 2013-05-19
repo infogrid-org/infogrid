@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2009 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2013 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
 // All rights reserved.
 //
 
@@ -23,9 +23,12 @@ import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.proxy.Proxy;
+import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.meshbase.store.net.NetStoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
-import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
+import org.infogrid.store.AbstractStoreListener;
+import org.infogrid.store.Store;
+import org.infogrid.store.StoreValue;
 import org.infogrid.store.prefixing.IterablePrefixingStore;
 import org.infogrid.util.logging.Log;
 
@@ -135,6 +138,47 @@ public class StoreNetMeshBaseTest2
         checkEquals( mb1ProxyStore.size(), 1, "Wrong number of entries in mb1ProxyStore" );
         checkEquals( mb2MeshStore.size(),  2, "Wrong number of entries in mb2MeshStore" );
         checkEquals( mb2ProxyStore.size(), 1, "Wrong number of entries in mb2ProxyStore" );
+        
+        //
+        
+        log.info( "moving the lock around without changing the semantics, i.e. no transactions involved" );
+        
+        checkCondition( obj1_mb2.tryToObtainLock(), "Failed to obtain lock" );
+        
+        checkProxies( obj1_mb1, new NetMeshBase[] { mb2 }, null, mb2,  "obj1_mb1 has wrong proxies" );
+        checkProxies( obj1_mb2, new NetMeshBase[] { mb1 }, mb1,  null, "obj1_mb2 has wrong proxies" );
+        
+        //
+        
+        log.info( "now erasing cache" );
+
+        obj1_mb1Ref = new WeakReference<MeshObject>( obj1_mb1 );
+        obj1_mb2Ref = new WeakReference<MeshObject>( obj1_mb2 );
+
+        obj1_mb1 = null;
+        obj1_mb2 = null;
+        
+        collectGarbage();
+
+        checkCondition( obj1_mb1Ref.get() == null, "obj1_mb1 found" );
+        checkCondition( obj1_mb2Ref.get() == null, "obj1_mb2 found" );
+
+        //
+        
+        log.info( "Recreating and checking objects" );
+        
+        obj1_mb1 = mb1.findMeshObjectByIdentifier( obj1Name );
+        obj1_mb2 = mb2.findMeshObjectByIdentifier( obj1Name );
+        
+        checkObject( obj1_mb1, "obj1_mb1 not found" );
+        checkObject( obj1_mb2, "obj1_mb2 not found" );
+
+        //
+        
+        log.info( "checking proxies" );
+
+        checkProxies( obj1_mb1, new NetMeshBase[] { mb2 }, null, mb2,  "obj1_mb1 has wrong proxies" );
+        checkProxies( obj1_mb2, new NetMeshBase[] { mb1 }, mb1,  null, "obj1_mb2 has wrong proxies" );
     }
 
     /**
