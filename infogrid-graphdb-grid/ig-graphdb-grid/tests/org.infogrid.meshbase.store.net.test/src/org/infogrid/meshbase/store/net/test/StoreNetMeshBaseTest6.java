@@ -14,8 +14,8 @@
 
 package org.infogrid.meshbase.store.net.test;
 
-import java.util.concurrent.ScheduledExecutorService;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.meshbase.net.NetMeshBase;
