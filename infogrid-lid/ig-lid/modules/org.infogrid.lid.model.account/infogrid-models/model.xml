@@ -9,7 +9,7 @@
 
     For more information about InfoGrid go to http://infogrid.org/
 
-    Copyright 1998-2012 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+    Copyright 1998-2013 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
     All rights reserved.
 -->
 
@@ -74,6 +74,12 @@
                             <name>Active</name>
                             <username>Active</username>
                             <userdescription>The Account has been in use and can be used again.</userdescription>
+                        </enum>
+                        <enum>
+                            <name>Closed</name>
+                            <username>Closed</username>
+                            <userdescription>The Account has closed based on the customer's request. It may or may not
+                            become active again.</userdescription>
                         </enum>
                         <enum>
                             <name>Disabled</name>
@@ -151,6 +157,8 @@
                 return org.infogrid.lid.account.LidAccount.LidAccountStatus.APPLIEDFOR;
             } else if( AccountSubjectArea.ACCOUNT_STATUS_type_ACTIVE.equals( status )) {
                 return org.infogrid.lid.account.LidAccount.LidAccountStatus.ACTIVE;
+            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_CLOSED.equals( getStatus() )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.CLOSED;
             } else if( AccountSubjectArea.ACCOUNT_STATUS_type_DISABLED.equals( getStatus() )) {
                 return org.infogrid.lid.account.LidAccount.LidAccountStatus.DISABLED;
             } else if( AccountSubjectArea.ACCOUNT_STATUS_type_OBSOLETED.equals( getStatus() )) {
