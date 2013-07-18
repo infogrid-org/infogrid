@@ -424,6 +424,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public AnetMeshObject createMeshObject(
             NetMeshObjectIdentifier identifier,
             EntityType []           types,
@@ -482,6 +483,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public AnetMeshObject createMeshObject(
             NetMeshObjectIdentifier identifier,
             EntityType []           types,
@@ -848,6 +850,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if invoked outside proper Transaction boundaries
      * @throws MustNotDeleteHomeObjectException thrown if applied to the home object of this NetMeshBase
      */
+    @Override
     public void purgeReplica(
             NetMeshObject replica )
         throws
@@ -865,6 +868,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if invoked outside proper Transaction boundaries
      * @throws MustNotDeleteHomeObjectException thrown if applied to the home object of this NetMeshBase
      */
+    @Override
     public void purgeReplicas(
             NetMeshObject [] replicas )
         throws
@@ -918,6 +922,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public AnetMeshObject rippleDelete(
             NetMeshObjectIdentifier identifier,
             NetMeshBaseIdentifier   proxyIdentifier,
@@ -969,6 +974,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws MeshObjectIdentifierNotUniqueException thrown if a NetMeshObject with this identifier exists locally already
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      */
+    @Override
     public NetMeshObject rippleCreate(
             ExternalizedNetMeshObject externalized,
             Proxy []                  proxies,
@@ -1094,6 +1100,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the called did not have sufficient privileges for this operation
      */
+    @Override
     public NetMeshObject rippleResynchronize(
             ExternalizedNetMeshObject externalized,
             Proxy []                  proxies,
@@ -1474,6 +1481,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if a ForwardReference to the same location has been created already
      */
+    @Override
     public AnetMeshObject createForwardReference(
             NetMeshBaseIdentifier meshObjectLocation )
         throws
@@ -1524,6 +1532,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if a ForwardReference to the same location has been created already
      */
+    @Override
     public AnetMeshObject createForwardReference(
             NetMeshBaseIdentifier meshObjectLocation,
             EntityType            type )
@@ -1579,6 +1588,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if a ForwardReference to the same location has been created already
      */
+    @Override
     public AnetMeshObject createForwardReference(
             NetMeshBaseIdentifier meshObjectLocation,
             EntityType []         types )
@@ -1632,6 +1642,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if a ForwardReference to the same location has been created already
      */
+    @Override
     public AnetMeshObject createForwardReference(
             NetMeshBaseIdentifier   meshObjectLocation,
             NetMeshObjectIdentifier identifier )
@@ -1685,6 +1696,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if a ForwardReference to the same location has been created already
      */
+    @Override
     public AnetMeshObject createForwardReference(
             NetMeshBaseIdentifier   meshObjectLocation,
             NetMeshObjectIdentifier identifier,
@@ -1742,6 +1754,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if a ForwardReference to the same location has been created already
      */
+    @Override
     public AnetMeshObject createForwardReference(
             NetMeshBaseIdentifier   meshObjectLocation,
             NetMeshObjectIdentifier identifier,
@@ -1796,6 +1809,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if a ForwardReference to the same location has been created already
      */
+    @Override
     public AnetMeshObject createForwardReference(
             NetMeshObjectAccessSpecification pathToObject )
         throws
@@ -1843,6 +1857,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if a ForwardReference to the same location has been created already
      */
+    @Override
     public AnetMeshObject createForwardReference(
             NetMeshObjectAccessSpecification pathToObject,
             EntityType                       type )
@@ -1894,6 +1909,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if a ForwardReference to the same location has been created already
      */
+    @Override
     public AnetMeshObject createForwardReference(
             NetMeshObjectAccessSpecification pathToObject,
             EntityType []                    types )
@@ -1947,6 +1963,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if the specified NetMeshBaseIdentifier was taken already
      */
+    @Override
     public NetMeshObject createForwardReference(
             NetMeshObjectAccessSpecification pathToObject,
             long                             timeCreated,
@@ -1983,6 +2000,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if the specified NetMeshBaseIdentifier was taken already
      */
+    @Override
     public NetMeshObject createForwardReference(
             NetMeshObjectAccessSpecification pathToObject,
             EntityType                       type,
@@ -2020,6 +2038,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if the specified NetMeshBaseIdentifier was taken already
      */
+    @Override
     public NetMeshObject createForwardReference(
             NetMeshObjectAccessSpecification pathToObject,
             EntityType []                    types,
@@ -2095,6 +2114,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if the specified NetMeshBaseIdentifier was taken already
      */
+    @Override
     public NetMeshObject [] createForwardReferences(
             NetMeshObjectAccessSpecification [] pathToObjects )
         throws
@@ -2142,6 +2162,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if the specified NetMeshBaseIdentifier was taken already
      */
+    @Override
     public NetMeshObject [] createForwardReferences(
             NetMeshObjectAccessSpecification [] pathToObjects,
             EntityType []                       types )
@@ -2197,6 +2218,7 @@ public class AnetMeshBaseLifecycleManager
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws MeshObjectIdentifierNotUniqueException thrown if the specified NetMeshBaseIdentifier was taken already
      */
+    @Override
     public NetMeshObject [] createForwardReferences(
             NetMeshObjectAccessSpecification [] pathToObjects,
             EntityType [][]                     types )
@@ -2395,6 +2417,7 @@ public class AnetMeshBaseLifecycleManager
      *
      * @param toKill the NetMeshObjects to kill
      */
+    @Override
     public void kill(
             NetMeshObject [] toKill )
         throws
