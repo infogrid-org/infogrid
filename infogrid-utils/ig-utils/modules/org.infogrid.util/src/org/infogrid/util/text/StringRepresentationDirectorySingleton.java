@@ -189,6 +189,18 @@ public class StringRepresentationDirectorySingleton
         // javadoc:    same as java
         // json:       same as javascript
 
+        plainMap.put(   "htmltextarea",     StringStringifier.create() );
+        htmlMap.put(    "htmltextarea",     HtmlifyingDelegatingStringifier.create( StringStringifier.create(), "textarea" ));
+        editHtmlMap.put("htmltextarea",     HtmlifyingDelegatingStringifier.create( StringStringifier.create(), "textarea" ));
+        // url:        same as plain
+        // httpPost:   same as plain
+        // java:       same as plain
+        // javascript: same as java
+        // javadoc:    same as java
+        // json:       same as javascript
+
+        
+                
         plainMap.put(   "stacktrace",     StacktraceStringifier.create() );
         htmlMap.put(    "stacktrace",     HtmlifyingDelegatingStringifier.create( StacktraceStringifier.create() ));
         urlMap.put(     "stacktrace",     InvalidStringifier.create() );

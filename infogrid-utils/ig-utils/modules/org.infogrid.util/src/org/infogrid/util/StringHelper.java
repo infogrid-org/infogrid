@@ -482,6 +482,91 @@ public abstract class StringHelper
     }
 
     /**
+     * Escape those characters in a String that make it "replaceable character data", per W3C.
+     * See http://www.w3.org/TR/html-markup/syntax.html#replaceable-character-data
+     *
+     * @param s the unescaped String
+     * @param enclosing the enclosing html tag, e.g. "textarea"
+     * @return the escaped String
+     */
+    public static String stringToReplaceableCharacterDataHtml(
+            String s,
+            String enclosing )
+    {
+        if( s == null ) {
+            return NULL_STRING;
+        }
+        StringBuilder sb = new StringBuilder( s.length() * 5 / 4 ); // fudge
+
+        // true if last char was blank
+        int len = s.length();
+
+        for( int i=0; i<len; ++i ) {
+            char c = s.charAt( i );
+
+            int ci = 0xffff & c;
+            if (ci < 128 ) {
+                // nothing special only 7 Bit
+                
+                if( c == '&' ) {
+                    sb.append( "&amp;" );
+
+                } else if( c == '<' && s.substring( i+1 ).toLowerCase().startsWith( "/" + enclosing )) {
+                    sb.append( "&lt;" );
+
+                } else {
+                    sb.append( c );
+                }
+
+            } else {
+                // Not 7 Bit use the unicode system
+                sb.append("&#");
+                sb.append(new Integer(ci).toString());
+                sb.append(';');
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Unescape those characters in a String that make it "replaceable character data", per W3C.
+     *
+     * @param s the escaped String
+     * @param enclosing the enclosing html tag, e.g. "textarea"
+     * @return the unescaped String
+     */
+    public static String replaceableCharacterDataHtmlToString(
+            String s,
+            String enclosing )
+    {
+        StringBuilder sb = new StringBuilder( s.length() );
+
+        int len = s.length();
+
+        for( int i=0; i<len; ++i ) {
+            char c = s.charAt( i );
+            if( c != '&' ) {
+                sb.append( c );
+            } else {
+                if( i+2 < len && s.charAt( i+1 ) == '#' ) { // +2 because we need at least one after the #
+                    int semi = s.indexOf( '#', i+1 );
+                    if( semi >= 0 ) {
+                        char unicode = Character.forDigit( Integer.parseInt( s.substring( i+2, semi )), 10 );
+                        sb.append( unicode );
+
+                    } else {
+                        sb.append( c ); // leave everything normal
+                    }
+                } else if( s.regionMatches( i, "&amp;", 0, 5 )) {
+                    sb.append( "&" );
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    
+    /**
      * Escape characters in a String so the output becomes a valid String
      * in JavaScript.
      *

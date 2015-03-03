@@ -15,6 +15,7 @@
 package org.infogrid.util.text;
 
 import org.infogrid.util.StringHelper;
+import org.infogrid.util.http.HTTP;
 
 /**
  * Takes the output of another Stringifier and makes it valid HTML. For example, this replaces
@@ -36,17 +37,36 @@ public class HtmlifyingDelegatingStringifier<T>
     public static <T> HtmlifyingDelegatingStringifier<T> create(
             Stringifier<T> delegate )
     {
-        return new HtmlifyingDelegatingStringifier<T>( delegate );
+        return new HtmlifyingDelegatingStringifier<T>( delegate, null );
+    }
+
+    /**
+     * Factory method.
+     *
+     * @return the created HtmlifyingDelegatingStringifier
+     * @param delegate the underlying Stringifier that knows how to deal with the real type
+     * @param enclosingTag if non-null, only htmlify what is necessary for "replaceable character data", per W3C.
+     * @param <T> the type of the Objects to be stringified
+     */
+    public static <T> HtmlifyingDelegatingStringifier<T> create(
+            Stringifier<T> delegate,
+            String         enclosingTag )
+    {
+        return new HtmlifyingDelegatingStringifier<T>( delegate, enclosingTag );
     }
 
     /**
      * No-op constructor. Use factory method.
      * @param delegate the underlying Stringifier that knows how to deal with the real type
+     * @param enclosingTag if non-null, only htmlify what is necessary for "replaceable character data", per W3C.
      */
     protected HtmlifyingDelegatingStringifier(
-            Stringifier<T> delegate )
+            Stringifier<T> delegate,
+            String         enclosingTag )
     {
         super( delegate );
+        
+        theEnclosingTag = enclosingTag;
     }
 
     /**
@@ -59,7 +79,12 @@ public class HtmlifyingDelegatingStringifier<T>
     protected String escape(
             String s )
     {
-        String ret = StringHelper.stringToHtml( s );
+        String ret;
+        if( theEnclosingTag != null ) {
+            ret = StringHelper.stringToReplaceableCharacterDataHtml( s, theEnclosingTag );
+        } else {
+            ret = StringHelper.stringToHtml( s );
+        }
         return ret;
     }
 
@@ -73,7 +98,17 @@ public class HtmlifyingDelegatingStringifier<T>
     protected String unescape(
             String s )
     {
-        String ret = StringHelper.htmlToString( s );
+        String ret;
+        if( theEnclosingTag != null ) {
+            ret = StringHelper.replaceableCharacterDataHtmlToString( s, theEnclosingTag );
+        } else {
+            ret = StringHelper.htmlToString( s );
+        }
         return ret;
     }
+    
+    /**
+     * The enclosing tag, in case of "replaceable character data" mode
+     */
+    protected String theEnclosingTag;
 }
