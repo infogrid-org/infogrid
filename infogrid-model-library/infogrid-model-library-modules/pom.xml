@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.infogrid</groupId>
+    <artifactId>infogrid-model-library-modules</artifactId>
+    <packaging>pom</packaging>
+    <name>infogrid-model-library-modules</name>
+    <url>http://infogrid.org/</url>
+
+    <parent>
+        <groupId>org.infogrid</groupId>
+        <artifactId>infogrid-model-library</artifactId>
+        <version>3.0-SNAPSHOT</version>
+    </parent>
+
+    <modules>
+        <module>org.infogrid.model.Annotation</module>
+        <module>org.infogrid.model.Blob</module>
+        <module>org.infogrid.model.Bookmark</module>
+        <module>org.infogrid.model.Common</module>
+        <module>org.infogrid.model.Feeds</module>
+        <module>org.infogrid.model.Requirement</module>
+        <module>org.infogrid.model.Tagging</module>
+        <module>org.infogrid.model.VCard</module>
+        <module>org.infogrid.model.Web</module>
+        <module>org.infogrid.model.Wiki</module>
+    </modules>
+</project>
