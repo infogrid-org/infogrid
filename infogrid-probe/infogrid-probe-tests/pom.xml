@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.infogrid</groupId>
+    <artifactId>infogrid-probe-tests</artifactId>
+    <packaging>pom</packaging>
+    <name>infogrid-probe-tests</name>
+    <url>http://infogrid.org/</url>
+
+    <parent>
+        <groupId>org.infogrid</groupId>
+        <artifactId>infogrid-probe</artifactId>
+        <version>3.0-SNAPSHOT</version>
+    </parent>
+
+    <modules>
+        <module>org.infogrid.probe.feeds.test</module>
+        <module>org.infogrid.probe.store.test</module>
+        <module>org.infogrid.probe.test</module>
+        <module>org.infogrid.probe.test.active</module>
+        <module>org.infogrid.probe.test.forwardreference</module>
+        <module>org.infogrid.probe.test.shadow</module>
+        <module>org.infogrid.probe.test.webfinger</module>
+        <module>org.infogrid.probe.test.writableprobe</module>
+        <module>org.infogrid.probe.test.yadis</module>
+        <module>org.infogrid.probe.vcard.test</module>
+        <module>org.infogrid.probe.xrd.test</module>
+    </modules>
+</project>
