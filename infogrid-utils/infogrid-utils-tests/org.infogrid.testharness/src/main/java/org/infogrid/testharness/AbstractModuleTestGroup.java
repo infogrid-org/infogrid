@@ -15,7 +15,7 @@
 package org.infogrid.testharness;
 
 import org.infogrid.module.Module;
-import org.infogrid.module.ModuleAdvertisement;
+import org.infogrid.module.ModuleMeta;
 import org.infogrid.module.ModuleRegistry;
 import org.infogrid.module.ModuleRequirement;
 import org.infogrid.util.logging.Log;
@@ -109,8 +109,8 @@ public abstract class AbstractModuleTestGroup
             throws
                 Throwable
         {
-            ModuleRegistry      registry  = ModuleRegistryContext.getModuleRegistry();
-            ModuleAdvertisement candidate = registry.determineSingleResolutionCandidate( theTestModuleRequirement );
+            ModuleRegistry registry  = ModuleRegistryContext.getModuleRegistry();
+            ModuleMeta     candidate = registry.determineSingleResolutionCandidate( theTestModuleRequirement );
 
             Module testModule = registry.resolve( candidate );
 

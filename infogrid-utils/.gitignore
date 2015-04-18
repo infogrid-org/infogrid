@@ -5,4 +5,4 @@ dist/
 genfiles.properties
 private.properties
 target/
-nbproject/
+nbactions.xml
