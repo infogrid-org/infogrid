@@ -3,7 +3,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
     <artifactId>org.infogrid.lid.model.yadis</artifactId>
-    <version>3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>org.infogrid.lid.model.yadis</name>
     <url>http://infogrid.org/</url>
@@ -18,6 +17,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>org.infogrid.kernel</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>org.infogrid.model.Web</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
