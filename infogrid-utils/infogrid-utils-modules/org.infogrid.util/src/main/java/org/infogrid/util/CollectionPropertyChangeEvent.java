@@ -188,7 +188,7 @@ public abstract class CollectionPropertyChangeEvent<T>
          * Sets the new value for the property, expressed as an Object.
          *
          * @return  The new value for the property, expressed as an Object.
-         *		May be null if multiple properties have changed.
+         *      May be null if multiple properties have changed.
          */
         @Override
         public Object getNewValue()
@@ -205,7 +205,7 @@ public abstract class CollectionPropertyChangeEvent<T>
          * Gets the old value for the property, expressed as an Object.
          *
          * @return  The old value for the property, expressed as an Object.
-         *		May be null if multiple properties have changed.
+         *      May be null if multiple properties have changed.
          */
         @Override
         public Object getOldValue()
@@ -253,7 +253,7 @@ public abstract class CollectionPropertyChangeEvent<T>
          * Sets the new value for the property, expressed as an Object.
          *
          * @return  The new value for the property, expressed as an Object.
-         *		May be null if multiple properties have changed.
+         *      May be null if multiple properties have changed.
          */
         @Override
         public Object getNewValue()
@@ -270,7 +270,7 @@ public abstract class CollectionPropertyChangeEvent<T>
          * Gets the old value for the property, expressed as an Object.
          *
          * @return  The old value for the property, expressed as an Object.
-         *		May be null if multiple properties have changed.
+         *      May be null if multiple properties have changed.
          */
         @Override
         public Object getOldValue()

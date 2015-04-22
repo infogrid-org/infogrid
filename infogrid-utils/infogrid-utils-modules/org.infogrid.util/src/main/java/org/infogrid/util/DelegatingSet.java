@@ -179,8 +179,8 @@ public class DelegatingSet<E>
      * runtime type of the returned array is that of the specified array.
      *
      * @param a the array into which the elements of this set are to
-     *		be stored, if it is big enough; otherwise, a new array of the
-     * 		same runtime type is allocated for this purpose.
+     *      be stored, if it is big enough; otherwise, a new array of the
+     *      same runtime type is allocated for this purpose.
      * @return an array containing the elements of this set.
      * @param <T> type of the array
      */
@@ -227,7 +227,7 @@ public class DelegatingSet<E>
      *         element.
      *
      * @throws UnsupportedOperationException if the <tt>add</tt> method is not
-     * 	       supported by this set.
+     *         supported by this set.
      */
     public boolean add(
             E o )
@@ -241,7 +241,7 @@ public class DelegatingSet<E>
      * @param o object to be removed from this set, if present.
      * @return true if the set contained the specified element.
      * @throws ClassCastException if the type of the specified element
-     * 	       is incompatible with this set (optional).
+     *         is incompatible with this set (optional).
      */
     public boolean remove(
             Object o )
@@ -258,7 +258,7 @@ public class DelegatingSet<E>
      *
      * @param  c collection to be checked for containment in this set.
      * @return <tt>true</tt> if this set contains all of the elements of the
-     * 	       specified collection.
+     *         specified collection.
      */
     public boolean containsAll(
             Collection<?> c )
@@ -279,7 +279,7 @@ public class DelegatingSet<E>
      * @return <tt>true</tt> if this set changed as a result of the call.
      *
      * @throws UnsupportedOperationException if the <tt>addAll</tt> method is
-     * 		  not supported by this set.
+     *        not supported by this set.
      */
     public boolean addAll(
             Collection<? extends E> c )
@@ -295,7 +295,7 @@ public class DelegatingSet<E>
      * @return <tt>true</tt> if this collection changed as a result of the
      *         call.
      * @throws UnsupportedOperationException if the <tt>retainAll</tt> method
-     * 		  is not supported by this Collection.
+     *        is not supported by this Collection.
      */
     public boolean retainAll(
             Collection<?> c )
@@ -312,7 +312,7 @@ public class DelegatingSet<E>
      * @return <tt>true</tt> if this set changed as a result of the call.
      *
      * @throws UnsupportedOperationException if the <tt>removeAll</tt>
-     * 		  method is not supported by this Collection.
+     *        method is not supported by this Collection.
      */
     public boolean removeAll(
             Collection<?> c )
@@ -324,7 +324,7 @@ public class DelegatingSet<E>
      * Removes all of the elements from this set.
      *
      * @throws UnsupportedOperationException if the <tt>clear</tt> method
-     * 		  is not supported by this set.
+     *        is not supported by this set.
      */
     public void clear()
     {

@@ -138,9 +138,9 @@ public class MCachingHashMap<K,V>
      * @param key key with which the specified value is to be associated.
      * @param value value to be associated with the specified key.
      * @return previous value associated with specified key, or <tt>null</tt>
-     *	       if there was no mapping for key.  A <tt>null</tt> return can
-     *	       also indicate that the HashMap previously associated
-     *	       <tt>null</tt> with the specified key.
+     *         if there was no mapping for key.  A <tt>null</tt> return can
+     *         also indicate that the HashMap previously associated
+     *         <tt>null</tt> with the specified key.
      */
     @SuppressWarnings(value={"unchecked"})
     @Override
@@ -180,9 +180,9 @@ public class MCachingHashMap<K,V>
      *
      * @param  key key whose mapping is to be removed from the map.
      * @return previous value associated with specified key, or <tt>null</tt>
-     *	       if there was no mapping for key.  A <tt>null</tt> return can
-     *	       also indicate that the map previously associated <tt>null</tt>
-     *	       with the specified key.
+     *         if there was no mapping for key.  A <tt>null</tt> return can
+     *         also indicate that the map previously associated <tt>null</tt>
+     *         with the specified key.
      */
     @SuppressWarnings(value={"unchecked"})
     @Override

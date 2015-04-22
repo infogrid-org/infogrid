@@ -399,12 +399,12 @@ public class SubsettingCursorIterator<E>
      * iterator (optional operation). This is the same as the current element.
      *
      * @throws UnsupportedOperationException if the <tt>remove</tt>
-     *		  operation is not supported by this Iterator.
+     *        operation is not supported by this Iterator.
 
      * @throws IllegalStateException if the <tt>next</tt> method has not
-     *		  yet been called, or the <tt>remove</tt> method has already
-     *		  been called after the last call to the <tt>next</tt>
-     *		  method.
+     *        yet been called, or the <tt>remove</tt> method has already
+     *        been called after the last call to the <tt>next</tt>
+     *        method.
      */
     @Override
     public void remove()
