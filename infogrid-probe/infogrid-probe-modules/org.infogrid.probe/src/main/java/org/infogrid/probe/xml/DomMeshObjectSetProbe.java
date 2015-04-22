@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2010 by R-Objects Inc. dba NetMesh Inc., Johannes Ernst
+// Copyright 1998-2015 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -69,7 +69,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * The NetMesh Xml Probe.
+ * The InfoGrid Xml Probe.
  */
 public class DomMeshObjectSetProbe
         implements
