@@ -14,10 +14,6 @@
     </parent>
 
     <modules>
-        <module>org.infogrid.comm.pingpong.test</module>
-        <module>org.infogrid.comm.smtp.test</module>
-        <module>org.infogrid.httpd.test</module>
         <module>org.infogrid.testharness</module>
-        <module>org.infogrid.util.test</module>
     </modules>
 </project>

@@ -50,6 +50,7 @@ import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.logging.ToStringDumperFactory;
+import org.junit.Assert;
 
 /**
  * An abstract superclass for tests. It provides a bunch of generic test
@@ -115,48 +116,18 @@ public abstract class AbstractTest
     }
 
     /**
-     * Run the test.
-     *
-     * @throws Throwable thrown if an Exception occurred during the test
-     */
-    public abstract void run()
-        throws
-            Throwable;
-
-    /**
-     * Clean up after test. Subclasses often override this.
-     */
-    public void cleanup()
-    {
-    }
-
-    /**
      * Report error if the arguments are not equal.
      *
      * @param one first argument to compare
      * @param two second argument to compare
      * @param msg message to print when arguments aren't equal
-     * @return true if check passed
      */
-    public final boolean checkEquals(
+    public final void checkEquals(
             Object one,
             Object two,
             String msg )
     {
-        if( one == null ) {
-            if( two == null ) {
-                return true;
-            } else {
-                reportError( msg, one, two );
-                return false;
-            }
-        }
-        if( one.equals( two )) {
-            return true;
-        } else {
-            reportError( msg, one, two );
-            return false;
-        }
+        Assert.assertEquals( msg, one, two );
     }
 
     /**
@@ -165,27 +136,13 @@ public abstract class AbstractTest
      * @param one first argument to compare
      * @param two second argument to compare
      * @param msg message to print when arguments are equal
-     * @return true if check passed
      */
-    public final boolean checkNotEquals(
+    public final void checkNotEquals(
             Object one,
             Object two,
             String msg )
     {
-        if( one == null ) {
-            if( two != null ) {
-                return true;
-            } else {
-                reportError( msg, one, two );
-                return false;
-            }
-        }
-        if( !one.equals( two )) {
-            return true;
-        } else {
-            reportError( msg, one, two );
-            return false;
-        }
+        Assert.assertNotEquals( msg, one, two );
     }
 
     /**
@@ -194,18 +151,13 @@ public abstract class AbstractTest
      * @param one first argument to compare
      * @param two second argument to compare
      * @param msg message to print when arguments aren't equal
-     * @return true if check passed
      */
-    public final boolean checkEquals(
+    public final void checkEquals(
             boolean one,
             boolean two,
             String msg )
     {
-        if( one != two ) {
-            reportError( msg, one, two );
-            return false;
-        }
-        return true;
+        Assert.assertEquals( msg, one, two );
     }
 
     /**
@@ -214,18 +166,13 @@ public abstract class AbstractTest
      * @param one first argument to compare
      * @param two second argument to compare
      * @param msg message to print when arguments are equal
-     * @return true if check passed
      */
-    public final boolean checkNotEquals(
+    public final void checkNotEquals(
             boolean one,
             boolean two,
             String msg )
     {
-        if( one == two ) {
-            reportError( msg, one, two );
-            return false;
-        }
-        return true;
+        Assert.assertNotEquals( msg, one, two);
     }
 
     /**
@@ -234,18 +181,13 @@ public abstract class AbstractTest
      * @param one first argument to compare
      * @param two second argument to compare
      * @param msg message to print when arguments aren't equal
-     * @return true if check passed
      */
-    public final boolean checkEquals(
+    public final void checkEquals(
             long   one,
             long   two,
             String msg )
     {
-        if( one != two ) {
-            reportError( msg, one, two );
-            return false;
-        }
-        return true;
+        Assert.assertEquals( msg, one, two );
     }
 
     /**
@@ -254,50 +196,13 @@ public abstract class AbstractTest
      * @param one first argument to compare
      * @param two second argument to compare
      * @param msg message to print when arguments aren't equal
-     * @return true if check passed
      */
-    public final boolean checkEqualByteArrays(
+    public final void checkEqualByteArrays(
             byte [] one,
             byte [] two,
             String msg )
     {
-        if( one == null ) {
-            if( two != null ) {
-                reportError( msg, one, two );
-                return false;
-            } else {
-                return true;
-            }
-        } else if( two == null ) {
-            reportError( msg, one, two );
-            return false;
-        } else {
-            int min = Math.min( one.length, two.length );
-            for( int i=0 ; i<min ; ++i ) {
-                if( one[i] != two[i] ) {
-                    if( one.length != two.length ) {
-                        reportError(
-                                msg,
-                                "byte arrays differ in length ("
-                                + one.length
-                                + " vs. "
-                                + two.length
-                                + ") and also at index " + i + ": " + Integer.toHexString( one[i] ) + " vs. " + Integer.toHexString( two[i] ));
-                    } else {
-                        reportError( msg, "byte arrays of same length differ at index " + i + ": " + Integer.toHexString( one[i] ) + " vs. " + Integer.toHexString( two[i] ));
-                    }
-                    return false;
-                }
-            }
-            if( one.length > two.length ) {
-                reportError( msg, "first byte[] longer than second (but a subset)" );
-                return false;
-            } else if( one.length < two.length ) {
-                reportError( msg, "first byte[] shorter than second (but a subset)" );
-                return false;
-            }
-        }
-        return true;
+        Assert.assertArrayEquals( msg, one, two );
     }
 
     /**
@@ -306,18 +211,13 @@ public abstract class AbstractTest
      * @param one first argument to compare
      * @param two second argument to compare
      * @param msg message to print when arguments are equal
-     * @return true if check passed
      */
-    public final boolean checkNotEquals(
+    public final void checkNotEquals(
             long   one,
             long   two,
             String msg )
     {
-        if( one == two ) {
-            reportError( msg, one, two );
-            return false;
-        }
-        return true;
+        Assert.assertNotEquals( msg, one, two );
     }
 
     /**
@@ -326,36 +226,13 @@ public abstract class AbstractTest
      * @param one first argument to compare
      * @param two second argument to compare
      * @param msg message to print when arguments aren't equal
-     * @return true if check passed
      */
-    public final boolean checkEqualsInSequence(
+    public final void checkEqualsInSequence(
             Object [] one,
             Object [] two,
             String    msg )
     {
-        boolean ret = true;
-
-        int length = one.length;
-        if( length != two.length ) {
-            ret = false;
-            reportError( msg, "different length: " + one.length + " vs. " + two.length );
-            if( length > two.length ) {
-                length = two.length;
-            }
-        }
-
-        for( int i=0 ; i<length ; ++i ) {
-            if( one[i] == null ) {
-                if( two[i] != null ) {
-                    ret = false;
-                    reportError( msg, "element at index " + i + " is different", one[i], two[i] );
-                }
-            } else if( !one[i].equals( two[i] )) {
-                ret = false;
-                reportError( msg, "element at index " + i + " is different", one[i], two[i] );
-            }
-        }
-        return ret;
+        Assert.assertArrayEquals( msg, one, two );
     }
 
     /**
@@ -432,19 +309,13 @@ public abstract class AbstractTest
      * @param one first argument to compare
      * @param two second argument to compare
      * @param msg message to print when arguments aren't identical
-     * @return true if check passed
      */
-    public final boolean checkIdentity(
+    public final void checkIdentity(
             Object one,
             Object two,
             String msg )
     {
-        if( one != two ) {
-            reportError( msg, one, two );
-            return false;
-        }
-
-        return true;
+        Assert.assertSame( msg, one, two );
     }
 
     /**
@@ -510,18 +381,12 @@ public abstract class AbstractTest
      *
      * @param one the object to test
      * @param msg message to print when the argument is null
-     * @return true if check passed
      */
-    public final boolean checkObject(
+    public final void checkObject(
             Object one,
             String msg )
     {
-        if( one == null ) {
-            reportError( msg );
-            return false;
-        }
-
-        return true;
+        Assert.assertNotNull( msg, one );
     }
 
     /**
@@ -529,18 +394,12 @@ public abstract class AbstractTest
      *
      * @param one the object to test
      * @param msg message to print when the argument is not null
-     * @return true if check passed
      */
-    public final boolean checkNotObject(
+    public final void checkNotObject(
             Object one,
             String msg )
     {
-        if( one != null ) {
-            reportError( msg, one );
-            return false;
-        }
-
-        return true;
+        Assert.assertNull( msg, one );
     }
 
     /**
@@ -572,16 +431,12 @@ public abstract class AbstractTest
      *
      * @param condition the condition
      * @param msg message to print when the condition is false
-     * @return true if check passed
      */
-    public final boolean checkCondition(
+    public final void checkCondition(
             boolean condition,
             String  msg )
     {
-        if( ! condition ) {
-            reportError( msg );
-        }
-        return condition;
+        Assert.assertTrue( msg, condition );
     }
 
     /**
@@ -589,20 +444,15 @@ public abstract class AbstractTest
      *
      * @param condition the condition
      * @param msg message to print when the condition is false
-     * @return true if check passed
      */
-    public final boolean checkCondition(
+    public final void checkCondition(
             Boolean condition,
             String  msg )
     {
-        if( condition == null ) {
-            reportError( msg, condition );
-            return false;
-
-        } else if( ! condition ) {
-            reportError( msg );
+        Assert.assertNotNull( msg, condition );
+        if( condition != null ) {
+            Assert.assertTrue( msg, condition );
         }
-        return condition;
     }
 
     /**
