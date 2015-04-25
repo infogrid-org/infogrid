@@ -9,8 +9,17 @@
     <url>http://infogrid.org/</url>
 
     <modules>
-        <module>infogrid-utils-modules</module>
-        <module>infogrid-utils-tests</module>
+        <module>org.infogrid.comm</module>
+        <module>org.infogrid.comm.pingpong</module>
+        <module>org.infogrid.comm.smtp</module>
+        <module>org.infogrid.crypto</module>
+        <module>org.infogrid.httpd</module>
+        <module>org.infogrid.httpd.filesystem</module>
+        <module>org.infogrid.testharness</module>
+        <module>org.infogrid.util</module>
+        <module>org.infogrid.util.instrument</module>
+        <module>org.infogrid.util.logging.log4j</module>
+        <module>org.infogrid.util.sql</module>
     </modules>
 
     <build>
