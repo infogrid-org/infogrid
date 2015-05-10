@@ -15,6 +15,7 @@
 package org.infogrid.httpd.test;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
@@ -28,13 +29,29 @@ import org.infogrid.httpd.HttpResponse;
 import org.infogrid.httpd.HttpResponseFactory;
 import org.infogrid.httpd.server.HttpServer;
 import org.infogrid.util.logging.Log;
+import org.infogrid.util.logging.log4j.Log4jLog;
+import org.infogrid.util.logging.log4j.Log4jLogFactory;
+import org.junit.BeforeClass;
 
 /**
  * Common functionality for all HTTP tests.
  */
 public abstract class AbstractHttpdTest
 {
-    @Before
+    /**
+     * Initialize logging.
+     */
+    @BeforeClass
+    public static final void beforeClass()
+        throws
+            IOException
+    {
+        Log4jLog.configure( "org/infogrid/httpd/test/Log.properties", AbstractHttpdTest.class.getClassLoader() );
+        Log.setLogFactory( new Log4jLogFactory());
+    }
+
+
+   @Before
     public void setup()
         throws
             Exception

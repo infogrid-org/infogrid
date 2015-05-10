@@ -14,6 +14,7 @@
 
 package org.infogrid.comm.pingpong.test;
 
+import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
@@ -21,12 +22,27 @@ import org.infogrid.util.NamedThreadFactory;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
+import org.infogrid.util.logging.log4j.Log4jLog;
+import org.infogrid.util.logging.log4j.Log4jLogFactory;
+import org.junit.BeforeClass;
 
 /**
  * Factors out functionality common to ping-pong tests.
  */
 public abstract class AbstractPingPongTest
 {
+    /**
+     * Initialize logging.
+     */
+    @BeforeClass
+    public static final void beforeClass()
+        throws
+            IOException
+    {
+        Log4jLog.configure( "org/infogrid/comm/pingpong/test/Log.properties", AbstractPingPongTest.class.getClassLoader() );
+        Log.setLogFactory( new Log4jLogFactory());
+    }
+
     /**
      * This starts a relative timer.
      * 

@@ -14,6 +14,10 @@
 
 package org.infogrid.util.logging.log4j;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -32,6 +36,46 @@ public class Log4jLog
     extends
         Log
 {
+    /**
+     * Convenience method to configure the log with the file containing the properties.
+     * 
+     * @param f the file
+     * @throws IOException thrown if the file cannot be read
+     */
+    public static void configure(
+            File f )
+        throws
+            IOException
+    {
+        if( f.canRead() ) {
+            throw new IOException( "Cannot read Log4j configuration file: " + f.getAbsolutePath() );
+        }
+
+        Properties logProperties = new Properties();
+        logProperties.load( new BufferedInputStream( new FileInputStream( f )));
+
+        configure( logProperties );
+    }
+
+    /**
+     * Convenience method to configure the log with a resource relative to a ClassLoader containing the properties.
+     * 
+     * @param r the resource
+     * @param l the ClassLoader to load the resource with
+     * @throws IOException thrown if the resource cannot be loaded
+     */
+    public static void configure(
+            String      r,
+            ClassLoader l )
+        throws
+            IOException
+    {
+        Properties logProperties = new Properties();
+        logProperties.load( new BufferedInputStream( l.getResourceAsStream( r )));
+
+        configure( logProperties );
+    }
+
     /**
      * This method allows us to configure the log with a set of properties.
      *
