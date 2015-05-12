@@ -7,8 +7,28 @@
     <packaging>pom</packaging>
     <name>infogrid-stores</name>
     <url>http://infogrid.org/</url>
+
     <modules>
-        <module>infogrid-stores-modules</module>
-        <module>infogrid-stores-tests</module>
+        <module>org.infogrid.store</module>
+        <module>org.infogrid.store.filesystem</module>
+        <module>org.infogrid.store.keystore</module>
+        <module>org.infogrid.store.sql</module>
+        <module>org.infogrid.store.sql.mysql</module>
+        <module>org.infogrid.store.sql.postgresql</module>
     </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test*.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
