@@ -50,8 +50,7 @@ public abstract class AbstractHttpdTest
         Log.setLogFactory( new Log4jLogFactory());
     }
 
-
-   @Before
+    @Before
     public void setup()
         throws
             Exception
