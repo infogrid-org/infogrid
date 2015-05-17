@@ -6,3 +6,4 @@ genfiles.properties
 private.properties
 target/
 generated/
+nbproject/

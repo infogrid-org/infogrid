@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
-    <artifactId>org.infogrid.lid.model.yadis</artifactId>
+    <artifactId>org.infogrid.lid.openid</artifactId>
     <packaging>jar</packaging>
-    <name>org.infogrid.lid.model.yadis</name>
+    <name>org.infogrid.lid.openid</name>
     <url>http://infogrid.org/</url>
 
     <parent>
         <groupId>org.infogrid</groupId>
-        <artifactId>infogrid-lid-modules</artifactId>
+        <artifactId>infogrid-lid</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
 
@@ -21,8 +21,24 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>org.infogrid.model.Web</artifactId>
+            <artifactId>org.infogrid.lid</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>org.infogrid.crypto</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
         </dependency>
     </dependencies>
 
@@ -31,17 +47,4 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>
