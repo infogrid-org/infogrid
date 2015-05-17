@@ -7,8 +7,18 @@
     <packaging>pom</packaging>
     <name>infogrid-model-library</name>
     <url>http://infogrid.org/</url>
+
     <modules>
-        <module>infogrid-model-library-modules</module>
+        <module>org.infogrid.model.Annotation</module>
+        <module>org.infogrid.model.Blob</module>
+        <module>org.infogrid.model.Bookmark</module>
+        <module>org.infogrid.model.Common</module>
+        <module>org.infogrid.model.Feeds</module>
+        <module>org.infogrid.model.Requirement</module>
+        <module>org.infogrid.model.Tagging</module>
+        <module>org.infogrid.model.VCard</module>
+        <module>org.infogrid.model.Web</module>
+        <module>org.infogrid.model.Wiki</module>
     </modules>
 
     <build>
@@ -39,7 +49,7 @@
                             <argument>${env.HOME}/.m2/repository/org/infogrid</argument>
                             <argument>${basedir}/infogrid-models/model.xml</argument>
                             <argument>-o</argument>
-                            <argument>${basedir}/src/generated</argument>
+                            <argument>${basedir}/target/infogrid-generated</argument>
                         </arguments>
                     </configuration>
                 </plugin>
@@ -56,7 +66,7 @@
                             </goals>
                             <configuration>
                                 <sources>
-                                    <source>${basedir}/src/generated</source>
+                                    <source>${basedir}/target/infogrid-generated</source>
                                 </sources>
                             </configuration>
                         </execution>
