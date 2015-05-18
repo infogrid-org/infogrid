@@ -7,12 +7,37 @@
     <packaging>pom</packaging>
     <name>infogrid-graphdb-grid</name>
     <url>http://infogrid.org/</url>
+
     <modules>
-        <module>infogrid-graphdb-grid-modules</module>
-        <module>infogrid-graphdb-grid-tests</module>
+        <module>org.infogrid.kernel.net</module>
+        <module>org.infogrid.meshbase.store.net</module>
+        <module>org.infogrid.scene</module>
     </modules>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test*.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -21,31 +46,20 @@
                     <version>1.4.0</version>
                     <executions>
                         <execution>
-                            <phase>generate-sources</phase>
+                            <id>copy-pom</id>
+                            <phase>test-compile</phase>
                             <goals>
                                 <goal>exec</goal>
                             </goals>
+                            <configuration>
+                                <executable>bash</executable>
+                                <arguments>
+                                    <argument>-c</argument>
+                                    <argument>mkdir -p ${project.build.directory}/test-classes/META-INF/maven; cp ${project.basedir}/pom.xml ${project.build.directory}/test-classes/META-INF/maven/this-pom.xml</argument>
+                                </arguments>
+                            </configuration>
                         </execution>
                     </executions>
-                    <configuration>
-                        <executable>java</executable>
-                        <mainClass>org.infogrid.module.commandline.CommandlineBootLoader</mainClass>
-                        <additionalClasspathElements>
-                            <additionalClasspathElement>${env.HOME}/.m2/repository/org/infogrid/org.infogrid.module.commandline/3.0-SNAPSHOT/org.infogrid.module.commandline-3.0-SNAPSHOT.jar</additionalClasspathElement>
-                            <additionalClasspathElement>${env.HOME}/.m2/repository/org/infogrid/org.infogrid.module/3.0-SNAPSHOT/org.infogrid.module-3.0-SNAPSHOT.jar</additionalClasspathElement>
-                        </additionalClasspathElements>
-                        <arguments>
-                            <argument>-jar</argument>
-                            <argument>${env.HOME}/.m2/repository/org/infogrid/org.infogrid.module.commandline/${project.version}/org.infogrid.module.commandline-${project.version}-jar-with-dependencies.jar</argument>
-                            <argument>--rootmodule</argument>
-                            <argument>org.infogrid.codegen</argument>
-                            <argument>--moduledirectory</argument>
-                            <argument>${env.HOME}/.m2/repository/org/infogrid</argument>
-                            <argument>${basedir}/infogrid-models/model.xml</argument>
-                            <argument>-o</argument>
-                            <argument>${basedir}/src/generated</argument>
-                        </arguments>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -60,22 +74,11 @@
                             </goals>
                             <configuration>
                                 <sources>
-                                    <source>${basedir}/src/generated</source>
+                                    <source>${basedir}/target/infogrid-generated</source>
                                 </sources>
                             </configuration>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-clean-plugin</artifactId>
-                    <version>2.6.1</version>
-                    <configuration>
-                        <filesets>
-                            <fileset>
-                                <directory>src/generated</directory>
-                            </fileset>
-                        </filesets>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
