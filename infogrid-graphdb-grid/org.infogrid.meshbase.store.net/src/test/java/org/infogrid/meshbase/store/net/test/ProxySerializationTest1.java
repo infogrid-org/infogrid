@@ -16,16 +16,14 @@ package org.infogrid.meshbase.store.net.test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
-import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObject;
-import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObjectFactory;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
-import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
-import org.infogrid.mesh.net.a.DefaultAnetMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.net.externalized.ExternalizedProxy;
 import org.infogrid.meshbase.net.externalized.xml.ExternalizedProxyXmlEncoder;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
@@ -39,17 +37,20 @@ import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeRemovedEvent;
 import org.infogrid.meshbase.net.xpriso.SimpleXprisoMessage;
 import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.meshbase.store.net.NetStoreMeshBase;
-import org.infogrid.modelbase.MeshTypeIdentifierFactory;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.modelbase.m.MMeshTypeIdentifierFactory;
-import org.infogrid.modelbase.m.MModelBase;
+import org.infogrid.modelbase.ModelBaseSingleton;
+import org.infogrid.module.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.store.m.MStore;
 import org.infogrid.testharness.AbstractTest;
+import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.context.SimpleContext;
 import org.infogrid.util.logging.Log;
+import org.infogrid.util.logging.log4j.Log4jLog;
+import org.infogrid.util.logging.log4j.Log4jLogFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -59,6 +60,33 @@ public class ProxySerializationTest1
         extends
             AbstractTest
 {
+    /**
+     * Initialize Module Framework, and initialize statics.
+     * 
+     * @throws Exception all sorts of things may go wrong in tests
+     */
+    @BeforeClass
+    public static void initialize()
+        throws
+            Exception
+    {
+        InClasspathModuleRegistry registry = InClasspathModuleRegistry.getSingleton();
+        registry.resolve( registry.getModuleMetaFor( "org.infogrid.kernel" )).activateRecursively();
+        registry.resolve( registry.getModuleMetaFor( "org.infogrid.model.Test" )).activateRecursively();
+
+        Log4jLog.configure( "org/infogrid/meshbase/store/net/test/Log.properties", AbstractStoreNetMeshBaseTest.class.getClassLoader() );
+        Log.setLogFactory( new Log4jLogFactory());
+        
+        ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
+                "org/infogrid/meshbase/store/net/test/ResourceHelper",
+                Locale.getDefault(),
+                AbstractStoreNetMeshBaseTest.class.getClassLoader() ));
+
+        theModelBase = ModelBaseSingleton.getSingleton();
+    
+        theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create();
+    }
+
     /**
      * Run the test.
      *
@@ -279,35 +307,13 @@ public class ProxySerializationTest1
     /**
      * ModelBase.
      */
-    protected static final ModelBase theModelBase = MModelBase.create();
+    protected static ModelBase theModelBase;
     
     /**
      * Factory for NetMeshBaseIdentifiers.
      */
-    protected static NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create();
+    protected static NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory;
     
-    /**
-     * An ExternalizedNetMeshObjectFactory for the test.
-     */
-    protected ParserFriendlyExternalizedNetMeshObjectFactory theExternalizedMeshObjectFactory
-            = new ParserFriendlyExternalizedNetMeshObjectFactory() {
-                    public ParserFriendlyExternalizedNetMeshObject createParserFriendlyExternalizedMeshObject() {
-                        return new ParserFriendlyExternalizedNetMeshObject();
-                    }
-            };
-    
-    /**
-     * A NetMeshObjectIdentifierFactory for the test.
-     */
-    protected NetMeshObjectIdentifierFactory theNetMeshObjectIdentifierFactory
-            = DefaultAnetMeshObjectIdentifierFactory.create( null, theMeshBaseIdentifierFactory );
-
-    /**
-     * A MeshTypeIdentifierFactory for the test.
-     */
-    protected MeshTypeIdentifierFactory theMeshTypeIdentifierFactory
-            = MMeshTypeIdentifierFactory.create();
-
     /**
      * NetMeshBase for the test.
      */

@@ -51,6 +51,12 @@ public class DefaultAnetMeshObjectIdentifierFactory
             NetMeshBaseIdentifier        meshBaseIdentifier,
             NetMeshBaseIdentifierFactory meshBaseIdentifierFactory )
     {
+        if( meshBaseIdentifier == null ) {
+            throw new NullPointerException( "Null NetMeshBaseIdentifier" );
+        }
+        if( meshBaseIdentifierFactory == null ) {
+            throw new NullPointerException( "Null NetMeshBaseIdentifierFactory" );
+        }
         UniqueStringGenerator generator = UniqueStringGenerator.create( DEFAULT_ID_LENGTH );
 
         DefaultAnetMeshObjectIdentifierFactory ret
@@ -71,6 +77,15 @@ public class DefaultAnetMeshObjectIdentifierFactory
             NetMeshBaseIdentifier        meshBaseIdentifier,
             NetMeshBaseIdentifierFactory meshBaseIdentifierFactory )
     {
+        if( generator == null ) {
+            throw new NullPointerException( "Null UniqueStringGenerator" );
+        }
+        if( meshBaseIdentifier == null ) {
+            throw new NullPointerException( "Null NetMeshBaseIdentifier" );
+        }
+        if( meshBaseIdentifierFactory == null ) {
+            throw new NullPointerException( "Null NetMeshBaseIdentifierFactory" );
+        }
         DefaultAnetMeshObjectIdentifierFactory ret
                 = new DefaultAnetMeshObjectIdentifierFactory( generator, meshBaseIdentifier, meshBaseIdentifierFactory );
         return ret;
@@ -146,6 +161,7 @@ public class DefaultAnetMeshObjectIdentifierFactory
      * @return the created DefaultAnetMeshObjectIdentifier
      * @throws ParseException a parsing error occurred
      */
+    @Override
     public DefaultAnetMeshObjectIdentifier fromExternalForm(
             NetMeshBaseIdentifier contextIdentifier,
             String                raw )
