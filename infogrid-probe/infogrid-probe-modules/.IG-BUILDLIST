@@ -1,8 +1,0 @@
-org.infogrid.model.Probe
-org.infogrid.probe
-org.infogrid.probe.store
-org.infogrid.probe.feeds
-org.infogrid.probe.vcard
-org.infogrid.probe.xrd
-org.infogrid.net.local
-org.infogrid.net.local.store
