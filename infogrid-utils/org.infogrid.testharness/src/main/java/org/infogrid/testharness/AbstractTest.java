@@ -127,7 +127,7 @@ public abstract class AbstractTest
             Object two,
             String msg )
     {
-        Assert.assertEquals( msg, one, two );
+        Assert.assertEquals( msg, two, one );
     }
 
     /**
@@ -142,7 +142,7 @@ public abstract class AbstractTest
             Object two,
             String msg )
     {
-        Assert.assertNotEquals( msg, one, two );
+        Assert.assertNotEquals( msg, two, one );
     }
 
     /**
@@ -155,9 +155,9 @@ public abstract class AbstractTest
     public final void checkEquals(
             boolean one,
             boolean two,
-            String msg )
+            String  msg )
     {
-        Assert.assertEquals( msg, one, two );
+        Assert.assertEquals( msg, two, one );
     }
 
     /**
@@ -170,9 +170,9 @@ public abstract class AbstractTest
     public final void checkNotEquals(
             boolean one,
             boolean two,
-            String msg )
+            String  msg )
     {
-        Assert.assertNotEquals( msg, one, two);
+        Assert.assertNotEquals( msg, two, one );
     }
 
     /**
@@ -187,7 +187,7 @@ public abstract class AbstractTest
             long   two,
             String msg )
     {
-        Assert.assertEquals( msg, one, two );
+        Assert.assertEquals( msg, two, one );
     }
 
     /**
@@ -202,7 +202,7 @@ public abstract class AbstractTest
             byte [] two,
             String msg )
     {
-        Assert.assertArrayEquals( msg, one, two );
+        Assert.assertArrayEquals( msg, two, one );
     }
 
     /**
@@ -217,7 +217,7 @@ public abstract class AbstractTest
             long   two,
             String msg )
     {
-        Assert.assertNotEquals( msg, one, two );
+        Assert.assertNotEquals( msg, two, one );
     }
 
     /**
@@ -232,7 +232,7 @@ public abstract class AbstractTest
             Object [] two,
             String    msg )
     {
-        Assert.assertArrayEquals( msg, one, two );
+        Assert.assertArrayEquals( msg, two, one );
     }
 
     /**
@@ -252,11 +252,11 @@ public abstract class AbstractTest
 
         if( one == null ) {
             if( two != null ) {
-                reportError( msg, one, two );
+                reportError( msg, two, one );
                 ret = false;
             }
         } else if( two == null ) {
-            reportError( msg, one, two );
+            reportError( msg, two, one );
             ret = false;
         } else {
             int length = one.size();
@@ -298,7 +298,7 @@ public abstract class AbstractTest
     {
         boolean ret = ArrayHelper.hasSameContentOutOfOrder( one, two, true );
         if( !ret ) {
-            reportError( msg, one, two );
+            reportError( msg, two, one );
         }
         return ret;
     }
@@ -315,7 +315,7 @@ public abstract class AbstractTest
             Object two,
             String msg )
     {
-        Assert.assertSame( msg, one, two );
+        Assert.assertSame( msg, two, one );
     }
 
     /**
@@ -854,6 +854,7 @@ public abstract class AbstractTest
             } else {
                 getLog().error( buf.toString() );
             }
+            Assert.fail( buf.toString() );
         }
         ++errorCount;
         return false;
@@ -1007,7 +1008,7 @@ public abstract class AbstractTest
             String   file )
     {
         StringBuilder ret = new StringBuilder();
-        ret.append( "src/" );
+        ret.append( "src/test/resources/" );
 
         String name = testClass.getName();
         String packageName = name.substring( 0, name.lastIndexOf( '.' ));
