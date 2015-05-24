@@ -8,7 +8,7 @@
 
     <parent>
         <groupId>org.infogrid</groupId>
-        <artifactId>infogrid-stores-modules</artifactId>
+        <artifactId>infogrid-stores</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
 
