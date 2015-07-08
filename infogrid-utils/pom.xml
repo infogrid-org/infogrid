@@ -35,5 +35,32 @@
                 </configuration>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>net.ubos</groupId>
+                    <artifactId>pacman-pkg-maven-plugin</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>pacmanpkg</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <makepkg>true</makepkg>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <diet4j.version>0.7</diet4j.version>
+    </properties>
 </project>
