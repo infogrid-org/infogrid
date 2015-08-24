@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
     <artifactId>infogrid-model-library</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>2.9.6</version>
     <packaging>pom</packaging>
     <name>infogrid-model-library</name>
     <url>http://infogrid.org/</url>
@@ -37,16 +37,9 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <executable>java</executable>
-                        <mainClass>org.infogrid.module.commandline.CommandlineBootLoader</mainClass>
+                        <executable>diet4j</executable>
                         <arguments>
-                            <argument>-classpath</argument>
-                            <argument>${env.HOME}/.m2/repository/org/infogrid/org.infogrid.module/3.0-SNAPSHOT/org.infogrid.module-3.0-SNAPSHOT.jar:${env.HOME}/.m2/repository/org/infogrid/org.infogrid.module.commandline/${project.version}/org.infogrid.module.commandline-${project.version}.jar</argument>
-                            <argument>org.infogrid.module.commandline.CommandlineBootLoader</argument>
-                            <argument>--rootmodule</argument>
-                            <argument>org.infogrid.codegen</argument>
-                            <argument>--moduledirectory</argument>
-                            <argument>${env.HOME}/.m2/repository/org/infogrid</argument>
+                            <argument>org.infogrid:org.infogrid.codegen:${project.version}</argument>
                             <argument>${basedir}/infogrid-models/model.xml</argument>
                             <argument>-o</argument>
                             <argument>${basedir}/target/infogrid-generated</argument>
@@ -86,4 +79,11 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <diet4j.version>0.7</diet4j.version>
+    </properties>
 </project>
