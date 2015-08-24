@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import org.diet4j.core.ModuleRequirement;
+import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
@@ -39,7 +41,6 @@ import org.infogrid.meshbase.net.xpriso.XprisoMessage;
 import org.infogrid.meshbase.store.net.NetStoreMeshBase;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
-import org.infogrid.module.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.store.m.MStore;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.ResourceHelper;
@@ -71,8 +72,8 @@ public class ProxySerializationTest1
             Exception
     {
         InClasspathModuleRegistry registry = InClasspathModuleRegistry.getSingleton();
-        registry.resolve( registry.getModuleMetaFor( "org.infogrid.kernel" )).activateRecursively();
-        registry.resolve( registry.getModuleMetaFor( "org.infogrid.model.Test" )).activateRecursively();
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.kernel" ))).activateRecursively();
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.model.Test" ))).activateRecursively();
 
         Log4jLog.configure( "org/infogrid/meshbase/store/net/test/Log.properties", AbstractStoreNetMeshBaseTest.class.getClassLoader() );
         Log.setLogFactory( new Log4jLogFactory());

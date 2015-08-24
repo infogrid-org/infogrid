@@ -17,11 +17,12 @@ package org.infogrid.kernel.net.test.xpriso;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
+import org.diet4j.core.ModuleRequirement;
+import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
-import org.infogrid.mesh.set.MeshObjectSelector;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBase;
@@ -39,7 +40,6 @@ import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
-import org.infogrid.module.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.context.Context;
@@ -67,17 +67,18 @@ public abstract class AbstractXprisoTest
         throws
             Exception
     {
-        InClasspathModuleRegistry registry = InClasspathModuleRegistry.getSingleton();
-        registry.resolve( registry.getModuleMetaFor( "org.infogrid.kernel" )).activateRecursively();
-        registry.resolve( registry.getModuleMetaFor( "org.infogrid.model.Test" )).activateRecursively();
+        ClassLoader cl = AbstractXprisoTest.class.getClassLoader();
+        InClasspathModuleRegistry registry = InClasspathModuleRegistry.instantiate( cl );
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.kernel" ))).activateRecursively();
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.model.Test" ))).activateRecursively();
 
-        Log4jLog.configure( "org/infogrid/kernel/net/test/xpriso/Log.properties", AbstractXprisoTest.class.getClassLoader() );
+        Log4jLog.configure( "org/infogrid/kernel/net/test/xpriso/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
         
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/kernel/net/test/xpriso/ResourceHelper",
                 Locale.getDefault(),
-                AbstractXprisoTest.class.getClassLoader() ));
+                cl ));
     }
 
     /**
@@ -160,13 +161,8 @@ public abstract class AbstractXprisoTest
         checkEqualsOutOfSequence( oneNeighbors.getMeshObjects(), twoNeighbors.getMeshObjects(), msg + " not the same neighbors for " + one.getIdentifier() );
 
         for( final MeshObject currentOne : oneNeighbors ) {
-            MeshObject currentTwo = twoNeighbors.find( new MeshObjectSelector() {
-                public boolean accepts(
-                        MeshObject candidate )
-                {
-                    return currentOne.getIdentifier().equals( candidate.getIdentifier() );
-                }
-            });
+            MeshObject currentTwo = twoNeighbors.find(
+                    ( MeshObject candidate ) -> currentOne.getIdentifier().equals( candidate.getIdentifier() ));
             
             RoleType [] relatedOne = one.getRoleTypes( currentOne );
             RoleType [] relatedTwo = two.getRoleTypes( currentTwo );
