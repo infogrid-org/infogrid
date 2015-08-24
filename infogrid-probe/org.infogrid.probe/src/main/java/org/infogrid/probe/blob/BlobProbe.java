@@ -32,9 +32,7 @@ import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.Blob.BlobSubjectArea;
-import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.primitives.StringValue;
-import org.infogrid.module.ModuleException;
 import org.infogrid.probe.NonXmlStreamProbe;
 import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;
@@ -89,7 +87,6 @@ public class BlobProbe
      * @throws MeshObjectIdentifierNotUniqueException thrown if the Probe developer incorrectly
      *         assigned duplicate MeshObjectsIdentifiers to created MeshObjects.
      *         Throwing this typically indicates a programming error.
-     * @throws ModuleException thrown if a Module required by the Probe could not be loaded
      * @throws NotPermittedException thrown if an operation performed by the Probe was not permitted
      * @throws NotRelatedException thrown if a relationship was supposed to become blessed, but the relationship
      *         did not exist. Throwing this typically indicates a programming error.
@@ -115,7 +112,6 @@ public class BlobProbe
             IOException,
             IsAbstractException,
             MeshObjectIdentifierNotUniqueException,
-            ModuleException,
             NotPermittedException,
             NotRelatedException,
             ProbeException,

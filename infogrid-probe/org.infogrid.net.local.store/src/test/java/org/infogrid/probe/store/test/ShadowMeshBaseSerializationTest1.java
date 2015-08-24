@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import org.diet4j.core.ModuleRequirement;
+import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObject;
 import org.infogrid.mesh.net.externalized.ParserFriendlyExternalizedNetMeshObjectFactory;
@@ -36,14 +38,11 @@ import org.infogrid.modelbase.MeshTypeIdentifierFactory;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.modelbase.m.MMeshTypeIdentifierFactory;
-import org.infogrid.modelbase.m.MModelBase;
-import org.infogrid.module.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.probe.httpmapping.TraditionalInfoGridHttpMappingPolicy;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowMeshBase;
 import org.infogrid.probe.shadow.externalized.xml.ExternalizedShadowMeshBaseXmlEncoder;
 import org.infogrid.probe.shadow.m.MShadowMeshBase;
-import static org.infogrid.probe.store.test.AbstractStoreProbeTest.theModelBase;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.context.Context;
@@ -74,7 +73,7 @@ public class ShadowMeshBaseSerializationTest1
             Exception
     {
         InClasspathModuleRegistry registry = InClasspathModuleRegistry.getSingleton();
-        registry.resolve( registry.getModuleMetaFor( "org.infogrid.probe.store" )).activateRecursively();
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.probe.store" ))).activateRecursively();
         
         Log4jLog.configure( "org/infogrid/probe/store/test/Log.properties", AbstractStoreProbeTest.class.getClassLoader() );
         Log.setLogFactory( new Log4jLogFactory());

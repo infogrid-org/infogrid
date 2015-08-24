@@ -14,12 +14,10 @@
 
 package org.infogrid.probe;
 
+import java.io.IOException;
+import org.diet4j.core.ModuleException;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.transaction.ChangeSet;
-
-import org.infogrid.module.ModuleException;
-
-import java.io.IOException;
 
 /**
  * <p>This interface is supported by all Probes that can both

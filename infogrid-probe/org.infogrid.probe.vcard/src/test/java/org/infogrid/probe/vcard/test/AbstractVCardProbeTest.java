@@ -17,12 +17,13 @@ package org.infogrid.probe.vcard.test;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.ScheduledExecutorService;
+import org.diet4j.core.ModuleRequirement;
+import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
-import org.infogrid.module.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.probe.ProbeDirectory.StreamProbeDescriptor;
 import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.manager.PassiveProbeManager;
@@ -58,8 +59,8 @@ public abstract class AbstractVCardProbeTest
             Exception
     {
         InClasspathModuleRegistry registry = InClasspathModuleRegistry.getSingleton();
-        registry.resolve( registry.getModuleMetaFor( "org.infogrid.probe.vcard" )).activateRecursively();
-        
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.probe.vcard" ))).activateRecursively();
+
         Log4jLog.configure( "org/infogrid/probe/vcard/test/Log.properties", AbstractVCardProbeTest.class.getClassLoader() );
         Log.setLogFactory( new Log4jLogFactory());
         

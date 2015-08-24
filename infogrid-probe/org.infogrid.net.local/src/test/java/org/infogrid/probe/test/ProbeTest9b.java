@@ -16,6 +16,7 @@ package org.infogrid.probe.test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import org.diet4j.core.ModuleException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
@@ -23,7 +24,6 @@ import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.transaction.TransactionException;
-import org.infogrid.module.ModuleException;
 import org.infogrid.probe.ApiProbe;
 import org.infogrid.probe.ProbeException;
 import org.infogrid.probe.StagingMeshBase;

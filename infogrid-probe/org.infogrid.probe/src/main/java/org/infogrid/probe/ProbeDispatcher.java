@@ -31,6 +31,14 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.diet4j.core.Module;
+import org.diet4j.core.ModuleActivationException;
+import org.diet4j.core.ModuleException;
+import org.diet4j.core.ModuleMeta;
+import org.diet4j.core.ModuleNotFoundException;
+import org.diet4j.core.ModuleRegistry;
+import org.diet4j.core.ModuleRequirement;
+import org.diet4j.core.ModuleResolutionException;
 import org.infogrid.lid.model.yadis.YadisSubjectArea;
 import org.infogrid.lid.yadis.YadisPipelineStage;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
@@ -66,17 +74,10 @@ import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.model.primitives.TimeStampValue;
-import org.infogrid.module.Module;
-import org.infogrid.module.ModuleCapability;
-import org.infogrid.module.ModuleException;
-import org.infogrid.module.ModuleNotFoundException;
-import org.infogrid.module.ModuleRegistry;
-import org.infogrid.module.ModuleResolutionException;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseEvent;
 import org.infogrid.probe.shadow.ShadowMeshBaseListener;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
-import org.infogrid.module.ModuleMeta;
 import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.shadow.m.MStagingMeshBase;
 import org.infogrid.probe.xml.DomMeshObjectSetProbe;
@@ -751,11 +752,13 @@ public class ProbeDispatcher
         String                 foundClassName   = null;
         Map<String,Object>     foundParameters  = null; // FIXME: currently not used
         ClassLoader            foundClassLoader = null;
+        ModuleRequirement      foundModuleReq   = null;
 
         if( desc1 != null ) {
             foundClass      = desc1.getProbeClass();
             foundClassName  = desc1.getProbeClassName();
             foundParameters = desc1.getParameters();
+            foundModuleReq  = desc1.getModuleRequirement();
 
             if( log.isDebugEnabled() ) {
                 log.debug( this + ": based on match, found name for Probe class: " + foundClassName );
@@ -768,6 +771,7 @@ public class ProbeDispatcher
                 foundClass      = desc2.getProbeClass();
                 foundClassName  = desc2.getProbeClassName();
                 foundParameters = desc2.getParameters();
+                foundModuleReq  = desc2.getModuleRequirement();
 
                 if( log.isDebugEnabled() ) {
                     log.debug( this + ": based on protocol, found name for Probe class: " + foundClassName );
@@ -777,23 +781,26 @@ public class ProbeDispatcher
 
         ApiProbe probe = null;
         if( foundClass == null && foundClassName != null ) {
-            if( theModuleRegistry != null ) {
+            if( theModuleRegistry != null && foundModuleReq != null ) {
                 // we take the first module that supports this interface/class
-                ModuleMeta [] candidates = theModuleRegistry.findModuleMetasForInterface( foundClassName, Integer.MAX_VALUE );
-                for( int i=0 ; i<candidates.length ; ++i ) {
-                    ModuleCapability [] caps = candidates[i].findCapabilitiesByInterface( foundClassName );
-                    if( caps != null && caps.length > 0 ) {
-                        try {
-                            Module foundModule = theModuleRegistry.resolve( candidates[i], true );
-                            foundClassLoader = foundModule.getClassLoader();
-                            break;
-                        } catch( ModuleResolutionException ex ) {
-                            log.warn( "Module could not be resolved for adv: " + candidates[i], ex );
-                        } catch( MalformedURLException ex ) {
-                            log.warn( "Module could not be resolved for adv: " + candidates[i], ex );
-                        } catch( ModuleNotFoundException ex ) {
-                            log.warn( "Module not found for adv: " + candidates[i], ex );
-                        }
+                ModuleMeta [] candidates = theModuleRegistry.determineResolutionCandidates( foundModuleReq );
+                if( candidates.length >= 1 ) {
+                    // if more than one, pick the most recent (i.e. first)
+                    if( candidates.length > 1 ) {
+                        log.info( "More than one Module found for ModuleRequirement", foundModuleReq, candidates );
+                    }
+                    try {
+                        Module foundModule = theModuleRegistry.resolve( candidates[0], true );
+                        foundModule.activateRecursively();
+                        foundClassLoader = foundModule.getClassLoader();
+                    } catch( ModuleResolutionException ex ) {
+                        log.warn( "Module could not be resolved for meta: " + candidates[0], ex );
+                    } catch( MalformedURLException ex ) {
+                        log.warn( "Module could not be resolved for meta: " + candidates[0], ex );
+                    } catch( ModuleNotFoundException ex ) {
+                        log.warn( "Module not found for meta: " + candidates[0], ex );
+                    } catch( ModuleActivationException ex ) {
+                        log.warn( "Module failed to activate for meta: " + candidates[0], ex );
                     }
                 }
             }
@@ -965,6 +972,7 @@ public class ProbeDispatcher
         Class<? extends Probe> foundClass       = null;
         ClassLoader            foundClassLoader = null;
         Map<String,Object>     foundParameters  = null; // FIXME not used
+        ModuleRequirement      foundModuleReq   = null;
 
         if( docType != null ) {
             if( MeshObjectSetProbeTags.MESHOBJECT_SET_TAG.equalsIgnoreCase( docType.getName() )) {
@@ -977,6 +985,7 @@ public class ProbeDispatcher
                 foundClass      = desc.getProbeClass();
                 foundClassName  = desc.getProbeClassName();
                 foundParameters = desc.getParameters();
+                foundModuleReq  = desc.getModuleRequirement();
 
                 if( log.isDebugEnabled() ) {
                     log.debug( this + ": based on doctype, found name for probe class: " + foundClassName );
@@ -990,6 +999,7 @@ public class ProbeDispatcher
                     foundClass      = desc.getProbeClass();
                     foundClassName  = desc.getProbeClassName();
                     foundParameters = desc.getParameters();
+                    foundModuleReq  = desc.getModuleRequirement();
 
                     if( log.isDebugEnabled() ) {
                         log.debug( this + ": based on tagtype, found name for probe class: " + foundClassName );
@@ -1008,21 +1018,26 @@ public class ProbeDispatcher
         }
 
         if( foundClass == null && foundClassName != null ) {
-            if( theModuleRegistry != null ) {
+            if( theModuleRegistry != null && foundModuleReq != null ) {
                 // we take the first module that supports this interface/class
-                ModuleMeta [] candidates = theModuleRegistry.findModuleMetasForInterface( foundClassName, Integer.MAX_VALUE );
-                for( int i=0 ; i<candidates.length ; ++i ) {
-                    ModuleCapability [] caps = candidates[i].findCapabilitiesByInterface( foundClassName );
-                    if( caps != null && caps.length > 0 ) {
-                        try {
-                            Module foundModule = theModuleRegistry.resolve( candidates[i], true );
-                            foundClassLoader = foundModule.getClassLoader();
-                            break;
-                        } catch( ModuleResolutionException ex ) {
-                            log.warn( "Module could not be resolved for adv: " + candidates[i], ex );
-                        } catch( ModuleNotFoundException ex ) {
-                            log.warn( "Module not found for adv: " + candidates[i], ex );
-                        }
+                ModuleMeta [] candidates = theModuleRegistry.determineResolutionCandidates( foundModuleReq );
+                if( candidates.length >= 1 ) {
+                    // if more than one, pick the most recent (i.e. first)
+                    if( candidates.length > 1 ) {
+                        log.info( "More than one Module found for ModuleRequirement", foundModuleReq, candidates );
+                    }
+                    try {
+                        Module foundModule = theModuleRegistry.resolve( candidates[0], true );
+                        foundModule.activateRecursively();
+                        foundClassLoader = foundModule.getClassLoader();
+                    } catch( ModuleResolutionException ex ) {
+                        log.warn( "Module could not be resolved for meta: " + candidates[0], ex );
+                    } catch( MalformedURLException ex ) {
+                        log.warn( "Module could not be resolved for meta: " + candidates[0], ex );
+                    } catch( ModuleNotFoundException ex ) {
+                        log.warn( "Module not found for meta: " + candidates[0], ex );
+                    } catch( ModuleActivationException ex ) {
+                        log.warn( "Module failed to activate for meta: " + candidates[0], ex );
                     }
                 }
             }
@@ -1154,6 +1169,7 @@ public class ProbeDispatcher
         String                 foundClassName   = null;
         ClassLoader            foundClassLoader = null;
         Map<String,Object>     foundParameters  = null; // FIXME what are they used for?
+        ModuleRequirement      foundModuleReq   = null;
         NetMeshBaseIdentifier  sourceIdentifier = theShadowMeshBase.getIdentifier();
 
         ProbeDirectory.StreamProbeDescriptor desc = theProbeDirectory.getStreamProbeDescriptorByMimeType( contentType );
@@ -1166,6 +1182,7 @@ public class ProbeDispatcher
             foundClass      = desc.getProbeClass();
             foundClassName  = desc.getProbeClassName();
             foundParameters = desc.getParameters();
+            foundModuleReq  = desc.getModuleRequirement();
 
             if( log.isDebugEnabled() ) {
                 log.debug( this + ": based on mime type, found name for probe class: " + foundClassName );
@@ -1173,24 +1190,26 @@ public class ProbeDispatcher
         }
 
         if( foundClass == null && foundClassName != null ) {
-            if( theModuleRegistry != null ) {
+            if( theModuleRegistry != null && foundModuleReq != null ) {
                 // we take the first module that supports this interface/class
-                ModuleMeta [] candidates = theModuleRegistry.findModuleMetasForInterface( foundClassName, Integer.MAX_VALUE );
-                for( int i=0 ; i<candidates.length ; ++i ) {
-                    ModuleCapability [] caps = candidates[i].findCapabilitiesByInterface( foundClassName );
-                    if( caps != null && caps.length > 0 ) {
-                        try {
-                            Module foundModule = theModuleRegistry.resolve( candidates[i], true );
-                            foundClassLoader = foundModule.getClassLoader();
-                            break;
-
-                        } catch( ModuleResolutionException ex ) {
-                            log.warn( "Module could not be resolved for adv: " + candidates[i], ex );
-                        } catch( MalformedURLException ex ) {
-                            log.warn( "Module could not be resolved for adv: " + candidates[i], ex );
-                        } catch( ModuleNotFoundException ex ) {
-                            log.warn( "Module not found for adv: " + candidates[i], ex );
-                        }
+                ModuleMeta [] candidates = theModuleRegistry.determineResolutionCandidates( foundModuleReq );
+                if( candidates.length >= 1 ) {
+                    // if more than one, pick the most recent (i.e. first)
+                    if( candidates.length > 1 ) {
+                        log.info( "More than one Module found for ModuleRequirement", foundModuleReq, candidates );
+                    }
+                    try {
+                        Module foundModule = theModuleRegistry.resolve( candidates[0], true );
+                        foundModule.activateRecursively();
+                        foundClassLoader = foundModule.getClassLoader();
+                    } catch( ModuleResolutionException ex ) {
+                        log.warn( "Module could not be resolved for meta: " + candidates[0], ex );
+                    } catch( MalformedURLException ex ) {
+                        log.warn( "Module could not be resolved for meta: " + candidates[0], ex );
+                    } catch( ModuleNotFoundException ex ) {
+                        log.warn( "Module not found for meta: " + candidates[0], ex );
+                    } catch( ModuleActivationException ex ) {
+                        log.warn( "Module failed to activate for meta: " + candidates[0], ex );
                     }
                 }
             }

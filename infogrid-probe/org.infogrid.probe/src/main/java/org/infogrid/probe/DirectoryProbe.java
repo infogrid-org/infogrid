@@ -14,15 +14,13 @@
 
 package org.infogrid.probe;
 
+import java.io.File;
+import java.io.IOException;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.transaction.TransactionException;
-import org.infogrid.module.ModuleException;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * <p>This interface is supported by all Probes that can
@@ -75,7 +73,6 @@ public interface DirectoryProbe
      * @throws NotPermittedException thrown if an operation performed by the Probe was not permitted
      * @throws ProbeException a Probe error occurred per the possible subclasses defined in ProbeException
      * @throws IOException an input/output error occurred during execution of the Probe
-     * @throws ModuleException thrown if a Module required by the Probe could not be loaded
      */
     public void readFromFile(
             File                   theFile,
@@ -87,6 +84,5 @@ public interface DirectoryProbe
             TransactionException,
             NotPermittedException,
             ProbeException,
-            IOException,
-            ModuleException;
+            IOException;
 }

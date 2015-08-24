@@ -18,6 +18,8 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
+import org.diet4j.core.ModuleRequirement;
+import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBase;
@@ -30,7 +32,6 @@ import org.infogrid.meshbase.net.schemes.Scheme;
 import org.infogrid.meshbase.net.schemes.StrictRegexScheme;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
-import org.infogrid.module.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.store.sql.AbstractSqlStore;
 import org.infogrid.store.sql.mysql.MysqlStore;
@@ -62,8 +63,8 @@ public abstract class AbstractStoreProbeTest
             Exception
     {
         InClasspathModuleRegistry registry = InClasspathModuleRegistry.getSingleton();
-        registry.resolve( registry.getModuleMetaFor( "org.infogrid.probe.store" )).activateRecursively();
-        registry.resolve( registry.getModuleMetaFor( "org.infogrid.model.Test" )).activateRecursively();
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.probe.store" ))).activateRecursively();
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.model.Test" ))).activateRecursively();
         
         Log4jLog.configure( "org/infogrid/probe/store/test/Log.properties", AbstractStoreProbeTest.class.getClassLoader() );
         Log.setLogFactory( new Log4jLogFactory());

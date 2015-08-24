@@ -16,11 +16,6 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>org.infogrid.module</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>org.infogrid.net.local</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -30,15 +25,22 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.diet4j</groupId>
+            <artifactId>diet4j-core</artifactId>
+            <version>${diet4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>org.infogrid.util.logging.log4j</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>org.infogrid.module.inclasspath</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.diet4j</groupId>
+            <artifactId>diet4j-inclasspath</artifactId>
+            <version>${diet4j.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -69,10 +71,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
 </project>

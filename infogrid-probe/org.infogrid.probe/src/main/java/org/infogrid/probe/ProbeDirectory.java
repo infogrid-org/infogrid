@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.diet4j.core.ModuleRequirement;
 import org.infogrid.probe.httpmapping.HttpMappingPolicy;
 import org.infogrid.probe.xml.XmlProbe;
 import org.infogrid.probe.xml.XmlDOMProbe;
@@ -171,15 +172,18 @@ public interface ProbeDirectory
          * @param className the name of the class implementing the Probe
          * @param clazz the actual Class we are supposed to instantiate (this is optional)
          * @param parameters the parameters for the Probe, if any
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
-        public ProbeDescriptor(
+        protected ProbeDescriptor(
                 String                 className,
                 Class<? extends Probe> clazz,
-                Map<String,Object>     parameters )
+                Map<String,Object>     parameters,
+                ModuleRequirement      req )
         {
-            theClassName             = className;
-            theClazz                 = clazz;
-            theParameters            = parameters;
+            theClassName         = className;
+            theClazz             = clazz;
+            theParameters        = parameters;
+            theModuleRequirement = req;
         }
 
         /**
@@ -205,8 +209,9 @@ public interface ProbeDirectory
         /**
          * Obtain the Probe parameters, if any.
          *
-         * @return the Probe parametes, if any
+         * @return the Probe parameters, if any
          */
+        @SuppressWarnings( "ReturnOfCollectionOrArrayField" )
         public final Map<String,Object> getParameters()
         {
             return theParameters;
@@ -227,6 +232,17 @@ public interface ProbeDirectory
         }
 
         /**
+         * Obtain the ModuleRequirement that can be used to find the Module that
+         * provides the Probe Class.
+         * 
+         * @return the ModuleRequirement, or null if the class was provided
+         */
+        public final ModuleRequirement getModuleRequirement()
+        {
+            return theModuleRequirement;
+        }
+
+        /**
          * The Probe class name.
          */
         protected String theClassName;
@@ -240,6 +256,11 @@ public interface ProbeDirectory
          * The Probe parameters (if any).
          */
         protected Map<String,Object> theParameters;
+        
+        /**
+         * Specifies the Module in which the Probe class can be found, if Class not given.
+         */
+        protected ModuleRequirement theModuleRequirement;
     }
 
     /**
@@ -260,16 +281,18 @@ public interface ProbeDirectory
          * @param className name of the Probe class
          * @param clazz the actual Probe class (optional)
          * @param parameters the parameters for the Probe, if any
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
-        public XmlProbeDescriptor(
+        protected XmlProbeDescriptor(
                 String []                 documentTypes,
                 String []                 toplevelElementNamespaces,
                 String []                 toplevelElementLocalNames,
                 String                    className,
                 Class<? extends XmlProbe> clazz,
-                Map<String,Object>        parameters )
+                Map<String,Object>        parameters,
+                ModuleRequirement         req )
         {
-            super( className, clazz, parameters );
+            super( className, clazz, parameters, req );
 
             theDocumentTypes = documentTypes;
 
@@ -355,6 +378,7 @@ public interface ProbeDirectory
          *
          * @param d the Dumper to dump to
          */
+        @Override
         public void dump(
                 Dumper d )
         {
@@ -363,13 +387,15 @@ public interface ProbeDirectory
                         "theDocumentTypes",
                         "theToplevelElementNamespaces",
                         "theToplevelElementLocalNames",
-                        "theClassName"
+                        "theClassName",
+                        "theModuleRequirement"
                     },
                     new Object[] {
                         theDocumentTypes,
                         theToplevelElementNamespaces,
                         theToplevelElementLocalNames,
-                        theClassName
+                        theClassName,
+                        theModuleRequirement
                     } );
         }
 
@@ -405,19 +431,22 @@ public interface ProbeDirectory
          * @param toplevelElementNamespace the namespace component of the top-level element that this Probe can access. Same sequence as toplevelElementLocalName.
          * @param toplevelElementLocalName the local name component of the top-level element that this Probe can access. Same sequence as toplevelElementNamespace.
          * @param className name of the Probe class
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public XmlDomProbeDescriptor(
-                String                       documentType,
-                String                       toplevelElementNamespace,
-                String                       toplevelElementLocalName,
-                String                       className )
+                String            documentType,
+                String            toplevelElementNamespace,
+                String            toplevelElementLocalName,
+                String            className,
+                ModuleRequirement req )
         {
             this(   new String[] { documentType },
                     new String[] { toplevelElementNamespace },
                     new String[] { toplevelElementLocalName },
                     className,
                     null,
-                    null );
+                    null,
+                    req );
         }
 
         /**
@@ -427,14 +456,22 @@ public interface ProbeDirectory
          * @param toplevelElementNamespaces the namespace components of the top-level element that this Probe can access. Same sequence as toplevelElementLocalNames.
          * @param toplevelElementLocalNames the local name components of the top-level element that this Probe can access. Same sequence as toplevelElementNamespaces.
          * @param className name of the Probe class
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public XmlDomProbeDescriptor(
-                String []                    documentTypes,
-                String []                    toplevelElementNamespaces,
-                String []                    toplevelElementLocalNames,
-                String                       className )
+                String []         documentTypes,
+                String []         toplevelElementNamespaces,
+                String []         toplevelElementLocalNames,
+                String            className,
+                ModuleRequirement req )
         {
-            this( documentTypes, toplevelElementNamespaces, toplevelElementLocalNames, className, null, null );
+            this(   documentTypes,
+                    toplevelElementNamespaces,
+                    toplevelElementLocalNames,
+                    className,
+                    null,
+                    null,
+                    req );
         }
 
         /**
@@ -456,6 +493,7 @@ public interface ProbeDirectory
                     new String[] { toplevelElementLocalName },
                     clazz.getName(),
                     clazz,
+                    null,
                     null );
         }
 
@@ -473,7 +511,13 @@ public interface ProbeDirectory
                 String []                    toplevelElementLocalNames,
                 Class<? extends XmlDOMProbe> clazz )
         {
-            this( documentTypes, toplevelElementNamespaces, toplevelElementLocalNames, clazz.getName(), clazz, null );
+            this(   documentTypes,
+                    toplevelElementNamespaces,
+                    toplevelElementLocalNames,
+                    clazz.getName(),
+                    clazz,
+                    null,
+                    null );
         }
 
         /**
@@ -485,6 +529,7 @@ public interface ProbeDirectory
          * @param className name of the Probe class
          * @param clazz the actual Probe class (optional)
          * @param parameters the parameters for the Probe, if any
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public XmlDomProbeDescriptor(
                 String []                    documentTypes,
@@ -492,9 +537,16 @@ public interface ProbeDirectory
                 String []                    toplevelElementLocalNames,
                 String                       className,
                 Class<? extends XmlDOMProbe> clazz,
-                Map<String,Object>           parameters )
+                Map<String,Object>           parameters,
+                ModuleRequirement            req )
         {
-            super( documentTypes, toplevelElementNamespaces, toplevelElementLocalNames, className, clazz, parameters );
+            super(  documentTypes,
+                    toplevelElementNamespaces,
+                    toplevelElementLocalNames,
+                    className,
+                    clazz,
+                    parameters,
+                    req );
         }
     }
 
@@ -514,12 +566,18 @@ public interface ProbeDirectory
          *
          * @param mimeType the MIME type that this Probe can access
          * @param className name of the Probe class
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public StreamProbeDescriptor(
-                String                mimeType,
-                String                className )
+                String            mimeType,
+                String            className,
+                ModuleRequirement req )
         {
-            this( new String[] { mimeType }, className, null, null );
+            this(   new String[] { mimeType },
+                    className,
+                    null,
+                    null,
+                    req );
         }
 
         /**
@@ -527,12 +585,18 @@ public interface ProbeDirectory
          *
          * @param mimeTypes the MIME types that this Probe can access
          * @param className name of the Probe class
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public StreamProbeDescriptor(
-                String []             mimeTypes,
-                String                className )
+                String []         mimeTypes,
+                String            className,
+                ModuleRequirement req )
         {
-            this( mimeTypes, className, null, null );
+            this(   mimeTypes,
+                    className,
+                    null,
+                    null,
+                    req );
         }
 
         /**
@@ -545,7 +609,11 @@ public interface ProbeDirectory
                 String                             mimeType,
                 Class<? extends NonXmlStreamProbe> clazz )
         { 
-            this( new String[] { mimeType }, clazz.getName(), clazz, null );
+            this(   new String[] { mimeType },
+                    clazz.getName(),
+                    clazz,
+                    null,
+                    null );
         }
 
         /**
@@ -558,7 +626,11 @@ public interface ProbeDirectory
                 String []                          mimeTypes,
                 Class<? extends NonXmlStreamProbe> clazz )
         {
-            this( mimeTypes, clazz.getName(), clazz, null );
+            this(   mimeTypes,
+                    clazz.getName(),
+                    clazz,
+                    null,
+                    null );
         }
 
         /**
@@ -568,14 +640,16 @@ public interface ProbeDirectory
          * @param className name of the Probe class
          * @param clazz the actual Probe class (if given)
          * @param parameters the parameters for the Probe, if any
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public StreamProbeDescriptor(
                 String []                          mimeTypes,
                 String                             className,
                 Class<? extends NonXmlStreamProbe> clazz,
-                Map<String,Object>                 parameters )
+                Map<String,Object>                 parameters,
+                ModuleRequirement                  req )
         {
-            super( className, clazz, parameters );
+            super( className, clazz, parameters, req );
 
             theMimeTypes = mimeTypes;
         }
@@ -612,17 +686,20 @@ public interface ProbeDirectory
          *
          * @param d the Dumper to dump to
          */
+        @Override
         public void dump(
                 Dumper d )
         {
             d.dump( this,
                     new String[] {
                         "theMimeTypes",
-                        "theClassName"
+                        "theClassName",
+                        "theModuleRequirement"
                     },
                     new Object[] {
                         theMimeTypes,
-                        theClassName
+                        theClassName,
+                        theModuleRequirement
                     } );
         }
 
@@ -648,12 +725,18 @@ public interface ProbeDirectory
          *
          * @param protocol the URL protocol for this Probe (eg jdbc)
          * @param className the name of the Probe class
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public ApiProbeDescriptor(
-                String                protocol,
-                String                className )
+                String            protocol,
+                String            className,
+                ModuleRequirement req )
         {
-            this( new String[] { protocol }, className, null, null );
+            this(   new String[] { protocol },
+                    className,
+                    null,
+                    null,
+                    req );
         }
 
         /**
@@ -661,12 +744,18 @@ public interface ProbeDirectory
          *
          * @param protocols the URL protocols for this Probe (eg jdbc)
          * @param className the name of the Probe class
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public ApiProbeDescriptor(
-                String []             protocols,
-                String                className )
+                String []         protocols,
+                String            className,
+                ModuleRequirement req )
         {
-            this( protocols, className, null, null );
+            this(   protocols,
+                    className,
+                    null,
+                    null,
+                    req );
         }
 
         /**
@@ -679,7 +768,11 @@ public interface ProbeDirectory
                 String                    protocol,
                 Class<? extends ApiProbe> clazz )
         {
-            this( new String[] { protocol }, clazz.getName(), clazz, null );
+            this(   new String[] { protocol },
+                    clazz.getName(),
+                    clazz,
+                    null,
+                    null );
         }
 
         /**
@@ -692,7 +785,11 @@ public interface ProbeDirectory
                 String []                 protocols,
                 Class<? extends ApiProbe> clazz )
         {
-            this( protocols, clazz.getName(), clazz, null );
+            this(   protocols,
+                    clazz.getName(),
+                    clazz,
+                    null,
+                    null );
         }
 
         /**
@@ -702,14 +799,16 @@ public interface ProbeDirectory
          * @param className the name of the Probe class
          * @param clazz the actual class we are supposed to instantiate, if any
          * @param parameters the parameters for the Probe, if any
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public ApiProbeDescriptor(
                 String []                 protocols,
                 String                    className,
                 Class<? extends ApiProbe> clazz,
-                Map<String,Object>        parameters )
+                Map<String,Object>        parameters,
+                ModuleRequirement         req )
         {
-            super( className, clazz, parameters );
+            super( className, clazz, parameters, req );
 
             theProtocols = protocols;
         }
@@ -746,17 +845,20 @@ public interface ProbeDirectory
          *
          * @param d the Dumper to dump to
          */
+        @Override
         public void dump(
                 Dumper d )
         {
             d.dump( this,
                     new String[] {
                         "theProtocols",
-                        "theClassName"
+                        "theClassName",
+                        "theModuleRequirement"
                     },
                     new Object[] {
                         theProtocols,
-                        theClassName
+                        theClassName,
+                        theModuleRequirement
                     } );
         }
 
@@ -781,13 +883,18 @@ public interface ProbeDirectory
          * @param className the Probe class that is being matched
          * @param clazz the actual Probe class (if given)
          * @param parameters the parameters for the Probe, if any
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
-        public MatchDescriptor(
+        protected MatchDescriptor(
                 String                 className,
                 Class<? extends Probe> clazz,
-                Map<String,Object>     parameters )
+                Map<String,Object>     parameters,
+                ModuleRequirement      req )
         {
-            super( className, clazz,  parameters );
+            super(   className,
+                     clazz,  
+                     parameters, 
+                     req );
         }
         
         /**
@@ -816,12 +923,18 @@ public interface ProbeDirectory
          *
          * @param url the URL that shall be matched
          * @param className the Probe class that is being matched
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public ExactMatchDescriptor(
-                String                url,
-                String                className )
+                String            url,
+                String            className,
+                ModuleRequirement req )
         {
-            this( url, className, null, null );
+            this(   url,
+                    className,
+                    null,
+                    null,
+                    req );
         }
 
         /**
@@ -834,7 +947,11 @@ public interface ProbeDirectory
                 String                    url,
                 Class<? extends ApiProbe> clazz )
         {
-            this( url, clazz.getName(), clazz, null );
+            this(   url,
+                    clazz.getName(), 
+                    clazz,
+                    null,
+                    null );
         }
 
         /**
@@ -844,14 +961,19 @@ public interface ProbeDirectory
          * @param className the Probe class that is being matched
          * @param clazz the actual Probe class (if given)
          * @param parameters the parameters for the Probe, if any
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public ExactMatchDescriptor(
                 String                    url,
                 String                    className,
                 Class<? extends ApiProbe> clazz,
-                Map<String,Object>        parameters )
+                Map<String,Object>        parameters,
+                ModuleRequirement         req )
         {
-            super( className, clazz, parameters );
+            super(   className,
+                     clazz,
+                     parameters,
+                     req );
 
             theUrl = url;
         }
@@ -872,6 +994,7 @@ public interface ProbeDirectory
          * @param url the provided URL
          * @return true if there is a match
          */
+        @Override
         public boolean matches(
                 String url )
         {
@@ -883,17 +1006,20 @@ public interface ProbeDirectory
          *
          * @param d the Dumper to dump to
          */
+        @Override
         public void dump(
                 Dumper d )
         {
             d.dump( this,
                     new String[] {
                         "theUrl",
-                        "theClassName"
+                        "theClassName",
+                        "theModuleRequirement"
                     },
                     new Object[] {
                         theUrl,
-                        theClassName
+                        theClassName,
+                        theModuleRequirement
                     } );
         }
 
@@ -919,12 +1045,18 @@ public interface ProbeDirectory
          *
          * @param urlPattern the URL pattern that shall be matched
          * @param className the Probe class that is being matched
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public PatternMatchDescriptor(
-                Pattern               urlPattern,
-                String                className )
+                Pattern           urlPattern,
+                String            className,
+                ModuleRequirement req )
         {
-            this( urlPattern, className, null, null );
+            this(   urlPattern,
+                    className,
+                    null,
+                    null,
+                    req );
         }
 
         /**
@@ -937,7 +1069,11 @@ public interface ProbeDirectory
                 Pattern                   urlPattern,
                 Class<? extends ApiProbe> clazz )
         {
-            this( urlPattern, clazz.getName(), clazz, null );
+            this(   urlPattern,
+                    clazz.getName(),
+                    clazz,
+                    null,
+                    null );
         }
 
         /**
@@ -947,14 +1083,16 @@ public interface ProbeDirectory
          * @param className the Probe class that is being matched
          * @param clazz the actual Probe class (if given)
          * @param parameters the parameters for the Probe, if any
+         * @param req specifies the Module in which the Probe class can be found, if not provided
          */
         public PatternMatchDescriptor(
                 Pattern                   urlPattern,
                 String                    className,
                 Class<? extends ApiProbe> clazz,
-                Map<String,Object>        parameters )
+                Map<String,Object>        parameters,
+                ModuleRequirement         req )
         {
-            super( className, clazz, parameters );
+            super( className, clazz, parameters, req );
 
             theUrlPattern = urlPattern;
         }
@@ -975,15 +1113,12 @@ public interface ProbeDirectory
          * @param url the provided URL
          * @return true if there is a match
          */
+        @Override
         public boolean matches(
                 String url )
         {
             Matcher m = theUrlPattern.matcher( url );
-            if( m.matches() ) {
-                return true;
-            } else {
-                return false;
-            }
+            return m.matches();
         }
 
         /**
@@ -991,17 +1126,20 @@ public interface ProbeDirectory
          *
          * @param d the Dumper to dump to
          */
+        @Override
         public void dump(
                 Dumper d )
         {
             d.dump( this,
                     new String[] {
                         "theUrlPattern",
-                        "theClassName"
+                        "theClassName",
+                        "theModuleRequirement"
                     },
                     new Object[] {
                         theUrlPattern,
-                        theClassName
+                        theClassName,
+                        theModuleRequirement
                     } );
         }
 

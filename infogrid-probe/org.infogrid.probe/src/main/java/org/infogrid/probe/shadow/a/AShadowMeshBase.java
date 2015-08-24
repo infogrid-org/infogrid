@@ -16,6 +16,7 @@ package org.infogrid.probe.shadow.a;
 
 import java.util.Iterator;
 import javax.net.ssl.HostnameVerifier;
+import org.diet4j.core.ModuleRegistry;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.net.NetMeshObject;
@@ -35,7 +36,6 @@ import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.meshbase.transaction.ChangeSet;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.module.ModuleRegistry;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.ProbeDispatcher;
 import org.infogrid.probe.ProbeException;
@@ -51,7 +51,6 @@ import org.infogrid.util.Factory;
 import org.infogrid.util.Invocable;
 import org.infogrid.util.IsDeadException;
 import org.infogrid.util.MapCursorIterator;
-import org.infogrid.util.RemoteQueryTimeoutException;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.logging.Log;
 
