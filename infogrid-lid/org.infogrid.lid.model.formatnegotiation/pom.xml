@@ -24,6 +24,12 @@
             <artifactId>org.infogrid.lid.model.yadis</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.diet4j</groupId>
+            <artifactId>diet4j-core</artifactId>
+            <version>${diet4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -34,28 +40,24 @@
                 <version>1.4.0</version>
                 <executions>
                     <execution>
+                        <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-jar</argument>
+                                <argument>${maven.repository}/org/diet4j/diet4j-cmdline/${diet4j.version}/diet4j-cmdline-${diet4j.version}.jar</argument>
+                                <argument>org.infogrid:org.infogrid.codegen:${project.version}</argument>
+                                <argument>${basedir}/infogrid-models/model.xml</argument>
+                                <argument>-o</argument>
+                                <argument>${basedir}/target/infogrid-generated</argument>
+                            </arguments>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <executable>java</executable>
-                    <mainClass>org.infogrid.module.commandline.CommandlineBootLoader</mainClass>
-                    <arguments>
-                        <argument>-classpath</argument>
-                        <argument>${env.HOME}/.m2/repository/org/infogrid/org.infogrid.module/3.0-SNAPSHOT/org.infogrid.module-3.0-SNAPSHOT.jar:${env.HOME}/.m2/repository/org/infogrid/org.infogrid.module.commandline/${project.version}/org.infogrid.module.commandline-${project.version}.jar</argument>
-                        <argument>org.infogrid.module.commandline.CommandlineBootLoader</argument>
-                        <argument>--rootmodule</argument>
-                        <argument>org.infogrid.codegen</argument>
-                        <argument>--moduledirectory</argument>
-                        <argument>${env.HOME}/.m2/repository</argument>
-                        <argument>${basedir}/infogrid-models/model.xml</argument>
-                        <argument>-o</argument>
-                        <argument>${basedir}/target/infogrid-generated</argument>
-                    </arguments>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -80,8 +82,6 @@
     </build>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <diet4j.activationclass>${project.artifactId}.ModuleInit</diet4j.activationclass>
     </properties>
 </project>
