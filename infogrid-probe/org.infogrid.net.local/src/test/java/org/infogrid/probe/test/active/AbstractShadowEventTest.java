@@ -17,6 +17,7 @@ package org.infogrid.probe.test.active;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
+import org.diet4j.core.ModuleRegistry;
 import org.diet4j.core.ModuleRequirement;
 import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
@@ -27,6 +28,7 @@ import org.infogrid.meshbase.net.schemes.Scheme;
 import org.infogrid.meshbase.net.schemes.StrictRegexScheme;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
+import org.infogrid.probe.test.AbstractProbeTest;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.context.Context;
@@ -53,17 +55,19 @@ public abstract class AbstractShadowEventTest
         throws
             Exception
     {
-        InClasspathModuleRegistry registry = InClasspathModuleRegistry.getSingleton();
-        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.probe" ))).activateRecursively();
-        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.model.Test" ))).activateRecursively();
+        ClassLoader    cl       = AbstractShadowEventTest.class.getClassLoader();
+        ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
+
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.probe" ))).activateRecursively();
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.model.Test" ))).activateRecursively();
         
-        Log4jLog.configure( "org/infogrid/probe/test/Log.properties", AbstractShadowEventTest.class.getClassLoader() );
+        Log4jLog.configure( "org/infogrid/probe/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
         
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/probe/test/ResourceHelper",
                 Locale.getDefault(),
-                AbstractShadowEventTest.class.getClassLoader() ));
+                cl ));
 
         theModelBase = ModelBaseSingleton.getSingleton();
     }

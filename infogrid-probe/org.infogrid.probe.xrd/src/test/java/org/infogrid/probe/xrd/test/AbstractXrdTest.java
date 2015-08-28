@@ -16,6 +16,7 @@ package org.infogrid.probe.xrd.test;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+import org.diet4j.core.ModuleRegistry;
 import org.diet4j.core.ModuleRequirement;
 import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.mesh.MeshObject;
@@ -48,16 +49,18 @@ public abstract class AbstractXrdTest
         throws
             Exception
     {
-        InClasspathModuleRegistry registry = InClasspathModuleRegistry.getSingleton();
-        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.probe.xrd" ))).activateRecursively();
+        ClassLoader    cl       = AbstractXrdTest.class.getClassLoader();
+        ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
+
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.probe.xrd" ))).activateRecursively();
         
-        Log4jLog.configure( "org/infogrid/probe/xrd/test/Log.properties", AbstractXrdTest.class.getClassLoader() );
+        Log4jLog.configure( "org/infogrid/probe/xrd/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
         
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/probe/xrd/test/ResourceHelper",
                 Locale.getDefault(),
-                AbstractXrdTest.class.getClassLoader() ));
+                cl ));
 
         theModelBase = ModelBaseSingleton.getSingleton();
     }

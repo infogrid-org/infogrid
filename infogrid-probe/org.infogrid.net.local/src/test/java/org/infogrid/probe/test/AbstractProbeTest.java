@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
+import org.diet4j.core.ModuleRegistry;
 import org.diet4j.core.ModuleRequirement;
 import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.mesh.MeshObject;
@@ -65,17 +66,19 @@ public abstract class AbstractProbeTest
         throws
             Exception
     {
-        InClasspathModuleRegistry registry = InClasspathModuleRegistry.getSingleton();
-        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.probe" ))).activateRecursively();
-        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.model.Test" ))).activateRecursively();
+        ClassLoader    cl       = AbstractProbeTest.class.getClassLoader();
+        ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
+
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.probe" ))).activateRecursively();
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.model.Test" ))).activateRecursively();
         
-        Log4jLog.configure( "org/infogrid/probe/test/Log.properties", AbstractProbeTest.class.getClassLoader() );
+        Log4jLog.configure( "org/infogrid/probe/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
         
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/probe/test/ResourceHelper",
                 Locale.getDefault(),
-                AbstractProbeTest.class.getClassLoader() ));
+                cl ));
 
         theModelBase = ModelBaseSingleton.getSingleton();
     }

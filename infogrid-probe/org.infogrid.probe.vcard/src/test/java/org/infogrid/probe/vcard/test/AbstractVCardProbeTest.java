@@ -17,6 +17,7 @@ package org.infogrid.probe.vcard.test;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.ScheduledExecutorService;
+import org.diet4j.core.ModuleRegistry;
 import org.diet4j.core.ModuleRequirement;
 import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
@@ -58,16 +59,18 @@ public abstract class AbstractVCardProbeTest
         throws
             Exception
     {
-        InClasspathModuleRegistry registry = InClasspathModuleRegistry.getSingleton();
-        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.probe.vcard" ))).activateRecursively();
+        ClassLoader    cl       = AbstractVCardProbeTest.class.getClassLoader();
+        ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
 
-        Log4jLog.configure( "org/infogrid/probe/vcard/test/Log.properties", AbstractVCardProbeTest.class.getClassLoader() );
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.probe.vcard" ))).activateRecursively();
+
+        Log4jLog.configure( "org/infogrid/probe/vcard/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
         
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/probe/vcard/test/ResourceHelper",
                 Locale.getDefault(),
-                AbstractVCardProbeTest.class.getClassLoader() ));
+                cl ));
 
         theModelBase = ModelBaseSingleton.getSingleton();
     }

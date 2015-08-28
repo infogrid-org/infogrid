@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.ScheduledExecutorService;
+import org.diet4j.core.ModuleRegistry;
 import org.diet4j.core.ModuleRequirement;
 import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.httpd.server.HttpServer;
@@ -71,16 +72,18 @@ public abstract class AbstractWebfingerTest
         throws
             Exception
     {
-        InClasspathModuleRegistry registry = InClasspathModuleRegistry.getSingleton();
-        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create1( "org.infogrid.probe.xrd" ))).activateRecursively();
+        ClassLoader    cl       = AbstractWebfingerTest.class.getClassLoader();
+        ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
+
+        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.probe.xrd" ))).activateRecursively();
         
-        Log4jLog.configure( "org/infogrid/probe/xrd/test/webfinger/Log.properties", AbstractXrdTest.class.getClassLoader() );
+        Log4jLog.configure( "org/infogrid/probe/xrd/test/webfinger/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
         
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/probe/xrd/test/webfinger/ResourceHelper",
                 Locale.getDefault(),
-                AbstractXrdTest.class.getClassLoader() ));
+                cl ));
 
         theModelBase = ModelBaseSingleton.getSingleton();
     }
