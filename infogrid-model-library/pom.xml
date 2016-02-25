@@ -37,13 +37,9 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <executable>java</executable>
+                        <executable>diet4j</executable>
                         <arguments>
-                            <argument>-jar</argument>
-                            <argument>${maven.repository}/org/diet4j/diet4j-cmdline/${diet4j.version}/diet4j-cmdline-${diet4j.version}.jar</argument>
-                            <argument>--directory</argument>
-                            <argument>${maven.repository}</argument>
-                            <argument>org.infogrid:org.infogrid.codegen:${project.version}</argument>
+                            <argument>org.infogrid:org.infogrid.codegen</argument>
                             <argument>${basedir}/infogrid-models/model.xml</argument>
                             <argument>-o</argument>
                             <argument>${basedir}/target/infogrid-generated</argument>
@@ -88,7 +84,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <diet4j.version>0.10</diet4j.version>
-        <maven.repository>${HOME}/.m2/repository</maven.repository>
+        <diet4j.version>0.11</diet4j.version>
     </properties>
 </project>
