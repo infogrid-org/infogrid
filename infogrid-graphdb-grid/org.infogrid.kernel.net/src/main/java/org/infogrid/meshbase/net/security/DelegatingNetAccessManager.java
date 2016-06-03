@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -75,6 +75,7 @@ public class DelegatingNetAccessManager
      * @param failedPaths the access path that was used
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedAccessLocally(
             NetMeshBase                         mb,
             NetMeshObjectAccessSpecification [] failedPaths )
