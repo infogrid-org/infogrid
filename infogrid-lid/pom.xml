@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.infogrid</groupId>
+    <artifactId>infogrid-lid</artifactId>
+    <version>2.9.8</version>
+    <packaging>pom</packaging>
+    <name>infogrid-lid</name>
+    <url>http://infogrid.org/</url>
+
+    <modules>
+        <module>org.infogrid.lid</module>
+        <module>org.infogrid.lid.ldap</module>
+        <module>org.infogrid.lid.model.account</module>
+        <module>org.infogrid.lid.model.formatnegotiation</module>
+        <module>org.infogrid.lid.model.lid</module>
+        <module>org.infogrid.lid.model.openid.auth</module>
+        <module>org.infogrid.lid.model.post</module>
+        <module>org.infogrid.lid.model.traversal</module>
+        <module>org.infogrid.lid.model.xrd</module>
+        <module>org.infogrid.lid.model.yadis</module>
+        <module>org.infogrid.lid.openid</module>
+        <module>org.infogrid.lid.openid.store</module>
+        <module>org.infogrid.lid.store</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <diet4j.version>0.12</diet4j.version>
+    </properties>
+</project>

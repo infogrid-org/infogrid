@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This file is part of InfoGrid(tm). You may not use this file except in
+    compliance with the InfoGrid license. The InfoGrid license and important
+    disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+    have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+    or you do not consent to all aspects of the license and the disclaimers,
+    no license is granted; do not use this file.
+
+    For more information about InfoGrid go to http://infogrid.org/
+
+    Copyright 1998-2015 by Johannes Ernst
+    All rights reserved.
+-->
+
+<!DOCTYPE model PUBLIC '-//InfoGrid.org//InfoGrid Model//EN' 'http://infogrid.org/dtds/model.dtd'>
+<model>
+    <subjectarea ID="org.infogrid.lid.model.account">
+        <name>org.infogrid.lid.model.account</name>
+        <username>LID Account and Session Subject Area</username>
+        <userdescription>Captures the notion of an account at a site, and sessions performed with this account.
+        Local and/or remote personas may be associated with the account.</userdescription>
+
+        <entitytype ID="org.infogrid.lid.model.account/AccountCollection">
+            <name>AccountCollection</name>
+            <username>Accounts</username>
+            <userdescription>Set of Accounts.</userdescription>
+        </entitytype>
+
+        <entitytype ID="org.infogrid.lid.model.account/Account">
+            <name>Account</name>
+            <username>Account</username>
+            <userdescription>A user at a particular website, aka account.</userdescription>
+            <additionalinterface>org.infogrid.lid.account.LidAccount</additionalinterface>
+
+            <propertytype ID="org.infogrid.lid.model.account/Account_Nickname">
+                <name>Nickname</name>
+                <username>Local nickname</username>
+                <userdescription>The user's local nick name, if any.</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.lid.model.account/Account_Picture">
+                <name>Picture</name>
+                <username>Picture</username>
+                <userdescription>The user's picture, if any.</userdescription>
+                <datatype>
+                    <BlobDataType typefield="theJdkSupportedBitmapType"/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.lid.model.account/Account_Status">
+                <name>Status</name>
+                <username>Status</username>
+                <userdescription>Status of the account.</userdescription>
+                <datatype>
+                    <EnumeratedDataType>
+                        <enum>
+                            <name>AppliedFor</name>
+                            <username>Applied for</username>
+                            <userdescription>Account has been applied for, but not approved or rejected yet.</userdescription>
+                        </enum>
+                        <enum>
+                            <name>Active</name>
+                            <username>Active</username>
+                            <userdescription>The Account has been in use and can be used again.</userdescription>
+                        </enum>
+                        <enum>
+                            <name>Closed</name>
+                            <username>Closed</username>
+                            <userdescription>The Account has closed based on the customer's request. It may or may not
+                            become active again.</userdescription>
+                        </enum>
+                        <enum>
+                            <name>Disabled</name>
+                            <username>Disabled</username>
+                            <userdescription>The Account has been disabled and cannot currently be used. It may or may not
+                            become active again.</userdescription>
+                        </enum>
+                        <enum>
+                            <name>Obsoleted</name>
+                            <username>Obsoleted</username>
+                            <userdescription>The Account has been disabled and will never be used again.</userdescription>
+                        </enum>
+                        <enum>
+                            <name>Refused</name>
+                            <username>Refused</username>
+                            <userdescription>Account was applied for, and the site operator decided not to approve the application.
+                            It is unlikely but not impossible that it will be approved in the future.</userdescription>
+                        </enum>
+                    </EnumeratedDataType>
+                </datatype>
+                <defaultvalue>AppliedFor</defaultvalue>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.lid.model.account/Account_LastLoggedIn">
+                <name>LastLoggedIn</name>
+                <username>Last logged in</username>
+                <userdescription>The time when the user last logged into this account. This is the time of log-in, not
+                 the last time the account was used.</userdescription>
+                <datatype>
+                    <TimeStampDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
+            <implementsMethod><![CDATA[
+    /**
+     * User-visible String is the the nickname if there is one.
+     *
+     * @return the user-visible String representing this instance
+     */
+    public String get_UserVisibleString()
+    {
+        try {
+            StringValue name = getNickname();
+            if( name != null ) {
+                return name.value();
+            }
+        } catch( NotPermittedException ex ) {
+            // ignore;
+        }
+        return null;
+    }
+    /**
+     * Determine the Identifier of the site at which this LidAccount exists.
+     *
+     * @return the Identifier of the site
+     */
+    public org.infogrid.util.Identifier getSiteIdentifier()
+    {
+        org.infogrid.mesh.MeshObject site = traverse( AccountSubjectArea.ACCOUNT_ATSITE_MESHOBJECT.getSource() ).getSingleMember();
+        return site.getIdentifier();
+    }
+
+    /**
+     * Determine this LidAccount's status.
+     *
+     * @return the LidAccount's status
+     */
+    public org.infogrid.lid.account.LidAccount.LidAccountStatus getAccountStatus()
+    {
+        try {
+            EnumeratedValue status = getStatus();
+
+            if( AccountSubjectArea.ACCOUNT_STATUS_type_APPLIEDFOR.equals( status )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.APPLIEDFOR;
+            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_ACTIVE.equals( status )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.ACTIVE;
+            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_CLOSED.equals( getStatus() )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.CLOSED;
+            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_DISABLED.equals( getStatus() )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.DISABLED;
+            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_OBSOLETED.equals( getStatus() )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.OBSOLETED;
+            } else if( AccountSubjectArea.ACCOUNT_STATUS_type_REFUSED.equals( getStatus() )) {
+                return org.infogrid.lid.account.LidAccount.LidAccountStatus.REFUSED;
+            } else {
+                log.error( "Unexpected value: " + getStatus() );
+            }
+        } catch( NotPermittedException ex ) {
+            // ignore;
+        }
+        return null;
+    }
+
+    /**
+     * Determine the set of remote Identifiers that are also associated with this LidAccount.
+     * The Identifier inherited from HasIdentifier is considered the local Identifier.
+     *
+     * @return the set of remote Identifiers, if any
+     */
+    public org.infogrid.util.Identifier [] getRemoteIdentifiers()
+    {
+        org.infogrid.mesh.set.MeshObjectSet remotes = traverse( AccountSubjectArea.ACCOUNT_MAYUSEIDENTITY_MESHOBJECT.getSource() );
+        return remotes.asIdentifiers();
+    }
+
+    /**
+     * Convenience method to determine whether this LidAccount is identified by the
+     * provided Identifier.
+     *
+     * @param identifier the Identifier to test
+     * @return true if this LidAccount is identified by the provided Identifier
+     */
+    public boolean isIdentifiedBy(
+            org.infogrid.util.Identifier identifier )
+    {
+        if( getIdentifier().equals( identifier )) {
+            return true;
+        }
+        org.infogrid.mesh.set.MeshObjectSet remotes = traverse( AccountSubjectArea.ACCOUNT_MAYUSEIDENTITY_MESHOBJECT.getSource() );
+        if( remotes.contains( identifier )) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Obtain an attribute of the account
+     *
+     * @param key the name of the attribute
+     * @return the value of the attribute, or null
+     */
+    public String getAttribute(
+            String key )
+    {
+        return getAttributes().get( key );
+    }
+
+    /**
+     * Get the set of keys into the set of attributes.
+     *
+     * @return the keys into the set of attributes
+     */
+    public java.util.Set<String> getAttributeKeys()
+    {
+        return getAttributes().keySet(); // FIXME this can be done more efficiently
+    }
+
+    /**
+     * Obtain the map of attributes. This breaks encapsulation, but works much better
+     * for JSP pages.
+     *
+     * @return the map of attributes
+     */
+    public java.util.Map<String,String> getAttributes()
+    {
+        java.util.Map<String,String> ret = new java.util.HashMap<String,String>();
+        ret.put( IDENTIFIER_ATTRIBUTE_NAME, getIdentifier().toExternalForm() );
+
+        StringValue nick = null;
+        try {
+            nick = getNickname();
+        } catch( NotPermittedException ex ) {
+            // ignore
+        }
+        if( nick != null ) {
+            ret.put( NICKNAME_ATTRIBUTE_NAME, nick.value() );
+        }
+
+        return ret;
+    }
+
+    /**
+     * Obtain the subset of credential types applicable to this LidAccount
+     *
+     * @param set the set of credential types
+     * @return the subset of credential types
+     */
+    public org.infogrid.lid.credential.LidCredentialType [] getApplicableCredentialTypes(
+            org.infogrid.lid.credential.LidCredentialType [] set )
+    {
+        return set; // FIXME for now
+    }
+
+    /**
+     * Obtain a specific credential.
+     *
+     * @param type the LidCredentialType for which the credential is to be obtained
+     * @return the credential, or null
+     */
+    public String getCredentialFor(
+            org.infogrid.lid.credential.LidCredentialType type )
+    {
+        return null; // FIXME for now
+    }
+
+    /**
+     * Obtain the Identifiers of the set of groups that this LidAccount is a member of.
+     *
+     * @return the Identifiers
+     */
+    public org.infogrid.mesh.MeshObjectIdentifier [] getGroupIdentifiers()
+    {
+        org.infogrid.mesh.set.MeshObjectSet categories = traverse( AccountSubjectArea.ACCOUNTCATEGORY_CATEGORIZES_ACCOUNT.getDestination() );
+        return categories.asIdentifiers();
+    }
+
+    /**
+     * Obtain the names of the set of groups that this LidAccount is a member of.
+     *
+     * @return the names
+     */
+    public String [] getGroupNames()
+    {
+        org.infogrid.mesh.set.MeshObjectSet categories = traverse( AccountSubjectArea.ACCOUNTCATEGORY_CATEGORIZES_ACCOUNT.getDestination() );
+        String [] ret = new String[ categories.size() ];
+        for( int i=0 ; i<ret.length ; ++i ) {
+            try {
+                StringValue found = (StringValue) categories.get( i ).getPropertyValue( AccountSubjectArea.ACCOUNTCATEGORY_NAME );
+                if( found != null ) {
+                    ret[i] = found.value();
+                } else {
+                    ret[i] = categories.get( i ).getIdentifier().toExternalForm();
+                }
+
+            } catch( Throwable ex ) {
+                log.error( ex );
+            }
+        }
+        return ret;
+    }
+    ]]></implementsMethod>
+
+
+            <implementsMethod><![CDATA[
+    /**
+     * Cascading delete.
+     */
+    public void cascadingDelete()
+        throws
+            org.infogrid.meshbase.transaction.TransactionException,
+            NotPermittedException
+    {
+        org.infogrid.mesh.set.MeshObjectSet sessions = traverse( AccountSubjectArea.SESSION_FOR_ACCOUNT.getDestination() );
+        get_Delegate().getMeshBase().getMeshBaseLifecycleManager().deleteMeshObjects( sessions );
+    }
+            ]]></implementsMethod>
+        </entitytype>
+
+        <relationshiptype ID="org.infogrid.lid.model.account/AccountCollection_Collects_Account">
+            <name>AccountCollection_Collects_Account</name>
+            <username>collects</username>
+            <userdescription>Collects the known Accounts</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.account/AccountCollection</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.lid.model.account/Account</e>
+              <MultiplicityValue>1:1</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <entitytype ID="org.infogrid.lid.model.account/AccountCategory">
+            <name>AccountCategory</name>
+            <username>Account Category</username>
+            <userdescription>Categorizes accounts into categories</userdescription>
+
+            <propertytype ID="org.infogrid.lid.model.account/AccountCategory_Name">
+                <name>Name</name>
+                <username>Name</username>
+                <userdescription>Name of the category.</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+        </entitytype>
+
+        <relationshiptype ID="org.infogrid.lid.model.account/AccountCategory_Categorizes_Account">
+            <name>AccountCategory_Categorizes_Account</name>
+            <username>categorizes</username>
+            <userdescription>Categorizes the accounts into categories</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.account/AccountCategory</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.lid.model.account/Account</e>
+              <MultiplicityValue>0:N</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <entitytype ID="org.infogrid.lid.model.account/Session">
+            <name>Session</name>
+            <username>Session</username>
+            <userdescription>A session of a user at a website.</userdescription>
+            <additionalinterface>org.infogrid.lid.session.LidSession</additionalinterface>
+
+            <implementsMethod><![CDATA[
+    /**
+     * Obtain the client whose session it is.
+     *
+     * @return the client
+     */
+    public org.infogrid.util.HasIdentifier getSessionClient()
+    {
+        MeshObject found = traverse( AccountSubjectArea.SESSION_USESIDENTITY_MESHOBJECT.getSource() ).getSingleMember();
+        return found;
+    }
+
+    /**
+     * Obtain the Identifier of the site where the session takes place.
+     *
+     * @return the site Identifier
+     */
+    public org.infogrid.util.Identifier getSiteIdentifier()
+    {
+        MeshObject found = traverse(
+                AccountSubjectArea.SESSION_ATSITE_MESHOBJECT.getSource() ).getSingleMember();
+        if( found == null ) {
+            return null;
+        } else {
+            return found.getIdentifier();
+        }
+    }
+
+    /**
+     * Obtain the LidAccount on whose behalf the session takes place.
+     *
+     * @return the LidAccount, if any
+     */
+    public Account getAccount()
+    {
+        try {
+            MeshObject found = traverse( AccountSubjectArea.SESSION_FOR_ACCOUNT.getSource() ).getSingleMember();
+            if( found != null ) {
+                return (org.infogrid.lid.model.account.Account) found.getTypedFacadeFor( AccountSubjectArea.ACCOUNT );
+            }
+        } catch( NotBlessedException ex ) {
+            log.error( ex );
+        }
+        return null;
+    }
+
+    /**
+     * Obtain the time the LidSession was last authenticated with something stronger than a session cookie.
+     *
+     * @return the time the LidSession was last authenticated, in System.currentTimeMillis() format
+     */
+    public long getTimeLastAuthenticated()
+    {
+        try {
+            TimeStampValue lastUsed = getLastAuthenticated();
+            if( lastUsed == null ) {
+                return -1L;
+            }
+            return lastUsed.getAsMillis();
+        } catch( Throwable t ) {
+            log.error( t );
+            return -1L;
+        }
+    }
+
+    /**
+     * Obtain the time the LidSession was last used successfully.
+     *
+     * @return the time the LidSession was last used successfully, in System.currentTimeMillis() format
+     */
+    public long getTimeLastUsedSuccessfully()
+    {
+        try {
+            TimeStampValue lastUsed = getLastUsedSuccessfully();
+            if( lastUsed == null ) {
+                return -1L;
+            }
+            return lastUsed.getAsMillis();
+        } catch( Throwable t ) {
+            log.error( t );
+            return -1L;
+        }
+    }
+
+    /**
+     * Obtain the time when the LidSession will or has become invalid.
+     *
+     * @return the time the LidSession will or has become invalid, in System.currentTimeMillis() format
+     */
+    public long getTimeValidUntil()
+    {
+        try {
+            TimeStampValue validUntil = getValidUntil();
+            if( validUntil == null ) {
+                return -1L;
+            }
+            return validUntil.getAsMillis();
+        } catch( Throwable t ) {
+            log.error( t );
+            return -1L;
+        }
+    }
+
+    /**
+     * Obtain the session token.
+     *
+     * @return the session token
+     */
+    public String getSessionToken()
+    {
+        String ret = org.infogrid.lid.model.account.utils.MeshObjectIdentifierSessionTokenConverter.meshObjectIdentifierToToken(
+                getIdentifier(),
+                get_MeshBase().getIdentifier().toExternalForm() + "#" );
+
+        return ret;
+    }
+
+    /**
+     * Obtain the IP address of the client that created this session.
+     *
+     * @return the IP address
+     */
+    public String getCreationClientIp()
+    {
+        try {
+            StringValue ip = getCreatedAtIp();
+            if( ip != null ) {
+                return ip.value();
+            } else {
+                return null;
+            }
+        } catch( Throwable t ) {
+            log.error( t );
+            return null;
+        }
+    }
+
+    /**
+     * Determine whether this token is still valid.
+     *
+     * @return true if it is still valid.
+     */
+    public boolean isStillValid()
+    {
+        try {
+            TimeStampValue until = getValidUntil();
+            if( until == null ) {
+                return false;
+            }
+            return until.isInFuture();
+        } catch( Throwable t ) {
+            log.error( t );
+            return false;
+        }
+    }
+
+    /**
+     * Notify the session that it was used successfully.
+     */
+    public void useSuccessfully()
+    {
+        try {
+            setLastUsedSuccessfully( TimeStampValue.now() );
+        } catch( Throwable t ) {
+            log.error( t );
+        }
+    }
+
+    /**
+     * Renew the session.
+     *
+     * @param duration the duration, in milliseconds, from now
+     */
+    public void renew(
+            final long duration )
+    {
+        get_MeshBase().executeNow( new org.infogrid.meshbase.transaction.TransactionAction<Void>() {
+                public Void execute()
+                    throws
+                        Throwable
+                {
+                    setValidUntil( TimeStampValue.nowWithOffset( duration ));
+                    return null;
+                }
+        } );
+    }
+
+    /**
+     * Invalidate this session.
+     */
+    public void cancel()
+    {
+        get_MeshBase().executeNow( new org.infogrid.meshbase.transaction.TransactionAction<Void>() {
+                public Void execute()
+                    throws
+                        Throwable
+                {
+                    setValidUntil( TimeStampValue.nowWithOffset( -1L ));
+                    setTimeExpires( getValidUntil().getAsMillis() );
+                    return null;
+                }
+        } );
+    }
+
+    /**
+     * Obtain the key for that was used to create this object by the Factory.
+     *
+     * @return the key
+     */
+    public String getFactoryKey()
+    {
+        return getSessionToken();
+    }
+
+    /**
+     * Enable a Factory to indicate to the FactoryCreatedObject that it was
+     * it that created it.
+     *
+     * @param factory the Factory that created the FactoryCreatedObject
+     */
+    public void setFactory(
+            org.infogrid.util.Factory<String,org.infogrid.lid.session.LidSession,org.infogrid.lid.session.LidSessionManagerArguments> factory )
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Obtain the Factory that created this FactoryCreatedObject. In case of
+     * chained factories that delegate to each other, this method is
+     * supposed to return the outermost factory invoked by the application programmer.
+     *
+     * @return the Factory that created the FactoryCreatedObject
+     */
+    public org.infogrid.util.Factory<String,org.infogrid.lid.session.LidSession,org.infogrid.lid.session.LidSessionManagerArguments> getFactory()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    ]]></implementsMethod>
+
+            <propertytype ID="org.infogrid.lid.model.account/Session_FirstAuthenticated">
+                <name>FirstAuthenticated</name>
+                <username>First authenticated at</username>
+                <userdescription>The TimeStamp when the user was first authenticated at this site.</userdescription>
+                <datatype>
+                    <TimeStampDataType/>
+                </datatype>
+                <defaultvalue code="true">TimeStampValue.now()</defaultvalue>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.lid.model.account/Session_LastAuthenticated">
+                <name>LastAuthenticated</name>
+                <username>Most recently authenticated at</username>
+                <userdescription>The TimeStamp when the user was most recently authenticated at this site.</userdescription>
+                <datatype>
+                    <TimeStampDataType/>
+                </datatype>
+                <defaultvalue code="true">TimeStampValue.now()</defaultvalue>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.lid.model.account/Session_LastUsedSuccesfully">
+                <name>LastUsedSuccessfully</name>
+                <username>Most recently used successfully at</username>
+                <userdescription>The TimeStamp when the user was most recently using this session successfully.</userdescription>
+                <datatype>
+                    <TimeStampDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.lid.model.account/Session_ValidUntil">
+                <name>ValidUntil</name>
+                <username>Valid until</username>
+                <userdescription>The TimeStamp when the session has, or will expire and a new authentication is required.</userdescription>
+                <datatype>
+                    <TimeStampDataType/>
+                </datatype>
+                <defaultvalue code="true">TimeStampValue.now()</defaultvalue>
+            </propertytype>
+
+            <propertytype ID="org.infogrid.lid.model.account/Session_CreatedAtIp">
+                <name>CreatedAtIp</name>
+                <username>Created at IP address</username>
+                <userdescription>The IP address from where this session was created.</userdescription>
+                <datatype>
+                    <StringDataType/>
+                </datatype>
+                <isoptional/>
+            </propertytype>
+        </entitytype>
+
+        <relationshiptype ID="org.infogrid.lid.model.account/Session_For_Account">
+            <name>Session_For_Account</name>
+            <username>for</username>
+            <userdescription>Identifies the Account that owns this Session</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.account/Session</e>
+              <MultiplicityValue>1:1</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.lid.model.account/Account</e>
+              <MultiplicityValue>0:n</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.lid.model.account/Account_MayUseIdentity_MeshObject">
+            <name>Account_MayUseIdentity_MeshObject</name>
+            <username>May use identity</username>
+            <userdescription>Enumerates the identities possibly used by this Account</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.account/Account</e>
+              <MultiplicityValue>1:n</MultiplicityValue>
+            </src>
+            <dest>
+              <MultiplicityValue>0:n</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.lid.model.account/Account_AtSite_MeshObject">
+            <name>Account_AtSite_MeshObject</name>
+            <username>At site</username>
+            <userdescription>Identifies the site where the Account is hosted. The site is now represented as a MeshObject
+            in order to reduce dependencies.</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.account/Account</e>
+              <MultiplicityValue>1:1</MultiplicityValue>
+            </src>
+            <dest>
+              <MultiplicityValue>0:n</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.lid.model.account/Session_AtSite_MeshObject">
+            <name>Session_AtSite_MeshObject</name>
+            <username>At site</username>
+            <userdescription>Identifies the website where the session is taking place</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.account/Session</e>
+              <MultiplicityValue>1:1</MultiplicityValue>
+            </src>
+            <dest>
+              <MultiplicityValue>0:n</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <relationshiptype ID="org.infogrid.lid.model.account/Session_UsesIdentity_MeshObject">
+            <name>Session_UsesIdentity_MeshObject</name>
+            <username>Uses identity</username>
+            <userdescription>Identifies the identity used for this session</userdescription>
+            <src>
+              <e>org.infogrid.lid.model.account/Session</e>
+              <MultiplicityValue>1:1</MultiplicityValue>
+            </src>
+            <dest>
+              <MultiplicityValue>0:n</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+    </subjectarea>
+</model>
