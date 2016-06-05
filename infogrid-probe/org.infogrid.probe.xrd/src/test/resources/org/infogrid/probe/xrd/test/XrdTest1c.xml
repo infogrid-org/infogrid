@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- from Google -->
+<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
+  <Subject>acct:johannes.ernst@gmail.com</Subject>
+  <Alias>http://www.google.com/profiles/johannes.ernst</Alias>
+  <Link rel="http://portablecontacts.net/spec/1.0" href="http://www-opensocial.googleusercontent.com/api/people/"/>
+  <Link rel="http://portablecontacts.net/spec/1.0#me" href="http://www-opensocial.googleusercontent.com/api/people/104555285104903729468/"/>
+  <Link rel="http://webfinger.net/rel/profile-page" href="http://www.google.com/profiles/johannes.ernst" type="text/html"/>
+  <Link rel="http://microformats.org/profile/hcard" href="http://www.google.com/profiles/johannes.ernst" type="text/html"/>
+  <Link rel="http://gmpg.org/xfn/11" href="http://www.google.com/profiles/johannes.ernst" type="text/html"/>
+  <Link rel="http://specs.openid.net/auth/2.0/provider" href="http://www.google.com/profiles/johannes.ernst"/>
+  <Link rel="describedby" href="http://www.google.com/profiles/johannes.ernst" type="text/html"/>
+  <Link rel="describedby" href="http://www.google.com/s2/webfinger/?q=johannes.ernst%40gmail.com&amp;fmt=foaf" type="application/rdf+xml"/>
+</XRD>
