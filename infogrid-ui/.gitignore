@@ -1,0 +1,9 @@
+*~
+private/
+build/
+dist/
+genfiles.properties
+private.properties
+nb-configuration.xml
+target/
+generated/
