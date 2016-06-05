@@ -1,0 +1,405 @@
+//
+// This file is part of InfoGrid(tm). You may not use this file except in
+// compliance with the InfoGrid license. The InfoGrid license and important
+// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+// or you do not consent to all aspects of the license and the disclaimers,
+// no license is granted; do not use this file.
+// 
+// For more information about InfoGrid go to http://infogrid.org/
+//
+// Copyright 1998-2015 by Johannes Ernst
+// All rights reserved.
+//
+
+package org.infogrid.model.primitives;
+
+import java.io.Serializable;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.model.primitives.text.ModelPrimitivesStringRepresentationParameters;
+import org.infogrid.util.text.HasStringRepresentation;
+import org.infogrid.util.text.StringRepresentation;
+import org.infogrid.util.text.StringRepresentationDirectory;
+import org.infogrid.util.text.StringRepresentationDirectorySingleton;
+import org.infogrid.util.text.StringRepresentationParameters;
+import org.infogrid.util.text.StringifierException;
+import org.infogrid.util.text.StringifierUnformatFactory;
+
+/**
+  * This represents a data type for properties. This is an abstract class;
+  * a more suitable subclass shall be instantiated.
+  * A DataType can refine another DataType and usually does.
+  *
+  * Note: This is different from a value for properties:
+  * Instances of (a subtype of) DataType represent the notion of a type,
+  * such as "a positive integer", while instances of (a subtype of)
+  * PropertyValue represent a value, such as "7".
+  */
+public abstract class DataType
+        implements
+            HasStringRepresentation,
+            StringifierUnformatFactory,
+            Serializable
+{
+    /**
+      * Constructor for subclasses only.
+      *
+      * @param supertype the DataType that we refine, if any
+      */
+    protected DataType(
+            DataType supertype )
+    {
+        theSupertype = supertype;
+    }
+
+    /**
+      * Obtain the name of the DataType.
+      *
+      * @return the name of the DataType
+      */
+    public final String getName()
+    {
+        return this.getClass().getName();
+    }
+
+    /**
+      * Test for equality.
+      *
+      * @param other object to test against
+      * @return true if the two objects are equal
+      */
+    @Override
+    public abstract boolean equals(
+            Object other );
+
+    /**
+      * Test whether this DataType is a superset of or equals the argument
+      * DataType. This is useful to test whether an assigment of
+      * values is legal prior to attempting to do it. By default, this delegates
+      * to the equals method.
+      *
+      * @param other the DataType we test against
+      * @return if true, this DataType is a superset or equals the argument DataType
+      */
+    public boolean isSupersetOfOrEquals(
+            DataType other )
+    {
+        return equals( other );
+    }
+
+    /**
+     * Determine whether this PropertyValue conforms to the constraints of this instance of DataType.
+     *
+     * @param value the candidate PropertyValue
+     * @return 0 if the candidate PropertyValue conforms to this type. Non-zero values depend
+     *         on the DataType; generally constructed by analogy with the return value of strcmp.
+     * @throws ClassCastException if this PropertyValue has the wrong type (e.g.
+     *         the PropertyValue is a StringValue, and the DataType an IntegerDataType)
+     */
+    public abstract int conforms(
+            PropertyValue value )
+        throws
+            ClassCastException;
+
+    /**
+      * Determine whether a domain check shall be performed on
+      * assignments. Default to false.
+      *
+      * @return if true, a domain check shall be performed prior to performing assignments
+      */
+    public boolean getPerformDomainCheck()
+    {
+        return false;
+    }
+
+    /**
+      * Return a boolean expression in the Java language that uses
+      * varName as an argument and that evaluates whether the content
+      * of variable varName is assignable to a value of this data type.
+      * For example, on an integer data type with minimum and maximum
+      * values, one would call it with argument "theValue", and it could
+      * return: "( theValue > 2 && theValue < 7 )", where "2" and "7" are
+      * the values of the min and max attributes of the integer data type.
+      *
+      * This is used primarily for code-generation purposes.
+      *
+      * @param varName the name of the variable containing the value
+      * @return the Java language  expression
+      */
+    public String getJavaDomainCheckExpression(
+            String varName )
+    {
+        return "true";
+    }
+
+    /**
+      * Obtain the Java class that can hold values of this data type.
+      *
+      * @return the Java class that can hold values of this data type
+      */
+    public abstract Class<? extends PropertyValue> getCorrespondingJavaClass();
+
+    /**
+     * Obtain a value expression in the Java language that invokes the constructor
+     * of factory method of the underlying concrete class, thereby creating or
+     * reusing an instance of the underlying concrete class that is identical
+     * to the instance on which this method was invoked.
+     *
+     * This is used primarily for code-generation purposes.
+     *
+     * @param classLoaderVar name of a variable containing the class loader to be used to initialize this value
+     * @return the Java language expression
+     */
+    public abstract String getJavaConstructorString(
+            String classLoaderVar );
+
+    /**
+      * Instantiate this data type into a PropertyValue with a
+      * reasonable default value.
+      *
+      * @return a PropertyValue with a reasonable default value that is an instance of this DataType
+      */
+    public final PropertyValue instantiate()
+    {
+        return getDefaultValue();
+    }
+
+    /**
+     * Obtain the default value of this DataType.
+     *
+     * @return the default value of this DataType
+     */
+    public abstract PropertyValue getDefaultValue();
+
+    /**
+     * If this DataType is a refinement of another, find which DataType it refines.
+     *
+     * @return the refined DataType, if any
+     */
+    public final DataType getSupertype()
+    {
+        return theSupertype;
+    }
+
+    /**
+     * Obtain the start part of a String representation of this object that acts
+     * as a link/hyperlink and can be shown to the user.
+     *
+     * @param rep the StringRepresentation
+     * @param pars collects parameters that may influence the String representation. Always provided.
+     * @return String representation
+     */
+    public String toStringRepresentationLinkStart(
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
+    {
+        return "";
+    }
+
+    /**
+     * Obtain the end part of a String representation of this MeshBase that acts
+     * as a link/hyperlink and can be shown to the user.
+     * 
+     * @param rep the StringRepresentation
+     * @param pars collects parameters that may influence the String representation. Always provided.
+     * @return String representation
+     */
+    public String toStringRepresentationLinkEnd(
+            StringRepresentation           rep,
+            StringRepresentationParameters pars )
+    {
+        return "";
+    }
+
+    /**
+     * Obtain a PropertyValue that corresponds to this PropertyType, based on the String representation
+     * of the PropertyValue.
+     * 
+     * @param representation the StringRepresentation in which the String s is given
+     * @param pars collects parameters that may influence the String representation. Always provided.
+     * @param s the String
+     * @param mimeType the MIME type of the representation, if known
+     * @return the PropertyValue
+     * @throws PropertyValueParsingException thrown if the String representation could not be parsed successfully
+     */
+    public abstract PropertyValue fromStringRepresentation(
+            StringRepresentation           representation,
+            StringRepresentationParameters pars,
+            String                         s,
+            String                         mimeType )
+        throws
+            PropertyValueParsingException;
+
+    /**
+     * Format a Property.
+     *
+     * @param owningMeshObject the MeshObject that owns this Property
+     * @param propertyType the PropertyType of the Property
+     * @param representation the representation scheme
+     * @param pars collects parameters that may influence the String representation. Always provided.
+     * @return the String representation
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
+     * @throws IllegalPropertyTypeException thrown if the PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public String formatProperty(
+            MeshObject                     owningMeshObject,
+            PropertyType                   propertyType,
+            StringRepresentation           representation,
+            StringRepresentationParameters pars )
+        throws
+            StringifierException,
+            IllegalPropertyTypeException,
+            NotPermittedException
+    {
+        String        editVar               = (String)  pars.get( StringRepresentationParameters.EDIT_VARIABLE );
+        Integer       editIndex             = (Integer) pars.get( StringRepresentationParameters.EDIT_INDEX );
+        Boolean       allowNull             = (Boolean) pars.get( ModelPrimitivesStringRepresentationParameters.ALLOW_NULL );
+        PropertyValue alternateDefaultValue = (PropertyValue) pars.get( ModelPrimitivesStringRepresentationParameters.DEFAULT_VALUE );
+
+        if( allowNull != null && allowNull.booleanValue() ) {
+            allowNull = propertyType.getIsOptional().value();
+        } // else if not allowNull from the parameters, don't care what the PropertyType says
+
+        if( allowNull == null ) {
+            allowNull = propertyType.getIsOptional().value();
+        }
+        if( editIndex == null ) {
+            editIndex = 1;
+        }
+
+        StringRepresentationParameters childPars               = pars.with( ModelPrimitivesStringRepresentationParameters.PROPERTY_TYPE, propertyType );
+        StringRepresentationParameters withoutAddTextChildPars = childPars.without( StringRepresentationParameters.ADD_TEXT );
+        StringRepresentationParameters withoutFormatChildPars  = withoutAddTextChildPars.without( StringRepresentationParameters.FORMAT_STRING );
+
+        PropertyValue defaultValue;
+        if( alternateDefaultValue != null ) {
+            defaultValue = alternateDefaultValue;
+        } else {
+            defaultValue = propertyType.getDefaultValue();
+        }
+        PropertyValue currentValue;
+        if( owningMeshObject != null ) {
+            currentValue = owningMeshObject.getPropertyValue( propertyType );
+        } else if( allowNull ) {
+            currentValue = null;
+        } else {
+            currentValue = defaultValue;
+        }
+
+        if( currentValue == null && owningMeshObject != null ) {
+            String nullString = (String) pars.get( StringRepresentationParameters.NULL_STRING );
+            if( nullString != null ) {
+                String ret = representation.formatEntry(
+                        DataType.class,
+                        "NullString",
+                        withoutFormatChildPars,
+               /*  0 */ nullString );
+                return ret;
+            }
+        }
+
+        String entry;
+        if( currentValue != null || !allowNull ) {
+            entry = "Value";
+        } else {
+            entry = "Null";
+        }
+
+        if( defaultValue == null ) {
+            defaultValue = getDefaultValue(); // the DataType's default, rather than the PropertyType's (which is null)
+        }
+        if( owningMeshObject == null && editVar == null && currentValue == null ) {
+            currentValue = defaultValue; // defaultValue is non-null here
+        }
+        StringRepresentation           jsRep    = StringRepresentationDirectorySingleton.getSingleton().get( StringRepresentationDirectory.TEXT_JAVASCRIPT_NAME );
+
+        String currentValueJsString = PropertyValue.toStringRepresentationOrNull( currentValue, jsRep, withoutFormatChildPars );
+        String defaultValueJsString = PropertyValue.toStringRepresentationOrNull( defaultValue, jsRep, withoutFormatChildPars );
+
+        String propertyHtml;
+        if( currentValue != null ) {
+            propertyHtml = currentValue.toStringRepresentation( representation, withoutAddTextChildPars );
+        } else {
+            propertyHtml = defaultValue.toStringRepresentation( representation, withoutAddTextChildPars );
+        }
+
+        String owningMeshObjectString;
+        if( owningMeshObject != null ) {
+            owningMeshObjectString = representation.formatEntry(
+                    DataType.class,
+                    "CurrentMeshObjectString",
+                    withoutFormatChildPars,
+                    editVar,
+                    owningMeshObject,
+                    owningMeshObject.getIdentifier() );
+
+        } else {
+            owningMeshObjectString = "";
+        }
+
+        StringRepresentationParameters forDataTypePars = pars.with( StringRepresentationParameters.MAX_LENGTH, Integer.MAX_VALUE );
+        forDataTypePars = forDataTypePars.without( StringRepresentationParameters.FORMAT_STRING );
+
+        String ret = representation.formatEntry(
+                DataType.class,
+                entry,
+                forDataTypePars,
+       /*  0 */ owningMeshObjectString,
+       /*  1 */ propertyType,
+       /*  2 */ currentValue,
+       /*  3 */ currentValueJsString,
+       /*  4 */ defaultValue,
+       /*  5 */ defaultValueJsString,
+       /*  6 */ propertyHtml,
+       /*  7 */ allowNull,
+       /*  8 */ propertyType.getIsReadOnly().value(),
+       /*  9 */ editVar,
+       /* 10 */ editIndex );
+
+        return ret;
+    }
+
+    /**
+     * The supertype of this DataType (if any).
+     */
+    protected DataType theSupertype;
+
+    /**
+     * String constant used in our subclasses in order to avoid using up more memory than necessary.
+     */
+    public static final String CREATE_STRING = ".create( ";
+
+    /**
+     * String constant used in our subclasses in order to avoid using up more memory than necessary.
+     */
+    public static final String COMMA_STRING = ", ";
+
+    /**
+     * String constant used in our subclasses in order to avoid using up more memory than necessary.
+     */
+    public static final String NULL_STRING = "null";
+
+    /**
+     * String constant used in our subclasses in order to avoid using up more memory than necessary.
+     */
+    public static final String QUOTE_STRING = "\"";
+
+    /**
+     * String constant used in our subclasses in order to avoid using up more memory than necessary.
+     */
+    public static final String DEFAULT_STRING = ".theDefault";
+
+    /**
+     * String constant used in our subclasses in order to avoid using up more memory than necessary.
+     */
+    public static final String CLOSE_PARENTHESIS_STRING = " )";
+
+    /**
+     * The default entry in the resource files for a DataType, prefixed by the StringRepresentation's prefix.
+     */
+    public static final String DEFAULT_ENTRY = "Type";
+}
