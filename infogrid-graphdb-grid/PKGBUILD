@@ -1,0 +1,30 @@
+pkgname=$(basename $(pwd))
+pkgver=2.9.8
+pkgrel=1
+pkgdesc='InfoGrid GraphDB (grid)'
+arch=('any')
+url="http://infogrid.org/"
+license=('AGPL')
+makedepends=(
+    'maven'
+    'jdk8-openjdk' )
+depends=(
+    'java-runtime'
+    'diet4j'
+    'infogrid-graphdb')
+
+build() {
+    cd ${startdir}
+    mvn package install ${MVN_OPTS}
+}
+
+package() {
+    installOne 'org.infogrid.kernel.net'
+    installOne 'org.infogrid.meshbase.store.net'
+    installOne 'org.infogrid.scene'
+}
+
+installOne() {
+    local name=$1
+    install -m644 -D ${startdir}/${name}/target/${name}-${pkgver}.jar ${pkgdir}/usr/lib/java/org/infogrid/${name}/${pkgver}/${name}-${pkgver}.jar
+}

@@ -1,0 +1,32 @@
+pkgname=$(basename $(pwd))
+pkgver=2.9.8
+pkgrel=1
+pkgdesc='InfoGrid Store abstraction'
+arch=('any')
+url="http://infogrid.org/"
+license=('AGPL')
+makedepends=('maven' 'jdk8-openjdk' )
+depends=(
+    'java-runtime'
+    'diet4j'
+    'infogrid-utils'
+    'mysql-connector-java')
+
+build() {
+    cd ${startdir}
+    mvn package install ${MVN_OPTS}
+}
+
+package() {
+    installOne 'org.infogrid.store'
+    installOne 'org.infogrid.store.filesystem'
+    installOne 'org.infogrid.store.keystore'
+    installOne 'org.infogrid.store.sql'
+    installOne 'org.infogrid.store.sql.mysql'
+    installOne 'org.infogrid.store.sql.postgresql'
+}
+
+installOne() {
+    local name=$1
+    install -m644 -D ${startdir}/${name}/target/${name}-${pkgver}.jar ${pkgdir}/usr/lib/java/org/infogrid/${name}/${pkgver}/${name}-${pkgver}.jar
+}

@@ -1,0 +1,37 @@
+pkgname=$(basename $(pwd))
+pkgver=2.9.8
+pkgrel=1
+pkgdesc='InfoGrid model library'
+arch=('any')
+url="http://infogrid.org/"
+license=('AGPL')
+makedepends=(
+    'maven'
+    'jdk8-openjdk' )
+depends=(
+    'java-runtime'
+    'diet4j'
+    'infogrid-graphdb')
+
+build() {
+    cd ${startdir}
+    mvn package install ${MVN_OPTS}
+}
+
+package() {
+    installOne 'org.infogrid.model.Annotation'
+    installOne 'org.infogrid.model.Blob'
+    installOne 'org.infogrid.model.Bookmark'
+    installOne 'org.infogrid.model.Common'
+    installOne 'org.infogrid.model.Feeds'
+    installOne 'org.infogrid.model.Requirement'
+    installOne 'org.infogrid.model.Tagging'
+    installOne 'org.infogrid.model.VCard'
+    installOne 'org.infogrid.model.Web'
+    installOne 'org.infogrid.model.Wiki'
+}
+
+installOne() {
+    local name=$1
+    install -m644 -D ${startdir}/${name}/target/${name}-${pkgver}.jar ${pkgdir}/usr/lib/java/org/infogrid/${name}/${pkgver}/${name}-${pkgver}.jar
+}

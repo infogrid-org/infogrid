@@ -1,0 +1,46 @@
+pkgname=$(basename $(pwd))
+pkgver=2.9.8
+pkgrel=1
+pkgdesc='InfoGrid UI'
+arch=('any')
+url="http://infogrid.org/"
+license=('AGPL')
+makedepends=(
+    'maven'
+    'jdk8-openjdk')
+depends=(
+    'java-runtime'
+    'diet4j'
+    'infogrid-probe'
+    'servlet-jstl-java')
+
+build() {
+    cd ${startdir}
+    mvn package install ${MVN_OPTS}
+}
+
+package() {
+    installJar 'org.infogrid.jee'
+    installJar 'org.infogrid.jee.lid'
+    installJar 'org.infogrid.jee.net.testapp'
+    installJar 'org.infogrid.jee.probe'
+    installJar 'org.infogrid.jee.security.aclbased'
+    installJar 'org.infogrid.jee.shell.http'
+    installJar 'org.infogrid.jee.templates'
+    installJar 'org.infogrid.jee.testapp'
+    installJar 'org.infogrid.jee.viewlet'
+    installJar 'org.infogrid.jee.viewlet.bulk'
+    installJar 'org.infogrid.jee.viewlet.json'
+    installJar 'org.infogrid.jee.viewlet.log4j'
+    installJar 'org.infogrid.jee.viewlet.net'
+    installJar 'org.infogrid.jee.viewlet.net.local'
+    installJar 'org.infogrid.jee.viewlet.net.local.store'
+    installJar 'org.infogrid.jee.viewlet.store'
+    installJar 'org.infogrid.model.Viewlet'
+    installJar 'org.infogrid.viewlet'
+}
+
+installJar() {
+    local name=$1
+    install -m644 -D ${startdir}/${name}/target/${name}-${pkgver}.jar ${pkgdir}/usr/lib/java/org/infogrid/${name}/${pkgver}/${name}-${pkgver}.jar
+}
