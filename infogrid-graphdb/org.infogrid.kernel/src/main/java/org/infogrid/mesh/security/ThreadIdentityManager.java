@@ -15,6 +15,7 @@
 package org.infogrid.mesh.security;
 
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.Pair;
@@ -299,6 +300,29 @@ public abstract class ThreadIdentityManager
             sudo();
 
             r.run();
+
+        } finally {
+            sudone();
+        }
+    }
+
+    /**
+     * Execute this action as super user.
+     *
+     * @param c the Callable containing the action
+     * @param <T> the return type of the Callable
+     * @return the result
+     * @throws Exception something went wrong
+     */
+    public static <T> T suExec(
+            Callable<T> c )
+        throws
+            Exception
+    {
+        try {
+            sudo();
+
+            return c.call();
 
         } finally {
             sudone();

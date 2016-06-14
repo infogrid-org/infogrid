@@ -138,6 +138,7 @@ public class HttpShellFilter
      * @throws IOException if an input/output error occurs
      * @throws ServletException if a servlet error occurs
      */
+    @Override
     public void doFilter(
             ServletRequest  request,
             ServletResponse response,
@@ -720,14 +721,12 @@ public class HttpShellFilter
             for( HttpShellHandler handler : handlers ) {
                 try {
                     String ret2 = handler.afterTransactionEnd( lidRequest, variables, txs, theMainMeshBase, now, thrown );
-                    if( ret2 == null ) {
-                        continue;
-                    }
-
-                    if( ret == null || ret.equals( ret2 )) {
-                        ret = ret2;
-                    } else {
-                        getLog().error( "More than one handler declared redirect URL: ", ret, ret2, handler );
+                    if( ret2 != null ) {
+                        if( ret == null || ret.equals( ret2 )) {
+                            ret = ret2;
+                        } else {
+                            getLog().error( "More than one handler declared redirect URL: ", ret, ret2, handler );
+                        }
                     }
 
                 // make sure we pass on the first exception
@@ -1196,6 +1195,7 @@ public class HttpShellFilter
     /**
      * Destroy method for this filter.
      */
+    @Override
     public void destroy()
     {
     }
