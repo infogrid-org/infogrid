@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.infogrid.mesh.security.PropertyReadOnlyException;
-import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.transaction.MeshObjectBecameDeadStateEvent;
@@ -41,12 +40,10 @@ import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.primitives.AttributableMeshType;
 import org.infogrid.model.primitives.DataType;
 import org.infogrid.model.primitives.EntityType;
-import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.model.primitives.Role;
 import org.infogrid.model.primitives.RoleType;
-import org.infogrid.model.traversal.TraversalSpecification;
 import org.infogrid.modelbase.MeshTypeNotFoundException;
 import org.infogrid.modelbase.PropertyTypeNotFoundException;
 import org.infogrid.util.ArrayHelper;
@@ -732,19 +729,6 @@ public abstract class AbstractMeshObject
             }
         }
         throw new PropertyTypeNotFoundException( null, propertyName );
-    }
-
-    /**
-     * Traverse from this MeshObject to all directly related MeshObjects. Directly
-     * related MeshObjects are those MeshObjects that are participating in a
-     * relationship with this MeshObject.
-     *
-     * @return the set of MeshObjects that are directly related to this MeshObject
-     */
-    @Override
-    public final MeshObjectSet traverseToNeighborMeshObjects()
-    {
-        return traverseToNeighborMeshObjects( true );
     }
 
     /**
@@ -1510,95 +1494,6 @@ public abstract class AbstractMeshObject
     }
 
     /**
-      * Traverse a TraversalSpecification from this MeshObject to obtain a set of MeshObjects.
-      * This will consider all MeshObjects equivalent to this one as the start MeshObject.
-      *
-      * @param theTraverseSpec the TraversalSpecification to traverse
-      * @return the set of MeshObjects found as a result of the traversal
-      */
-    @Override
-    public final MeshObjectSet traverse(
-            TraversalSpecification theTraverseSpec )
-    {
-        return traverse( theTraverseSpec, true );
-    }
-
-    /**
-     * Obtain the RoleTypes that this MeshObject currently participates in. This will return only one
-     * instance of the same RoleType object, even if the MeshObject participates in this RoleType
-     * multiple times with different other MeshObjects.
-     *
-     * @return the RoleTypes that this MeshObject currently participates in.
-     */
-    @Override
-    public final RoleType [] getRoleTypes()
-    {
-        return getRoleTypes( true );
-    }
-
-    /**
-     * Obtain the Roles that this MeshObject currently participates in.
-     *
-     * @return the Roles that this MeshObject currently participates in.
-     */
-    @Override
-    public final Role [] getRoles()
-    {
-        return getRoles( true );
-    }
-
-    /**
-     * Obtain the RoleTypes that this MeshObject currently participates in with the
-     * specified other MeshObject.
-     *
-     * @param neighbor the other MeshObject
-     * @return the RoleTypes that this MeshObject currently participates in.
-     * @throws NotRelatedException thrown if this MeshObject and otherObject are not related
-     */
-    @Override
-    public final RoleType [] getRoleTypes(
-            MeshObject neighbor )
-        throws
-            NotRelatedException
-    {
-        return getRoleTypes( neighbor, true );
-    }
-
-    /**
-     * Obtain the RoleTypes that this MeshObject currently participates in with the
-     * MeshObject with the specified MeshObjectIdentifier.
-     *
-     * @param neighborIdentifier the MeshObjectIdentifier of the other MeshObject
-     * @return the RoleTypes that this MeshObject currently participates in.
-     * @throws NotRelatedException thrown if this MeshObject and the neighbor MeshObject are not related
-     */
-    @Override
-    public RoleType [] getRoleTypes(
-            MeshObjectIdentifier neighborIdentifier )
-        throws
-            NotRelatedException
-    {
-        return getRoleTypes( neighborIdentifier, true );
-    }
-
-    /**
-     * Obtain the MeshTypeIdentifiers of the RoleTypes that this MeshObject plays with a
-     * given neighbor MeshObject identified by its MeshObjectIdentifier.
-     *
-     * @param neighborIdentifier the MeshObjectIdentifier of the neighbor MeshObject
-     * @return the identifiers of the RoleTypes
-     * @throws NotRelatedException thrown if the specified MeshObject is not actually a neighbor
-     */
-    @Override
-    public final MeshTypeIdentifier [] getRoleTypeIdentifiers(
-            MeshObjectIdentifier neighborIdentifier )
-        throws
-            NotRelatedException
-    {
-        return getRoleTypeIdentifiers( neighborIdentifier, true );
-    }
-
-    /**
      * Determine whether this MeshObject's relationship to the other MeshObject is blessed
      * with a given RoleType. Also returns false if the two MeshObjects are not related.
      *
@@ -1646,19 +1541,6 @@ public abstract class AbstractMeshObject
         } catch( NotRelatedException ex ) {
             return false;
         }
-    }
-
-    /**
-     * Obtain the Identifiers of the equivalent MeshObjects. This is sometimes more efficient than
-     * traversing to the equivalents, and determining the MeshObjectIdentifiers.
-     *
-     * @return the MeshObjectIdentifiers of the equivalents
-     */
-    @Override
-    public MeshObjectIdentifier[] getEquivalentMeshObjectIdentifiers()
-    {
-        MeshObjectIdentifier [] ret = getEquivalents().asIdentifiers();
-        return ret;
     }
 
     /**

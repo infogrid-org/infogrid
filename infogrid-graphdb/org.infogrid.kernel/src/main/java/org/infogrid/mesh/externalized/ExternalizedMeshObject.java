@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -99,12 +99,4 @@ public interface ExternalizedMeshObject
      */
     public abstract MeshTypeIdentifier [] getRoleTypesFor(
             MeshObjectIdentifier neighbor );
-
-    /**
-     * Obtain the MeshObjectIdentifiers of the MeshObjects that participate in an equivalence
-     * set with this MeshObject.
-     *
-     * @return the MeshObjectIdentifier. May be null.
-     */
-    public abstract MeshObjectIdentifier [] getEquivalents();
 }

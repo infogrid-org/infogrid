@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -101,17 +101,11 @@ public class SelectiveTraversalSpecification
     }
 
     /**
-     * Use this TraversalSpecification to traverse from the passed-in start MeshObject
-     * to related MeshObjects.
-     *
-     * @param start the start MeshObject for the traversal
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the result of the traversal
+     * {@inheritDoc}
      */
+    @Override
     public MeshObjectSet traverse(
-            MeshObject start,
-            boolean    considerEquivalents )
+            MeshObject start )
     {
         MeshObjectSetFactory setFactory = start.getMeshBase().getMeshObjectSetFactory();
 
@@ -119,7 +113,7 @@ public class SelectiveTraversalSpecification
             return setFactory.obtainEmptyImmutableMeshObjectSet();
         }
 
-        MeshObjectSet s = theQualified.traverse( start, considerEquivalents );
+        MeshObjectSet s = theQualified.traverse( start );
 
         if( theEndSelector != null ) {
             return setFactory.createImmutableMeshObjectSet( s, theEndSelector );
@@ -129,17 +123,11 @@ public class SelectiveTraversalSpecification
     }
 
     /**
-     * Use this TraversalSpecification to traverse from the passed-in start MeshObjectSet
-     * to related MeshObjects.
-     *
-     * @param theSet the start MeshObjectSet for the traversal
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the result of the traversal
+     * {@inheritDoc}
      */
+    @Override
     public MeshObjectSet traverse(
-            MeshObjectSet theSet,
-            boolean       considerEquivalents )
+            MeshObjectSet theSet )
     {
         MeshObjectSetFactory setFactory = theSet.getFactory();
 
@@ -149,7 +137,7 @@ public class SelectiveTraversalSpecification
         } else {
             realStart = theSet;
         }
-        MeshObjectSet s = theQualified.traverse( realStart, considerEquivalents );
+        MeshObjectSet s = theQualified.traverse( realStart );
 
         if( theEndSelector != null ) {
             return setFactory.createImmutableMeshObjectSet( s, theEndSelector );
@@ -198,7 +186,7 @@ public class SelectiveTraversalSpecification
 
     /**
      * Hash code.
-     * 
+     *
      * @return hash code
      */
     @Override
@@ -223,6 +211,7 @@ public class SelectiveTraversalSpecification
      * @return true if this event may affect the result of traversing from the MeshObject
      *         that sent this event
      */
+    @Override
     public boolean isAffectedBy(
             MeshBase                  meshBase,
             MeshObjectRoleChangeEvent theEvent )

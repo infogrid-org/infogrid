@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -40,7 +40,7 @@ public interface NetMeshBaseLifecycleManager
     /**
      * <p>Obtain the NetMeshBase that this NetMeshBaseLifecycleManager works on.</p>
      * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     * 
+     *
      * @return the NetMeshBase that this NetMeshBaseLifecycleManager works on
      */
     public abstract NetMeshBase getMeshBase();
@@ -112,10 +112,10 @@ public interface NetMeshBaseLifecycleManager
      * and with a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
      *                        automatically create a suitable NetMeshObjectIdentifier.
      * @return the created NetMeshObject
@@ -135,10 +135,10 @@ public interface NetMeshBaseLifecycleManager
      * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
      *                        automatically create a suitable NetMeshObjectIdentifier.
      * @param type the EntityType with which the NetMeshObject will be blessed
@@ -162,10 +162,10 @@ public interface NetMeshBaseLifecycleManager
      * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
      *                        automatically create a suitable NetMeshObjectIdentifier.
      * @param types the EntityTypes with which the NetMeshObject will be blessed
@@ -189,10 +189,10 @@ public interface NetMeshBaseLifecycleManager
      * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. This must not be null.
      * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
      * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
@@ -220,10 +220,10 @@ public interface NetMeshBaseLifecycleManager
      * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
      *                        automatically create a suitable NetMeshObjectIdentifier.
      * @param type the EntityType with which the NetMeshObject will be blessed
@@ -256,10 +256,10 @@ public interface NetMeshBaseLifecycleManager
      * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
      *                        automatically create a suitable NetMeshObjectIdentifier.
      * @param types the EntityTypes with which the NetMeshObject will be blessed
@@ -290,12 +290,12 @@ public interface NetMeshBaseLifecycleManager
      * <p>Convenience method to create a new replica of an existing NetMeshObject with zero or more types,
      * with the provided time stamps, the provided NetMeshObjectIdentifier, flags whether to give up the
      * lock or home replica status should this replica ever acquire either, and the Proxy in which both
-     * homeReplica and lock are to be found. 
+     * homeReplica and lock are to be found.
      * This call creates a replica of an existing MeshObject, so it is not a "semantic create".</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created replica. This must not be null.
      * @param types the EntityTypes with which the NetMeshObject will be blessed
      * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
@@ -332,10 +332,10 @@ public interface NetMeshBaseLifecycleManager
      * with the provided time stamps, the provided NetMeshObjectIdentifier, flags whether to give up the
      * lock or home replica status should this replica ever acquire either, and all Proxies and their roles.
      * This call creates a replica of an existing MeshObject, so it is not a "semantic create".</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created replica. This must not be null.
      * @param types the EntityTypes with which the NetMeshObject will be blessed
      * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
@@ -656,7 +656,7 @@ public interface NetMeshBaseLifecycleManager
         throws
             TransactionException,
             MustNotDeleteHomeObjectException;
-    
+
     /**
      * Purge several replicas. This method can be applied on all NetMeshObjects in this NetMeshBase,
      * except the home object of this NetMeshBase.
@@ -698,7 +698,7 @@ public interface NetMeshBaseLifecycleManager
      * Proxy information is provided
      * as separate parameters, as a ProxyPolicy may choose to use different Proxies than offered
      * by the NetMeshObject replica being replicated.
-     * 
+     *
      * @param externalized the external form of the NetMeshObject that is being replicated locally
      * @param proxies the Proxies to use
      * @param proxyTowardsHomeIndex the index, in the proxies, that holds the Proxy towards the home replica. -1 if none.
@@ -719,7 +719,7 @@ public interface NetMeshBaseLifecycleManager
     /**
      * Delete a replica NetMeshObject in this NetMeshBase, thereby removing a
      * branch in the replication graph.
-     * 
+     *
      * @param identifier the identifier of the NetMeshObject whose replica is to be deleted
      * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
      * @return the deleted NetMeshObject
@@ -741,6 +741,7 @@ public interface NetMeshBaseLifecycleManager
      * constraints.
      *
      * @param toKill the NetMeshObjects to kill
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      */
     public abstract void kill(
             NetMeshObject [] toKill )

@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -50,21 +50,6 @@ public interface TraversalSpecification
             MeshObject start );
 
     /**
-     * Use this TraversalSpecification to traverse from the passed-in start MeshObject
-     * to related MeshObjects. This method is defined on TraversalSpecification, so
-     * different implementations of TraversalSpecification can implement different ways
-     * of doing this. Specify whether relationships of equivalent MeshObjects
-     * should be considered as well.
-     *
-     * @param start the start MeshObject for the traversal
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     * @return the result of the traversal
-     */
-    public abstract MeshObjectSet traverse(
-            MeshObject start,
-            boolean    considerEquivalents );
-
-    /**
       * Use this TraversalSpecification to traverse from the passed-in start MeshObjectSet
       * to related MeshObjects. This method is defined on TraversalSpecification, so
       * different implementations of TraversalSpecification can implement different ways
@@ -75,21 +60,6 @@ public interface TraversalSpecification
       */
     public abstract MeshObjectSet traverse(
             MeshObjectSet theSet );
-
-    /**
-      * Use this TraversalSpecification to traverse from the passed-in start MeshObjectSet
-      * to related MeshObjects. This method is defined on TraversalSpecification, so
-      * different implementations of TraversalSpecification can implement different ways
-      * of doing this. Specify whether relationships of equivalent MeshObjects
-      * should be considered as well.
-      *
-      * @param theSet the start MeshObjectSet for the traversal
-      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-      * @return the result of the traversal
-      */
-    public abstract MeshObjectSet traverse(
-            MeshObjectSet theSet,
-            boolean       considerEquivalents );
 
     /**
      * Determine whether a given event, with a source of from where we traverse the

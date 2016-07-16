@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -33,8 +33,6 @@ import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.a.AccessLocallySynchronizer;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectPropertyChangeEvent;
@@ -124,6 +122,7 @@ public abstract class AbstractCommunicatingProxy
      *
      * @return the BidirectionalMessageEndpoint
      */
+    @Override
     public final ProxyMessageEndpoint getMessageEndpoint()
     {
         return theEndpoint;
@@ -139,6 +138,7 @@ public abstract class AbstractCommunicatingProxy
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
+    @Override
     public long obtainReplicas(
             NetMeshObjectAccessSpecification [] paths,
             long                                duration )
@@ -161,6 +161,7 @@ public abstract class AbstractCommunicatingProxy
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
+    @Override
     public long tryToObtainLocks(
             NetMeshObject [] localReplicas,
             long             duration )
@@ -185,6 +186,7 @@ public abstract class AbstractCommunicatingProxy
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
+    @Override
     public long tryToPushLocks(
             NetMeshObject [] localReplicas,
             boolean []       isNewProxy,
@@ -208,6 +210,7 @@ public abstract class AbstractCommunicatingProxy
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
+    @Override
     public long tryToObtainHomeReplicas(
             NetMeshObject [] localReplicas,
             long             duration )
@@ -232,6 +235,7 @@ public abstract class AbstractCommunicatingProxy
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
+    @Override
     public long tryToPushHomeReplicas(
             NetMeshObject [] localReplicas,
             boolean []       isNewProxy,
@@ -255,6 +259,7 @@ public abstract class AbstractCommunicatingProxy
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
+    @Override
     public long forceObtainLocks(
             NetMeshObject [] localReplicas,
             long             duration )
@@ -280,6 +285,7 @@ public abstract class AbstractCommunicatingProxy
      *         enables resynchronization to be performed on another thread while an accessLocally operation is still waiting
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
+    @Override
     public long tryResynchronizeReplicas(
             NetMeshObjectIdentifier [] identifiers,
             long                       duration,
@@ -299,6 +305,7 @@ public abstract class AbstractCommunicatingProxy
      * @param localReplicas the local replicas for which the lease should be canceled
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
+    @Override
     public long cancelReplicas(
             NetMeshObject [] localReplicas,
             long             duration )
@@ -319,6 +326,7 @@ public abstract class AbstractCommunicatingProxy
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return the duration, in milliseconds, that the Proxy believes this operation will take
      */
+    @Override
     public long freshen(
             NetMeshObject [] localReplicas,
             long             duration )
@@ -337,6 +345,7 @@ public abstract class AbstractCommunicatingProxy
      * @param isPermanent if true, this Proxy will go away permanently; if false,
      *        it may come alive again some time later, e.g. after a reboot
      */
+    @Override
     public void die(
             boolean isPermanent )
     {
@@ -360,6 +369,7 @@ public abstract class AbstractCommunicatingProxy
      *
      * @param theTransaction the Transaction that was committed
      */
+    @Override
     public void transactionCommitted(
             Transaction theTransaction )
     {
@@ -380,6 +390,7 @@ public abstract class AbstractCommunicatingProxy
      * @param endpoint the MessageEndpoint sending this event
      * @param incoming the incoming messages
      */
+    @Override
     public final void messageReceived(
             ReceivingMessageEndpoint<XprisoMessage> endpoint,
             List<XprisoMessage>                     incoming )
@@ -537,6 +548,7 @@ public abstract class AbstractCommunicatingProxy
                  *
                  * @return the instantiated object
                  */
+                @Override
                 protected Transaction instantiate()
                     throws
                         Throwable
@@ -584,18 +596,6 @@ public abstract class AbstractCommunicatingProxy
                 }
             }
             for( NetMeshObjectTypeAddedEvent event : instructions.getTypeAdditions() ) {
-                NetMeshObject obj = null;
-                try {
-                    obj = event.potentiallyApplyToReplicaIn( theMeshBase, perhapsTx, this );
-                } catch( CannotApplyChangeException ex ) {
-                    log.error( ex );
-                } finally {
-                    if( obj != null ) {
-                        meshObjectModifiedDuringMessageProcessing( obj );
-                    }
-                }
-            }
-            for( NetMeshObjectEquivalentsAddedEvent event : instructions.getEquivalentsAdditions() ) {
                 NetMeshObject obj = null;
                 try {
                     obj = event.potentiallyApplyToReplicaIn( theMeshBase, perhapsTx, this );
@@ -656,18 +656,6 @@ public abstract class AbstractCommunicatingProxy
                 }
             }
             for( NetMeshObjectNeighborRemovedEvent event : instructions.getNeighborRemovals() ) {
-                NetMeshObject obj = null;
-                try {
-                    obj = event.potentiallyApplyToReplicaIn( theMeshBase, perhapsTx, this );
-                } catch( CannotApplyChangeException ex ) {
-                    log.error( ex );
-                } finally {
-                    if( obj != null ) {
-                        meshObjectModifiedDuringMessageProcessing( obj );
-                    }
-                }
-            }
-            for( NetMeshObjectEquivalentsRemovedEvent event : instructions.getEquivalentsRemovals() ) {
                 NetMeshObject obj = null;
                 try {
                     obj = event.potentiallyApplyToReplicaIn( theMeshBase, perhapsTx, this );
@@ -791,7 +779,7 @@ public abstract class AbstractCommunicatingProxy
             }
         }
         if( incoming != null ) {
-            List<XprisoMessage> l = new ArrayList<XprisoMessage>( 1 );
+            List<XprisoMessage> l = new ArrayList<>( 1 );
             l.add( incoming );
             theWaitEndpoint.messageReceived( instructions.getIncomingXprisoMessageEndpoint(), l );
         }
@@ -821,6 +809,7 @@ public abstract class AbstractCommunicatingProxy
      * @param endpoint the MessageEndpoint sending this event
      * @param msg the sent message
      */
+    @Override
     public void messageSent(
             SendingMessageEndpoint<XprisoMessage> endpoint,
             XprisoMessage                         msg )
@@ -839,6 +828,7 @@ public abstract class AbstractCommunicatingProxy
      * @param endpoint the MessageEndpoint sending this event
      * @param msg the enqueued message
      */
+    @Override
     public void messageEnqueued(
             SendingMessageEndpoint<XprisoMessage> endpoint,
             XprisoMessage                         msg )
@@ -857,6 +847,7 @@ public abstract class AbstractCommunicatingProxy
      * @param endpoint the MessageEndpoint sending this event
      * @param msg the outgoing message
      */
+    @Override
     public void messageSendingFailed(
             SendingMessageEndpoint<XprisoMessage> endpoint,
             XprisoMessage                         msg )
@@ -870,6 +861,7 @@ public abstract class AbstractCommunicatingProxy
      * @param endpoint the MessageEndpoint sending this event
      * @param token the received token
      */
+    @Override
     public final void tokenReceived(
             PingPongMessageEndpoint<XprisoMessage> endpoint,
             long                                   token )
@@ -883,6 +875,7 @@ public abstract class AbstractCommunicatingProxy
      * @param endpoint the MessageEndpoint sending this event
      * @param token the sent token
      */
+    @Override
     public final void tokenSent(
             PingPongMessageEndpoint<XprisoMessage> endpoint,
             long                                   token )
@@ -897,6 +890,7 @@ public abstract class AbstractCommunicatingProxy
      * @param msg the status of the outgoing queue
      * @param t the error
      */
+    @Override
     public void disablingError(
             MessageEndpoint<XprisoMessage> endpoint,
             List<XprisoMessage>            msg,
@@ -938,6 +932,7 @@ public abstract class AbstractCommunicatingProxy
                      *
                      * @return the instantiated object
                      */
+                    @Override
                     protected ParserFriendlyXprisoMessage instantiate()
                     {
                         ParserFriendlyXprisoMessage ret = ParserFriendlyXprisoMessage.create(

@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -63,6 +63,7 @@ public class GuardCheckingAccessManager
      * @param newOwner the MeshObject that is the new owner.
      * @throws TransactionException thrown if this is invoked outside of proper transaction boundaries
      */
+    @Override
     public void assignOwner(
             MeshObject toBeOwned,
             MeshObject newOwner )
@@ -80,6 +81,7 @@ public class GuardCheckingAccessManager
      * @param identifier the MeshObjectIdentifier
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedCreate(
             MeshBase             mb,
             MeshObjectIdentifier identifier )
@@ -96,6 +98,7 @@ public class GuardCheckingAccessManager
      * @param two the second MeshObject
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedRelate(
             MeshObject one,
             MeshObject two )
@@ -112,6 +115,7 @@ public class GuardCheckingAccessManager
      * @param two the second MeshObject
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedUnrelate(
             MeshObject one,
             MeshObject two )
@@ -128,6 +132,7 @@ public class GuardCheckingAccessManager
      * @param newValue the proposed new value for timeExpires
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedSetTimeExpires(
             MeshObject obj,
             long       newValue )
@@ -143,7 +148,7 @@ public class GuardCheckingAccessManager
 
             MeshObject caller = ThreadIdentityManager.getCaller();
 
-            for( Role current : obj.getRoles( false ) ) {
+            for( Role current : obj.getRoles() ) {
                 current.getRoleType().checkPermittedSetTimeExpires(
                         obj,
                         newValue,
@@ -163,6 +168,7 @@ public class GuardCheckingAccessManager
      * @param newValue the proposed new value for the property
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedSetProperty(
             MeshObject    obj,
             PropertyType  thePropertyType,
@@ -196,6 +202,7 @@ public class GuardCheckingAccessManager
      * @param thePropertyType the PropertyType identifing the property to be read
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedGetProperty(
             MeshObject   obj,
             PropertyType thePropertyType )
@@ -228,6 +235,7 @@ public class GuardCheckingAccessManager
      * @param type the EntityType whose blessing we wish to check
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedBlessedBy(
             MeshObject obj,
             EntityType type )
@@ -259,6 +267,7 @@ public class GuardCheckingAccessManager
      * @param types the EntityTypes with which to bless
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedBless(
             MeshObject    obj,
             EntityType [] types )
@@ -283,7 +292,7 @@ public class GuardCheckingAccessManager
                         caller );
             }
 
-            Role [] roles = obj.getRoles( false );
+            Role [] roles = obj.getRoles();
             for( Role current : roles ) {
                 RoleType   roleType = current.getRoleType();
                 MeshObject neighbor = theMeshBase.findMeshObjectByIdentifier( current.getNeighborIdentifier() );
@@ -307,6 +316,7 @@ public class GuardCheckingAccessManager
      * @param types the EntityTypes from which to unbless
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedUnbless(
             MeshObject    obj,
             EntityType [] types )
@@ -327,7 +337,7 @@ public class GuardCheckingAccessManager
                 current.checkPermittedUnbless( obj, caller );
             }
 
-            Role [] roles = obj.getRoles( false );
+            Role [] roles = obj.getRoles();
             for( Role current : roles ) {
                 RoleType   roleType = current.getRoleType();
                 MeshObject neighbor = theMeshBase.findMeshObjectByIdentifier( current.getNeighborIdentifier() );
@@ -354,6 +364,7 @@ public class GuardCheckingAccessManager
      * @param neighbor neighbor to which this MeshObject is related, if it could be resolved
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedBless(
             MeshObject           obj,
             RoleType []          thisEnds,
@@ -388,7 +399,7 @@ public class GuardCheckingAccessManager
                 }
             }
 
-            Role [] roles = obj.getRoles( false );
+            Role [] roles = obj.getRoles();
             for( Role current : roles ) {
                 RoleType roleType = current.getRoleType();
 
@@ -406,7 +417,7 @@ public class GuardCheckingAccessManager
             }
 
             if( neighbor != null ) {
-                Role [] neighborRoles = neighbor.getRoles( false );
+                Role [] neighborRoles = neighbor.getRoles();
                 RoleType [] otherEnds = new RoleType[ thisEnds.length ];
                 for( int i=0 ; i<thisEnds.length ; ++i ) {
                     otherEnds[i] = thisEnds[i].getInverseRoleType();
@@ -442,6 +453,7 @@ public class GuardCheckingAccessManager
      * @param neighbor neighbor to which this MeshObject is related, if it could be resolved
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedUnbless(
             MeshObject           obj,
             RoleType []          thisEnds,
@@ -476,7 +488,7 @@ public class GuardCheckingAccessManager
                 }
             }
 
-            Role [] roles = obj.getRoles( false );
+            Role [] roles = obj.getRoles();
             for( Role current : roles ) {
                 RoleType roleType = current.getRoleType();
 
@@ -494,7 +506,7 @@ public class GuardCheckingAccessManager
             }
 
             if( neighbor != null ) {
-                Role [] neighborRoles = neighbor.getRoles( false );
+                Role [] neighborRoles = neighbor.getRoles();
                 RoleType [] otherEnds = new RoleType[ thisEnds.length ];
                 for( int i=0 ; i<thisEnds.length ; ++i ) {
                     otherEnds[i] = thisEnds[i].getInverseRoleType();
@@ -531,6 +543,7 @@ public class GuardCheckingAccessManager
      * @param neighbor neighbor to which this traversal leads
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedTraversal(
             MeshObject           obj,
             RoleType             toTraverse,
@@ -563,6 +576,7 @@ public class GuardCheckingAccessManager
      * @param two the second MeshObject, if it could be resolved
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedAddAsEquivalent(
             MeshObject           one,
             MeshObjectIdentifier twoIdentifier,
@@ -581,6 +595,7 @@ public class GuardCheckingAccessManager
      * @param roleTypesToAsk the RoleTypes to ask
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedRemoveAsEquivalent(
             MeshObject  obj,
             RoleType [] roleTypesToAsk )
@@ -598,6 +613,7 @@ public class GuardCheckingAccessManager
      * @param obj the MeshObject
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedDelete(
             MeshObject obj )
         throws
@@ -614,7 +630,7 @@ public class GuardCheckingAccessManager
 
             checkPermittedUnbless( obj, allTypes );
 
-            for( Role current : obj.getRoles( false ) ) {
+            for( Role current : obj.getRoles() ) {
                 RoleType roleType = current.getRoleType();
 
                 checkPermittedUnbless(

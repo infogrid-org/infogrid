@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -31,7 +31,7 @@ public abstract class AclUtils
      */
     private AclUtils()
     {}
-    
+
     /**
      * Evaluate whether a MeshObject has access of a certain type to another MeshObject.
      *
@@ -47,8 +47,7 @@ public abstract class AclUtils
     {
         // let's hope this implementation is reasonably efficient
         MeshObject protectionDomain = accessed.traverse(
-                AclbasedSubjectArea.PROTECTIONDOMAIN_GOVERNS_MESHOBJECT.getDestination(),
-                false ).getSingleMember();
+                AclbasedSubjectArea.PROTECTIONDOMAIN_GOVERNS_MESHOBJECT.getDestination()).getSingleMember();
             // it's important that we don't consider equivalents here
 
         if( protectionDomain == null ) {
@@ -82,9 +81,9 @@ public abstract class AclUtils
             MeshObject potentialOwner,
             MeshObject potentialOwned )
     {
-        MeshObjectSet owners = potentialOwned.traverse( AclbasedSubjectArea.MESHOBJECT_HASOWNER_MESHOBJECT.getSource(), false );
+        MeshObjectSet owners = potentialOwned.traverse( AclbasedSubjectArea.MESHOBJECT_HASOWNER_MESHOBJECT.getSource());
             // it's important that we don't consider equivalents here
-        
+
         if( potentialOwner == potentialOwned && owners.isEmpty() ) {
             return true; // MeshObjects without related owners own themselves
         }

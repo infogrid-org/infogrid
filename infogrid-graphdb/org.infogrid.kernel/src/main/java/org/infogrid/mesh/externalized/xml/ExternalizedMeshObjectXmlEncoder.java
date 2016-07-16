@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -57,7 +57,7 @@ public class ExternalizedMeshObjectXmlEncoder
 
     /**
      * Serialize an ExternalizedMeshObject to an OutputStream.
-     * 
+     *
      * @param obj the input ExternalizedMeshObject
      * @param out the OutputStream to which to append the ExternalizedMeshObject
      * @throws EncodingException thrown if a problem occurred during encoding
@@ -81,7 +81,7 @@ public class ExternalizedMeshObjectXmlEncoder
 
     /**
      * Serialize an ExternalizedMeshObject to a StringBuilder.
-     * 
+     *
      * @param obj the ExternalizedMeshObject to encode
      * @param buf the StringBuilder to which to append the ExternalizedMeshObject
      * @throws EncodingException thrown if a problem occurred during encoding
@@ -115,8 +115,7 @@ public class ExternalizedMeshObjectXmlEncoder
         encodeExternalizedMeshObjectTypes(       obj, buf );
         encodeExternalizedMeshObjectProperties(  obj, buf );
         encodeExternalizedMeshObjectNeighbors(   obj, buf );
-        encodeExternalizedMeshObjectEquivalents( obj, buf );
-        
+
         appendExternalizedMeshObjectEncodingHook( obj, buf  );
 
         buf.append( "</" ).append( meshObjectTagName ).append( ">\n" );
@@ -272,34 +271,6 @@ public class ExternalizedMeshObjectXmlEncoder
     }
 
     /**
-     * Serialize the equivalents section.
-     *
-     * @param obj the ExternalizedMeshObject to encode
-     * @param buf the StringBuilder to which to append the ExternalizedMeshObject
-     * @throws EncodingException thrown if a problem occurred during encoding
-     */
-    protected void encodeExternalizedMeshObjectEquivalents(
-            ExternalizedMeshObject obj,
-            StringBuilder          buf  )
-        throws
-            EncodingException
-    {
-        // If we have this, we have to write even null values, because otherwise we can't distinguish right from left
-        MeshObjectIdentifier [] equivalentsNames = obj.getEquivalents();
-        if( equivalentsNames != null ) {
-            for( int i=0 ; i<equivalentsNames.length ; ++i ) {
-                buf.append( " <" );
-                buf.append( EQUIVALENT_TAG );
-                buf.append( ">" );
-                appendIdentifier( equivalentsNames[i], buf );
-                buf.append( "</" );
-                buf.append( EQUIVALENT_TAG );
-                buf.append( ">\n" );
-            }
-        }
-    }
-
-    /**
      * Hook to enable subclasses to add to the encoding of an ExternalizedMeshObject.
      *
      * @param obj the ExternalizedMeshObject to encode
@@ -311,10 +282,10 @@ public class ExternalizedMeshObjectXmlEncoder
     {
         // noop on this level
     }
-    
+
     /**
      * Deserialize a ExternalizedMeshObject from a stream.
-     * 
+     *
      * @param contentAsStream the byte [] stream in which the ExternalizedProxy is encoded
      * @param mb the MeshBase on whose behalf the decoding is performed
      * @return return the just-instantiated ExternalizedMeshObject
@@ -329,7 +300,7 @@ public class ExternalizedMeshObjectXmlEncoder
             IOException
     {
         theMeshBase = mb;
-        
+
         try {
             synchronized( theParser ) {
                 theParser.parse( contentAsStream, this );
@@ -390,7 +361,7 @@ public class ExternalizedMeshObjectXmlEncoder
             }
             if( timeExpires != null && timeExpires.length() > 0 ) {
                 theMeshObjectBeingParsed.setTimeExpires( Long.parseLong( timeExpires ));
-            } 
+            }
         } else if( TYPE_TAG.equals( qName )) {
             // no op
         } else if( PROPERTY_TYPE_TAG.equals( qName )) {
@@ -418,8 +389,6 @@ public class ExternalizedMeshObjectXmlEncoder
                 log.error( "empty '" + IDENTIFIER_TAG + "' on '" + RELATIONSHIP_TAG + "'" );
             }
 
-        } else if( EQUIVALENT_TAG.equals( qName )) {
-            // no op
         } else {
             startElement2( namespaceURI, localName, qName, attrs );
         }
@@ -427,7 +396,7 @@ public class ExternalizedMeshObjectXmlEncoder
 
     /**
      * Factors out the creation of Relationship instances, so subclasses can override it.
-     * 
+     *
      * @param identifier the MeshObjectIdentifier on this side of the relationship
      * @param neighborIdentifier the MeshObjectIdentifier on the other side of the relationship
      * @param timeUpdated the time it was last updated
@@ -478,7 +447,7 @@ public class ExternalizedMeshObjectXmlEncoder
             SAXException
     {
         if( MESHOBJECT_TAG.equals( qName )) {
-            // no op        
+            // no op
         } else if( TYPE_TAG.equals( qName )) {
             // first the "inner" element if present
             if( theHasTypesBeingParsed != null ) {
@@ -490,7 +459,7 @@ public class ExternalizedMeshObjectXmlEncoder
             } else {
                 log.error( "neither found" );
             }
-        
+
         } else if( PROPERTY_TYPE_TAG.equals( qName )) {
             theMeshObjectBeingParsed.addPropertyValue( thePropertyValue );
 
@@ -498,16 +467,6 @@ public class ExternalizedMeshObjectXmlEncoder
             theMeshObjectBeingParsed.addRelationship( (ParserFriendlyExternalizedMeshObject.Relationship) theHasTypesBeingParsed );
             theHasTypesBeingParsed = null;
 
-        } else if( EQUIVALENT_TAG.equals( qName )) {
-            if( theCharacters != null ) {
-                try {
-                    theMeshObjectBeingParsed.addEquivalent(
-                            theMeshBase.getMeshObjectIdentifierFactory().guessFromExternalForm( theCharacters.toString() ));
-                } catch( ParseException ex ) {
-                    error( ex );
-                }
-            }
-            
         } else {
             endElement2( namespaceURI, localName, qName );
         }
@@ -538,7 +497,7 @@ public class ExternalizedMeshObjectXmlEncoder
     public void clearState()
     {
         theMeshObjectBeingParsed = null;
-        
+
         super.clearState();
     }
 
@@ -551,7 +510,7 @@ public class ExternalizedMeshObjectXmlEncoder
      * The ExternalizedMeshObject that is currently being parsed, if any.
      */
     protected ParserFriendlyExternalizedMeshObject theMeshObjectBeingParsed = null;
-    
+
     /**
      * The Relationship that is currently being parsed, if any.
      */

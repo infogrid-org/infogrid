@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -57,6 +57,11 @@ public abstract class AbstractUrlTest
 
         Log4jLog.configure( "org/infogrid/kernel/net/test/urls/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
+
+        ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
+                "org/infogrid/kernel/net/test/urls/ResourceHelper",
+                Locale.getDefault(),
+                cl ));
     }
 
     /**

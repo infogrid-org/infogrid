@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -44,85 +44,43 @@ public class ImmutableMMeshObjectSet
             MeshObject []        content )
     {
         super( factory );
-        
+
         setInitialContent( content );
     }
 
     /**
-     * Returns a MeshObjectSet obtained by traversing all the MeshObjects
-     * contained in this ImmutableMMeshObjectSet for the given RoleType.
-     * 
-     * @param role the RoleType to traverse
-     * @return the set of reached MeshObjects
+     * {@inheritDoc}
      */
     public MeshObjectSet traverse(
             RoleType role )
     {
-        return traverse( role, true );
-    }
+        ArrayList<MeshObject> almostRet = new ArrayList<>( currentContent.length * 3 ); // fudge
+        for( int i = 0 ; i < currentContent.length ; ++i ) {
+            MeshObject [] found = currentContent[i].traverse( role ).getMeshObjects();
 
-    /**
-     * Returns a MeshObjectSet obtained by traversing all the MeshObjects
-     * contained in this ImmutableMMeshObjectSet for the given RoleType.
-     * 
-     * @param role the RoleType to traverse
-     * @param considerEquivalents if true, consider equivalents for the traversal
-     * @return the set of reached MeshObjects
-     */
-    public MeshObjectSet traverse(
-            RoleType role,
-            boolean  considerEquivalents )
-    {
-        ArrayList<MeshObject> almostRet = new ArrayList<MeshObject>( currentContent.length * 3 ); // fudge
-        if( considerEquivalents ) {
-
-            for( int i = 0 ; i < currentContent.length ; ++i ) {
-                MeshObject [] equivalents = currentContent[i].getEquivalents().getMeshObjects();
-
-                for( int j = 0 ; j < equivalents.length ; ++j ) {
-                    MeshObject [] found = equivalents[j].traverse( role ).getMeshObjects();
-
-                    for( int k=0 ; k<found.length ; ++k ) {
-                        if( ! almostRet.contains( found[k] )) {
-                            almostRet.add( found[k] );
-                        }
-                    }
+            for( int j=0 ; j<found.length ; ++j ) {
+                if( ! almostRet.contains( found[j] )) {
+                    almostRet.add( found[j] );
                 }
             }
-
-        } else {
-
-            for( int i = 0 ; i < currentContent.length ; ++i ) {
-                MeshObject [] found = currentContent[i].traverse( role ).getMeshObjects();
-
-                for( int j=0 ; j<found.length ; ++j ) {
-                    if( ! almostRet.contains( found[j] )) {
-                        almostRet.add( found[j] );
-                    }
-                }
-            }            
         }
+
         MeshObjectSet ret = theFactory.createImmutableMeshObjectSet( ArrayHelper.copyIntoNewArray( almostRet, MeshObject.class ));
         return ret;
     }
 
     /**
-     * Returns a MeshObjectSet obtained by traversing all the MeshObjects
-     * contained in this ImmutableMMeshObjectSet for the given TraversalSpecification.
-     * 
-     * @param theSpec the TraversalSpecification to traverse
-     * @return the set of reached MeshObjects
+     * {@inheritDoc}
      */
     @Override
     public MeshObjectSet traverse(
-            TraversalSpecification theSpec,
-            boolean                considerEquivalents )
+            TraversalSpecification theSpec )
     {
         if( theSpec instanceof RoleType ) {
-            return traverse( (RoleType) theSpec, considerEquivalents );
+            return traverse( (RoleType) theSpec );
 
         } else {
-            return theSpec.traverse( this, considerEquivalents );
+            return theSpec.traverse( this );
         }
     }
 }

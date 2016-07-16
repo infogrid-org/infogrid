@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -117,7 +117,7 @@ public class XprisoTest7_5
         log.info( "Accessing obj2 at mb3 via mb2 from mb1" );
 
         NetMeshObject obj2_mb3 = mb3.accessLocally(
-                mb3.getNetMeshObjectAccessSpecificationFactory().obtain( 
+                mb3.getNetMeshObjectAccessSpecificationFactory().obtain(
                         new NetMeshBaseIdentifier[] {
                                 mb2.getIdentifier(),
                                 mb1.getIdentifier(),
@@ -156,8 +156,8 @@ public class XprisoTest7_5
         checkProxies( obj2_mb3, new NetMeshBase[] { mb2 },      mb2,  mb2,  "obj2_mb3 has wrong proxies" );
 
         //
-        
-        
+
+
         log.info( "Accessing obj2 at mb4 from mb2" );
 
         NetMeshObject obj2_mb4 = mb4.accessLocally(
@@ -208,24 +208,24 @@ public class XprisoTest7_5
         // checkRelationshipProxies( obj1_mb2, obj2_mb2, null,                           "obj1_mb2-obj2_mb2 has wrong relationship proxies" );
         // checkRelationshipProxies( obj1_mb3, obj2_mb3, new NetMeshBase[] { mb1, mb2 }, "obj1_mb3-obj2_mb3 has wrong relationship proxies" );
         checkRelationshipProxies( obj1_mb4, obj2_mb4, new NetMeshBase[] { mb2 },      "obj1_mb4-obj2_mb4 has wrong relationship proxies" );
-        
+
         //
 
         log.info( "Checking mb2 relationship." );
 
-        MeshObjectSet neighbors1_mb2 = obj1_mb2.traverseToNeighborMeshObjects( false );
+        MeshObjectSet neighbors1_mb2 = obj1_mb2.traverseToNeighborMeshObjects();
         MeshObjectSet rsReplica_mb2  = obj1_mb2.traverse( TestSubjectArea.AR1A.getSource() );
-        
+
         checkEquals( neighbors1_mb2.size(), 1, "obj1 in mb2 has wrong number of neighbors" );
         checkEquals( rsReplica_mb2.size(),  1, "obj1 in mb2 has wrong number of relationships" );
 
         //
 
         log.info( "Checking mb1 relationship." );
-        
-        MeshObjectSet neighbors1_mb1 = obj1_mb1.traverseToNeighborMeshObjects( false );
+
+        MeshObjectSet neighbors1_mb1 = obj1_mb1.traverseToNeighborMeshObjects();
         MeshObjectSet rsReplica_mb1  = obj1_mb1.traverse( TestSubjectArea.AR1A.getSource() );
-        
+
         checkEquals( neighbors1_mb1.size(), 1, "obj1 in mb1 has wrong number of neighbors" );
         checkEquals( rsReplica_mb1.size(),  1, "obj1 in mb1 has wrong number of relationships" );
 
@@ -235,23 +235,23 @@ public class XprisoTest7_5
 
         // now do it the other way round
         MeshObjectSet rsReplica_mb3  = obj1_mb3.traverse( TestSubjectArea.AR1A.getSource() );
-        MeshObjectSet neighbors1_mb3 = obj1_mb3.traverseToNeighborMeshObjects( false );
-        
+        MeshObjectSet neighbors1_mb3 = obj1_mb3.traverseToNeighborMeshObjects();
+
         checkEquals( rsReplica_mb3.size(),  1, "obj1 in mb3 has wrong number of relationships" );
         checkEquals( neighbors1_mb3.size(), 1, "obj1 in mb3 has wrong number of neighbors" );
 
         //
 
         log.info( "Checking mb4 relationship." );
-        
+
         MeshObjectSet rsReplica_mb4  = obj1_mb4.traverse( TestSubjectArea.AR1A.getSource() );
-        MeshObjectSet neighbors1_mb4 = obj1_mb4.traverseToNeighborMeshObjects( false );
-        
+        MeshObjectSet neighbors1_mb4 = obj1_mb4.traverseToNeighborMeshObjects();
+
         checkEquals( rsReplica_mb4.size(),  1, "obj1 in mb4 has wrong number of relationships" );
         checkEquals( neighbors1_mb4.size(), 1, "obj1 in mb4 has wrong number of neighbors" );
 
         //
-        
+
         log.debug( "Checking proxies (8)" );
 
         checkProxies( obj1_mb1, new NetMeshBase[] { mb2 },           null, null, "obj1_mb1 has wrong proxies" );
@@ -276,12 +276,12 @@ public class XprisoTest7_5
             Exception
     {
         super.setup();
-        
+
         net1 = theMeshBaseIdentifierFactory.fromExternalForm( "test://one.local" );
         net2 = theMeshBaseIdentifierFactory.fromExternalForm( "test://two.local" );
         net3 = theMeshBaseIdentifierFactory.fromExternalForm( "test://three.local" );
         net4 = theMeshBaseIdentifierFactory.fromExternalForm( "test://four.local" );
-        
+
         MPingPongNetMessageEndpointFactory endpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactory.setNameServer( theNameServer );
 
@@ -308,7 +308,7 @@ public class XprisoTest7_5
         mb2.die();
         mb3.die();
         mb4.die();
-        
+
         exec.shutdown();
     }
 
@@ -358,5 +358,5 @@ public class XprisoTest7_5
     protected ScheduledExecutorService exec = createThreadPool( 3 ); // I think we need three
 
     // Our Logger
-    private static Log log = Log.getLogInstance( XprisoTest7_5.class );
+    private static final Log log = Log.getLogInstance( XprisoTest7_5.class );
 }

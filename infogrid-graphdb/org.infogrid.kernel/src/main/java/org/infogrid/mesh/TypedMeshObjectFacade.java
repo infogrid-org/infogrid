@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -20,14 +20,12 @@ import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.model.primitives.EntityType;
-import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.Role;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.model.traversal.TraversalSpecification;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.IsDeadException;
 import org.infogrid.util.logging.CanBeDumped;
-import org.infogrid.util.logging.Dumper;
 
 /**
  * The abstract interface of all type-safe facades for MeshObjects that are typically
@@ -59,6 +57,7 @@ public interface TypedMeshObjectFacade
      *
      * @return the globally unique identifier of this MeshObject
      */
+    @Override
     public abstract MeshObjectIdentifier getIdentifier();
 
     /**
@@ -138,18 +137,6 @@ public interface TypedMeshObjectFacade
      * @return the set of MeshObjects that are directly related to this MeshObject
      */
     public abstract MeshObjectSet traverseToNeighborMeshObjects();
-
-    /**
-     * Traverse from this MeshObject to all directly related MeshObjects. Directly
-     * related MeshObjects are those MeshObjects that are participating in a
-     * relationship with this MeshObject. Specify whether to consider equivalents
-     * as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     * @return the set of MeshObjects that are directly related to this MeshObject
-     */
-    public abstract MeshObjectSet traverseToNeighborMeshObjects(
-            boolean considerEquivalents );
 
     /**
      * Relate this MeshObject to another MeshObject. This does not bless the relationship.
@@ -342,26 +329,12 @@ public interface TypedMeshObjectFacade
 
     /**
       * Traverse a TraversalSpecification from this MeshObject to obtain a set of MeshObjects.
-      * This will consider all MeshObjects equivalent to this one as the start MeshObject.
       *
       * @param theTraverseSpec the TraversalSpecification to traverse
       * @return the set of MeshObjects found as a result of the traversal
       */
     public abstract MeshObjectSet traverse(
             TraversalSpecification theTraverseSpec );
-
-    /**
-      * Traverse a TraversalSpecification from this MeshObject to obtain a set of MeshObjects.
-      * Specify whether relationships of equivalent MeshObjects should be considered as well.
-      *
-      * @param theTraverseSpec the TraversalSpecification to traverse
-      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-      *        if false, only this MeshObject will be used as the start
-      * @return the set of MeshObjects found as a result of the traversal
-      */
-    public abstract MeshObjectSet traverse(
-            TraversalSpecification theTraverseSpec,
-            boolean                considerEquivalents );
 
     /**
      * Obtain the RoleTypes that this MeshObject currently participates in. This will return only one
@@ -373,36 +346,11 @@ public interface TypedMeshObjectFacade
     public abstract RoleType [] get_RoleTypes();
 
     /**
-     * Obtain the RoleTypes that this MeshObject currently participates in. This will return only one
-     * instance of the same RoleType object, even if the MeshObject participates in this RoleType
-     * multiple times with different other MeshObjects. Specify whether equivalent MeshObjects
-     * should be considered as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the RoleTypes that this MeshObject currently participates in.
-     */
-    public abstract RoleType [] get_RoleTypes(
-            boolean considerEquivalents );
-
-    /**
      * Obtain the Roles that this MeshObject currently participates in.
      *
      * @return the Roles that this MeshObject currently participates in.
      */
     public abstract Role [] get_Roles();
-
-    /**
-     * Obtain the Roles that this MeshObject currently participates in.
-     * Specify whether relationships of equivalent MeshObjects
-     * should be considered as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     *        if false, only this MeshObject will be used as the start
-     * @return the Roles that this MeshObject currently participates in.
-     */
-    public abstract Role [] get_Roles(
-            boolean considerEquivalents );
 
     /**
      * Obtain the RoleTypes that this MeshObject currently participates in with the
@@ -416,61 +364,6 @@ public interface TypedMeshObjectFacade
             TypedMeshObjectFacade otherObject )
         throws
             NotRelatedException;
-
-    /**
-     * Obtain the RoleTypes that this MeshObject currently participates in with the
-     * specified other MeshObject.
-     * Specify whether relationships of equivalent MeshObjects should be considered
-     * as well.
-     *
-     * @param otherObject the other MeshObject
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the RoleTypes that this MeshObject currently participates in.
-     * @throws NotRelatedException thrown if this MeshObject and otherObject are not related
-     */
-    public abstract RoleType [] get_RoleTypes(
-            TypedMeshObjectFacade otherObject,
-            boolean               considerEquivalents )
-        throws
-            NotRelatedException;
-
-    /**
-     * Add another MeshObject as an equivalent. All MeshObjects that are already equivalent
-     * to this MeshObject, and all MeshObjects that are already equivalent to the newly
-     * added MeshObject, are now equivalent.
-     *
-     * @param equiv the new equivalent
-     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public abstract void addAsEquivalent(
-            TypedMeshObjectFacade equiv )
-        throws
-            EquivalentAlreadyException,
-            TransactionException,
-            NotPermittedException;
-
-    /**
-     * Obtain the set of MeshObjects, including this one, that are equivalent.
-     * This always returns at least this MeshObject.
-     *
-     * @return the set of MeshObjects that are equivalent
-     */
-    public abstract MeshObjectSet get_Equivalents();
-
-    /**
-     * Remove this MeshObject as an equivalent from the set of equivalents. If this MeshObject
-     * is not currently equivalent to any other MeshObject, this does nothing.
-     *
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public abstract void removeAsEquivalent()
-        throws
-            TransactionException,
-            NotPermittedException;
 
     /**
      * Add a PropertyChangeListener.

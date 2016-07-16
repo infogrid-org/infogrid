@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -31,7 +31,7 @@ public class StayRightHereTraversalSpecification
 
     /**
      * Factory method always returns the same singleton instance.
-     * 
+     *
      * @return the singleton instance
      */
     public static StayRightHereTraversalSpecification create()
@@ -48,59 +48,26 @@ public class StayRightHereTraversalSpecification
     }
 
     /**
-     * Use this TraversalSpecification to traverse from the passed-in start MeshObject
-     * to related MeshObjects. This method is defined on TraversalSpecification, so
-     * different implementations of TraversalSpecification can implement different ways
-     * of doing this. Specify whether relationships of equivalent MeshObjects
-     * should be considered as well.
-     *
-     * @param start the start MeshObject for the traversal
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     * @return the result of the traversal
+     * {@inheritDoc}
      */
+    @Override
     public MeshObjectSet traverse(
-            MeshObject start,
-            boolean    considerEquivalents )
+            MeshObject start )
     {
-        MeshObjectSet ret;
-        if( considerEquivalents ) {
-            ret = start.getEquivalents();
+        MeshObjectSetFactory setFactory = start.getMeshBase().getMeshObjectSetFactory();
+        MeshObjectSet        ret = setFactory.createSingleMemberImmutableMeshObjectSet( start );
 
-        } else {
-            MeshObjectSetFactory setFactory = start.getMeshBase().getMeshObjectSetFactory();
-            ret = setFactory.createSingleMemberImmutableMeshObjectSet( start );
-        }
         return ret;
     }
 
     /**
-      * Use this TraversalSpecification to traverse from the passed-in start MeshObjectSet
-      * to related MeshObjects. This method is defined on TraversalSpecification, so
-      * different implementations of TraversalSpecification can implement different ways
-      * of doing this. Specify whether relationships of equivalent MeshObjects
-      * should be considered as well.
-      *
-      * @param theSet the start MeshObjectSet for the traversal
-      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-      * @return the result of the traversal
-      */
+     * {@inheritDoc}
+     */
+    @Override
     public MeshObjectSet traverse(
-            MeshObjectSet theSet,
-            boolean       considerEquivalents )
+            MeshObjectSet theSet )
     {
-        MeshObjectSet ret;
-        if( considerEquivalents ) {
-            MeshObjectSetFactory setFactory = theSet.getMeshBase().getMeshObjectSetFactory();
-
-            ret = setFactory.obtainEmptyImmutableMeshObjectSet();
-            for( MeshObject current : theSet ) {
-                MeshObjectSet equivalents = current.getEquivalents();
-                ret = setFactory.createImmutableMeshObjectSetUnification( ret, equivalents );
-            }
-        } else {
-            ret = theSet;
-        }
-        return ret;
+        return theSet;
     }
 
     /**
@@ -112,6 +79,7 @@ public class StayRightHereTraversalSpecification
      * @return true if this event may affect the result of traversing from the MeshObject
      *         that sent this event
      */
+    @Override
     public boolean isAffectedBy(
             MeshBase                  meshBase,
             MeshObjectRoleChangeEvent theEvent )

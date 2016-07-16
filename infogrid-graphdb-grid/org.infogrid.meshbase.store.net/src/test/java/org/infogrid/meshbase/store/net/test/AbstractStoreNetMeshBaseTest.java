@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -61,7 +61,7 @@ public abstract class AbstractStoreNetMeshBaseTest
 {
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -77,7 +77,7 @@ public abstract class AbstractStoreNetMeshBaseTest
 
         Log4jLog.configure( "org/infogrid/meshbase/store/net/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/meshbase/store/net/test/ResourceHelper",
                 Locale.getDefault(),
@@ -86,7 +86,7 @@ public abstract class AbstractStoreNetMeshBaseTest
 
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things can go wrong in a test
      */
     @Before
@@ -98,10 +98,10 @@ public abstract class AbstractStoreNetMeshBaseTest
 
         theDataSource = new MysqlDataSource();
         theDataSource.setDatabaseName( test_DATABASE_NAME );
-        
+
         theSqlStore = MysqlStore.create( theDataSource, test_TABLE_NAME );
     }
-    
+
     /**
      * Report an error if the properties are not the same in both replicas.
      *
@@ -161,22 +161,22 @@ public abstract class AbstractStoreNetMeshBaseTest
         throws
             NotRelatedException
     {
-        MeshObjectSet oneNeighbors = one.traverseToNeighborMeshObjects( false );
-        MeshObjectSet twoNeighbors = two.traverseToNeighborMeshObjects( false );
+        MeshObjectSet oneNeighbors = one.traverseToNeighborMeshObjects();
+        MeshObjectSet twoNeighbors = two.traverseToNeighborMeshObjects();
 
         checkEqualsOutOfSequence( oneNeighbors.getMeshObjects(), twoNeighbors.getMeshObjects(), msg + " not the same neighbors for " + one.getIdentifier() );
 
         for( final MeshObject currentOne : oneNeighbors ) {
             MeshObject currentTwo = twoNeighbors.find(
                      (MeshObject candidate) -> currentOne.getIdentifier().equals( candidate.getIdentifier() ));
-            
+
             RoleType [] relatedOne = one.getRoleTypes( currentOne );
             RoleType [] relatedTwo = two.getRoleTypes( currentTwo );
-            
+
             checkEqualsOutOfSequence( relatedOne, relatedTwo, msg + " not the same RoleTypes for " + one.getIdentifier() + " related to " + currentOne.getIdentifier() );
         }
     }
-    
+
     /**
      * Report and error if the position of the Proxies is wrong.
      *
@@ -209,7 +209,7 @@ public abstract class AbstractStoreNetMeshBaseTest
         if( proxies.length != proxiesTowards.length ) {
             reportError( msg + ": object has wrong number of proxies. Should have ", proxiesTowards, proxies );
         }
-        
+
         NetMeshBaseIdentifier [] proxiesIdentifiers        = new NetMeshBaseIdentifier[ proxies.length ];
         NetMeshBaseIdentifier [] proxiesTowardsIdentifiers = new NetMeshBaseIdentifier[ proxiesTowards.length ];
         for( int i=0 ; i<proxies.length ; ++i ) {

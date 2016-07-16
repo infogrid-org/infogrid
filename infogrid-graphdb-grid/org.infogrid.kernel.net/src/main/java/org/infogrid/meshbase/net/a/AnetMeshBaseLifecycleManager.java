@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -42,7 +42,6 @@ import org.infogrid.mesh.net.security.CannotObtainLockException;
 import org.infogrid.mesh.security.MustNotDeleteHomeObjectException;
 import org.infogrid.meshbase.a.AMeshBase;
 import org.infogrid.meshbase.a.AMeshBaseLifecycleManager;
-import org.infogrid.meshbase.a.AMeshObjectEquivalenceSetComparator;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseAccessSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
@@ -84,14 +83,14 @@ public class AnetMeshBaseLifecycleManager
     /**
      * Factory method. The application developer should not call this or a subclass constructor; use
      * MeshBase.getMeshObjectLifecycleManager() instead.
-     * 
+     *
      * @return the created AnetMeshBaseLifecycleManager
      */
     public static AnetMeshBaseLifecycleManager create()
     {
         return new AnetMeshBaseLifecycleManager();
     }
-    
+
     /**
      * Constructor. The application developer should not call this or a subclass constructor; use
      * MeshBase.getMeshObjectLifecycleManager() instead.
@@ -104,7 +103,7 @@ public class AnetMeshBaseLifecycleManager
     /**
      * <p>Obtain the NetMeshBase that this NetMeshBaseLifecycleManager works on.</p>
      * <p>We list this here again because this type returns a more concrete type than our supertype does.</p>
-     * 
+     *
      * @return the NetMeshBase that this NetMeshBaseLifecycleManager works on
      */
     @Override
@@ -195,10 +194,10 @@ public class AnetMeshBaseLifecycleManager
      * and with a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
      *                        automatically create a suitable NetMeshObjectIdentifier.
      * @return the created NetMeshObject
@@ -223,10 +222,10 @@ public class AnetMeshBaseLifecycleManager
      * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
      *                        automatically create a suitable NetMeshObjectIdentifier.
      * @param type the EntityType with which the NetMeshObject will be blessed
@@ -255,10 +254,10 @@ public class AnetMeshBaseLifecycleManager
      * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
      *                        automatically create a suitable NetMeshObjectIdentifier.
      * @param types the EntityTypes with which the NetMeshObject will be blessed
@@ -287,10 +286,10 @@ public class AnetMeshBaseLifecycleManager
      * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. This must not be null.
      * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
      * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
@@ -323,10 +322,10 @@ public class AnetMeshBaseLifecycleManager
      * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
      *                        automatically create a suitable NetMeshObjectIdentifier.
      * @param type the EntityType with which the NetMeshObject will be blessed
@@ -364,10 +363,10 @@ public class AnetMeshBaseLifecycleManager
      * and a provided NetMeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. If this is null,
      *                        automatically create a suitable NetMeshObjectIdentifier.
      * @param types the EntityTypes with which the NetMeshObject will be blessed
@@ -403,12 +402,12 @@ public class AnetMeshBaseLifecycleManager
      * <p>Convenience method to create a new replica of an existing NetMeshObject with zero or more types,
      * with the provided time stamps, the provided NetMeshObjectIdentifier, flags whether to give up the
      * lock or home replica status should this replica ever acquire either, and the Proxy in which both
-     * homeReplica and lock are to be found. 
+     * homeReplica and lock are to be found.
      * This call creates a replica of an existing MeshObject, so it is not a "semantic create".</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created replica. This must not be null.
      * @param types the EntityTypes with which the NetMeshObject will be blessed
      * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
@@ -454,16 +453,16 @@ public class AnetMeshBaseLifecycleManager
                 0,
                 0 );
     }
-    
+
     /**
      * <p>Create a new replica of an existing NetMeshObject with zero or more types,
      * with the provided time stamps, the provided NetMeshObjectIdentifier, flags whether to give up the
      * lock or home replica status should this replica ever acquire either, and all Proxies and their roles.
      * This call creates a replica of an existing MeshObject, so it is not a "semantic create".</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created replica. This must not be null.
      * @param types the EntityTypes with which the NetMeshObject will be blessed
      * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
@@ -559,7 +558,7 @@ public class AnetMeshBaseLifecycleManager
 
     /**
      * Check whether it is permitted to create a MeshObject with the specfied parameters.
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. This must not be null.
      * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified Identifier
      * @throws NotPermittedException thrown if the combination of arguments was not permitted
@@ -587,16 +586,16 @@ public class AnetMeshBaseLifecycleManager
 
     /**
      * <p>Semantically delete several NetMeshObjects at the same time.</p>
-     * 
+     *
      * <p>This call is a "semantic delete", which means that an existing
      * NetMeshObjects will go away in all its replicas. Due to time lag, the NetMeshObject
      * may still exist in certain replicas in other places for a while, but
      * the request to deleteMeshObjects all objects is in the queue and will get there
      * eventually.</p>
-     * 
+     *
      * <p>This call either succeeds or fails in total: if one or more of the specified NetMeshObjects cannot be
      *    deleted for some reason, none of the other NetMeshObjects will be deleted either.</p>
-     * 
+     *
      * @param theObjects the MeshObjects to be semantically deleted
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
@@ -610,7 +609,7 @@ public class AnetMeshBaseLifecycleManager
     {
         AMeshBase realBase = (AMeshBase) theMeshBase;
         long      now      = System.currentTimeMillis();
-        
+
         Transaction tx = realBase.checkTransaction();
 
         MeshObject home = realBase.getHomeObject();
@@ -641,7 +640,7 @@ public class AnetMeshBaseLifecycleManager
             AnetMeshObject         current              = (AnetMeshObject) theObjects[i];
             MeshObjectIdentifier   currentCanonicalName = current.getIdentifier();
             ExternalizedMeshObject externalized         = current.asExternalized( true );
-            
+
             current.delete();
             removeFromMeshBase(
                     current.getIdentifier(),
@@ -651,7 +650,7 @@ public class AnetMeshBaseLifecycleManager
 
     /**
      * Helper method to instantiate the right subclass of MeshObject.
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. This must not be null.
      * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
      * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
@@ -679,13 +678,13 @@ public class AnetMeshBaseLifecycleManager
                 null,
                 AnetMeshObject.HERE_CONSTANT,
                 AnetMeshObject.HERE_CONSTANT );
-        
+
         return ret;
     }
-    
+
     /**
      * Helper method to instantiate the right subclass of MeshObject.
-     * 
+     *
      * @param identifier the identifier of the to-be-created NetMeshObject. This must not be null.
      * @param timeCreated the time when this NetMeshObject was semantically created, in System.currentTimeMillis() format
      * @param timeUpdated the time when this NetMeshObject was last updated, in System.currentTimeMillis() format
@@ -724,13 +723,13 @@ public class AnetMeshBaseLifecycleManager
                 proxies,
                 homeProxyIndex,
                 proxyTowardsLockIndex );
-        
+
         return ret;
     }
 
     /**
      * Factored out method to instantiate a recreated NetMeshObject.
-     * 
+     *
      * @param identifier the identifier of the MeshObject
      * @param timeCreated the time it was created
      * @param timeUpdated the time it was last udpated
@@ -738,7 +737,6 @@ public class AnetMeshBaseLifecycleManager
      * @param timeExpires the time it will expire
      * @param properties the properties of the MeshObject
      * @param types the EntityTypes of the MeshObject
-     * @param equivalents either an array of length 2, or null. If given, contains the left and right equivalence pointers.
      * @param neighbors the identifiers of the MeshObject's neighbors, if any
      * @param roleTypes the RoleTypes in which this MeshObject participates with its neighbors
      * @param theObjectBeingParsed the externalized representation of the MeshObject
@@ -753,14 +751,13 @@ public class AnetMeshBaseLifecycleManager
             long                                timeExpires,
             HashMap<PropertyType,PropertyValue> properties,
             EntityType []                       types,
-            MeshObjectIdentifier []             equivalents,
             MeshObjectIdentifier []             neighbors,
             RoleType [][]                       roleTypes,
             ExternalizedMeshObject              theObjectBeingParsed )
     {
         AnetMeshBase              realBase              = (AnetMeshBase)              theMeshBase;
         ExternalizedNetMeshObject realObjectBeingParsed = (ExternalizedNetMeshObject) theObjectBeingParsed;
-        
+
 //        if(    identifier instanceof NetMeshObjectIdentifier ) {
 //            NetMeshObjectIdentifier realIdentifier = (NetMeshObjectIdentifier) identifier;
 //
@@ -768,7 +765,7 @@ public class AnetMeshBaseLifecycleManager
 //                identifier = MeshObjectIdentifier.create( realIdentifier.getLocalId() );
 //            }
 //        }
-        
+
         boolean giveUpHomeReplica = realObjectBeingParsed.getGiveUpHomeReplica();
         boolean giveUpLock        = realObjectBeingParsed.getGiveUpLock();
 
@@ -776,7 +773,7 @@ public class AnetMeshBaseLifecycleManager
 
         int proxyTowardsHomeIndex = -1;
         int proxyTowardsLockIndex = -1;
-        
+
         Proxy [] proxies = new Proxy[ proxyNetworkIdentifiers.length ];
 
         for( int i=0 ; i<proxies.length ; ++i ) {
@@ -819,7 +816,7 @@ public class AnetMeshBaseLifecycleManager
         } else {
             relationshipProxies = null;
         }
-        
+
         AnetMeshObject ret = new AnetMeshObject(
                 (NetMeshObjectIdentifier) identifier,
                 realBase,
@@ -829,7 +826,6 @@ public class AnetMeshBaseLifecycleManager
                 timeExpires,
                 properties,
                 types,
-                (NetMeshObjectIdentifier []) equivalents,
                 (NetMeshObjectIdentifier []) neighbors,
                 roleTypes,
                 giveUpHomeReplica,
@@ -859,7 +855,7 @@ public class AnetMeshBaseLifecycleManager
     {
         purgeReplicas( new NetMeshObject[] { replica } );
     }
-    
+
     /**
      * Purge several replicas. This method can be applied on all NetMeshObjects in this NetMeshBase,
      * except the home object of this NetMeshBase.
@@ -880,7 +876,7 @@ public class AnetMeshBaseLifecycleManager
         Transaction tx = realBase.checkTransaction();
 
         long time = System.currentTimeMillis();
-        
+
         // we don't do that here because it's the slave replica
         // theObject.checkPermittedDelete(); // this may throw NotPermittedException
 
@@ -893,7 +889,7 @@ public class AnetMeshBaseLifecycleManager
                 ExternalizedNetMeshObject externalized = current.asExternalized( true );
 
                 ((AnetMeshObject) current).purge();
-                
+
                 removeFromMeshBase(
                         identifier,
                         new ReplicaPurgedEvent(
@@ -914,7 +910,7 @@ public class AnetMeshBaseLifecycleManager
     /**
      * Delete a replica NetMeshObject in this NetMeshBase, thereby removing a
      * branch in the replication graph.
-     * 
+     *
      * @param identifier the identifier of the NetMeshObject whose replica is to be deleted
      * @param proxyIdentifier the NetMeshBaseIdentifier that selects the Proxy that conveyed this command
      * @return the deleted NetMeshObject
@@ -933,7 +929,7 @@ public class AnetMeshBaseLifecycleManager
     {
         AnetMeshBase   realBase  = (AnetMeshBase) theMeshBase;
         AnetMeshObject theObject = (AnetMeshObject) realBase.findMeshObjectByIdentifier( identifier );
-        
+
         if( theObject != null ) {
             NetMeshObjectIdentifier   realIdentifier = theObject.getIdentifier();
             ExternalizedNetMeshObject externalized   = theObject.asExternalized( true );
@@ -960,7 +956,7 @@ public class AnetMeshBaseLifecycleManager
         }
         return theObject;
     }
-    
+
     /**
      * Instantiate a replica NetMeshObject in this NetMeshBase. Proxy information is provided
      * as separate parameters, as a ProxyPolicy may choose to use different Proxies than offered
@@ -989,25 +985,20 @@ public class AnetMeshBaseLifecycleManager
         Transaction tx = realBase.checkTransaction();
 
         NetMeshObjectIdentifier identifier = externalized.getIdentifier();
-        
+
         AnetMeshObject ret = findInStore( identifier );
-        
+
         if( ret != null ) {
             throw new MeshObjectIdentifierNotUniqueException( ret );
         }
-        
+
         long now = System.currentTimeMillis();
 
-        NetMeshObjectIdentifier [] leftRight
-                = (NetMeshObjectIdentifier []) AMeshObjectEquivalenceSetComparator.SINGLETON.findLeftAndRightEquivalents(
-                        identifier,
-                        externalized.getEquivalents() );
-        
-        HashMap<PropertyType,PropertyValue> properties = propertiesFromExternalizedMeshObject( externalized );        
+        HashMap<PropertyType,PropertyValue> properties = propertiesFromExternalizedMeshObject( externalized );
         EntityType []                       types      = typesFromExternalizedMeshObject( externalized );
         NetMeshObjectIdentifier []          neighbors  = externalized.getNeighbors();
         RoleType [][]                       roleTypes  = roleTypesFromExternalizedMeshObject( externalized );
-        
+
         ret = instantiateMeshObjectImplementation(
                 identifier,
                 externalized.getTimeCreated(),
@@ -1045,7 +1036,7 @@ public class AnetMeshBaseLifecycleManager
                 log.error( ex );
             }
         }
-        
+
         for( int i=0 ; i<neighbors.length ; ++i ) {
             try {
                 ret.rippleRelate( neighbors[i], externalized.getTimeUpdated() );
@@ -1080,18 +1071,18 @@ public class AnetMeshBaseLifecycleManager
                         ret,
                         incomingProxyIdentifier,
                         now ));
-        
+
         // don't assign owner, that comes via replication
 
-        return ret;        
-    }    
+        return ret;
+    }
 
     /**
      * Resynchronize an existing replica NetMeshObject in this NetMeshBase with the provided information.
      * Proxy information is provided
      * as separate parameters, as a ProxyPolicy may choose to use different Proxies than offered
      * by the NetMeshObject replica being replicated.
-     * 
+     *
      * @param externalized the external form of the NetMeshObject that is being replicated locally
      * @param proxies the Proxies to use
      * @param proxyTowardsHomeIndex the index, in the proxies, that holds the Proxy towards the home replica. -1 if none.
@@ -1117,13 +1108,13 @@ public class AnetMeshBaseLifecycleManager
         if( ret == null ) {
             throw new IllegalStateException( "Should exist: " + identifier );
         }
-        
+
         EntityType [] correctTypes = typesFromExternalizedMeshObject( externalized );
         EntityType [] currentTypes = ret.getTypes();
 
         ArrayHelper.Difference<EntityType> typeDifferences
                 = ArrayHelper.determineDifference( currentTypes, correctTypes, false, EntityType.class );
-        
+
         for( EntityType toAdd : typeDifferences.getAdditions() ) {
             try {
                 ret.rippleBless( new EntityType[] { toAdd }, externalized.getTimeUpdated() );
@@ -1150,7 +1141,7 @@ public class AnetMeshBaseLifecycleManager
                 }
             }
         }
-        
+
         // FIXME: equivalents
 
         // neighbors
@@ -1173,7 +1164,7 @@ public class AnetMeshBaseLifecycleManager
                 // happens for the other end of the relationship
             }
         }
-        
+
         // roles
         for( NetMeshObjectIdentifier neighborIdentifier : correctNeighbors ) { // only those that ExternalizedMeshObject knows something about
             MeshTypeIdentifier [] correctRoles;
@@ -1211,7 +1202,7 @@ public class AnetMeshBaseLifecycleManager
                 }
             }
         }
-        
+
         // properties
         HashMap<PropertyType,PropertyValue> correctProperties = propertiesFromExternalizedMeshObject( externalized );
         PropertyType []  propertyTypes  = new PropertyType[ correctProperties.size() ];
@@ -1222,7 +1213,7 @@ public class AnetMeshBaseLifecycleManager
             propertyValues[i] = correctProperties.get( current );
             ++i;
         }
-        
+
         try {
             ret.internalSetPropertyValues( propertyTypes, propertyValues, false, true, externalized.getTimeUpdated() );
         } catch( IllegalPropertyTypeException ex ) {
@@ -1230,11 +1221,11 @@ public class AnetMeshBaseLifecycleManager
         } catch( IllegalPropertyValueException ex ) {
             log.error( ex );
         }
-        
+
         // should the next two lines be here? FIXME?
         ret.setWillGiveUpHomeReplica( externalized.getGiveUpHomeReplica() );
         ret.setWillGiveUpLock( externalized.getGiveUpLock() );
-       
+
         ret.proxyOnlyResynchronizeReplica(
                 externalized.getTimeCreated(),
                 externalized.getTimeUpdated(),
@@ -1243,13 +1234,13 @@ public class AnetMeshBaseLifecycleManager
                 proxies,
                 proxyTowardsHomeIndex,
                 proxyTowardsLockIndex );
-        
+
         return ret;
     }
 
     /**
      * Internal helper to extract Properties from an ExternalizedNetMeshObject.
-     * 
+     *
      * @param externalized the ExternalizedNetMeshObject
      * @return the Properties, as PropertyType/PropertyValue pairs
      */
@@ -1258,11 +1249,11 @@ public class AnetMeshBaseLifecycleManager
     {
         ModelBase model = theMeshBase.getModelBase();
 
-        HashMap<PropertyType,PropertyValue> ret = new HashMap<PropertyType,PropertyValue>();
+        HashMap<PropertyType,PropertyValue> ret = new HashMap<>();
         for( int i=0 ; i<externalized.getPropertyTypes().length ; ++i ) {
             try {
                 PropertyType  type  = model.findPropertyTypeByIdentifier( externalized.getPropertyTypes()[i] );
-                
+
                 if( !type.getIsReadOnly().value() ) {
                     PropertyValue value = externalized.getPropertyValues()[i];
                     ret.put(  type, value );
@@ -1273,10 +1264,10 @@ public class AnetMeshBaseLifecycleManager
         }
         return ret;
     }
-        
+
     /**
      * Internal helper to extract EntityTypes from an ExternalizedNetMeshObject.
-     * 
+     *
      * @param externalized the ExternalizedNetMeshObject
      * @return the EntityTypes
      */
@@ -1293,17 +1284,17 @@ public class AnetMeshBaseLifecycleManager
                 ++count;
             } catch( MeshTypeWithIdentifierNotFoundException ex ) {
                 log.error( ex );
-            }                
+            }
         }
         if( count < ret.length ) {
             ret = ArrayHelper.copyIntoNewArray( ret, 0, count, EntityType.class );
         }
         return ret;
     }
-    
+
     /**
      * Internal helper to extract RoleTypes from an ExternalizedNetMeshObject.
-     * 
+     *
      * @param externalized the ExternalizedNetMeshObject
      * @return the RoleTypes, ordered in the same sequence as the neighbors
      */
@@ -1313,7 +1304,7 @@ public class AnetMeshBaseLifecycleManager
         ModelBase model = theMeshBase.getModelBase();
 
         MeshObjectIdentifier [] neighbors = externalized.getNeighbors();
-        
+
         RoleType [][] roleTypes = new RoleType[ neighbors.length ][];
         for( int i=0 ; i<neighbors.length ; ++i ) {
             MeshTypeIdentifier [] row = externalized.getRoleTypesFor( neighbors[i] );
@@ -1326,7 +1317,7 @@ public class AnetMeshBaseLifecycleManager
                         ++count;
                     } catch( MeshTypeWithIdentifierNotFoundException ex ) {
                         log.error( ex );
-                    }                
+                    }
                 }
                 if( count < roleTypes[i].length ) {
                     roleTypes[i] = ArrayHelper.copyIntoNewArray( roleTypes[i], 0, count, RoleType.class );
@@ -1338,7 +1329,7 @@ public class AnetMeshBaseLifecycleManager
 
     /**
      * Internal helper to extract the neighbor MeshObjectIdentifiers from an ExternalizedNetMeshObject.
-     * 
+     *
      * @param externalized the ExternalizedNetMeshObject
      * @return the neighbors
      */
@@ -1352,7 +1343,7 @@ public class AnetMeshBaseLifecycleManager
     /**
      * Internal helper to extract from an ExternalizedNetMeshObject the identifiers of the RoleTypes
      * that the MeshObject plays with a given neighbor MeshObject.
-     * 
+     *
      * @param externalized the ExternalizedNetMeshObject
      * @param neighborIdentifier identifies the neighbor MeshObject
      * @return the identifiers of the RoleTypes
@@ -1413,11 +1404,11 @@ public class AnetMeshBaseLifecycleManager
                 (NetMeshObject) createdObject,
                 incomingProxyIdentifier );
         return ret;
-    } 
+    }
 
     /**
      * Overridable helper to create a NetMeshObjectDeletedEvent.
-     * 
+     *
      * @param deletedObject the deleted MeshObject
      * @param canonicalIdentifier the canonical MeshObjectIdentifier of the deleted MeshObject.
      *        Once a MeshObject has been deleted, its canonical MeshObjectIdentifier can no longer be determined
@@ -1447,10 +1438,10 @@ public class AnetMeshBaseLifecycleManager
                 timeEventOccurred );
         return ret;
     }
-    
+
     /**
      * Helper method that allows our subclasses to access the Store without having to expose it publicly.
-     * 
+     *
      * @param identifier the Identifier of the MeshObject
      * @return the found MeshObject, or none.
      */
@@ -1464,7 +1455,7 @@ public class AnetMeshBaseLifecycleManager
     /**
      * Instantiate an ExternalizedMeshObject that is appropriate to capture the information held by
      * the subtype of MeshObject used by an AMeshBase. This is factored out so it can be subclassed.
-     * 
+     *
      * @return the AParserFriendlyExternalizedMeshObjector subclass.
      */
     @Override
@@ -2301,7 +2292,7 @@ public class AnetMeshBaseLifecycleManager
         NetMeshObjectIdentifier []          identifiers = new NetMeshObjectIdentifier[ pathToObjects.length ];
         AnetMeshObject []                   ret         = new AnetMeshObject[ pathToObjects.length ];
 
-        Map<Proxy,ArrayList<NetMeshObjectIdentifier>> proxiesForIdentifiers = new HashMap<Proxy,ArrayList<NetMeshObjectIdentifier>>();
+        Map<Proxy,ArrayList<NetMeshObjectIdentifier>> proxiesForIdentifiers = new HashMap<>();
 
         for( int i=0 ; i<pathToObjects.length ; ++i ) {
             accessPaths[i] = pathToObjects[i].getAccessPath();
@@ -2416,6 +2407,7 @@ public class AnetMeshBaseLifecycleManager
      * constraints.
      *
      * @param toKill the NetMeshObjects to kill
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      */
     @Override
     public void kill(
@@ -2434,10 +2426,6 @@ public class AnetMeshBaseLifecycleManager
             AnetMeshObject         current              = (AnetMeshObject) toKill[i];
             MeshObjectIdentifier   currentCanonicalName = current.getIdentifier();
 
-            if( current == null ) {
-                log.error( "MeshObject at index " + i + " is null" );
-                continue;
-            }
             if( current.getMeshBase() != realBase ) {
                 log.error( "Cannot kill MeshObjects in a different MeshBases" );
                 continue;

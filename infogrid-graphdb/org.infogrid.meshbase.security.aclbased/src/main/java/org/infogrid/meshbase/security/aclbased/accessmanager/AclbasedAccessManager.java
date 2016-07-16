@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -73,6 +73,7 @@ public class AclbasedAccessManager
      * @throws NotPermittedException thrown if it is not permitted
      * @throws TransactionException thrown if this is invoked outside of proper transaction boundaries
      */
+    @Override
     public void assignOwner(
             MeshObject toBeOwned,
             MeshObject newOwner )
@@ -106,6 +107,7 @@ public class AclbasedAccessManager
      * @param identifier the MeshObjectIdentifier
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedCreate(
             MeshBase             mb,
             MeshObjectIdentifier identifier )
@@ -122,6 +124,7 @@ public class AclbasedAccessManager
      * @param two the second MeshObject
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedRelate(
             MeshObject one,
             MeshObject two )
@@ -138,6 +141,7 @@ public class AclbasedAccessManager
      * @param two the second MeshObject
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedUnrelate(
             MeshObject one,
             MeshObject two )
@@ -167,7 +171,7 @@ public class AclbasedAccessManager
         try {
             ThreadIdentityManager.sudo();
             MeshObject    caller = ThreadIdentityManager.getCaller();
-            MeshObjectSet owners = obj.traverse( AclbasedSubjectArea.MESHOBJECT_HASOWNER_MESHOBJECT.getSource(), false );
+            MeshObjectSet owners = obj.traverse( AclbasedSubjectArea.MESHOBJECT_HASOWNER_MESHOBJECT.getSource());
 
             // if we don't have an owner, it's free for all
             if( owners.isEmpty() ) {
@@ -175,7 +179,7 @@ public class AclbasedAccessManager
             }
 
             // if we don't have a protection domain, it's free for all
-            MeshObject protectionDomain = obj.traverse( AclbasedSubjectArea.PROTECTIONDOMAIN_GOVERNS_MESHOBJECT.getDestination(), false ).getSingleMember();
+            MeshObject protectionDomain = obj.traverse( AclbasedSubjectArea.PROTECTIONDOMAIN_GOVERNS_MESHOBJECT.getDestination()).getSingleMember();
             if( protectionDomain == null ) {
                 return;
             }
@@ -299,6 +303,7 @@ public class AclbasedAccessManager
      * @param newValue the proposed new value for the auto-delete time
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedSetTimeExpires(
             MeshObject obj,
             long       newValue )
@@ -317,6 +322,7 @@ public class AclbasedAccessManager
      * @param newValue the proposed new value for the property
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedSetProperty(
             MeshObject    obj,
             PropertyType  thePropertyType,
@@ -334,6 +340,7 @@ public class AclbasedAccessManager
      * @param thePropertyType the PropertyType identifing the property to be read
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedGetProperty(
             MeshObject   obj,
             PropertyType thePropertyType )
@@ -351,6 +358,7 @@ public class AclbasedAccessManager
      * @param type the EntityType whose blessing we wish to check
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedBlessedBy(
             MeshObject obj,
             EntityType type )
@@ -367,6 +375,7 @@ public class AclbasedAccessManager
      * @param types the EntityTypes with which to bless
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedBless(
             MeshObject    obj,
             EntityType [] types )
@@ -383,6 +392,7 @@ public class AclbasedAccessManager
      * @param types the EntityTypes from which to unbless
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedUnbless(
             MeshObject    obj,
             EntityType [] types )
@@ -402,6 +412,7 @@ public class AclbasedAccessManager
      * @param neighbor neighbor to which this MeshObject is related, if it could be resolved
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedBless(
             MeshObject           obj,
             RoleType []          thisEnds,
@@ -423,6 +434,7 @@ public class AclbasedAccessManager
      * @param neighbor neighbor to which this MeshObject is related, if it could be resolved
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedUnbless(
             MeshObject           obj,
             RoleType []          thisEnds,
@@ -444,6 +456,7 @@ public class AclbasedAccessManager
      * @param neighbor neighbor to which this traversal leads
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedTraversal(
             MeshObject           obj,
             RoleType             toTraverse,
@@ -463,6 +476,7 @@ public class AclbasedAccessManager
      * @param two the second MeshObject, if it could be resolved
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedAddAsEquivalent(
             MeshObject           one,
             MeshObjectIdentifier twoIdentifier,
@@ -483,6 +497,7 @@ public class AclbasedAccessManager
      * @param roleTypesToAsk the RoleTypes to ask
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedRemoveAsEquivalent(
             MeshObject  obj,
             RoleType [] roleTypesToAsk )
@@ -500,6 +515,7 @@ public class AclbasedAccessManager
      * @param obj the MeshObject
      * @throws NotPermittedException thrown if it is not permitted
      */
+    @Override
     public void checkPermittedDelete(
             MeshObject obj )
         throws

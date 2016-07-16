@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -24,8 +24,6 @@ import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.IterableMeshBaseDifferencer;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectPropertyChangeEvent;
@@ -60,7 +58,7 @@ public class IterableNetMeshBaseDifferencer
     /**
      * Helper method to create an array of MeshObjectIdentifier from an array of
      * MeshObjects.
-     * 
+     *
      * @param objs the MeshObjects
      * @return the MeshObjectIdentifiers
      */
@@ -77,7 +75,7 @@ public class IterableNetMeshBaseDifferencer
 
     /**
      * Allow subclasses to instantiate a more specific event.
-     * 
+     *
      * @param obj the MeshObject that was created
      * @param time the time at which the creation occurred
      * @return the MeshObjectCreatedEvent or subclass
@@ -99,7 +97,7 @@ public class IterableNetMeshBaseDifferencer
 
     /**
      * Allow subclasses to instantiate a more specific event.
-     * 
+     *
      * @param canonicalIdentifier the canonical Identifier of the MeshObject that was deleted
      * @param obj the MeshObject that was deleted
      * @param externalized external form of the deleted MeshObject
@@ -325,62 +323,6 @@ public class IterableNetMeshBaseDifferencer
                 removedRoleTypes,
                 newRoleTypes,
                 (NetMeshObjectIdentifier) otherSideInBase.getIdentifier(),
-                (NetMeshBaseIdentifier) null,
-                meshObjectInComparison.getTimeUpdated() );
-
-        return ret;
-    }
-
-    /**
-     * Allow subclasses to instantiate a more specific event.
-     *
-     * @param meshObjectInBase the MeshObject in the baseline
-     * @param meshObjectInComparison the MeshObject in the comparison
-     * @param added the MeshObjects that were added as neighbors
-     * @param newEquivalents the Identifiers of the resulting set of equivalents
-     * @return the MeshObjectDeletedEvent or subclass
-     */
-    @Override
-    protected NetMeshObjectEquivalentsAddedEvent createMeshObjectEquivalentsAddedEvent(
-            MeshObject              meshObjectInBase,
-            MeshObject              meshObjectInComparison,
-            MeshObjectSet           oldEquivalents,
-            MeshObjectIdentifier [] added,
-            MeshObjectSet           newEquivalents )
-    {
-        NetMeshObjectEquivalentsAddedEvent ret = new NetMeshObjectEquivalentsAddedEvent(
-                (NetMeshObject) meshObjectInBase,
-                (NetMeshObjectIdentifier []) oldEquivalents.asIdentifiers(),
-                (NetMeshObjectIdentifier []) added,
-                (NetMeshObjectIdentifier []) newEquivalents.asIdentifiers(),
-                (NetMeshBaseIdentifier) null,
-                meshObjectInComparison.getTimeUpdated() );
-
-        return ret;
-    }
-    
-    /**
-     * Allow subclasses to instantiate a more specific event.
-     *
-     * @param meshObjectInBase the MeshObject in the baseline
-     * @param meshObjectInComparison the MeshObject in the comparison
-     * @param removed the Identifiers of the MeshObjects that were removed as equivalents
-     * @param newEquivalents the Identifiers of the resulting set of equivalents
-     * @return the MeshObjectEquivalentsRemovedEvent or subclass
-     */
-    @Override
-    protected NetMeshObjectEquivalentsRemovedEvent createMeshObjectEquivalentsRemovedEvent(
-            MeshObject              meshObjectInBase,
-            MeshObject              meshObjectInComparison,
-            MeshObjectSet           oldEquivalents,
-            MeshObjectIdentifier [] removed,
-            MeshObjectSet           newEquivalents )
-    {
-        NetMeshObjectEquivalentsRemovedEvent ret = new NetMeshObjectEquivalentsRemovedEvent(
-                (NetMeshObject) meshObjectInBase,
-                (NetMeshObjectIdentifier []) oldEquivalents.asIdentifiers(),
-                (NetMeshObjectIdentifier []) removed,
-                (NetMeshObjectIdentifier []) newEquivalents.asIdentifiers(),
                 (NetMeshBaseIdentifier) null,
                 meshObjectInComparison.getTimeUpdated() );
 

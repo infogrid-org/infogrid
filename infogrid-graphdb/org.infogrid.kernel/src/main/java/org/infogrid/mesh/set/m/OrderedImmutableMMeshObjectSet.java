@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -45,7 +45,7 @@ public class OrderedImmutableMMeshObjectSet
             int                  max )
     {
         super( factory, orderedContent );
-        
+
         theMaximum = max;
     }
 
@@ -56,6 +56,7 @@ public class OrderedImmutableMMeshObjectSet
      * @return the found MeshObject at this index
      * @throws ArrayIndexOutOfBoundsException thrown if the index is out of bounds
      */
+    @Override
     public MeshObject getMeshObject(
             int index )
     {
@@ -64,9 +65,10 @@ public class OrderedImmutableMMeshObjectSet
 
     /**
      * Obtain the first MeshObject in the OrderedMeshObjectSet, or null if the OrderedMeshObjectSet is empty.
-     * 
+     *
      * @return the first MeshObject, if any
      */
+    @Override
     public MeshObject getFirstMeshObject()
     {
         if( currentContent != null && currentContent.length > 0 ) {
@@ -75,12 +77,13 @@ public class OrderedImmutableMMeshObjectSet
             return null;
         }
     }
-    
+
     /**
      * Obtain the last MeshObject in the OrderedMeshObjectSet, or null if the OrderedMeshObjectSet is empty.
-     * 
+     *
      * @return the last MeshObject, if any
      */
+    @Override
     public MeshObject getLastMeshObject()
     {
         if( currentContent != null && currentContent.length > 0 ) {
@@ -122,17 +125,18 @@ public class OrderedImmutableMMeshObjectSet
     {
         return theFactory.createOrderedImmutableMeshObjectSet( getMeshObjects(), selector );
     }
-    
+
     /**
      * Obtain the maximum number of elements in ths set.
-     * 
+     *
      * @return the maximum number of elements in the set, or UNLIMITED
      */
+    @Override
     public int getMaximumElements()
     {
         return theMaximum;
     }
-    
+
     /**
      * The maximum number of elements in the set.
      */

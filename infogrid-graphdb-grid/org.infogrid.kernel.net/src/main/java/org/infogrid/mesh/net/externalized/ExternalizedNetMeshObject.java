@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -41,16 +41,8 @@ public interface ExternalizedNetMeshObject
     public abstract NetMeshObjectIdentifier [] getNeighbors();
 
     /**
-     * Obtain the NetMeshObjectIdentifiers of the NetMeshObjects that participate in an equivalence
-     * set with this NetMeshObject.
-     *
-     * @return the NetMeshObjectIdentifiers. May be null.
-     */
-    public abstract NetMeshObjectIdentifier [] getEquivalents();
-    
-    /**
      * Obtain the GiveUpHomeReplica property.
-     * 
+     *
      * @return the GiveUpHomeReplica property
      */
     public abstract boolean getGiveUpHomeReplica();
@@ -71,14 +63,14 @@ public interface ExternalizedNetMeshObject
 
     /**
      * Obtain the NetMeshBaseIdentifier of the Proxy towards the home replica.
-     * 
+     *
      * @return the NetMeshBaseIdentifier, if any
      */
     public abstract NetMeshBaseIdentifier getProxyTowardsHomeNetworkIdentifier();
 
     /**
      * Obtain the NetMeshBaseIdentifier of the Proxy towards the replica with the lock.
-     * 
+     *
      * @return the NetMeshBaseIdentifier, if any
      */
     public abstract NetMeshBaseIdentifier getProxyTowardsLockNetworkIdentifier();

@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -30,9 +30,6 @@ import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.transaction.NetChange;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectBecameDeadStateEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsChangeEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectPropertyChangeEvent;
@@ -69,7 +66,7 @@ public abstract class AbstractProxyPolicy
 
     /**
      * Constructor.
-     * 
+     *
      * @param coherence the CoherenceSpecification used by this ProxyPolicy
      * @param pointsReplicasToItself if true, new Replicas will be created by a branch from the local Replica
      */
@@ -80,12 +77,13 @@ public abstract class AbstractProxyPolicy
         theCoherenceSpecification = coherence;
         thePointsReplicasToItself = pointsReplicasToItself;
     }
-    
+
     /**
      * Obtain the CoherenceSpecification used by this ProxyPolicy.
-     * 
+     *
      * @return the CoherenceSpecification
      */
+    @Override
     public CoherenceSpecification getCoherenceSpecification()
     {
         return theCoherenceSpecification;
@@ -96,6 +94,7 @@ public abstract class AbstractProxyPolicy
      *
      * @param newValue the new value
      */
+    @Override
     public void setCoherenceSpecification(
             CoherenceSpecification newValue )
     {
@@ -118,7 +117,7 @@ public abstract class AbstractProxyPolicy
     /**
      * Default factory method for ProcessingInstructions objects. This may be overridden
      * in subclasses.
-     * 
+     *
      * @return the created ProxyProcessingInstructions object.
      */
     protected ProxyProcessingInstructions createInstructions()
@@ -134,6 +133,7 @@ public abstract class AbstractProxyPolicy
      * @param permanent if true, the Proxy dies permanently
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
     public ProxyProcessingInstructions calculateForProxyDeath(
             CommunicatingProxy                            proxy,
             CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing,
@@ -173,13 +173,14 @@ public abstract class AbstractProxyPolicy
     /**
      * Determine the ProxyProcessingInstructions for obtaining one or more
      * replicas via this Proxy.
-     * 
+     *
      * @param paths the NetMeshObjectAccessSpecification for finding the NetMeshObjects to be replicated
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
     public ProxyProcessingInstructions calculateForObtainReplicas(
             NetMeshObjectAccessSpecification []           paths,
             long                                          duration,
@@ -198,20 +199,21 @@ public abstract class AbstractProxyPolicy
         ret.setStartCommunicating( true );
         ret.setSendViaWaitEndpoint( outgoing );
         ret.setWaitEndpointTimeout( calculateTimeoutDuration( duration, theDefaultRpcWaitDuration ));
-        
+
         return ret;
     }
 
     /**
      * Determine the ProxyProcessingInstructions for obtaining one or more
      * locks via this Proxy.
-     * 
+     *
      * @param localReplicas the local replicas for which the lock should be obtained
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
     public ProxyProcessingInstructions calculateForTryToObtainLocks(
             NetMeshObject []                              localReplicas,
             long                                          duration,
@@ -234,14 +236,14 @@ public abstract class AbstractProxyPolicy
         ret.setStartCommunicating( true );
         ret.setSendViaWaitEndpoint( outgoing );
         ret.setWaitEndpointTimeout( calculateTimeoutDuration( duration, theDefaultRpcWaitDuration ));
-        
+
         return ret;
     }
 
     /**
      * Determine the ProxyProcessingInstructions for pushing one or more
      * locks via this Proxy.
-     * 
+     *
      * @param localReplicas the local replicas for which the lock should be obtained
      * @param isNewProxy if true, the NetMeshObject did not replicate via this Proxy prior to this call.
      *         The sequence in the array is the same sequence as in localReplicas.
@@ -250,6 +252,7 @@ public abstract class AbstractProxyPolicy
      * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
     public ProxyProcessingInstructions calculateForTryToPushLocks(
             NetMeshObject []                              localReplicas,
             boolean []                                    isNewProxy,
@@ -277,13 +280,14 @@ public abstract class AbstractProxyPolicy
     /**
      * Determine the ProxyProcessingInstructions for obtaining one or more
      * home replica statuses via this Proxy.
-     * 
+     *
      * @param localReplicas the local replicas for which the home replica statuses should be obtained
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
     public ProxyProcessingInstructions calculateForTryToObtainHomeReplicas(
             NetMeshObject []                              localReplicas,
             long                                          duration,
@@ -294,9 +298,9 @@ public abstract class AbstractProxyPolicy
         for( int i=0 ; i<localReplicas.length ; ++i ) {
             identifiers[i] = localReplicas[i].getIdentifier();
         }
-        
+
         ProxyProcessingInstructions ret = createInstructions();
-        
+
         // ret.setRequestedHomeReplicas( identifiers );
 
         ParserFriendlyXprisoMessage outgoing = perhapsOutgoing.obtain();
@@ -306,14 +310,14 @@ public abstract class AbstractProxyPolicy
         ret.setStartCommunicating( true );
         ret.setSendViaWaitEndpoint( outgoing );
         ret.setWaitEndpointTimeout( calculateTimeoutDuration( duration, theDefaultRpcWaitDuration ));
-        
+
         return ret;
     }
 
     /**
      * Determine the ProxyProcessingInstructions for pushing one or more
      * home replica statuses via this Proxy.
-     * 
+     *
      * @param localReplicas the local replicas for which the home replica statuses should be obtained
      * @param isNewProxy if true, the NetMeshObject did not replicate via this Proxy prior to this call.
      *         The sequence in the array is the same sequence as in localReplicas.
@@ -322,6 +326,7 @@ public abstract class AbstractProxyPolicy
      * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
     public ProxyProcessingInstructions calculateForTryToPushHomeReplicas(
             NetMeshObject []                              localReplicas,
             boolean []                                    isNewProxy,
@@ -356,6 +361,7 @@ public abstract class AbstractProxyPolicy
      * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
     public ProxyProcessingInstructions calculateForForceObtainLocks(
             NetMeshObject []                              localReplicas,
             long                                          duration,
@@ -366,9 +372,9 @@ public abstract class AbstractProxyPolicy
         for( int i=0 ; i<localReplicas.length ; ++i ) {
             identifiers[i] = localReplicas[i].getIdentifier();
         }
-        
+
         ProxyProcessingInstructions ret = createInstructions();
-        
+
         // ret.setReclaimedLockObjects( identifiers );
 
         ParserFriendlyXprisoMessage outgoing = perhapsOutgoing.obtain();
@@ -378,14 +384,14 @@ public abstract class AbstractProxyPolicy
         ret.setStartCommunicating( true );
         ret.setSendViaEndpoint( outgoing );
         // we send this without waiting for receipt. So we ignore the passed duration parameter.
-        
+
         return ret;
     }
-    
+
     /**
      * Determine the ProxyProcessingInstructions for attempting to resynchronize one or more
      * NetMeshObjects via this Proxy.
-     * 
+     *
      * @param identifiers the identifiers of the local replicas which should be resynchronized
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @param accessLocallySynchronizerQueryKey if given, add all to-be-opened queries within this operation to the existing transaction
@@ -394,6 +400,7 @@ public abstract class AbstractProxyPolicy
      * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
     public ProxyProcessingInstructions calculateForTryResynchronizeReplicas(
             NetMeshObjectIdentifier []                    identifiers,
             CommunicatingProxy                            proxy,
@@ -401,7 +408,7 @@ public abstract class AbstractProxyPolicy
             CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )
     {
         ProxyProcessingInstructions ret = createInstructions();
-        
+
         ret.setStartCommunicating( true );
         // ret.setReclaimedLockObjects( identifiers );
 
@@ -414,20 +421,21 @@ public abstract class AbstractProxyPolicy
         } else {
             ret.setSendViaEndpoint( outgoing );
         }
-        
+
         return ret;
     }
-    
+
     /**
-     * Determine the ProxyProcessingInstructions for canceling one or more 
+     * Determine the ProxyProcessingInstructions for canceling one or more
      * NetMeshObject leases via this Proxy.
-     * 
+     *
      * @param localReplicas the local replicas for which the lease should be canceled
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
     public ProxyProcessingInstructions calculateForCancelReplicas(
             NetMeshObject []                              localReplicas,
             long                                          duration,
@@ -440,7 +448,7 @@ public abstract class AbstractProxyPolicy
         }
 
         ProxyProcessingInstructions ret = createInstructions();
-        
+
         // ret.setReclaimedLockObjects( identifiers );
 
         ParserFriendlyXprisoMessage outgoing = perhapsOutgoing.obtain();
@@ -449,8 +457,8 @@ public abstract class AbstractProxyPolicy
 
         ret.setStartCommunicating( true );
         ret.setSendViaEndpoint( outgoing );
-        
-        return ret;        
+
+        return ret;
     }
 
     /**
@@ -463,6 +471,7 @@ public abstract class AbstractProxyPolicy
      * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
     public ProxyProcessingInstructions calculateForFreshenReplicas(
             NetMeshObject []                              localReplicas,
             long                                          duration,
@@ -490,35 +499,36 @@ public abstract class AbstractProxyPolicy
     /**
      * Given a committed Transaction, determine the ProxyProcessingInstructions for notifying
      * our partner Proxy.
-     * 
+     *
      * @param tx the Transaction
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
      public ProxyProcessingInstructions calculateForTransactionCommitted(
             Transaction                                   tx,
             CommunicatingProxy                            proxy,
             CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )
     {
         ProxyProcessingInstructions ret = createInstructions();
-        
+
         // ret.setReclaimedLockObjects( identifiers );
 
         Change [] changes = tx.getChangeSet().getChanges();
 
-        ArrayList<NetMeshObject> potentiallyConvey = new ArrayList<NetMeshObject>();
+        ArrayList<NetMeshObject> potentiallyConvey = new ArrayList<>();
 
         for( int i=0 ; i<changes.length ; ++i ) {
             NetChange current = (NetChange) changes[i];
-            
+
             current.setResolver( proxy.getNetMeshBase() );
 
             NetMeshObjectIdentifier currentIdentifier = current.getAffectedMeshObjectIdentifier();
             // NetMeshObject affectedObject = current.getAffectedMeshObject(); // affected object may be null
 
             if( current.shouldBeSent( proxy )) {
-                
+
                 if( current instanceof ReplicaPurgedEvent ) {
                     // affectedObject is null
                     perhapsOutgoing.obtain().addRequestedCanceledObject( currentIdentifier );
@@ -530,18 +540,10 @@ public abstract class AbstractProxyPolicy
                     NetMeshObjectDeletedEvent realCurrent = (NetMeshObjectDeletedEvent) current;
                     perhapsOutgoing.obtain().addDeleteChange( realCurrent );
 
-                } else if( current instanceof NetMeshObjectEquivalentsAddedEvent ) {
-                    NetMeshObjectEquivalentsAddedEvent realCurrent = (NetMeshObjectEquivalentsAddedEvent) current;
-                    perhapsOutgoing.obtain().addEquivalentAddition( realCurrent );
-
-                } else if( current instanceof NetMeshObjectEquivalentsRemovedEvent ) {
-                    NetMeshObjectEquivalentsRemovedEvent realCurrent = (NetMeshObjectEquivalentsRemovedEvent) current;
-                    perhapsOutgoing.obtain().addEquivalentRemoval( realCurrent );
-
                 } else if( current instanceof NetMeshObjectNeighborAddedEvent ) {
                     NetMeshObjectNeighborAddedEvent realCurrent = (NetMeshObjectNeighborAddedEvent) current;
                     perhapsOutgoing.obtain().addNeighborAddition( realCurrent );
-                    
+
                     NetMeshObject neighbor = realCurrent.getNeighborMeshObject();
                     if( neighbor != null ) {
                         potentiallyConvey.add( neighbor );
@@ -579,13 +581,13 @@ public abstract class AbstractProxyPolicy
                 }
             }
         }
-        
+
         for( NetMeshObject current : potentiallyConvey ) {
             if( addPotentiallyConvey( current, perhapsOutgoing, proxy )) {
                 ret.addRegisterReplicationIfNotAlready( current );
             }
         }
-        
+
         if( perhapsOutgoing.hasBeenCreated() && !perhapsOutgoing.obtain().isEmpty() ) {
             ret.setStartCommunicating( true );
             ret.setSendViaEndpoint( perhapsOutgoing.obtain() );
@@ -596,11 +598,11 @@ public abstract class AbstractProxyPolicy
             return null;
         }
     }
-     
+
     /**
      * Determine the necessary operations that need to be performed to process
      * this incoming message according to this ProxyPolicy.
-     * 
+     *
      * @param endpoint the MessageEndpoint through which the message arrived
      * @param incoming the incoming XprisoMessage
      * @param isResponseToOngoingQuery if true, this message is known to be a response to a still-ongoing
@@ -609,6 +611,7 @@ public abstract class AbstractProxyPolicy
      * @param perhapsOutgoing the outgoing message being assembled
      * @return the calculated ProxyProcessingInstructions, or null
      */
+    @Override
     public ProxyProcessingInstructions calculateForIncomingMessage(
             ReceivingMessageEndpoint<XprisoMessage>       endpoint,
             XprisoMessage                                 incoming,
@@ -634,7 +637,6 @@ public abstract class AbstractProxyPolicy
         processIncomingPropertyChanges(                proxy, ret, perhapsOutgoing );
         processIncomingTypeChanges(                    proxy, ret, perhapsOutgoing );
         processIncomingNeighborRoleChanges(            proxy, ret, perhapsOutgoing );
-        processIncomingEquivalentChanges(              proxy, ret, perhapsOutgoing );
         processIncomingDeleteChanges(                  proxy, ret, perhapsOutgoing );
 
         if( incoming.getRequestId() != 0 ) {
@@ -652,7 +654,7 @@ public abstract class AbstractProxyPolicy
 
     /**
      * Process the incoming request: first-time requested objects.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -693,7 +695,7 @@ public abstract class AbstractProxyPolicy
 
     /**
      * Process the incoming request: resynchronize replicas.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -709,7 +711,7 @@ public abstract class AbstractProxyPolicy
         // requested resynchronized objects
         if( ArrayHelper.arrayHasContent( incoming.getRequestedResynchronizeReplicas())) {
             NetMeshObject [] resync = theMeshBase.findMeshObjectsByIdentifier( incoming.getRequestedResynchronizeReplicas() );
-            
+
             for( int i=0 ; i<resync.length ; ++i ) {
                 if( resync[i] != null ) {
                     if( addPotentiallyConvey( resync[i], perhapsOutgoing, incomingProxy )) {
@@ -737,7 +739,7 @@ public abstract class AbstractProxyPolicy
 
     /**
      * Process the incoming request: requested home replicas.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -754,8 +756,8 @@ public abstract class AbstractProxyPolicy
         if( ArrayHelper.arrayHasContent( incoming.getRequestedHomeReplicas())) {
             NetMeshObject [] homes = theMeshBase.findMeshObjectsByIdentifier( incoming.getRequestedHomeReplicas() );
 
-            ArrayList<NetMeshObject>                toSurrender = new ArrayList<NetMeshObject>();
-            HashMap<Proxy,ArrayList<NetMeshObject>> toGet       = new HashMap<Proxy,ArrayList<NetMeshObject>>();
+            ArrayList<NetMeshObject>                toSurrender = new ArrayList<>();
+            HashMap<Proxy,ArrayList<NetMeshObject>> toGet       = new HashMap<>();
             for( int i=0 ; i<homes.length ; ++i ) {
                 if( homes[i] == null ) {
                     // can't/won't do anything
@@ -767,7 +769,7 @@ public abstract class AbstractProxyPolicy
                 } else {
                     ArrayList<NetMeshObject> list = toGet.get( homes[i].getProxyTowardsHomeReplica() );
                     if( list == null ) {
-                        list = new ArrayList<NetMeshObject>();
+                        list = new ArrayList<>();
                         toGet.put( homes[i].getProxyTowardsHomeReplica(), list );
                     }
                     list.add( homes[i] );
@@ -816,7 +818,7 @@ public abstract class AbstractProxyPolicy
 
     /**
      * Process the incoming request: requested locks.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -832,9 +834,9 @@ public abstract class AbstractProxyPolicy
         // requested locks
         if( ArrayHelper.arrayHasContent( incoming.getRequestedLockObjects())) {
             NetMeshObject [] locks = theMeshBase.findMeshObjectsByIdentifier( incoming.getRequestedLockObjects() );
-            
-            ArrayList<NetMeshObject>                toSurrender = new ArrayList<NetMeshObject>();
-            HashMap<Proxy,ArrayList<NetMeshObject>> toGet       = new HashMap<Proxy,ArrayList<NetMeshObject>>();
+
+            ArrayList<NetMeshObject>                toSurrender = new ArrayList<>();
+            HashMap<Proxy,ArrayList<NetMeshObject>> toGet       = new HashMap<>();
             for( int i=0 ; i<locks.length ; ++i ) {
                 if( locks[i] == null ) {
                     // can't/won't do anything
@@ -846,7 +848,7 @@ public abstract class AbstractProxyPolicy
                 } else {
                     ArrayList<NetMeshObject> list = toGet.get( locks[i].getProxyTowardsLockReplica() );
                     if( list == null ) {
-                        list = new ArrayList<NetMeshObject>();
+                        list = new ArrayList<>();
                         toGet.put( locks[i].getProxyTowardsLockReplica(), list );
                     }
                     list.add( locks[i] );
@@ -874,7 +876,7 @@ public abstract class AbstractProxyPolicy
             } catch( InterruptedException ex ) {
                 log.error( ex );
             }
-            
+
             for( Proxy p : toGet.keySet() ) {
                 ArrayList<NetMeshObject> list = toGet.get( p );
                 for( NetMeshObject current : list ) {
@@ -891,10 +893,10 @@ public abstract class AbstractProxyPolicy
             }
         }
     }
-    
+
     /**
      * Process the incoming request: reclaimed locks.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -910,16 +912,16 @@ public abstract class AbstractProxyPolicy
         // reclaimed locks
         if( ArrayHelper.arrayHasContent( incoming.getReclaimedLockObjects())) {
             NetMeshObject [] lost = theMeshBase.findMeshObjectsByIdentifier( incoming.getReclaimedLockObjects() );
-            
+
             for( int i=0 ; i<lost.length ; ++i ) {
                 ret.addSurrenderLock( lost[i] );
             }
         }
     }
-    
+
     /**
      * Process the incoming request: objects to be canceled.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -931,7 +933,7 @@ public abstract class AbstractProxyPolicy
     {
         XprisoMessage incoming    = ret.getIncomingXprisoMessage();
         NetMeshBase   theMeshBase = incomingProxy.getNetMeshBase();
-        
+
     // canceled objects
         if( ArrayHelper.arrayHasContent( incoming.getRequestedCanceledObjects())) {
             NetMeshObject [] cancel = theMeshBase.findMeshObjectsByIdentifier( incoming.getRequestedCanceledObjects() );
@@ -943,10 +945,10 @@ public abstract class AbstractProxyPolicy
             }
         }
     }
-    
+
     /**
      * Process the incoming request: conveyed objects.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -960,7 +962,7 @@ public abstract class AbstractProxyPolicy
     {
         XprisoMessage incoming    = ret.getIncomingXprisoMessage();
         NetMeshBase   theMeshBase = incomingProxy.getNetMeshBase();
-    
+
     // conveyed objects
         if( ArrayHelper.arrayHasContent( incoming.getConveyedMeshObjects())) {
             for( ExternalizedNetMeshObject externalized : incoming.getConveyedMeshObjects() ) {
@@ -995,20 +997,20 @@ public abstract class AbstractProxyPolicy
                 // B: do nothing | cancel lease from current proxyTorwardsHome
                 // C: do nothing | create instruction to issue resynchronize message with home proxy specified in conveyed MeshObject
                 // D: do nothing | cancel lease of offered conveyed object
- 
+
                 boolean doRippleCreate        = false;
                 boolean doRippleResynchronize = false;
-                
+
                 boolean cancelCurrentLease = false;
                 boolean cancelOfferedLease = false;
-                
+
                 boolean issueResyncMessage = false;
-                
+
                 if( found == null ) {
                     if( externalizedHasDifferentHomeProxy ) {
                         if( isResponseToOngoingQuery ) {
                             // 1.1.1 -- we don't have it yet, but asked for it, and its home is somewhere else
-                            
+
                             doRippleCreate     = true;
                             issueResyncMessage = true;
 
@@ -1022,7 +1024,7 @@ public abstract class AbstractProxyPolicy
                     } else { // !differentHomeProxy
                         if( isResponseToOngoingQuery ) {
                             // 1.2.1 -- we don't have it yet, but asked for it, and we have the right home
-                            
+
                             doRippleCreate = true;
 
                         } else { // !isResponseToOngoingQuery
@@ -1032,7 +1034,7 @@ public abstract class AbstractProxyPolicy
                             cancelOfferedLease = true;
                         }
                     }
-                    
+
                 } else if( found.getProxyTowardsHomeReplica() == incomingProxy ) { // found != null
                     if( externalizedHasDifferentHomeProxy ) {
                         if( isResponseToOngoingQuery ) {
@@ -1044,7 +1046,7 @@ public abstract class AbstractProxyPolicy
 
                         } else { // !isResponseToOngoingQuery
                             // 2.1.2 -- we have it, but didn't ask, message comes from the home, but its home is somewhere else
-                            
+
                             // do nothing, we don't care
                             // cancelOfferedLease = true;  // externalizedHasNoRelationshipsNotFoundLocally( found, externalized )
                             cancelOfferedLease = externalizedHasNoRelationshipsNotFoundLocally( found, externalized );
@@ -1053,18 +1055,18 @@ public abstract class AbstractProxyPolicy
                     } else { // !differentHomeProxy
                         if( isResponseToOngoingQuery ) {
                             // 2.2.1 -- we have it, but asked for it, message comes from the home, and we have the right home
-                            
+
                             // to be safe, do a resync because we just got a fresh copy of authoritative data
                             doRippleResynchronize = true;
-                            
+
                         } else { // !isResponseToOngoingQuery
                             // 2.2.2 -- we have it, but didn't ask, message comes from the home, and we have the right home
-                            
+
                             // to be safe, do a resync because we just got a fresh copy of authoritative data
                             doRippleResynchronize = true;
-                        }                        
+                        }
                     }
-                    
+
                 } else { // found != null && found.getProxyTowardsHomeReplica() != proxy
                     if( externalizedHasDifferentHomeProxy ) {
                         if( isResponseToOngoingQuery ) {
@@ -1072,10 +1074,10 @@ public abstract class AbstractProxyPolicy
 
                             // only accept lead if it has unique information about relationships
                             cancelOfferedLease = externalizedHasNoRelationshipsNotFoundLocally( found, externalized );
-                            
+
                         } else { // !isResponseToOngoingQuery
                             // 3.1.2 -- we have it, didn't ask for it, message comes from somewhere else, and its home is somewhere else
-                            
+
                             // only accept lead if it has unique information about relationships
                             cancelOfferedLease = externalizedHasNoRelationshipsNotFoundLocally( found, externalized );
                         }
@@ -1089,18 +1091,18 @@ public abstract class AbstractProxyPolicy
                             cancelCurrentLease    = currentProxyHasNoRelationshipsNotFoundExternally( found, externalized );
                             doRippleResynchronize = true;
 //                            cancelOfferedLease = externalizedHasNoRelationshipsNotFoundLocally( found, externalized );
-                            
+
                         } else { // !isResponseToOngoingQuery
                             // 3.2.2 -- we have it, didn't ask for it, message comes from the home, and we thought we have the right home
-                            
+
                             // cancelCurrentLease    = true;
                             cancelCurrentLease    = currentProxyHasNoRelationshipsNotFoundExternally( found, externalized );
                             doRippleResynchronize = true;
                         }
                     }
                 }
-                
-                
+
+
                 // A:
                 if( doRippleCreate ) {
                     if( doRippleResynchronize ) {
@@ -1113,15 +1115,15 @@ public abstract class AbstractProxyPolicy
                 } // else do nothing
 
                 // B:
-                if( cancelCurrentLease ) {
+                if( cancelCurrentLease && found != null ) {
                     ret.addToCancelInstructions( found, found.getProxyTowardsHomeReplica());
                 }
-                
+
                 // C:
                 if( cancelOfferedLease ) {
                     perhapsOutgoing.obtain().addRequestedCanceledObject( externalized.getIdentifier() );
                 }
-                
+
                 // D:
                 if( issueResyncMessage ) {
                     ret.addToResynchronizeInstructions(
@@ -1181,7 +1183,7 @@ public abstract class AbstractProxyPolicy
 
     /**
      * Process the incoming request: pushed locks.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -1193,10 +1195,10 @@ public abstract class AbstractProxyPolicy
     {
         XprisoMessage incoming    = ret.getIncomingXprisoMessage();
         NetMeshBase   theMeshBase = incomingProxy.getNetMeshBase();
-        
+
         if( ArrayHelper.arrayHasContent( incoming.getPushLockObjects())) {
             NetMeshObject [] locks = theMeshBase.findMeshObjectsByIdentifier( incoming.getPushLockObjects() );
-            
+
             for( int i=0 ; i<locks.length ; ++i ) {
                 if( locks[i] != null ) {
                     locks[i].proxyOnlyPushLock( incomingProxy );
@@ -1204,10 +1206,10 @@ public abstract class AbstractProxyPolicy
             }
         }
     }
-    
+
     /**
      * Process the incoming request: pushed home replicas.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -1222,7 +1224,7 @@ public abstract class AbstractProxyPolicy
 
         if( ArrayHelper.arrayHasContent( incoming.getPushHomeReplicas() )) {
             NetMeshObject [] homes = theMeshBase.findMeshObjectsByIdentifier( incoming.getPushHomeReplicas() );
-            
+
             for( int i=0 ; i<homes.length ; ++i ) {
                 if( homes[i] != null ) {
                     homes[i].proxyOnlyPushHomeReplica( incomingProxy );
@@ -1230,10 +1232,10 @@ public abstract class AbstractProxyPolicy
             }
         }
     }
-    
+
     /**
      * Process the incoming request: property changes.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -1247,14 +1249,14 @@ public abstract class AbstractProxyPolicy
 
         if( ArrayHelper.arrayHasContent( incoming.getPropertyChanges() )) {
             NetMeshObjectPropertyChangeEvent [] events = incoming.getPropertyChanges();
-            
+
             ret.setPropertyChanges( events );
         }
     }
-    
+
     /**
      * Process the incoming request: type changes.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -1268,19 +1270,19 @@ public abstract class AbstractProxyPolicy
 
         if( ArrayHelper.arrayHasContent( incoming.getTypeAdditions())) {
             NetMeshObjectTypeAddedEvent [] events = incoming.getTypeAdditions();
-            
+
             ret.setTypeAdditions( events );
         }
         if( ArrayHelper.arrayHasContent( incoming.getTypeRemovals())) {
             NetMeshObjectTypeRemovedEvent [] events = incoming.getTypeRemovals();
-            
+
             ret.setTypeRemovals( events );
         }
     }
-    
+
     /**
      * Process the incoming request: neighbor and role changes.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -1304,7 +1306,7 @@ public abstract class AbstractProxyPolicy
         }
         if( ArrayHelper.arrayHasContent( incoming.getNeighborRemovals())) {
             NetMeshObjectNeighborRemovedEvent [] events = incoming.getNeighborRemovals();
-            
+
             for( NetMeshObjectNeighborRemovedEvent current : events ) {
                 if( acceptRelationshipEvent( incomingProxy, current )) {
                     ret.addNeighborRemoval( current );
@@ -1314,10 +1316,10 @@ public abstract class AbstractProxyPolicy
                 }
             }
         }
-        
+
         if( ArrayHelper.arrayHasContent( incoming.getRoleAdditions())) {
             NetMeshObjectRoleAddedEvent [] events = incoming.getRoleAdditions();
-            
+
             for( NetMeshObjectRoleAddedEvent current : events ) {
                 if( acceptRelationshipEvent( incomingProxy, current )) {
                     ret.addRoleAddition( current );
@@ -1327,14 +1329,14 @@ public abstract class AbstractProxyPolicy
         }
         if( ArrayHelper.arrayHasContent( incoming.getRoleRemovals())) {
             NetMeshObjectRoleRemovedEvent [] events = incoming.getRoleRemovals();
-            
+
             for( NetMeshObjectRoleRemovedEvent current : events ) {
                 if( acceptRelationshipEvent( incomingProxy, current )) {
                     ret.addRoleRemoval( current );
                 } else if( current.getNeighborMeshObject() != null ) {
                     // we don't want it, send it right back: however, only those that are ours
                     RoleType [] removed = current.getAffectedRoleTypes();
-                    ArrayList<RoleType> sendBack = new ArrayList<RoleType>( removed.length );
+                    ArrayList<RoleType> sendBack = new ArrayList<>( removed.length );
 
                     for( int i=0 ; i<removed.length ; ++i ) {
                         if( current.getSource().isRelated( removed[i], current.getNeighborMeshObject() )) {
@@ -1357,48 +1359,8 @@ public abstract class AbstractProxyPolicy
     }
 
     /**
-     * Process the incoming request: equivalence changes.
-     * 
-     * @param incomingProxy the incoming Proxy
-     * @param ret the instructions being assembled assembled
-     * @param perhapsOutgoing the outgoing message being assembled
-     */
-    protected void processIncomingEquivalentChanges(
-            Proxy                                         incomingProxy,
-            ProxyProcessingInstructions                   ret,
-            CreateWhenNeeded<ParserFriendlyXprisoMessage> perhapsOutgoing )
-    {
-        XprisoMessage incoming = ret.getIncomingXprisoMessage();
-
-        if( ArrayHelper.arrayHasContent( incoming.getEquivalentsAdditions())) {
-            NetMeshObjectEquivalentsAddedEvent [] events = incoming.getEquivalentsAdditions();
-            
-            for( NetMeshObjectEquivalentsAddedEvent current : events ) {
-                if( acceptRelationshipEvent( incomingProxy, current )) {
-                    ret.addEquivalentsAddition( current );
-                } else if( !ArrayHelper.hasNullInArray( current.getDeltaValue())) {
-                    // we don't want it, send it right back
-                    perhapsOutgoing.obtain().addEquivalentRemoval( current.inverse() );
-                }
-            }
-        }
-        if( ArrayHelper.arrayHasContent( incoming.getEquivalentsRemovals())) {
-            NetMeshObjectEquivalentsRemovedEvent [] events = incoming.getEquivalentsRemovals();
-            
-            for( NetMeshObjectEquivalentsRemovedEvent current : events ) {
-                if( acceptRelationshipEvent( incomingProxy, current )) {
-                    ret.addEquivalentsRemoval( current );
-                } else if( !ArrayHelper.hasNullInArray( current.getDeltaValue())) {
-                    // we don't want it, send it right back
-                    perhapsOutgoing.obtain().addEquivalentAddition( current.inverse() );
-                }
-            }
-        }
-    }
-
-    /**
      * Process the incoming request: delete changes.
-     * 
+     *
      * @param incomingProxy the incoming Proxy
      * @param ret the instructions being assembled assembled
      * @param perhapsOutgoing the outgoing message being assembled
@@ -1412,18 +1374,18 @@ public abstract class AbstractProxyPolicy
 
         if( ArrayHelper.arrayHasContent( incoming.getDeletions())) {
             NetMeshObjectDeletedEvent [] events = incoming.getDeletions();
-            
+
             ret.setDeletions( events );
         }
-    }      
-    
+    }
+
     /**
      * Helper method to add a NetMeshObject to an outgoing XprisoMessage to be conveyed, if needed.
-     * 
+     *
      * @param obj the potentially added NetMeshObject
      * @param perhapsOutgoing the outgoing message being assembled
      * @param proxy the Proxy via which the XprisoMessage will be sent
-     * @param needsToBeSent if false, do not send. 
+     * @param needsToBeSent if false, do not send.
      * @return true if the NetMeshObject was added
      */
     protected boolean addPotentiallyConvey(
@@ -1440,7 +1402,7 @@ public abstract class AbstractProxyPolicy
                 }
             }
         }
-        
+
         // make sure we need to
         if( !needsToBeSent ) {
             return false;
@@ -1453,7 +1415,7 @@ public abstract class AbstractProxyPolicy
 
     /**
      * Helper method to add a NetMeshObject to an outgoing XprisoMessage to be conveyed, if needed.
-     * 
+     *
      * @param obj the potentially added NetMeshObject
      * @param perhapsOutgoing the outgoing message being assembled
      * @param proxy the Proxy via which the XprisoMessage will be sent
@@ -1469,7 +1431,7 @@ public abstract class AbstractProxyPolicy
 
     /**
      * Helper method to calculate a timeout.
-     * 
+     *
      * @param callerRequestedDuration the timeout duration specified by the caller. This may be -1, indicating default.
      * @param defaultDuration the default duration as per this ProxyPolicy.
      * @return the calculated timeout
@@ -1489,7 +1451,7 @@ public abstract class AbstractProxyPolicy
     /**
      * Helper method to determine whether to accept an incoming relationship-related event.
      * Can be overridden in subclasses.
-     * 
+     *
      * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
      * @param e the event
      * @return true if we accept the event
@@ -1502,25 +1464,10 @@ public abstract class AbstractProxyPolicy
     }
 
     /**
-     * Helper method to determine whether to accept an incoming relationship-related event.
-     * Can be overridden in subclasses.
-     * 
-     * @param proxy the Proxy on whose behalf the ProxyProcessingInstructions are constructed
-     * @param e the event
-     * @return true if we accept the event
-     */
-    protected boolean acceptRelationshipEvent(
-            Proxy                               proxy,
-            NetMeshObjectEquivalentsChangeEvent e )
-    {
-        return true;
-    }
-
-    /**
      * The CoherenceSpecification used by this ProxyPolicy.
      */
     protected CoherenceSpecification theCoherenceSpecification;
-    
+
     /**
      * If true, new Replicas will be created by a branch from the local Replica.
      */
@@ -1530,7 +1477,7 @@ public abstract class AbstractProxyPolicy
      * Our ResourceHelper.
      */
     private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( AbstractProxyPolicy.class );
-    
+
     /**
      * The default duration, in milliseconds, that we are willing for remote Proxies
      * to communicate with us.

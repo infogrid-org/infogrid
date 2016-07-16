@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,7 +21,6 @@ import java.util.Set;
 import org.infogrid.mesh.AbstractMeshObject;
 import org.infogrid.mesh.CannotRelateToItselfException;
 import org.infogrid.mesh.EntityNotBlessedException;
-import org.infogrid.mesh.EquivalentAlreadyException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
@@ -97,7 +96,6 @@ public class AMeshObject
      * @param expires the time this MeshObject will expire
      * @param properties the properties with their values of the MeshObject, if any
      * @param meshTypes the MeshTypes and facdes of the MeshObject, if any
-     * @param equivalents either an array of length 2, or null. If given, contains the left and right equivalence pointers.
      * @param neighborIdentifiers the current neighbors of the MeshObject, given as Identifiers
      * @param neighborRoleTypes the RoleTypes of the relationships with the various neighbors, in sequence
      */
@@ -110,7 +108,6 @@ public class AMeshObject
             long                                expires,
             HashMap<PropertyType,PropertyValue> properties,
             EntityType []                       meshTypes,
-            MeshObjectIdentifier []             equivalents,
             MeshObjectIdentifier []             neighborIdentifiers,
             RoleType [][]                       neighborRoleTypes )
     {
@@ -119,11 +116,6 @@ public class AMeshObject
         theProperties          = properties;
         theNeighborIdentifiers = neighborIdentifiers;
         theNeighborRoleTypes   = neighborRoleTypes;
-
-        if( equivalents != null && equivalents.length != 2 ) {
-            throw new IllegalArgumentException( "Equivalents must be of length 2" );
-        }
-        theEquivalenceSetPointers = equivalents;
 
         if( meshTypes != null && meshTypes.length > 0 ) {
             theMeshTypes = createMeshTypes();
@@ -166,26 +158,14 @@ public class AMeshObject
     }
 
     /**
-     * Traverse from this MeshObject to all directly related MeshObjects. Directly
-     * related MeshObjects are those MeshObjects that are participating in a
-     * relationship with this MeshObject. Specify whether to consider equivalents
-     * as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     * @return the set of MeshObjects that are directly related to this MeshObject
+     * {@inheritDoc}
      */
     @Override
-    public MeshObjectSet traverseToNeighborMeshObjects(
-            boolean considerEquivalents )
+    public MeshObjectSet traverseToNeighborMeshObjects()
     {
         checkAlive();
 
-        MeshObject [] starts;
-        if( considerEquivalents ) {
-            starts = getEquivalents().getMeshObjects();
-        } else {
-            starts = new MeshObject[] { this };
-        }
+        MeshObject [] starts = new MeshObject[] { this };
 
         AMeshObjectNeighborManager nMgr                = getNeighborManager();
         AMeshBase                  realBase            = (AMeshBase) theMeshBase;
@@ -1045,32 +1025,20 @@ public class AMeshObject
     }
 
     /**
-      * Traverse a TraversalSpecification from this MeshObject to obtain a set of MeshObjects.
-      * Specify whether relationships of equivalent MeshObjects should be considered as well.
-      *
-      * @param theTraverseSpec the TraversalSpecification to traverse
-      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-      *        if false, only this MeshObject will be used as the start
-      * @return the set of MeshObjects found as a result of the traversal
-      */
+     * {@inheritDoc}
+     */
     @Override
     public MeshObjectSet traverse(
-            TraversalSpecification theTraverseSpec,
-            boolean                considerEquivalents )
+            TraversalSpecification theTraverseSpec )
     {
         checkAlive();
 
         if( !( theTraverseSpec instanceof RoleType )) {
-            return theTraverseSpec.traverse( this, considerEquivalents );
+            return theTraverseSpec.traverse( this );
         }
         RoleType type = (RoleType) theTraverseSpec;
 
-        MeshObject [] starts;
-        if( considerEquivalents ) {
-            starts = getEquivalents().getMeshObjects();
-        } else {
-            starts = new MeshObject[] { this };
-        }
+        MeshObject [] starts = new MeshObject[] { this };
 
         AMeshObjectNeighborManager nMgr = getNeighborManager();
 
@@ -1141,27 +1109,14 @@ public class AMeshObject
     }
 
     /**
-     * Obtain the RoleTypes that this MeshObject currently participates in. This will return only one
-     * instance of the same RoleType object, even if the MeshObject participates in this RoleType
-     * multiple times with different other MeshObjects. Specify whether equivalent MeshObjects
-     * should be considered as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the RoleTypes that this MeshObject currently participates in.
+     * {@inheritDoc}
      */
     @Override
-    public RoleType [] getRoleTypes(
-            boolean considerEquivalents )
+    public RoleType [] getRoleTypes()
     {
         checkAlive();
 
-        MeshObject [] starts;
-        if( considerEquivalents ) {
-            starts = getEquivalents().getMeshObjects();
-        } else {
-            starts = new MeshObject[] { this };
-        }
+        MeshObject [] starts = new MeshObject[] { this };
 
         AMeshObjectNeighborManager nMgr = getNeighborManager();
 
@@ -1219,28 +1174,15 @@ public class AMeshObject
     }
 
     /**
-     * Obtain the MeshTypeIdentifiers of the RoleTypes that this MeshObject plays with a
-     * given neighbor MeshObject identified by its MeshObjectIdentifier.
-     *
-     * @param neighborIdentifier the MeshObjectIdentifier of the neighbor MeshObject
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the identifiers of the RoleTypes
-     * @throws NotRelatedException thrown if the specified MeshObject is not actually a neighbor
+     * {@inheritDoc}
      */
     @Override
     public MeshTypeIdentifier [] getRoleTypeIdentifiers(
-            MeshObjectIdentifier neighborIdentifier,
-            boolean              considerEquivalents )
+            MeshObjectIdentifier neighborIdentifier )
         throws
             NotRelatedException
     {
-        MeshObject [] starts;
-        if( considerEquivalents ) {
-            starts = getEquivalents().getMeshObjects();
-        } else {
-            starts = new MeshObject[] { this };
-        }
+        MeshObject [] starts = new MeshObject[] { this };
 
         AMeshObjectNeighborManager nMgr = getNeighborManager();
 
@@ -1273,26 +1215,14 @@ public class AMeshObject
     }
 
     /**
-     * Obtain the Roles that this MeshObject currently participates in.
-     * Specify whether relationships of equivalent MeshObjects
-     * should be considered as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     *        if false, only this MeshObject will be used as the start
-     * @return the Roles that this MeshObject currently participates in.
+     * {@inheritDoc}
      */
     @Override
-    public Role [] getRoles(
-            boolean considerEquivalents )
+    public Role [] getRoles()
     {
         checkAlive();
 
-        MeshObject [] starts;
-        if( considerEquivalents ) {
-            starts = getEquivalents().getMeshObjects();
-        } else {
-            starts = new MeshObject[] { this };
-        }
+        MeshObject [] starts = new MeshObject[] { this };
 
         AMeshObjectNeighborManager nMgr = getNeighborManager();
 
@@ -1352,39 +1282,23 @@ public class AMeshObject
     }
 
     /**
-     * Obtain the RoleTypes that this MeshObject currently participates in with the
-     * specified other MeshObject.
-     * Specify whether relationships of equivalent MeshObjects should be considered
-     * as well.
-     *
-     * @param neighbor the other MeshObject
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the RoleTypes that this MeshObject currently participates in.
+     * {@inheritDoc}
      */
     @Override
     public RoleType [] getRoleTypes(
-            MeshObject neighbor,
-            boolean    considerEquivalents )
+            MeshObject neighbor )
+        throws
+            NotRelatedException
     {
-        return getRoleTypes( neighbor.getIdentifier(), considerEquivalents );
+        return getRoleTypes( neighbor.getIdentifier());
     }
 
     /**
-     * Obtain the RoleTypes that this MeshObject currently participates in with the
-     * specified other MeshObject.
-     * Specify whether relationships of equivalent MeshObjects should be considered
-     * as well.
-     *
-     * @param neighborIdentifier identifier the other MeshObject
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the RoleTypes that this MeshObject currently participates in.
+     * {@inheritDoc}
      */
     @Override
     public RoleType [] getRoleTypes(
-            MeshObjectIdentifier neighborIdentifier,
-            boolean              considerEquivalents )
+            MeshObjectIdentifier neighborIdentifier )
     {
         if( neighborIdentifier == null ) {
             throw new NullPointerException( "neighborIdentifier is null" );
@@ -1401,12 +1315,7 @@ public class AMeshObject
             throw new WrongMeshBaseException( getMeshBase(), neighbor.getMeshBase() );
         }
 
-        MeshObject [] starts;
-        if( considerEquivalents ) {
-            starts = getEquivalents().getMeshObjects();
-        } else {
-            starts = new MeshObject[] { this };
-        }
+        MeshObject [] starts = new MeshObject[] { this };
 
         AMeshObjectNeighborManager nMgr = getNeighborManager();
 
@@ -1472,219 +1381,6 @@ public class AMeshObject
     }
 
     /**
-     * Add another MeshObject as an equivalent. All MeshObjects that are already equivalent
-     * to this MeshObject, and all MeshObjects that are already equivalent to the newly
-     * added MeshObject, are now equivalent.
-     *
-     * @param equiv the new equivalent
-     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    @Override
-    public void addAsEquivalent(
-            MeshObject equiv )
-        throws
-            EquivalentAlreadyException,
-            TransactionException,
-            NotPermittedException
-    {
-        internalAddAsEquivalent( equiv.getIdentifier(), true, 0L );
-    }
-
-    /**
-     * Internal helper to implement a method. While on this level, it does not appear that
-     * factoring out this method makes any sense, subclasses may appreciate it.
-     *
-     * @param equivIdentifier identifier of the new equivalent
-     * @param isMaster is true, this is the master replica
-     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
-     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    protected synchronized void internalAddAsEquivalent(
-            MeshObjectIdentifier equivIdentifier,
-            boolean              isMaster,
-            long                 timeUpdated )
-        throws
-            EquivalentAlreadyException,
-            TransactionException,
-            NotPermittedException
-    {
-        if( equivIdentifier == null ) {
-            throw new NullPointerException( "equivIdentifier is null" );
-        }
-        MeshObject equiv = theMeshBase.findMeshObjectByIdentifier( equivIdentifier );
-                // if we have it here, deal with it. If we don't, don't.
-
-        checkAlive();
-        if( equiv != null ) {
-            equiv.checkAlive();
-        }
-
-        checkTransaction();
-
-        if( this == equiv ) {
-            throw new EquivalentAlreadyException( this, equiv );
-        }
-
-        if( equiv != null && theMeshBase != equiv.getMeshBase() ) {
-            throw new WrongMeshBaseException( getMeshBase(), equiv.getMeshBase() );
-        }
-
-        AMeshObject temp = this;
-        while( ( temp = temp.getLeftEquivalentObject( theMeshBase ) ) != null ) {
-            if( temp == equiv ) {
-                throw new EquivalentAlreadyException( this, equiv );
-            }
-        }
-        temp = this;
-        while( ( temp = temp.getRightEquivalentObject( theMeshBase ) ) != null ) {
-            if( temp == equiv ) {
-                throw new EquivalentAlreadyException( this, equiv );
-            }
-        }
-
-        checkPermittedAddAsEquivalent( equivIdentifier, equiv );
-
-        // now insert, being mindful that we might be joining to chains here
-
-        AMeshObject leftMostHere = this;
-        while( ( temp = leftMostHere.getLeftEquivalentObject( theMeshBase )) != null ) {
-            leftMostHere = temp;
-        }
-
-        AMeshObject rightMostThere = (AMeshObject) equiv;
-        while( ( temp = rightMostThere.getRightEquivalentObject( theMeshBase ) ) != null ) {
-            rightMostThere = temp;
-        }
-
-        if( rightMostThere.theEquivalenceSetPointers == null ) {
-            rightMostThere.theEquivalenceSetPointers = createMeshObjectIdentifierArray( 2 );
-        }
-        rightMostThere.theEquivalenceSetPointers[1] = leftMostHere.getIdentifier();
-
-        if( leftMostHere.theEquivalenceSetPointers == null ) {
-            leftMostHere.theEquivalenceSetPointers = createMeshObjectIdentifierArray( 2 );
-        }
-        leftMostHere.theEquivalenceSetPointers[0] = rightMostThere.getIdentifier();
-
-        updateLastUpdated( timeUpdated, theTimeUpdated );
-    }
-
-    /**
-     * Obtain the set of MeshObjects, including this one, that are equivalent.
-     * This always returns at least this MeshObject.
-     *
-     * @return the set of MeshObjects that are equivalent
-     */
-    @Override
-    public synchronized MeshObjectSet getEquivalents()
-    {
-        checkAlive();
-
-        AMeshBase realBase = (AMeshBase) theMeshBase;
-
-        if( theEquivalenceSetPointers == null ) {
-            return realBase.getMeshObjectSetFactory().createSingleMemberImmutableMeshObjectSet( this );
-        }
-
-        ArrayList<MeshObject> toTheLeft  = new ArrayList<MeshObject>();
-        ArrayList<MeshObject> toTheRight = new ArrayList<MeshObject>();
-
-        AMeshObject current = this;
-        while( ( current = current.getLeftEquivalentObject( theMeshBase ) ) != null ) {
-            toTheLeft.add( current );
-        }
-        current = this;
-        toTheRight.add( current );
-        while( ( current = current.getRightEquivalentObject( theMeshBase ) ) != null ) {
-            toTheRight.add( current );
-        }
-
-        // we revert the direction of the toTheLeft, in order to make debugging easier
-        ArrayList<MeshObject> allEquivalents = new ArrayList<MeshObject>( toTheLeft.size() );
-        for( int i=toTheLeft.size()-1 ; i>=0 ; --i ) {
-            allEquivalents.add( toTheLeft.get( i ));
-        }
-        for( MeshObject loop : toTheRight ) {
-            allEquivalents.add( loop );
-        }
-
-        MeshObjectSet ret = realBase.getMeshObjectSetFactory().createImmutableMeshObjectSet(
-                ArrayHelper.copyIntoNewArray( allEquivalents, MeshObject.class ));
-
-        updateLastRead();
-
-        return ret;
-    }
-
-    /**
-     * Remove this MeshObject as an equivalent from the set of equivalents. If this MeshObject
-     * is not currently equivalent to any other MeshObject, this does nothing.
-     *
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    @Override
-    public void removeAsEquivalent()
-        throws
-            TransactionException,
-            NotPermittedException
-    {
-        internalRemoveAsEquivalent( true, 0L );
-    }
-
-    /**
-     * Internal helper to implement a method. While on this level, it does not appear that
-     * factoring out this method makes any sense, subclasses may appreciate it.
-     *
-     * @param isMaster if true, this is the master replica
-     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    protected void internalRemoveAsEquivalent(
-            boolean isMaster,
-            long    timeUpdated )
-        throws
-            TransactionException,
-            NotPermittedException
-    {
-        checkAlive();
-        checkTransaction();
-
-        checkPermittedRemoveAsEquivalent();
-
-        AMeshObject theLeft  = getLeftEquivalentObject( theMeshBase );
-        AMeshObject theRight = getRightEquivalentObject( theMeshBase );
-
-        if( theLeft != null ) {
-            theLeft.theEquivalenceSetPointers[1] = ( theRight != null ) ? theRight.getIdentifier() : null;
-        }
-        if( theRight != null ) {
-            theRight.theEquivalenceSetPointers[0] = ( theLeft != null ) ? theLeft.getIdentifier() : null;
-        }
-
-        theEquivalenceSetPointers = null;
-
-        updateLastUpdated( timeUpdated, theTimeUpdated );
-    }
-
-    /**
-     * For clients that know we are an AMeshObject, we can also return our internal representation.
-     * Please do not modify the content of this array, bad things may happen.
-     *
-     * @return the MeshObjectIdentifiers of the left and right equivalent MeshObject. Either may be null. The
-     *         return value may be null, too.
-     */
-    public MeshObjectIdentifier[] getInternalEquivalentList()
-    {
-        return theEquivalenceSetPointers;
-    }
-
-    /**
      * Delete this MeshObject. This must only be invoked by our MeshObjectLifecycleManager
      * and thus is defined down here, not higher up in the inheritance hierarchy.
      *
@@ -1727,28 +1423,6 @@ public class AMeshObject
         }
         MeshBase oldMeshBase = theMeshBase;
 
-        AMeshObject theLeft  = getLeftEquivalentObject( oldMeshBase );
-        AMeshObject theRight = getRightEquivalentObject( oldMeshBase );
-        if( theLeft != null ) {
-            if( theRight != null ) {
-                // we are in the middle
-                theLeft.theEquivalenceSetPointers[1]  = theRight.theIdentifier;
-                theRight.theEquivalenceSetPointers[0] = theLeft.theIdentifier;
-            } else {
-                if( theLeft.theEquivalenceSetPointers[0] == null ) {
-                    theLeft.theEquivalenceSetPointers = null; // don't need them any more
-                } else {
-                    theLeft.theEquivalenceSetPointers[1] = null;
-                }
-            }
-        } else if( theRight != null ) {
-            if( theRight.theEquivalenceSetPointers[1] == null ) {
-                theRight.theEquivalenceSetPointers = null; // don't need them any more
-            } else {
-                theRight.theEquivalenceSetPointers[0] = null;
-            }
-        }
-
         AMeshObjectNeighborManager nMgr = getNeighborManager();
 
         if( nMgr.hasNeighbors( this ) ) {
@@ -1776,48 +1450,6 @@ public class AMeshObject
         theMeshBase = null; // this needs to happen rather late so the other code still works
 
         fireDeleted( oldMeshBase, canonicalMeshObjectName, System.currentTimeMillis() );
-    }
-
-    /**
-     * Internal helper to obtain the left equivalent MeshObject, if any.
-     * We pass in the MeshBase to use because this may be invoked when a MeshObject's member
-     * variable has been zero'd out already.
-     *
-     * @param mb the MeshBase to use
-     * @return the left equivalent MeshObject, if any
-     */
-    protected AMeshObject getLeftEquivalentObject(
-            MeshBase mb )
-    {
-        if( theEquivalenceSetPointers == null ) {
-            return null;
-        }
-        if( theEquivalenceSetPointers[0] == null ) {
-            return null;
-        }
-        MeshObject ret = findRelatedMeshObject( mb, theEquivalenceSetPointers[0] );
-        return (AMeshObject) ret;
-    }
-
-    /**
-     * Internal helper to obtain the right equivalent MeshObject, if any.
-     * We pass in the MeshBase to use because this may be invoked when a MeshObject's member
-     * variable has been zero'd out already.
-     *
-     * @param mb the MeshBase to use
-     * @return the left equivalent MeshObject, if any
-     */
-    protected AMeshObject getRightEquivalentObject(
-            MeshBase mb )
-    {
-        if( theEquivalenceSetPointers == null ) {
-            return null;
-        }
-        if( theEquivalenceSetPointers[1] == null ) {
-            return null;
-        }
-        MeshObject ret = findRelatedMeshObject( mb, theEquivalenceSetPointers[1] );
-        return (AMeshObject) ret;
     }
 
     /**
@@ -1875,28 +1507,6 @@ public class AMeshObject
             roleTypeIdentifiers = null;
         }
 
-        MeshObjectIdentifier [] equivalents;
-        if( theEquivalenceSetPointers == null ) {
-            equivalents = null;
-        } else {
-            int count = 0;
-            if( theEquivalenceSetPointers[0] != null ) {
-                ++count;
-            }
-            if( theEquivalenceSetPointers[1] != null ) {
-                ++count;
-            }
-            equivalents = createMeshObjectIdentifierArray( count );
-            if( theEquivalenceSetPointers[0] != null ) {
-                equivalents[0] = theEquivalenceSetPointers[0];
-                if( theEquivalenceSetPointers[1] != null ) {
-                    equivalents[1] = theEquivalenceSetPointers[1];
-                }
-            } else if( theEquivalenceSetPointers[1] != null ) {
-                equivalents[0] = theEquivalenceSetPointers[1];
-            }
-        }
-
         SimpleExternalizedMeshObject ret = SimpleExternalizedMeshObject.create(
                 getIdentifier(),
                 types,
@@ -1907,8 +1517,7 @@ public class AMeshObject
                 propertyTypes,
                 propertyValues,
                 nMgr.getNeighborIdentifiers( this ),
-                roleTypeIdentifiers,
-                equivalents );
+                roleTypeIdentifiers );
 
         return ret;
     }
@@ -2179,14 +1788,6 @@ public class AMeshObject
      * The set of sets of RoleTypes that goes with theOtherSides.
      */
     protected RoleType [][] theNeighborRoleTypes;
-
-    /**
-     * The left and right MeshObject in the equivalence set. This member is either null,
-     * or MeshObjectIdentifier[2], which may have one or two entries, the first representing
-     * the "left" side in the doubly-linked list, the second representing the "right"
-     * side.
-     */
-    protected MeshObjectIdentifier [] theEquivalenceSetPointers;
 
     /**
      * String representing the home object if no other UserVisibleString could be found.

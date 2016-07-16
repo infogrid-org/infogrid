@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -20,8 +20,6 @@ import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectPropertyChangeEvent;
@@ -74,7 +72,7 @@ public class ParserFriendlyXprisoMessage
 
     /**
      * Constructor.
-     * 
+     *
      * @param sender identifies the sender of this message
      * @param receiver identifies the receiver of this message
      */
@@ -90,23 +88,25 @@ public class ParserFriendlyXprisoMessage
      *
      * @param id the request ID
      */
+    @Override
     public void setRequestId(
             long id )
     {
         theRequestId = id;
     }
-    
+
     /**
      * Set the response ID.
      *
      * @param id the response ID
      */
+    @Override
     public void setResponseId(
             long id )
     {
         theResponseId = id;
     }
-    
+
     /**
      * Set whether or not to cease communications after this message.
      *
@@ -117,7 +117,7 @@ public class ParserFriendlyXprisoMessage
     {
         theCeaseCommunications = newValue;
     }
-    
+
     /**
      * Add an externalized representation of a NetMeshObject that is conveyed
      * by the sender to the receiver, e.g. in response to a first-time lease request.
@@ -162,6 +162,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the ExternalizedNetMeshObjects
      */
+    @Override
     public ExternalizedNetMeshObject [] getConveyedMeshObjects()
     {
         ExternalizedNetMeshObject [] ret = ArrayHelper.copyIntoNewArray( theConveyedMeshObjects, ExternalizedNetMeshObject.class );
@@ -212,6 +213,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the NetMeshObjectAccessSpecifications for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectAccessSpecification[] getRequestedFirstTimeObjects()
     {
         NetMeshObjectAccessSpecification [] ret = ArrayHelper.copyIntoNewArray( theRequestedFirstTimeObjects, NetMeshObjectAccessSpecification.class );
@@ -235,7 +237,7 @@ public class ParserFriendlyXprisoMessage
         }
         theRequestedCanceledObjects.add( toAdd );
     }
-    
+
     /**
      * Add several identifiers for NetMeshObjects for which the sender requests
      * that a currently valid lease be chanceled.
@@ -262,6 +264,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getRequestedCanceledObjects()
     {
         NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedCanceledObjects, NetMeshObjectIdentifier.class );
@@ -312,6 +315,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getRequestedFreshenReplicas()
     {
         NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedFreshenReplicas, NetMeshObjectIdentifier.class );
@@ -321,7 +325,7 @@ public class ParserFriendlyXprisoMessage
     /**
      * Add an identifier for a NetMeshObject for which the sender has a replica
      * that it wishes to resynchronize.
-     * 
+     *
      * @param toAdd the NetMeshObjectIdentifier for the NetMeshObject
      */
     public void addRequestedResynchronizeReplica(
@@ -362,6 +366,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getRequestedResynchronizeReplicas()
     {
         NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedResynchronizeReplicas, NetMeshObjectIdentifier.class  );
@@ -371,7 +376,7 @@ public class ParserFriendlyXprisoMessage
     /**
      * Add an identifier for a NetMeshObject for which the sender requests
      * the lock from the receiver (i.e. update rights).
-     * 
+     *
      * @param toAdd the NetMeshObjectIdentifier for the NetMeshObject
      */
     public void addRequestedLockObject(
@@ -412,6 +417,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getRequestedLockObjects()
     {
         NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedLockObjects, NetMeshObjectIdentifier.class );
@@ -421,7 +427,7 @@ public class ParserFriendlyXprisoMessage
     /**
      * Add an identifier for a NetMeshObject for which the sender surrenders
      * the lock to the receiver (i.e. update rights).
-     * 
+     *
      * @param toAdd the NetMeshObjectIdentifier for the NetMeshObject
      */
     public void addPushLockObject(
@@ -462,16 +468,17 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getPushLockObjects()
     {
         NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( thePushLockObjects, NetMeshObjectIdentifier.class );
         return ret;
     }
-    
+
     /**
      * Add an identifier for a NetMeshObject for which the sender has forcefully
      * reclaimed the lock.
-     * 
+     *
      * @param toAdd the NetMeshObjectIdentifier for the NetMeshObject
      */
     public void addReclaimedLockObject(
@@ -512,16 +519,17 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getReclaimedLockObjects()
     {
         NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theReclaimedLockObjects, NetMeshObjectIdentifier.class );
         return ret;
     }
-    
+
     /**
      * Add an identifier for a NetMeshObject for which the sender requests
      * home replica status.
-     * 
+     *
      * @param toAdd the NetMeshObjectIdentifier for the NetMeshObject
      */
     public void addRequestedHomeReplica(
@@ -559,9 +567,10 @@ public class ParserFriendlyXprisoMessage
     /**
      * Obtain the identifiers for the NetMeshObjects for which the sender requests
      * home replica status.
-     * 
+     *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getRequestedHomeReplicas()
     {
         NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( theRequestedHomeReplicas, NetMeshObjectIdentifier.class );
@@ -571,7 +580,7 @@ public class ParserFriendlyXprisoMessage
     /**
      * Add an identifier for a NetMeshObject for which the sender surrenders
      * the home replica status to the receiver.
-     * 
+     *
      * @param toAdd the NetMeshObjectIdentifier for the NetMeshObject
      */
     public void addPushHomeReplica(
@@ -609,15 +618,16 @@ public class ParserFriendlyXprisoMessage
     /**
      * Obtain the identifiers for the NetMeshObjects for which the sender surrenders
      * the home replica status to the receiver.
-     * 
+     *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getPushHomeReplicas()
     {
         NetMeshObjectIdentifier [] ret = ArrayHelper.copyIntoNewArray( thePushHomeReplicas, NetMeshObjectIdentifier.class );
         return ret;
     }
-    
+
     /**
      * Add a type added event that the sender needs to convey to the
      * receiver.
@@ -662,6 +672,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the type addition events
      */
+    @Override
     public NetMeshObjectTypeAddedEvent [] getTypeAdditions()
     {
         NetMeshObjectTypeAddedEvent [] ret = ArrayHelper.copyIntoNewArray( theTypeAdditions, NetMeshObjectTypeAddedEvent.class );
@@ -712,6 +723,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the type removal events
      */
+    @Override
     public NetMeshObjectTypeRemovedEvent [] getTypeRemovals()
     {
         NetMeshObjectTypeRemovedEvent [] ret = ArrayHelper.copyIntoNewArray( theTypeRemovals, NetMeshObjectTypeRemovedEvent.class );
@@ -762,6 +774,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the property change events
      */
+    @Override
     public NetMeshObjectPropertyChangeEvent [] getPropertyChanges()
     {
         NetMeshObjectPropertyChangeEvent [] ret = ArrayHelper.copyIntoNewArray( thePropertyChanges, NetMeshObjectPropertyChangeEvent.class );
@@ -812,6 +825,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the neighbor addition events
      */
+    @Override
     public NetMeshObjectNeighborAddedEvent [] getNeighborAdditions()
     {
         NetMeshObjectNeighborAddedEvent [] ret = ArrayHelper.copyIntoNewArray( theNeighborAdditions, NetMeshObjectNeighborAddedEvent.class );
@@ -862,112 +876,13 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the neighbor removal events
      */
+    @Override
     public NetMeshObjectNeighborRemovedEvent [] getNeighborRemovals()
     {
         NetMeshObjectNeighborRemovedEvent [] ret = ArrayHelper.copyIntoNewArray( theNeighborRemovals, NetMeshObjectNeighborRemovedEvent.class );
         return ret;
     }
-    
-    /**
-     * Add an equivalent addition event that the sender needs to convey to the
-     * receiver.
-     * 
-     * @param toAdd the equivalent addition event
-     */
-    public void addEquivalentAddition(
-            NetMeshObjectEquivalentsAddedEvent toAdd )
-    {
-        if( toAdd == null ) {
-            throw new NullPointerException();
-        }
-        if( theEquivalentsAdditions.contains( toAdd )) {
-            throw new IllegalStateException( "Have element already: " + toAdd );
-        }
-        theEquivalentsAdditions.add( toAdd );
-    }
 
-    /**
-     * Add several equivalent addition events that the sender needs to convey to the
-     * receiver.
-     *
-     * @param toAdd the equivalent addition event
-     */
-    public void addEquivalentAdditions(
-            NetMeshObjectEquivalentsAddedEvent [] toAdd )
-    {
-        for( int i=0 ; i<toAdd.length ; ++i ) {
-            if( toAdd[i] == null ) {
-                throw new NullPointerException();
-            }
-            if( theEquivalentsAdditions.contains( toAdd[i] )) {
-                throw new IllegalStateException( "Have element already: " + toAdd[i] );
-            }
-            theEquivalentsAdditions.add( toAdd[i] );
-        }
-    }
-
-    /**
-     * Obtain the equivalent addition events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the equivalent addition events
-     */
-    public NetMeshObjectEquivalentsAddedEvent [] getEquivalentsAdditions()
-    {
-        NetMeshObjectEquivalentsAddedEvent [] ret = ArrayHelper.copyIntoNewArray( theEquivalentsAdditions, NetMeshObjectEquivalentsAddedEvent.class );
-        return ret;
-    }
-
-    /**
-     * Add an equivalent removal event that the sender needs to convey to the
-     * receiver.
-     * 
-     * @param toAdd the equivalent removal event
-     */
-    public void addEquivalentRemoval(
-            NetMeshObjectEquivalentsRemovedEvent toAdd )
-    {
-        if( toAdd == null ) {
-            throw new NullPointerException();
-        }
-        if( theEquivalentsRemovals.contains( toAdd )) {
-            throw new IllegalStateException( "Have element already: " + toAdd );
-        }
-        theEquivalentsRemovals.add( toAdd );
-    }
-
-    /**
-     * Add several equivalent removal events that the sender needs to convey to the
-     * receiver.
-     *
-     * @param toAdd the equivalent removal event
-     */
-    public void addEquivalentRemovals(
-            NetMeshObjectEquivalentsRemovedEvent [] toAdd )
-    {
-        for( int i=0 ; i<toAdd.length ; ++i ) {
-            if( toAdd[i] == null ) {
-                throw new NullPointerException();
-            }
-            if( theEquivalentsRemovals.contains( toAdd[i] )) {
-                throw new IllegalStateException( "Have element already: " + toAdd[i] );
-            }
-            theEquivalentsRemovals.add( toAdd[i] );
-        }
-    }
-
-    /**
-     * Obtain the equivalent removal events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the equivalent removal events
-     */
-    public NetMeshObjectEquivalentsRemovedEvent [] getEquivalentsRemovals()
-    {
-        NetMeshObjectEquivalentsRemovedEvent [] ret = ArrayHelper.copyIntoNewArray( theEquivalentsRemovals, NetMeshObjectEquivalentsRemovedEvent.class );
-        return ret;
-    }    
-    
     /**
      * Add a role addition event that the sender needs to convey to the
      * receiver.
@@ -1012,11 +927,12 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the role addition events
      */
+    @Override
     public NetMeshObjectRoleAddedEvent [] getRoleAdditions()
     {
         NetMeshObjectRoleAddedEvent [] ret = ArrayHelper.copyIntoNewArray( theRoleAdditions, NetMeshObjectRoleAddedEvent.class );
-        return ret;        
-        
+        return ret;
+
     }
 
     /**
@@ -1063,6 +979,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the role removal events
      */
+    @Override
     public NetMeshObjectRoleRemovedEvent [] getRoleRemovals()
     {
         NetMeshObjectRoleRemovedEvent [] ret = ArrayHelper.copyIntoNewArray( theRoleRemovals, NetMeshObjectRoleRemovedEvent.class );
@@ -1113,6 +1030,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @return the deletion events
      */
+    @Override
     public NetMeshObjectDeletedEvent [] getDeletions()
     {
         NetMeshObjectDeletedEvent [] ret = ArrayHelper.copyIntoNewArray( theDeleteChanges, NetMeshObjectDeletedEvent.class );
@@ -1124,13 +1042,14 @@ public class ParserFriendlyXprisoMessage
      *
      * @return true if it is empty
      */
+    @Override
     public boolean isEmpty()
     {
         // ignore theSenderIdentifier;
         // ignore theReceiverIdentifier;
         // ignore theRequestId;
         // do NOT ignore responseID: may acknowledge receipt of incoming message
-        
+
         // alphabetically, so we can make sure we have all of them by comparing with the IDE
 
         if( theCeaseCommunications ) {
@@ -1140,12 +1059,6 @@ public class ParserFriendlyXprisoMessage
             return false;
         }
         if( theDeleteChanges.size() > 0 ) {
-            return false;
-        }
-        if( theEquivalentsAdditions.size() > 0 ) {
-            return false;
-        }
-        if( theEquivalentsRemovals.size() > 0 ) {
             return false;
         }
         if( theNeighborAdditions.size() > 0 ) {
@@ -1196,7 +1109,7 @@ public class ParserFriendlyXprisoMessage
         if( theRoleRemovals.size() > 0 ) {
             return false;
         }
-        // ignore theSenderIdentifier;        
+        // ignore theSenderIdentifier;
         if( theTypeAdditions.size() > 0 ) {
             return false;
         }
@@ -1211,6 +1124,7 @@ public class ParserFriendlyXprisoMessage
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {
@@ -1223,8 +1137,6 @@ public class ParserFriendlyXprisoMessage
                     "theCeaseCommunications",
                     "theConveyedMeshObjects",
                     "theDeleteChanges",
-                    "theEquivalentsAdditions",
-                    "theEquivalentsRemovals",
                     "theNeighborAdditions",
                     "theNeighborRemovals",
                     "thePropertyChanges",
@@ -1250,8 +1162,6 @@ public class ParserFriendlyXprisoMessage
                     theCeaseCommunications,
                     theConveyedMeshObjects,
                     theDeleteChanges,
-                    theEquivalentsAdditions,
-                    theEquivalentsRemovals,
                     theNeighborAdditions,
                     theNeighborRemovals,
                     thePropertyChanges,
@@ -1275,112 +1185,102 @@ public class ParserFriendlyXprisoMessage
      * The set of MeshObjects that is being conveyed by the sender to the receiver,
      * e.g. in response to a first-time lease requested.
      */
-    protected ArrayList<ExternalizedNetMeshObject> theConveyedMeshObjects = new ArrayList<ExternalizedNetMeshObject>();
+    protected ArrayList<ExternalizedNetMeshObject> theConveyedMeshObjects = new ArrayList<>();
 
     /**
      * The set of MeshObjects, identified by their NetMeshObjectAccessSpecifications, for which the
      * sender would like to obtain a first-time lease.
      */
-    protected ArrayList<NetMeshObjectAccessSpecification> theRequestedFirstTimeObjects = new ArrayList<NetMeshObjectAccessSpecification>();
-    
+    protected ArrayList<NetMeshObjectAccessSpecification> theRequestedFirstTimeObjects = new ArrayList<>();
+
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifiers, for which the
      * sender currently has a lease, but whose lease the sender would like to
      * cancel.
      */
-    protected ArrayList<NetMeshObjectIdentifier> theRequestedCanceledObjects = new ArrayList<NetMeshObjectIdentifier>();
+    protected ArrayList<NetMeshObjectIdentifier> theRequestedCanceledObjects = new ArrayList<>();
 
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifiers, for which the
      * sender requests a freshening.
      */
-    protected ArrayList<NetMeshObjectIdentifier> theRequestedFreshenReplicas = new ArrayList<NetMeshObjectIdentifier>();
+    protected ArrayList<NetMeshObjectIdentifier> theRequestedFreshenReplicas = new ArrayList<>();
 
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifiers, that the sender
      * wishes to resynchronize as dependent replicas.
      */
-    protected ArrayList<NetMeshObjectIdentifier> theRequestedResynchronizeReplicas = new ArrayList<NetMeshObjectIdentifier>();
-    
+    protected ArrayList<NetMeshObjectIdentifier> theRequestedResynchronizeReplicas = new ArrayList<>();
+
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifiers, for which the
      * sender requests the lock.
      */
-    protected ArrayList<NetMeshObjectIdentifier> theRequestedLockObjects = new ArrayList<NetMeshObjectIdentifier>();
-    
+    protected ArrayList<NetMeshObjectIdentifier> theRequestedLockObjects = new ArrayList<>();
+
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifiers, whose lock
      * the sender surrenders to the receiver.
      */
-    protected ArrayList<NetMeshObjectIdentifier> thePushLockObjects = new ArrayList<NetMeshObjectIdentifier>();
-    
+    protected ArrayList<NetMeshObjectIdentifier> thePushLockObjects = new ArrayList<>();
+
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifiers, whose lock
      * the sender has forcefully reclaimed.
      */
-    protected ArrayList<NetMeshObjectIdentifier> theReclaimedLockObjects = new ArrayList<NetMeshObjectIdentifier>();
-    
+    protected ArrayList<NetMeshObjectIdentifier> theReclaimedLockObjects = new ArrayList<>();
+
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifiers, whose which the
      * sender requests the homeReplica status.
      */
-    protected ArrayList<NetMeshObjectIdentifier> theRequestedHomeReplicas = new ArrayList<NetMeshObjectIdentifier>();
+    protected ArrayList<NetMeshObjectIdentifier> theRequestedHomeReplicas = new ArrayList<>();
 
     /**
      * The set of MeshObjects, identified by the MeshObjectIdentifiers, whose homeReplica status
      * the sender surrenders to the receiver.
      */
-    protected ArrayList<NetMeshObjectIdentifier> thePushHomeReplicas = new ArrayList<NetMeshObjectIdentifier>();
-    
+    protected ArrayList<NetMeshObjectIdentifier> thePushHomeReplicas = new ArrayList<>();
+
     /**
      * The set of TypeAddedEvents that the sender needs to convey to the receiver.
      */
-    protected ArrayList<NetMeshObjectTypeAddedEvent> theTypeAdditions = new ArrayList<NetMeshObjectTypeAddedEvent>();
-    
+    protected ArrayList<NetMeshObjectTypeAddedEvent> theTypeAdditions = new ArrayList<>();
+
     /**
      * The set of TypeRemovedEvents that the sender needs to convey to the receiver.
      */
-    protected ArrayList<NetMeshObjectTypeRemovedEvent> theTypeRemovals = new ArrayList<NetMeshObjectTypeRemovedEvent>();
+    protected ArrayList<NetMeshObjectTypeRemovedEvent> theTypeRemovals = new ArrayList<>();
 
     /**
      * The set of PropertyChanges that the sender needs to convey to the receiver.
      */
-    protected ArrayList<NetMeshObjectPropertyChangeEvent> thePropertyChanges = new ArrayList<NetMeshObjectPropertyChangeEvent>();
+    protected ArrayList<NetMeshObjectPropertyChangeEvent> thePropertyChanges = new ArrayList<>();
 
     /**
      * The set of NeighborAddedEvents that the sender needs to convey to the receiver.
      */
-    protected ArrayList<NetMeshObjectNeighborAddedEvent> theNeighborAdditions = new ArrayList<NetMeshObjectNeighborAddedEvent>();
-    
+    protected ArrayList<NetMeshObjectNeighborAddedEvent> theNeighborAdditions = new ArrayList<>();
+
     /**
      * The set of NeighborAddedEvents that the sender needs to convey to the receiver.
      */
-    protected ArrayList<NetMeshObjectNeighborRemovedEvent> theNeighborRemovals = new ArrayList<NetMeshObjectNeighborRemovedEvent>();
-    
-    /**
-     * The set of EquivalentsAddedEvents that the sender needs to convey to the receiver.
-     */
-    protected ArrayList<NetMeshObjectEquivalentsAddedEvent> theEquivalentsAdditions = new ArrayList<NetMeshObjectEquivalentsAddedEvent>();
-    
-    /**
-     * The set of EquivalentsRemovedEvents that the sender needs to convey to the receiver.
-     */
-    protected ArrayList<NetMeshObjectEquivalentsRemovedEvent> theEquivalentsRemovals = new ArrayList<NetMeshObjectEquivalentsRemovedEvent>();
-    
+    protected ArrayList<NetMeshObjectNeighborRemovedEvent> theNeighborRemovals = new ArrayList<>();
+
     /**
      * The set of RoleChanges that the sender needs to convey to the receiver.
      */
-    protected ArrayList<NetMeshObjectRoleAddedEvent> theRoleAdditions = new ArrayList<NetMeshObjectRoleAddedEvent>();
-    
+    protected ArrayList<NetMeshObjectRoleAddedEvent> theRoleAdditions = new ArrayList<>();
+
     /**
      * The set of RoleChanges that the sender needs to convey to the receiver.
      */
-    protected ArrayList<NetMeshObjectRoleRemovedEvent> theRoleRemovals = new ArrayList<NetMeshObjectRoleRemovedEvent>();
-    
+    protected ArrayList<NetMeshObjectRoleRemovedEvent> theRoleRemovals = new ArrayList<>();
+
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifier, that have been
      * deleted semantically by the sender, and of whose deletion the receiver
      * needs to be notified.
      */
-    protected ArrayList<NetMeshObjectDeletedEvent> theDeleteChanges = new ArrayList<NetMeshObjectDeletedEvent>();
+    protected ArrayList<NetMeshObjectDeletedEvent> theDeleteChanges = new ArrayList<>();
 }

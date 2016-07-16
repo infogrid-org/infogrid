@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -48,44 +48,28 @@ public class AllNeighborsTraversalSpecification
     }
 
     /**
-     * Use this TraversalSpecification to traverse from the passed-in start MeshObject
-     * to related MeshObjects. This method is defined on TraversalSpecification, so
-     * different implementations of TraversalSpecification can implement different ways
-     * of doing this. Specify whether relationships of equivalent MeshObjects
-     * should be considered as well.
-     *
-     * @param start the start MeshObject for the traversal
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     * @return the result of the traversal
+     * {@inheritDoc}
      */
+    @Override
     public MeshObjectSet traverse(
-            MeshObject start,
-            boolean    considerEquivalents )
+            MeshObject start )
     {
-        MeshObjectSet ret = start.traverseToNeighborMeshObjects( considerEquivalents );
+        MeshObjectSet ret = start.traverseToNeighborMeshObjects( );
         return ret;
     }
 
     /**
-      * Use this TraversalSpecification to traverse from the passed-in start MeshObjectSet
-      * to related MeshObjects. This method is defined on TraversalSpecification, so
-      * different implementations of TraversalSpecification can implement different ways
-      * of doing this. Specify whether relationships of equivalent MeshObjects
-      * should be considered as well.
-      *
-      * @param theSet the start MeshObjectSet for the traversal
-      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-      * @return the result of the traversal
-      */
+     * {@inheritDoc}
+     */
+    @Override
     public MeshObjectSet traverse(
-            MeshObjectSet theSet,
-            boolean       considerEquivalents )
+            MeshObjectSet theSet )
     {
         MeshObjectSetFactory setFactory = theSet.getMeshBase().getMeshObjectSetFactory();
 
         MeshObjectSet ret = setFactory.obtainEmptyImmutableMeshObjectSet();
         for( MeshObject current : theSet ) {
-            MeshObjectSet toAdd = current.traverseToNeighborMeshObjects( considerEquivalents );
+            MeshObjectSet toAdd = current.traverseToNeighborMeshObjects();
             ret = setFactory.createImmutableMeshObjectSetUnification( ret, toAdd );
         }
         return ret;
@@ -100,6 +84,7 @@ public class AllNeighborsTraversalSpecification
      * @return true if this event may affect the result of traversing from the MeshObject
      *         that sent this event
      */
+    @Override
     public boolean isAffectedBy(
             MeshBase                  meshBase,
             MeshObjectRoleChangeEvent theEvent )

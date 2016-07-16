@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -65,7 +65,7 @@ public class ShadowMeshBaseSerializationTest1
 {
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -77,10 +77,10 @@ public class ShadowMeshBaseSerializationTest1
         ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
 
         registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.probe.store" ))).activateRecursively();
-        
+
         Log4jLog.configure( "org/infogrid/probe/store/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/probe/store/test/ResourceHelper",
                 Locale.getDefault(),
@@ -118,7 +118,6 @@ public class ShadowMeshBaseSerializationTest1
                                 null,
                                 null,
                                 null,
-                                null,
                                 false,
                                 false,
                                 null,
@@ -128,7 +127,7 @@ public class ShadowMeshBaseSerializationTest1
                     }
             )
         };
-        
+
         for( int i=0 ; i<testCases.length ; ++i ) {
             runTest( thisDir, testCases[i] );
         }
@@ -136,7 +135,7 @@ public class ShadowMeshBaseSerializationTest1
 
     /**
      *  Run one test.
-     * 
+     *
      * @param parentDir the parent directory
      * @param testCase the test case to run
      * @throws Exception all sorts of things may go wrong in tests
@@ -148,24 +147,24 @@ public class ShadowMeshBaseSerializationTest1
             Exception
     {
         log.debug( "Now running testcase " + testCase.theInputFile );
-            
+
         File theFile = new File( parentDir, testCase.theInputFile );
 
         ExternalizedShadowMeshBaseXmlEncoder test = new ExternalizedShadowMeshBaseXmlEncoder();
-        
+
         ExternalizedShadowMeshBase mb = test.decodeShadowMeshBase(
                 new FileInputStream( theFile ),
                 theShadowMeshBase );
 
         checkEquals( mb.getNetworkIdentifier(), testCase.theNetworkIdentifier, testCase.theInputFile + ": NetworkIdentifier wrong" );
-        
+
         checkEqualsOutOfSequence( mb.getExternalizedProxies(),        testCase.theProxies, testCase.theInputFile + ": Proxies wrong" );
         checkEqualsOutOfSequence( mb.getExternalizedNetMeshObjects(), testCase.theObjects, testCase.theInputFile + ": MeshObjects wrong" );
     }
-    
+
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @Before
@@ -174,19 +173,15 @@ public class ShadowMeshBaseSerializationTest1
             Exception
     {
         nmbid1 = theMeshBaseIdentifierFactory.fromExternalForm( "https://foo.example.com/%27" );
-        
+
         theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create();
         theExternalizedMeshObjectFactory
-                = new ParserFriendlyExternalizedNetMeshObjectFactory() {
-                        public ParserFriendlyExternalizedNetMeshObject createParserFriendlyExternalizedMeshObject() {
-                            return new ParserFriendlyExternalizedNetMeshObject();
-                        }
-                };
+                = () -> new ParserFriendlyExternalizedNetMeshObject();
         theNetMeshObjectIdentifierFactory
                 = DefaultAnetMeshObjectIdentifierFactory.create( nmbid1, theMeshBaseIdentifierFactory );
 
         theMeshTypeIdentifierFactory = MMeshTypeIdentifierFactory.create();
-    
+
         theNetMeshBaseAccessSpecificationFactory = DefaultNetMeshBaseAccessSpecificationFactory.create(
                     theMeshBaseIdentifierFactory );
 
@@ -208,7 +203,7 @@ public class ShadowMeshBaseSerializationTest1
                 TraditionalInfoGridHttpMappingPolicy.SINGLETON,
                 theApplicationContext );
     }
-    
+
     /**
      * Tear-down.
      */
@@ -220,13 +215,13 @@ public class ShadowMeshBaseSerializationTest1
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( ShadowMeshBaseSerializationTest1.class );
-    
+    private static final Log log = Log.getLogInstance( ShadowMeshBaseSerializationTest1.class );
+
     /**
      * Factory for NetMeshBaseIdentifiers.
      */
     protected NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create();
-    
+
     /**
      * A NetMeshBaseIdentifier for the test.
      */
@@ -236,7 +231,7 @@ public class ShadowMeshBaseSerializationTest1
      * A ExternalizedNetMeshObjectFactory for the test.
      */
     protected ParserFriendlyExternalizedNetMeshObjectFactory theExternalizedMeshObjectFactory;
-    
+
     /**
      * A NetMeshObjectIdentifierFactory for the test.
      */
@@ -246,7 +241,7 @@ public class ShadowMeshBaseSerializationTest1
      * A MeshTypeIdentifierFactory for the test.
      */
     protected MeshTypeIdentifierFactory theMeshTypeIdentifierFactory;
-    
+
     /**
      * a factory for NetMeshBaseAccessSpecifications for the test.
      */
@@ -255,22 +250,22 @@ public class ShadowMeshBaseSerializationTest1
      * A factory for NetMeshObjectAccessSpecifications for the test.
      */
     protected NetMeshObjectAccessSpecificationFactory theNetMeshObjectAccessSpecificationFactory;
-    
+
     /**
      * Our ModelBase.
      */
     protected static ModelBase theModelBase;
-    
+
     /**
      * Root application context.
      */
     protected static Context theApplicationContext = SimpleContext.createRoot( "root" );
-    
+
     /**
      * ShadowMeshBase to be serialized into.
      */
     protected ShadowMeshBase theShadowMeshBase;
-    
+
     /**
      * Represents one TestCase.
      */
@@ -287,7 +282,7 @@ public class ShadowMeshBaseSerializationTest1
         {
             theInputFile         = inputFile;
             theNetworkIdentifier = id;
-            
+
             if( proxies != null ) {
                 theProxies = proxies;
             } else {

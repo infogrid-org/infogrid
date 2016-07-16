@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -108,45 +108,33 @@ public class AlternativeCompoundTraversalSpecification
     }
 
     /**
-     * Use this AlternativeCompoundTraversalSpecification to traverse from the passed-in MeshObject
-     * to related MeshObjects.
-     *
-     * @param start the start MeshObject
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the reached MeshObjectSet
+     * {@inheritDoc}
      */
+    @Override
     public MeshObjectSet traverse(
-            MeshObject start,
-            boolean    considerEquivalents )
+            MeshObject start )
     {
         MeshObjectSetFactory setFactory = start.getMeshBase().getMeshObjectSetFactory();
 
         MeshObjectSet [] sets = new MeshObjectSet[ theAlternatives.length ];
         for( int i=0 ; i<sets.length ; ++i ) {
-            sets[i] = theAlternatives[i].traverse( start, considerEquivalents );
+            sets[i] = theAlternatives[i].traverse( start );
         }
         return setFactory.createImmutableMeshObjectSetUnification( sets );
     }
 
     /**
-     * Use this AlternativeCompoundTraversalSpecification to traverse from the passed-in MeshObjectSet
-     * to related MeshObjects.
-     *
-     * @param theSet the start MeshObjectSet
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the reached MeshObjectSet
+     * {@inheritDoc}
      */
+    @Override
     public MeshObjectSet traverse(
-            MeshObjectSet theSet,
-            boolean       considerEquivalents )
+            MeshObjectSet theSet )
     {
         MeshObjectSetFactory setFactory = theSet.getFactory();
 
         MeshObjectSet [] sets = new MeshObjectSet[ theAlternatives.length ];
         for( int i=0 ; i<sets.length ; ++i ) {
-            sets[i] = theAlternatives[i].traverse( theSet, considerEquivalents );
+            sets[i] = theAlternatives[i].traverse( theSet );
         }
         return setFactory.createImmutableMeshObjectSetUnification( sets );
     }
@@ -169,7 +157,7 @@ public class AlternativeCompoundTraversalSpecification
                 return false;
             }
 
-            for( int i=0 ; i<theAlternatives.length ; ++i ) {                
+            for( int i=0 ; i<theAlternatives.length ; ++i ) {
                 if( !theAlternatives[i].equals( realOther.theAlternatives[i] )) {
                     return false;
                 }
@@ -181,7 +169,7 @@ public class AlternativeCompoundTraversalSpecification
 
     /**
      * Hash code.
-     * 
+     *
      * @return hash code
      */
     @Override
@@ -195,13 +183,9 @@ public class AlternativeCompoundTraversalSpecification
     }
 
     /**
-     * Determine whether a given event, with a source of from where we traverse the
-     * TraversalSpecification, may affect the result of the traversal.
-     *
-     * @param theEvent the event that we consider
-     * @return true if this event may affect the result of traversing from the MeshObject
-     *         that sent this event
+     * {@inheritDoc}
      */
+    @Override
     public boolean isAffectedBy(
             MeshBase                  meshBase,
             MeshObjectRoleChangeEvent theEvent )

@@ -5,16 +5,17 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.model.primitives.m;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotPermittedException;
@@ -50,7 +51,7 @@ public abstract class MRoleType
 
     /**
      * Constructor.
-     * 
+     *
      * @param identifier the Identifier of the to-be-created object
      * @param relationship the RelationshipType to which this RoleType will belong
      * @param entity the EntityType related to this RoleType
@@ -226,23 +227,6 @@ public abstract class MRoleType
     }
 
     /**
-     * Use this TraversalSpecification to traverse from the passed-in start MeshObject
-     * to related MeshObjects. This method is defined on TraversalSpecification, so
-     * different implementations of TraversalSpecification can implement different ways
-     * of doing this.
-     *
-     * @param start the start MeshObject for the traversal
-     * @return the result of the traversal
-     */
-    @Override
-    public final MeshObjectSet traverse(
-            MeshObject start,
-            boolean    considerEquivalents )
-    {
-        return start.traverse( this, considerEquivalents );
-    }
-
-    /**
       * Use this TraversalSpecification to traverse from the passed-in start MeshObjectSet
       * to related MeshObjects. This method is defined on TraversalSpecification, so
       * different implementations of TraversalSpecification can implement different ways
@@ -256,23 +240,6 @@ public abstract class MRoleType
             MeshObjectSet theSet )
     {
         return theSet.traverse( this );
-    }
-
-    /**
-      * Use this TraversalSpecification to traverse from the passed-in start MeshObjectSet
-      * to related MeshObjects. This method is defined on TraversalSpecification, so
-      * different implementations of TraversalSpecification can implement different ways
-      * of doing this.
-      *
-      * @param theSet the start MeshObjectSet for the traversal
-      * @return the result of the traversal
-      */
-    @Override
-    public final MeshObjectSet traverse(
-            MeshObjectSet theSet,
-            boolean       considerEquivalents )
-    {
-        return theSet.traverse( this, considerEquivalents );
     }
 
     /**
@@ -324,7 +291,7 @@ public abstract class MRoleType
     public synchronized RoleTypeGuard [] getLocalRoleTypeGuards()
     {
         if( theLocalRoleTypeGuards == null ) {
-            
+
             ClassLoader loader      = theRelationshipType.getSubjectArea().getClassLoader();
             theLocalRoleTypeGuards = new RoleTypeGuard[ theLocalRoleTypeGuardClassNames.length ];
 
@@ -332,7 +299,7 @@ public abstract class MRoleType
                 try {
                     Class<?> clazz = Class.forName( theLocalRoleTypeGuardClassNames[i], true, loader );
                     theLocalRoleTypeGuards[i] = (RoleTypeGuard) clazz.newInstance();
-                
+
                 } catch( ClassNotFoundException ex ) {
                     log.error( ex );
                 } catch( IllegalAccessException ex ) {
@@ -380,16 +347,14 @@ public abstract class MRoleType
             throws
                 InheritanceConflictException
     {
-        ArrayList<RoleTypeGuard> ret = new ArrayList<RoleTypeGuard>( 20 ); // fudge factor
-        for( RoleTypeGuard current : getLocalRoleTypeGuards() ) {
-            ret.add( current );
-        }
+        ArrayList<RoleTypeGuard> ret = new ArrayList<>( 20 ); // fudge factor
+        ret.addAll( Arrays.asList( getLocalRoleTypeGuards() ) );
 
         for( int i=0 ; i<theDirectSuperRoleTypes.length ; ++i ) {
             RoleTypeGuard [] inherited = theDirectSuperRoleTypes[i].getAllRoleTypeGuards();
 
             for( int j=0 ; j<inherited.length ; ++j ) {
-                
+
                 if( !ret.contains( inherited[j] )) {
                     ret.add( inherited[j] );
                 }
@@ -398,7 +363,7 @@ public abstract class MRoleType
 
         return ret;
     }
-    
+
     /**
      * Obtain the class names of the set of RoleTypeGuards on this RoleType.
      *
@@ -417,7 +382,7 @@ public abstract class MRoleType
      * @param obj the MeshObject whose auto-delete property shall be changed
      * @param newValue the new value of the property
      * @param caller the MeshObject representing the caller
-     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     * @throws NotPermittedException thrown if this caller is not permitted to do this
      */
     @Override
     public void checkPermittedSetTimeExpires(
@@ -446,7 +411,7 @@ public abstract class MRoleType
      * @param neighborIdentifier identifier of the MeshObject to which the relationship leads
      * @param neighbor MeshObject to which the relationship leads, if successfully resolved
      * @param caller the MeshObject representing the caller
-     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     * @throws NotPermittedException thrown if this caller is not permitted to do this
      */
     @Override
     public void checkPermittedBless(
@@ -477,7 +442,7 @@ public abstract class MRoleType
      * @param neighborIdentifier identifier of the MeshObject to which the relationship leads
      * @param neighbor MeshObject to which the relationship leads, if successfully resolved
      * @param caller the MeshObject representing the caller
-     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     * @throws NotPermittedException thrown if this caller is not permitted to do this
      */
     @Override
     public void checkPermittedUnbless(
@@ -567,7 +532,7 @@ public abstract class MRoleType
                     caller );
         }
     }
-    
+
     /**
      * Check whether the given caller is allowed to bless an existing relationship from a given start
      * MeshObject to a given destination MeshObject with a given new RoleType, in the opinion of
@@ -606,7 +571,7 @@ public abstract class MRoleType
                     caller );
         }
     }
-    
+
     /**
      * Check whether the given caller is allowed to bless an existing relationship from a given start
      * MeshObject to a given destination MeshObject with a given new RoleType, in the opinion of
@@ -645,7 +610,7 @@ public abstract class MRoleType
                     caller );
         }
     }
-    
+
     /**
      * Check whether the given caller is allowed to traverse this RoleType from a given start
      * MeshObject to a given destination MeshObject.
@@ -654,7 +619,7 @@ public abstract class MRoleType
      * @param neighborIdentifier identifier of the MeshObject to which the relationship leads
      * @param neighbor MeshObject to which the relationship leads, if successfully resolved
      * @param caller the MeshObject representing the caller
-     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     * @throws NotPermittedException thrown if this caller is not permitted to do this
      */
     @Override
     public void checkPermittedTraversal(
@@ -678,12 +643,12 @@ public abstract class MRoleType
     /**
      * Check whether the given caller is allowed to make one and two members of the same
      * equivalence set.
-     * 
+     *
      * @param one the first MeshObject
      * @param twoIdentifier identifier of the second MeshObject
      * @param two the second MeshObject, if successfully resolved
      * @param caller the MeshObject representing the caller
-     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     * @throws NotPermittedException thrown if this caller is not permitted to do this
      */
     @Override
     public void checkPermittedAddAsEquivalent(
@@ -701,16 +666,16 @@ public abstract class MRoleType
                     twoIdentifier,
                     two,
                     caller );
-        }        
+        }
     }
-    
+
     /**
      * Check whether the given caller is allowed to remove the MeshObject from its
      * equivalence set.
-     * 
+     *
      * @param obj the MeshObject
      * @param caller the MeshObject representing the caller
-     * @throws NotPermittedException thrown if this caller is not permitted to do this 
+     * @throws NotPermittedException thrown if this caller is not permitted to do this
      */
     @Override
     public void checkPermittedRemoveAsEquivalent(
@@ -724,7 +689,7 @@ public abstract class MRoleType
                     this,
                     obj,
                     caller );
-        }        
+        }
     }
 
     /**
@@ -753,17 +718,17 @@ public abstract class MRoleType
     /**
       * The RelationshipType that this RoleType belongs to.
       */
-    private MRelationshipType theRelationshipType;
+    private final MRelationshipType theRelationshipType;
 
     /**
       * The EntityType associated with this MetaRole.
       */
-    private MEntityType theEntityType;
+    private final MEntityType theEntityType;
 
     /**
       * The value of the source multiplicity.
       */
-    private MultiplicityValue theMultiplicity;
+    private final MultiplicityValue theMultiplicity;
 
     /**
       * The RoleTypes that this RoleType refines directly.
@@ -773,7 +738,7 @@ public abstract class MRoleType
     /**
      * The set of RoleTypeGroups on this RoleType (not a supertype), expressed as the set of class names.
      */
-    private String [] theLocalRoleTypeGuardClassNames;
+    private final String [] theLocalRoleTypeGuardClassNames;
 
     /**
      * The set of RoleTypeGroups on this RoleType (not a supertype). This is allocated when needed.

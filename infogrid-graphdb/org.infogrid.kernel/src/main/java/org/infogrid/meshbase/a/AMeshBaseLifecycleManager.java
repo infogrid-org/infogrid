@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,7 +16,6 @@ package org.infogrid.meshbase.a;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import org.infogrid.mesh.AbstractMeshObject;
 import org.infogrid.mesh.MeshObject;
@@ -440,7 +439,7 @@ public class AMeshBaseLifecycleManager
         MeshTypeIdentifier [] propertyTypeNames = theObjectBeingParsed.getPropertyTypes();
         PropertyValue      [] propertyValues    = theObjectBeingParsed.getPropertyValues();
 
-        HashMap<PropertyType,PropertyValue> properties = new HashMap<PropertyType,PropertyValue>();
+        HashMap<PropertyType,PropertyValue> properties = new HashMap<>();
 
         // set defaults first
         for( EntityType type : types ) {
@@ -530,14 +529,6 @@ public class AMeshBaseLifecycleManager
             }
         }
 
-        // equivalents
-
-        MeshObjectIdentifier [] equivalents = theObjectBeingParsed.getEquivalents();
-
-        MeshObjectIdentifier [] leftRight = AMeshObjectEquivalenceSetComparator.SINGLETON.findLeftAndRightEquivalents(
-                theObjectBeingParsed.getIdentifier(),
-                equivalents );
-
         // instantiate
 
         AMeshObject ret = instantiateRecreatedMeshObject(
@@ -548,7 +539,6 @@ public class AMeshBaseLifecycleManager
                 theObjectBeingParsed.getTimeExpires(),
                 properties,
                 types,
-                leftRight,
                 otherSides,
                 roleTypes,
                 theObjectBeingParsed );
@@ -567,7 +557,6 @@ public class AMeshBaseLifecycleManager
      * @param timeExpires the time it will expire
      * @param properties the properties of the MeshObject
      * @param types the EntityTypes of the MeshObject
-     * @param equivalents either an array of length 2, or null. If given, contains the left and right equivalence pointers.
      * @param otherSides the identifiers of the MeshObject's neighbors, if any
      * @param roleTypes the RoleTypes in which this MeshObject participates with its neighbors
      * @param theObjectBeingParsed the externalized representation of the MeshObject
@@ -581,7 +570,6 @@ public class AMeshBaseLifecycleManager
             long                                timeExpires,
             HashMap<PropertyType,PropertyValue> properties,
             EntityType []                       types,
-            MeshObjectIdentifier []             equivalents,
             MeshObjectIdentifier []             otherSides,
             RoleType [][]                       roleTypes,
             ExternalizedMeshObject              theObjectBeingParsed )
@@ -595,7 +583,6 @@ public class AMeshBaseLifecycleManager
                 timeExpires,
                 properties,
                 types,
-                equivalents,
                 otherSides,
                 roleTypes );
 

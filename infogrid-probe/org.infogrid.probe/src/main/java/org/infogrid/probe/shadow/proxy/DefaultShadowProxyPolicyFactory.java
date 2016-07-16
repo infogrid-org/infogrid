@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -32,7 +32,7 @@ public class DefaultShadowProxyPolicyFactory
 {
     /**
      * Factory method to create the factory.
-     * 
+     *
      * @return the created DefaultShadowProxyPolicyFactory
      */
     public static DefaultShadowProxyPolicyFactory create()
@@ -40,7 +40,7 @@ public class DefaultShadowProxyPolicyFactory
         DefaultShadowProxyPolicyFactory ret = new DefaultShadowProxyPolicyFactory();
         return ret;
     }
-    
+
     /**
      * Constructor for subclasses only, use factory method.
      */
@@ -57,6 +57,7 @@ public class DefaultShadowProxyPolicyFactory
      * @return the created object
      * @throws FactoryException catch-all Exception, consider its cause
      */
+    @Override
     public DefaultShadowProxyPolicy obtainFor(
             NetMeshBaseIdentifier  key,
             CoherenceSpecification argument )

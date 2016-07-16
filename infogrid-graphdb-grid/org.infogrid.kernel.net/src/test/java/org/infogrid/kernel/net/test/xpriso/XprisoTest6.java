@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -52,9 +52,9 @@ public class XprisoTest6
         NetMeshBaseLifecycleManager life1 = mb1.getMeshBaseLifecycleManager();
 
         MyListener obj1_mb2_listener = new MyListener();
-        
+
         //
-        
+
         log.info( "Instantiating objects in mb1" );
 
         Transaction tx1 = mb1.createTransactionAsap();
@@ -85,7 +85,7 @@ public class XprisoTest6
 
         checkObject( obj1_mb2, "object1 not found in mb2" );
         checkObject( obj2_mb2, "object2 not found in mb2" );
-        
+
         checkProxies( obj1_mb1, new NetMeshBase[] { mb2 }, null, null, "obj1_mb1 has wrong proxies" );
         checkProxies( obj2_mb1, new NetMeshBase[] { mb2 }, null, null, "obj2_mb1 has wrong proxies" );
         checkProxies( obj1_mb2, new NetMeshBase[] { mb1 }, mb1,  mb1,  "obj1_mb2 has wrong proxies" );
@@ -97,42 +97,42 @@ public class XprisoTest6
         checkNotObject( obj2_mb2.getAllRelationshipProxies(), "unexpectedly found relationship proxies in obj2_mb2" );
 
         obj1_mb2.addSoftPropertyChangeListener( obj1_mb2_listener );
-        
+
         //
-        
+
         log.info( "Relating in mb1" );
-        
+
         tx1 = mb1.createTransactionAsap();
-        
+
         obj1_mb1.relateAndBless( TestSubjectArea.R.getSource(), obj2_mb1 );
-        
+
         tx1.commitTransaction();
-        
+
         //
-        
+
         log.info( "Sleeping a bit, then checking that events have propagated" );
 
         Thread.sleep( PINGPONG_ROUNDTRIP_DURATION );
-        
+
         checkEquals( obj1_mb2_listener.theEvents.size(), 2, "Wrong number of events received" );
             // neighbor added, and role added
         checkProxies( obj1_mb1, new NetMeshBase[] { mb2 }, null, null, "obj1_mb1 has wrong proxies" );
         checkProxies( obj2_mb1, new NetMeshBase[] { mb2 }, null, null, "obj2_mb1 has wrong proxies" );
         checkProxies( obj1_mb2, new NetMeshBase[] { mb1 }, mb1,  mb1,  "obj1_mb2 has wrong proxies" );
         checkProxies( obj2_mb2, new NetMeshBase[] { mb1 }, mb1,  mb1,  "obj2_mb2 has wrong proxies" );
-        
+
         checkRelationshipProxies( obj1_mb1, obj2_mb1.getIdentifier(), null, "obj1-obj2 has wrong relationship proxies in mb1" );
         checkRelationshipProxies( obj2_mb1, obj1_mb1.getIdentifier(), null, "obj2-obj1 has wrong relationship proxies in mb1" );
         checkRelationshipProxies( obj1_mb2, obj2_mb2.getIdentifier(), new NetMeshBase[] { mb1 }, "obj1-obj2 has wrong relationship proxies in mb2" );
         checkRelationshipProxies( obj2_mb2, obj1_mb2.getIdentifier(), new NetMeshBase[] { mb1 }, "obj2-obj1 has wrong relationship proxies in mb2" );
 
         //
-        
+
         log.info( "Checking mb2 relationship." );
-        
-        MeshObjectSet neighbors1_mb2 = obj1_mb2.traverseToNeighborMeshObjects( false );
+
+        MeshObjectSet neighbors1_mb2 = obj1_mb2.traverseToNeighborMeshObjects();
         MeshObjectSet related1_mb2   = obj1_mb2.traverse( TestSubjectArea.R.getSource() );
-        
+
         checkEquals( neighbors1_mb2.size(), 1, "Object1 in mb2 has wrong number of neighbors" );
         checkEquals( related1_mb2.size(), 1,   "Object1 in mb2 is not related right" );
 
@@ -159,10 +159,10 @@ public class XprisoTest6
             Exception
     {
         super.setup();
-        
+
         net1 = theMeshBaseIdentifierFactory.fromExternalForm( "test://one.local" );
         net2 = theMeshBaseIdentifierFactory.fromExternalForm( "test://two.local" );
-        
+
         MPingPongNetMessageEndpointFactory endpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactory.setNameServer( theNameServer );
 
@@ -181,7 +181,7 @@ public class XprisoTest6
     {
         mb1.die();
         mb2.die();
-        
+
         exec.shutdown();
     }
 
@@ -209,11 +209,11 @@ public class XprisoTest6
      * Our ThreadPool.
      */
     protected ScheduledExecutorService exec = createThreadPool( 2 ); // gotta have two threads
-        
+
 
     // Our Logger
-    private static Log log = Log.getLogInstance( XprisoTest6.class );
-    
+    private static final Log log = Log.getLogInstance( XprisoTest6.class );
+
     /**
      * Listener implementation.
      */
@@ -226,12 +226,13 @@ public class XprisoTest6
          *
          * @param event the vent
          */
+        @Override
         public void propertyChange(
                 PropertyChangeEvent event )
         {
             theEvents.add( event );
         }
-        
+
         /**
          * Clear the listener.
          */
@@ -243,6 +244,6 @@ public class XprisoTest6
         /**
          * The collected events.
          */
-        protected ArrayList<PropertyChangeEvent> theEvents = new ArrayList<PropertyChangeEvent>();
+        protected ArrayList<PropertyChangeEvent> theEvents = new ArrayList<>();
     }
 }

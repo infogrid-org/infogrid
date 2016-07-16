@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -60,7 +60,7 @@ public abstract class AbstractXprisoTest
 {
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -76,7 +76,7 @@ public abstract class AbstractXprisoTest
 
         Log4jLog.configure( "org/infogrid/kernel/net/test/xpriso/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/kernel/net/test/xpriso/ResourceHelper",
                 Locale.getDefault(),
@@ -85,7 +85,7 @@ public abstract class AbstractXprisoTest
 
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong during a test
      */
     @Before
@@ -157,18 +157,18 @@ public abstract class AbstractXprisoTest
         throws
             NotRelatedException
     {
-        MeshObjectSet oneNeighbors = one.traverseToNeighborMeshObjects( false );
-        MeshObjectSet twoNeighbors = two.traverseToNeighborMeshObjects( false );
+        MeshObjectSet oneNeighbors = one.traverseToNeighborMeshObjects();
+        MeshObjectSet twoNeighbors = two.traverseToNeighborMeshObjects();
 
         checkEqualsOutOfSequence( oneNeighbors.getMeshObjects(), twoNeighbors.getMeshObjects(), msg + " not the same neighbors for " + one.getIdentifier() );
 
         for( final MeshObject currentOne : oneNeighbors ) {
             MeshObject currentTwo = twoNeighbors.find(
                     ( MeshObject candidate ) -> currentOne.getIdentifier().equals( candidate.getIdentifier() ));
-            
+
             RoleType [] relatedOne = one.getRoleTypes( currentOne );
             RoleType [] relatedTwo = two.getRoleTypes( currentTwo );
-            
+
             checkEqualsOutOfSequence( relatedOne, relatedTwo, msg + " not the same RoleTypes for " + one.getIdentifier() + " related to " + currentOne.getIdentifier() );
         }
     }
@@ -193,7 +193,7 @@ public abstract class AbstractXprisoTest
             reportError( "Cannot check proxies of null object" );
             return;
         }
-        
+
         Proxy [] proxies = obj.getAllProxies();
 
         if( proxies == null || proxies.length == 0 ) {
@@ -210,7 +210,7 @@ public abstract class AbstractXprisoTest
         if( proxies.length != proxiesTowards.length ) {
             reportError( msg + ": object has wrong number of proxies.", proxiesTowards.length, proxies.length );
         }
-        
+
         NetMeshBaseIdentifier [] proxiesIdentifiers        = new NetMeshBaseIdentifier[ proxies.length ];
         NetMeshBaseIdentifier [] proxiesTowardsIdentifiers = new NetMeshBaseIdentifier[ proxiesTowards.length ];
         for( int i=0 ; i<proxies.length ; ++i ) {
@@ -336,7 +336,7 @@ public abstract class AbstractXprisoTest
                     new HttpScheme(),
                     new StrictRegexScheme( "test", Pattern.compile( "test:.*" ))
              } );
-    
+
     /**
      * The root context for these tests.
      */

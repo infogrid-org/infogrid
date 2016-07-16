@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,7 +16,6 @@ package org.infogrid.mesh.net.proxy;
 
 import org.infogrid.mesh.EntityBlessedAlreadyException;
 import org.infogrid.mesh.EntityNotBlessedException;
-import org.infogrid.mesh.EquivalentAlreadyException;
 import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.IsAbstractException;
@@ -70,11 +69,11 @@ public interface ReplicaProxyInterface
      */
     public abstract boolean proxyOnlySurrenderHomeReplica(
             Proxy theProxy );
-    
+
     /**
      * Push home replica status to this replica. This shall not be called by the application
      * programmer. This is called only by Proxies that identify themselves to this call.
-     * 
+     *
      * @param theProxy the Proxy invoking this method
      */
     public abstract void proxyOnlyPushHomeReplica(
@@ -107,7 +106,7 @@ public interface ReplicaProxyInterface
 
     /**
      * Resynchronize a replica.
-     * 
+     *
      * @param timeCreated the timeCreated to use
      * @param timeUpdated the timeUpdated to use
      * @param timeRead the timeRead to use
@@ -165,7 +164,7 @@ public interface ReplicaProxyInterface
 
     /**
      * Relate two replica NetMeshObjects, as a consequence of relating other replicas.
-     * 
+     *
      * @param newNeighborIdentifier the identifier of the NetMeshObject to relate to
      * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws RelatedAlreadyException thrown to indicate that this MeshObject is already related
@@ -178,10 +177,10 @@ public interface ReplicaProxyInterface
         throws
             RelatedAlreadyException,
             TransactionException;
-    
+
     /**
      * Unrelate two replica NetMeshObjects, as a consequence of unrelating other replicas.
-     * 
+     *
      * @param neighborIdentifier the identifier of the NetMeshObject to unrelate from
      * @param mb the MeshBase that this MeshObject does or used to belong to
      * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
@@ -201,7 +200,7 @@ public interface ReplicaProxyInterface
     /**
      * Bless the relationship of two replica NetMeshObjects, as a consequence of blessing the relationship
      * of two other replicas.
-     * 
+     *
      * @param theTypes the RoleTypes to use for blessing
      * @param neighborIdentifier the identifier of the NetMeshObject that
      *        identifies the relationship that shall be blessed
@@ -229,7 +228,7 @@ public interface ReplicaProxyInterface
     /**
      * Unbless the relationship of two replica NetMeshObjects, as a consequence of unblessing the relationship
      * of two other replicas.
-     * 
+     *
      * @param theTypes the RoleTypes to use for unblessing
      * @param neighborIdentifier the identifier of the NetMeshObject that
      *        identifies the relationship that shall be unblessed
@@ -246,38 +245,6 @@ public interface ReplicaProxyInterface
         throws
             RoleTypeNotBlessedException,
             NotRelatedException,
-            TransactionException,
-            NotPermittedException;
-    
-    /**
-     * Add a replica NetMeshObject as an equivalent, as a consequence of adding a different replica
-     * as equivalent.
-     * 
-     * @param identifierOfEquivalent the Identifier of the replica NetMeshObject
-     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
-     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public abstract void rippleAddAsEquivalent(
-            NetMeshObjectIdentifier identifierOfEquivalent,
-            long                    timeUpdated )
-        throws
-            EquivalentAlreadyException,
-            TransactionException,
-            NotPermittedException;
-    
-    /**
-     * Remove this replica NetMeshObject as an equivalent from the current set of equivalents, as a consequence of removing
-     * a different replica as equivalent.
-     * 
-     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public abstract void rippleRemoveAsEquivalent(
-            long timeUpdated )
-        throws
             TransactionException,
             NotPermittedException;
 
@@ -306,7 +273,7 @@ public interface ReplicaProxyInterface
 
     /**
      * Delete a replica NetMeshObject as a consequence of deleting another replica.
-     * 
+     *
      * @param mb the MeshBase that this MeshObject does or used to belong to
      * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
@@ -317,5 +284,5 @@ public interface ReplicaProxyInterface
             long        timeUpdated )
         throws
             TransactionException,
-            NotPermittedException;    
+            NotPermittedException;
 }

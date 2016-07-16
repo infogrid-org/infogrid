@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -36,7 +36,7 @@ public class SimpleExternalizedMeshObject
 
     /**
      * Factory method.
-     * 
+     *
      * @param identifier the MeshObjectIdentifier of the MeshObject
      * @param typeNames the MeshTypeIdentifier identifying the EntityTypes with which the MeshObject is currently blessed
      * @param timeCreated the time the MeshObject was created
@@ -47,7 +47,6 @@ public class SimpleExternalizedMeshObject
      * @param propertyValues the current values of the PropertyTypes, in the same sequence as propertyTypes
      * @param neighbors the MeshObjectIdentifiers of the directly related MeshObjects
      * @param roleTypes the MeshTypeIdentifiers of the RoleTypes applicable to the neighbors, in the same sequence
-     * @param equivalents the MeshObjectIdentifiers of the current left and right equivalent MeshObject, if any
      * @return the created SimpleExternalizedMeshObject
      */
     public static SimpleExternalizedMeshObject create(
@@ -60,8 +59,7 @@ public class SimpleExternalizedMeshObject
             MeshTypeIdentifier []   propertyTypes,
             PropertyValue []        propertyValues,
             MeshObjectIdentifier [] neighbors,
-            MeshTypeIdentifier [][] roleTypes,
-            MeshObjectIdentifier [] equivalents )
+            MeshTypeIdentifier [][] roleTypes )
     {
         // do some sanity checking
         if( identifier == null ) {
@@ -98,17 +96,7 @@ public class SimpleExternalizedMeshObject
             neighbors = new MeshObjectIdentifier[0];
             roleTypes = new MeshTypeIdentifier[0][];
         }
-        
-        if( equivalents != null ) {
-            for( MeshObjectIdentifier current : equivalents ) {
-                if( current == null ) {
-                    throw new IllegalArgumentException( "null equivalent" );
-                }
-            }
-        } else {
-            equivalents = new MeshObjectIdentifier[0];
-        }
-        
+
         SimpleExternalizedMeshObject ret = new SimpleExternalizedMeshObject(
                 identifier,
                 typeNames,
@@ -119,12 +107,11 @@ public class SimpleExternalizedMeshObject
                 propertyTypes,
                 propertyValues,
                 neighbors,
-                roleTypes,
-                equivalents );
+                roleTypes );
 
         return ret;
     }
-        
+
     /**
      * Construct one from externalized data.
      *
@@ -138,7 +125,6 @@ public class SimpleExternalizedMeshObject
      * @param propertyValues the current values of the PropertyTypes, in the same sequence as propertyTypes
      * @param neighbors the MeshObjectIdentifiers of the directly related MeshObjects
      * @param roleTypes the MeshTypeIdentifiers of the RoleTypes applicable to the neighbors, in the same sequence
-     * @param equivalents the MeshObjectIdentifiers of the current left and right equivalent MeshObject, if any
      */
     protected SimpleExternalizedMeshObject(
             MeshObjectIdentifier    identifier,
@@ -150,8 +136,7 @@ public class SimpleExternalizedMeshObject
             MeshTypeIdentifier []   propertyTypes,
             PropertyValue  []       propertyValues,
             MeshObjectIdentifier[]  neighbors,
-            MeshTypeIdentifier [][] roleTypes,
-            MeshObjectIdentifier[]  equivalents )
+            MeshTypeIdentifier [][] roleTypes )
     {
         super( identifier, timeCreated, timeUpdated, timeRead, timeExpires );
 
@@ -190,23 +175,13 @@ public class SimpleExternalizedMeshObject
             neighbors = new MeshObjectIdentifier[0];
             roleTypes = new MeshTypeIdentifier[0][];
         }
-        
-        if( equivalents != null ) {
-            for( MeshObjectIdentifier current : equivalents ) {
-                if( current == null ) {
-                    throw new IllegalArgumentException( "null equivalent" );
-                }
-            }
-        } else {
-            equivalents = new MeshObjectIdentifier[0];
-        }
+
         theIdentifier      = identifier;
         theTypeNames       = typeNames;
         thePropertyTypes   = propertyTypes;
         thePropertyValues  = propertyValues;
         theNeighbors       = neighbors;
         theRoleTypes       = roleTypes;
-        theEquivalents     = equivalents;
     }
 
     /**
@@ -214,6 +189,7 @@ public class SimpleExternalizedMeshObject
      *
      * @return the MeshTypeIdentifiers of the MeshObject's EntityTypes
      */
+    @Override
     public final MeshTypeIdentifier [] getExternalTypeIdentifiers()
     {
         return theTypeNames;
@@ -225,6 +201,7 @@ public class SimpleExternalizedMeshObject
      * @return the MeshTypeIdentifier of the MeshObject's PropertyTypes
      * @see #getPropertyValues()
      */
+    @Override
     public final MeshTypeIdentifier [] getPropertyTypes()
     {
         return thePropertyTypes;
@@ -237,6 +214,7 @@ public class SimpleExternalizedMeshObject
      * @return the PropertyValues of the MeshObject's properties
      * @see #getPropertyTypes()
      */
+    @Override
     public PropertyValue [] getPropertyValues()
     {
         return thePropertyValues;
@@ -247,6 +225,7 @@ public class SimpleExternalizedMeshObject
      *
      * @return the MeshObjectIdentifier of the neighbors
      */
+    @Override
     public MeshObjectIdentifier [] getNeighbors()
     {
         return theNeighbors;
@@ -259,6 +238,7 @@ public class SimpleExternalizedMeshObject
      * @param neighbor the neighbor
      * @return the RoleTypes
      */
+    @Override
     public MeshTypeIdentifier [] getRoleTypesFor(
             MeshObjectIdentifier neighbor )
     {
@@ -277,21 +257,11 @@ public class SimpleExternalizedMeshObject
     }
 
     /**
-     * Obtain the MeshObjectIdentifiers of the left and right MeshObjects that
-     * participate in an equivalence set with this MeshObject.
-     *
-     * @return the MeshObjectIdentifier. May be null.
-     */
-    public MeshObjectIdentifier [] getEquivalents()
-    {
-        return theEquivalents;
-    }
-
-    /**
      * Dump this object.
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {
@@ -306,8 +276,7 @@ public class SimpleExternalizedMeshObject
                     "theTimeRead",
                     "theTimeExpires",
                     "theNeighbors",
-                    "theRoleTypes",
-                    "theEquivalents"
+                    "theRoleTypes"
                 },
                 new Object[] {
                     theIdentifier,
@@ -319,8 +288,7 @@ public class SimpleExternalizedMeshObject
                     theTimeRead,
                     theTimeExpires,
                     theNeighbors,
-                    theRoleTypes,
-                    theEquivalents
+                    theRoleTypes
                 });
     }
 
@@ -349,9 +317,4 @@ public class SimpleExternalizedMeshObject
      * same sequence as theNeighbors.
      */
     protected MeshTypeIdentifier [][] theRoleTypes;
-
-    /**
-     * The identities of the other members of the equivalence set in which this MeshObject participates
-     */
-    protected MeshObjectIdentifier[] theEquivalents;
 }

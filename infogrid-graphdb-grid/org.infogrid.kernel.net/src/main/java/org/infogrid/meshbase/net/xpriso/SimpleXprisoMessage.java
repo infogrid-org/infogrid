@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -20,8 +20,6 @@ import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectPropertyChangeEvent;
@@ -50,7 +48,7 @@ public class SimpleXprisoMessage
 
     /**
      * Create a blank SimpleXprisoMessage.
-     * 
+     *
      * @param sender identifies the sender of this message
      * @param receiver identifies the receiver of this message
      * @return the created SimpleXprisoMessage
@@ -75,7 +73,7 @@ public class SimpleXprisoMessage
 
     /**
      * Constructor.
-     * 
+     *
      * @param sender identifies the sender of this message
      * @param receiver identifies the receiver of this message
      */
@@ -85,23 +83,25 @@ public class SimpleXprisoMessage
     {
         super( sender, receiver );
     }
-    
+
     /**
      * Set the request ID.
      *
      * @param id the request ID
      */
+    @Override
     public void setRequestId(
             long id )
     {
         theRequestId = id;
     }
-    
+
     /**
      * Set the response ID.
      *
      * @param id the response ID
      */
+    @Override
     public void setResponseId(
             long id )
     {
@@ -118,7 +118,7 @@ public class SimpleXprisoMessage
     {
         theCeaseCommunications = newValue;
     }
-    
+
     /**
      * Set the externalized representation of the NetMeshObjects that are conveyed
      * by the sender to the receiver, e.g. in response to a first-time lease request.
@@ -142,11 +142,12 @@ public class SimpleXprisoMessage
      *
      * @return the ExternalizedNetMeshObjects
      */
+    @Override
     public ExternalizedNetMeshObject[] getConveyedMeshObjects()
     {
         return theConveyedMeshObjects;
     }
-    
+
     /**
      * Set the NetMeshObjectAccessSpecifications to the NetMeshObjects for which the sender requests
      * a lease for the first time.
@@ -163,13 +164,14 @@ public class SimpleXprisoMessage
         }
         theRequestedFirstTimeObjects = newValue;
     }
-    
+
     /**
      * Obtain the NetMeshObjectAccessSpecifications to the NetMeshObjects for which the sender requests
      * a lease for the first time.
      *
      * @return the NetMeshObjectAccessSpecifications for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectAccessSpecification [] getRequestedFirstTimeObjects()
     {
         return theRequestedFirstTimeObjects;
@@ -191,13 +193,14 @@ public class SimpleXprisoMessage
         }
         theRequestedCanceledObjects = newValue;
     }
-    
+
     /**
      * Obtain the identifiers for the NetMeshObjects for which the sender requests
      * that a currently valid lease be canceled.
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getRequestedCanceledObjects()
     {
         return theRequestedCanceledObjects;
@@ -226,6 +229,7 @@ public class SimpleXprisoMessage
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getRequestedFreshenReplicas()
     {
         return theRequestedFreshenReplicas;
@@ -254,6 +258,7 @@ public class SimpleXprisoMessage
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getRequestedResynchronizeReplicas()
     {
         return theRequestedResynchronizeReplicas;
@@ -282,6 +287,7 @@ public class SimpleXprisoMessage
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getRequestedLockObjects()
     {
         return theRequestedLockObjects;
@@ -310,11 +316,12 @@ public class SimpleXprisoMessage
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getPushLockObjects()
     {
         return thePushLockObjects;
     }
-    
+
     /**
      * Set the identifiers for the NetMeshObjects for which the sender has forcefully
      * reclaimed the lock.
@@ -338,15 +345,16 @@ public class SimpleXprisoMessage
      *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getReclaimedLockObjects()
     {
         return theReclaimedLockObjects;
     }
-    
+
     /**
      * Set the identifiers for the NetMeshObjects for which the sender requests
      * home replica status.
-     * 
+     *
      * @param newValue the NetMeshObjectIdentifiers for the NetMeshObjects
      */
     public void setRequestedHomeReplicas(
@@ -363,9 +371,10 @@ public class SimpleXprisoMessage
     /**
      * Obtain the identifiers for the NetMeshObjects for which the sender requests
      * home replica status.
-     * 
+     *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getRequestedHomeReplicas()
     {
         return theRequestedHomeReplicas;
@@ -374,7 +383,7 @@ public class SimpleXprisoMessage
     /**
      * Set the identifiers for the NetMeshObjects for which the sender surrenders
      * the home replica status to the receiver.
-     * 
+     *
      * @param newValue the NetMeshObjectIdentifiers for the NetMeshObjects
      */
     public void setPushHomeReplicas(
@@ -391,14 +400,15 @@ public class SimpleXprisoMessage
     /**
      * Obtain the identifiers for the NetMeshObjects for which the sender surrenders
      * the home replica status to the receiver.
-     * 
+     *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
+    @Override
     public NetMeshObjectIdentifier [] getPushHomeReplicas()
     {
         return thePushHomeReplicas;
     }
-    
+
     /**
      * Set the type addition events that the sender needs to convey to the
      * receiver.
@@ -422,6 +432,7 @@ public class SimpleXprisoMessage
      *
      * @return the type addition events
      */
+    @Override
     public NetMeshObjectTypeAddedEvent [] getTypeAdditions()
     {
         return theTypeAdditions;
@@ -450,6 +461,7 @@ public class SimpleXprisoMessage
      *
      * @return the type removal events
      */
+    @Override
     public NetMeshObjectTypeRemovedEvent [] getTypeRemovals()
     {
         return theTypeRemovals;
@@ -478,6 +490,7 @@ public class SimpleXprisoMessage
      *
      * @return the property change events
      */
+    @Override
     public NetMeshObjectPropertyChangeEvent [] getPropertyChanges()
     {
         return thePropertyChanges;
@@ -506,6 +519,7 @@ public class SimpleXprisoMessage
      *
      * @return the neighbor addition events
      */
+    @Override
     public NetMeshObjectNeighborAddedEvent [] getNeighborAdditions()
     {
         return theNeighborAdditions;
@@ -534,65 +548,10 @@ public class SimpleXprisoMessage
      *
      * @return the neighbor removal events
      */
+    @Override
     public NetMeshObjectNeighborRemovedEvent [] getNeighborRemovals()
     {
         return theNeighborRemovals;
-    }
-
-    /**
-     * Set the equivalent addition events that the sender needs to convey to the
-     * receiver.
-     * 
-     * @param newValue the equivalent addition events
-     */
-    public void setEquivalentAdditions(
-            NetMeshObjectEquivalentsAddedEvent [] newValue )
-    {
-        for( int i=0 ; i<newValue.length ; ++i ) {
-            if( newValue[i] == null ) {
-                throw new NullPointerException( "index " + i );
-            }
-        }
-        theEquivalentsAdditions = newValue;
-    }
-
-    /**
-     * Obtain the equivalent addition events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the equivalent addition events
-     */
-    public NetMeshObjectEquivalentsAddedEvent [] getEquivalentsAdditions()
-    {
-        return theEquivalentsAdditions;
-    }
-
-    /**
-     * Set the equivalent removal events that the sender needs to convey to the
-     * receiver.
-     * 
-     * @param newValue the equivalent removal events
-     */
-    public void setEquivalentRemovals(
-            NetMeshObjectEquivalentsRemovedEvent [] newValue )
-    {
-        for( int i=0 ; i<newValue.length ; ++i ) {
-            if( newValue[i] == null ) {
-                throw new NullPointerException( "index " + i );
-            }
-        }
-        theEquivalentsRemovals = newValue;
-    }
-
-    /**
-     * Obtain the equivalent removal events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the equivalent removal events
-     */
-    public NetMeshObjectEquivalentsRemovedEvent [] getEquivalentsRemovals()
-    {
-        return theEquivalentsRemovals;
     }
 
     /**
@@ -618,6 +577,7 @@ public class SimpleXprisoMessage
      *
      * @return the role addition events
      */
+    @Override
     public NetMeshObjectRoleAddedEvent [] getRoleAdditions()
     {
         return theRoleAdditions;
@@ -646,6 +606,7 @@ public class SimpleXprisoMessage
      *
      * @return the role removal events
      */
+    @Override
     public NetMeshObjectRoleRemovedEvent [] getRoleRemovals()
     {
         return theRoleRemovals;
@@ -674,6 +635,7 @@ public class SimpleXprisoMessage
      *
      * @return the deletion events
      */
+    @Override
     public NetMeshObjectDeletedEvent [] getDeletions()
     {
         return theDeleteChanges;
@@ -684,13 +646,14 @@ public class SimpleXprisoMessage
      *
      * @return true if it is empty
      */
+    @Override
     public boolean isEmpty()
     {
         // ignore theSenderIdentifier;
         // ignore theReceiverIdentifier;
         // ignore theRequestId;
         // do NOT ignore responseID: may acknowledge receipt of incoming message
-        
+
         // alphabetically, so we can make sure we have all of them by comparing with the IDE
 
         if( theCeaseCommunications ) {
@@ -700,12 +663,6 @@ public class SimpleXprisoMessage
             return false;
         }
         if( theDeleteChanges != null && theDeleteChanges.length > 0 ) {
-            return false;
-        }
-        if( theEquivalentsAdditions != null && theEquivalentsAdditions.length > 0 ) {
-            return false;
-        }
-        if( theEquivalentsRemovals != null && theEquivalentsRemovals.length > 0 ) {
             return false;
         }
         if( theNeighborAdditions != null && theNeighborAdditions.length > 0 ) {
@@ -770,6 +727,7 @@ public class SimpleXprisoMessage
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {
@@ -782,8 +740,6 @@ public class SimpleXprisoMessage
                     "theCeaseCommunications",
                     "theConveyedMeshObjects",
                     "theDeleteChanges",
-                    "theEquivalentsAdditions",
-                    "theEquivalentsRemovals",
                     "theNeighborAdditions",
                     "theNeighborRemovals",
                     "thePropertyChanges",
@@ -809,8 +765,6 @@ public class SimpleXprisoMessage
                     theCeaseCommunications,
                     theConveyedMeshObjects,
                     theDeleteChanges,
-                    theEquivalentsAdditions,
-                    theEquivalentsRemovals,
                     theNeighborAdditions,
                     theNeighborRemovals,
                     thePropertyChanges,
@@ -841,7 +795,7 @@ public class SimpleXprisoMessage
      * sender would like to obtain a first-time lease.
      */
     protected NetMeshObjectAccessSpecification[] theRequestedFirstTimeObjects = NetMeshObjectAccessSpecification.EMPTY_ARRAY;
-    
+
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifier, for which the
      * sender currently as a lease, but whose lease the sender would like to
@@ -866,13 +820,13 @@ public class SimpleXprisoMessage
      * sender requests the lock.
      */
     protected NetMeshObjectIdentifier [] theRequestedLockObjects = NetMeshObjectIdentifier.NET_EMPTY_ARRAY;
-    
+
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifier, whose lock
      * the sender surrenders to the receiver.
      */
     protected NetMeshObjectIdentifier [] thePushLockObjects = NetMeshObjectIdentifier.NET_EMPTY_ARRAY;
-    
+
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifier, whose lock
      * the sender has forcefully reclaimed.
@@ -895,52 +849,42 @@ public class SimpleXprisoMessage
      * The set of TypeAddedEvents that the sender needs to convey to the receiver.
      */
     protected NetMeshObjectTypeAddedEvent [] theTypeAdditions = {};
-    
+
     /**
      * The set of TypeRemovedEvents that the sender needs to convey to the receiver.
      */
     protected NetMeshObjectTypeRemovedEvent [] theTypeRemovals = {};
-    
+
     /**
      * The set of PropertyChanges that the sender needs to convey to the receiver.
      */
     protected NetMeshObjectPropertyChangeEvent [] thePropertyChanges = {};
-    
+
     /**
      * The set of NeighborAddedEvents that the sender needs to convey to the receiver.
      */
     protected NetMeshObjectNeighborAddedEvent [] theNeighborAdditions = {};
-    
+
     /**
      * The set of NeighborAddedEvents that the sender needs to convey to the receiver.
      */
     protected NetMeshObjectNeighborRemovedEvent [] theNeighborRemovals = {};
-    
-    /**
-     * The set of EquivalentsAddedEvents that the sender needs to convey to the receiver.
-     */
-    protected NetMeshObjectEquivalentsAddedEvent [] theEquivalentsAdditions = {};
-
-    /**
-     * The set of EquivalentsRemovedEvents that the sender needs to convey to the receiver.
-     */
-    protected NetMeshObjectEquivalentsRemovedEvent [] theEquivalentsRemovals = {};
 
     /**
      * The set of RoleChanges that the sender needs to convey to the receiver.
      */
     protected NetMeshObjectRoleAddedEvent [] theRoleAdditions = {};
-    
+
     /**
      * The set of RoleChanges that the sender needs to convey to the receiver.
      */
     protected NetMeshObjectRoleRemovedEvent [] theRoleRemovals = {};
-    
+
     /**
      * The set of MeshObjects, identified by their MeshObjectIdentifier, that have been
      * deleted semantically by the sender, and of whose deletion the receiver
      * needs to be notified.
      */
     protected NetMeshObjectDeletedEvent [] theDeleteChanges = {};
-    
+
 }

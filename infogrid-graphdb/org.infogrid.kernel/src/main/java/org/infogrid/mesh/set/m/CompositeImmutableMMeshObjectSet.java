@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -56,6 +56,7 @@ public abstract class CompositeImmutableMMeshObjectSet
      *
      * @return the operands that were used to construct this set
      */
+    @Override
     public MeshObjectSet [] getOperands()
     {
         return theOperands;

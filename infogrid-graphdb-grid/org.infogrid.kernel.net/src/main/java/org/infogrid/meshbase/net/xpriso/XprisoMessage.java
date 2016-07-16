@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,8 +21,6 @@ import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectPropertyChangeEvent;
@@ -42,14 +40,14 @@ public interface XprisoMessage
 {
     /**
      * Obtain the NetMeshBaseIdentifier of the sender.
-     * 
+     *
      * @return the sender's NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getSenderIdentifier();
-    
+
     /**
      * Obtain the NetMeshBaseIdentifier of the receiver.
-     * 
+     *
      * @return the receiver's NetMeshBaseIdentifier
      */
     public NetMeshBaseIdentifier getReceiverIdentifier();
@@ -59,6 +57,7 @@ public interface XprisoMessage
      *
      * @return the request ID
      */
+    @Override
     public long getRequestId();
 
     /**
@@ -66,6 +65,7 @@ public interface XprisoMessage
      *
      * @return the response ID
      */
+    @Override
     public long getResponseId();
 
     /**
@@ -142,7 +142,7 @@ public interface XprisoMessage
     /**
      * Obtain the identifiers for the NetMeshObjects for which the sender requests
      * home replica status.
-     * 
+     *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
     public NetMeshObjectIdentifier [] getRequestedHomeReplicas();
@@ -150,11 +150,11 @@ public interface XprisoMessage
     /**
      * Obtain the identifiers for the NetMeshObjects for which the sender surrenders
      * the home replica status to the receiver.
-     * 
+     *
      * @return the NetMeshObjectIdentifiers for the NetMeshObjects
      */
     public NetMeshObjectIdentifier [] getPushHomeReplicas();
-    
+
     /**
      * Obtain the type addition events that the sender needs to convey to the
      * receiver.
@@ -194,22 +194,6 @@ public interface XprisoMessage
      * @return the neighbor removal events
      */
     public NetMeshObjectNeighborRemovedEvent [] getNeighborRemovals();
-
-    /**
-     * Obtain the equivalent addition events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the equivalent addition events
-     */
-    public NetMeshObjectEquivalentsAddedEvent [] getEquivalentsAdditions();
-
-    /**
-     * Obtain the equivalent removal events that the sender needs to convey to the
-     * receiver.
-     *
-     * @return the equivalent addition events
-     */
-    public NetMeshObjectEquivalentsRemovedEvent [] getEquivalentsRemovals();
 
     /**
      * Obtain the role addition events that the sender needs to convey to the

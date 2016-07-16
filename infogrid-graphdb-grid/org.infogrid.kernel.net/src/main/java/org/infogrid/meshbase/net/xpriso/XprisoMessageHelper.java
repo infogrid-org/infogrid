@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -20,8 +20,6 @@ import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectPropertyChangeEvent;
@@ -29,7 +27,6 @@ import org.infogrid.meshbase.net.transaction.NetMeshObjectRoleAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectRoleRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectTypeRemovedEvent;
-import org.infogrid.meshbase.transaction.Change;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -54,13 +51,13 @@ public abstract class XprisoMessageHelper
     public static List<XprisoMessage> consolidate(
             List<XprisoMessage> candidates )
     {
-        if( false ) {
-            return candidates; // FIXME
-        }
+//        if( false ) {
+//            return candidates; // FIXME
+//        }
         if( candidates == null || candidates.size() <= 1 ) {
             return candidates;
         }
-        List<XprisoMessage> ret = new ArrayList<XprisoMessage>( candidates.size() );
+        List<XprisoMessage> ret = new ArrayList<>( candidates.size() );
 
         XprisoMessage currentRet = null;
         for( XprisoMessage currentCandidate : candidates ) {
@@ -294,7 +291,7 @@ public abstract class XprisoMessageHelper
 
             //
 
-            ArrayList<NetMeshObjectTypeRemovedEvent> secondTypesRemovedDontAdd = new ArrayList<NetMeshObjectTypeRemovedEvent>();
+            ArrayList<NetMeshObjectTypeRemovedEvent> secondTypesRemovedDontAdd = new ArrayList<>();
             for( NetMeshObjectTypeAddedEvent currentAdded : firstTypesAdded ) {
                 NetMeshObjectTypeRemovedEvent inverse = null;
                 for( NetMeshObjectTypeRemovedEvent currentRemoved : secondTypesRemoved ) {
@@ -367,7 +364,7 @@ public abstract class XprisoMessageHelper
             NetMeshObjectNeighborRemovedEvent [] firstNeighborRemovals   = first.getNeighborRemovals();
             NetMeshObjectNeighborRemovedEvent [] secondNeighborRemovals  = second.getNeighborRemovals();
 
-            ArrayList<NetMeshObjectNeighborRemovedEvent> secondRemovalsDontAdd = new ArrayList<NetMeshObjectNeighborRemovedEvent>();
+            ArrayList<NetMeshObjectNeighborRemovedEvent> secondRemovalsDontAdd = new ArrayList<>();
             for( NetMeshObjectNeighborAddedEvent currentFirst : firstNeighborAdditions ) {
                 NetMeshObjectNeighborRemovedEvent inverse = null;
                 for( NetMeshObjectNeighborRemovedEvent currentSecond : secondNeighborRemovals ) {
@@ -406,16 +403,6 @@ public abstract class XprisoMessageHelper
                 }
             }
 
-            // equivalents: for right now, we just don't merge
-            NetMeshObjectEquivalentsAddedEvent   [] firstEquivalentAdditions  = first.getEquivalentsAdditions();
-            NetMeshObjectEquivalentsAddedEvent   [] secondEquivalentAdditions = second.getEquivalentsAdditions();
-            NetMeshObjectEquivalentsRemovedEvent [] firstEquivalentRemovals   = first.getEquivalentsRemovals();
-            NetMeshObjectEquivalentsRemovedEvent [] secondEquivalentRemovals  = second.getEquivalentsRemovals();
-
-            if( firstEquivalentAdditions.length > 0 || secondEquivalentAdditions.length > 0 || firstEquivalentRemovals.length > 0 || secondEquivalentRemovals.length > 0 ) {
-                return null;
-            }
-
             // only role additions that aren't removed later
             // only role removals that aren't added later
 
@@ -424,7 +411,7 @@ public abstract class XprisoMessageHelper
             NetMeshObjectRoleRemovedEvent [] firstRoleRemovals   = first.getRoleRemovals();
             NetMeshObjectRoleRemovedEvent [] secondRoleRemovals  = second.getRoleRemovals();
 
-            ArrayList<NetMeshObjectRoleRemovedEvent> secondRoleRemovalsDontAdd = new ArrayList<NetMeshObjectRoleRemovedEvent>();
+            ArrayList<NetMeshObjectRoleRemovedEvent> secondRoleRemovalsDontAdd = new ArrayList<>();
             for( NetMeshObjectRoleAddedEvent currentFirst : firstRoleAdditions ) {
                 NetMeshObjectRoleRemovedEvent inverse = null;
                 for( NetMeshObjectRoleRemovedEvent currentSecond : secondRoleRemovals ) {

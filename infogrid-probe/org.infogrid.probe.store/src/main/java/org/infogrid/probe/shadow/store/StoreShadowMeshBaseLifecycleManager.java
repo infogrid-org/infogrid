@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -22,7 +22,6 @@ import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.net.a.AnetMeshObject;
-import org.infogrid.meshbase.a.AMeshObjectEquivalenceSetComparator;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.model.primitives.EntityType;
@@ -45,11 +44,11 @@ public class StoreShadowMeshBaseLifecycleManager
             AStagingMeshBaseLifecycleManager
 {
     private static final Log log = Log.getLogInstance( StoreShadowMeshBaseLifecycleManager.class ); // our own, private logger
-    
+
     /**
      * Factory method. The application developer should not call this or a subclass constructor; use
      * MeshBase.getMeshObjectLifecycleManager() instead.
-     * 
+     *
      * @return the created StoreShadowMeshBaseLifecycleManager
      */
     public static StoreShadowMeshBaseLifecycleManager create()
@@ -66,10 +65,10 @@ public class StoreShadowMeshBaseLifecycleManager
     {
         super();
     }
-    
+
     /**
      * Recreate a NetMeshObject previously created here but swapped out on disk.
-     * 
+     *
      * @param externalized the externalized form of the NetMeshObject
      * @return the recreated NetMeshObject
      * @throws MeshObjectIdentifierNotUniqueException thrown if a MeshObject with this identifier existed already
@@ -83,7 +82,7 @@ public class StoreShadowMeshBaseLifecycleManager
         if( existing != null ) {
             throw new MeshObjectIdentifierNotUniqueException( existing );
         }
-        
+
         StoreShadowMeshBase realBase  = (StoreShadowMeshBase) theMeshBase;
         ModelBase           modelBase = theMeshBase.getModelBase();
 
@@ -106,9 +105,9 @@ public class StoreShadowMeshBaseLifecycleManager
                 proxyTowardsLockIndex = i;
             }
         }
-        
+
         NetMeshObjectIdentifier identifier = externalized.getIdentifier();
-        
+
         int typeCounter = 0;
         EntityType [] types;
         if( externalized.getExternalTypeIdentifiers() != null && externalized.getExternalTypeIdentifiers().length > 0 ) {
@@ -117,7 +116,7 @@ public class StoreShadowMeshBaseLifecycleManager
                 try {
                     types[typeCounter] = (EntityType) modelBase.findMeshTypeByIdentifier( externalized.getExternalTypeIdentifiers()[i] );
                     typeCounter++; // make sure we do the increment after an exception might have been thrown
-                    
+
                 } catch( MeshTypeNotFoundException ex ) {
                     log.error( ex );
                 }
@@ -132,11 +131,11 @@ public class StoreShadowMeshBaseLifecycleManager
         HashMap<PropertyType,PropertyValue> localProperties;
         if( externalized.getPropertyTypes() != null && externalized.getPropertyTypes().length > 0 ) {
 
-            localProperties = new HashMap<PropertyType,PropertyValue>( externalized.getPropertyTypes().length );
+            localProperties = new HashMap<>( externalized.getPropertyTypes().length );
             for( int i=externalized.getPropertyTypes().length-1 ; i>=0 ; --i ) {
-                
+
                 try {
-                    PropertyType type = (PropertyType) modelBase.findMeshTypeByIdentifier( externalized.getPropertyTypes()[i] );             
+                    PropertyType type = (PropertyType) modelBase.findMeshTypeByIdentifier( externalized.getPropertyTypes()[i] );
                     localProperties.put( type, externalized.getPropertyValues()[i] );
                 } catch( MeshTypeNotFoundException ex ) {
                     log.error( ex );
@@ -149,7 +148,7 @@ public class StoreShadowMeshBaseLifecycleManager
         MeshObjectIdentifier []    neighbors = externalized.getNeighbors();
         RoleType [][]              roleTypes = null;
         NetMeshObjectIdentifier [] realNeighbors;
-        
+
         if( neighbors != null && neighbors.length > 0 ) {
             roleTypes      = new RoleType[ neighbors.length ][];
             realNeighbors = new NetMeshObjectIdentifier[ neighbors.length ];
@@ -203,13 +202,6 @@ public class StoreShadowMeshBaseLifecycleManager
             relationshipProxies = null;
         }
 
-        NetMeshObjectIdentifier [] equivalents = externalized.getEquivalents();
-        
-        NetMeshObjectIdentifier [] leftRight
-                = (NetMeshObjectIdentifier []) AMeshObjectEquivalenceSetComparator.SINGLETON.findLeftAndRightEquivalents(
-                        externalized.getIdentifier(),
-                        equivalents );
-
         AnetMeshObject ret = new AnetMeshObject(
                 identifier,
                 realBase,
@@ -219,7 +211,6 @@ public class StoreShadowMeshBaseLifecycleManager
                 externalized.getTimeExpires(),
                 localProperties,
                 types,
-                leftRight,
                 realNeighbors,
                 roleTypes,
                 externalized.getGiveUpHomeReplica(),
@@ -232,6 +223,6 @@ public class StoreShadowMeshBaseLifecycleManager
         putIntoMeshBase( ret, null ); // this does not create an event
 
         // no transaction
-        return ret;        
+        return ret;
     }
 }

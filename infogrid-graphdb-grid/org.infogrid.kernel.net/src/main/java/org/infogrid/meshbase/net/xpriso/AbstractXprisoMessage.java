@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -26,7 +26,7 @@ public abstract class AbstractXprisoMessage
     /**
      * Constructor. This does not pass the requestId and responseId as they
      * are set by the communications framework.
-     * 
+     *
      * @param sender identifies the sender of this message
      * @param receiver identifies the receiver of this message
      */
@@ -40,19 +40,21 @@ public abstract class AbstractXprisoMessage
 
     /**
      * Obtain the NetMeshBaseIdentifier of the sender.
-     * 
+     *
      * @return the sender's NetMeshBaseIdentifier
      */
+    @Override
     public NetMeshBaseIdentifier getSenderIdentifier()
     {
         return theSenderIdentifier;
     }
-    
+
     /**
      * Obtain the NetMeshBaseIdentifier of the receiver.
-     * 
+     *
      * @return the receiver's NetMeshBaseIdentifier
      */
+    @Override
     public NetMeshBaseIdentifier getReceiverIdentifier()
     {
         return theReceiverIdentifier;
@@ -63,6 +65,7 @@ public abstract class AbstractXprisoMessage
      *
      * @return the request ID
      */
+    @Override
     public long getRequestId()
     {
         return theRequestId;
@@ -73,6 +76,7 @@ public abstract class AbstractXprisoMessage
      *
      * @return the response ID
      */
+    @Override
     public long getResponseId()
     {
         return theResponseId;
@@ -83,11 +87,12 @@ public abstract class AbstractXprisoMessage
      *
      * @return if true, cease communications
      */
+    @Override
     public boolean getCeaseCommunications()
     {
         return theCeaseCommunications;
     }
-    
+
     /**
      * Default implementation of equals().
      *
@@ -110,12 +115,6 @@ public abstract class AbstractXprisoMessage
             return false;
         }
         if( !arraysEquals( getDeletions(), realOther.getDeletions() )) {
-            return false;
-        }
-        if( !arraysEquals( getEquivalentsAdditions(), realOther.getEquivalentsAdditions() )) {
-            return false;
-        }
-        if( !arraysEquals( getEquivalentsRemovals(), realOther.getEquivalentsRemovals() )) {
             return false;
         }
         if( !arraysEquals( getNeighborAdditions(), realOther.getNeighborAdditions() )) {
@@ -180,7 +179,7 @@ public abstract class AbstractXprisoMessage
 
     /**
      * Default implementation for hash code.
-     * 
+     *
      * @return hash code
      */
     @Override
@@ -188,10 +187,10 @@ public abstract class AbstractXprisoMessage
     {
         // following the default NetBeans implementation here. We don't deal with a lot of content -- likely not necessary
         // because of the uniqueness of request/response and sender/receiver
-        
+
         int hash = 5;
 
-        hash = 79 * hash + ( int ) ( theRequestId  ^ ( theRequestId  >>> 32 ) );        
+        hash = 79 * hash + ( int ) ( theRequestId  ^ ( theRequestId  >>> 32 ) );
         hash = 79 * hash + ( int ) ( theResponseId ^ ( theResponseId >>> 32 ) );
         hash = 79 * hash + ( theSenderIdentifier != null ? theSenderIdentifier.hashCode() : 0 );
         hash = 79 * hash + ( theReceiverIdentifier != null ? theReceiverIdentifier.hashCode() : 0 );
@@ -204,6 +203,7 @@ public abstract class AbstractXprisoMessage
      *
      * @throws IllegalStateException thrown if the XprisoMessage is not internally correct
      */
+    @Override
     public void check()
             throws
                 IllegalStateException
@@ -311,12 +311,12 @@ public abstract class AbstractXprisoMessage
      * The return address. This is the same as the sender's address.
      */
     protected NetMeshBaseIdentifier theSenderIdentifier;
-    
+
     /**
      * The destination address.
      */
     protected NetMeshBaseIdentifier theReceiverIdentifier;
-    
+
     /**
      * If true, this indicates that communications should cease after this message.
      */

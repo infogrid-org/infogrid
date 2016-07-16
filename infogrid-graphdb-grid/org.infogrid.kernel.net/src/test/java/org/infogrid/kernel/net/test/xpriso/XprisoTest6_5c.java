@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -108,17 +108,17 @@ public class XprisoTest6_5c
         Thread.sleep( PINGPONG_ROUNDTRIP_DURATION ); // need to wait here as the operation is not synchronous
 
         //
-        
+
         log.debug( "Checking replication" );
-        
+
         NetMeshObject obj2_mb2 = mb2.findMeshObjectByIdentifier( obj2_mb1.getIdentifier() );
-        
+
         checkNotObject( obj2_mb2, "obj2 in mb2 should not have been replicated" );
 
         //
-        
+
         log.debug( "Checking proxies (3)" );
-        
+
         checkProxies( obj1_mb1, new NetMeshBase[] { mb2 }, null, null, "obj1_mb1 has wrong proxies" );
         checkProxies( obj1_mb2, new NetMeshBase[] { mb1 }, mb1,  mb1,  "obj1_mb2 has wrong proxies" );
         checkProxies( obj2_mb1, new NetMeshBase[] {},      null, null, "obj2_mb1 has wrong proxies" );
@@ -130,14 +130,14 @@ public class XprisoTest6_5c
 
         log.info( "Checking mb2 relationship." );
 
-        MeshObjectSet neighbors1_mb2 = obj1_mb2.traverseToNeighborMeshObjects( false );
-        MeshObjectSet related1_mb2   = obj1_mb2.traverse( TestSubjectArea.AR1A.getSource(), false );
+        MeshObjectSet neighbors1_mb2 = obj1_mb2.traverseToNeighborMeshObjects();
+        MeshObjectSet related1_mb2   = obj1_mb2.traverse( TestSubjectArea.AR1A.getSource());
 
         obj2_mb2 = mb2.findMeshObjectByIdentifier(  obj2_mb1.getIdentifier() ); // now it has been replicated
 
-        MeshObjectSet neighbors2_mb2 = obj2_mb2.traverseToNeighborMeshObjects( false );
-        MeshObjectSet related2_mb2   = obj2_mb2.traverse( TestSubjectArea.AR1A.getDestination(), false );
-        
+        MeshObjectSet neighbors2_mb2 = obj2_mb2.traverseToNeighborMeshObjects();
+        MeshObjectSet related2_mb2   = obj2_mb2.traverse( TestSubjectArea.AR1A.getDestination());
+
         checkEquals( neighbors1_mb2.size(), 1, "obj1 in mb2 has wrong number of neighbors" );
         checkEquals( related1_mb2.size(),   1, "obj1 in mb2 has wrong number of relationships" );
         checkEquals( neighbors2_mb2.size(), 1, "obj2 in mb2 has wrong number of neighbors" );
@@ -151,11 +151,11 @@ public class XprisoTest6_5c
 
         log.info( "Checking mb1 relationship." );
 
-        MeshObjectSet neighbors1_mb1 = obj1_mb1.traverseToNeighborMeshObjects( false );
-        MeshObjectSet related1_mb1   = obj1_mb1.traverse( TestSubjectArea.AR1A.getSource(), false );
-        MeshObjectSet neighbors2_mb1 = obj2_mb1.traverseToNeighborMeshObjects( false );
-        MeshObjectSet related2_mb1   = obj2_mb1.traverse( TestSubjectArea.AR1A.getDestination(), false );
-        
+        MeshObjectSet neighbors1_mb1 = obj1_mb1.traverseToNeighborMeshObjects();
+        MeshObjectSet related1_mb1   = obj1_mb1.traverse( TestSubjectArea.AR1A.getSource() );
+        MeshObjectSet neighbors2_mb1 = obj2_mb1.traverseToNeighborMeshObjects();
+        MeshObjectSet related2_mb1   = obj2_mb1.traverse( TestSubjectArea.AR1A.getDestination() );
+
         checkEquals( neighbors1_mb1.size(), 1, "obj1 in mb1 has wrong number of neighbors" );
         checkEquals( related1_mb1.size(),   1, "obj1 in mb1 has wrong number of relationships" );
         checkEquals( neighbors2_mb1.size(), 1, "obj2 in mb1 has wrong number of neighbors" );
@@ -174,10 +174,10 @@ public class XprisoTest6_5c
             Exception
     {
         super.setup();
-        
+
         net1 = theMeshBaseIdentifierFactory.fromExternalForm( "test://one.local" );
         net2 = theMeshBaseIdentifierFactory.fromExternalForm( "test://two.local" );
-        
+
         MPingPongNetMessageEndpointFactory endpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactory.setNameServer( theNameServer );
 
@@ -198,7 +198,7 @@ public class XprisoTest6_5c
     {
         mb1.die();
         mb2.die();
-        
+
         exec.shutdown();
     }
 
@@ -228,5 +228,5 @@ public class XprisoTest6_5c
     protected ScheduledExecutorService exec = createThreadPool( 3 ); // I think we need three
 
     // Our Logger
-    private static Log log = Log.getLogInstance( XprisoTest6_5c.class  );
+    private static final Log log = Log.getLogInstance( XprisoTest6_5c.class  );
 }

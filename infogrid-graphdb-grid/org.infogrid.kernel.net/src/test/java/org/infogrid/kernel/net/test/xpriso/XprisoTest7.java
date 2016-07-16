@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -168,7 +168,7 @@ public class XprisoTest7
 
         log.info( "Checking mb2 relationship." );
 
-        MeshObjectSet neighbors1_mb2 = obj1_mb2.traverseToNeighborMeshObjects( false );
+        MeshObjectSet neighbors1_mb2 = obj1_mb2.traverseToNeighborMeshObjects();
         MeshObjectSet rsReplica_mb2  = obj1_mb2.traverse( TestSubjectArea.AR1A.getSource() );
 
         checkEquals( neighbors1_mb2.size(), 1, "obj1 in mb2 has wrong number of neighbors" );
@@ -178,7 +178,7 @@ public class XprisoTest7
 
         log.info( "Checking mb1 relationship." );
 
-        MeshObjectSet neighbors1_mb1 = obj1_mb1.traverseToNeighborMeshObjects( false );
+        MeshObjectSet neighbors1_mb1 = obj1_mb1.traverseToNeighborMeshObjects();
         MeshObjectSet rsReplica_mb1  = obj1_mb1.traverse( TestSubjectArea.AR1A.getSource() );
 
         checkEquals( neighbors1_mb1.size(), 1, "obj1 in mb1 has wrong number of neighbors" );
@@ -190,7 +190,7 @@ public class XprisoTest7
 
         // now do it the other way round
         MeshObjectSet rsReplica_mb3  = obj1_mb3.traverse( TestSubjectArea.AR1A.getSource() );
-        MeshObjectSet neighbors1_mb3 = obj1_mb3.traverseToNeighborMeshObjects( false );
+        MeshObjectSet neighbors1_mb3 = obj1_mb3.traverseToNeighborMeshObjects();
 
         checkEquals( rsReplica_mb3.size(),  1, "obj1 in mb3 has wrong number of relationships" );
         checkEquals( neighbors1_mb3.size(), 1, "obj1 in mb3 has wrong number of neighbors" );
@@ -208,7 +208,7 @@ public class XprisoTest7
             Exception
     {
         super.setup();
-        
+
         net1 = theMeshBaseIdentifierFactory.fromExternalForm( "test://one.local" );
         net2 = theMeshBaseIdentifierFactory.fromExternalForm( "test://two.local" );
         net3 = theMeshBaseIdentifierFactory.fromExternalForm( "test://three.local" );
@@ -241,7 +241,7 @@ public class XprisoTest7
         mb1.die();
         mb2.die();
         mb3.die();
-        
+
         exec1.shutdown();
         exec2.shutdown();
         exec3.shutdown();
@@ -285,5 +285,5 @@ public class XprisoTest7
     protected ScheduledExecutorService exec3 = createThreadPool( 1 ); // I think we need three
 
     // Our Logger
-    private static Log log = Log.getLogInstance( XprisoTest7_5.class );
+    private static final Log log = Log.getLogInstance( XprisoTest7_5.class );
 }

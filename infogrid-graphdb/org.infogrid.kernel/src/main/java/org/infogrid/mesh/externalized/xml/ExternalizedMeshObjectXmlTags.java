@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -40,16 +40,13 @@ public interface ExternalizedMeshObjectXmlTags
 
     /** Tag indicating the Identifier of a MeshObject. */
     public static final String IDENTIFIER_TAG = "ID";
-    
+
     /** Tag indicating meta, aka type information. */
     public static final String TYPE_TAG = "T";
 
     /** Tag indicating a PropertyType. */
     public static final String PROPERTY_TYPE_TAG = "PT";
-    
+
     /** Tag indicating a Relationship. */
     public static final String RELATIONSHIP_TAG = "R";
-
-    /** Tag indicating an equivalent */
-    public static final String EQUIVALENT_TAG = "EQ";    
 }

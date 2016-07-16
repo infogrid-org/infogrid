@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -35,7 +35,7 @@ public abstract class AbstractExternalizedMeshObject
 
     /**
      * Constructor for subclasses only. Set all local properties.
-     * 
+     *
      * @param identifier the MeshObjectIdentifier of the MeshObject
      * @param timeCreated the time the MeshObject was created
      * @param timeUpdated the time the MeshObject was last updated
@@ -61,6 +61,7 @@ public abstract class AbstractExternalizedMeshObject
      *
      * @return the MeshObjectIdentifier of the MeshObject
      */
+    @Override
     public MeshObjectIdentifier getIdentifier()
     {
         return theIdentifier;
@@ -71,6 +72,7 @@ public abstract class AbstractExternalizedMeshObject
      *
      * @return the time the MeshObject was created, in System.currentTimeMillis() format
      */
+    @Override
     public long getTimeCreated()
     {
         return theTimeCreated;
@@ -81,6 +83,7 @@ public abstract class AbstractExternalizedMeshObject
      *
      * @return the time the MeshObject was last updated, in System.currentTimeMillis() format
      */
+    @Override
     public long getTimeUpdated()
     {
         return theTimeUpdated;
@@ -91,6 +94,7 @@ public abstract class AbstractExternalizedMeshObject
      *
      * @return the time the MeshObject was last read, in System.currentTimeMillis() format
      */
+    @Override
     public long getTimeRead()
     {
         return theTimeRead;
@@ -101,6 +105,7 @@ public abstract class AbstractExternalizedMeshObject
      *
      * @return the time the MeshObject will expire, in System.currentTimeMillis() format, or -1 if never.
      */
+    @Override
     public long getTimeExpires()
     {
         return theTimeExpires;
@@ -119,7 +124,7 @@ public abstract class AbstractExternalizedMeshObject
         if( !( other instanceof ExternalizedMeshObject )) {
             return false;
         }
-        
+
         ExternalizedMeshObject realOther = (ExternalizedMeshObject) other;
 
         if( !theIdentifier.equals( realOther.getIdentifier() )) {
@@ -154,16 +159,13 @@ public abstract class AbstractExternalizedMeshObject
                 return false;
             }
         }
-        if( !ArrayHelper.hasSameContentOutOfOrder( getEquivalents(), realOther.getEquivalents(), true )) {
-            return false;
-        }
 
         return true;
     }
-    
+
     /**
      * Determine HashCode.
-     * 
+     *
      * @return hash code
      */
     @Override
@@ -191,7 +193,7 @@ public abstract class AbstractExternalizedMeshObject
      * Our time of last read in System.currentTimeMillis() format.
      */
     protected long theTimeRead = -1L;
-    
+
     /**
      * Our time of expiration in System.currentTimeMillis() format.
      */

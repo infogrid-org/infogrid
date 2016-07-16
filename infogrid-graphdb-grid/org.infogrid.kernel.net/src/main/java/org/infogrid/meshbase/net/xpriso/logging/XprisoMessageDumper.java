@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -20,8 +20,6 @@ import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsAddedEvent;
-import org.infogrid.meshbase.net.transaction.NetMeshObjectEquivalentsRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborRemovedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectPropertyChangeEvent;
@@ -280,32 +278,6 @@ public class XprisoMessageDumper
             emit( "\n    neighborRemovals:" );
             for( NetMeshObjectNeighborRemovedEvent current : obj.getNeighborRemovals() ) {
                 emit( "\n        " );
-                emit( current.getAffectedMeshObjectIdentifier().toExternalForm() );
-                for( MeshObjectIdentifier neigh : current.getDeltaValueIdentifier() ) {
-                    emit( " - " );
-                    emit( neigh.toExternalForm() );
-                }
-            }
-        }
-
-        if( obj.getEquivalentsAdditions().length > 0 ) {
-            emit( "\n    equivalentAdditions:" );
-            for( NetMeshObjectEquivalentsAddedEvent current : obj.getEquivalentsAdditions() ) {
-                emit( "\n        " );
-                emit( current.getAffectedMeshObjectIdentifier().toExternalForm() );
-                emit( current.getAffectedMeshObjectIdentifier().toExternalForm() );
-                for( MeshObjectIdentifier neigh : current.getDeltaValueIdentifier() ) {
-                    emit( " + " );
-                    emit( neigh.toExternalForm() );
-                }
-            }
-        }
-
-        if( obj.getEquivalentsRemovals().length > 0 ) {
-            emit( "\n    equivalentRemovals:" );
-            for( NetMeshObjectEquivalentsRemovedEvent current : obj.getEquivalentsRemovals() ) {
-                emit( "\n        " );
-                emit( current.getAffectedMeshObjectIdentifier().toExternalForm() );
                 emit( current.getAffectedMeshObjectIdentifier().toExternalForm() );
                 for( MeshObjectIdentifier neigh : current.getDeltaValueIdentifier() ) {
                     emit( " - " );

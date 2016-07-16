@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -56,6 +56,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the underlying MeshObject
      */
+    @Override
     public final MeshObject get_Delegate()
     {
         return the_Delegate;
@@ -67,6 +68,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the MeshObjectType
      */
+    @Override
     public final EntityType get_Type()
     {
         return the_Delegate.getTypeFor( this );
@@ -77,6 +79,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the globally unique identifier of this MeshObject
      */
+    @Override
     public final MeshObjectIdentifier getIdentifier()
     {
         return the_Delegate.getIdentifier();
@@ -90,6 +93,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @param toTest the Identifier to test against
      * @return true if this HasIdentifier is being identified by the provided Identifier
      */
+    @Override
     public boolean isIdentifiedBy(
             Identifier toTest )
     {
@@ -102,6 +106,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the MeshBase that contains this MeshObject.
      */
+    @Override
     public final MeshBase get_MeshBase()
     {
         return the_Delegate.getMeshBase();
@@ -113,6 +118,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the time this MeshObject was created, in System.currentTimeMillis() format
      */
+    @Override
     public final long getTimeCreated()
     {
         return the_Delegate.getTimeCreated();
@@ -124,6 +130,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the time this MeshObject was last updated, in System.currentTimeMillis() format
      */
+    @Override
     public final long getTimeUpdated()
     {
         return the_Delegate.getTimeUpdated();
@@ -135,6 +142,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the time this MeshObject was last read, in System.currentTimeMillis() format
      */
+    @Override
     public final long getTimeRead()
     {
         return the_Delegate.getTimeRead();
@@ -146,6 +154,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @param newValue the new value, in <code>System.currentTimeMillis()</code> format
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public final void setTimeExpires(
             long newValue )
         throws
@@ -159,6 +168,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the time at which this MeshObject expires, in System.currentTimeMillis() format
      */
+    @Override
     public final long getTimeExpires()
     {
         return the_Delegate.getTimeExpires();
@@ -169,6 +179,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return true if the MeshObject is dead
      */
+    @Override
     public final boolean getIsDead()
     {
         return the_Delegate.getIsDead();
@@ -180,6 +191,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @throws IsDeadException thrown if this MeshObject is dead already
      */
+    @Override
     public final void checkAlive()
         throws
             IsDeadException
@@ -196,24 +208,10 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the set of MeshObjects that are directly related to this MeshObject
      */
+    @Override
     public final MeshObjectSet traverseToNeighborMeshObjects()
     {
         return the_Delegate.traverseToNeighborMeshObjects();
-    }
-
-    /**
-     * Traverse from this MeshObject to all directly related MeshObjects. Directly
-     * related MeshObjects are those MeshObjects that are participating in a
-     * relationship with this MeshObject. Specify whether to consider equivalents
-     * as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     * @return the set of MeshObjects that are directly related to this MeshObject
-     */
-    public final MeshObjectSet traverseToNeighborMeshObjects(
-            boolean considerEquivalents )
-    {
-        return the_Delegate.traverseToNeighborMeshObjects( considerEquivalents );
     }
 
     /**
@@ -227,6 +225,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @see #unrelate
      * @see #relateAndBless
      */
+    @Override
     public final void relate(
             TypedMeshObjectFacade otherObject )
         throws
@@ -246,6 +245,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      * @see #relate
      */
+    @Override
     public final void unrelate(
             TypedMeshObjectFacade otherObject )
         throws
@@ -262,6 +262,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @param otherObject the MeshObject to which this MeshObject may be related
      * @return true if this MeshObject is currently related to otherObject
      */
+    @Override
     public final boolean isRelated(
             TypedMeshObjectFacade otherObject )
     {
@@ -284,6 +285,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @see #relateAndBless
      * @see #unrelate
      */
+    @Override
     public final void blessRelationship(
             RoleType              thisEnd,
             TypedMeshObjectFacade otherObject )
@@ -315,6 +317,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @see #relateAndBless
      * @see #unrelate
      */
+    @Override
     public final void blessRelationship(
             RoleType []           thisEnd,
             TypedMeshObjectFacade otherObject )
@@ -345,6 +348,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @see #blessRelationship
      * @see #unrelate
      */
+    @Override
     public final void relateAndBless(
             RoleType              thisEnd,
             TypedMeshObjectFacade otherObject )
@@ -374,6 +378,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @see #blessRelationship
      * @see #unrelate
      */
+    @Override
     public final void relateAndBless(
             RoleType []           thisEnd,
             TypedMeshObjectFacade otherObject )
@@ -397,6 +402,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public final void unblessRelationship(
             RoleType              thisEnd,
             TypedMeshObjectFacade otherObject )
@@ -420,6 +426,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public final void unblessRelationship(
             RoleType []           thisEnd,
             TypedMeshObjectFacade otherObject )
@@ -439,26 +446,11 @@ public abstract class TypedMeshObjectFacadeImpl
       * @param theTraverseSpec the TraversalSpecification to traverse
       * @return the set of MeshObjects found as a result of the traversal
       */
+    @Override
     public final MeshObjectSet traverse(
             TraversalSpecification theTraverseSpec )
     {
         return the_Delegate.traverse( theTraverseSpec );
-    }
-
-    /**
-      * Traverse a TraversalSpecification from this MeshObject to obtain a set of MeshObjects.
-      * Specify whether relationships of equivalent MeshObjects should be considered as well.
-      *
-      * @param theTraverseSpec the TraversalSpecification to traverse
-      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-      *        if false, only this MeshObject will be used as the start
-      * @return the set of MeshObjects found as a result of the traversal
-      */
-    public final MeshObjectSet traverse(
-            TraversalSpecification theTraverseSpec,
-            boolean                considerEquivalents )
-    {
-        return the_Delegate.traverse( theTraverseSpec, considerEquivalents );
     }
 
     /**
@@ -468,25 +460,10 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the RoleTypes that this MeshObject currently participates in.
      */
+    @Override
     public final RoleType [] get_RoleTypes()
     {
         return the_Delegate.getRoleTypes();
-    }
-
-    /**
-     * Obtain the RoleTypes that this MeshObject currently participates in. This will return only one
-     * instance of the same RoleType object, even if the MeshObject participates in this RoleType
-     * multiple times with different other MeshObjects. Specify whether equivalent MeshObjects
-     * should be considered as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the RoleTypes that this MeshObject currently participates in.
-     */
-    public final RoleType [] get_RoleTypes(
-            boolean considerEquivalents )
-    {
-        return the_Delegate.getRoleTypes( considerEquivalents );
     }
 
     /**
@@ -500,21 +477,6 @@ public abstract class TypedMeshObjectFacadeImpl
     }
 
     /**
-     * Obtain the Roles that this MeshObject currently participates in.
-     * Specify whether relationships of equivalent MeshObjects
-     * should be considered as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     *        if false, only this MeshObject will be used as the start
-     * @return the Roles that this MeshObject currently participates in.
-     */
-    public final Role [] get_Roles(
-            boolean considerEquivalents )
-    {
-        return the_Delegate.getRoles( considerEquivalents );
-    }
-
-    /**
      * Obtain the RoleTypes that this MeshObject currently participates in with the
      * specified other MeshObject.
      *
@@ -522,79 +484,13 @@ public abstract class TypedMeshObjectFacadeImpl
      * @return the RoleTypes that this MeshObject currently participates in.
      * @throws NotRelatedException thrown if this MeshObject and otherObject are not related
      */
+    @Override
     public final RoleType [] get_RoleTypes(
             TypedMeshObjectFacade otherObject )
         throws
             NotRelatedException
     {
         return the_Delegate.getRoleTypes( otherObject.get_Delegate() );
-    }
-
-    /**
-     * Obtain the RoleTypes that this MeshObject currently participates in with the
-     * specified other MeshObject.
-     * Specify whether relationships of equivalent MeshObjects should be considered
-     * as well.
-     *
-     * @param otherObject the other MeshObject
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the RoleTypes that this MeshObject currently participates in.
-     * @throws NotRelatedException thrown if this MeshObject and otherObject are not related
-     */
-    public final RoleType [] get_RoleTypes(
-            TypedMeshObjectFacade otherObject,
-            boolean               considerEquivalents )
-        throws
-            NotRelatedException
-    {
-        return the_Delegate.getRoleTypes( otherObject.get_Delegate(), considerEquivalents );
-    }
-
-    /**
-     * Add another MeshObject as an equivalent. All MeshObjects that are already equivalent
-     * to this MeshObject, and all MeshObjects that are already equivalent to the newly
-     * added MeshObject, are now equivalent.
-     *
-     * @param equiv the new equivalent
-     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public final void addAsEquivalent(
-            TypedMeshObjectFacade equiv )
-        throws
-            EquivalentAlreadyException,
-            TransactionException,
-            NotPermittedException
-    {
-        the_Delegate.addAsEquivalent( equiv.get_Delegate() );
-    }
-
-    /**
-     * Obtain the set of MeshObjects, including this one, that are equivalent.
-     * This always returns at least this MeshObject.
-     *
-     * @return the set of MeshObjects that are equivalent
-     */
-    public final MeshObjectSet get_Equivalents()
-    {
-        return the_Delegate.getEquivalents();
-    }
-
-    /**
-     * Remove this MeshObject as an equivalent from the set of equivalents. If this MeshObject
-     * is not currently equivalent to any other MeshObject, this does nothing.
-     *
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public final void removeAsEquivalent()
-        throws
-            TransactionException,
-            NotPermittedException
-    {
-        the_Delegate.removeAsEquivalent();
     }
 
     /**
@@ -607,6 +503,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @see #addSoftPropertyChangeListener
      * @see #removePropertyChangeListener
      */
+    @Override
     public final void addDirectPropertyChangeListener(
             PropertyChangeListener newListener )
     {
@@ -624,6 +521,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @see #addSoftPropertyChangeListener
      * @see #removePropertyChangeListener
      */
+    @Override
     public final void addWeakPropertyChangeListener(
             PropertyChangeListener newListener )
     {
@@ -641,6 +539,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @see #addWeakPropertyChangeListener
      * @see #removePropertyChangeListener
      */
+    @Override
     public final void addSoftPropertyChangeListener(
             PropertyChangeListener newListener )
     {
@@ -655,6 +554,7 @@ public abstract class TypedMeshObjectFacadeImpl
      * @see #addWeakPropertyChangeListener
      * @see #addSoftPropertyChangeListener
      */
+    @Override
     public final void removePropertyChangeListener(
             PropertyChangeListener oldListener )
     {
@@ -666,6 +566,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return true if there is at least one currently subscribed PropertyChangeListener.
      */
+    @Override
     public final boolean hasPropertyChangeListener()
     {
         return the_Delegate.hasPropertyChangeListener();
@@ -676,6 +577,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the Iterator over the currently subscribed PropertyChangeListeners
      */
+    @Override
     public final Iterator<PropertyChangeListener> propertyChangeListenersIterator()
     {
         return the_Delegate.propertyChangeListenersIterator();
@@ -686,6 +588,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {
@@ -716,6 +619,7 @@ public abstract class TypedMeshObjectFacadeImpl
      *
      * @return the user-visible String representing this instance
      */
+    @Override
     public String get_UserVisibleString()
     {
         return null;

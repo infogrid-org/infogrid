@@ -5,21 +5,21 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.mesh.net.a;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.infogrid.mesh.EntityBlessedAlreadyException;
 import org.infogrid.mesh.EntityNotBlessedException;
-import org.infogrid.mesh.EquivalentAlreadyException;
 import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.IsAbstractException;
@@ -82,7 +82,7 @@ import org.infogrid.util.logging.Log;
 /**
  * <p>Subclasses AMeshObject to add information necessary for NetMeshBases according
  * to the NetMeshObject interface.</p>
- * 
+ *
  * <p>To save memory, lock operations are synchronized on theIdentifier instead of a
  * (cleaner) additional object; they cannot be synchronized on the AnetMeshObject itself
  * as this conflicts with property change operations' synchronization which may trigger
@@ -99,7 +99,7 @@ public class AnetMeshObject
 
     /**
      * Constructor for regular instantiation.
-     * 
+     *
      * @param identifier the NetMeshObjectIdentifier of the NetMeshObject
      * @param meshBase the NetMeshBase that this NetMeshObject belongs to
      * @param created the time this NetMeshObject was created
@@ -136,7 +136,7 @@ public class AnetMeshObject
 
     /**
      * Constructor for re-instantiation from external storage.
-     * 
+     *
      * @param identifier the MeshObjectIdentifier of the MeshObject
      * @param meshBase the MeshBase that this MeshObject belongs to
      * @param created the time this MeshObject was created
@@ -145,7 +145,6 @@ public class AnetMeshObject
      * @param expires the time this MeshObject will expire
      * @param properties the properties with their values of the MeshObject, if any
      * @param meshTypes the MeshTypes and facdes of the MeshObject, if any
-     * @param equivalents either an array of length 2, or null. If given, contains the left and right equivalence pointers.
      * @param otherSides the current neighbors of the MeshObject, given as Identifiers
      * @param roleTypes the RoleTypes of the relationships with the various neighbors, in sequence
      * @param giveUpHomeReplica if true, this replica will give up home replica status when asked
@@ -164,7 +163,6 @@ public class AnetMeshObject
             long                                expires,
             HashMap<PropertyType,PropertyValue> properties,
             EntityType []                       meshTypes,
-            NetMeshObjectIdentifier []          equivalents,
             NetMeshObjectIdentifier []          otherSides,
             RoleType [][]                       roleTypes,
             boolean                             giveUpHomeReplica,
@@ -182,7 +180,6 @@ public class AnetMeshObject
                 expires,
                 properties,
                 meshTypes,
-                equivalents,
                 otherSides,
                 roleTypes );
 
@@ -193,7 +190,7 @@ public class AnetMeshObject
         theProxyTowardsLockIndex = proxyTowardsLockIndex;
         theRelationshipProxies   = relationshipProxies;
     }
-    
+
     /**
      * Obtain the globally unique identifier of this NetMeshObject.
      *
@@ -237,6 +234,7 @@ public class AnetMeshObject
      * @param p the Proxy
      * @return the NetMeshObjectIdentifiers of the neighbors, if any, according to the Proxy
      */
+    @Override
     public NetMeshObjectIdentifier [] getNeighborMeshObjectIdentifiersAccordingTo(
             Proxy p )
     {
@@ -251,6 +249,7 @@ public class AnetMeshObject
       *
       * @return returns true if this is replica has the update rights
       */
+    @Override
     public boolean hasLock()
     {
         return theProxyTowardsLockIndex == HERE_CONSTANT;
@@ -262,6 +261,7 @@ public class AnetMeshObject
      * @return returns true if we have update rights, or we were successful obtaining them.
      * @throws RemoteQueryTimeoutException thrown if the replica that has the lock could not be contacted or did not reply in the time alloted
      */
+    @Override
     public boolean tryToObtainLock()
         throws
             RemoteQueryTimeoutException
@@ -276,6 +276,7 @@ public class AnetMeshObject
      * @return returns true if we have update rights, or we were successful obtaining them.
      * @throws RemoteQueryTimeoutException thrown if the replica that has the lock could not be contacted or did not reply in the time alloted
      */
+    @Override
     public boolean tryToObtainLock(
             long duration )
         throws
@@ -308,9 +309,9 @@ public class AnetMeshObject
         } catch( InterruptedException ex ) {
             log.error( ex );
         }
-        
+
         if( theProxyTowardsLockIndex == HERE_CONSTANT ) {
-            AnetMeshBase realBase = (AnetMeshBase) theMeshBase;                
+            AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
             realBase.addReplicationChangedObject( this );
 
             fireLockGainedEvent();
@@ -325,12 +326,13 @@ public class AnetMeshObject
     /**
      * Attempt to move update rights to the NetMeshBase that can be found through the
      * specified Proxy. This requires this NetMeshObject to have the update rights.
-     * 
+     *
      * @param outgoingProxy the Proxy
      * @return returns true if the update rights were moved
      * @throws DoNotHaveLockException thrown if this NetMeshObject does not have update rights
      * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
      */
+    @Override
     public boolean tryToPushLock(
             Proxy outgoingProxy )
         throws
@@ -339,17 +341,18 @@ public class AnetMeshObject
     {
         return tryToPushLock( outgoingProxy, -1L );
     }
-            
+
     /**
      * Attempt to move update rights to the NetMeshBase that can be found through the
      * specified Proxy. Specify a timeout in milliseconds. This requires this NetMeshObject to have the update rights.
-     * 
+     *
      * @param outgoingProxy the Proxy
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return returns true if the update rights were moved
      * @throws DoNotHaveLockException thrown if this NetMeshObject does not have update rights
      * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
      */
+    @Override
     public boolean tryToPushLock(
             Proxy outgoingProxy,
             long  duration )
@@ -386,7 +389,7 @@ public class AnetMeshObject
                 }
                 theProxyTowardsLockIndex = theProxies.length - 1;
 
-                AnetMeshBase realBase = (AnetMeshBase) theMeshBase;                
+                AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
                 realBase.addReplicationChangedObject( this );
             }
         }
@@ -404,7 +407,7 @@ public class AnetMeshObject
         } catch( InterruptedException ex ) {
             log.error( ex );
         }
-        
+
         if( theProxyTowardsLockIndex != HERE_CONSTANT ) {
             fireLockLostEvent();
 
@@ -414,12 +417,13 @@ public class AnetMeshObject
             return false;
         }
     }
-    
+
     /**
      * Forced recovery of the lock by the home replica.
-     * 
+     *
      * @throws NotHomeReplicaException thrown if this method is invoked on a replica other than the home replica
      */
+    @Override
     public void forceLockRecovery()
             throws
                 NotHomeReplicaException
@@ -449,12 +453,12 @@ public class AnetMeshObject
             log.error( ex );
         }
 
-        AnetMeshBase realBase = (AnetMeshBase) theMeshBase;                
+        AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
         realBase.addReplicationChangedObject( this );
 
         fireLockGainedEvent();
     }
-    
+
     /**
       * Determine whether this replica is going to give up update rights if it has them,
       * in case someone asks. This only says "if this replica has update rights, it will
@@ -464,6 +468,7 @@ public class AnetMeshObject
       * @return if true, this replica will give up update rights when asked
       * @see #getWillGiveUpLock
       */
+    @Override
     public boolean getWillGiveUpLock()
     {
         return theGiveUpLock;
@@ -478,15 +483,16 @@ public class AnetMeshObject
       * @param yesNo if true, this replica will give update rights when asked
       * @see #getWillGiveUpLock
       */
+    @Override
     public void setWillGiveUpLock(
             boolean yesNo )
     {
         if( yesNo != theGiveUpLock ) {
             theGiveUpLock = yesNo; // currently does not generate events
-            
+
             AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
             realBase.addReplicationChangedObject( this );
-        }        
+        }
     }
 
     /**
@@ -495,6 +501,7 @@ public class AnetMeshObject
      *
      * @return the Proxy in the direction of the update rights
      */
+    @Override
     public Proxy getProxyTowardsLockReplica()
     {
         if( theProxyTowardsLockIndex == HERE_CONSTANT ) {
@@ -503,12 +510,13 @@ public class AnetMeshObject
             return theProxies[ theProxyTowardsLockIndex ];
         }
     }
-    
+
     /**
      * Determine whether this the home replica.
      *
      * @return returns true if this is the home replica
      */
+    @Override
     public boolean isHomeReplica()
     {
         return theHomeProxyIndex == HERE_CONSTANT;
@@ -520,6 +528,7 @@ public class AnetMeshObject
      * @return returns true if we have home replica status, or we were successful obtaining it.
      * @throws RemoteQueryTimeoutException thrown if the replica that has home replica status could not be contacted or did not reply in the time alloted
      */
+    @Override
     public boolean tryToObtainHomeReplica()
         throws
             RemoteQueryTimeoutException
@@ -534,6 +543,7 @@ public class AnetMeshObject
      * @return returns true if we have home replica status, or we were successful obtaining it.
      * @throws RemoteQueryTimeoutException thrown if the replica that has home replica status could not be contacted or did not reply in the time alloted
      */
+    @Override
     public boolean tryToObtainHomeReplica(
             long duration )
         throws
@@ -564,9 +574,9 @@ public class AnetMeshObject
         } catch( InterruptedException ex ) {
             log.error( ex );
         }
-        
+
         if( theHomeProxyIndex == HERE_CONSTANT ) {
-            AnetMeshBase realBase = (AnetMeshBase) theMeshBase;                
+            AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
             realBase.addReplicationChangedObject( this );
 
             fireHomeReplicaGainedEvent();
@@ -575,18 +585,19 @@ public class AnetMeshObject
 
         } else {
             return false;
-        }        
+        }
     }
 
     /**
      * Attempt to move the home replica status to the NetMeshBase that can be found through the
      * specified Proxy. This requires this NetMeshObject to have home replica status.
-     * 
+     *
      * @param outgoingProxy the Proxy
      * @return returns true if the home replica status was moved
      * @throws NotHomeReplicaException thrown if this NetMeshObject does not have home replica status
      * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
      */
+    @Override
     public boolean tryToPushHomeReplica(
             Proxy outgoingProxy )
         throws
@@ -595,17 +606,18 @@ public class AnetMeshObject
     {
         return tryToPushHomeReplica( outgoingProxy, -1L );
     }
-            
+
     /**
      * Attempt to move the home replica status to the NetMeshBase that can be found through the
      * specified Proxy. Specify a timeout in milliseconds. This requires this NetMeshObject to have home replica status.
-     * 
+     *
      * @param outgoingProxy the Proxy
      * @param duration the duration, in milliseconds, that the caller is willing to wait to perform the request. -1 means "use default".
      * @return returns true if the home replica status was moved
      * @throws NotHomeReplicaException thrown if this NetMeshObject does not have home replica status
      * @throws RemoteQueryTimeoutException thrown if the NetMeshBase could not be contacted or did not reply in the time alloted
      */
+    @Override
     public boolean tryToPushHomeReplica(
             Proxy outgoingProxy,
             long  duration )
@@ -641,7 +653,7 @@ public class AnetMeshObject
                 }
                 theHomeProxyIndex = theProxies.length - 1;
 
-                AnetMeshBase realBase = (AnetMeshBase) theMeshBase;                
+                AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
                 realBase.addReplicationChangedObject( this );
             }
         }
@@ -670,15 +682,15 @@ public class AnetMeshObject
 
         } else {
             return false;
-        }        
+        }
     }
-    
+
     /**
      * Determine whether this replica is going to give up home replica status if it has it,
      * in case someone asks. This only says "if this replica is the home replica, it
      * will give it up when asked". This call makes no statement about whether this replica
      * currently does or does not have home replica status.
-     * 
+     *
      * @return if true, this replica will give up home replica status when asked
      * @see #setWillGiveUpHomeReplica
      */
@@ -689,19 +701,20 @@ public class AnetMeshObject
 
     /**
      * Set whether this replica will allow home replica status to be given up or not.
-     * 
+     *
      * @param yesNo if true, this replica will give up home replica status when asked
      * @see #getWillGiveUpHomeReplica
      */
+    @Override
     public void setWillGiveUpHomeReplica(
             boolean yesNo )
     {
         if( yesNo != theGiveUpHomeReplica ) {
             theGiveUpHomeReplica = yesNo; // currently does not generate events
-            
+
             AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
             realBase.addReplicationChangedObject( this );
-        }        
+        }
     }
 
     /**
@@ -710,6 +723,7 @@ public class AnetMeshObject
      *
      * @return the Proxy in the direction of the home replica
      */
+    @Override
     public Proxy getProxyTowardsHomeReplica()
     {
         if( theHomeProxyIndex == HERE_CONSTANT ) {
@@ -718,12 +732,13 @@ public class AnetMeshObject
             return theProxies[ theHomeProxyIndex ];
         }
     }
-    
+
     /**
      * Obtain all Proxies applicable to this replica.
      *
      * @return all Proxies. This may return null for efficiency reasons.
      */
+    @Override
     public Proxy [] getAllProxies()
     {
         return theProxies;
@@ -734,6 +749,7 @@ public class AnetMeshObject
      *
      * @return the CursorIterator
      */
+    @Override
     public CursorIterator<Proxy> proxyIterator()
     {
         Proxy [] p = theProxies; // saves us a synchronized
@@ -747,10 +763,11 @@ public class AnetMeshObject
     /**
      * Find a Proxy towards a partner NetMeshBase with a particular NetMeshBaseIdentifier. If such a
      * Proxy does not exist, return null.
-     * 
+     *
      * @param partnerIdentifier the NetMeshBaseIdentifier of the partner NetMeshBase
      * @return the found Proxy, or null
      */
+    @Override
     public Proxy findProxyTowards(
             NetMeshBaseIdentifier partnerIdentifier )
     {
@@ -771,6 +788,7 @@ public class AnetMeshObject
      *
      * @return all relationship Proxies. This may return null for efficiency reasons.
      */
+    @Override
     public Proxy [] getAllRelationshipProxies()
     {
         AnetMeshObjectNeighborManager nMgr = getNeighborManager();
@@ -779,7 +797,7 @@ public class AnetMeshObject
         if( found == null || found.length == 0 ) {
             return null;
         }
-        ArrayList<Proxy> almost = new ArrayList<Proxy>();
+        ArrayList<Proxy> almost = new ArrayList<>();
         for( int i=0 ; i<found.length ; ++i ) {
             if( found[i] == null ) {
                 continue;
@@ -805,6 +823,7 @@ public class AnetMeshObject
      * @return the found relationship Proxies
      * @throws NotRelatedException thrown if the two NetMeshObjects are not related
      */
+    @Override
     public Proxy [] getRelationshipProxiesFor(
             NetMeshObjectIdentifier neighborIdentifier )
         throws
@@ -821,6 +840,7 @@ public class AnetMeshObject
      *
      * @return the path to the NetMeshObject's home 4replica
      */
+    @Override
     public NetMeshObjectAccessSpecification getPathToHomeReplica()
     {
         // FIXME -- needs more data
@@ -837,7 +857,7 @@ public class AnetMeshObject
 
     /**
      * Obtain the same NetMeshObject as ExternalizedNetMeshObject so it can be easily serialized.
-     * 
+     *
      * @return this NetMeshObject as SimpleExternalizedNetMeshObject
      */
     @Override
@@ -848,11 +868,12 @@ public class AnetMeshObject
 
     /**
      * Obtain the same NetMeshObject as SimpleExternalizedNetMeshObject so it can be easily serialized.
-     * 
+     *
      * @param captureProxies if true, the SimpleExternalizedNetMeshObject contain entries for the
      *        Proxies as held in this replica. If false, that information will be left out.
      * @return this NetMeshObject as SimpleExternalizedNetMeshObject
      */
+    @Override
     public SimpleExternalizedNetMeshObject asExternalized(
             boolean captureProxies )
     {
@@ -869,7 +890,7 @@ public class AnetMeshObject
         } else {
             types = null;
         }
-        
+
         // FIXME? Only send read-write and not read-only properties?
         MeshTypeIdentifier [] propertyTypes;
         PropertyValue  [] propertyValues;
@@ -887,7 +908,7 @@ public class AnetMeshObject
             propertyTypes  = null;
             propertyValues = null;
         }
-        
+
         NetMeshObjectIdentifier [] neighborIdentifiers;
         MeshTypeIdentifier [][]    roleTypeIdentifiers;
         NetMeshBaseIdentifier [][] relationshipProxyNames;
@@ -924,7 +945,7 @@ public class AnetMeshObject
         NetMeshBaseIdentifier [] proxyNames;
         int homeProxyIndex;
         int lockProxyIndex;
-        
+
         if( captureProxies ) {
             if( theProxies == null ) {
                 proxyNames = null;
@@ -941,27 +962,7 @@ public class AnetMeshObject
             homeProxyIndex = HERE_CONSTANT;
             lockProxyIndex = HERE_CONSTANT;
         }
-        
-        NetMeshObjectIdentifier [] equivalents;
-        if( theEquivalenceSetPointers == null ) {
-            equivalents = null;
-        } else if( theEquivalenceSetPointers[0] == null ) {
-            if( theEquivalenceSetPointers[1] == null ) {
-                equivalents = null;
-            } else {
-                equivalents = new NetMeshObjectIdentifier[] { (NetMeshObjectIdentifier) theEquivalenceSetPointers[1] };
-            }
-        } else if( theEquivalenceSetPointers[1] == null ) {
-            equivalents = new NetMeshObjectIdentifier[] {
-                    (NetMeshObjectIdentifier) theEquivalenceSetPointers[0]
-            };
-        } else {
-            equivalents = new NetMeshObjectIdentifier[] {
-                    (NetMeshObjectIdentifier) theEquivalenceSetPointers[0],
-                    (NetMeshObjectIdentifier) theEquivalenceSetPointers[1]
-            };
-        }
-        
+
         SimpleExternalizedNetMeshObject ret = SimpleExternalizedNetMeshObject.create(
                 getIdentifier(),
                 types,
@@ -973,7 +974,6 @@ public class AnetMeshObject
                 propertyValues,
                 neighborIdentifiers,
                 roleTypeIdentifiers,
-                equivalents,
                 theGiveUpHomeReplica,
                 theGiveUpLock,
                 proxyNames,
@@ -984,8 +984,8 @@ public class AnetMeshObject
         return ret;
     }
 
-// ReplicaProxyInterface    
-    
+// ReplicaProxyInterface
+
     /**
       * Surrender update rights when invoked. This shall not be called by the application
       * programmer. This is called only by Proxies that identify themselves to this call.
@@ -993,6 +993,7 @@ public class AnetMeshObject
       * @param theProxy the Proxy invoking this method
       * @return true if successful, false otherwise.
       */
+    @Override
     public boolean proxyOnlySurrenderLock(
             Proxy theProxy )
     {
@@ -1020,13 +1021,13 @@ public class AnetMeshObject
 
             } else {
                 int index = ArrayHelper.findIn( theProxy, theProxies, false );
-                
+
                 if( index >=0 ) {
                     theProxyTowardsLockIndex = index;
                     success                  = true;
                 }
             }
-            
+
             if( success ) {
                 fireLockLostEvent();
                 return true;
@@ -1034,7 +1035,7 @@ public class AnetMeshObject
             } else {
                 return false;
             }
-        }        
+        }
     }
 
     /**
@@ -1043,6 +1044,7 @@ public class AnetMeshObject
       *
       * @param theProxy the Proxy invoking this method
       */
+    @Override
     public void proxyOnlyPushLock(
             Proxy theProxy )
     {
@@ -1074,6 +1076,7 @@ public class AnetMeshObject
      * @param theProxy the Proxy invoking this method
      * @return true if successful, false otherwise.
      */
+    @Override
     public boolean proxyOnlySurrenderHomeReplica(
             Proxy theProxy )
     {
@@ -1101,13 +1104,13 @@ public class AnetMeshObject
 
             } else {
                 int index = ArrayHelper.findIn( theProxy, theProxies, false );
-                
+
                 if( index >=0 ) {
                     theHomeProxyIndex        = index;
                     success                  = true;
                 }
             }
-            
+
             if( success ) {
                 fireHomeReplicaLostEvent();
                 return true;
@@ -1115,15 +1118,16 @@ public class AnetMeshObject
             } else {
                 return false;
             }
-        }         
+        }
     }
-    
+
     /**
      * Push home replica status to this replica. This shall not be called by the application
      * programmer. This is called only by Proxies that identify themselves to this call.
-     * 
+     *
      * @param theProxy the Proxy invoking this method
      */
+    @Override
     public void proxyOnlyPushHomeReplica(
             Proxy theProxy )
     {
@@ -1157,6 +1161,7 @@ public class AnetMeshObject
      * @param theProxy the Proxy invoking this method
      * @throws IllegalArgumentException thrown if the proxy had been registered before
      */
+    @Override
     public void proxyOnlyRegisterReplicationTowards(
             Proxy theProxy )
         throws
@@ -1193,6 +1198,7 @@ public class AnetMeshObject
       *
       * @param theProxy the Proxy invoking this method
       */
+    @Override
     public void proxyOnlyUnregisterReplicationTowards(
             Proxy theProxy )
     {
@@ -1245,7 +1251,7 @@ public class AnetMeshObject
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
         realBase.addReplicationChangedObject( this );
     }
-    
+
     /**
      * Find a single neighbor MeshObject of this MeshObject that is known by its
      * MeshObjectIdentifier.
@@ -1329,7 +1335,7 @@ public class AnetMeshObject
                     Transaction tx = null;
                     try {
                         tx = realBase.createTransactionAsapIfNeeded();
-                    
+
                         found = life.createForwardReferences( toFind );
 
                     } catch( TransactionException ex ) {
@@ -1417,7 +1423,7 @@ public class AnetMeshObject
     /**
      * Check whether it is permitted to bless this MeshObject with the given EntityTypes. Subclasses
      * may override this.
-     * 
+     *
      * @param types the EntityTypes with which to bless
      * @throws NotPermittedException thrown if it is not permitted
      */
@@ -1436,11 +1442,11 @@ public class AnetMeshObject
         }
         super.checkPermittedBless( types );
     }
-    
+
     /**
      * Check whether it is permitted to unbless this MeshObject from the given EntityTypes. Subclasses
      * may override this.
-     * 
+     *
      * @param types the EntityTypes from which to unbless
      * @throws NotPermittedException thrown if it is not permitted
      */
@@ -1485,7 +1491,7 @@ public class AnetMeshObject
 
     /**
      * Internal helper to implement a method.
-     * 
+     *
      * @param isMaster true if this is the master replica
      * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws TransactionException thrown if invoked outside of proper Transaction boundaries
@@ -1508,7 +1514,7 @@ public class AnetMeshObject
     /**
      * Allows us to bless MeshObjects that act as ForwardReferences with EntityTypes
      * that are abstract.
-     * 
+     *
      * @param types the new EntityTypes to be supported by this MeshObject
      * @throws EntityBlessedAlreadyException thrown if this MeshObject is blessed already with at least one of these EntityTypes
      * @throws TransactionException thrown if invoked outside of proper transaction boundaries
@@ -1531,7 +1537,7 @@ public class AnetMeshObject
     /**
      * Purge this MeshObject. This must only be invoked by our MeshObjectLifecycleManager
      * and thus is defined down here, not higher up in the inheritance hierarchy.
-     * 
+     *
      * @throws TransactionException thrown if invoked outside of proper transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
@@ -1547,14 +1553,14 @@ public class AnetMeshObject
         NetMeshBase oldMeshBase = (NetMeshBase) theMeshBase;
 
         NetMeshObjectIdentifier identifier = getIdentifier();
-        
+
         theMeshBase            = null; // this needs to happen rather late so the other code still works
         theProxies             = null;
         theRelationshipProxies = null;
-        
+
         firePurged( oldMeshBase, identifier, System.currentTimeMillis() );
     }
-    
+
     /**
       * Tell the NetMeshObject to make a note of the fact that it is a replica of the
       * NetMeshObject that exists in the direction of the provided Proxy.
@@ -1595,7 +1601,7 @@ public class AnetMeshObject
         AnetMeshBase realBase = (AnetMeshBase) theMeshBase;
         realBase.addReplicationChangedObject( this );
     }
-    
+
     /**
      * Bless a replica NetMeshObject, as a consequence of the blessing of a master replica.
      *
@@ -1606,6 +1612,7 @@ public class AnetMeshObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public void rippleBless(
             EntityType [] types,
             long          timeUpdated )
@@ -1616,7 +1623,7 @@ public class AnetMeshObject
             NotPermittedException
     {
         try {
-            internalBless( types, false, false, true, timeUpdated );         
+            internalBless( types, false, false, true, timeUpdated );
 
         } catch( IsDeadException ex ) {
             if( log.isDebugEnabled()) {
@@ -1635,6 +1642,7 @@ public class AnetMeshObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public void rippleUnbless(
             EntityType [] types,
             long          timeUpdated )
@@ -1656,13 +1664,14 @@ public class AnetMeshObject
 
     /**
      * Relate two replica NetMeshObjects, as a consequence of relating other replicas.
-     * 
+     *
      * @param newNeighborIdentifier the identifier of the NetMeshObject to relate to
      * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws RelatedAlreadyException thrown to indicate that this MeshObject is already related
      *         to the newNeighbor
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      */
+    @Override
     public synchronized void rippleRelate(
             NetMeshObjectIdentifier newNeighborIdentifier,
             long                    timeUpdated )
@@ -1692,7 +1701,7 @@ public class AnetMeshObject
             nMgr.appendNeighbor( this, newNeighborIdentifier, null );
             fireNeighborAdded( null, oldNeighborIdentifiers, newNeighborIdentifier, nMgr.getNeighborIdentifiers( this ), theMeshBase );
         }
-        
+
         NetMeshObject neighbor = ((NetMeshBase)theMeshBase).findMeshObjectByIdentifier( newNeighborIdentifier );
         if( neighbor != null ) {
             AnetMeshObject realNeighbor = (AnetMeshObject) neighbor;
@@ -1717,13 +1726,13 @@ public class AnetMeshObject
                 realNeighbor.fireNeighborAdded( null, oldNeighborNeighborIdentifiers, theIdentifier, nMgr.getNeighborIdentifiers( realNeighbor ), theMeshBase );
             }
         }
-        
+
         updateLastUpdated( timeUpdated, theTimeUpdated );
     }
-    
+
     /**
      * Unrelate two replica NetMeshObjects, as a consequence of unrelating other replicas.
-     * 
+     *
      * @param neighborIdentifier the identifier of the NetMeshObject to unrelate from
      * @param mb the MeshBase that this MeshObject does or used to belong to
      * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
@@ -1731,6 +1740,7 @@ public class AnetMeshObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public void rippleUnrelate(
             NetMeshObjectIdentifier neighborIdentifier,
             NetMeshBase             mb,
@@ -1746,7 +1756,7 @@ public class AnetMeshObject
     /**
      * Bless the relationship of two replica NetMeshObjects, as a consequence of blessing the relationship
      * of two other replicas.
-     * 
+     *
      * @param theTypes the RoleTypes to use for blessing
      * @param neighborIdentifier the identifier of the NetMeshObject that
      *        identifies the relationship that shall be blessed
@@ -1777,7 +1787,7 @@ public class AnetMeshObject
         AnetMeshObjectNeighborManager nMgr = getNeighborManager();
 
         RoleType []         oldRoleTypesHere = nMgr.getRoleTypesFor( this, neighborIdentifier ); // throws NotRelatedException
-        ArrayList<RoleType> toAddHere        = new ArrayList<RoleType>();
+        ArrayList<RoleType> toAddHere        = new ArrayList<>();
 
         if( oldRoleTypesHere != null && oldRoleTypesHere.length > 0 ) {
             boolean foundRole = false;
@@ -1795,9 +1805,7 @@ public class AnetMeshObject
             }
 
         } else {
-            for( RoleType current : theTypes ) {
-                toAddHere.add( current );
-            }
+            toAddHere.addAll( Arrays.asList( theTypes ) );
         }
 
         RoleType [] addedHere = ArrayHelper.copyIntoNewArray( toAddHere, RoleType.class );
@@ -1809,7 +1817,7 @@ public class AnetMeshObject
 
         if( neighbor != null ) {
             oldRoleTypesThere              = nMgr.getRoleTypesFor( neighbor, theIdentifier );
-            ArrayList<RoleType> toAddThere = new ArrayList<RoleType>();
+            ArrayList<RoleType> toAddThere = new ArrayList<>();
 
             if( oldRoleTypesThere != null && oldRoleTypesThere.length > 0 ) {
                 boolean foundRole = false;
@@ -1851,7 +1859,7 @@ public class AnetMeshObject
     /**
      * Unbless the relationship of two replica NetMeshObjects, as a consequence of unblessing the relationship
      * of two other replicas.
-     * 
+     *
      * @param theTypes the RoleTypes to use for unblessing
      * @param neighborIdentifier the identifier of the NetMeshObject that
      *        identifies the relationship that shall be unblessed
@@ -1861,6 +1869,7 @@ public class AnetMeshObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public void rippleUnbless(
             RoleType []             theTypes,
             NetMeshObjectIdentifier neighborIdentifier,
@@ -1872,44 +1881,6 @@ public class AnetMeshObject
             NotPermittedException
     {
         internalUnbless( theTypes, neighborIdentifier, false, timeUpdated );
-    }
-
-    /**
-     * Add a replica NetMeshObject as an equivalent, as a consequence of adding a different replica
-     * as equivalent.
-     * 
-     * @param identifierOfEquivalent the Identifier of the replica NetMeshObject
-     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
-     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public void rippleAddAsEquivalent(
-            NetMeshObjectIdentifier identifierOfEquivalent,
-            long                    timeUpdated )
-        throws
-            EquivalentAlreadyException,
-            TransactionException,
-            NotPermittedException
-    {
-        internalAddAsEquivalent( identifierOfEquivalent, false, timeUpdated );
-    }
-    
-    /**
-     * Remove this replica NetMeshObject as an equivalent from the current set of equivalents, as a consequence of removing
-     * a different replica as equivalent.
-     * 
-     * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public void rippleRemoveAsEquivalent(
-            long timeUpdated )
-        throws
-            TransactionException,
-            NotPermittedException
-    {
-        internalRemoveAsEquivalent( false, timeUpdated );
     }
 
     /**
@@ -1925,6 +1896,7 @@ public class AnetMeshObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public void rippleSetPropertyValues(
             PropertyType []  types,
             PropertyValue [] values,
@@ -1937,7 +1909,7 @@ public class AnetMeshObject
     {
         internalSetPropertyValues( types, values, false, true, timeUpdated );
     }
-    
+
     /**
      * Change the values of Properties on a replica, as a consequence of changing the value of the property
      * in another replica.
@@ -1962,7 +1934,7 @@ public class AnetMeshObject
         // FIXME not the world's most efficient algorithm
         PropertyType []  types  = new PropertyType[ map.size() ];
         PropertyValue [] values = new PropertyValue[ types.length ];
-        
+
         int i=0;
         for( PropertyType currentType : map.keySet() ) {
             PropertyValue currentValue = map.get( currentType );
@@ -1972,15 +1944,16 @@ public class AnetMeshObject
         }
         internalSetPropertyValues( types, values, false, true, timeUpdated );
     }
-    
+
     /**
      * Delete a replica NetMeshObject as a consequence of deleting another replica.
-     * 
+     *
      * @param mb the MeshBase that this MeshObject does or used to belong to
      * @param timeUpdated the value for the timeUpdated property after this operation. -1 indicates "don't change"
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public void rippleDelete(
             NetMeshBase mb,
             long        timeUpdated )
@@ -1993,7 +1966,7 @@ public class AnetMeshObject
 
     /**
      * Resynchronize a replica.
-     * 
+     *
      * @param timeCreated the timeCreated to use
      * @param timeUpdated the timeUpdated to use
      * @param timeRead the timeRead to use
@@ -2002,6 +1975,7 @@ public class AnetMeshObject
      * @param correctHomeProxyIndex the index into the correctProxies that identifies the home proxy, or -1 if none
      * @param correctProxyTowardsLockIndex the index into the correctProxies that identifies the proxy towards lock, or -1 if none
      */
+    @Override
     public void proxyOnlyResynchronizeReplica(
             long     timeCreated,
             long     timeUpdated,
@@ -2017,7 +1991,7 @@ public class AnetMeshObject
         theTimeExpires = timeExpires;
 
         theProxies = correctProxies;
-        
+
         theHomeProxyIndex        = correctHomeProxyIndex;
         theProxyTowardsLockIndex = correctProxyTowardsLockIndex;
     }
@@ -2055,7 +2029,7 @@ public class AnetMeshObject
                     theMeshBase != null ? theMeshBase.getIdentifier().toExternalForm() : null
                 });
     }
-    
+
     /**
      * This simply invokes the superclass method. It is replicated here in order to
      * get around the restrictions of the <tt>protected</tt> keyword without
@@ -2091,7 +2065,7 @@ public class AnetMeshObject
 
     /**
      * Helper method to determine the NetMeshBaseIdentifier of the incoming Proxy, if any.
-     * 
+     *
      * @param mb the MeshBase to use
      * @return the NetMeshBaseIdentifier the incoming Proxy, if any
      */
@@ -2162,11 +2136,11 @@ public class AnetMeshObject
 
         firePropertyChange( theEvent );
     }
-    
+
     /**
      * Fire an event indicating that this MeshObject was purged.
      * We pass in the MeshBase, because the member variable has already been zero'd.
-     * 
+     *
      * @param oldMeshBase the MeshBase this MeshObject used to belong to
      * @param canonicalIdentifier the canonical identifier that this MeshObject used to have
      * @param timeEventOccurred the time at which the event occurred, in System.currentTimeMillis() format
@@ -2181,9 +2155,9 @@ public class AnetMeshObject
                 canonicalIdentifier,
                 determineIncomingProxyIdentifier( oldMeshBase ),
                 timeEventOccurred );
-        
+
         oldMeshBase.getCurrentTransaction().addChange( theEvent );
-        
+
         firePropertyChange( theEvent );
     }
 
@@ -2218,7 +2192,7 @@ public class AnetMeshObject
 
     /**
      * Fire an event indicating a change in the set of neighbors of this MeshObject.
-     * 
+     *
      * @param addedRoleTypes the newly added RoleTypes, if any
      * @param oldValue the MeshObjectIdentifiers of the neighbors prior to the change
      * @param added the added MeshObjectIdentifier
@@ -2407,7 +2381,7 @@ public class AnetMeshObject
     /**
      * Fire an event indicating that this MeshObject was deleted.
      * We pass in the MeshBase, because the member variable has already been zero'd.
-     * 
+     *
      * @param oldMeshBase the MeshBase this MeshObject used to belong to
      * @param canonicalMeshObjectName the canonical Identifier that this MeshObject used to have
      * @param time the time at which this change occurred
@@ -2424,12 +2398,12 @@ public class AnetMeshObject
                         (NetMeshObjectIdentifier) canonicalMeshObjectName,
                         determineIncomingProxyIdentifier( oldMeshBase ),
                         time );
-        
+
         // Let's not insert it into the transaction any more, there is no point of having
         // both MeshObjectBecameDeadStateEvent and MeshObjectDeletedEvent
         //
         // oldMeshBase.getCurrentTransaction().addChange( theEvent );
-        
+
         firePropertyChange( theEvent );
     }
 
@@ -2493,7 +2467,7 @@ public class AnetMeshObject
      * indicates that this is the home replica.
      */
     protected int theHomeProxyIndex = HERE_CONSTANT;
-    
+
     /**
      * The index into theProxies that represents the Proxy towards the lock. If this
      * is HERE_CONSTANT, it indicates that this replica has the lock.
@@ -2509,7 +2483,7 @@ public class AnetMeshObject
      */
     protected Proxy [][] theRelationshipProxies;
 
-    /** 
+    /**
      * Special value indicating this replica (instead of another, reached through a Proxy).
      */
     public static final int HERE_CONSTANT = -1;

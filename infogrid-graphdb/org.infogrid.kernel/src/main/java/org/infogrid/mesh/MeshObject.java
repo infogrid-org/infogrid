@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -51,11 +51,6 @@ import org.infogrid.util.text.HasStringRepresentation;
  * of {@link org.infogrid.meshbase.transaction.Transaction} boundaries; for updates, Transactions
  * are needed. (See {@link org.infogrid.meshbase.MeshBase#createTransactionNow} and similar
  * methods)</p>
- *
- * <p>A MeshObject may be part of an equivalence set. In InfoGrid, an equivalence set of
- * MeshObjects collects one or more MeshObjects and considers them semantically equivalent.
- * When traversing relationships, all relationships of the MeshObjects in the equivalence
- * set are considered as if they were relationships of the same MeshObject.</p>
  *
  * <p>A caller may or may not have the appropriate authorization to perform any of the
  * operations that may throw NotPermittedException, in which this exception is thrown.
@@ -357,18 +352,6 @@ public interface MeshObject
      * @return the set of MeshObjects that are directly related to this MeshObject
      */
     public abstract MeshObjectSet traverseToNeighborMeshObjects();
-
-    /**
-     * Traverse from this MeshObject to all directly related MeshObjects. Directly
-     * related MeshObjects are those MeshObjects that are participating in a
-     * relationship with this MeshObject. Specify whether to consider equivalents
-     * as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     * @return the set of MeshObjects that are directly related to this MeshObject
-     */
-    public abstract MeshObjectSet traverseToNeighborMeshObjects(
-            boolean considerEquivalents );
 
     /**
      * Obtain the MeshObjectIdentifiers of the neighbors of this MeshObject. This is sometimes a
@@ -758,26 +741,12 @@ public interface MeshObject
 
     /**
       * Traverse a TraversalSpecification from this MeshObject to obtain a set of MeshObjects.
-      * This will consider all MeshObjects equivalent to this one as the start MeshObject.
       *
       * @param theTraverseSpec the TraversalSpecification to traverse
       * @return the set of MeshObjects found as a result of the traversal
       */
     public abstract MeshObjectSet traverse(
             TraversalSpecification theTraverseSpec );
-
-    /**
-      * Traverse a TraversalSpecification from this MeshObject to obtain a set of MeshObjects.
-      * Specify whether relationships of equivalent MeshObjects should be considered as well.
-      *
-      * @param theTraverseSpec the TraversalSpecification to traverse
-      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-      *        if false, only this MeshObject will be used as the start
-      * @return the set of MeshObjects found as a result of the traversal
-      */
-    public abstract MeshObjectSet traverse(
-            TraversalSpecification theTraverseSpec,
-            boolean                considerEquivalents );
 
     /**
      * Obtain the RoleTypes that this MeshObject currently participates in. This will return only one
@@ -787,19 +756,6 @@ public interface MeshObject
      * @return the RoleTypes that this MeshObject currently participates in.
      */
     public abstract RoleType [] getRoleTypes();
-
-    /**
-     * Obtain the RoleTypes that this MeshObject currently participates in. This will return only one
-     * instance of the same RoleType object, even if the MeshObject participates in this RoleType
-     * multiple times with different other MeshObjects. Specify whether equivalent MeshObjects
-     * should be considered as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the RoleTypes that this MeshObject currently participates in.
-     */
-    public abstract RoleType [] getRoleTypes(
-            boolean considerEquivalents );
 
     /**
      * Obtain the MeshTypeIdentifiers of the RoleTypes that this MeshObject plays with a
@@ -815,39 +771,11 @@ public interface MeshObject
             NotRelatedException;
 
     /**
-     * Obtain the MeshTypeIdentifiers of the RoleTypes that this MeshObject plays with a
-     * given neighbor MeshObject identified by its MeshObjectIdentifier.
-     *
-     * @param neighborIdentifier the MeshObjectIdentifier of the neighbor MeshObject
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the identifiers of the RoleTypes
-     * @throws NotRelatedException thrown if the specified MeshObject is not actually a neighbor
-     */
-    public abstract MeshTypeIdentifier [] getRoleTypeIdentifiers(
-            MeshObjectIdentifier neighborIdentifier,
-            boolean              considerEquivalents )
-        throws
-            NotRelatedException;
-
-    /**
      * Obtain the Roles that this MeshObject currently participates in.
      *
      * @return the Roles that this MeshObject currently participates in.
      */
     public abstract Role [] getRoles();
-
-    /**
-     * Obtain the Roles that this MeshObject currently participates in.
-     * Specify whether relationships of equivalent MeshObjects
-     * should be considered as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     *        if false, only this MeshObject will be used as the start
-     * @return the Roles that this MeshObject currently participates in.
-     */
-    public abstract Role [] getRoles(
-            boolean considerEquivalents );
 
     /**
      * Obtain the RoleTypes that this MeshObject currently participates in with the
@@ -876,42 +804,6 @@ public interface MeshObject
             NotRelatedException;
 
     /**
-     * Obtain the RoleTypes that this MeshObject currently participates in with the
-     * specified other MeshObject.
-     * Specify whether relationships of equivalent MeshObjects should be considered
-     * as well.
-     *
-     * @param neighbor the other MeshObject
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the RoleTypes that this MeshObject currently participates in.
-     * @throws NotRelatedException thrown if this MeshObject and the neighbor MeshObject are not related
-     */
-    public abstract RoleType [] getRoleTypes(
-            MeshObject neighbor,
-            boolean    considerEquivalents )
-        throws
-            NotRelatedException;
-
-    /**
-     * Obtain the RoleTypes that this MeshObject currently participates in with the
-     * MeshObject with the specified MeshObjectIdentifier.
-     * Specify whether relationships of equivalent MeshObjects should be considered
-     * as well.
-     *
-     * @param neighborIdentifier the MeshObjectIdentifier of the other MeshObject
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the RoleTypes that this MeshObject currently participates in.
-     * @throws NotRelatedException thrown if this MeshObject and the neighbor MeshObject are not related
-     */
-    public abstract RoleType [] getRoleTypes(
-            MeshObjectIdentifier neighborIdentifier,
-            boolean              considerEquivalents )
-        throws
-            NotRelatedException;
-
-    /**
      * Determine whether this MeshObject's relationship to the other MeshObject is blessed
      * with a given RoleType. Also returns false if the two MeshObjects are not related.
      *
@@ -934,51 +826,6 @@ public interface MeshObject
     public abstract boolean isRelated(
             RoleType             thisEnd,
             MeshObjectIdentifier neighborIdentifier );
-
-    /**
-     * Add another MeshObject as an equivalent. All MeshObjects that are already equivalent
-     * to this MeshObject, and all MeshObjects that are already equivalent to the newly
-     * added MeshObject, are now equivalent.
-     *
-     * @param equiv the new equivalent
-     * @throws EquivalentAlreadyException thrown if the provided MeshObject is already an equivalent of this MeshObject
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public void addAsEquivalent(
-            MeshObject equiv )
-        throws
-            EquivalentAlreadyException,
-            TransactionException,
-            NotPermittedException;
-
-    /**
-     * Obtain the set of MeshObjects, including this one, that are equivalent.
-     * This always returns at least this MeshObject.
-     *
-     * @return the set of MeshObjects that are equivalent
-     */
-    public MeshObjectSet getEquivalents();
-
-    /**
-     * Obtain the Identifiers of the equivalent MeshObjects. This is sometimes more efficient than
-     * traversing to the equivalents, and determining the MeshObjectIdentifiers.
-     *
-     * @return the MeshObjectIdentifiers of the equivalents
-     */
-    public MeshObjectIdentifier [] getEquivalentMeshObjectIdentifiers();
-
-    /**
-     * Remove this MeshObject as an equivalent from the set of equivalents. If this MeshObject
-     * is not currently equivalent to any other MeshObject, this does nothing.
-     *
-     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     */
-    public void removeAsEquivalent()
-        throws
-            TransactionException,
-            NotPermittedException;
 
     /**
      * Add a PropertyChangeListener.
@@ -1101,9 +948,4 @@ public interface MeshObject
      * The name of a pseudo-property that indicates that current set of neighbor MeshTypes.
      */
     public static final String _MESH_OBJECT_NEIGHBOR_PROPERTY = "_MeshObjectNeighbors";
-
-    /**
-     * The name of a pseudo-property that indicates the current set of equivalents.
-     */
-    public static final String _MESH_OBJECT_EQUIVALENTS_PROPERTY = "_MeshObjectEquivalents";
 }

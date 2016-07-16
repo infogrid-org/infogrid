@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -35,7 +35,7 @@ public interface MeshObjectSet
 {
     /**
      * Set a name for this MeshObjectSet. Its only purpose is to help in debugging.
-     * 
+     *
      * @param newValue the new value
      */
     public abstract void setDebugName(
@@ -43,7 +43,7 @@ public interface MeshObjectSet
 
     /**
      * Obtain a name for this MeshObjectSet. Its only purpose is to help in debugging.
-     * 
+     *
      * @return the name
      */
     public abstract String getDebugName();
@@ -57,7 +57,7 @@ public interface MeshObjectSet
 
     /**
      * Shorthand to obtain the MeshBase to which this MeshObjectSet belongs.
-     * 
+     *
      * @return the MeshBase
      */
     public abstract MeshBase getMeshBase();
@@ -157,6 +157,7 @@ public interface MeshObjectSet
      * Determine whether this set has the same content as another set.
      *
      * @param other the MeshObjectSet to compare to
+     * @return true if it has the same content
      */
     public abstract boolean hasSameContent(
             MeshObjectSet other );
@@ -185,13 +186,13 @@ public interface MeshObjectSet
     /**
      * Create a new OrderedMeshObjectSet with the same content as this MeshObjectSet, but sorted
      * according to a MeshObjectSorter.
-     * 
+     *
      * @param sorter the MeshObjectSorter to use
      * @return the OrderedMeshObjectSet
      */
     public abstract OrderedMeshObjectSet ordered(
             MeshObjectSorter sorter );
-    
+
     /**
      * Determine whether this set is empty.
      *
@@ -253,38 +254,12 @@ public interface MeshObjectSet
             TraversalSpecification theTraversalSpecification );
 
     /**
-     * Returns an MeshObjectSet which is the union of all MeshObjectSets obtained
-     * by traversing this TraversalSpecification for each of the MeshObjects in this set.
-     * Specify whether or not equivalent MeshObjects should be considered as well. Note
-     * that the semantics of MeshObjectSet do not allow duplicates and thus there
-     * won't be any duplicates in this result. This is a convenience function.
-     *
-     * @param theTraversalSpecification specifies how to traverse
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the set of MeshObjects obtained through the traversal
-     */
-    public abstract MeshObjectSet traverse(
-            TraversalSpecification theTraversalSpecification,
-            boolean                considerEquivalents );
-
-    /**
      * Traverse to the neighbor MeshObjects of all the members of this set. This is
      * a convenience method.
      *
      * @return the set of neighbor MeshObjects
      */
     public abstract MeshObjectSet traverseToNeighborMeshObjects();
-
-    /**
-     * Traverse to the neighbor MeshObjects of the members of this set. Specify whether
-     * to consider equivalent MeshObjects as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     * @return the set of neighbor Entities
-     */
-    public abstract MeshObjectSet traverseToNeighborMeshObjects(
-            boolean considerEquivalents );
 
     /**
      * Set the PropertyTypes whose change events we forward to content

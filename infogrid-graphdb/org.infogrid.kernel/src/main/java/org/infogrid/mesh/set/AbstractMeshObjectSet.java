@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -50,7 +50,7 @@ public abstract class AbstractMeshObjectSet
             PropertyChangeListener, // for property callbacks from the members of our set
             CanBeDumped
 {
-    private static Log log = Log.getLogInstance( AbstractMeshObjectSet.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance( AbstractMeshObjectSet.class ); // our own, private logger
 
     /**
       * Constructor to be used by subclasses only.
@@ -65,7 +65,7 @@ public abstract class AbstractMeshObjectSet
 
     /**
      * Set a name for this MeshObjectSet. Its only purpose is to help in debugging.
-     * 
+     *
      * @param newValue the new value
      */
     @Override
@@ -77,7 +77,7 @@ public abstract class AbstractMeshObjectSet
 
     /**
      * Obtain a name for this MeshObjectSet. Its only purpose is to help in debugging.
-     * 
+     *
      * @return the name
      */
     @Override
@@ -99,7 +99,7 @@ public abstract class AbstractMeshObjectSet
 
     /**
      * Shorthand to obtain the MeshBase to which this MeshObjectSet belongs.
-     * 
+     *
      * @return the MeshBase
      */
     @Override
@@ -247,6 +247,7 @@ public abstract class AbstractMeshObjectSet
      * Determine whether this set has the same content as another set.
      *
      * @param other the MeshObjectSet to compare to
+     * @return true if it has the same content
      */
     @Override
     public boolean hasSameContent(
@@ -266,7 +267,7 @@ public abstract class AbstractMeshObjectSet
 
     /**
      * Determine whether this set contains a MeshObject with this identifier.
-     * 
+     *
      * @param identifier the identifier of the MeshObject to look for
      * @return true if this set contains the given MeshObject
      */
@@ -283,7 +284,7 @@ public abstract class AbstractMeshObjectSet
         }
         return false;
     }
-    
+
     /**
      * Convenience method to to easily find a member of this set by providing a
      * MeshObjectSelector that will select the MeshObject to be found. This method will return
@@ -298,7 +299,7 @@ public abstract class AbstractMeshObjectSet
     {
         // using an Iterator is most effecient for potentially large sets that aren't all loaded at the same time
         for( MeshObject current : this ) {
-            
+
             if( selector.accepts( current )) {
                 return current;
             }
@@ -323,7 +324,7 @@ public abstract class AbstractMeshObjectSet
     /**
      * Create a new OrderedMeshObjectSet with the same content as this MeshObjectSet, but sorted
      * according to a MeshObjectSorter.
-     * 
+     *
      * @param sorter the MeshObjectSorter to use
      * @return the OrderedMeshObjectSet
      */
@@ -546,34 +547,15 @@ public abstract class AbstractMeshObjectSet
      * @return the set of Entities obtained through the traversal
      */
     @Override
-    public final MeshObjectSet traverse(
+    public MeshObjectSet traverse(
             TraversalSpecification theTraversalSpecification )
     {
-        return traverse( theTraversalSpecification, true );
-    }
-
-    /**
-     * Returns a MeshObjectSet which is the union of all MeshObjectSets obtained
-     * by traversing this TraversalSpecification for each of the MeshObjects in this set.
-     * Specify whether to consider equivalent MeshObjects as well.
-     * Note that the semantics of MeshObjectSet do not allow duplicates and thus there
-     * won't be any duplicates in this result. This is a convenience function.
-     *
-     * @param theTraversalSpecification specifies how to traverse
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     * @return the set of Entities obtained through the traversal
-     */
-    @Override
-    public MeshObjectSet traverse(
-            TraversalSpecification theTraversalSpecification,
-            boolean                considerEquivalents )
-    {
         if( log.isTraceEnabled() ) {
-            log.traceMethodCallEntry( this, "traverse", theTraversalSpecification, considerEquivalents );
+            log.traceMethodCallEntry( this, "traverse", theTraversalSpecification );
         }
 
         MeshObjectSet us = theFactory.createImmutableMeshObjectSet( getMeshObjects() );
-        return us.traverse( theTraversalSpecification, considerEquivalents );
+        return us.traverse( theTraversalSpecification );
     }
 
     /**
@@ -582,28 +564,14 @@ public abstract class AbstractMeshObjectSet
      * @return the set of neighbor Entities
      */
     @Override
-    public final MeshObjectSet traverseToNeighborMeshObjects()
-    {
-        return traverseToNeighborMeshObjects( true );
-    }
-
-    /**
-     * Traverse to the neighbor MeshObjects of the members of this set. Specify whether
-     * to consider equivalent MeshObjects as well.
-     *
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well
-     * @return the set of neighbor Entities
-     */
-    @Override
-    public MeshObjectSet traverseToNeighborMeshObjects(
-            boolean considerEquivalents )
+    public MeshObjectSet traverseToNeighborMeshObjects()
     {
         MeshObject [] meshObjects = getMeshObjects();
-        
+
         MeshObjectSet [] neighbors = new MeshObjectSet[ meshObjects.length ];
 
         for( int i=0 ; i<meshObjects.length ; ++i ) {
-            neighbors[i] = meshObjects[i].traverseToNeighborMeshObjects( considerEquivalents );
+            neighbors[i] = meshObjects[i].traverseToNeighborMeshObjects();
         }
 
         return theFactory.createImmutableMeshObjectSetUnification( neighbors );
@@ -674,7 +642,7 @@ public abstract class AbstractMeshObjectSet
             }
         } else if( candidateEvent instanceof AbstractMeshObjectRoleChangeEvent ) {
             if( forwardRolePlayerChangeEvents ) {
-                return true; 
+                return true;
             } else {
                 return false;
             }
@@ -807,8 +775,8 @@ public abstract class AbstractMeshObjectSet
      * Buffer for the last N events for filtering out duplicates. This is a ring buffer with
      * eventTrackerIndex pointing to the next insertion point
      */
-    private EventObject [] eventTracker = new EventObject[4];
-    
+    private final EventObject [] eventTracker = new EventObject[4];
+
     /**
      * Pointer into the eventTracker array
      */

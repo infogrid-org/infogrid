@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -69,7 +69,7 @@ public class XprisoMessageSerializationTest1
             Exception
     {
         XprisoMessage [] testMessages = constructTestMessages();
-        
+
         for( int i=0 ; i<testMessages.length ; ++i ) {
             runOne( i, testMessages[i] );
         }
@@ -77,7 +77,7 @@ public class XprisoMessageSerializationTest1
 
     /**
      * Run a single test.
-     * 
+     *
      * @param index the index of the test
      * @param message the XprisoMessage to test
      * @throws Exception all sorts of things may go wrong during a test
@@ -89,18 +89,18 @@ public class XprisoMessageSerializationTest1
             Exception
     {
         log.info( "Now running test " + index );
-        
+
         XprisoMessageXmlEncoder encoder = new XprisoMessageXmlEncoder();
         StringBuilder           buf     = new StringBuilder();
-        
+
         encoder.appendXprisoMessage( message, buf );
-        
+
         String encodedMessage = buf.toString();
-        
+
         log.debug( "Serialized message: " + encodedMessage );
-        
+
         ByteArrayInputStream inStream = new ByteArrayInputStream( encodedMessage.getBytes( "UTF-8" ));
-        
+
         XprisoMessage recovered = encoder.decodeXprisoMessage(
                 inStream,
                 theNetMeshBase );
@@ -110,7 +110,7 @@ public class XprisoMessageSerializationTest1
 
     /**
      * Construct the test messages.
-     * 
+     *
      * @return the constructed test messages
      * @throws Exception all sorts of things may go wrong during a test
      */
@@ -119,11 +119,11 @@ public class XprisoMessageSerializationTest1
             Exception
     {
         // some useful data setup
-        
+
         NetMeshBaseIdentifier id1 = theMeshBaseIdentifierFactory.fromExternalForm( "http://some.where.example.com/" );
         NetMeshBaseIdentifier id2 = theMeshBaseIdentifierFactory.fromExternalForm( "http://foo.net/" ); // FIXME Make this work with plain =foo, too
         NetMeshBaseIdentifier id3 = theMeshBaseIdentifierFactory.fromExternalForm( "http://abc.example.net/?some=parameter&other=%20" );
-        
+
         NetMeshObjectIdentifier nmo_ref1 = theNetMeshObjectIdentifierFactory.fromExternalForm( "" );
         NetMeshObjectIdentifier nmo_ref2 = theNetMeshObjectIdentifierFactory.fromExternalForm( "abc" );
         NetMeshObjectIdentifier nmo_ref3 = theNetMeshObjectIdentifierFactory.fromExternalForm( "def" );
@@ -136,24 +136,24 @@ public class XprisoMessageSerializationTest1
         MeshTypeIdentifier mt_ref3 = theMeshTypeIdentifierFactory.fromExternalForm( "http://foo.bar.example/com/123" );
         MeshTypeIdentifier mt_ref4 = theMeshTypeIdentifierFactory.fromExternalForm( "https://foobar" );
         MeshTypeIdentifier mt_ref5 = theMeshTypeIdentifierFactory.fromExternalForm( "https://foo.com/bar/12" );
-        
+
         // Message 0
-        
+
         ParserFriendlyXprisoMessage zero = ParserFriendlyXprisoMessage.create( id1, id2 );
         zero.setRequestId( 0 );
         zero.setResponseId( 33 );
         zero.addRequestedFirstTimeObject( theNetMeshObjectAccessSpecificationFactory.obtain( id2 ));
         zero.addRequestedFirstTimeObject( theNetMeshObjectAccessSpecificationFactory.obtain(
                 new NetMeshBaseIdentifier[] { id3, id1 } ));
-        
+
         zero.addPushLockObject( nmo_ref3 );
         zero.addPushLockObject( nmo_ref4 );
-        
+
         zero.addRequestedCanceledObject( nmo_ref1 );
         zero.addRequestedLockObject( nmo_ref2 );
-        
+
         // Message 1
-        
+
         ParserFriendlyXprisoMessage one = ParserFriendlyXprisoMessage.create( id2, id3 );
         one.setRequestId( 111 );
         one.setResponseId( 123456 );
@@ -161,9 +161,9 @@ public class XprisoMessageSerializationTest1
         one.addReclaimedLockObject( nmo_ref3 );
         one.addRequestedResynchronizeReplica( nmo_ref1 );
         one.setCeaseCommunications( true );
-        
+
         // Message 2
-        
+
         ParserFriendlyXprisoMessage two = ParserFriendlyXprisoMessage.create( id3, id1 );
         two.setRequestId( 222 );
         two.setResponseId( 0 );
@@ -171,7 +171,7 @@ public class XprisoMessageSerializationTest1
                 nmo_ref1, // identifier
                 new MeshTypeIdentifier[] {
                         mt_ref1,
-                        mt_ref2 
+                        mt_ref2
                 }, // typeNames
                 12L, // timeCreated
                 34L, // timeUpdated
@@ -193,10 +193,6 @@ public class XprisoMessageSerializationTest1
                         new MeshTypeIdentifier [] { mt_ref5, mt_ref2, mt_ref1 },
                         null
                 }, // roleTypes
-                new NetMeshObjectIdentifier[] {
-                        nmo_ref3,
-                        nmo_ref5
-                }, // equivalents
                 false, // giveUpHomeReplica
                 true, // giveUpLock
                 new NetMeshBaseIdentifier[] {
@@ -209,9 +205,9 @@ public class XprisoMessageSerializationTest1
                         new NetMeshBaseIdentifier [] { id3, id2 },
                         null
                 })); // relationshipProxyNames
-        
+
         // Message 3
-        
+
         ParserFriendlyXprisoMessage three = ParserFriendlyXprisoMessage.create( id3, id1 );
         three.setRequestId( 333 );
         three.setResponseId( -27 );
@@ -225,7 +221,7 @@ public class XprisoMessageSerializationTest1
                 5834L ));
 
         // Message 4
-        
+
         ParserFriendlyXprisoMessage four = ParserFriendlyXprisoMessage.create( id2, id3 );
         four.setRequestId( 444 );
         four.setResponseId( -11111 );
@@ -242,7 +238,6 @@ public class XprisoMessageSerializationTest1
                 new PropertyValue[0], // propertyValues
                 new NetMeshObjectIdentifier[0], // neighbors
                 new MeshTypeIdentifier [0][], // roleTypes
-                new NetMeshObjectIdentifier[0], // equivalents
                 true, // giveUpHomeReplica
                 true, // giveUpLock
                 new NetMeshBaseIdentifier[0], // proxyNames
@@ -251,7 +246,7 @@ public class XprisoMessageSerializationTest1
                 new NetMeshBaseIdentifier[0][] )); // relationshipProxyNames
 
         // Message 5
-        
+
         ParserFriendlyXprisoMessage five = ParserFriendlyXprisoMessage.create( id3, id1 );
         five.setRequestId( 555 );
         five.addNeighborAddition( new NetMeshObjectNeighborAddedEvent(
@@ -272,7 +267,7 @@ public class XprisoMessageSerializationTest1
                 id2,
                 92L,
                 null ) );
-        
+
         // Message 7
 
         ParserFriendlyXprisoMessage seven = ParserFriendlyXprisoMessage.create( id2, id1 );
@@ -291,7 +286,7 @@ public class XprisoMessageSerializationTest1
                 id2,
                 8888L,
                 null ) );
-        
+
         // Message 8
 
         ParserFriendlyXprisoMessage eight = ParserFriendlyXprisoMessage.create( id2, id1 );
@@ -310,7 +305,7 @@ public class XprisoMessageSerializationTest1
                 null ) );
 
         // Message 7
-        
+
         ParserFriendlyXprisoMessage nine = ParserFriendlyXprisoMessage.create( id2, id1 );
         nine.setRequestId( 999 );
         nine.addPropertyChange( new NetMeshObjectPropertyChangeEvent(
@@ -321,7 +316,7 @@ public class XprisoMessageSerializationTest1
                 id1,
                 17L,
                 null ) );
-        
+
         // Put response together
         return new XprisoMessage[] {
                 zero,
@@ -343,6 +338,7 @@ public class XprisoMessageSerializationTest1
      * @throws Exception all sorts of things may go wrong during a test
      */
     @Before
+    @Override
     public void setup()
         throws
             Exception
@@ -353,23 +349,19 @@ public class XprisoMessageSerializationTest1
         nmbid1 = theNetMeshBaseIdentifierFactory.fromExternalForm( "https://foo.exampe.com/%27" );
 
         theNetMeshBase = NetMMeshBase.create( nmbid0, theModelBase, null, null, rootContext );
-        
+
         theExternalizedMeshObjectFactory
-                = new ParserFriendlyExternalizedNetMeshObjectFactory() {
-                        public ParserFriendlyExternalizedNetMeshObject createParserFriendlyExternalizedMeshObject() {
-                            return new ParserFriendlyExternalizedNetMeshObject();
-                        }
-                };
-    
+                = () -> new ParserFriendlyExternalizedNetMeshObject();
+
         theNetMeshObjectIdentifierFactory
                 = DefaultAnetMeshObjectIdentifierFactory.create( nmbid1, theNetMeshBaseIdentifierFactory );
 
         theMeshTypeIdentifierFactory = MMeshTypeIdentifierFactory.create();
-    
+
         theNetMeshObjectAccessSpecificationFactory
                 = DefaultNetMeshObjectAccessSpecificationFactory.create( nmbid1 );
     }
-    
+
     /**
      * Teardown.
      *
@@ -384,7 +376,7 @@ public class XprisoMessageSerializationTest1
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( XprisoMessageSerializationTest1.class );
+    private static final Log log = Log.getLogInstance( XprisoMessageSerializationTest1.class );
 
     /**
      * Factory for NetMeshBaseIdentifiers.
@@ -405,7 +397,7 @@ public class XprisoMessageSerializationTest1
      * Factory for ExternalizedMeshObjects.
      */
     protected ParserFriendlyExternalizedNetMeshObjectFactory theExternalizedMeshObjectFactory;
-    
+
     /**
      * Factory for NetMeshObjectIdentifiers.
      */
@@ -415,12 +407,12 @@ public class XprisoMessageSerializationTest1
      * Factory for MeshTypeIdentifiers.
      */
     protected MeshTypeIdentifierFactory theMeshTypeIdentifierFactory;
-    
+
     /**
      * Factory for NetMeshObjectAccessSpecifications.
      */
     protected NetMeshObjectAccessSpecificationFactory theNetMeshObjectAccessSpecificationFactory;
-    
+
     /**
      * The NetMeshBase used to decode incoming messages.
      */

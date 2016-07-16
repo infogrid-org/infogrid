@@ -5,10 +5,10 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -148,42 +148,30 @@ public class SequentialCompoundTraversalSpecification
     }
 
     /**
-     * Use this TraversalSpecification to traverse from the passed-in start MeshObject
-     * to related MeshObjects.
-     *
-     * @param start the start MeshObject for the traversal
-     * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-     *        if false, only this MeshObject will be used as the start
-     * @return the result of the traversal
+     * {@inheritDoc}
      */
+    @Override
     public MeshObjectSet traverse(
-            MeshObject start,
-            boolean    considerEquivalents )
+            MeshObject start )
     {
-        MeshObjectSet current = theSteps[0].traverse( start, considerEquivalents );
+        MeshObjectSet current = theSteps[0].traverse( start );
         for( int i=1 ; i<theSteps.length ; ++i ) {
-                current = current.traverse( theSteps[i], considerEquivalents );
+                current = current.traverse( theSteps[i] );
             }
         return current;
     }
 
     /**
-      * Use this TraversalSpecification to traverse from the passed-in start MeshObjectSet
-      * to related MeshObjects.
-      *
-      * @param theSet the start MeshObjectSet for the traversal
-      * @param considerEquivalents if true, all equivalent MeshObjects are considered as well;
-      *        if false, only this MeshObject will be used as the start
-      * @return the result of the traversal
-      */
+     * {@inheritDoc}
+     */
+    @Override
     public MeshObjectSet traverse(
-            MeshObjectSet theSet,
-            boolean       considerEquivalents )
+            MeshObjectSet theSet )
     {
         MeshObjectSet current = theSet;
 
         for( int i=0 ; i<theSteps.length ; ++i ) {
-            current = current.traverse( theSteps[i], considerEquivalents );
+            current = current.traverse( theSteps[i] );
         }
         return current;
     }
@@ -217,7 +205,7 @@ public class SequentialCompoundTraversalSpecification
 
     /**
      * Hash code.
-     * 
+     *
      * @return hash code
      */
     @Override
