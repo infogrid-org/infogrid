@@ -1142,8 +1142,6 @@ public class AnetMeshBaseLifecycleManager
             }
         }
 
-        // FIXME: equivalents
-
         // neighbors
         NetMeshObjectIdentifier [] correctNeighbors = neighborsFromExternalizedMeshObject( externalized );
         MeshObjectIdentifier []    currentNeighbors = ret.getNeighborManager().getNeighborMeshObjectIdentifiersFromSource( ret, incomingProxy );

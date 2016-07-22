@@ -83,32 +83,6 @@ public class ParserFriendlyExternalizedNetMeshObject
     }
 
     /**
-     * Add an equivalent, using its MeshObjectIdentifier.
-     * 
-     * @param identifier the identifier of an equivalent
-     */
-    @Override
-    public void addEquivalent(
-            MeshObjectIdentifier identifier )
-    {
-        NetMeshObjectIdentifier realIdentifier = (NetMeshObjectIdentifier) identifier;
-        super.addEquivalent( realIdentifier );
-    }
-
-    /**
-     * Obtain the NetMeshObjectIdentifiers of the NetMeshObjects that participate in an equivalence
-     * set with this NetMeshObject.
-     *
-     * @return the NetMeshObjectIdentifiers. May be null.
-     */
-    @Override
-    public NetMeshObjectIdentifier [] getEquivalents()
-    {
-        NetMeshObjectIdentifier [] ret = theEquivalents.toArray( new NetMeshObjectIdentifier[ theEquivalents.size() ]);
-        return ret;
-    }
-
-    /**
      * Set the GiveUpHomeReplica property.
      *
      * @param newValue the new value
@@ -320,7 +294,6 @@ public class ParserFriendlyExternalizedNetMeshObject
                     "theTimeRead",
                     "theTimeExpires",
                     "theRelationships",
-                    "theEquivalents",
                     "theGiveUpHomeReplica",
                     "theGiveUpLock",
                     "theProxyIdentifiers",
@@ -337,7 +310,6 @@ public class ParserFriendlyExternalizedNetMeshObject
                     theTimeRead,
                     theTimeExpires,
                     theRelationships,
-                    theEquivalents,
                     theGiveUpHomeReplica,
                     theGiveUpLock,
                     theProxyIdentifiers,

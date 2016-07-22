@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -31,7 +31,7 @@ public class ParserFriendlyExternalizedMeshObject
 {
     /**
      * Set the MeshObjectIdentifier of the MeshObject.
-     * 
+     *
      * @param newValue the new value
      */
     public void setIdentifier(
@@ -50,7 +50,7 @@ public class ParserFriendlyExternalizedMeshObject
     {
         theTimeCreated = newValue;
     }
-    
+
     /**
      * Set the TimeUpdated.
      *
@@ -61,7 +61,7 @@ public class ParserFriendlyExternalizedMeshObject
     {
         theTimeUpdated = newValue;
     }
-    
+
     /**
      * Set the TimeRead.
      *
@@ -72,7 +72,7 @@ public class ParserFriendlyExternalizedMeshObject
     {
         theTimeRead = newValue;
     }
-    
+
     /**
      * Set the TimeExpires.
      *
@@ -83,10 +83,10 @@ public class ParserFriendlyExternalizedMeshObject
     {
         theTimeExpires = newValue;
     }
-    
+
     /**
      * Add a MeshTypeIdentifier for the MeshType that the MeshObject is blessed with.
-     * 
+     *
      * @param identifier the MeshType
      */
     public void addMeshType(
@@ -100,6 +100,7 @@ public class ParserFriendlyExternalizedMeshObject
      *
      * @return the MeshTypeIdentifiers
      */
+    @Override
     public MeshTypeIdentifier [] getExternalTypeIdentifiers()
     {
         MeshTypeIdentifier [] ret = theMeshTypes.toArray( new MeshTypeIdentifier[ theMeshTypes.size() ]);
@@ -108,9 +109,10 @@ public class ParserFriendlyExternalizedMeshObject
 
     /**
      * Obtain the identifiers of the neighbors of this MeshObject.
-     * 
+     *
      * @return the dentifiers of the neighbors
      */
+    @Override
     public MeshObjectIdentifier[] getNeighbors()
     {
         MeshObjectIdentifier [] ret = new MeshObjectIdentifier[ theRelationships.size() ];
@@ -127,6 +129,7 @@ public class ParserFriendlyExternalizedMeshObject
      * @param neighbor the neighbor
      * @return the RoleTypes
      */
+    @Override
     public MeshTypeIdentifier [] getRoleTypesFor(
             MeshObjectIdentifier neighbor )
     {
@@ -141,30 +144,8 @@ public class ParserFriendlyExternalizedMeshObject
     }
 
     /**
-     * Add an equivalent, using its MeshObjectIdentifier.
-     * 
-     * @param identifier the MeshObjectIdentifier of an equivalent
-     */
-    public void addEquivalent(
-            MeshObjectIdentifier identifier )
-    {
-        theEquivalents.add( identifier );
-    }
-
-    /**
-     * Get the MeshObject's equivalents, if any.
-     *
-     * @return the equivalents' MeshObjectIdentifiers.
-     */
-    public MeshObjectIdentifier[] getEquivalents()
-    {
-        MeshObjectIdentifier [] ret = theEquivalents.toArray( new MeshObjectIdentifier[ theEquivalents.size() ]);
-        return ret;
-    }
-
-    /**
      * Add a PropertyType, using its MeshTypeIdentifier.
-     * 
+     *
      * @param identifier the PropertyType's identifier
      */
     public void addPropertyType(
@@ -178,6 +159,7 @@ public class ParserFriendlyExternalizedMeshObject
      *
      * @return the PropertyTypes' identifiers.
      */
+    @Override
     public MeshTypeIdentifier [] getPropertyTypes()
     {
         MeshTypeIdentifier [] ret = thePropertyTypes.toArray( new MeshTypeIdentifier[ thePropertyTypes.size() ]);
@@ -200,6 +182,7 @@ public class ParserFriendlyExternalizedMeshObject
      *
      * @return the PropertyValues
      */
+    @Override
     public PropertyValue [] getPropertyValues()
     {
         PropertyValue [] ret = thePropertyValues.toArray( new PropertyValue[ thePropertyValues.size() ]);
@@ -267,8 +250,7 @@ public class ParserFriendlyExternalizedMeshObject
                     "theTimeUpdated",
                     "theTimeRead",
                     "theTimeExpires",
-                    "theRelationships",
-                    "theEquivalents"
+                    "theRelationships"
                 },
                 new Object[] {
                     theIdentifier,
@@ -279,36 +261,30 @@ public class ParserFriendlyExternalizedMeshObject
                     theTimeUpdated,
                     theTimeRead,
                     theTimeExpires,
-                    theRelationships,
-                    theEquivalents
+                    theRelationships
                 });
     }
 
     /**
      * The MeshTypeIdentifiers of the MeshTypes.
      */
-    protected ArrayList<MeshTypeIdentifier> theMeshTypes = new ArrayList<MeshTypeIdentifier>();
-    
-    /**
-     * The MeshObjectIdentifiers of the equivalents.
-     */
-    protected ArrayList<MeshObjectIdentifier> theEquivalents = new ArrayList<MeshObjectIdentifier>();
-    
+    protected ArrayList<MeshTypeIdentifier> theMeshTypes = new ArrayList<>();
+
     /**
      * The MeshTypeIdentifiers of the PropertyTypes.
      */
-    protected ArrayList<MeshTypeIdentifier> thePropertyTypes = new ArrayList<MeshTypeIdentifier>();
-    
+    protected ArrayList<MeshTypeIdentifier> thePropertyTypes = new ArrayList<>();
+
     /**
      * The PropertyValues that go with the PropertyTypes.
      */
-    protected ArrayList<PropertyValue> thePropertyValues = new ArrayList<PropertyValue>();
+    protected ArrayList<PropertyValue> thePropertyValues = new ArrayList<>();
 
     /**
      * The relationships in which this ExternalizedMeshObject participates.
      */
-    protected ArrayList<Relationship> theRelationships = new ArrayList<Relationship>();
-    
+    protected ArrayList<Relationship> theRelationships = new ArrayList<>();
+
     /**
      * The PropertyValue that is currently being parsed.
      */
@@ -322,7 +298,7 @@ public class ParserFriendlyExternalizedMeshObject
     {
         /**
          * Constructor.
-         * 
+         *
          * @param identifier the MeshObjectIdentifier
          * @param timeUpdated the time it was last updated
          */
@@ -336,14 +312,14 @@ public class ParserFriendlyExternalizedMeshObject
 
         /**
          * Obtain the MeshObjectIdentifier of the MeshObject at this end.
-         * 
+         *
          * @return the MeshObjectIdentifier of the MeshObject at this end
          */
         public MeshObjectIdentifier getIdentifier()
         {
             return theIdentifier;
         }
-        
+
         /**
          * Get the identifiers of the types at this end, i.e. EntityTypes or RoleTypes.
          *
@@ -357,7 +333,7 @@ public class ParserFriendlyExternalizedMeshObject
 
         /**
          * Add a type by identifier
-         * 
+         *
          * @param identifier the identifier
          */
         public void addType(
@@ -384,7 +360,7 @@ public class ParserFriendlyExternalizedMeshObject
         /**
          * The identifiers of the types.
          */
-        protected ArrayList<MeshTypeIdentifier> theTypes = new ArrayList<MeshTypeIdentifier>();
+        protected ArrayList<MeshTypeIdentifier> theTypes = new ArrayList<>();
 
         /**
          * The time at which it was last updated.
@@ -402,7 +378,7 @@ public class ParserFriendlyExternalizedMeshObject
     {
         /**
          * Constructor.
-         * 
+         *
          * @param identifier the MeshObjectIdentifier on this side of the relationship
          * @param neighborIdentifier the MeshObjectIdentifier on the other side of the relationship
          * @param timeUpdated the time it was last updated
@@ -419,14 +395,14 @@ public class ParserFriendlyExternalizedMeshObject
 
         /**
          * Obtain the MeshObjectIdentifier of the MeshObject at the other end.
-         * 
+         *
          * @return the HasMeshObjectIdentifierypes of the MeshObject at the other end
          */
         public MeshObjectIdentifier getNeighborIdentifier()
         {
             return theNeighborIdentifier;
         }
-        
+
         /**
          * Dump this object.
          *
@@ -484,7 +460,7 @@ public class ParserFriendlyExternalizedMeshObject
     {
         /**
          * Constructor.
-         * 
+         *
          * @param identifier the MeshObjectIdentifier
          * @param propertyTypeName the identifier of the PropertyType
          * @param timeUpdated the time it was last updated
@@ -498,27 +474,27 @@ public class ParserFriendlyExternalizedMeshObject
             thePropertyTypeName = propertyTypeName;
             theTimeUpdated      = timeUpdated;
         }
-        
+
         /**
          * Obtain the MeshObjectIdentifier.
-         * 
+         *
          * @return the MeshObjectIdentifier
          */
         public MeshObjectIdentifier getIdentifier()
         {
             return theIdentifier;
         }
-        
+
         /**
          * Obtain the identifier of the PropertyType.
-         * 
+         *
          * @return the identifier of the PropertyType.
          */
         public MeshTypeIdentifier getPropertyTypeName()
         {
             return thePropertyTypeName;
         }
-        
+
         /**
          * Obtain the time at which it was last updated.
          *

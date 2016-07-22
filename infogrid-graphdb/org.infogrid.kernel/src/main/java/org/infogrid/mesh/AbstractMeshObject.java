@@ -2273,47 +2273,6 @@ public abstract class AbstractMeshObject
     }
 
     /**
-     * Check whether it is permitted to make this MeshObject equivalent to another.
-     * Subclasses may override this.
-     *
-     * @param newEquivalentIdentifier identifier of the potential new equivalent
-     * @param newEquivalent the potential new equivalent
-     * @throws NotPermittedException thrown if it is not permitted
-     */
-    public void checkPermittedAddAsEquivalent(
-            MeshObjectIdentifier newEquivalentIdentifier,
-            MeshObject           newEquivalent )
-        throws
-            NotPermittedException
-    {
-        checkAlive();
-
-        AccessManager accessMgr = theMeshBase.getAccessManager();
-        if( accessMgr != null ) {
-            accessMgr.checkPermittedAddAsEquivalent( this, newEquivalentIdentifier, newEquivalent );
-        }
-    }
-
-    /**
-     * Check whether it is permitted to remove this MeshObject from the equivalence set
-     * it is currently a member of.
-     * Subclasses may override this.
-     *
-     * @throws NotPermittedException thrown if it is not permitted
-     */
-    public void checkPermittedRemoveAsEquivalent()
-        throws
-            NotPermittedException
-    {
-        checkAlive();
-
-        AccessManager accessMgr = theMeshBase.getAccessManager();
-        if( accessMgr != null ) {
-            accessMgr.checkPermittedRemoveAsEquivalent( this, getRoleTypes() );
-        }
-    }
-
-    /**
      * Check whether it is permitted to delete this MeshObject. This checks both whether the
      * MeshObject itself may be deleted, and whether the relationships it participates in may
      * be deleted (which in turn depends on whether the relationships may be unblessed).

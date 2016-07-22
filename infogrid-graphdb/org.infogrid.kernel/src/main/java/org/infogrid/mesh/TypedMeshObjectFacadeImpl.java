@@ -441,7 +441,6 @@ public abstract class TypedMeshObjectFacadeImpl
 
     /**
       * Traverse a TraversalSpecification from this MeshObject to obtain a set of MeshObjects.
-      * This will consider all MeshObjects equivalent to this one as the start MeshObject.
       *
       * @param theTraverseSpec the TraversalSpecification to traverse
       * @return the set of MeshObjects found as a result of the traversal

@@ -641,58 +641,6 @@ public abstract class MRoleType
     }
 
     /**
-     * Check whether the given caller is allowed to make one and two members of the same
-     * equivalence set.
-     *
-     * @param one the first MeshObject
-     * @param twoIdentifier identifier of the second MeshObject
-     * @param two the second MeshObject, if successfully resolved
-     * @param caller the MeshObject representing the caller
-     * @throws NotPermittedException thrown if this caller is not permitted to do this
-     */
-    @Override
-    public void checkPermittedAddAsEquivalent(
-            MeshObject           one,
-            MeshObjectIdentifier twoIdentifier,
-            MeshObject           two,
-            MeshObject           caller )
-        throws
-            NotPermittedException
-    {
-        for( RoleTypeGuard current : getAllRoleTypeGuards() ) {
-            current.checkPermittedAddAsEquivalent(
-                    this,
-                    one,
-                    twoIdentifier,
-                    two,
-                    caller );
-        }
-    }
-
-    /**
-     * Check whether the given caller is allowed to remove the MeshObject from its
-     * equivalence set.
-     *
-     * @param obj the MeshObject
-     * @param caller the MeshObject representing the caller
-     * @throws NotPermittedException thrown if this caller is not permitted to do this
-     */
-    @Override
-    public void checkPermittedRemoveAsEquivalent(
-            MeshObject  obj,
-            MeshObject  caller )
-        throws
-            NotPermittedException
-    {
-        for( RoleTypeGuard current : getAllRoleTypeGuards() ) {
-            current.checkPermittedRemoveAsEquivalent(
-                    this,
-                    obj,
-                    caller );
-        }
-    }
-
-    /**
      * Convert to String form, for debugging.
      *
      * @return String form of this object

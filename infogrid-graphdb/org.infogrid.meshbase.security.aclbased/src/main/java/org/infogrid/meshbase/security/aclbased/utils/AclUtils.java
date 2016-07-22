@@ -48,7 +48,6 @@ public abstract class AclUtils
         // let's hope this implementation is reasonably efficient
         MeshObject protectionDomain = accessed.traverse(
                 AclbasedSubjectArea.PROTECTIONDOMAIN_GOVERNS_MESHOBJECT.getDestination()).getSingleMember();
-            // it's important that we don't consider equivalents here
 
         if( protectionDomain == null ) {
             // anybody can do whatever
@@ -82,7 +81,6 @@ public abstract class AclUtils
             MeshObject potentialOwned )
     {
         MeshObjectSet owners = potentialOwned.traverse( AclbasedSubjectArea.MESHOBJECT_HASOWNER_MESHOBJECT.getSource());
-            // it's important that we don't consider equivalents here
 
         if( potentialOwner == potentialOwned && owners.isEmpty() ) {
             return true; // MeshObjects without related owners own themselves

@@ -314,38 +314,6 @@ public interface RoleType
             NotPermittedException;
 
     /**
-     * Check whether the given caller is allowed to make one and two members of the same
-     * equivalence set.
-     * 
-     * @param one the first MeshObject
-     * @param twoIdentifier identifier of the second MeshObject
-     * @param two the second MeshObject, if successfully resolved
-     * @param caller the MeshObject representing the caller
-     * @throws NotPermittedException thrown if this caller is not permitted to do this 
-     */
-    public void checkPermittedAddAsEquivalent(
-            MeshObject           one,
-            MeshObjectIdentifier twoIdentifier,
-            MeshObject           two,
-            MeshObject           caller )
-        throws
-            NotPermittedException;
-    
-    /**
-     * Check whether the given caller is allowed to remove the MeshObject from its
-     * equivalence set.
-     * 
-     * @param obj the MeshObject to be removed from its equivalence set
-     * @param caller the MeshObject representing the caller
-     * @throws NotPermittedException thrown if this caller is not permitted to do this 
-     */
-    public void checkPermittedRemoveAsEquivalent(
-            MeshObject  obj,
-            MeshObject  caller )
-        throws
-            NotPermittedException;
-    
-    /**
       * Appended to the Identifier of a RelationshipType to create a "source" RoleType's Identifier.
       * Note: an application programmer should not depend on this; use provided methods instead to
       * query a RoleType.

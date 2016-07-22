@@ -469,45 +469,6 @@ public class AclbasedAccessManager
     }
 
     /**
-     * Check whether it is permitted to make one MeshObject equivalent to another.
-     *
-     * @param one the first MeshObject
-     * @param twoIdentifier identifier of the second MeshObject
-     * @param two the second MeshObject, if it could be resolved
-     * @throws NotPermittedException thrown if it is not permitted
-     */
-    @Override
-    public void checkPermittedAddAsEquivalent(
-            MeshObject           one,
-            MeshObjectIdentifier twoIdentifier,
-            MeshObject           two )
-        throws
-            NotPermittedException
-    {
-        checkPermittedUpdate( one );
-        checkPermittedUpdate( two );
-    }
-
-    /**
-     * Check whether it is permitted to remove a MeshObject from the equivalence set
-     * it is currently a member of.
-     * Subclasses may override this.
-     *
-     * @param obj the MeshObject to remove
-     * @param roleTypesToAsk the RoleTypes to ask
-     * @throws NotPermittedException thrown if it is not permitted
-     */
-    @Override
-    public void checkPermittedRemoveAsEquivalent(
-            MeshObject  obj,
-            RoleType [] roleTypesToAsk )
-        throws
-            NotPermittedException
-    {
-        checkPermittedUpdate( obj );
-    }
-
-    /**
      * Check whether it is permitted to delete this MeshObject. This checks both whether the
      * MeshObject itself may be deleted, and whether the relationships it participates in may
      * be deleted (which in turn depends on whether the relationships may be unblessed).
