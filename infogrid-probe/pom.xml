@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
     <artifactId>infogrid-probe</artifactId>
-    <version>2.9.9</version>
+    <version><!-- PKGVER -->2.9.9<!-- /PKGVER --></version>
     <packaging>pom</packaging>
     <name>infogrid-probe</name>
     <url>http://infogrid.org/</url>

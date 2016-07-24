@@ -6,10 +6,10 @@
     <name>org.infogrid.store.filesystem</name>
     <url>http://infogrid.org/</url>
 
-       <parent>
+    <parent>
         <groupId>org.infogrid</groupId>
         <artifactId>infogrid-stores</artifactId>
-        <version>2.9.9</version>
+        <version><!-- PKGVER -->2.9.9<!-- /PKGVER --></version>
     </parent>
 
     <dependencies>

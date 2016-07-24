@@ -1,5 +1,5 @@
 pkgname=$(basename $(pwd))
-pkgver=2.9.8
+pkgver=2.9.9
 pkgrel=1
 pkgdesc='InfoGrid LID'
 arch=('any')
@@ -12,6 +12,11 @@ depends=(
     'java-runtime'
     'diet4j'
     'infogrid-model-library')
+
+prepare() {
+    # Set pom.xml versions correctly; depends on XML-comment-based markup in pom.xml files
+    find ${startdir} -name pom.xml -exec perl -pi -e "s/(?<=\<\!-- PKGVER -->)(\d+(\.\d+)+)(?=\<\!-- \/PKGVER -->)/${pkgver}/g" {} \;
+}
 
 build() {
     cd ${startdir}

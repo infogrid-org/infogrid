@@ -1,5 +1,5 @@
 pkgname=$(basename $(pwd))
-pkgver=2.9.8
+pkgver=2.9.9
 pkgrel=1
 pkgdesc='InfoGrid Probe framework'
 arch=('any')
@@ -14,6 +14,11 @@ depends=(
     'infogrid-model-library'
     'infogrid-graphdb-grid'
     'infogrid-lid')
+
+prepare() {
+    # Set pom.xml versions correctly; depends on XML-comment-based markup in pom.xml files
+    find ${startdir} -name pom.xml -exec perl -pi -e "s/(?<=\<\!-- PKGVER -->)(\d+(\.\d+)+)(?=\<\!-- \/PKGVER -->)/${pkgver}/g" {} \;
+}
 
 build() {
     cd ${startdir}
