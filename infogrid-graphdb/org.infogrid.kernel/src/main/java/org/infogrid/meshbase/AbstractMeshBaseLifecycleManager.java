@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -54,7 +54,7 @@ public abstract class AbstractMeshBaseLifecycleManager
 
     /**
      * Enable the AbstractMeshBase to tell this MeshBaseLifecycleManager that they are working together.
-     * 
+     *
      * @param meshBase the AbstractMeshBase with which this MeshBaseLifecycleManager works
      */
     void setMeshBase(
@@ -64,17 +64,6 @@ public abstract class AbstractMeshBaseLifecycleManager
             throw new IllegalStateException( "Have MeshBase already: " + theMeshBase );
         }
         theMeshBase = meshBase;
-    }
-
-    /**
-     * Obtain the MeshBase that this MeshBaseLifecycleManager works on.
-     * 
-     * @return the MeshBase that this MMeshBaseLifecycleManagerworks on
-     */
-    @Override
-    public MeshBase getMeshBase()
-    {
-        return theMeshBase;
     }
 
     /**
@@ -153,10 +142,10 @@ public abstract class AbstractMeshBaseLifecycleManager
      * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. If this is null,
      *                        automatically create a suitable MeshObjectIdentifier.
      * @return the created MeshObject
@@ -174,7 +163,7 @@ public abstract class AbstractMeshBaseLifecycleManager
     {
         long time = determineCreationTime();
         long autoExpires;
-        
+
         if( DEFAULT_RELATIVE_TIME_EXPIRES > 0 ) {
             autoExpires = time + DEFAULT_RELATIVE_TIME_EXPIRES;
         } else {
@@ -189,10 +178,10 @@ public abstract class AbstractMeshBaseLifecycleManager
      * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. If this is null,
      *                        automatically create a suitable MeshObjectIdentifier.
      * @param type the EntityType with which the MeshObject will be blessed
@@ -229,10 +218,10 @@ public abstract class AbstractMeshBaseLifecycleManager
      * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. If this is null,
      *                        automatically create a suitable MeshObjectIdentifier.
      * @param types the EntityTypes with which the MeshObject will be blessed
@@ -270,10 +259,10 @@ public abstract class AbstractMeshBaseLifecycleManager
      * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. If this is null,
      *                        automatically create a suitable MeshObjectIdentifier.
      * @param type the EntityType with which the MeshObject will be blessed
@@ -302,7 +291,7 @@ public abstract class AbstractMeshBaseLifecycleManager
             NotPermittedException
     {
         MeshObject ret = createMeshObject( identifier, timeCreated, timeUpdated, timeRead, timeExpires );
-        
+
         if( type != null ) {
             try {
                 ret.bless( type );
@@ -320,10 +309,10 @@ public abstract class AbstractMeshBaseLifecycleManager
      * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. If this is null,
      *                        automatically create a suitable MeshObjectIdentifier.
      * @param types the EntityTypes with which the MeshObject will be blessed
@@ -352,7 +341,7 @@ public abstract class AbstractMeshBaseLifecycleManager
             NotPermittedException
     {
         MeshObject ret = createMeshObject( identifier, timeCreated, timeUpdated, timeRead, timeExpires );
-        
+
         if( types != null && types.length > 0 ) {
             try {
                 ret.bless( types );
@@ -363,16 +352,16 @@ public abstract class AbstractMeshBaseLifecycleManager
         }
         return ret;
     }
-    
+
     /**
      * <p>Semantically delete a MeshObject.</p>
-     * 
+     *
      * <p>This call is a "semantic delete", which means that an existing
      * MeshObject will go away in all its replicas. Due to time lag, the MeshObject
      * may still exist in certain replicas in other places for a while, but
      * the request to deleteMeshObjects all objects is in the queue and will get there
      * eventually.</p>
-     * 
+     *
      * @param theObject the MeshObject to be semantically deleted
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
@@ -392,7 +381,7 @@ public abstract class AbstractMeshBaseLifecycleManager
      * Instantiate an ExternalizedMeshObject that is appropriate to capture the information held by
      * the subtype of MeshObject used by this MeshBase. This is factored out so it can easily be
      * overridden in subclasses.
-     * 
+     *
      * @return the ParserFriendlyExternalizedMeshObject.
      */
     @Override
@@ -455,11 +444,11 @@ public abstract class AbstractMeshBaseLifecycleManager
                 createdObject,
                 createdObject.getTimeCreated() );
         return ret;
-    } 
+    }
 
     /**
      * Overridable helper to create a MeshObjectDeletedEvent.
-     * 
+     *
      * @param deletedObject the deleted MeshObject
      * @param canonicalIdentifier the canonical MeshObjectIdentifier of the deleted MeshObject.
      *        Once a MeshObject has been deleted, its canonical MeshObjectIdentifier can no longer be determined
@@ -485,7 +474,7 @@ public abstract class AbstractMeshBaseLifecycleManager
 
     /**
      * Helper method that allows our subclasses to access the internal storage without having to expose it publicly.
-     * 
+     *
      * @param identifier the identifier of the MeshObject to look for
      * @return the found MeshObject, or none.
      */
@@ -510,7 +499,7 @@ public abstract class AbstractMeshBaseLifecycleManager
         AbstractMeshBase realBase = (AbstractMeshBase) theMeshBase;
 
         realBase.theCache.putIgnorePrevious( obj.getIdentifier(), obj );
-        
+
         if( event != null ) {
             realBase.getCurrentTransaction().addChange( event );
             realBase.notifyLifecycleEvent( event );
@@ -519,7 +508,7 @@ public abstract class AbstractMeshBaseLifecycleManager
 
     /**
      * Helper method that allows our subclasses to access the internal storage without having to expose it publicly.
-     * 
+     *
      * @param identifier the identifier of the MeshObject
      * @param event the MeshObjectLifeCycleEvent
      * @return the removed MeshObject, or null
@@ -530,7 +519,7 @@ public abstract class AbstractMeshBaseLifecycleManager
     {
         AbstractMeshBase realBase = (AbstractMeshBase) theMeshBase;
         MeshObject       ret      = realBase.theCache.remove( identifier );
-        
+
         if( event != null ) {
             realBase.getCurrentTransaction().addChange( event );
             realBase.notifyLifecycleEvent( event );
@@ -542,7 +531,7 @@ public abstract class AbstractMeshBaseLifecycleManager
      * The MeshBase that we work on.
      */
     protected MeshBase theMeshBase;
-    
+
     /**
      * Our ResourceHelper.
      */
@@ -553,7 +542,7 @@ public abstract class AbstractMeshBaseLifecycleManager
      * This is given as a relative time, from the current time. If -1 is given, it means
      * "never".
      */
-    public static final long DEFAULT_RELATIVE_TIME_EXPIRES = theResourceHelper.getResourceLongOrDefault( 
+    public static final long DEFAULT_RELATIVE_TIME_EXPIRES = theResourceHelper.getResourceLongOrDefault(
             "DefaultRelativeTimeExpires",
             -1L );
 }

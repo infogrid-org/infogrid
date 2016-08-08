@@ -15,11 +15,16 @@
 package org.infogrid.meshbase;
 
 import java.beans.PropertyChangeListener;
+import java.text.ParseException;
+import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.mesh.TypedMeshObjectFacade;
+import org.infogrid.mesh.externalized.ExternalizedMeshObject;
+import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObject;
 import org.infogrid.mesh.security.ThreadIdentityManager;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
@@ -40,6 +45,7 @@ import org.infogrid.meshbase.transaction.TransactionActiveAlreadyException;
 import org.infogrid.meshbase.transaction.TransactionAsapTimeoutException;
 import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.meshbase.transaction.TransactionListener;
+import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.util.AbstractFactory;
@@ -130,8 +136,7 @@ public abstract class AbstractMeshBase
         this.theCache                       = cache;
         this.theContext                     = context;
 
-        this.theMeshObjectIdentifierFactory.setMeshBase( this ); // may throw IllegalStateException
-        this.theMeshBaseLifecycleManager.setMeshBase(    this );
+        this.theMeshBaseLifecycleManager.setMeshBase( this );
 
         QuitManager qm = getContext().findContextObject( QuitManager.class );
         if( qm != null ) {
@@ -544,6 +549,419 @@ public abstract class AbstractMeshBase
     }
 
     /**
+     * <p>Create a new MeshObject without a type
+     * and an automatically created MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @return the created MeshObject
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public MeshObject createMeshObject()
+        throws
+            TransactionException,
+            NotPermittedException
+    {
+        return theMeshBaseLifecycleManager.createMeshObject();
+    }
+
+    /**
+     * <p>This is a convenience method to create a MeshObject with exactly one EntityType
+     * and an automatically created MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @param type the EntityType with which the MeshObject will be blessed
+     * @return the created MeshObject
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public MeshObject createMeshObject(
+            EntityType type )
+        throws
+            IsAbstractException,
+            TransactionException,
+            NotPermittedException
+    {
+        return theMeshBaseLifecycleManager.createMeshObject( type );
+    }
+
+    /**
+     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes
+     * and an automatically created MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @param types the EntityTypes with which the MeshObject will be blessed
+     * @return the created MeshObject
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public MeshObject createMeshObject(
+            EntityType [] types )
+        throws
+            IsAbstractException,
+            TransactionException,
+            NotPermittedException
+    {
+        return theMeshBaseLifecycleManager.createMeshObject( types );
+    }
+
+    /**
+     * <p>Create a new MeshObject without a type
+     * and with a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is to be created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
+     * @return the created MeshObject
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public MeshObject createMeshObject(
+            MeshObjectIdentifier identifier )
+        throws
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException
+    {
+        return theMeshBaseLifecycleManager.createMeshObject( identifier );
+    }
+
+    /**
+     * <p>This is a convenience method to create a MeshObject with exactly one EntityType
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
+     * @param type the EntityType with which the MeshObject will be blessed
+     * @return the created MeshObject
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public MeshObject createMeshObject(
+            MeshObjectIdentifier identifier,
+            EntityType           type )
+        throws
+            IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException
+    {
+        return theMeshBaseLifecycleManager.createMeshObject( identifier, type );
+    }
+
+    /**
+     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
+     * @param types the EntityTypes with which the MeshObject will be blessed
+     * @return the created MeshObject
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public MeshObject createMeshObject(
+            MeshObjectIdentifier identifier,
+            EntityType []        types )
+        throws
+            IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException
+    {
+        return theMeshBaseLifecycleManager.createMeshObject( identifier, types );
+    }
+
+    /**
+     * <p>Create a new MeshObject without a type, but with provided time stamps
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is to be created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @param identifier the identifier of the to-be-created MeshObject. This must not be null.
+     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
+     * @return the created MeshObject
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public MeshObject createMeshObject(
+            MeshObjectIdentifier identifier,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
+        throws
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException
+    {
+        return theMeshBaseLifecycleManager.createMeshObject( identifier, timeCreated, timeUpdated, timeRead, timeExpires );
+    }
+
+    /**
+     * <p>This is a convenience method to create a MeshObject with exactly one EntityType,
+     * with provided time stamps
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
+     * @param type the EntityType with which the MeshObject will be blessed
+     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
+     * @return the created MeshObject
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public MeshObject createMeshObject(
+            MeshObjectIdentifier identifier,
+            EntityType           type,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
+        throws
+            IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException
+    {
+        return theMeshBaseLifecycleManager.createMeshObject( identifier, type, timeCreated, timeUpdated, timeRead, timeExpires );
+    }
+
+    /**
+     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes,
+     * with provided time stamps
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     *
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     *
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
+     * @param types the EntityTypes with which the MeshObject will be blessed
+     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
+     * @return the created MeshObject
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public MeshObject createMeshObject(
+            MeshObjectIdentifier identifier,
+            EntityType []        types,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
+        throws
+            IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException
+    {
+        return theMeshBaseLifecycleManager.createMeshObject( identifier, types, timeCreated, timeUpdated, timeRead, timeExpires );
+    }
+
+    /**
+     * Factory method.
+     *
+     * @return the created ParserFriendlyExternalizedMeshObject
+     */
+    @Override
+    public ParserFriendlyExternalizedMeshObject createParserFriendlyExternalizedMeshObject()
+    {
+        return theMeshBaseLifecycleManager.createParserFriendlyExternalizedMeshObject();
+    }
+
+    /**
+     * <p>Semantically delete a MeshObject.</p>
+     *
+     * <p>This call is a "semantic delete", which means that an existing
+     * MeshObject will go away in all its replicas. Due to time lag, the MeshObject
+     * may still exist in certain replicas in other places for a while, but
+     * the request to deleteMeshObjects all objects is in the queue and will get there
+     * eventually.</p>
+     *
+     * @param theObject the MeshObject to be semantically deleted
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public void deleteMeshObject(
+            MeshObject theObject )
+        throws
+            TransactionException,
+            NotPermittedException
+    {
+        theMeshBaseLifecycleManager.deleteMeshObject( theObject );
+    }
+
+    /**
+     * <p>Semantically delete several MeshObjects at the same time.</p>
+     *
+     * <p>This call is a "semantic delete", which means that an existing
+     * MeshObject will go away in all its replicas. Due to time lag, the MeshObject
+     * may still exist in certain replicas in other places for a while, but
+     * the request to deleteMeshObjects all objects is in the queue and will get there
+     * eventually.</p>
+     *
+     * <p>This call either succeeds or fails in total: if one or more of the specified MeshObject cannot be
+     *    deleted for some reason, none of the other MeshObjects will be deleted either.</p>
+     *
+     * @param theObjects the MeshObjects to be semantically deleted
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public void deleteMeshObjects(
+            MeshObject [] theObjects )
+        throws
+            TransactionException,
+            NotPermittedException
+    {
+        theMeshBaseLifecycleManager.deleteMeshObjects( theObjects );
+    }
+
+    /**
+     * <p>Semantically delete all MeshObjects in a MeshObjectSet at the same time.</p>
+     *
+     * <p>This call is a "semantic delete", which means that an existing
+     * MeshObject will go away in all its replicas. Due to time lag, the MeshObject
+     * may still exist in certain replicas in other places for a while, but
+     * the request to deleteMeshObjects all objects is in the queue and will get there
+     * eventually.</p>
+     *
+     * <p>This call either succeeds or fails in total: if one or more of the specified MeshObject cannot be
+     *    deleted for some reason, none of the other MeshObjects will be deleted either.</p>
+     *
+     * @param theSet the set of MeshObjects to be semantically deleted
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    @Override
+    public void deleteMeshObjects(
+            MeshObjectSet theSet )
+        throws
+            TransactionException,
+            NotPermittedException
+    {
+        theMeshBaseLifecycleManager.deleteMeshObjects( theSet );
+    }
+
+    /**
+     * Create a typed {@link TypedMeshObjectFacade} for a MeshObject. This should generally
+     * not be invoked by the application programmer. Use
+     * {@link MeshObject#getTypedFacadeFor MeshObject.getTypedFacadeFor}.
+     *
+     * @param object the MeshObject for which to create a TypedMeshObjectFacade
+     * @param type the EntityType for the TypedMeshObjectFacade
+     * @return the created TypedMeshObjectFacade
+     */
+    @Override
+    public TypedMeshObjectFacade createTypedMeshObjectFacade(
+            MeshObject object,
+            EntityType type )
+    {
+        return theMeshBaseLifecycleManager.createTypedMeshObjectFacade( object, type );
+    }
+
+    /**
+      * Determine the implementation class for an TypedMeshObjectFacade for an EntityType.
+      * As an application developer, you should not usually have any reason to invoke this.
+      *
+      * @param theObjectType the type object
+      * @return the Class
+      * @throws ClassNotFoundException thrown if for some reason, this Class could not be found
+      */
+    @Override
+    public Class<? extends TypedMeshObjectFacade> getImplementationClass(
+            EntityType theObjectType )
+        throws
+            ClassNotFoundException
+    {
+        return theMeshBaseLifecycleManager.getImplementationClass( theObjectType );
+    }
+
+    /**
+     * Externally load a MeshObject.
+     *
+     * @param theExternalizedObject the externalized representation of the MeshObject
+     * @return the created MeshObject
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     */
+    @Override
+    public MeshObject loadExternalizedMeshObject(
+            ExternalizedMeshObject theExternalizedObject )
+        throws
+            TransactionException
+    {
+        return theMeshBaseLifecycleManager.loadExternalizedMeshObject( theExternalizedObject );
+    }
+
+    /**
       * Obtain the ModelBase that contains the type descriptions
       * for the content of this MeshBase.
       *
@@ -612,6 +1030,108 @@ public abstract class AbstractMeshBase
     public MeshObjectIdentifierFactory getMeshObjectIdentifierFactory()
     {
         return theMeshObjectIdentifierFactory;
+    }
+
+    /**
+     * Obtain the MeshBase that this MeshObjectIdentifierFactory works on.
+     *
+     * @return the MeshBase that this MeshObjectIdentifierFactory on
+     */
+    @Override
+    public MeshBase getMeshBase()
+    {
+        return this;
+    }
+
+    /**
+     * Determine the MeshObjectIdentifier of the Home MeshObject of this MeshBase.
+     *
+     * @return the Identifier
+     */
+    @Override
+    public MeshObjectIdentifier getHomeMeshObjectIdentifier()
+    {
+        return theMeshObjectIdentifierFactory.getHomeMeshObjectIdentifier();
+    }
+
+    /**
+     * Create a unique MeshObjectIdentifier for a MeshObject that can be used to create a MeshObject
+     * with the associated MeshBaseLifecycleManager.
+     *
+     * @return the created Identifier
+     */
+    @Override
+    public MeshObjectIdentifier createMeshObjectIdentifier()
+    {
+        return theMeshObjectIdentifierFactory.createMeshObjectIdentifier();
+    }
+
+    /**
+     * Create a unique MeshObjectIdentifier of a certain length for a MeshObject that can be used to create a MeshObject
+     * with the associated MeshBaseLifecycleManager.
+     *
+     * @param length the desired length of the MeshObjectIdentifier
+     * @return the created Identifier
+     */
+    @Override
+    public MeshObjectIdentifier createMeshObjectIdentifier(
+            int length )
+    {
+        return theMeshObjectIdentifierFactory.createMeshObjectIdentifier( length );
+    }
+
+    /**
+     * Recreate a MeshObjectIdentifier from an external form.
+     *
+     * @param raw the external form
+     * @return the created MeshObjectIdentifier
+     * @throws ParseException thrown if a parsing error occurred
+     */
+    @Override
+    public MeshObjectIdentifier fromExternalForm(
+            String raw )
+        throws
+            ParseException
+    {
+        return theMeshObjectIdentifierFactory.fromExternalForm( raw );
+    }
+
+    /**
+     * Recreate a MeshObjectIdentifier from an external form. Be lenient about syntax and
+     * attempt to interpret what the user meant when entering an invalid or incomplete
+     * raw String.
+     *
+     * @param raw the external form
+     * @return the created MeshObjectIdentifier
+     * @throws ParseException thrown if the String could not be successfully parsed
+     */
+    @Override
+    public MeshObjectIdentifier guessFromExternalForm(
+            String raw )
+        throws
+            ParseException
+    {
+        return theMeshObjectIdentifierFactory.guessFromExternalForm( raw );
+    }
+
+    /**
+     * Convert this StringRepresentation back to a MeshObjectIdentifier.
+     *
+     * @param representation the StringRepresentation in which this String is represented
+     * @param pars collects parameters that may influence the String representation. Always provided.
+     * @param s the String to parse
+     * @return the created MeshObjectIdentifier
+     * @throws ParseException thrown if the String could not be successfully parsed
+     */
+    @Override
+    public MeshObjectIdentifier fromStringRepresentation(
+            StringRepresentation           representation,
+            StringRepresentationParameters pars,
+            String                         s )
+        throws
+            ParseException
+    {
+        return theMeshObjectIdentifierFactory.fromStringRepresentation( representation, pars, s );
     }
 
     /**

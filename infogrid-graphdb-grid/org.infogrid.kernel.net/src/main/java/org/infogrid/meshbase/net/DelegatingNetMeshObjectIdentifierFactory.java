@@ -54,26 +54,10 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
      *
      * @return the MeshBase
      */
+    @Override
     public MeshBase getMeshBase()
     {
         return theDelegate.getMeshBase();
-    }
-
-    /**
-     * Set the MeshBase to which this MeshObjectIdentifierFactory belongs.
-     * This is invoked by the MeshBase's constructor and does not need to invoked
-     * by the application programmer. It can only be invoked once; subsequent
-     * invocations throw an IllegalStateException.
-     *
-     * @param mb the MeshBase
-     * @throws IllegalStateException thrown if this call is performed more than one on the same instance
-     */
-    public void setMeshBase(
-            MeshBase mb )
-        throws
-            IllegalStateException
-    {
-        theDelegate.setMeshBase( mb );
     }
 
     /**
@@ -81,6 +65,7 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
      *
      * @return the Identifier
      */
+    @Override
     public NetMeshObjectIdentifier getHomeMeshObjectIdentifier()
     {
         return theDelegate.getHomeMeshObjectIdentifier();
@@ -93,6 +78,7 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
      * @param mbIdentifier the NetMeshBaseIdentifier of the NetMeshBase
      * @return the Identifier
      */
+    @Override
     public NetMeshObjectIdentifier getHomeMeshObjectIdentifierFor(
             NetMeshBaseIdentifier mbIdentifier )
     {
@@ -105,6 +91,7 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
      *
      * @return the created Identifier
      */
+    @Override
     public NetMeshObjectIdentifier createMeshObjectIdentifier()
     {
         return theDelegate.createMeshObjectIdentifier();
@@ -117,6 +104,7 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
      * @param length the desired length of the MeshObjectIdentifier
      * @return the created Identifier
      */
+    @Override
     public NetMeshObjectIdentifier createMeshObjectIdentifier(
             int length )
     {
@@ -130,6 +118,7 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
      * @return the created NetMeshObjectIdentifier
      * @throws ParseException a parsing error occurred
      */
+    @Override
     public NetMeshObjectIdentifier fromExternalForm(
             String raw )
         throws
@@ -146,6 +135,7 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
      * @return the created NetMeshObjectIdentifier
      * @throws ParseException a parsing error occurred
      */
+    @Override
     public NetMeshObjectIdentifier fromExternalForm(
             NetMeshBaseIdentifier meshBaseIdentifier,
             String                raw )
@@ -164,6 +154,7 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
      * @return the created MeshObjectIdentifier
      * @throws ParseException a parsing error occurred
      */
+    @Override
     public NetMeshObjectIdentifier guessFromExternalForm(
             String raw )
         throws
@@ -182,6 +173,7 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
      * @return the created MeshObjectIdentifier
      * @throws ParseException thrown if a parsing error occurred
      */
+    @Override
     public NetMeshObjectIdentifier guessFromExternalForm(
             NetMeshBaseIdentifier contextIdentifier,
             String                raw )
@@ -200,6 +192,7 @@ public abstract class DelegatingNetMeshObjectIdentifierFactory
      * @return the created MeshObjectIdentifier
      * @throws ParseException thrown if the String could not be successfully parsed
      */
+    @Override
     public NetMeshObjectIdentifier fromStringRepresentation(
             StringRepresentation           representation,
             StringRepresentationParameters pars,

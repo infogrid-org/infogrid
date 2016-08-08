@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -28,25 +28,11 @@ public interface MeshObjectIdentifierFactory
              IdentifierFactory
 {
     /**
-     * Determine the MeshBase to which this MeshObjectIdentifierFactory belongs.
+     * Obtain the MeshBase that this MeshObjectIdentifierFactory works on.
      *
-     * @return the MeshBase
+     * @return the MeshBase that this MeshObjectIdentifierFactory on
      */
     public abstract MeshBase getMeshBase();
-
-    /**
-     * Set the MeshBase to which this MeshObjectIdentifierFactory belongs.
-     * This is invoked by the MeshBase's constructor and does not need to invoked
-     * by the application programmer. It can only be invoked once; subsequent
-     * invocations throw an IllegalStateException.
-     *
-     * @param mb the MeshBase
-     * @throws IllegalStateException thrown if this call is performed more than one on the same instance
-     */
-    public void setMeshBase(
-            MeshBase mb )
-        throws
-            IllegalStateException;
 
     /**
      * Determine the MeshObjectIdentifier of the Home MeshObject of this MeshBase.

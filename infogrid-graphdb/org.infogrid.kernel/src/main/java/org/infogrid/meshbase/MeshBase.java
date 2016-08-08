@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -56,7 +56,7 @@ import org.infogrid.util.text.HasStringRepresentation;
   * "directory object", or an object which is a logical entry point into the
   * information held by the MeshBase. The home object cannot be deleted, but
   * it may be updated (e.g. blessed, properties set, related etc.)</p>
-  * 
+  *
   * <p>All operations potentially modifying information held in a MeshBase must be performed
   *    within a {@link Transaction}. A good pattern to use for Transactions is this:
   * <pre>
@@ -83,13 +83,16 @@ public interface MeshBase
             LiveDeadObject,
             HasIdentifier,
             HasIdentifierFinder,
+            MeshBaseLifecycleManager,
+            MeshObjectIdentifierFactory,
             HasStringRepresentation
-{    
+{
     /**
      * Obtain the MeshBaseIdentifier that identifies this MeshBase.
-     * 
+     *
      * @return the MeshBaseIdentifier
      */
+    @Override
     public abstract MeshBaseIdentifier getIdentifier();
 
     /**
@@ -106,7 +109,7 @@ public interface MeshBase
      * the {@link #accessLocally accessLocally} methods, this method purely considers MeshObjects in the
      * MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
      * <p>If not found, returns <code>null</code>.</p>
-     * 
+     *
      * @param identifier the identifier of the MeshObject that shall be found
      * @return the found MeshObject, or null if not found
      * @see #findMeshObjectByIdentifierOrThrow
@@ -120,7 +123,7 @@ public interface MeshBase
      *    MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
      * <p>If one or more of the MeshObjects could not be found, returns <code>null</code> at
      *    the respective index in the returned array.</p>
-     * 
+     *
      * @param identifiers the identifiers of the MeshObjects that shall be found
      * @return the found MeshObjects, which may contain null values for MeshObjects that were not found
      */
@@ -132,7 +135,7 @@ public interface MeshBase
      * the {@link #accessLocally accessLocally} methods, this method purely considers MeshObjects in the
      * MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
      * <p>If not found, throws {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
-     * 
+     *
      * @param identifier the identifier of the MeshObject that shall be found
      * @return the found MeshObject, or null if not found
      * @throws MeshObjectsNotFoundException if the MeshObject was not found
@@ -148,7 +151,7 @@ public interface MeshBase
      *    MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
      * <p>If one or more of the MeshObjects could not be found, throws
      *    {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
-     * 
+     *
      * @param identifiers the identifiers of the MeshObjects that shall be found
      * @return the found MeshObjects, which may contain null values for MeshObjects that were not found
      * @throws MeshObjectsNotFoundException if one or more of the MeshObjects were not found
@@ -160,7 +163,7 @@ public interface MeshBase
 
     /**
      * Obtain a MeshObject whose unique identifier is known.
-     * 
+     *
      * @param identifier the identifier property of the MeshObject
      * @return the locally found MeshObject, or null if not found locally
      * @throws MeshObjectAccessException thrown if something went wrong accessing one or more MeshObjects
@@ -174,7 +177,7 @@ public interface MeshBase
 
     /**
      * Obtain N locally available MeshObjects whose unique identifiers are known.
-     * 
+     *
      * @param identifiers the identifier properties of the MeshObjects
      * @return array of the same length as identifiers, with the locally found MeshObjects filled
      *         in at the same positions. If one or more of the MeshObjects were not found, the respective
@@ -190,7 +193,7 @@ public interface MeshBase
 
    /**
      * <p>Obtain a manager for MeshObject lifecycles.</p>
-     * 
+     *
      * @return a MeshBaseLifecycleManager that works on this MeshBase
      */
     public abstract MeshBaseLifecycleManager getMeshBaseLifecycleManager();
@@ -227,14 +230,14 @@ public interface MeshBase
      */
     public abstract void setSweeper(
             Sweeper newSweeper );
-    
+
     /**
      * Obtain the currently set Sweeper for this MeshBase, if any.
      *
      * @return the Sweeper, if any
      */
     public abstract Sweeper getSweeper();
-    
+
     /**
      * Obtain a factory for MeshObjectIdentifiers that is appropriate for this MeshBase.
      *
@@ -244,7 +247,7 @@ public interface MeshBase
 
     /**
      * Obtain the factory for MeshObjectSets.
-     * 
+     *
      * @return the factory for MeshObjectSets
      * @see #setMeshObjectSetFactory
      */
@@ -252,7 +255,7 @@ public interface MeshBase
 
     /**
      * Set a new factory for MeshObjectSets.
-     * 
+     *
      * @param newValue the new factory
      * @see #getMeshObjectSetFactory
      */
@@ -382,7 +385,7 @@ public interface MeshBase
      */
     public abstract MeshObjectSet findCommonNeighbors(
             MeshObject [] all );
-    
+
     /**
      * Determine the set of MeshObjects that are neighbors of both of the passed-in MeshObjects
      * while playing particular RoleTypes.
@@ -507,7 +510,7 @@ public interface MeshBase
     /**
      * Subscribe to events indicating the addition/removal/etc
      * of MeshObjects to/from this MeshBase, without using a Reference.
-     * 
+     *
      * @param newListener the to-be-added MMeshObjectLifecycleListener@see #removeMeshObjectLifecycleEventListener
      * @see #addWeakMeshObjectLifecycleEventListener
      * @see #addSoftMeshObjectLifecycleEventListener
@@ -519,7 +522,7 @@ public interface MeshBase
     /**
      * Subscribe to events indicating the addition/removal/etc
      * of MeshObjects to/from this MeshBase, using a WeakReference.
-     * 
+     *
      * @param newListener the to-be-added MMeshObjectLifecycleListener@see #removeMeshObjectLifecycleEventListener
      * @see #addDirectMeshObjectLifecycleEventListener
      * @see #addSoftMeshObjectLifecycleEventListener
@@ -531,7 +534,7 @@ public interface MeshBase
     /**
      * Subscribe to events indicating the addition/removal/etc
      * of MeshObjects to/from this MeshBase, using a SoftReference.
-     * 
+     *
      * @param newListener the to-be-added MMeshObjectLifecycleListener@see #removeMeshObjectLifecycleEventListener
      * @see #addWeakMeshObjectLifecycleEventListener
      * @see #addDirectMeshObjectLifecycleEventListener
@@ -543,7 +546,7 @@ public interface MeshBase
     /**
      * Unsubscribe from events indicating the addition/removal/etc
      * of MeshObjects to/from this MeshBase.
-     * 
+     *
      * @param oldListener the to-be-removed MMeshObjectLifecycleListener@see #addMeshObjectLifecycleEventListener
      * @see #addWeakMeshObjectLifecycleEventListener
      * @see #addSoftMeshObjectLifecycleEventListener

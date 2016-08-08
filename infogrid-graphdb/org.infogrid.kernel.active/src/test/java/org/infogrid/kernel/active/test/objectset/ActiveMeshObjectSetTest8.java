@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -26,7 +26,6 @@ import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.util.logging.Log;
-import org.junit.Test;
 
 /**
  * Tests OrderedActiveMeshObjectSet.
@@ -37,7 +36,7 @@ public class ActiveMeshObjectSetTest8
 {
     /**
      * Tun the test.
-     * 
+     *
      * @throws Exception all kinds of things may go wrong during a test
      */
 //    @Test
@@ -53,7 +52,7 @@ public class ActiveMeshObjectSetTest8
 
         MeshObject [] testData = new MeshObject[ 10 ];
         for( int i=0 ; i<testData.length ; ++i ) {
-            testData[i] = createTestObject( life, typeAA, typeX, i );
+            testData[i] = createTestObject( typeAA, typeX, i );
         }
         tx.commitTransaction();
 
@@ -235,8 +234,7 @@ public class ActiveMeshObjectSetTest8
 
     /**
      * Create one test object.
-     * 
-     * @param life the lifecycle manager to create the test MeshObject
+     *
      * @param eType the type of MeshObject
      * @param pType the PropertyType of the property to set
      * @param index the value of the property
@@ -244,14 +242,13 @@ public class ActiveMeshObjectSetTest8
      * @throws Exception all kinds of things may go wrong during a test
      */
     protected MeshObject createTestObject(
-            MeshBaseLifecycleManager   life,
             EntityType                 eType,
             PropertyType               pType,
             int                        index )
         throws
             Exception
     {
-        MeshObject ret = createMeshObject( life, eType, life.getMeshBase().getMeshObjectIdentifierFactory().fromExternalForm( "CPO" + index ) );
+        MeshObject ret = createMeshObject( theMeshBase, eType, theMeshBase.fromExternalForm( "CPO" + index ) );
         ret.setPropertyValue( pType, StringValue.create( String.valueOf( index )) );
 
         return ret;
@@ -270,7 +267,7 @@ public class ActiveMeshObjectSetTest8
     {
         /**
          * Constructor.
-         * 
+         *
          * @param factory the ActiveMeshObjectSetFactory
          * @param data the data held by the set
          */
@@ -283,7 +280,7 @@ public class ActiveMeshObjectSetTest8
 
         /**
          * Add an object.
-         * 
+         *
          * @param toAdd the object to add
          */
         public void add(
@@ -294,7 +291,7 @@ public class ActiveMeshObjectSetTest8
 
         /**
          * Remove an object.
-         * 
+         *
          * @param toRemove the object to remove
          */
         public void remove(

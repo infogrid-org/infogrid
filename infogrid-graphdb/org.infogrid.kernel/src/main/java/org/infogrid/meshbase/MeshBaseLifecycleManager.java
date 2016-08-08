@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -40,13 +40,6 @@ public interface MeshBaseLifecycleManager
         extends
             ParserFriendlyExternalizedMeshObjectFactory
 {
-    /**
-     * Obtain the MeshBase that this MeshBaseLifecycleManager works on.
-     * 
-     * @return the MeshBase that this MMeshBaseLifecycleManagerworks on
-     */
-    public abstract MeshBase getMeshBase();
-
     /**
      * <p>Create a new MeshObject without a type
      * and an automatically created MeshObjectIdentifier.
@@ -114,10 +107,10 @@ public interface MeshBaseLifecycleManager
      * and with a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. If this is null,
      *                        automatically create a suitable MeshObjectIdentifier.
      * @return the created MeshObject
@@ -137,10 +130,10 @@ public interface MeshBaseLifecycleManager
      * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. If this is null,
      *                        automatically create a suitable MeshObjectIdentifier.
      * @param type the EntityType with which the MeshObject will be blessed
@@ -164,10 +157,10 @@ public interface MeshBaseLifecycleManager
      * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. If this is null,
      *                        automatically create a suitable MeshObjectIdentifier.
      * @param types the EntityTypes with which the MeshObject will be blessed
@@ -191,10 +184,10 @@ public interface MeshBaseLifecycleManager
      * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is to be created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. This must not be null.
      * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
      * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
@@ -222,10 +215,10 @@ public interface MeshBaseLifecycleManager
      * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. If this is null,
      *                        automatically create a suitable MeshObjectIdentifier.
      * @param type the EntityType with which the MeshObject will be blessed
@@ -258,10 +251,10 @@ public interface MeshBaseLifecycleManager
      * and a provided MeshObjectIdentifier.
      * This call is a "semantic create" which means that a new, semantically distinct object
      * is created.</p>
-     * 
+     *
      * <p>Before this operation can be successfully invoked, a Transaction must be active
      * on this Thread.>/p>
-     * 
+     *
      * @param identifier the identifier of the to-be-created MeshObject. If this is null,
      *                        automatically create a suitable MeshObjectIdentifier.
      * @param types the EntityTypes with which the MeshObject will be blessed
@@ -287,16 +280,16 @@ public interface MeshBaseLifecycleManager
             MeshObjectIdentifierNotUniqueException,
             TransactionException,
             NotPermittedException;
-    
+
     /**
      * <p>Semantically delete a MeshObject.</p>
-     * 
+     *
      * <p>This call is a "semantic delete", which means that an existing
      * MeshObject will go away in all its replicas. Due to time lag, the MeshObject
      * may still exist in certain replicas in other places for a while, but
      * the request to deleteMeshObjects all objects is in the queue and will get there
      * eventually.</p>
-     * 
+     *
      * @param theObject the MeshObject to be semantically deleted
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
@@ -309,16 +302,16 @@ public interface MeshBaseLifecycleManager
 
     /**
      * <p>Semantically delete several MeshObjects at the same time.</p>
-     * 
+     *
      * <p>This call is a "semantic delete", which means that an existing
      * MeshObject will go away in all its replicas. Due to time lag, the MeshObject
      * may still exist in certain replicas in other places for a while, but
      * the request to deleteMeshObjects all objects is in the queue and will get there
      * eventually.</p>
-     * 
+     *
      * <p>This call either succeeds or fails in total: if one or more of the specified MeshObject cannot be
      *    deleted for some reason, none of the other MeshObjects will be deleted either.</p>
-     * 
+     *
      * @param theObjects the MeshObjects to be semantically deleted
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
@@ -379,7 +372,7 @@ public interface MeshBaseLifecycleManager
 
     /**
      * Externally load a MeshObject.
-     * 
+     *
      * @param theExternalizedObject the externalized representation of the MeshObject
      * @return the created MeshObject
      * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
