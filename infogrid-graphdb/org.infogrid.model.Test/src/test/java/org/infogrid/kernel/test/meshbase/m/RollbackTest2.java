@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -52,29 +52,23 @@ public class RollbackTest2
         final MeshObjectIdentifier fixed4Id = idFact.fromExternalForm( "fixed4" );
 
         //
-        
-        log.debug( "Creating MeshObjectGraph that won't be rolled back" );
-        
-        theMeshBase.executeNow( new TransactionAction<Void>() {
-                @Override
-                public Void execute()
-                        throws
-                            Throwable
-                {
-                    MeshObject fixed1 = life.createMeshObject( fixed1Id, TestSubjectArea.AA );
-                    MeshObject fixed2 = life.createMeshObject( fixed2Id, TestSubjectArea.AA );
-                    MeshObject fixed3 = life.createMeshObject( fixed3Id, TestSubjectArea.AA );
-                    MeshObject fixed4 = life.createMeshObject( fixed4Id, TestSubjectArea.AA );
 
-                    fixed1.relateAndBless( TestSubjectArea.AR1A.getSource(), fixed2 );
-                    fixed2.relateAndBless( TestSubjectArea.AR1A.getSource(), fixed3 );
-                    fixed3.relateAndBless( TestSubjectArea.AR1A.getSource(), fixed4 );
-                    fixed4.relateAndBless( TestSubjectArea.AR1A.getSource(), fixed1 );
-                    
-                    return null;
-                }
+        log.debug( "Creating MeshObjectGraph that won't be rolled back" );
+
+        theMeshBase.executeNow( tx -> {
+                MeshObject fixed1 = theMeshBase.createMeshObject( fixed1Id, TestSubjectArea.AA );
+                MeshObject fixed2 = theMeshBase.createMeshObject( fixed2Id, TestSubjectArea.AA );
+                MeshObject fixed3 = theMeshBase.createMeshObject( fixed3Id, TestSubjectArea.AA );
+                MeshObject fixed4 = theMeshBase.createMeshObject( fixed4Id, TestSubjectArea.AA );
+
+                fixed1.relateAndBless( TestSubjectArea.AR1A.getSource(), fixed2 );
+                fixed2.relateAndBless( TestSubjectArea.AR1A.getSource(), fixed3 );
+                fixed3.relateAndBless( TestSubjectArea.AR1A.getSource(), fixed4 );
+                fixed4.relateAndBless( TestSubjectArea.AR1A.getSource(), fixed1 );
+
+                return null;
         });
-        
+
         checkEquals( theMeshBase.size(), 5, "Wrong initial number of MeshObjects" );
 
         final MeshObject fixed1 = theMeshBase.findMeshObjectByIdentifier( fixed1Id );
@@ -83,24 +77,25 @@ public class RollbackTest2
         final MeshObject fixed4 = theMeshBase.findMeshObjectByIdentifier( fixed4Id );
 
         //
-        
+
         log.debug( "Creating failing Transaction that will automatically be rolled back." );
-        
+
         theMeshBase.executeNow( new TransactionAction<Void>() {
                 @Override
-                public Void execute()
-                        throws
-                            Throwable
+                public Void execute(
+                        Transaction tx )
+                    throws
+                        Throwable
                 {
-                    life.deleteMeshObject( fixed4 );
-                    
+                    theMeshBase.deleteMeshObject( fixed4 );
+
                     fixed1.unrelate( fixed2 );
-                    
+
                     fixed2.unblessRelationship( TestSubjectArea.AR1A.getSource(), fixed3 );
-                    
+
                     throw new TransactionActionException.Rollback();
                 }
-                
+
                 @Override
                 public void preRollbackTransaction(
                         Transaction tx,
@@ -109,9 +104,9 @@ public class RollbackTest2
                     checkEquals( tx.getChangeSet().size(), 15, "Wrong number of changes" );
                 }
         });
-        
+
         //
-        
+
         final MeshObject fixed4New = theMeshBase.findMeshObjectByIdentifier( fixed4Id );
         // fixed4 is now dead and cannot currently be revived (FIXME?)
 

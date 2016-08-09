@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -71,11 +71,11 @@ public class MeshBaseTest1
             // noop
         }
 
-        
+
         //
-        
+
         log.info( "Creating MeshObjects" );
-        
+
         Transaction tx = theMeshBase.createTransactionNow();
 
         t1 = System.currentTimeMillis();
@@ -100,13 +100,13 @@ public class MeshBaseTest1
                     "MeshObject " + i + " updated at wrong time" );
         }
         tx.commitTransaction();
-        
+
         //
-        
+
         log.info( "Duplicate Identifiers not allowed" );
-        
+
         tx = theMeshBase.createTransactionNow();
-        
+
         try{
             life.createMeshObject( mesh[0].getIdentifier() );
             reportError( "createMeshObject with duplicate Identifier did not throw IdentifierNotUniqueException" );
@@ -114,9 +114,9 @@ public class MeshBaseTest1
             // noop
         }
         tx.commitTransaction();
-        
+
         //
-        
+
         theMeshBase.die();
     }
 

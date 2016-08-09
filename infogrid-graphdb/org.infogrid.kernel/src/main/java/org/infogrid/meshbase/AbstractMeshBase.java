@@ -1974,8 +1974,6 @@ public abstract class AbstractMeshBase
         T         ret         = null;
         Throwable firstThrown = null;
 
-        act.setMeshBase( this );
-
         int maxRetries = Math.min( act.getCommitRetries(), MAX_COMMIT_RETRIES );
         for( int counter = 0 ; counter <= maxRetries ; ++counter ) { // one more, because we specify re-tries
 
@@ -1984,9 +1982,7 @@ public abstract class AbstractMeshBase
             try {
                 tx = txFactory.obtainFor( null, null ); // return null if a Transaction is active already
 
-                act.setTransaction( tx );
-                ret = act.execute();
-                act.setTransaction( null );
+                ret = act.execute( tx );
 
                 if( tx != null ) {
                     // only if this is not a sub-transaction
@@ -2030,7 +2026,6 @@ public abstract class AbstractMeshBase
                 log.error( ex );
 
             } finally {
-                act.setTransaction( null );
                 if( tx != null ) {
                     try {
                         act.preRollbackTransaction( tx, thrown );

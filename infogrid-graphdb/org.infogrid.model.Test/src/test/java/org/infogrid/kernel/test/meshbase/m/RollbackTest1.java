@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -54,22 +54,16 @@ public class RollbackTest1
         final MeshObjectIdentifier wrong2Id = idFact.fromExternalForm( "wrong2" );
 
         //
-        
-        log.debug( "Creating MeshObjectGraph that won't be rolled back" );
-        
-        theMeshBase.executeNow( new TransactionAction<Void>() {
-                @Override
-                public Void execute()
-                        throws
-                            Throwable
-                {
-                    MeshObject fixed1 = life.createMeshObject( fixed1Id, TestSubjectArea.AA );
-                    MeshObject fixed2 = life.createMeshObject( fixed2Id, TestSubjectArea.AA );
 
-                    return null;
-                }
+        log.debug( "Creating MeshObjectGraph that won't be rolled back" );
+
+        theMeshBase.executeNow( t -> {
+            MeshObject fixed1 = theMeshBase.createMeshObject( fixed1Id, TestSubjectArea.AA );
+            MeshObject fixed2 = theMeshBase.createMeshObject( fixed2Id, TestSubjectArea.AA );
+
+            return null;
         });
-        
+
         checkEquals( theMeshBase.size(), 3, "Wrong initial number of MeshObjects" );
 
         final MeshObject fixed1 = theMeshBase.findMeshObjectByIdentifier( fixed1Id );
@@ -77,33 +71,34 @@ public class RollbackTest1
 
         PropertyValue fixed1Value = fixed1.getPropertyValue( TestSubjectArea.AA_Y );
         PropertyValue fixed2Value = fixed2.getPropertyValue( TestSubjectArea.AA_Y );
-        
+
         //
-        
+
         log.debug( "Creating failing Transaction that will automatically be rolled back." );
-        
+
         theMeshBase.executeNow( new TransactionAction<Void>() {
                 @Override
-                public Void execute()
-                        throws
-                            Throwable
+                public Void execute(
+                        Transaction tx )
+                    throws
+                        Throwable
                 {
-                    MeshObject wrong1 = life.createMeshObject( wrong1Id, TestSubjectArea.AA );
-                    MeshObject wrong2 = life.createMeshObject( wrong2Id, TestSubjectArea.AA );
+                    MeshObject wrong1 = theMeshBase.createMeshObject( wrong1Id, TestSubjectArea.AA );
+                    MeshObject wrong2 = theMeshBase.createMeshObject( wrong2Id, TestSubjectArea.AA );
 
                     fixed1.setPropertyValue( TestSubjectArea.AA_Y, FloatValue.create( 1.2 ));
-                    
+
                     wrong1.relateAndBless( TestSubjectArea.AR1A.getSource(), wrong2 );
                     fixed1.relate( wrong1 );
                     wrong2.relateAndBless( TestSubjectArea.AR1A.getSource(), fixed2 );
-                    
+
                     wrong2.setPropertyValue( TestSubjectArea.AA_Y, FloatValue.create( 3.4 ));
-                    
+
                     fixed1.relateAndBless( TestSubjectArea.AR1A.getSource(), fixed2 );
-                    
+
                     throw new TransactionActionException.Rollback();
                 }
-                
+
                 @Override
                 public void preRollbackTransaction(
                         Transaction tx,
@@ -112,9 +107,9 @@ public class RollbackTest1
                     checkEquals( tx.getChangeSet().size(), 20, "Wrong number of changes" );
                 }
         });
-        
+
         //
-        
+
         checkEquals( theMeshBase.size(), 3, "Wrong initial number of MeshObjects" );
         checkCondition( theMeshBase.findMeshObjectByIdentifier( wrong1Id ) == null, "Found wrong1Id" );
         checkCondition( theMeshBase.findMeshObjectByIdentifier( wrong2Id ) == null, "Found wrong2Id" );
