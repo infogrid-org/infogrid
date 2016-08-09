@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -381,7 +381,7 @@ public abstract class AbstractGenerator
      */
     protected static final DateFormat theCurrentDateTimeFormat = new SimpleDateFormat(
             "EEE, yyyy-MM-dd HH:mm:ss Z" );
-    
+
     /**
      * StringRepresentation for comments.
      */

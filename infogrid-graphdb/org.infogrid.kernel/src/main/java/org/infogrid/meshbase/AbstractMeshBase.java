@@ -26,8 +26,17 @@ import org.infogrid.mesh.TypedMeshObjectFacade;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.externalized.ParserFriendlyExternalizedMeshObject;
 import org.infogrid.mesh.security.ThreadIdentityManager;
+import org.infogrid.mesh.set.CompositeImmutableMeshObjectSet;
+import org.infogrid.mesh.set.ImmutableMeshObjectSet;
+import org.infogrid.mesh.set.ImmutableTraversalPathSet;
+import org.infogrid.mesh.set.MeshObjectSelector;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
+import org.infogrid.mesh.set.MeshObjectSorter;
+import org.infogrid.mesh.set.OrderedImmutableMeshObjectSet;
+import org.infogrid.mesh.set.OrderedImmutableTraversalPathSet;
+import org.infogrid.mesh.set.TraversalPathSet;
+import org.infogrid.mesh.set.TraversalPathSorter;
 import org.infogrid.mesh.text.MeshStringRepresentationParameters;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.sweeper.Sweeper;
@@ -47,6 +56,8 @@ import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.meshbase.transaction.TransactionListener;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.RoleType;
+import org.infogrid.model.traversal.TraversalPath;
+import org.infogrid.model.traversal.TraversalSpecification;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.AbstractLiveDeadObject;
@@ -1147,16 +1158,521 @@ public abstract class AbstractMeshBase
     }
 
     /**
-     * Set a new factory for MeshObjectSets.
+     * Factory method to create an empty MeshObjectSet. This method may return
+     * the same instance every time it is invoked, but is not required to do so.
+     * Given that it is empty, we might as well return an OrderedMeshObjectSet.
      *
-     * @param newValue the new factory
-     * @see #getMeshObjectSetFactory
+     * @return the empty MeshObjectSet
      */
     @Override
-    public void setMeshObjectSetFactory(
-            MeshObjectSetFactory newValue )
+    public OrderedImmutableMeshObjectSet obtainEmptyImmutableMeshObjectSet()
     {
-        theMeshObjectSetFactory = newValue;
+        return theMeshObjectSetFactory.obtainEmptyImmutableMeshObjectSet();
+    }
+
+    /**
+     * Factory method to construct a MeshObjectSet with the single specified member.
+     * Given that it has only one member, we might as well return an OrderedMeshObjectSet.
+     *
+     * @param member the content of the set
+     * @return the created MeshObjectSet
+     */
+    @Override
+    public OrderedImmutableMeshObjectSet createSingleMemberImmutableMeshObjectSet(
+            MeshObject member )
+    {
+        return theMeshObjectSetFactory.createSingleMemberImmutableMeshObjectSet( member );
+    }
+
+    /**
+     * Factory method to construct a MeshObjectSet with the specified members.
+     *
+     * @param members the content of the set
+     * @return the created MeshObjectSet
+     */
+    @Override
+    public ImmutableMeshObjectSet createImmutableMeshObjectSet(
+            MeshObject [] members )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSet( members );
+    }
+
+    /**
+     * Factory method to construct a MeshObjectSet with the specified members, as long
+     * as they are selected by the MeshObjectSelector.
+     *
+     * @param candidates the candidate members of the set
+     * @param selector determines which candidates are included
+     * @return the created MeshObjectSet
+     */
+    public ImmutableMeshObjectSet createImmutableMeshObjectSet(
+            MeshObject []      candidates,
+            MeshObjectSelector selector )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSet( candidates, selector );
+    }
+
+    /**
+     * Factory method to construct a MeshObjectSet with the members of another
+     * MeshObjectSet, as long as they are selected by the MeshObjectSelector.
+     *
+     * @param input the input MeshObjectSet
+     * @param selector determines which candidates are included
+     * @return the created MeshObjectSet
+     */
+    @Override
+    public ImmutableMeshObjectSet createImmutableMeshObjectSet(
+            MeshObjectSet      input,
+            MeshObjectSelector selector )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSet( input, selector );
+    }
+
+    /**
+     * Factory method to construct a MeshObjectSet with all the members of the provided
+     * MeshObjectSets.
+     *
+     * @param operands the sets to unify
+     * @return the created MeshObjectSet
+     */
+    @Override
+    public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetUnification(
+            MeshObjectSet [] operands )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSetUnification( operands );
+    }
+
+    /**
+     * Factory method to construct a MeshObjectSet with all the members of the provided
+     * MeshObjectSets, as long as they are selected by the MeshObjectSelector.
+     *
+     * @param operands the sets to unify
+     * @param selector the MeshObjectSelector to use, if any
+     * @return the created MeshObjectSet
+     */
+    @Override
+    public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetUnification(
+            MeshObjectSet []   operands,
+            MeshObjectSelector selector )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSetUnification( operands, selector );
+    }
+
+    /**
+     * Convenience factory method to construct a unification of two MeshObjectSets.
+     *
+     * @param one the first set to unify
+     * @param two the second set to unify
+     * @return the created MeshObjectSet
+     */
+    @Override
+    public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetUnification(
+            MeshObjectSet one,
+            MeshObjectSet two )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSetUnification( one, two );
+    }
+
+    /**
+     * Convenience factory method to construct a unification of a MeshObjectSet and
+     * a second single-element MeshObjectSet.
+     *
+     * @param one the first set to unify
+     * @param two the second set to unify
+     * @return the created MeshObjectSet
+     */
+    public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetUnification(
+            MeshObjectSet one,
+            MeshObject    two )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSetUnification( one, two );
+    }
+
+    /**
+     * Factory method to construct a MeshObjectSet that contains those MeshObjects that are contained
+     * in all of the provided MeshObjectSets.
+     *
+     * @param operands the sets to intersect
+     * @return the created MeshObjectSet
+     */
+    @Override
+    public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetIntersection(
+            MeshObjectSet [] operands )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSetIntersection( operands );
+    }
+
+    /**
+     * Factory method to construct a MeshObjectSet that conatins those MeshObjects that are
+     * contained in all of the provided MeshObjectSets, as long as they are also
+     * selected by the MeshObjectSelector.
+     *
+     * @param operands the sets to intersect
+     * @param selector the MeshObjectSelector to use, if any
+     * @return the created MeshObjectSet
+     */
+    @Override
+    public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetIntersection(
+            MeshObjectSet []   operands,
+            MeshObjectSelector selector )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSetIntersection( operands, selector );
+    }
+
+    /**
+     * Convenience factory method to construct an intersection of two MeshObjectSets.
+     *
+     * @param one the first set to intersect
+     * @param two the second set to intersect
+     * @return the created MeshObjectSet
+     */
+    @Override
+    public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetIntersection(
+            MeshObjectSet one,
+            MeshObjectSet two )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSetIntersection( one, two );
+    }
+
+    /**
+     * Convenience factory method to construct an intersection of two MeshObjectSets.
+     *
+     * @param one the first set to intersect
+     * @param two the second set to intersect
+     * @return the created MeshObjectSet
+     */
+    @Override
+    public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetIntersection(
+            MeshObjectSet one,
+            MeshObject    two )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSetIntersection( one, two );
+    }
+
+    /**
+     * Factory method to construct a MeshObjectSet that contains those MeshObjects from
+     * a first MeshObjectSet that are not contained in a second MeshObjectSet.
+     *
+     * @param one the first MeshObjectSet
+     * @param two the second MeshObjectSet
+     * @return the created CompositeImmutableMeshObjectSet
+     */
+    @Override
+    public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetMinus(
+            MeshObjectSet one,
+            MeshObjectSet two )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSetMinus( one, two );
+    }
+
+    /**
+     * Factory method to construct a MeshObjectSet that contains those MeshObjects from
+     * a first MeshObjectSet that are not contained in a second MeshObjectSet.
+     *
+     * @param one the first MeshObjectSet
+     * @param two the second MeshObjectSet
+     * @return the created CompositeImmutableMeshObjectSet
+     */
+    @Override
+    public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetMinus(
+            MeshObjectSet one,
+            MeshObject    two )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSetMinus( one, two );
+    }
+
+    /**
+     * Factory method to construct a MeshObjectSet that contains those MeshObjects from
+     * a first MeshObjectSet that are not contained in a second MeshObjectSet, as long
+     * as they are also selected by the MeshObjectSelector.
+     *
+     * @param one the first MeshObjectSet
+     * @param two the second MeshObjectSet
+     * @param selector the MeshObjectSelector to use, if any
+     * @return the created CompositeImmutableMeshObjectSet
+     */
+    @Override
+    public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetMinus(
+            MeshObjectSet      one,
+            MeshObjectSet      two,
+            MeshObjectSelector selector )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSetMinus( one, two );
+    }
+
+    /**
+     * Factory method to create an OrderedMeshObjectSet.
+     *
+     * @param contentInOrder the content of the OrderedMeshObjectSet, in order
+     * @return the created OrderedImmutableMeshObjectSet
+     */
+    @Override
+    public OrderedImmutableMeshObjectSet createOrderedImmutableMeshObjectSet(
+            MeshObject [] contentInOrder )
+    {
+        return theMeshObjectSetFactory.createOrderedImmutableMeshObjectSet( contentInOrder );
+    }
+
+    /**
+     * Factory method to create an OrderedMeshObjectSet with the specified members, as long
+     * as they are selected by the MeshObjectSelector.
+     *
+     * @param candidatesInOrder the candidate content of the OrderedMeshObjectSet, in order
+     * @param selector determines which candidates are included
+     * @return the created OrderedImmutableMeshObjectSet
+     */
+    @Override
+    public OrderedImmutableMeshObjectSet createOrderedImmutableMeshObjectSet(
+            MeshObject []      candidatesInOrder,
+            MeshObjectSelector selector )
+    {
+        return theMeshObjectSetFactory.createOrderedImmutableMeshObjectSet( candidatesInOrder, selector );
+    }
+
+    /**
+     * Factory method to create an OrderedMeshObjectSet.
+     *
+     * @param content the content of the OrderedMeshObjectSet, in any order
+     * @param sorter the MeshObjectSorter that determines the ordering within the OrderedMeshObjectSet
+     * @return the created OrderedImmutableMeshObjectSet
+     */
+    @Override
+    public OrderedImmutableMeshObjectSet createOrderedImmutableMeshObjectSet(
+            MeshObject []    content,
+            MeshObjectSorter sorter )
+    {
+        return theMeshObjectSetFactory.createOrderedImmutableMeshObjectSet( content, sorter );
+    }
+
+    /**
+     * Factory method to create an OrderedMeshObjectSet.
+     *
+     * @param content the content of the OrderedMeshObjectSet
+     * @param sorter the MeshObjectSorter that determines the ordering within the OrderedMeshObjectSet
+     * @return the created OrderedImmutableMeshObjectSet
+     */
+    @Override
+    public OrderedImmutableMeshObjectSet createOrderedImmutableMeshObjectSet(
+            MeshObjectSet    content,
+            MeshObjectSorter sorter )
+    {
+        return theMeshObjectSetFactory.createOrderedImmutableMeshObjectSet( content, sorter );
+    }
+
+    /**
+     * Factory method to create an OrderedMeshObjectSet.
+     *
+     * @param content the content of the OrderedMeshObjectSet
+     * @param sorter the MeshObjectSorter that determines the ordering within the OrderedMeshObjectSet
+     * @param max the maximum number of MeshObjects that will be contained by this set. If the underlying set contains more,
+     *        this set will only contain the first max MeshObjects according to the sorter.
+     * @return the created OrderedImmutableMeshObjectSet
+     */
+    @Override
+    public OrderedImmutableMeshObjectSet createOrderedImmutableMeshObjectSet(
+            MeshObjectSet    content,
+            MeshObjectSorter sorter,
+            int              max )
+    {
+        return theMeshObjectSetFactory.createOrderedImmutableMeshObjectSet( content, sorter, max );
+    }
+
+   /**
+     * Factory method to construct a ImmutableMeshObjectSet as the result of
+     * traversing from a MeshObject through a TraversalSpecification.
+     *
+     * @param startObject the MeshObject from where we start the traversal
+     * @param specification the TraversalSpecification to apply to the startObject
+     * @return the created ActiveMeshObjectSet
+     */
+    @Override
+    public ImmutableMeshObjectSet createImmutableMeshObjectSet(
+            MeshObject             startObject,
+            TraversalSpecification specification )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSet( startObject, specification );
+    }
+
+    /**
+     * Factory method to construct a ImmutableMeshObjectSet as the result of
+     * traversing from a MeshObjectSet through a TraversalSpecification.
+     *
+     * @param startSet the MeshObjectSet from where we start the traversal
+     * @param specification the TraversalSpecification to apply to the startObject
+     * @return the created ActiveMeshObjectSet
+     */
+    @Override
+    public ImmutableMeshObjectSet createImmutableMeshObjectSet(
+            MeshObjectSet          startSet,
+            TraversalSpecification specification )
+    {
+        return theMeshObjectSetFactory.createImmutableMeshObjectSet( startSet, specification );
+    }
+
+    /**
+     * Factory method to construct a ImmutableMeshObjectSet as the result of
+     * traversing from a MeshObject through a TraversalSpecification, and repeating that process.
+     *
+     * @param startObject the MeshObject from where we start the traversal
+     * @param specification the TraversalSpecification to apply to the startObject
+     * @return the created ActiveMeshObjectSet
+     */
+    @Override
+    public ImmutableMeshObjectSet createTransitiveClosureImmutableMeshObjectSet(
+            MeshObject             startObject,
+            TraversalSpecification specification )
+    {
+        return theMeshObjectSetFactory.createTransitiveClosureImmutableMeshObjectSet( startObject, specification );
+    }
+
+    /**
+     * Factory method to create an empty TraversalPathSet. This method may return
+     * the same instance every time it is invoked, but is not required to do so.
+     * Given that it is empty, we might as well return an OrderedTraversalPathSet.
+     *
+     * @return the empty TraversalPathSet
+     */
+    @Override
+    public OrderedImmutableTraversalPathSet obtainEmptyImmutableTraversalPathSet()
+    {
+        return theMeshObjectSetFactory.obtainEmptyImmutableTraversalPathSet();
+    }
+
+    /**
+     * Factory method to create an ImmutableTraversalPathSet.
+     * Given that it has only one member, it might as well return an ordered TraversalPathSet.
+     *
+     * @param singleMember the single member of the ImmutableTraversalPathSet
+     * @return return the created ImmutableTraversalPathSet
+     */
+    @Override
+    public ImmutableTraversalPathSet createSingleMemberImmutableTraversalPathSet(
+            TraversalPath singleMember )
+    {
+        return theMeshObjectSetFactory.createSingleMemberImmutableTraversalPathSet( singleMember );
+    }
+
+    /**
+     * Factory method to create an ImmutableTraversalPathSet.
+     *
+     * @param content the content for the ImmutableTraversalPathSet
+     * @return the created ImmutableTraversalPathSet
+     */
+    @Override
+    public ImmutableTraversalPathSet createImmutableTraversalPathSet(
+            TraversalPath [] content )
+    {
+        return theMeshObjectSetFactory.createImmutableTraversalPathSet( content );
+    }
+
+    /**
+     * Factory method to create an ImmutableTraversalPathSet.
+     * This creates a set of TraversalPaths each with length 1.
+     * The destination of each TraversalPath corresponds to the elements of the
+     * given MeshObjectSet. The TraversalSpecification is passed in.
+     *
+     * @param spec the traversed TraversalSpecification
+     * @param set used to construct the content for the ImmutableTraversalPathSet
+     * @return the created ImmutableTraversalPathSet
+     */
+    @Override
+    public ImmutableTraversalPathSet createImmutableTraversalPathSet(
+            TraversalSpecification spec,
+            MeshObjectSet          set )
+    {
+        return theMeshObjectSetFactory.createImmutableTraversalPathSet( spec, set );
+    }
+
+    /**
+     * Factory method to create an ImmutableTraversalPathSet.
+     *
+     * @param start the MeshObject from which we start the traversal
+     * @param spec the TraversalSpecification from the start MeshObject
+     * @return the created ImmutableTraversalPathSet
+     */
+    @Override
+    public ImmutableTraversalPathSet createImmutableTraversalPathSet(
+            MeshObject             start,
+            TraversalSpecification spec )
+    {
+        return theMeshObjectSetFactory.createImmutableTraversalPathSet( start, spec );
+    }
+
+    /**
+     * Factory method to create an ImmutableTraversalPathSet.
+     *
+     * @param startSet the MeshObjectSet from which we start the traversal
+     * @param spec the TraversalSpecification from the start MeshObject
+     * @return the created ImmutableTraversalPathSet
+     */
+    @Override
+    public ImmutableTraversalPathSet createImmutableTraversalPathSet(
+            MeshObjectSet          startSet,
+            TraversalSpecification spec )
+    {
+        return theMeshObjectSetFactory.createImmutableTraversalPathSet( startSet, spec );
+    }
+
+    /**
+     * Factory method to create an ImmutableTraversalPathSet.
+     *
+     * @param startSet the TraversalPathSet from whose destination MeshObject we start the traversal
+     * @param spec the TraversalSpecification from the start MeshObject
+     * @return the created ImmutableTraversalPathSet
+     */
+    @Override
+    public ImmutableTraversalPathSet createImmutableTraversalPathSet(
+            TraversalPathSet       startSet,
+            TraversalSpecification spec )
+    {
+        return theMeshObjectSetFactory.createImmutableTraversalPathSet( startSet, spec );
+    }
+
+    /**
+     * Factory method to create an OrderedImmutableTraversalPathSet.
+     *
+     * @param content the content of the TraversalPathSet
+     * @param sorter the TraversalPathSorter that determines the ordering within the OrderedTraversalPathSet
+     * @return the created OrderedImmutableTraversalPathSet
+     */
+    @Override
+    public OrderedImmutableTraversalPathSet createOrderedImmutableTraversalPathSet(
+            TraversalPathSet    content,
+            TraversalPathSorter sorter )
+    {
+        return theMeshObjectSetFactory.createOrderedImmutableTraversalPathSet( content, sorter );
+    }
+
+    /**
+     * Factory method to create an OrderedImmutableTraversalPathSet.
+     *
+     * @param content the content of the TraversalPathSet
+     * @param sorter the TraversalPathSorter that determines the ordering within the OrderedTraversalPathSet
+     * @param max the maximum number of TraversalPaths that will be contained by this set. If the underlying set contains more,
+     *        this set will only contain the first max TraversalPaths according to the sorter.
+     * @return the created OrderedImmutableTraversalPathSet
+     */
+    @Override
+    public OrderedImmutableTraversalPathSet createOrderedImmutableTraversalPathSet(
+            TraversalPathSet    content,
+            TraversalPathSorter sorter,
+            int                 max )
+    {
+        return theMeshObjectSetFactory.createOrderedImmutableTraversalPathSet( content, sorter, max );
+    }
+
+    /**
+     * Convenience method to return an array of MeshObjects as an
+     * array of the canonical Identifiers of the member MeshObjects.
+     *
+     * @param array the MeshObjects
+     * @return the array of IdentifierValues representing the Identifiers
+     */
+    @Override
+    public MeshObjectIdentifier [] asIdentifiers(
+            MeshObject [] array )
+    {
+        return theMeshObjectSetFactory.asIdentifiers( array );
     }
 
     /**
@@ -2242,14 +2758,14 @@ public abstract class AbstractMeshBase
     /**
       * The number of tries before "asap" Transactions time out.
       */
-    private int nTries = theResourceHelper.getResourceIntegerOrDefault(
+    private final int nTries = theResourceHelper.getResourceIntegerOrDefault(
             "NTriesForAsapTransactions",
             10 );
 
     /**
       * The interval in milliseconds before an "asap" Transaction is retried.
       */
-    private int asapRetryInterval = theResourceHelper.getResourceIntegerOrDefault(
+    private final int asapRetryInterval = theResourceHelper.getResourceIntegerOrDefault(
             "AsapTransactionRetryInterval",
             200 );
 

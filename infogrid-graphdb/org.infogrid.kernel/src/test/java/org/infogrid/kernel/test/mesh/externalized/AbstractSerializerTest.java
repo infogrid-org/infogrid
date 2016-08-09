@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -35,7 +35,7 @@ public abstract class AbstractSerializerTest
 {
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -47,10 +47,10 @@ public abstract class AbstractSerializerTest
         ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
 
         registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.kernel" ))).activateRecursively();
-        
+
         Log4jLog.configure( "org/infogrid/kernel/test/mesh/externalized/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/kernel/test/mesh/externalized/ResourceHelper",
                 Locale.getDefault(),
