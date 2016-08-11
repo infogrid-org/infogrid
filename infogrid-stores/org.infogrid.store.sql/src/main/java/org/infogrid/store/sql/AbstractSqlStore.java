@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -17,8 +17,8 @@ package org.infogrid.store.sql;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.NoSuchElementException;
-import org.infogrid.store.AbstractIterableStore;
-import org.infogrid.store.IterableStoreCursor;
+import org.infogrid.store.AbstractStore;
+import org.infogrid.store.StoreCursor;
 import org.infogrid.store.StoreKeyDoesNotExistException;
 import org.infogrid.store.StoreKeyExistsAlreadyException;
 import org.infogrid.store.StoreValue;
@@ -32,7 +32,7 @@ import org.infogrid.util.sql.SqlDatabase;
  */
 public abstract class AbstractSqlStore
         extends
-            AbstractIterableStore
+            AbstractStore
         implements
             CanBeDumped
 {
@@ -54,16 +54,17 @@ public abstract class AbstractSqlStore
 
     /**
      * Obtain the Database that this AbstractSqlStore works on.
-     * 
+     *
      * @return the Database
      */
     public SqlDatabase getDatabase()
     {
         return theDatabase;
     }
-    
+
     /**
      * Obtain the name of the table in the SQL DataSource in which the data will be stored
+     * @return
      */
     public String getTableName()
     {
@@ -73,9 +74,10 @@ public abstract class AbstractSqlStore
     /**
      * Initialize the Store. If the Store was initialized earlier, this will delete all
      * contained information. This operation is similar to unconditionally formatting a hard drive.
-     * 
+     *
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void initializeHard()
             throws
                 IOException
@@ -83,14 +85,15 @@ public abstract class AbstractSqlStore
         dropTables();
         createTables();
     }
-    
+
     /**
      * Initialize the Store if needed. If the Store was initialized earlier, this will do
      * nothing. This operation is equivalent to {@link #initializeHard} if and only if
      * the Store had not been initialized earlier.
-     * 
+     *
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public synchronized void initializeIfNecessary()
             throws
                 IOException
@@ -102,25 +105,25 @@ public abstract class AbstractSqlStore
 
     /**
      * Determine whether the SqlStore has the SQL tables it needs.
-     * 
+     *
      * @return true if the Store yhas the SQL tables it needs
      */
     protected abstract boolean hasTables();
-    
+
     /**
      * Drop all tables that this SqlStore needs. Do nothing if there are none.
      */
     protected abstract void dropTables();
-    
+
     /**
      * Create all tables that this SqlStore needs.
-     * 
+     *
      * @throws IOException thrown if creating the tables was not possible
      */
     protected abstract void createTables()
             throws
                 IOException;
-    
+
     /**
      * Put a data element into the Store for the first time. Throw an Exception if a data
      * element has already been store using the same key.
@@ -132,6 +135,7 @@ public abstract class AbstractSqlStore
      * @see #update if a data element with this key exists already
      * @see #putOrUpdate if a data element with this key may exist already
      */
+    @Override
     public void put(
             StoreValue toStore )
         throws
@@ -159,6 +163,7 @@ public abstract class AbstractSqlStore
      * @see #put if a data element with this key does not exist already
      * @see #putOrUpdate if a data element with this key may exist already
      */
+    @Override
     public void update(
             StoreValue toUpdate )
         throws
@@ -173,7 +178,7 @@ public abstract class AbstractSqlStore
                 toUpdate.getTimeExpires(),
                 toUpdate.getData() );
     }
-    
+
     /**
      * Put (if does not exist already) or update (if it does exist) a data element in the Store.
      *
@@ -184,6 +189,7 @@ public abstract class AbstractSqlStore
      * @see #put if a data element with this key does not exist already
      * @see #update if a data element with this key exists already
      */
+    @Override
     public boolean putOrUpdate(
             StoreValue toStoreOrUpdate )
         throws
@@ -198,13 +204,14 @@ public abstract class AbstractSqlStore
                 toStoreOrUpdate.getTimeExpires(),
                 toStoreOrUpdate.getData() );
     }
-    
+
     /**
      * Obtain an Iterator over the content of this Store.
      *
      * @return the Iterator
      */
-    public IterableStoreCursor iterator()
+    @Override
+    public StoreCursor iterator()
     {
         try {
             if( isEmpty() ) {
@@ -325,7 +332,7 @@ public abstract class AbstractSqlStore
      */
     protected abstract int hasPreviousExcluding(
             String key );
-    
+
     /**
      * Determine the number of rows between two keys.
      *

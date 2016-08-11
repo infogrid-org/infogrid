@@ -23,7 +23,7 @@ import org.diet4j.core.ModuleRequirement;
 import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.httpd.server.HttpServer;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.IterableMeshBase;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
@@ -40,7 +40,6 @@ import org.infogrid.probe.blob.BlobProbe;
 import org.infogrid.probe.m.MProbeDirectory;
 import org.infogrid.probe.xrd.WebfingerAcctProbe;
 import org.infogrid.probe.xrd.XrdProbe;
-import org.infogrid.probe.xrd.test.AbstractXrdTest;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.context.Context;
@@ -64,7 +63,7 @@ public abstract class AbstractWebfingerTest
 
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -76,10 +75,10 @@ public abstract class AbstractWebfingerTest
         ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
 
         registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.probe.xrd" ))).activateRecursively();
-        
+
         Log4jLog.configure( "org/infogrid/probe/xrd/test/webfinger/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/probe/xrd/test/webfinger/ResourceHelper",
                 Locale.getDefault(),
@@ -150,9 +149,9 @@ public abstract class AbstractWebfingerTest
      * @throws Exception all sorts of things may go wrong during a test
      */
     protected final void dumpMeshBase(
-            IterableMeshBase mb,
-            String           prefix,
-            Log              mylog )
+            MeshBase mb,
+            String   prefix,
+            Log      mylog )
         throws
             Exception
     {

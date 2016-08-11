@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -23,9 +23,8 @@ import org.diet4j.core.ModuleRequirement;
 import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
-import org.infogrid.meshbase.IterableMeshBase;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
-import org.infogrid.meshbase.net.IterableNetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
@@ -58,7 +57,7 @@ public abstract class AbstractProbeTest
 {
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -71,10 +70,10 @@ public abstract class AbstractProbeTest
 
         registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.probe" ))).activateRecursively();
         registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.model.Test" ))).activateRecursively();
-        
+
         Log4jLog.configure( "org/infogrid/probe/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/probe/test/ResourceHelper",
                 Locale.getDefault(),
@@ -91,8 +90,8 @@ public abstract class AbstractProbeTest
      * @return the number of MeshObjects in the MeshBase
      */
     protected static int countMeshObjects(
-            IterableNetMeshBase base,
-            Log                 mylog )
+            NetMeshBase base,
+            Log         mylog )
     {
         int    ret = countFromIterator( base.iterator(), mylog );
         return ret;
@@ -137,9 +136,9 @@ public abstract class AbstractProbeTest
      * @throws Exception catch-all Exception
      */
     protected final void dumpMeshBase(
-            IterableMeshBase mb,
-            String           prefix,
-            Log              mylog )
+            MeshBase mb,
+            String   prefix,
+            Log      mylog )
         throws
             Exception
     {
@@ -179,7 +178,7 @@ public abstract class AbstractProbeTest
 
     /**
      * Dump a ChangeSet to the traceMethodCallEntry channel of a Log.
-     * 
+     *
      * @param changes the ChangeSet to dump
      * @param mylog the Log
      */
@@ -215,7 +214,7 @@ public abstract class AbstractProbeTest
             reportError( "Cannot check proxies of null object" );
             return;
         }
-        
+
         Proxy [] proxies = obj.getAllProxies();
 
         if( proxies == null || proxies.length == 0 ) {
@@ -232,7 +231,7 @@ public abstract class AbstractProbeTest
         if( proxies.length != proxiesTowards.length ) {
             reportError( msg + ": object has wrong number of proxies.", proxiesTowards, proxies.length );
         }
-        
+
         NetMeshBaseIdentifier [] proxiesIdentifiers        = new NetMeshBaseIdentifier[ proxies.length ];
         NetMeshBaseIdentifier [] proxiesTowardsIdentifiers = new NetMeshBaseIdentifier[ proxiesTowards.length ];
         for( int i=0 ; i<proxies.length ; ++i ) {
@@ -268,7 +267,7 @@ public abstract class AbstractProbeTest
             checkEquals( proxyTowardHome.getIdentifier(), obj.getProxyTowardsHomeReplica().getPartnerMeshBaseIdentifier(), msg + ": wrong proxyTowardLock" );
         }
     }
-    
+
     /**
      * The root context for these tests.
      */
@@ -278,7 +277,7 @@ public abstract class AbstractProbeTest
      * The ModelBase.
      */
     protected static ModelBase theModelBase;
-    
+
     /**
      * The test protocol. In the real world this would be something like "jdbc".
      */

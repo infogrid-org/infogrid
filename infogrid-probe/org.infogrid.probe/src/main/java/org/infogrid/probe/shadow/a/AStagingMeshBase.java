@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -18,7 +18,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
-import org.infogrid.meshbase.net.IterableNetMeshBaseDifferencer;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
@@ -29,7 +28,6 @@ import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.util.CachingMap;
-import org.infogrid.util.CursorIterator;
 import org.infogrid.util.context.Context;
 
 /**
@@ -86,7 +84,7 @@ public abstract class AStagingMeshBase
 
     /**
      * <p>Obtain a manager for object lifecycles.</p>
-     * 
+     *
      * @return a MeshBaseLifecycleManager that works on this MeshBase with the specified parameters
      */
     @Override
@@ -94,26 +92,17 @@ public abstract class AStagingMeshBase
     {
         return (AStagingMeshBaseLifecycleManager) theMeshBaseLifecycleManager;
     }
-    
+
     /**
      * Enable the ProbeDispatcher to obtain the home object in the StagingMeshBase.
      *
      * @param timeCreated the creation date for the home object
      */
+    @Override
     public void initializeHomeObject(
             long timeCreated )
     {
         super.initializeHomeObject( timeCreated, timeCreated, timeCreated );
-    }
-
-    /**
-     * Map iterator.
-     *
-     * @return the iterator
-     */
-    public final CursorIterator<MeshObject> getIterator()
-    {
-        return iterator();
     }
 
     /**
@@ -149,40 +138,6 @@ public abstract class AStagingMeshBase
     }
 
     /**
-     * Determine the number of MeshObjects in this MeshBase.
-     *
-     * @return the number of MeshObjects in this MeshBase
-     */
-    public int size()
-    {
-        return theCache.size();
-    }
-   
-    /**
-     * Determine the number of MeshObjects in this MeshBase. This redundant method
-     * is provided to make life easier for JavaBeans-aware software.
-     *
-     * @return the number of MeshObjects in this MeshBase
-     * @see #size()
-     */
-    public final int getSize()
-    {
-        return size();
-    }
-
-    /**
-     * Factory method for a IterableMeshBaseDifferencer, with this IterableMeshBase
-     * being the comparison base.
-     *
-     * @return the IterableMeshBaseDifferencer
-     * @throws UnsupportedOperationException always thrown because this should not be invoked on ShadowMeshBases
-     */
-    public IterableNetMeshBaseDifferencer getDifferencer()
-    {
-        return null;
-    }
-
-    /**
      * Continually sweep this IterableMeshBase in the background, according to
      * the configured Sweeper. For ShadowMeshBases, this does nothing.
      *
@@ -193,7 +148,7 @@ public abstract class AStagingMeshBase
     {
         // no op
     }
-    
+
     /**
      * Stop the background sweeping. For ShadowMeshBases, this does nothing.
      */
@@ -201,7 +156,7 @@ public abstract class AStagingMeshBase
     {
         // no op
     }
-    
+
     /**
      * Perform a sweep on every single MeshObject in this InterableMeshBase.
      * This may take a long time; using background sweeping is almost always

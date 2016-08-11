@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -18,20 +18,15 @@ import java.io.IOException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import org.infogrid.jee.app.InfoGridWebApp;
 import org.infogrid.jee.rest.defaultapp.store.AbstractStoreRestfulAppInitializationFilter;
 import org.infogrid.jee.templates.defaultapp.AppInitializationException;
 import org.infogrid.jee.viewlet.DefaultJeeMeshObjectsToViewFactory;
 import org.infogrid.jee.viewlet.JeeMeshObjectsToViewFactory;
 import org.infogrid.meshbase.MeshBase;
-import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.MeshBaseIdentifierFactory;
 import org.infogrid.meshbase.MeshBaseNameServer;
-import org.infogrid.meshbase.security.AccessManager;
-import org.infogrid.meshbase.store.IterableStoreMeshBase;
 import org.infogrid.model.traversal.TraversalTranslator;
 import org.infogrid.model.traversal.xpath.XpathTraversalTranslator;
-import org.infogrid.modelbase.ModelBase;
 import org.infogrid.store.m.MStore;
 import org.infogrid.store.sql.mysql.MysqlStore;
 import org.infogrid.util.CompoundException;

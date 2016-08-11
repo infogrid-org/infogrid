@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -20,7 +20,7 @@ import java.util.Collection;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.meshbase.net.IterableNetMeshBaseDifferencer;
+import org.infogrid.meshbase.net.NetMeshBaseDifferencer;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.transaction.ChangeSet;
 import org.infogrid.probe.shadow.ShadowMeshBase;
@@ -41,7 +41,7 @@ public class ShadowTest1
 {
     /**
      * Test parameters.
-     * 
+     *
      * @return test parameters
      */
     @Parameterized.Parameters
@@ -64,7 +64,7 @@ public class ShadowTest1
             Exception
     {
         log.info( "accessing #abc of test file with NetMeshBase" );
-        
+
         MeshObject abc = base.accessLocally(
                 base.getNetMeshObjectAccessSpecificationFactory().obtain(
                         testFile1Id,
@@ -73,22 +73,22 @@ public class ShadowTest1
 
         checkObject( abc, "Object not found" );
         checkEquals( IteratorElementCounter.countIteratorElements( base.proxies()), 1, "wrong number of proxies in main NetMeshBase" );
-        
+
         //
-        
+
         log.info( "accessing #def of test file with NetMeshBase" );
-        
+
         MeshObject def = base.accessLocally(
                 base.getNetMeshObjectAccessSpecificationFactory().obtain(
                         testFile1Id,
                         base.getMeshObjectIdentifierFactory().fromExternalForm( testFile1Id.toExternalForm() + "#def" ),
                         CoherenceSpecification.ONE_TIME_ONLY ));
-                
+
         checkObject( def, "Object not found" );
         checkEquals( IteratorElementCounter.countIteratorElements( base.proxies()), 1, "wrong number of proxies in main NetMeshBase" );
 
         //
-        
+
         log.info( "traverse to related objects" );
 
         MeshObjectSet abcNeighbors = abc.traverseToNeighborMeshObjects();
@@ -98,18 +98,18 @@ public class ShadowTest1
         checkEquals( defNeighbors.size(), 1, "wrong number of neighbors for def" );
 
         //
-        
+
         log.info( "now compare main and shadow base" );
-        
+
         ShadowMeshBase shadow = base.getShadowMeshBaseFor( testFile1Id );
-        
-        IterableNetMeshBaseDifferencer diff = new IterableNetMeshBaseDifferencer( base );
+
+        NetMeshBaseDifferencer diff = new NetMeshBaseDifferencer( base );
         ChangeSet changes = diff.determineChangeSet( shadow );
 
         // these two are here for better debugging
         MeshObject baseHome   = base.getHomeObject();
         MeshObject shadowHome = shadow.getHomeObject();
-        
+
         checkEquals( changes.size(), 6, "wrong number of changes" );
         // These changes should be:
         // 1. Home Object created
@@ -126,7 +126,7 @@ public class ShadowTest1
 
     /**
      * Constructor with parameters.
-     * 
+     *
      * @param testFile1 the test file
      * @throws Exception all sorts of things can go wrong during a test
      */

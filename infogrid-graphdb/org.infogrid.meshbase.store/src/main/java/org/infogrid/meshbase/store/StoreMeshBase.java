@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.store;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.infogrid.mesh.MeshObject;
@@ -22,6 +23,7 @@ import org.infogrid.mesh.a.DefaultAMeshObjectIdentifierFactory;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 import org.infogrid.meshbase.DefaultMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.MeshBaseDifferencer;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.MeshObjectIdentifierFactory;
 import org.infogrid.meshbase.a.AMeshBase;
@@ -40,6 +42,7 @@ import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.m.MModelBase;
 import org.infogrid.store.Store;
 import org.infogrid.store.util.StoreBackedSwappingHashMap;
+import org.infogrid.util.CursorIterator;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.context.SimpleContext;
 import org.infogrid.util.logging.Log;
@@ -103,6 +106,7 @@ public class StoreMeshBase
                 accessMgr,
                 meshObjectStore,
                 context );
+        setFactory.setMeshBase( ret );
 
         return ret;
     }
@@ -129,7 +133,7 @@ public class StoreMeshBase
         StoreMeshBaseEntryMapper objectMapper = new StoreMeshBaseEntryMapper();
 
         StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject> objectStorage
-                = new StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>( objectMapper, meshObjectStore );
+                = new StoreMeshBaseSwappingHashMap<>( objectMapper, meshObjectStore );
 
         MeshObjectIdentifierFactory identifierFactory = DefaultAMeshObjectIdentifierFactory.create();
         AMeshBaseLifecycleManager   life              = AMeshBaseLifecycleManager.create();
@@ -144,7 +148,6 @@ public class StoreMeshBase
                 objectStorage,
                 context );
 
-        setFactory.setMeshBase( ret );
         objectMapper.setMeshBase( ret );
         ret.initializeHomeObject();
 
@@ -178,7 +181,7 @@ public class StoreMeshBase
         StoreMeshBaseEntryMapper objectMapper = new StoreMeshBaseEntryMapper();
 
         StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject> objectStorage
-                = new StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>( objectMapper, meshObjectStore );
+                = new StoreMeshBaseSwappingHashMap<>( objectMapper, meshObjectStore );
 
         AMeshBaseLifecycleManager life = AMeshBaseLifecycleManager.create();
 
@@ -237,6 +240,65 @@ public class StoreMeshBase
     }
 
     /**
+     * Obtain an Iterator over all MeshObjects in the Store.
+     *
+     * @return the Iterator
+     */
+    public CursorIterator<MeshObject> iterator()
+    {
+        return getCachingMap().valuesIterator( MeshObjectIdentifier.class, MeshObject.class );
+    }
+
+    /**
+     * Obtain an Iterator over all MeshObjects in the Store.
+     *
+     * @return the Iterator
+     */
+    final public CursorIterator<MeshObject> getIterator()
+    {
+        return iterator();
+    }
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase.
+     *
+     * @return the number of MeshObjects in this MeshBase
+     */
+    public int size()
+    {
+        try {
+            return getCachingMap().getStore().size();
+
+        } catch( IOException ex ) {
+            log.error( ex );
+            return 0;
+        }
+    }
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase. This redundant method
+     * is provided to make life easier for JavaBeans-aware software.
+     *
+     * @return the number of MeshObjects in this MeshBase
+     * @see #size()
+     */
+    public final int getSize()
+    {
+        return size();
+    }
+
+    /**
+     * Factory method for a IterableMeshBaseDifferencer, with this IterableMeshBase
+     * being the comparison base.
+     *
+     * @return the IterableMeshBaseDifferencer
+     */
+    public MeshBaseDifferencer getDifferencer()
+    {
+        return new MeshBaseDifferencer( this );
+    }
+
+    /**
      * Update the cache when Transactions are committed.
      *
      * @param tx Transaction the Transaction that was committed
@@ -282,14 +344,14 @@ public class StoreMeshBase
      * use it without replicating code.
      *
      * @param tx Transaction the Transaction that was committed
-     * @param map the storage for the MeshObjects
+     * @return
      */
     public static Map<MeshObjectIdentifier,MeshObject> determineObjectsToWriteFromTransaction(
             Transaction tx )
     {
         Change [] theChanges = tx.getChangeSet().getChanges();
 
-        HashMap<MeshObjectIdentifier,MeshObject> ret = new HashMap<MeshObjectIdentifier,MeshObject>( theChanges.length );
+        HashMap<MeshObjectIdentifier,MeshObject> ret = new HashMap<>( theChanges.length );
 
         // we go backwards, that way we don't forget to store MeshObjects that were deleted and recreated within the
         // same Transaction

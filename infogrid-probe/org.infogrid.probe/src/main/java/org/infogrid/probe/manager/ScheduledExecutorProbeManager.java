@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
-import org.infogrid.meshbase.transaction.TransactionAction;
+import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionActionException;
 import org.infogrid.model.Probe.ProbeSubjectArea;
 import org.infogrid.model.Probe.ProbeUpdateSpecification;
@@ -71,20 +71,20 @@ public abstract class ScheduledExecutorProbeManager
 
         theExecutorService = null; // must invoke start() to start
     }
-    
+
     /**
      * Obtain the ScheduledExecutorService that is used by this ProbeManager.
-     * 
+     *
      * @return the ScheduledExecutorService
      */
     public ScheduledExecutorService getScheduledExecutorService()
     {
         return theExecutorService;
     }
-    
+
     /**
      * Start this ScheduledExecutorProbeManager.
-     * 
+     *
      * @param exec the ScheduledExecutorService to use
      */
     public synchronized void start(
@@ -112,7 +112,7 @@ public abstract class ScheduledExecutorProbeManager
                     long nextTime = value.getDelayUntilNextUpdate();
                     if( nextTime >= 0 ) {  // allow 0 for immediate execution
                         ScheduledFuture<Long> newFuture = theExecutorService.schedule(
-                                new ExecutorAdapter( new WeakReference<ScheduledExecutorProbeManager>( this ), key, nextTime ),
+                                new ExecutorAdapter( new WeakReference<>( this ), key, nextTime ),
                                 nextTime,
                                 TimeUnit.MILLISECONDS );
                         theFutures.put( key, newFuture );
@@ -142,7 +142,7 @@ public abstract class ScheduledExecutorProbeManager
             current.cancel( false );
         }
         theFutures.clear();
-        
+
         theExecutorService = null;
     }
 
@@ -153,6 +153,7 @@ public abstract class ScheduledExecutorProbeManager
      * @throws ProbeException thrown if the update was unsuccessful
      * @throws IsDeadException thrown in this ShadowMeshBase is dead already
      */
+    @Override
     public void doUpdateNow(
             ShadowMeshBase shadow )
         throws
@@ -168,7 +169,7 @@ public abstract class ScheduledExecutorProbeManager
 
         if( nextTime >= 0 ) {  // allow 0 for immediate execution
             ScheduledFuture<Long> newFuture = theExecutorService.schedule(
-                    new ExecutorAdapter( new WeakReference<ScheduledExecutorProbeManager>( this ), shadow.getIdentifier(), nextTime ),
+                    new ExecutorAdapter( new WeakReference<>( this ), shadow.getIdentifier(), nextTime ),
                     nextTime,
                     TimeUnit.MILLISECONDS );
             theFutures.put( shadow.getIdentifier(), newFuture );
@@ -180,6 +181,7 @@ public abstract class ScheduledExecutorProbeManager
      *
      * @param shadow the ShadowMeshBase
      */
+    @Override
     public void disableFutureUpdates(
             final ShadowMeshBase shadow )
     {
@@ -189,17 +191,12 @@ public abstract class ScheduledExecutorProbeManager
         }
 
         try {
-            shadow.executeAsap( new TransactionAction<ProbeUpdateSpecification>() {
-                    public ProbeUpdateSpecification execute()
-                        throws
-                            Throwable
-                    {
-                        MeshObject               home = shadow.getHomeObject();
-                        ProbeUpdateSpecification spec = (ProbeUpdateSpecification) home.getTypedFacadeFor( ProbeSubjectArea.PROBEUPDATESPECIFICATION );
+            shadow.executeAsap( ( Transaction tx ) -> {
+                    MeshObject               home = shadow.getHomeObject();
+                    ProbeUpdateSpecification spec = (ProbeUpdateSpecification) home.getTypedFacadeFor( ProbeSubjectArea.PROBEUPDATESPECIFICATION );
 
-                        spec.stopUpdating();
-                        return spec;
-                    }
+                    spec.stopUpdating();
+                    return spec;
             });
 
         } catch( TransactionActionException ex ) {
@@ -212,7 +209,7 @@ public abstract class ScheduledExecutorProbeManager
      * every time this SmartFactory created a new value by invoking the delegate Factory.
      * It is not invoked for those returned values that are merely retrieved from
      * the storage in the smart factory.
-     * 
+     *
      * @param key the key of the newly created value
      * @param value the newly created value
      * @param argument the argument into the creation of the newly created value
@@ -226,7 +223,7 @@ public abstract class ScheduledExecutorProbeManager
         long nextTime = value.getDelayUntilNextUpdate();
         if( nextTime >= 0 && theExecutorService != null ) { // allow 0 for immediate execution
             ScheduledFuture<Long> newFuture = theExecutorService.schedule(
-                    new ExecutorAdapter( new WeakReference<ScheduledExecutorProbeManager>( this ), key, nextTime ),
+                    new ExecutorAdapter( new WeakReference<>( this ), key, nextTime ),
                     nextTime,
                     TimeUnit.MILLISECONDS );
             theFutures.put( key, newFuture );
@@ -236,9 +233,10 @@ public abstract class ScheduledExecutorProbeManager
 
     /**
      * We are not needed any more.
-     * 
+     *
      * @param isPermanent if true, this MeshBase will go away permanently; if false, it may come alive again some time later
      */
+    @Override
     public synchronized void die(
             boolean isPermanent )
     {
@@ -248,7 +246,7 @@ public abstract class ScheduledExecutorProbeManager
         // Apparently a ConcurrentModificationException is possible here. (Why? FIXME)
         // So we do it as two steps:
 
-        ArrayList<ShadowMeshBase> toKill = new ArrayList<ShadowMeshBase>();
+        ArrayList<ShadowMeshBase> toKill = new ArrayList<>();
         for( ShadowMeshBase shadow : theKeyValueMap.values() ) {
             toKill.add( shadow );
         }
@@ -269,7 +267,7 @@ public abstract class ScheduledExecutorProbeManager
      * The ScheduledExecutorService that executes our Probe runs.
      */
     protected ScheduledExecutorService theExecutorService;
-    
+
     /**
      * The Futures currently waiting to be executed on behalf of this ScheduledExecutorProbeManager.
      * This maps from the ShadowMeshBase's identifier to the Future.
@@ -290,7 +288,7 @@ public abstract class ScheduledExecutorProbeManager
      * The default thread-pool size.
      */
     protected static int DEFAULT_THREAD_POOL_SIZE = 1;
-    
+
     /**
      * Helper class to be able to reschedule the ShadowMeshBase. This is a static class, so the ProbeManager
      * can be garbage-collected, even while some ScheduledExecutorService still thinks it has a future call to make.
@@ -324,10 +322,11 @@ public abstract class ScheduledExecutorProbeManager
 
         /**
          * The main call when invoked by a background Thread.
-         * 
+         *
          * @throws Exception catch-all Exception
          * @return desired time of the next update, in milliseconds. -1 indicates never.
          */
+        @Override
         public Long call()
             throws
                 Exception
@@ -337,7 +336,7 @@ public abstract class ScheduledExecutorProbeManager
 
         /**
          * The main call when invoked on the thread of the application programmer.
-         * 
+         *
          * @param pars optional ProxyParameters
          * @return desired time of the next update, in milliseconds. -1 indicates never.
          * @throws Exception catch-all Exception
@@ -350,7 +349,7 @@ public abstract class ScheduledExecutorProbeManager
             if( log.isInfoEnabled() ) {
                 log.info( this, "call", pars );
             }
-            
+
             ScheduledExecutorProbeManager belongsTo = theBelongsTo.get();
             boolean                       removeOld = true;
             try {
@@ -397,6 +396,7 @@ public abstract class ScheduledExecutorProbeManager
          *
          * @param d the Dumper to dump to
          */
+        @Override
         public void dump(
                 Dumper d )
         {
@@ -422,7 +422,7 @@ public abstract class ScheduledExecutorProbeManager
          * for the ShadowMeshBase to proceed even if future runs are scheduled.
          */
         protected NetMeshBaseIdentifier theShadowIdentifier;
-        
+
         /**
          * The time at which this Callable will be called. This is only here for debugging purposes.
          */

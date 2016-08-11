@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.meshbase.net.IterableNetMeshBaseDifferencer;
+import org.infogrid.meshbase.net.NetMeshBaseDifferencer;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.transaction.ChangeSet;
 import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
@@ -48,7 +48,7 @@ public class ProbeTest2
 {
     /**
      * Test parameters.
-     * 
+     *
      * @return test parameters
      */
     @Parameterized.Parameters
@@ -76,7 +76,7 @@ public class ProbeTest2
         copyFile(theTestFile1, theTestFile0 );
 
         log.info( "accessing test file 1 with meshBaseA" );
-        
+
         ShadowMeshBase meshBaseA = theProbeManagerA.obtainFor(theTestFile0Id, CoherenceSpecification.ONE_TIME_ONLY );
 
             checkObject( meshBaseA, "could not find meshBaseA" );
@@ -89,7 +89,7 @@ public class ProbeTest2
         //
 
         log.info( "accessing test file 1 with meshBaseB" );
-        
+
         ShadowMeshBase meshBaseB = theProbeManagerB.obtainFor(theTestFile0Id, CoherenceSpecification.ONE_TIME_ONLY );
 
             checkObject( meshBaseB, "could not find meshBaseB" );
@@ -98,11 +98,11 @@ public class ProbeTest2
             dumpMeshBase( meshBaseB, "meshBaseB", log );
 
         //
-        
+
         log.info( "diff'ing meshBaseA and meshBaseB -- should be the exact same, we read the same file" );
 
-        IterableNetMeshBaseDifferencer diff_A_B       = new IterableNetMeshBaseDifferencer( meshBaseA );
-        ChangeSet                      firstChangeSet = diff_A_B.determineChangeSet( meshBaseB );
+        NetMeshBaseDifferencer diff_A_B       = new NetMeshBaseDifferencer( meshBaseA );
+        ChangeSet              firstChangeSet = diff_A_B.determineChangeSet( meshBaseB );
 
             checkEquals( firstChangeSet.size(), 1, "not the same content" );
             checkCondition( firstChangeSet.getChange( 0 ) instanceof NetMeshObjectPropertyChangeEvent, "wrong change type" );
@@ -119,7 +119,7 @@ public class ProbeTest2
         //
 
         copyFile(theTestFile2, theTestFile0 );
-        
+
         log.info( "updating meshBaseB to read file 2" );
 
         meshBaseB.doUpdateNow();
@@ -192,12 +192,12 @@ public class ProbeTest2
         theTestFile0 = testFile0;
         theTestFile1 = testFile1;
         theTestFile2 = testFile2;
-        
+
         theTestFile0Id = theMeshBaseIdentifierFactory.obtain( new File( testFile0 ) );
         theTestFile1Id = theMeshBaseIdentifierFactory.obtain( new File( testFile1 ) );
         theTestFile2Id = theMeshBaseIdentifierFactory.obtain( new File( testFile2 ) );
     }
-    
+
     /**
      * Setup.
      */
@@ -206,7 +206,7 @@ public class ProbeTest2
     {
         theProbeDirectory = MProbeDirectory.create();
         exec = createThreadPool( 1 );
-                
+
         listenerA = new ProbeTestShadowListener( "A" );
         listenerB = new ProbeTestShadowListener( "B" );
 
@@ -223,7 +223,7 @@ public class ProbeTest2
                 shadowEndpointFactoryB,
                 theModelBase,
                 rootContext );
-        
+
         theProbeManagerA = MPassiveProbeManager.create( shadowFactoryA, theProbeDirectory );
         theProbeManagerB = MPassiveProbeManager.create( shadowFactoryB, theProbeDirectory );
 
@@ -282,7 +282,7 @@ public class ProbeTest2
      * The NetworkIdentifer of the test file in the read position.
      */
     protected NetMeshBaseIdentifier theTestFile0Id;
-    
+
     /**
      * The NetworkIdentifer of the first test file.
      */
@@ -302,12 +302,12 @@ public class ProbeTest2
      * The ProbeManager that we use for the second Probe.
      */
     protected PassiveProbeManager theProbeManagerB;
-    
+
     /**
      * First listener.
      */
     protected ProbeTestShadowListener listenerA;
-    
+
     /**
      * Second listener.
      */

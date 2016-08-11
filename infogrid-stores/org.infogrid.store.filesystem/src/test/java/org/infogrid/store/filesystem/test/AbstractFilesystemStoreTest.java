@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,8 +15,8 @@
 package org.infogrid.store.filesystem.test;
 
 import java.io.File;
-import org.infogrid.store.IterableStore;
 import org.infogrid.store.filesystem.FilesystemStore;
+import org.infogrid.store.Store;
 import org.infogrid.testharness.AbstractTest;
 import org.junit.Before;
 
@@ -31,7 +31,7 @@ public abstract class AbstractFilesystemStoreTest
     public void setup()
     {
         File subdir = new File( test_SUBDIR_NAME );
-        
+
         theFilesystemStore = FilesystemStore.create( subdir );
     }
 
@@ -39,12 +39,12 @@ public abstract class AbstractFilesystemStoreTest
      * The FilesystemStore to be tested.
      */
     protected FilesystemStore theFilesystemStore;
-    
+
     /**
      * The actual Store to be tested. This may or may not be pointed to theFilesystemStore
      * by subclasses.
      */
-    protected IterableStore theTestStore;
+    protected Store theTestStore;
 
     /**
      * The name of the subdirectory in which to store test data

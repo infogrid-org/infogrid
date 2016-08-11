@@ -17,16 +17,16 @@ package org.infogrid.meshbase.net.sweeper;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
-import org.infogrid.meshbase.net.IterableNetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetSweepPolicy;
-import org.infogrid.meshbase.sweeper.DefaultIterableSweeper;
+import org.infogrid.meshbase.sweeper.DefaultSweeper;
 
 /**
  * Adds functionality to DefaultIterableSweeper that deals with replicas.
  */
-public class DefaultNetIterableSweeper
+public class DefaultNetSweeper
         extends
-            DefaultIterableSweeper
+            DefaultSweeper
 {
     /**
      * Factory method if the Sweeper is only supposed to be invoked manually.
@@ -35,11 +35,11 @@ public class DefaultNetIterableSweeper
      * @param policy the SweepPolicy to use
      * @return the created DefaultIterableSweeper
      */
-    public static DefaultNetIterableSweeper create(
-            IterableNetMeshBase      mb,
-            NetSweepPolicy           policy )
+    public static DefaultNetSweeper create(
+            NetMeshBase    mb,
+            NetSweepPolicy policy )
     {
-        return new DefaultNetIterableSweeper(
+        return new DefaultNetSweeper(
                 mb,
                 policy,
                 null,
@@ -55,12 +55,12 @@ public class DefaultNetIterableSweeper
      * @param scheduler the scheduler to use, if any
      * @return the created DefaultIterableSweeper
      */
-    public static DefaultNetIterableSweeper create(
-            IterableNetMeshBase      mb,
+    public static DefaultNetSweeper create(
+            NetMeshBase              mb,
             NetSweepPolicy           policy,
             ScheduledExecutorService scheduler )
     {
-        return new DefaultNetIterableSweeper(
+        return new DefaultNetSweeper(
                 mb,
                 policy,
                 null,
@@ -73,9 +73,12 @@ public class DefaultNetIterableSweeper
      *
      * @param mb the IterableMeshBase on which this Sweeper works
      * @param policy the NetSweepPolicy to use
+     * @param scheduler
+     * @param lotSize
+     * @param waitBetweenLots
      */
-    protected DefaultNetIterableSweeper(
-            IterableNetMeshBase      mb,
+    protected DefaultNetSweeper(
+            NetMeshBase              mb,
             NetSweepPolicy           policy,
             ScheduledExecutorService scheduler,
             int                      lotSize,

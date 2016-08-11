@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -19,8 +19,8 @@ import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.manager.ScheduledExecutorProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.store.StoreShadowMeshBaseFactory;
-import org.infogrid.store.IterableStore;
-import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
+import org.infogrid.store.Store;
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.AbstractSwappingHashMapListener;
 import org.infogrid.util.SwappingHashMap;
 
@@ -42,11 +42,11 @@ public class StoreScheduledExecutorProbeManager
     public static StoreScheduledExecutorProbeManager create(
             StoreShadowMeshBaseFactory delegate,
             ProbeDirectory             dir,
-            IterableStore              shadowStore )
+            Store                      shadowStore )
     {
         StoreProbeManagerMapper theMapper = new StoreProbeManagerMapper( delegate );
 
-        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = IterableStoreBackedSwappingHashMap.createWeak( theMapper, shadowStore );
+        StoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage = StoreBackedSwappingHashMap.createWeak( theMapper, shadowStore );
 
         StoreScheduledExecutorProbeManager ret = new StoreScheduledExecutorProbeManager( delegate, storage, dir );
 
@@ -55,20 +55,20 @@ public class StoreScheduledExecutorProbeManager
 
     /**
      * Private constructor, use factory method.
-     * 
+     *
      * @param delegate the underlying factory for StoreShadowMeshBases
      * @param storage the storage to use
      * @param dir the ProbeDirectory to use
      */
     protected StoreScheduledExecutorProbeManager(
-            StoreShadowMeshBaseFactory                                               delegate,
-            IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage,
-            ProbeDirectory                                                           dir )
+            StoreShadowMeshBaseFactory                                       delegate,
+            StoreBackedSwappingHashMap<NetMeshBaseIdentifier,ShadowMeshBase> storage,
+            ProbeDirectory                                                   dir )
     {
         super( delegate, storage, dir );
 
         theMapListener = new MyMapListener();
-        storage.addWeakSwappingHashMapListener( theMapListener ); // this must be weak 
+        storage.addWeakSwappingHashMapListener( theMapListener ); // this must be weak
     }
 
     /**
@@ -99,6 +99,6 @@ public class StoreScheduledExecutorProbeManager
             if( value != null ) {
                 value.setFactory( StoreScheduledExecutorProbeManager.this ); // patch this back in after restore from disk
             }
-        }        
+        }
     }
 }

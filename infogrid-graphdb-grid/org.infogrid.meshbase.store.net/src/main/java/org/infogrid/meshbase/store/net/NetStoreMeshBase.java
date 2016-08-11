@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.store.net;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import org.infogrid.mesh.MeshObject;
@@ -41,9 +42,9 @@ import org.infogrid.meshbase.store.StoreMeshBase;
 import org.infogrid.meshbase.store.StoreMeshBaseSwappingHashMap;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.store.IterableStore;
 import org.infogrid.store.Store;
-import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
+import org.infogrid.util.CursorIterator;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.logging.Log;
 
@@ -75,14 +76,14 @@ public class NetStoreMeshBase
             NetAccessManager                        accessMgr,
             ProxyMessageEndpointFactory             endpointFactory,
             Store                                   meshObjectStore,
-            IterableStore                           proxyStore,
+            Store                                   proxyStore,
             Context                                 context )
     {
         NetMeshObjectAccessSpecificationFactory netMeshObjectAccessSpecificationFactory
                 = DefaultNetMeshObjectAccessSpecificationFactory.create( identifier );
 
         NiceAndTrustingProxyPolicyFactory proxyPolicyFactory = NiceAndTrustingProxyPolicyFactory.create();
-        
+
         NetStoreMeshBase ret = create(
                 identifier,
                 netMeshObjectAccessSpecificationFactory,
@@ -117,11 +118,11 @@ public class NetStoreMeshBase
             NetAccessManager                        accessMgr,
             ProxyMessageEndpointFactory             endpointFactory,
             Store                                   meshObjectStore,
-            IterableStore                           proxyStore,
+            Store                                   proxyStore,
             Context                                 context )
     {
         NiceAndTrustingProxyPolicyFactory proxyPolicyFactory = NiceAndTrustingProxyPolicyFactory.create();
-        
+
         NetStoreMeshBase ret = create(
                 identifier,
                 netMeshObjectAccessSpecificationFactory,
@@ -158,17 +159,17 @@ public class NetStoreMeshBase
             ProxyMessageEndpointFactory             endpointFactory,
             ProxyPolicyFactory                      proxyPolicyFactory,
             Store                                   meshObjectStore,
-            IterableStore                           proxyStore,
+            Store                                   proxyStore,
             Context                                 context )
     {
         DefaultProxyFactory proxyFactory = DefaultProxyFactory.create( endpointFactory, proxyPolicyFactory );
 
         NetStoreMeshBaseEntryMapper objectMapper = new NetStoreMeshBaseEntryMapper();
         StoreProxyEntryMapper       proxyMapper  = new StoreProxyEntryMapper( proxyFactory );
-        
-        StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>   objectStorage = new StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>( objectMapper, meshObjectStore );
-        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( proxyMapper, proxyStore );
-        
+
+        StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = new StoreMeshBaseSwappingHashMap<>( objectMapper, meshObjectStore );
+        StoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy>       proxyStorage  = StoreBackedSwappingHashMap.createWeak( proxyMapper, proxyStore );
+
         StoreProxyManager              proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
         AnetMeshBaseLifecycleManager   life         = AnetMeshBaseLifecycleManager.create();
         ImmutableMMeshObjectSetFactory setFactory   = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
@@ -191,13 +192,13 @@ public class NetStoreMeshBase
         objectMapper.setMeshBase( ret );
         proxyMapper.setMeshBase( ret );
         ret.initializeHomeObject();
-        
+
         if( log.isDebugEnabled() ) {
             log.debug( "created " + ret );
         }
         return ret;
     }
-    
+
     /**
      * Factory method.
      *
@@ -218,17 +219,17 @@ public class NetStoreMeshBase
             NetAccessManager                        accessMgr,
             ProxyFactory                            proxyFactory,
             Store                                   meshObjectStore,
-            IterableStore                           proxyStore,
+            Store                                   proxyStore,
             Context                                 context )
     {
         NetStoreMeshBaseEntryMapper objectMapper = new NetStoreMeshBaseEntryMapper();
         StoreProxyEntryMapper       proxyMapper  = new StoreProxyEntryMapper( proxyFactory );
-        
-        StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>   objectStorage = new StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>( objectMapper, meshObjectStore );
-        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( proxyMapper, proxyStore );
+
+        StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = new StoreMeshBaseSwappingHashMap<>( objectMapper, meshObjectStore );
+        StoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy>       proxyStorage  = StoreBackedSwappingHashMap.createWeak( proxyMapper, proxyStore );
 
         StoreProxyManager              proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
-        AnetMeshBaseLifecycleManager   life         = AnetMeshBaseLifecycleManager.create();        
+        AnetMeshBaseLifecycleManager   life         = AnetMeshBaseLifecycleManager.create();
         ImmutableMMeshObjectSetFactory setFactory   = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
 
         NetStoreMeshBase ret = new NetStoreMeshBase(
@@ -249,7 +250,7 @@ public class NetStoreMeshBase
         objectMapper.setMeshBase( ret );
         proxyMapper.setMeshBase( ret );
         ret.initializeHomeObject();
-        
+
         if( log.isDebugEnabled() ) {
             log.debug( "created " + ret );
         }
@@ -308,19 +309,48 @@ public class NetStoreMeshBase
      *
      * @return the Identifier
      */
+    @Override
     public NetMeshObjectIdentifier getHomeMeshObjectIdentifier()
     {
         return HOME_OBJECT_IDENTIFIER;
     }
-    
+
     /**
      * Helper method for typecasting to the right subtype of CachingMap.
-     * 
+     *
      * @return the right subtype of CachingMap
      */
-    protected IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> getCachingMap()
+    protected StoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> getCachingMap()
     {
-        return (IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject>) theCache;
+        return (StoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject>) theCache;
+    }
+
+    /**
+     * Obtain an Iterator over all MeshObjects in the Store.
+     *
+     * @return the Iterator
+     */
+    @Override
+    public CursorIterator<MeshObject> iterator()
+    {
+        return getCachingMap().valuesIterator( null, MeshObject.class );
+    }
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase.
+     *
+     * @return the number of MeshObjects in this MeshBase
+     */
+    @Override
+    public int size()
+    {
+        try {
+            return getCachingMap().getStore().size();
+
+        } catch( IOException ex ) {
+            log.error( ex );
+            return 0;
+        }
     }
 
     /**
@@ -333,10 +363,10 @@ public class NetStoreMeshBase
             Transaction tx )
     {
         super.transactionCommittedHook( tx );
-        
+
         Map<MeshObjectIdentifier,MeshObject>                          toWrite = StoreMeshBase.determineObjectsToWriteFromTransaction( tx );
         StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject> map     = (StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>) theCache;
-        
+
         for( AnetMeshObject current : theReplicationChangedObjectsToBeStored ) {
             if( !toWrite.containsKey( current.getIdentifier() ) ) {
                 // otherwise we might write an object that was deleted
@@ -344,7 +374,7 @@ public class NetStoreMeshBase
             }
         }
         theReplicationChangedObjectsToBeStored.clear();
-        
+
         for( Map.Entry<MeshObjectIdentifier,MeshObject> current : toWrite.entrySet() ) {
             if( current.getValue() != null ) {
                 map.saveValueToStorageUponCommit( current.getKey(), current.getValue() );
@@ -358,7 +388,7 @@ public class NetStoreMeshBase
     /**
      * Tell the MeshBase that this AMeshObject needs to be saved into persistent
      * storage (if applicable per AMeshBase implementation).
-     * 
+     *
      * @param obj the AbstractMeshObject to be saved
      */
     @Override
@@ -367,21 +397,21 @@ public class NetStoreMeshBase
     {
         theReplicationChangedObjectsToBeStored.add( obj );
         if( getCurrentTransaction() == null ) {
-           StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject> map = (StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>) theCache; 
-           
+           StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject> map = (StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>) theCache;
+
            for( AnetMeshObject current : theReplicationChangedObjectsToBeStored ) {
                map.saveValueToStorageUponCommit( current.getIdentifier(), current );
            }
            theReplicationChangedObjectsToBeStored.clear();
         }
     }
-    
+
     /**
      * A set of NetMeshObjects that needs to written to storage because their replication status changed.
      * This queue gets immediately worked down if there is no current transaction. When there is a current
      * transaction, it grows.
      */
-    protected HashSet<AnetMeshObject> theReplicationChangedObjectsToBeStored = new HashSet<AnetMeshObject>();
+    protected HashSet<AnetMeshObject> theReplicationChangedObjectsToBeStored = new HashSet<>();
 
     /**
      * The home object identifier.

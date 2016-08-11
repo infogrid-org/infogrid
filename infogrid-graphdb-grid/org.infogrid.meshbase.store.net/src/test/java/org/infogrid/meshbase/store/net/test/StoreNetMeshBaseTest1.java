@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -26,9 +26,7 @@ import org.infogrid.meshbase.store.net.NetStoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.model.primitives.StringValue;
-import org.infogrid.store.IterableStore;
 import org.infogrid.store.Store;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
 import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.util.logging.Log;
 import org.junit.Before;
@@ -53,9 +51,9 @@ public class StoreNetMeshBaseTest1
     {
         //
 
-        Store         meshObjectStore = PrefixingStore.create(         "mesh", theSqlStore );
-        IterableStore proxyStore      = IterablePrefixingStore.create( "proxy", theSqlStore );
-        
+        Store meshObjectStore = PrefixingStore.create( "mesh",  theSqlStore );
+        Store proxyStore      = PrefixingStore.create( "proxy", theSqlStore );
+
         RecordingStoreListener listener = new RecordingStoreListener();
         theSqlStore.addDirectStoreListener( listener );
 
@@ -96,17 +94,17 @@ public class StoreNetMeshBaseTest1
         //
 
         log.info( "Creating MeshObjects" );
-        
+
         Transaction tx = mb.createTransactionNow();
 
         MeshObject []           mesh  = new MeshObject[ theTestSize ];
         MeshObjectIdentifier [] names = new MeshObjectIdentifier[ theTestSize ];
-        
+
         for( int i=0 ; i<mesh.length ; ++i ) {
             mesh[i] = life.createMeshObject();
-            
+
             names[i] = mesh[i].getIdentifier();
-            
+
             if( i % 3 == 1 ) {
                 mesh[i].bless( TestSubjectArea.AA );
             } else if( i % 3 == 2 ) {
@@ -125,15 +123,15 @@ public class StoreNetMeshBaseTest1
         listener.reset();
 
         //
-        
+
         log.info( "Clearing cache, and loading MeshObjects again" );
-        
+
         mesh = new MeshObject[ names.length ]; // forget old references
         mb.clearMemoryCache();
 
         for( int i=0 ; i<names.length ; ++i ) {
             mesh[i] = mb.findMeshObjectByIdentifier( names[i] );
-            
+
             checkObject( mesh[i], "Could not retrieve MeshObject with Identifier " + names[i] );
         }
 
@@ -154,6 +152,7 @@ public class StoreNetMeshBaseTest1
      * @throws Exception anything can go wrong in a test
      */
     @Before
+    @Override
     public void setup()
         throws
             Exception
@@ -171,8 +170,8 @@ public class StoreNetMeshBaseTest1
     protected int theTestSize = 1000;
 
     // Our Logger
-    private static Log log = Log.getLogInstance( StoreNetMeshBaseTest1.class );
-    
+    private static final Log log = Log.getLogInstance( StoreNetMeshBaseTest1.class );
+
     /**
      * The NetMeshBaseIdentifier for the NetMeshBase.
      */
@@ -186,7 +185,7 @@ public class StoreNetMeshBaseTest1
             log.error( ex );
             id = null;
         }
-        
+
         theNetworkIdentifier = id;
     }
 }

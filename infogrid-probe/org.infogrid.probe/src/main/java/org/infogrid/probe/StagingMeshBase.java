@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -14,7 +14,7 @@
 
 package org.infogrid.probe;
 
-import org.infogrid.meshbase.net.IterableNetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBase;
 
 /**
  * The specific subtype of MeshBase that is used for Probes to stage the information
@@ -23,7 +23,7 @@ import org.infogrid.meshbase.net.IterableNetMeshBase;
  */
 public interface StagingMeshBase
         extends
-            IterableNetMeshBase
+            NetMeshBase
 {
     /**
      * Enable the ProbeDispatcher to create the home object in the StagingMeshBase.
@@ -40,14 +40,14 @@ public interface StagingMeshBase
      * @return the start time of the current update
      */
     public long getCurrentUpdateStartedTime();
-    
+
     /**
      * Obtain a MeshObjectLifecycleManager that is appropriate for StagingMeshBases.
      *
      * @return the StagingMeshBaseLifecycleManager
      */
     public StagingMeshBaseLifecycleManager getMeshBaseLifecycleManager();
-    
+
     /**
      * Allow a Proxy to tell this StagingMeshBase that it performed an operation that
      * modified data in the StagingMeshBase, and the StagingMeshBase may have to be flushed to disk.

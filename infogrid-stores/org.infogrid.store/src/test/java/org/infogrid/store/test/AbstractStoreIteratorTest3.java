@@ -15,7 +15,7 @@
 package org.infogrid.store.test;
 
 import java.util.NoSuchElementException;
-import org.infogrid.store.IterableStore;
+import org.infogrid.store.Store;
 import org.infogrid.store.StoreValue;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.CursorIterator;
@@ -110,11 +110,11 @@ public abstract class AbstractStoreIteratorTest3
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( AbstractStoreIteratorTest3.class );
+    private static final Log log = Log.getLogInstance( AbstractStoreIteratorTest3.class );
 
     /**
      * The actual Store to be tested. This may or may not be pointed to theSqlStore
      * by subclasses.
      */
-    protected IterableStore theTestStore;
+    protected Store theTestStore;
 }

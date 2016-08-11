@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -21,7 +21,7 @@ import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
 import org.infogrid.meshbase.MeshObjectIdentifierFactory;
-import org.infogrid.meshbase.store.IterableStoreMeshBase;
+import org.infogrid.meshbase.store.StoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.util.logging.Log;
@@ -45,16 +45,16 @@ public class StoreMeshBaseTest9
             Exception
     {
         //
-        
+
         log.info( "Deleting old database and creating new database" );
 
         theSqlStore.initializeHard();
-        
+
         //
 
         log.info( "Creating MeshBase" );
 
-        IterableStoreMeshBase mb = IterableStoreMeshBase.create(
+        StoreMeshBase mb = StoreMeshBase.create(
                 theMeshBaseIdentifierFactory.fromExternalForm( "MeshBase" ),
                 theModelBase,
                 null,
@@ -67,23 +67,23 @@ public class StoreMeshBaseTest9
         MeshObjectIdentifier oneId   = idFact.fromExternalForm( "one" );
         MeshObjectIdentifier twoId   = idFact.fromExternalForm( "two" );
         MeshObjectIdentifier threeId = idFact.fromExternalForm( "three" );
-        
+
         //
 
         log.info( "Creating MeshObjects" );
-        
+
         Transaction tx = mb.createTransactionNow();
 
         MeshObject one   = life.createMeshObject( oneId, TestSubjectArea.AA );
         MeshObject two   = life.createMeshObject( twoId, TestSubjectArea.AA );
         MeshObject three = null;
-        
+
         one.relateAndBless( TestSubjectArea.AR1A.getSource(), two );
-        
+
         tx.commitTransaction();
 
         checkEquals( mb.size(), 3, "Wrong number of MeshObjects in MeshBase" );
-        
+
         one = null;
         two = null;
         mb.clearMemoryCache();
@@ -92,17 +92,17 @@ public class StoreMeshBaseTest9
         checkEquals( mb.size(), 3, "Wrong number of MeshObjects in MeshBase" );
 
         //
-        
+
         log.info( "Modifying (1)" );
-        
+
         try {
             tx = mb.createTransactionNow();
-        
+
             life.createMeshObject( threeId );
             life.createMeshObject( oneId, TestSubjectArea.B );
-            
+
             reportError( "MeshObjectIdentifierNotUniqueException not thrown" );
-            
+
         } catch( MeshObjectIdentifierNotUniqueException ex ) {
             // good
         } finally {
@@ -113,7 +113,7 @@ public class StoreMeshBaseTest9
         two = null;
         mb.clearMemoryCache();
         collectGarbage();
-        
+
         one   = mb.findMeshObjectByIdentifier( oneId );
         two   = mb.findMeshObjectByIdentifier( twoId );
         three = mb.findMeshObjectByIdentifier( threeId );
@@ -125,19 +125,19 @@ public class StoreMeshBaseTest9
         checkCondition( two.isBlessedBy( TestSubjectArea.AA ), "Two not blessed with AA" );
         checkCondition( !two.isBlessedBy( TestSubjectArea.B ), "Two blessed with B" );
         checkEquals( mb.size(), 3, "Wrong number of MeshObjects in MeshBase" );
-        
+
         //
-        
+
         log.info( "Modifying (2)" );
-        
+
         try {
             tx = mb.createTransactionNow();
-        
+
             life.createMeshObject( threeId );
             one.relate( two );
-            
+
             reportError( "RelatedAlreadyException not thrown" );
-            
+
         } catch( RelatedAlreadyException ex ) {
             // good
         } finally {
@@ -148,7 +148,7 @@ public class StoreMeshBaseTest9
         two = null;
         mb.clearMemoryCache();
         collectGarbage();
-        
+
         one   = mb.findMeshObjectByIdentifier( oneId );
         two   = mb.findMeshObjectByIdentifier( twoId );
         three = mb.findMeshObjectByIdentifier( threeId );
@@ -161,19 +161,19 @@ public class StoreMeshBaseTest9
         checkCondition( !two.isBlessedBy( TestSubjectArea.B ), "Two blessed with B" );
         checkCondition( one.isRelated( TestSubjectArea.AR1A.getSource(), two ), "not related and blessed" );
         checkEquals( mb.size(), 3, "Wrong number of MeshObjects in MeshBase" );
-    
+
         //
-        
+
         log.info( "Modifying (3)" );
-        
+
         try {
             tx = mb.createTransactionNow();
-        
+
             life.createMeshObject( threeId );
             one.blessRelationship( TestSubjectArea.AR1A.getSource(), two );
-            
+
             reportError( "RoleTypeBlessedAlreadyException not thrown" );
-            
+
         } catch( RoleTypeBlessedAlreadyException ex ) {
             // good
         } finally {
@@ -188,7 +188,7 @@ public class StoreMeshBaseTest9
         checkCondition( !two.isBlessedBy( TestSubjectArea.B ), "Two blessed with B" );
         checkCondition( one.isRelated( TestSubjectArea.AR1A.getSource(), two ), "not related and blessed" );
         checkEquals( mb.size(), 3, "Wrong number of MeshObjects in MeshBase" );
-    
+
         one = null;
         two = null;
         mb.clearMemoryCache();

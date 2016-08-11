@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -14,10 +14,10 @@
 
 package org.infogrid.store.test;
 
-import org.infogrid.store.IterableStore;
 import org.infogrid.store.SerializingStoreEntryMapper;
+import org.infogrid.store.Store;
 import org.infogrid.store.m.MStore;
-import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.logging.Log;
 import org.junit.Test;
 
@@ -39,9 +39,9 @@ public class StoreBackedSwappingHashMapTest2
             Exception
     {
         //
-        
-        IterableStore store = MStore.create();
-        
+
+        Store store = MStore.create();
+
         SerializingStoreEntryMapper<String,Integer> mapper = new SerializingStoreEntryMapper<String,Integer>() {
             public String stringToKey(
                     String s )
@@ -49,9 +49,9 @@ public class StoreBackedSwappingHashMapTest2
                 return s;
             }
         };
-        
-        IterableStoreBackedSwappingHashMap<String,Integer> map = IterableStoreBackedSwappingHashMap.createWeak( mapper, store );
-                
+
+        StoreBackedSwappingHashMap<String,Integer> map = StoreBackedSwappingHashMap.createWeak( mapper, store );
+
         String [] keys = {
             "a",
             "d",
@@ -61,26 +61,26 @@ public class StoreBackedSwappingHashMapTest2
         };
 
         log.info( "Inserting" );
-        
+
         for( int i=0 ; i<keys.length ; ++i ) {
             map.put( keys[i], new Integer( i ));
         }
-            
+
         checkEquals( map.size(), keys.length, "Wrong size map" );
-        
+
         //
-        
+
         log.info( "Waiting and iterating" );
-        
+
         Thread.sleep( 2000L );
         collectGarbage();
 
         int count = 0;
         for( String key : map.keySet() ) {
             Integer value = map.get( key );
-            
+
             checkObject( value, "Value not found for key " + key );
-            
+
             // they come in a different sequence
             int found = -1;
             for( int i=0 ; i<keys.length ; ++i ) {
@@ -94,7 +94,7 @@ public class StoreBackedSwappingHashMapTest2
             } else {
                 checkEquals( found, value.intValue(), "Wrong value found at index " + found );
             }
-            
+
             ++count;
         }
         checkEquals( count,      keys.length, "Wrong number of elements found via iterator" );

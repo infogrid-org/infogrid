@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -41,7 +41,7 @@ public interface NetMeshBase
 {
     /**
      * Obtain the NetMeshBaseIdentifier at which this NetMeshBase is located.
-     * 
+     *
      * @return the NetMeshBaseIdentifier
      */
     public abstract NetMeshBaseIdentifier getIdentifier();
@@ -60,7 +60,7 @@ public interface NetMeshBase
      * the {@link #accessLocally accessLocally} methods, this method purely considers NetMeshObjects in the
      * NetMeshBase, and does not attempt to obtain them if they are not in the NetMeshBase yet.</p>
      * <p>If not found, returns <code>null</code>.</p>
-     * 
+     *
      * @param identifier the identifier of the NetMeshObject that shall be found
      * @return the found NetMeshObject, or null if not found
      * @see #findMeshObjectByIdentifierOrThrow
@@ -74,7 +74,7 @@ public interface NetMeshBase
      *    NetMeshBase, and does not attempt to obtain them if they are not in the NetMeshBase yet.</p>
      * <p>If one or more of the NetMeshObjects could not be found, returns <code>null</code> at
      *    the respective index in the returned array.</p>
-     * 
+     *
      * @param identifiers the identifiers of the NetMeshObjects that shall be found
      * @return the found NetMeshObjects, which may contain null values for NetMeshObjects that were not found
      */
@@ -86,7 +86,7 @@ public interface NetMeshBase
      * the {@link #accessLocally accessLocally} methods, this method purely considers NetMeshObjects in the
      * NetMeshBase, and does not attempt to obtain them if they are not in the NetMeshBase yet.</p>
      * <p>If not found, throws {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
-     * 
+     *
      * @param identifier the identifier of the NetMeshObject that shall be found
      * @return the found NetMeshObject, or null if not found
      * @throws MeshObjectsNotFoundException thrown if the NetMeshObject was not found
@@ -102,7 +102,7 @@ public interface NetMeshBase
      *    NetMeshBase, and does not attempt to obtain them if they are not in the NetMeshBase yet.</p>
      * <p>If one or more of the NetMeshObjects could not be found, throws
      *    {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
-     * 
+     *
      * @param identifiers the identifiers of the NetMeshObjects that shall be found
      * @return the found NetMeshObjects
      * @throws MeshObjectsNotFoundException if one or more of the NetMeshObjects were not found. Note that this Exception
@@ -154,7 +154,7 @@ public interface NetMeshBase
 
     /**
      * Obtain a MeshObject whose unique identifier is known.
-     * 
+     *
      * @param identifier the identifier property of the MeshObject
      * @return the locally found MeshObject, or null if not found locally
      * @throws NetMeshObjectAccessException thrown if something went wrong accessing the MeshObject
@@ -168,7 +168,7 @@ public interface NetMeshBase
 
     /**
      * Obtain N locally available MeshObjects whose unique identifiers are known.
-     * 
+     *
      * @param identifiers the identifier properties of the MeshObjects
      * @return array of the same length as identifiers, with the locally found MeshObjects filled
      *         in at the same positions. If one or more of the MeshObjects were not found, the respective
@@ -186,7 +186,7 @@ public interface NetMeshBase
      * <p>Obtain a local replica of the home NetMeshObject held by a possibly remote NetMeshBase
      * identified by its NetMeshBaseIdentifier.
      * This call does not obtain update rights for the obtained replica.</p>
-     * 
+     *
      * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
      *        a local replica of the remote NetMeshObject
      * @return the locally replicated NetMeshObject, or null if not found
@@ -204,7 +204,7 @@ public interface NetMeshBase
      * identified by its NetMeshBaseIdentifier.
      * Specify a non-default timeout.
      * This call does not obtain update rights for the obtained replica.</p>
-     * 
+     *
      * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
      *        a replica of the remote MeshObject
      * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
@@ -224,7 +224,7 @@ public interface NetMeshBase
      * identified by its NetMeshBaseIdentifier.
      * Request a non-default CoherenceSpecification.
      * This call does not obtain update rights for the obtained replica.</p>
-     * 
+     *
      * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
      *        a replica of the remote MeshObject
      * @param coherence the CoherenceSpecification requested by the caller
@@ -243,7 +243,7 @@ public interface NetMeshBase
      * <p>Obtain a local replica of a named NetMeshObject held by a possibly remote NetMeshBase
      * identified by its NetMeshBaseIdentifier.
      * This call does not obtain update rights for the obtained replica.</p>
-     * 
+     *
      * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
      *        a replica of the remote MeshObject
      * @param objectIdentifier the NetMeshObjectIdentifier of the remote NetMeshObject
@@ -263,7 +263,7 @@ public interface NetMeshBase
      * identified by its NetMeshBaseIdentifier.
      * Specify a non-default timeout.
      * This call does not obtain update rights for the obtained replica.</p>
-     * 
+     *
      * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
      *        a replica of the remote MeshObject
      * @param objectIdentifier the NetMeshObjectIdentifier of the remote NetMeshObject
@@ -285,7 +285,7 @@ public interface NetMeshBase
      * identified by its NetMeshBaseIdentifier.
      * Request a non-default CoherenceSpecification.
      * This call does not obtain update rights for the obtained replica.</p>
-     * 
+     *
      * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
      *        a replica of the remote MeshObject
      * @param objectIdentifier the NetMeshObjectIdentifier of the remote NetMeshObject
@@ -308,7 +308,7 @@ public interface NetMeshBase
      * Request a non-default CoherenceSpecification.
      * Specify a non-default timeout.
      * This call does not obtain update rights for the obtained replica.</p>
-     * 
+     *
      * @param remoteLocation the NetMeshBaseIdentifier for the location from where to obtain
      *        a replica of the remote MeshObject
      * @param objectIdentifier the NetMeshObjectIdentifier of the remote NetMeshObject
@@ -330,7 +330,7 @@ public interface NetMeshBase
     /**
      * <p>Obtain a local replica of a NetMeshObject using a NetMeshObjectAccessSpecification.
      * This call does not obtain update rights for the obtained replica.</p>
-     * 
+     *
      * @param pathToObject the NetMeshObjectAccessSpecification indicating the location and path to use to access the remote NetMeshObject
      * @return the locally replicated NetMeshObject, or null if not found
      * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
@@ -346,7 +346,7 @@ public interface NetMeshBase
      * <p>Obtain a local replica of a NetMeshObject using a NetMeshObjectAccessSpecification.
      * Specify a non-default timeout.
      * This call does not obtain update rights for the obtained replica.</p>
-     * 
+     *
      * @param pathToObject the NetMeshObjectAccessSpecification indicating the location and path to use to access the remote NetMeshObject
      * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
      * @return the locally replicated NetMeshObject, or null if not found
@@ -368,7 +368,7 @@ public interface NetMeshBase
      * single call, smart implementations may attempt group requests by shared paths, or execute them
      * in parallel, and thus optimize communications. There is no requirement on implementations to do
      * that, however.</p>
-     * 
+     *
      * @param pathsToObjects the NetMeshObjectAccessSpecifications indicating the location and paths to use to access the remote NetMeshObjects
      * @return the locally replicated NetMeshObjects, or null if not found
      * @throws NetMeshObjectAccessException thrown if something went wrong attempting to access the NetMeshObject
@@ -389,7 +389,7 @@ public interface NetMeshBase
      * single call, smart implementations may attempt group requests by shared paths, or execute them
      * in parallel, and thus optimize communications. There is no requirement on implementations to do
      * that, however.</p>
-     * 
+     *
      * @param pathsToObjects the NetMeshObjectAccessSpecifications indicating the location and paths to use to access the remote NetMeshObjects
      * @param timeoutInMillis the timeout parameter for this call, in milli-seconds
      * @return the locally replicated NetMeshObjects, or null if not found
@@ -405,7 +405,7 @@ public interface NetMeshBase
 
     /**
      * <p>Obtain a manager for NetMeshObject lifecycles.</p>
-     * 
+     *
      * @return a NetMeshBaseLifecycleManager that works on this MeshBase
      */
     public abstract NetMeshBaseLifecycleManager getMeshBaseLifecycleManager();
@@ -429,21 +429,31 @@ public interface NetMeshBase
 
     /**
      * Obtain a factory for NetMeshBaseIdentifiers that is appropriate for this NetMeshBase.
-     * 
+     *
      * @return the factory for NetMeshBaseIdentifiers
      */
     public abstract NetMeshBaseIdentifierFactory getMeshBaseIdentifierFactory();
-    
+
     /**
      * Obtain a factory for NetMeshObjectAccessSpecifications that is appropriate for this NetMeshBase.
      *
      * @return the factory for NetMeshObjectAccessSpecifications
      */
     public abstract NetMeshObjectAccessSpecificationFactory getNetMeshObjectAccessSpecificationFactory();
-    
+
+    /**
+     * Factory method for a IterableMeshBaseDifferencer, with this IterableMeshBase
+     * being the comparison base. This overrides the method defined higher up
+     * in the inheritance hierarchy with a more specific subtype.
+     *
+     * @return the IterableMeshBaseDifferencer
+     */
+    @Override
+    public abstract NetMeshBaseDifferencer getDifferencer();
+
     /**
      * Obtain or create a Proxy for communication with a NetMeshBase at the specified NetMeshBaseIdentifier.
-     * 
+     *
      * @param networkIdentifier the NetMeshBaseIdentifier
      * @param pars the ProxyParameters to use, if any
      * @return the Proxy
@@ -473,11 +483,11 @@ public interface NetMeshBase
      * @return the CursorIterator over the Proxies
      */
     public abstract CursorIterator<Proxy> proxies();
-    
+
     /**
      * Obtain this NetMeshBase as a NameServer for its Proxies, keyed by the NetMeshBaseIdentifiers
      * of the partner NetMeshBases.
-     * 
+     *
      * @return the NameServer mapping NetMeshBaseIdentifiers to Proxies.
      */
     public abstract NameServer<NetMeshBaseIdentifier,Proxy> getAsProxyNameServer();
@@ -497,7 +507,7 @@ public interface NetMeshBase
      */
     public abstract void registerIncomingProxy(
             Proxy incomingProxy );
-    
+
     /**
      * Unregister the incoming Proxy for this Thread. To be called only be Proxies
      * about themselves.

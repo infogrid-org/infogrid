@@ -15,7 +15,7 @@
 package org.infogrid.meshbase.store.test;
 
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.store.IterableStoreMeshBase;
+import org.infogrid.meshbase.store.StoreMeshBase;
 import org.infogrid.model.primitives.BooleanValue;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.L10PropertyValueMapImpl;
@@ -50,7 +50,7 @@ public class ModelChangeTest1
     {
         log.info( "Creating and populating MB1" );
 
-        IterableStoreMeshBase mb1 = createTestStoreMeshBase(
+        StoreMeshBase mb1 = createTestStoreMeshBase(
                 theMeshBaseIdentifierFactory.fromExternalForm( "MeshBase" ),
                 theModelBase,
                 theSqlStore,
@@ -153,7 +153,7 @@ public class ModelChangeTest1
 
         log.info( "Creating mb2" );
 
-        IterableStoreMeshBase mb2 = createTestStoreMeshBase(
+        StoreMeshBase mb2 = createTestStoreMeshBase(
                 theMeshBaseIdentifierFactory.fromExternalForm( "MeshBase" ),
                 newModelBase,
                 theSqlStore,

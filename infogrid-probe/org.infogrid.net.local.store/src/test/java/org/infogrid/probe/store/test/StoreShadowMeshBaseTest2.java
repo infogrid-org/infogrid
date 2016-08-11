@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -47,7 +47,7 @@ import org.infogrid.probe.manager.PassiveProbeManager;
 import org.infogrid.probe.manager.store.StorePassiveProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.store.StoreShadowMeshBaseFactory;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.util.logging.Log;
 import org.junit.After;
 import org.junit.Before;
@@ -73,54 +73,54 @@ public class StoreShadowMeshBaseTest2
         //
 
         log.info( "accessing test file with meshBase" );
-        
+
         ShadowMeshBase meshBase1 = theProbeManager1.obtainFor( test_NETWORK_IDENTIFIER, new CoherenceSpecification.Periodic( 20000L ));
         checkObject( meshBase1, "MeshBase1 not created" );
-        
+
         MeshObject home1 = meshBase1.getHomeObject();
         checkObject( home1, "no home object found" );
         checkCondition( home1.isBlessedBy( TestSubjectArea.AA ), "Home object not blessed" );
         checkEquals( home1.getPropertyValue( ProbeSubjectArea.PROBEUPDATESPECIFICATION_PROBERUNCOUNTER ), IntegerValue.create( 1 ), "Wrong number of probe runs" );
-        
+
         MeshObject other1 = home1.traverseToNeighborMeshObjects().getSingleMember();
         checkObject( other1, "no other object found" );
         checkCondition( other1.isBlessedBy( TestSubjectArea.B ), "Other object not blessed" );
 
         checkEquals( probeRunCounter, 1, "Probe run wrong number of times" );
-        
+
         //
-        
+
         log.info( "Checking that Shadow goes away when not referenced" );
 
-        WeakReference<ShadowMeshBase> meshBase1Ref = new WeakReference<ShadowMeshBase>( meshBase1 );
+        WeakReference<ShadowMeshBase> meshBase1Ref = new WeakReference<>( meshBase1 );
         meshBase1 = null;
         home1     = null;
         other1    = null;
-        
+
         sleepUntilIsGone( meshBase1Ref, 12000L, "ShadowMeshBase still here, should have been garbage collected" );
-        
+
         //
-        
+
         log.info( "Checking that the Shadow gets transparently re-created" );
-        
+
         ShadowMeshBase meshBase2 = theProbeManager1.get( test_NETWORK_IDENTIFIER );
         checkObject( meshBase2, "MeshBase2 not re-created" );
-        
+
         MeshObject home2 = meshBase2.getHomeObject();
         checkObject( home2, "no home object found" );
         checkCondition( home2.isBlessedBy( TestSubjectArea.AA ), "Home object not blessed" );
         checkEquals( home2.getPropertyValue( ProbeSubjectArea.PROBEUPDATESPECIFICATION_PROBERUNCOUNTER ), IntegerValue.create( 1 ), "Wrong number of probe runs" );
-        
+
         MeshObject other2 = home2.traverseToNeighborMeshObjects().getSingleMember();
         checkObject( other2, "no other object found" );
         checkCondition( other2.isBlessedBy( TestSubjectArea.B ), "Other object not blessed" );
-        
+
         checkEquals( probeRunCounter, 1, "Probe run wrong number of times" ); // this proves that it was recreated from disk
     }
- 
+
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @Before
@@ -136,16 +136,16 @@ public class StoreShadowMeshBaseTest2
                 TestApiProbe.class ));
 
         //
-        
+
         log.info( "Deleting old database and creating new database" );
 
         theSqlStore.initializeHard();
 
-        IterablePrefixingStore theShadowStore      = IterablePrefixingStore.create( "Shadow",      theSqlStore );
-        IterablePrefixingStore theShadowProxyStore = IterablePrefixingStore.create( "ShadowProxy", theSqlStore );
-        
-        // 
-        
+        PrefixingStore theShadowStore      = PrefixingStore.create( "Shadow",      theSqlStore );
+        PrefixingStore theShadowProxyStore = PrefixingStore.create( "ShadowProxy", theSqlStore );
+
+        //
+
         exec = createThreadPool( 1 );
 
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
@@ -157,7 +157,7 @@ public class StoreShadowMeshBaseTest2
                 theShadowStore,
                 theShadowProxyStore,
                 rootContext );
-        
+
         theProbeManager1 = StorePassiveProbeManager.create( shadowFactory, theProbeDirectory, theShadowStore );
         shadowEndpointFactory.setNameServer( theProbeManager1.getNetMeshBaseNameServer() );
         shadowFactory.setProbeManager( theProbeManager1 );
@@ -208,7 +208,7 @@ public class StoreShadowMeshBaseTest2
      * Counter for probe runs.
      */
     protected static int probeRunCounter = 0;
-    
+
     /**
      * The test Probe.
      */
@@ -243,12 +243,12 @@ public class StoreShadowMeshBaseTest2
             MeshObject home = mb.getHomeObject();
             home.bless( TestSubjectArea.AA );
             home.setPropertyValue( TestSubjectArea.A_X, StringValue.create( "A_X" ));
-            
+
             MeshObject other = mb.getMeshBaseLifecycleManager().createMeshObject(
                     mb.getMeshObjectIdentifierFactory().fromExternalForm( "other" ),
                     TestSubjectArea.B );
             other.setPropertyValue( TestSubjectArea.B_U, StringValue.create( "B_U" ));
-            
+
             home.relateAndBless( TestSubjectArea.R.getSource(), other );
         }
     }

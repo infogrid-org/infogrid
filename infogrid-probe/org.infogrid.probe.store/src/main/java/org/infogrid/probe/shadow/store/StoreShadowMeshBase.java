@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -38,8 +38,8 @@ import org.infogrid.probe.shadow.a.AShadowMeshBase;
 import org.infogrid.probe.shadow.externalized.ExternalizedShadowMeshBase;
 import org.infogrid.probe.shadow.proxy.DefaultShadowProxyFactory;
 import org.infogrid.probe.shadow.proxy.DefaultShadowProxyPolicyFactory;
-import org.infogrid.store.IterableStore;
-import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
+import org.infogrid.store.Store;
+import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.MCachingHashMap;
 import org.infogrid.util.context.Context;
@@ -70,6 +70,7 @@ public class StoreShadowMeshBase
      *         even if none of its MeshObjects are replicated to another NetMeshBase. If this is negative, it means "forever".
      *         If this is 0, it will expire immediately after the first Probe run, before the caller returns, which is probably
      *         not very useful.
+     * @param mappingPolicy
      * @param proxyStore the IterableStore in which to store the StoreShadowMeshBase's Proxies
      * @param context the Context in which this NetMeshBase runs.
      * @return the created StoreShadowMeshBase
@@ -84,7 +85,7 @@ public class StoreShadowMeshBase
             ProbeDirectory                          directory,
             long                                    timeNotNeededTillExpires,
             HttpMappingPolicy                       mappingPolicy,
-            IterableStore                           proxyStore,
+            Store                                   proxyStore,
             Context                                 context )
     {
         DefaultShadowProxyPolicyFactory proxyPolicyFactory = DefaultShadowProxyPolicyFactory.create();
@@ -135,14 +136,14 @@ public class StoreShadowMeshBase
             ProbeDirectory                          directory,
             long                                    timeNotNeededTillExpires,
             HttpMappingPolicy                       mappingPolicy,
-            IterableStore                           proxyStore,
+            Store                                   proxyStore,
             Context                                 context )
     {
         DefaultShadowProxyFactory   proxyFactory   = DefaultShadowProxyFactory.create( endpointFactory, proxyPolicyFactory );
         ShadowStoreProxyEntryMapper theProxyMapper = new ShadowStoreProxyEntryMapper( proxyFactory );
-        
-        MCachingHashMap<MeshObjectIdentifier,MeshObject>    objectStorage = MCachingHashMap.create();
-        IterableStoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = IterableStoreBackedSwappingHashMap.createWeak( theProxyMapper, proxyStore );
+
+        MCachingHashMap<MeshObjectIdentifier,MeshObject>        objectStorage = MCachingHashMap.create();
+        StoreBackedSwappingHashMap<NetMeshBaseIdentifier,Proxy> proxyStorage  = StoreBackedSwappingHashMap.createWeak( theProxyMapper, proxyStore );
 
         StoreProxyManager proxyManager = StoreProxyManager.create( proxyFactory, proxyStorage );
 
@@ -198,6 +199,7 @@ public class StoreShadowMeshBase
      *         even if none of its MeshObjects are replicated to another NetMeshBase. If this is negative, it means "forever".
      *         If this is 0, it will expire immediately after the first Probe run, before the caller returns, which is probably
      *         not very useful.
+     * @param mappingPolicy
      * @param context the Context in which this NetMeshBase runs.
      */
     protected StoreShadowMeshBase(
@@ -236,7 +238,7 @@ public class StoreShadowMeshBase
 
     /**
      * <p>Obtain a manager for object lifecycles.</p>
-     * 
+     *
      * @return a MeshBaseLifecycleManager that works on this MeshBase with the specified parameters
      */
     @Override
@@ -244,22 +246,23 @@ public class StoreShadowMeshBase
     {
         return (StoreShadowMeshBaseLifecycleManager) theMeshBaseLifecycleManager;
     }
-    
+
     /**
      * Allow a Proxy to tell this StagingMeshBase that it performed an operation that
      * modified data in the StagingMeshBase, and the StagingMeshBase may have to be flushed to disk.
      */
+    @Override
     public void flushMeshBase()
     {
         if( theProbeManager != null ) {
             theProbeManager.factoryCreatedObjectUpdated( this );
         }
     }
-    
+
     /**
      * Restore this (empty) ShadowMeshBase to the content contained in the
      * ExternalizedShadowMeshBase.
-     * 
+     *
      * @param externalized the externalized representation of the ShadowMeshBase content to restore to
      */
     public void restoreTo(
@@ -267,7 +270,7 @@ public class StoreShadowMeshBase
     {
         // cannot restore the Proxies here, we don't have the data (FIXME? tbd?)
         StoreShadowMeshBaseLifecycleManager life = (StoreShadowMeshBaseLifecycleManager) theMeshBaseLifecycleManager;
-        
+
         for( ExternalizedNetMeshObject current : externalized.getExternalizedNetMeshObjects() ) {
             try {
                 life.restore( current );
@@ -276,7 +279,7 @@ public class StoreShadowMeshBase
                 // just in case
                 log.error( ex );
             }
-        }        
+        }
     }
 
     /**

@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -25,7 +25,7 @@ import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.meshbase.store.net.NetStoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.util.logging.Log;
 import org.junit.After;
 import org.junit.Before;
@@ -51,13 +51,13 @@ public class StoreNetMeshBaseTest6
         log.info( "Creating Meshbases and instantiating objects" );
 
         NetMMeshBaseNameServer<NetMeshBaseIdentifier,NetMeshBase> theNameServerA = NetMMeshBaseNameServer.create();
-        
+
         MPingPongNetMessageEndpointFactory endpointFactoryA = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactoryA.setNameServer( theNameServerA );
 
         mb1A = NetStoreMeshBase.create( net1, theModelBase, null, endpointFactoryA, mb1MeshStore, mb1ProxyStore, rootContext );
         mb2A = NetStoreMeshBase.create( net2, theModelBase, null, endpointFactoryA, mb2MeshStore, mb2ProxyStore, rootContext );
-        
+
         theNameServerA.put( mb1A.getIdentifier(), mb1A );
         theNameServerA.put( mb2A.getIdentifier(), mb2A );
 
@@ -65,47 +65,47 @@ public class StoreNetMeshBaseTest6
         NetMeshObjectIdentifier id1A = mb1A.getMeshObjectIdentifierFactory().fromExternalForm( id1String );
 
         Transaction tx1A = mb1A.createTransactionNow();
-        
+
         NetMeshObject obj1_1A = mb1A.getMeshBaseLifecycleManager().createMeshObject( id1A );
-        
+
         tx1A.commitTransaction();
         tx1A = null;
 
         NetMeshObject obj1_2A = mb2A.accessLocally( mb1A.getIdentifier(), id1A );
-        
+
         checkObject( obj1_1A, "No object obj1_1" );
         checkObject( obj1_2A, "No object obj1_2" );
-        
+
         //
-        
+
         log.info( "Killing off MeshBases" );
 
-        WeakReference<NetStoreMeshBase> mb1ARef = new WeakReference<NetStoreMeshBase>( mb1A );
-        WeakReference<NetStoreMeshBase> mb2ARef = new WeakReference<NetStoreMeshBase>( mb2A );
-        WeakReference<NetMeshObject>    obj1_1ARef = new WeakReference<NetMeshObject>( obj1_1A );
-        WeakReference<NetMeshObject>    obj1_2ARef = new WeakReference<NetMeshObject>( obj1_2A );
+        WeakReference<NetStoreMeshBase> mb1ARef = new WeakReference<>( mb1A );
+        WeakReference<NetStoreMeshBase> mb2ARef = new WeakReference<>( mb2A );
+        WeakReference<NetMeshObject>    obj1_1ARef = new WeakReference<>( obj1_1A );
+        WeakReference<NetMeshObject>    obj1_2ARef = new WeakReference<>( obj1_2A );
 
         id1A = null;
         endpointFactoryA = null;
         theNameServerA   = null;
         obj1_1A = null;
         obj1_2A = null;
-        
+
         mb1A.die();
         mb2A.die();
-        
+
         mb1A = null;
         mb2A = null;
-        
+
         sleepUntilIsGone( mb1ARef, 15000L, "MB1 still here" );
         // sleepUntilIsGone( mb2ARef, 15000L, "MB2 still here" ); // FIXME: This somehow only sometimes goes away
         sleepUntilIsGone( obj1_1ARef, 1000L, "obj1_1 still here" );
         sleepUntilIsGone( obj1_2ARef, 1000L, "obj1_2 still here" );
-        
+
         //
-        
+
         log.info( "Recreating MeshBases" );
-        
+
         NetMMeshBaseNameServer<NetMeshBaseIdentifier,NetMeshBase> theNameServerB = NetMMeshBaseNameServer.create();
 
         MPingPongNetMessageEndpointFactory endpointFactoryB = MPingPongNetMessageEndpointFactory.create( exec );
@@ -113,25 +113,25 @@ public class StoreNetMeshBaseTest6
 
         mb1B = NetStoreMeshBase.create( net1, theModelBase, null, endpointFactoryB, mb1MeshStore, mb1ProxyStore, rootContext );
         mb2B = NetStoreMeshBase.create( net2, theModelBase, null, endpointFactoryB, mb2MeshStore, mb2ProxyStore, rootContext );
-        
+
         theNameServerB.put( mb1B.getIdentifier(), mb1B );
         theNameServerB.put( mb2B.getIdentifier(), mb2B );
 
         NetMeshObjectIdentifier id1B = mb1B.getMeshObjectIdentifierFactory().fromExternalForm( id1String );
         NetMeshObject obj1_1B = mb1B.findMeshObjectByIdentifier( id1B );
-        
+
         checkObject( obj1_1B, "obj1_1 not found" );
-        
+
         //
-        
+
         log.info( "Making change and checking whether it propagates" );
-        
+
         Transaction tx1B = mb1B.createTransactionNow();
-        
+
         obj1_1B.bless( TestSubjectArea.AA );
-        
+
         tx1B.commitTransaction();
-        
+
         Thread.sleep( PINGPONG_ROUNDTRIP_DURATION );
 
         NetMeshObject obj1_2B = mb2B.findMeshObjectByIdentifier( id1B );
@@ -141,7 +141,7 @@ public class StoreNetMeshBaseTest6
         checkObject( obj1_2B, "obj1_2 not found" );
         checkCondition( obj1_1B.isBlessedBy( TestSubjectArea.AA ), "ob1_1 not blessed" );
         checkCondition( obj1_2B.isBlessedBy( TestSubjectArea.AA ), "ob1_2 not blessed" );
-     
+
         log.info( "done" );
     }
 
@@ -151,6 +151,7 @@ public class StoreNetMeshBaseTest6
      * @throws Exception anything can go wrong in a test
      */
     @Before
+    @Override
     public void setup()
         throws
             Exception
@@ -161,13 +162,13 @@ public class StoreNetMeshBaseTest6
         net2 = theMeshBaseIdentifierFactory.fromExternalForm( "http://two.local/" );
 
         log.info( "Deleting old database and creating new database" );
-        
+
         theSqlStore.initializeHard();
 
-        mb1MeshStore  = IterablePrefixingStore.create( "mb1-mesh-",  theSqlStore );
-        mb1ProxyStore = IterablePrefixingStore.create( "mb1-proxy-", theSqlStore );
-        mb2MeshStore  = IterablePrefixingStore.create( "mb2-mesh-",  theSqlStore );
-        mb2ProxyStore = IterablePrefixingStore.create( "mb2-proxy-", theSqlStore );
+        mb1MeshStore  = PrefixingStore.create( "mb1-mesh-",  theSqlStore );
+        mb1ProxyStore = PrefixingStore.create( "mb1-proxy-", theSqlStore );
+        mb2MeshStore  = PrefixingStore.create( "mb2-mesh-",  theSqlStore );
+        mb2ProxyStore = PrefixingStore.create( "mb2-proxy-", theSqlStore );
     }
 
     /**
@@ -205,22 +206,22 @@ public class StoreNetMeshBaseTest6
     /**
      * The Store storing NetMeshBase mb1's MeshObjects.
      */
-    protected IterablePrefixingStore mb1MeshStore;
-    
+    protected PrefixingStore mb1MeshStore;
+
     /**
      * The Store storing NetMeshBase mb1's Proxies.
      */
-    protected IterablePrefixingStore mb1ProxyStore;
+    protected PrefixingStore mb1ProxyStore;
 
     /**
      * The Store storing NetMeshBase mb2's MeshObjects.
      */
-    protected IterablePrefixingStore mb2MeshStore;
-    
+    protected PrefixingStore mb2MeshStore;
+
     /**
      * The Store storing NetMeshBase mb2's Proxies.
      */
-    protected IterablePrefixingStore mb2ProxyStore;
+    protected PrefixingStore mb2ProxyStore;
 
     /**
      * MeshBases to shut down at the end of the test.
@@ -236,5 +237,5 @@ public class StoreNetMeshBaseTest6
     protected ScheduledExecutorService exec = createThreadPool( 1 );
 
     // Our Logger
-    private static Log log = Log.getLogInstance( StoreNetMeshBaseTest6.class );
+    private static final Log log = Log.getLogInstance( StoreNetMeshBaseTest6.class );
 }

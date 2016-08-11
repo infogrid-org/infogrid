@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -64,7 +64,7 @@ public class ProxySerializationTest1
 {
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -80,14 +80,14 @@ public class ProxySerializationTest1
 
         Log4jLog.configure( "org/infogrid/meshbase/store/net/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/meshbase/store/net/test/ResourceHelper",
                 Locale.getDefault(),
                 cl ));
 
         theModelBase = ModelBaseSingleton.getSingleton();
-    
+
         theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create();
     }
 
@@ -222,7 +222,7 @@ public class ProxySerializationTest1
                                 false )
                     })
         };
-        
+
         for( int i=0 ; i<testCases.length ; ++i ) {
             runTest( thisDir, testCases[i] );
         }
@@ -230,7 +230,7 @@ public class ProxySerializationTest1
 
     /**
      * Run one test.
-     * 
+     *
      * @param parentDir the parent directory
      * @param testCase the actual test
      * @throws Exception may throw any exception, it's a test after all
@@ -242,11 +242,11 @@ public class ProxySerializationTest1
             Exception
     {
         log.debug( "Now running testcase " + testCase.theInputFile );
-            
+
         File theFile = new File( parentDir, testCase.theInputFile );
 
         ExternalizedProxyXmlEncoder test = new ExternalizedProxyXmlEncoder();
-        
+
         ExternalizedProxy proxy = test.decodeExternalizedProxy(
                 new FileInputStream( theFile ),
                 theNetMeshBase );
@@ -276,7 +276,7 @@ public class ProxySerializationTest1
     {
         MStore meshObjectStore = MStore.create();
         MStore proxyStore      = MStore.create();
-        
+
         theNetMeshBase = NetStoreMeshBase.create(
                 theMeshBaseIdentifierFactory.fromExternalForm( "http://here.local/" ),
                 theModelBase,
@@ -289,7 +289,7 @@ public class ProxySerializationTest1
 
     /**
      * Teardown.
-     * 
+     *
      * @throws Exception anything can go wrong in a test
      */
     @After
@@ -301,23 +301,23 @@ public class ProxySerializationTest1
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( ProxySerializationTest1.class );
-    
+    private static final Log log = Log.getLogInstance( ProxySerializationTest1.class );
+
     /**
      * The root application context.
      */
     protected static final Context rootContext = SimpleContext.createRoot( "root" );
-    
+
     /**
      * ModelBase.
      */
     protected static ModelBase theModelBase;
-    
+
     /**
      * Factory for NetMeshBaseIdentifiers.
      */
     protected static NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory;
-    
+
     /**
      * NetMeshBase for the test.
      */
@@ -370,7 +370,7 @@ public class ProxySerializationTest1
                 theLastMessagesSent = new XprisoMessage[0];
             }
         }
-        
+
         public String theInputFile;
         public long   theTimeCreated;
         public long   theTimeUpdated;
@@ -392,7 +392,7 @@ public class ProxySerializationTest1
                 SimpleXprisoMessage
     {
         private static final long serialVersionUID = 1L; // helps to get rid of IDE compiler warnings
-        
+
         public TestXprisoMessage(
                 int                                  requestId,
                 int                                  responseId,

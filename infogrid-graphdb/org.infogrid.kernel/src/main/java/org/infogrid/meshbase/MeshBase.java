@@ -35,6 +35,8 @@ import org.infogrid.util.QuitListener;
 import org.infogrid.util.context.ObjectInContext;
 import org.infogrid.meshbase.transaction.TransactionAction;
 import org.infogrid.meshbase.transaction.TransactionActionException;
+import org.infogrid.util.CursorIterable;
+import org.infogrid.util.CursorIterator;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.HasIdentifierFinder;
 import org.infogrid.util.IsDeadException;
@@ -86,7 +88,8 @@ public interface MeshBase
             MeshBaseLifecycleManager,
             MeshObjectIdentifierFactory,
             MeshObjectSetFactory,
-            HasStringRepresentation
+            HasStringRepresentation,
+            CursorIterable<MeshObject>
 {
     /**
      * Obtain the MeshBaseIdentifier that identifies this MeshBase.
@@ -253,6 +256,47 @@ public interface MeshBase
      * @see #setMeshObjectSetFactory
      */
     public abstract MeshObjectSetFactory getMeshObjectSetFactory();
+
+    /**
+     * Returns a CursorIterator over the content of this MeshBase.
+     *
+     * @return a CursorIterator.
+     */
+    @Override
+    public CursorIterator<MeshObject> getIterator();
+
+    /**
+     * Returns a CursorIterator over the content of this MeshBase.
+     *
+     * @return a CursorIterator.
+     */
+    @Override
+    public CursorIterator<MeshObject> iterator();
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase.
+     *
+     * @return the number of MeshObjects in this MeshBase
+     * @see #getSize()
+     */
+    public abstract int size();
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase. This redundant method
+     * is provided to make life easier for JavaBeans-aware software.
+     *
+     * @return the number of MeshObjects in this MeshBase
+     * @see #size()
+     */
+    public abstract int getSize();
+
+    /**
+     * Factory method for a IterableMeshBaseDifferencer, with this IterableMeshBase
+     * being the comparison base.
+     *
+     * @return the IterableMeshBaseDifferencer
+     */
+    public abstract MeshBaseDifferencer getDifferencer();
 
     /**
      * Create a new Transaction as soon as possible. This means the calling Thread may be suspended

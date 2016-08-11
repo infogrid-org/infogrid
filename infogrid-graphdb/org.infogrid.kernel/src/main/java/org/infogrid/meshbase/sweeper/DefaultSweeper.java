@@ -17,16 +17,16 @@ package org.infogrid.meshbase.sweeper;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.IterableMeshBase;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.ResourceHelper;
 
 /**
  * Default implementation of Sweeper for IterableMeshBases.
  */
-public class DefaultIterableSweeper
+public class DefaultSweeper
         implements
-            IterableSweeper
+            Sweeper
 {
     /**
      * Factory method if the Sweeper is only supposed to be invoked manually.
@@ -35,11 +35,11 @@ public class DefaultIterableSweeper
      * @param policy the SweepPolicy to use
      * @return the created DefaultIterableSweeper
      */
-    public static DefaultIterableSweeper create(
-            IterableMeshBase         mb,
-            SweepPolicy              policy )
+    public static DefaultSweeper create(
+            MeshBase    mb,
+            SweepPolicy policy )
     {
-        return new DefaultIterableSweeper(
+        return new DefaultSweeper(
                 mb,
                 policy,
                 null,
@@ -55,12 +55,12 @@ public class DefaultIterableSweeper
      * @param scheduler the scheduler to use, if any
      * @return the created DefaultIterableSweeper
      */
-    public static DefaultIterableSweeper create(
-            IterableMeshBase         mb,
+    public static DefaultSweeper create(
+            MeshBase                 mb,
             SweepPolicy              policy,
             ScheduledExecutorService scheduler )
     {
-        return new DefaultIterableSweeper(
+        return new DefaultSweeper(
                 mb,
                 policy,
                 scheduler,
@@ -78,14 +78,14 @@ public class DefaultIterableSweeper
      * @param waitBetweenLots the time, in milliseconds, between examining subsequent lots
      * @return the created DefaultIterableSweeper
      */
-    public static DefaultIterableSweeper create(
-            IterableMeshBase         mb,
+    public static DefaultSweeper create(
+            MeshBase                 mb,
             SweepPolicy              policy,
             ScheduledExecutorService scheduler,
             int                      lotSize,
             long                     waitBetweenLots )
     {
-        return new DefaultIterableSweeper(
+        return new DefaultSweeper(
                 mb,
                 policy,
                 scheduler,
@@ -102,8 +102,8 @@ public class DefaultIterableSweeper
      * @param lotSize the number of MeshObjects to consider at a time
      * @param waitBetweenLots the time, in milliseconds, between examining subsequent lots
      */
-    protected DefaultIterableSweeper(
-            IterableMeshBase         mb,
+    protected DefaultSweeper(
+            MeshBase                 mb,
             SweepPolicy              policy,
             ScheduledExecutorService scheduler,
             int                      lotSize,
@@ -121,6 +121,7 @@ public class DefaultIterableSweeper
      *
      * @param newValue the new SweepPolicy
      */
+    @Override
     public void setSweepPolicy(
             SweepPolicy newValue )
     {
@@ -132,6 +133,7 @@ public class DefaultIterableSweeper
      *
      * @return the SweepPolicy
      */
+    @Override
     public SweepPolicy getSweepPolicy()
     {
         return thePolicy;
@@ -142,7 +144,8 @@ public class DefaultIterableSweeper
      *
      * @return the IterableMeshBase
      */
-    public IterableMeshBase getMeshBase()
+    @Override
+    public MeshBase getMeshBase()
     {
         return theMeshBase;
     }
@@ -154,6 +157,7 @@ public class DefaultIterableSweeper
      * @param scheduleVia the ScheduledExecutorService to use for scheduling
      * @throws NullPointerException thrown if no Sweeper has been set
      */
+    @Override
     public void startBackgroundSweeping(
             ScheduledExecutorService scheduleVia )
         throws
@@ -167,6 +171,7 @@ public class DefaultIterableSweeper
     /**
      * Stop the background sweeping.
      */
+    @Override
     public void stopBackgroundSweeping()
     {
         SweepStep nextStep = theNextSweepStep;
@@ -184,6 +189,7 @@ public class DefaultIterableSweeper
      * This may take a long time; using background sweeping is almost always
      * a better alternative.
      */
+    @Override
     public synchronized void sweepAllNow()
     {
         boolean doReschedule = cancelSweepStep();
@@ -201,6 +207,7 @@ public class DefaultIterableSweeper
     /**
      * Perform a sweep on the next lot in this IterableMeshBase.
      */
+    @Override
     public void sweepNextLot()
     {
         boolean doReschedule = cancelSweepStep();
@@ -220,7 +227,9 @@ public class DefaultIterableSweeper
     /**
      * Perform a sweep on this MeshObject. This method
      * may be overridden by subclasses.
+     * @param current
      */
+    @Override
     public void sweepObject(
             MeshObject current )
     {
@@ -256,7 +265,7 @@ public class DefaultIterableSweeper
     /**
      * The IterableMeshBase on which this Sweeper works.
      */
-    protected IterableMeshBase theMeshBase;
+    protected MeshBase theMeshBase;
 
     /**
      * The policy in effect.
@@ -291,7 +300,7 @@ public class DefaultIterableSweeper
     /**
      * The ResourceHelper.
      */
-    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( DefaultIterableSweeper.class );
+    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance(DefaultSweeper.class );
 
     /**
      * The default number of MeshObjects to consider at a time.

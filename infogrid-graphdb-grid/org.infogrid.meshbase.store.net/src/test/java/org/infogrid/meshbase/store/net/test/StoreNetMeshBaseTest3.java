@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -33,7 +33,7 @@ import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.model.primitives.BlobValue;
 import org.infogrid.model.primitives.StringValue;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.util.logging.Log;
 import org.junit.After;
 import org.junit.Before;
@@ -58,13 +58,13 @@ public class StoreNetMeshBaseTest3
     {
 // first section: Make sure things work while in memory
 // second section: Make sure things get restored correctly from Store
-        
+
         log.info( "Setting up entities" );
 
         MeshObjectIdentifier obj1Name = mb1.getMeshObjectIdentifierFactory().fromExternalForm( "obj1" );
         MeshObjectIdentifier obj2Name = mb1.getMeshObjectIdentifierFactory().fromExternalForm( "obj2" );
         MeshObjectIdentifier obj3Name = mb1.getMeshObjectIdentifierFactory().fromExternalForm( "obj3" );
-        
+
         Transaction tx = mb1.createTransactionAsap();
 
         NetMeshBaseLifecycleManager life1 = mb1.getMeshBaseLifecycleManager();
@@ -87,7 +87,7 @@ public class StoreNetMeshBaseTest3
         obj1Name = obj1_mb1.getIdentifier();
         obj2Name = obj2_mb1.getIdentifier();
         obj3Name = obj3_mb1.getIdentifier();
-        
+
         checkProxies( obj1_mb1, null, null, null, "obj1_mb1 has proxies" );
         checkProxies( obj2_mb1, null, null, null, "obj2_mb1 has proxies" );
         checkProxies( obj3_mb1, null, null, null, "obj3_mb1 has proxies" );
@@ -96,7 +96,7 @@ public class StoreNetMeshBaseTest3
         checkEquals( mb1ProxyStore.size(), 0, "Wrong number of entries in mb1ProxyStore" );
         checkEquals( mb2MeshStore.size(),  1, "Wrong number of entries in mb2MeshStore" );
         checkEquals( mb2ProxyStore.size(), 0, "Wrong number of entries in mb2ProxyStore" );
-        
+
         //
 
         log.info( "Relate objects 1-2, 2-3" );
@@ -149,7 +149,7 @@ public class StoreNetMeshBaseTest3
         checkEquals( neighborsOf( obj2_mb1 ).length, 2, "Wrong number of internal neighbors" );
         checkEquals( neighborsOf( obj3_mb1 ).length, 1, "Wrong number of internal neighbors" );
         checkEquals( neighborsOf( obj1_mb2 ).length, 1, "Wrong number of internal neighbors" );
-        
+
         NetMeshObject obj2_mb2   = mb2.findMeshObjectByIdentifier( obj2Name );
         checkCondition( obj2_mb2 == null, "obj2 should not be here yet" );
 
@@ -176,7 +176,7 @@ public class StoreNetMeshBaseTest3
         checkProxies( obj2_mb2, new NetMeshBase[] { mb1 }, mb1,  mb1,  "obj2_mb2 has wrong proxies" );
 
         checkProxies( obj3_mb1, null, null, null, "obj1_mb1 has proxies" );
-        
+
         checkEquals( mb1MeshStore.size(),  4, "Wrong number of entries in mb1MeshStore" );
         checkEquals( mb1ProxyStore.size(), 1, "Wrong number of entries in mb1ProxyStore" );
         checkEquals( mb2MeshStore.size(),  3, "Wrong number of entries in mb2MeshStore" );
@@ -227,22 +227,22 @@ public class StoreNetMeshBaseTest3
         checkNeighborsReplication( obj1_mb1, obj1_mb2, "replica 1 RPT replication didn't work" );
         checkNeighborsReplication( obj2_mb1, obj2_mb2, "replica 2 RPT replication didn't work" );
         checkNeighborsReplication( obj3_mb1, obj3_mb2, "replica 3 RPT replication didn't work" );
-        
+
         //
-        
+
         log.info( "now erasing cache" );
-        
-        WeakReference<Proxy> p1Ref = new WeakReference<Proxy>( mb1.proxies().next() );
+
+        WeakReference<Proxy> p1Ref = new WeakReference<>( mb1.proxies().next() );
         checkCondition( p1Ref.get() != null, "no mb1 proxy found" );
-        WeakReference<Proxy> p2Ref = new WeakReference<Proxy>( mb2.proxies().next() );
+        WeakReference<Proxy> p2Ref = new WeakReference<>( mb2.proxies().next() );
         checkCondition( p2Ref.get() != null, "no mb2 proxy found" );
 
-        WeakReference<MeshObject> obj1_mb1Ref = new WeakReference<MeshObject>( obj1_mb1 );
-        WeakReference<MeshObject> obj1_mb2Ref = new WeakReference<MeshObject>( obj1_mb2 );
-        WeakReference<MeshObject> obj2_mb1Ref = new WeakReference<MeshObject>( obj2_mb1 );
-        WeakReference<MeshObject> obj2_mb2Ref = new WeakReference<MeshObject>( obj2_mb2 );
-        WeakReference<MeshObject> obj3_mb1Ref = new WeakReference<MeshObject>( obj3_mb1 );
-        WeakReference<MeshObject> obj3_mb2Ref = new WeakReference<MeshObject>( obj3_mb2 );
+        WeakReference<MeshObject> obj1_mb1Ref = new WeakReference<>( obj1_mb1 );
+        WeakReference<MeshObject> obj1_mb2Ref = new WeakReference<>( obj1_mb2 );
+        WeakReference<MeshObject> obj2_mb1Ref = new WeakReference<>( obj2_mb1 );
+        WeakReference<MeshObject> obj2_mb2Ref = new WeakReference<>( obj2_mb2 );
+        WeakReference<MeshObject> obj3_mb1Ref = new WeakReference<>( obj3_mb1 );
+        WeakReference<MeshObject> obj3_mb2Ref = new WeakReference<>( obj3_mb2 );
 
         obj1_mb1 = null;
         obj2_mb1 = null;
@@ -251,12 +251,12 @@ public class StoreNetMeshBaseTest3
         obj2_mb2 = null;
         obj3_mb2 = null;
         replicaSet = null;
-        
+
         collectGarbage();
 
         checkCondition( p1Ref.get() == null, "mb1 proxy found" );
         checkCondition( p2Ref.get() == null, "mb2 proxy found" );
-        
+
         checkCondition( obj1_mb1Ref.get() == null, "obj1_mb1 found" );
         checkCondition( obj1_mb2Ref.get() == null, "obj1_mb2 found" );
         checkCondition( obj2_mb1Ref.get() == null, "obj2_mb1 found" );
@@ -265,16 +265,16 @@ public class StoreNetMeshBaseTest3
         checkCondition( obj3_mb2Ref.get() == null, "obj3_mb2 found" );
 
         //
-        
+
         log.info( "Recreating and checking objects" );
-        
+
         obj1_mb1 = mb1.findMeshObjectByIdentifier( obj1Name );
         obj2_mb1 = mb1.findMeshObjectByIdentifier( obj2Name );
         obj3_mb1 = mb1.findMeshObjectByIdentifier( obj3Name );
         obj1_mb2 = mb2.findMeshObjectByIdentifier( obj1Name );
         obj2_mb2 = mb2.findMeshObjectByIdentifier( obj2Name );
         obj3_mb2 = mb2.findMeshObjectByIdentifier( obj3Name );
-        
+
         checkObject( obj1_mb1, "obj1_mb1 not found" );
         checkObject( obj2_mb1, "obj2_mb1 not found" );
         checkObject( obj3_mb1, "obj3_mb1 not found" );
@@ -290,7 +290,7 @@ public class StoreNetMeshBaseTest3
         checkEquals( neighborsOf( obj3_mb2 ).length, 1, "Wrong number of internal neighbors" );
 
         //
-        
+
         log.info( "checking proxies" );
 
         checkProxies( obj1_mb1, new NetMeshBase[] { mb2 }, null, null, "obj1_mb1 has wrong proxies" );
@@ -307,11 +307,11 @@ public class StoreNetMeshBaseTest3
         checkNeighborsReplication( obj1_mb1, obj1_mb2, "replica 1 RPT replication didn't work" );
         checkNeighborsReplication( obj2_mb1, obj2_mb2, "replica 2 RPT replication didn't work" );
         checkNeighborsReplication( obj3_mb1, obj3_mb2, "replica 3 RPT replication didn't work" );
-        
+
         //
-        
+
         log.info( "Checking Store" );
-        
+
         checkEquals( mb1MeshStore.size(),  4, "Wrong number of entries in mb1MeshStore" );
         checkEquals( mb1ProxyStore.size(), 1, "Wrong number of entries in mb1ProxyStore" );
         checkEquals( mb2MeshStore.size(),  4, "Wrong number of entries in mb2MeshStore" );
@@ -340,14 +340,14 @@ public class StoreNetMeshBaseTest3
 
         theSqlStore.initializeHard();
 
-        mb1MeshStore  = IterablePrefixingStore.create( "mb1-mesh-",  theSqlStore );
-        mb1ProxyStore = IterablePrefixingStore.create( "mb1-proxy-", theSqlStore );
-        mb2MeshStore  = IterablePrefixingStore.create( "mb2-mesh-",  theSqlStore );
-        mb2ProxyStore = IterablePrefixingStore.create( "mb2-proxy-", theSqlStore );
-        
+        mb1MeshStore  = PrefixingStore.create( "mb1-mesh-",  theSqlStore );
+        mb1ProxyStore = PrefixingStore.create( "mb1-proxy-", theSqlStore );
+        mb2MeshStore  = PrefixingStore.create( "mb2-mesh-",  theSqlStore );
+        mb2ProxyStore = PrefixingStore.create( "mb2-proxy-", theSqlStore );
+
         mb1 = NetStoreMeshBase.create( net1, theModelBase, null, endpointFactory, mb1MeshStore, mb1ProxyStore, rootContext );
         mb2 = NetStoreMeshBase.create( net2, theModelBase, null, endpointFactory, mb2MeshStore, mb2ProxyStore, rootContext );
-        
+
         theNameServer.put( mb1.getIdentifier(), mb1 );
         theNameServer.put( mb2.getIdentifier(), mb2 );
     }
@@ -360,7 +360,7 @@ public class StoreNetMeshBaseTest3
     {
         mb1.die();
         mb2.die();
-        
+
         exec.shutdown();
     }
 
@@ -403,22 +403,22 @@ public class StoreNetMeshBaseTest3
     /**
      * The Store storing NetMeshBase mb1's MeshObjects.
      */
-    protected IterablePrefixingStore mb1MeshStore;
-    
+    protected PrefixingStore mb1MeshStore;
+
     /**
      * The Store storing NetMeshBase mb1's Proxies.
      */
-    protected IterablePrefixingStore mb1ProxyStore;
+    protected PrefixingStore mb1ProxyStore;
 
     /**
      * The Store storing NetMeshBase mb2's MeshObjects.
      */
-    protected IterablePrefixingStore mb2MeshStore;
-    
+    protected PrefixingStore mb2MeshStore;
+
     /**
      * The Store storing NetMeshBase mb2's Proxies.
      */
-    protected IterablePrefixingStore mb2ProxyStore;
+    protected PrefixingStore mb2ProxyStore;
 
     /**
      * Our ThreadPool.

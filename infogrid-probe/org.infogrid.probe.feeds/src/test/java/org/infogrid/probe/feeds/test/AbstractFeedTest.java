@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -22,9 +22,9 @@ import org.diet4j.core.ModuleRegistry;
 import org.diet4j.core.ModuleRequirement;
 import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.IterableMeshBase;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
-import org.infogrid.meshbase.net.IterableNetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.model.primitives.EntityType;
@@ -55,7 +55,7 @@ public abstract class AbstractFeedTest
 {
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -68,10 +68,10 @@ public abstract class AbstractFeedTest
 
         registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.probe.feeds" ))).activateRecursively();
         registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.model.Test" ))).activateRecursively();
-        
+
         Log4jLog.configure( "org/infogrid/probe/feeds/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/probe/feeds/test/ResourceHelper",
                 Locale.getDefault(),
@@ -82,7 +82,7 @@ public abstract class AbstractFeedTest
 
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @Before
@@ -126,8 +126,8 @@ public abstract class AbstractFeedTest
      * @return the number of MeshObjects in the MeshBase
      */
     protected static int countMeshObjects(
-            IterableNetMeshBase base,
-            Log                 mylog )
+            NetMeshBase base,
+            Log         mylog )
     {
         int ret = countFromIterator( base.iterator(), mylog );
         return ret;
@@ -168,9 +168,9 @@ public abstract class AbstractFeedTest
      * @throws Exception all sorts of things may go wrong during a test
      */
     protected final void dumpMeshBase(
-            IterableMeshBase mb,
-            String           prefix,
-            Log              mylog )
+            MeshBase mb,
+            String   prefix,
+            Log      mylog )
         throws
             Exception
     {
@@ -222,7 +222,7 @@ public abstract class AbstractFeedTest
      * The ProbeDirectory.
      */
     protected MProbeDirectory theProbeDirectory = MProbeDirectory.create();
-    
+
     /**
      * Factory for NetMeshBaseIdentifiers.
      */

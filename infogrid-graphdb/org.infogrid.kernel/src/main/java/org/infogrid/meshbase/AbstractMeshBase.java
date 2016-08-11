@@ -64,6 +64,7 @@ import org.infogrid.util.AbstractLiveDeadObject;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CannotFindHasIdentifierException;
+import org.infogrid.util.CursorIterator;
 import org.infogrid.util.Factory;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.FlexibleListenerSet;
@@ -1673,6 +1674,29 @@ public abstract class AbstractMeshBase
             MeshObject [] array )
     {
         return theMeshObjectSetFactory.asIdentifiers( array );
+    }
+
+    /**
+     * Returns a CursorIterator over the content of this MeshBase.
+     *
+     * @return a CursorIterator.
+     */
+    @Override
+    public CursorIterator<MeshObject> getIterator()
+    {
+        return iterator();
+    }
+
+    /**
+     * Factory method for a IterableMeshBaseDifferencer, with this IterableMeshBase
+     * being the comparison base.
+     *
+     * @return the IterableMeshBaseDifferencer
+     */
+    @Override
+    public MeshBaseDifferencer getDifferencer()
+    {
+        return new MeshBaseDifferencer( this );
     }
 
     /**

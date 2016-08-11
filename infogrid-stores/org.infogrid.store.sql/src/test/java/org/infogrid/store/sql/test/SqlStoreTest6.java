@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,7 +15,7 @@
 package org.infogrid.store.sql.test;
 
 import org.infogrid.store.StoreValue;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.util.logging.Log;
 import org.junit.Test;
 
@@ -38,19 +38,19 @@ public abstract class SqlStoreTest6
             Exception
     {
         //
-        
+
         log.info( "Deleting old database and creating new database" );
-        
+
         theSqlStore.initializeHard();
-        
+
         final String prefix1 = "one-";
         final String prefix2 = "two-";
-        
-        IterablePrefixingStore store1 = IterablePrefixingStore.create( prefix1, theSqlStore );
-        IterablePrefixingStore store2 = IterablePrefixingStore.create( prefix2, theSqlStore );
-        
+
+        PrefixingStore store1 = PrefixingStore.create( prefix1, theSqlStore );
+        PrefixingStore store2 = PrefixingStore.create( prefix2, theSqlStore );
+
         //
-        
+
         log.info( "Inserting data" );
 
         for( int i=0 ; i<firstSet.length ; ++i ) {
@@ -81,13 +81,13 @@ public abstract class SqlStoreTest6
         checkEquals( theSqlStore.size(), firstSet.length + secondSet.length, "Wrong size of SqlStore" );
         checkEquals( store1.size(), firstSet.length,  "Wrong size of store1" );
         checkEquals( store2.size(), secondSet.length, "Wrong size of store2" );
-        
+
         //
-        
+
         int count;
-        
+
 //        log.info( "Iterating over what's in the SQL Store" );
-//        
+//
 //        count = 0;
 //        for( StoreValue current : theSqlStore ) {
 //            log.traceMethodCallEntry( "Found " + count + ": " + current.getKey() );
@@ -112,9 +112,9 @@ public abstract class SqlStoreTest6
 //        checkEquals( count, firstSet.length + secondSet.length, "wrong length of set" );
 
         //
-        
+
         log.info( "Iterating over what's in store1" );
-        
+
         count = 0;
         for( StoreValue current : store1 ) {
             log.debug( "Found " + count + ": " + current.getKey() );
@@ -131,11 +131,11 @@ public abstract class SqlStoreTest6
             }
         }
         checkEquals( count, firstSet.length, "wrong length of set" );
-        
+
         //
-        
+
         log.info( "Iterating over what's in store2" );
-        
+
         count = 0;
         for( StoreValue current : store2 ) {
             log.debug( "Found " + count + ": " + current.getKey() );
@@ -155,8 +155,8 @@ public abstract class SqlStoreTest6
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( SqlStoreTest6.class);
-    
+    private static final Log log = Log.getLogInstance( SqlStoreTest6.class);
+
     /**
      * Test data.
      */
@@ -194,7 +194,7 @@ public abstract class SqlStoreTest6
             theTimeAutoDeletes = timeAutoDeletes;
             theData            = data;
         }
-        
+
         @Override
         public String toString()
         {

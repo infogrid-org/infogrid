@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -22,10 +22,10 @@ import org.infogrid.jee.rest.net.local.defaultapp.store.AbstractStoreNetLocalRes
 import org.infogrid.jee.templates.defaultapp.AppInitializationException;
 import org.infogrid.jee.viewlet.JeeMeshObjectsToViewFactory;
 import org.infogrid.jee.viewlet.net.DefaultJeeNetMeshObjectsToViewFactory;
-import org.infogrid.meshbase.net.IterableNetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshBaseNameServer;
-import org.infogrid.meshbase.net.sweeper.DefaultNetIterableSweeper;
+import org.infogrid.meshbase.net.sweeper.DefaultNetSweeper;
 import org.infogrid.meshbase.net.sweeper.UnnecessaryReplicasSweepPolicy;
 import org.infogrid.model.traversal.TraversalTranslator;
 import org.infogrid.model.traversal.xpath.XpathTraversalTranslator;
@@ -133,8 +133,8 @@ public class AppInitializationFilter
     {
         super.initializeContextObjects( incomingRequest, rootContext );
 
-        IterableNetMeshBase mb = rootContext.findContextObjectOrThrow( IterableNetMeshBase.class );
-        mb.setSweeper( DefaultNetIterableSweeper.create( mb, UnnecessaryReplicasSweepPolicy.create( 1000L )));
+        NetMeshBase mb = rootContext.findContextObjectOrThrow( NetMeshBase.class );
+        mb.setSweeper( DefaultNetSweeper.create( mb, UnnecessaryReplicasSweepPolicy.create( 1000L )));
 
         NetMeshBaseIdentifierFactory mbIdentifierFact = rootContext.findContextObject( NetMeshBaseIdentifierFactory.class );
         NetMeshBaseNameServer        mbNameServer     = rootContext.findContextObject( NetMeshBaseNameServer.class );

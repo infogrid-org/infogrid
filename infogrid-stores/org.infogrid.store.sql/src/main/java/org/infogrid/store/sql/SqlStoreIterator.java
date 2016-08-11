@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,7 +15,7 @@
 package org.infogrid.store.sql;
 
 import java.util.NoSuchElementException;
-import org.infogrid.store.AbstractKeyBasedIterableStoreCursor;
+import org.infogrid.store.AbstractKeyBasedStoreCursor;
 import org.infogrid.store.StoreValue;
 import org.infogrid.util.logging.Log;
 
@@ -25,7 +25,7 @@ import org.infogrid.util.logging.Log;
  */
 class SqlStoreIterator
         extends
-            AbstractKeyBasedIterableStoreCursor
+            AbstractKeyBasedStoreCursor
 {
     private static final Log log = Log.getLogInstance( SqlStoreIterator.class ); // our own, private logger
 
@@ -57,7 +57,7 @@ class SqlStoreIterator
         StoreValue [] ret = ((AbstractSqlStore)theStore).findNextIncluding( key, n );
         return ret;
     }
-    
+
     /**
      * Find the next n keys, including key. This method
      * will return fewer values if only fewer values could be found.
@@ -105,7 +105,7 @@ class SqlStoreIterator
         String [] ret = ((AbstractSqlStore)theStore).findPreviousKeyExcluding( key, n );
         return ret;
     }
-    
+
     /**
      * Count the number of elements following and including the one with the key.
      *
@@ -164,10 +164,10 @@ class SqlStoreIterator
         int ret = ((AbstractSqlStore)theStore).determineDistance( from, to );
         return ret;
     }
-    
+
     /**
      * Determine the key at the very beginning.
-     * 
+     *
      * @return the key
      * @throws NoSuchElementException thrown if the Store is empty
      */
@@ -178,17 +178,17 @@ class SqlStoreIterator
         String ret = ((AbstractSqlStore)theStore).findFirstKey();
         return ret;
     }
-    
+
     /**
      * Determine the key at the very end.
-     * 
+     *
      * @return the key
      */
     protected String getAfterLastPosition()
     {
         return null;
     }
-    
+
     /**
      * Clone this position.
      *

@@ -127,10 +127,10 @@ public class RecordingStoreListener
         theAllDeletes.clear();
     }
 
-    protected ArrayList<String> thePuts       = new ArrayList<String>();
-    protected ArrayList<String> theUpdates    = new ArrayList<String>();
-    protected ArrayList<String> theGets       = new ArrayList<String>();
-    protected ArrayList<String> theFailedGets = new ArrayList<String>();
-    protected ArrayList<String> theDeletes    = new ArrayList<String>();
-    protected ArrayList<String> theAllDeletes = new ArrayList<String>();
+    protected ArrayList<String> thePuts       = new ArrayList<>();
+    protected ArrayList<String> theUpdates    = new ArrayList<>();
+    protected ArrayList<String> theGets       = new ArrayList<>();
+    protected ArrayList<String> theFailedGets = new ArrayList<>();
+    protected ArrayList<String> theDeletes    = new ArrayList<>();
+    protected ArrayList<String> theAllDeletes = new ArrayList<>();
 }

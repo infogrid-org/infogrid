@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -42,6 +42,7 @@ public class ProbeTestShadowListener
       *
       * @param theEvent the event
       */
+    @Override
     public void updateStarting(
             ShadowMeshBaseEvent theEvent )
     {
@@ -54,6 +55,7 @@ public class ProbeTestShadowListener
       *
       * @param theEvent the event
       */
+    @Override
     public void updateSkipped(
             ShadowMeshBaseEvent theEvent )
     {
@@ -66,6 +68,7 @@ public class ProbeTestShadowListener
       *
       * @param theEvent the event
       */
+    @Override
     public void updateFinishedSuccessfully(
             ShadowMeshBaseEvent theEvent )
     {
@@ -78,6 +81,7 @@ public class ProbeTestShadowListener
       *
       * @param theEvent the event
       */
+    @Override
     public void updateFinishedUnsuccessfully(
             ShadowMeshBaseEvent theEvent )
     {
@@ -86,7 +90,7 @@ public class ProbeTestShadowListener
 
     /**
      * Add an event. This is factored out so we can easily set a breakpoint.
-     * 
+     *
      * @param s String representing the event
      */
     protected void addEvent(
@@ -112,7 +116,7 @@ public class ProbeTestShadowListener
     {
         eventQueue.clear();
     }
-    
+
     /**
      * Convert to String, for debugging.
      *
@@ -134,7 +138,7 @@ public class ProbeTestShadowListener
      * Distinguishes this particular listener.
      */
     protected String identifier;
-    
+
     /**
      * The event queue.
      */

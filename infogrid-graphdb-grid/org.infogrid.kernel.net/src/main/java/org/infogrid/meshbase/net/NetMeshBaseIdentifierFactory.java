@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -50,6 +50,7 @@ public interface NetMeshBaseIdentifierFactory
      * @return the created NetMeshBaseIdentifier
      * @throws ParseException thrown if a parsing error occurred
      */
+    @Override
     public NetMeshBaseIdentifier fromExternalForm(
             String raw )
         throws
@@ -57,7 +58,7 @@ public interface NetMeshBaseIdentifierFactory
 
     /**
      * Factory method.
-     * 
+     *
      * @param file the local File whose NetMeshBaseIdentifier we obtain
      * @return the created NetMeshBaseIdentifier
      * @throws ParseException thrown if a parsing error occurred
@@ -69,7 +70,7 @@ public interface NetMeshBaseIdentifierFactory
 
     /**
      * Factory method.
-     * 
+     *
      * @param url the URL whose NetMeshBaseIdentifier we obtain
      * @return the created NetMeshBaseIdentifier
      * @throws ParseException thrown if a parsing error occurred
@@ -78,10 +79,10 @@ public interface NetMeshBaseIdentifierFactory
             URL url )
         throws
             ParseException;
-    
+
     /**
      * Factory method.
-     * 
+     *
      * @param uri the URI form
      * @return the created NetMeshBaseIdentifier
      * @throws ParseException thrown if a parsing error occurred
@@ -94,7 +95,7 @@ public interface NetMeshBaseIdentifierFactory
     /**
      * Factory method to obtain a NetMeshBaseIdentifier.
      * This method attempts to guess the protocol if none has been provided.
-     * 
+     *
      * @param string the (potentially incomplete) String form of this NetMeshBaseIdentifier
      * @return the created NetMeshBaseIdentifier
      * @throws ParseException thrown if a parsing error occurred
@@ -103,11 +104,11 @@ public interface NetMeshBaseIdentifierFactory
             String string )
         throws
             ParseException;
-    
+
     /**
      * Factory method to obtain a NetMeshBaseIdentifier specified in relative form in the
      * context of another NetMeshBaseIdentifier.
-     * 
+     *
      * @param context the NetMeshBaseIdentifier that forms the context
      * @param string the (potentially incomplete) String form of this NetMeshBaseIdentifier
      * @return the created NetMeshBaseIdentifier

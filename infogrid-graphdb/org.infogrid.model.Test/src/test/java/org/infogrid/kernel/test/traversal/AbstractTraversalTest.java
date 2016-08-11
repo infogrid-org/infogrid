@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -19,9 +19,8 @@ import java.util.ResourceBundle;
 import org.diet4j.core.ModuleRegistry;
 import org.diet4j.core.ModuleRequirement;
 import org.diet4j.inclasspath.InClasspathModuleRegistry;
-import org.infogrid.kernel.test.differencer.AbstractDifferencerTest;
 import org.infogrid.meshbase.DefaultMeshBaseIdentifierFactory;
-import org.infogrid.meshbase.IterableMeshBase;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifierFactory;
 import org.infogrid.meshbase.m.MMeshBase;
 import org.infogrid.modelbase.ModelBase;
@@ -46,7 +45,7 @@ public abstract class AbstractTraversalTest
 {
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -60,7 +59,7 @@ public abstract class AbstractTraversalTest
 
         Log4jLog.configure( "org/infogrid/kernel/test/traversal/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/kernel/test/traversal/ResourceHelper",
                 Locale.getDefault(),
@@ -69,7 +68,7 @@ public abstract class AbstractTraversalTest
 
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in a test
      */
     @Before
@@ -83,7 +82,7 @@ public abstract class AbstractTraversalTest
                 null,
                 rootContext );
     }
-    
+
     /**
      * Clean up after the test.
      */
@@ -96,7 +95,7 @@ public abstract class AbstractTraversalTest
     /**
      * The MeshBase for the test.
      */
-    protected IterableMeshBase theMeshBase;
+    protected MeshBase theMeshBase;
 
     /**
      * The ModelBase.

@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -54,7 +54,7 @@ public class StoreNetMeshBaseTest4
         log.info( "Setting up entities" );
 
         MeshObjectIdentifier obj1Name = mb1.getMeshObjectIdentifierFactory().fromExternalForm( "obj1" );
-        
+
         Transaction tx = mb1.createTransactionAsap();
 
         NetMeshBaseLifecycleManager life1 = mb1.getMeshBaseLifecycleManager();
@@ -84,11 +84,11 @@ public class StoreNetMeshBaseTest4
         checkEquals( mb2ProxyStore.size(), 1, "Wrong number of entries in mb2ProxyStore" );
 
         //
-        
+
         log.info( "Sleeping for a bit, recording where we are" );
 
         Thread.sleep( 1000L ); // should  not really need this
-        
+
         mb1_p1.getMessageEndpoint().stopCommunicating();
         mb2_p1.getMessageEndpoint().stopCommunicating();
 
@@ -100,7 +100,7 @@ public class StoreNetMeshBaseTest4
         long mb2_p1_lastReceived = mb2_p1.getMessageEndpoint().getLastReceivedToken();
 
         //
-        
+
         ExternalizedProxyXmlEncoder test = new ExternalizedProxyXmlEncoder();
 
         StoreValue mb1_p1_data = mb1ProxyStore.get( mb2.getIdentifier().toExternalForm() );
@@ -109,7 +109,7 @@ public class StoreNetMeshBaseTest4
         ExternalizedProxy mb1_p1_ext = test.decodeExternalizedProxy(
                 mb1_p1_data.getDataAsStream(),
                 mb1 );
-        
+
         ExternalizedProxy mb2_p1_ext = test.decodeExternalizedProxy(
                 mb2_p1_data.getDataAsStream(),
                 mb2 );
@@ -126,6 +126,7 @@ public class StoreNetMeshBaseTest4
      * @throws Exception anything can go wrong in a test
      */
     @Before
+    @Override
     public void setup()
         throws
             Exception
@@ -139,15 +140,15 @@ public class StoreNetMeshBaseTest4
         endpointFactory.setNameServer( theNameServer );
 
         log.info( "Deleting old database and creating new database" );
-        
+
         mb1MeshStore  = MStore.create();
         mb1ProxyStore = MStore.create();
         mb2MeshStore  = MStore.create();
         mb2ProxyStore = MStore.create();
-        
+
         mb1 = NetStoreMeshBase.create( net1, theModelBase, null, endpointFactory, mb1MeshStore, mb1ProxyStore, rootContext );
         mb2 = NetStoreMeshBase.create( net2, theModelBase, null, endpointFactory, mb2MeshStore, mb2ProxyStore, rootContext );
-        
+
         theNameServer.put( mb1.getIdentifier(), mb1 );
         theNameServer.put( mb2.getIdentifier(), mb2 );
     }
@@ -160,7 +161,7 @@ public class StoreNetMeshBaseTest4
     {
         mb1.die();
         mb2.die();
-        
+
         exec.shutdown();
     }
 
@@ -188,7 +189,7 @@ public class StoreNetMeshBaseTest4
      * The Store storing NetMeshBase mb1's MeshObjects.
      */
     protected MStore mb1MeshStore;
-    
+
     /**
      * The Store storing NetMeshBase mb1's Proxies.
      */
@@ -198,7 +199,7 @@ public class StoreNetMeshBaseTest4
      * The Store storing NetMeshBase mb2's MeshObjects.
      */
     protected MStore mb2MeshStore;
-    
+
     /**
      * The Store storing NetMeshBase mb2's Proxies.
      */

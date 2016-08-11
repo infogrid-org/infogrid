@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -48,7 +48,6 @@ import org.infogrid.probe.shadow.externalized.SimpleExternalizedShadowMeshBase;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.Factory;
-import org.infogrid.util.Invocable;
 import org.infogrid.util.IsDeadException;
 import org.infogrid.util.MapCursorIterator;
 import org.infogrid.util.context.Context;
@@ -84,6 +83,7 @@ public abstract class AShadowMeshBase
      *         even if none of its MeshObjects are replicated to another NetMeshBase. If this is negative, it means "forever".
      *         If this is 0, it will expire immediately after the first Probe run, before the caller returns, which is probably
      *         not very useful.
+     * @param mappingPolicy
      * @param context the Context in which this NetMeshBase runs.
      */
     protected AShadowMeshBase(
@@ -114,7 +114,7 @@ public abstract class AShadowMeshBase
                 cache,
                 proxyManager,
                 context );
-        
+
         theHostnameVerifier = context.findContextObject( HostnameVerifier.class );
 
         ModuleRegistry registry = context.findContextObject( ModuleRegistry.class );
@@ -123,9 +123,10 @@ public abstract class AShadowMeshBase
 
     /**
      * Returns a CursorIterator over the content of this MeshBase.
-     * 
+     *
      * @return a CursorIterator.
      */
+    @Override
     public CursorIterator<MeshObject> iterator()
     {
         // not sure why these type casts are needed, they should not be
@@ -142,6 +143,7 @@ public abstract class AShadowMeshBase
      *
      * @param factory the Factory that created the FactoryCreatedObject
      */
+    @Override
     public final void setFactory(
             Factory<NetMeshBaseIdentifier,ShadowMeshBase,ProxyParameters> factory )
     {
@@ -170,6 +172,7 @@ public abstract class AShadowMeshBase
      *
      * @return the Factory that created the FactoryCreatedObject
      */
+    @Override
     public final Factory<NetMeshBaseIdentifier,ShadowMeshBase,ProxyParameters> getFactory()
     {
         return theProbeManager;
@@ -180,6 +183,7 @@ public abstract class AShadowMeshBase
      *
      * @return the key
      */
+    @Override
     public NetMeshBaseIdentifier getFactoryKey()
     {
         return getIdentifier();
@@ -190,6 +194,7 @@ public abstract class AShadowMeshBase
      *
      * @param newValue the new value
      */
+    @Override
     public void setHttpMappingPolicy(
             HttpMappingPolicy newValue )
     {
@@ -201,6 +206,7 @@ public abstract class AShadowMeshBase
      *
      * @return the mapping policy
      */
+    @Override
     public HttpMappingPolicy getHttpMappingPolicy()
     {
         return theDispatcher.getHttpMappingPolicy();
@@ -211,6 +217,7 @@ public abstract class AShadowMeshBase
      *
      * @return the ProbeManager
      */
+    @Override
     public ProbeManager getProbeManager()
     {
         return theProbeManager;
@@ -218,9 +225,10 @@ public abstract class AShadowMeshBase
 
     /**
      * Determine whether at the last run, this ShadowMeshBase used a WritableProbe.
-     * 
+     *
      * @return true if at the last run, this ShadowMeshBase used a WritableProbe
      */
+    @Override
     public boolean usesWritableProbe()
     {
         return theDispatcher.usesWritableProbe();
@@ -233,6 +241,7 @@ public abstract class AShadowMeshBase
      * @throws ProbeException thrown if the update was unsuccessful
      * @throws IsDeadException thrown if the ShadowMeshBase is dead already when this method is being invoked
      */
+    @Override
     public long doUpdateNow()
         throws
             ProbeException,
@@ -249,6 +258,7 @@ public abstract class AShadowMeshBase
      * @throws ProbeException thrown if the update was unsuccessful
      * @throws IsDeadException thrown if the ShadowMeshBase is dead already when this method is being invoked
      */
+    @Override
     public long doUpdateNow(
             ProxyParameters pars )
         throws
@@ -287,22 +297,18 @@ public abstract class AShadowMeshBase
                 }
 
                 // got to do this trick with the callback, otherwise we get a race condition
-                theProbeManager.remove( (NetMeshBaseIdentifier) theMeshBaseIdentifier, new Invocable<ShadowMeshBase,Void>() {
-                        public Void invoke(
-                                ShadowMeshBase toDelete )
-                        {
-                            Iterator<Proxy> iter = toDelete.proxies();
-                            while( iter.hasNext() ) {
-                                Proxy current = iter.next();
+                theProbeManager.remove((NetMeshBaseIdentifier) theMeshBaseIdentifier, ( ShadowMeshBase toDelete ) -> {
+                    Iterator<Proxy> iter = toDelete.proxies();
+                    while( iter.hasNext() ) {
+                        Proxy current = iter.next();
 
-                                if( log.isDebugEnabled() ) {
-                                    log.debug( AShadowMeshBase.this + ": removing proxy " + current );
-                                }
-
-                                current.die( true );
-                            }
-                            return null;
+                        if( log.isDebugEnabled() ) {
+                            log.debug( AShadowMeshBase.this + ": removing proxy " + current );
                         }
+
+                        current.die( true );
+                    }
+                    return null;
                 });
 
                 return -1L;
@@ -315,6 +321,7 @@ public abstract class AShadowMeshBase
      *
      * @return the time at which this ShadowMeshBase was created, in System.currentTimeMillis() format
      */
+    @Override
     public final long getTimeCreated()
     {
         return theDispatcher.getTimeCreated();
@@ -326,6 +333,7 @@ public abstract class AShadowMeshBase
      *
      * @return the time at which the update started, in System.currentTimeMillis() format
      */
+    @Override
     public final long getLastSuccessfulUpdateStartedTime()
     {
         return theDispatcher.getLastSuccessfulUpdateStartedTime();
@@ -337,6 +345,7 @@ public abstract class AShadowMeshBase
      *
      * @return the time at which the update started, in System.currentTimeMillis() format
      */
+    @Override
     public final long getLastUpdateStartedTime()
     {
         return theDispatcher.getLastUpdateStartedTime();
@@ -347,6 +356,7 @@ public abstract class AShadowMeshBase
      *
      * @return the time at which the next update is supposed to happen, or -1 if none.
      */
+    @Override
     public final long getDelayUntilNextUpdate()
     {
         return theDispatcher.getDelayUntilNextUpdate();
@@ -361,6 +371,7 @@ public abstract class AShadowMeshBase
      *
      * @return the current problem with updating this ShadowMeshBase
      */
+    @Override
     public final Throwable getCurrentProblem()
     {
         return theDispatcher.getCurrentProblem();
@@ -376,7 +387,7 @@ public abstract class AShadowMeshBase
             Transaction tx )
     {
         super.transactionCommittedHook( tx );
-        
+
         theDispatcher.queueNewChanges( tx.getChangeSet() );
     }
 
@@ -387,6 +398,7 @@ public abstract class AShadowMeshBase
      *
      * @param newChangeSet the set of new Changes
      */
+    @Override
     public final void queueNewChanges(
             ChangeSet newChangeSet )
     {
@@ -399,6 +411,7 @@ public abstract class AShadowMeshBase
      *
      * @return true if it is still needed
      */
+    @Override
     public final boolean isNeeded()
     {
         return theDispatcher.isNeeded();
@@ -409,6 +422,7 @@ public abstract class AShadowMeshBase
      *
      * @return the ProxyPolicyFactory
      */
+    @Override
     public ProxyPolicyFactory getProxyPolicyFactory()
     {
         ProxyPolicyFactory ret = NiceAndTrustingProxyPolicyFactory.create();
@@ -421,6 +435,7 @@ public abstract class AShadowMeshBase
      *
      * @return the start time of the current update
      */
+    @Override
     public final long getCurrentUpdateStartedTime()
     {
         return theDispatcher.getCurrentUpdateStartedTime();
@@ -434,6 +449,7 @@ public abstract class AShadowMeshBase
      * @see #addSoftShadowListener
      * @see #removeShadowListener
      */
+    @Override
     public final void addDirectShadowListener(
             ShadowMeshBaseListener newListener )
     {
@@ -448,6 +464,7 @@ public abstract class AShadowMeshBase
      * @see #addSoftShadowListener
      * @see #removeShadowListener
      */
+    @Override
     public final void addWeakShadowListener(
             ShadowMeshBaseListener newListener )
     {
@@ -462,6 +479,7 @@ public abstract class AShadowMeshBase
      * @see #addWeakShadowListener
      * @see #removeShadowListener
      */
+    @Override
     public final void addSoftShadowListener(
             ShadowMeshBaseListener newListener )
     {
@@ -476,6 +494,7 @@ public abstract class AShadowMeshBase
      * @see #addWeakShadowListener
      * @see #addSoftShadowListener
      */
+    @Override
     public final void removeShadowListener(
             ShadowMeshBaseListener oldListener )
     {
@@ -484,35 +503,37 @@ public abstract class AShadowMeshBase
 
     /**
      * Obtain the same MeshBase as ExternalizedMeshBase so it can be easily serialized.
-     * 
+     *
      * @return this MeshObject as ExternalizedMeshBase
      */
+    @Override
     public synchronized ExternalizedShadowMeshBase asExternalized()
     {
         ExternalizedProxy [] externalizedProxies = theProxyManager.externalizedProxies();
-        
+
         ExternalizedNetMeshObject [] externalizedNetMeshObjects = new ExternalizedNetMeshObject[ super.size() ];
         Iterator<MeshObject> iter = iterator();
-        
+
         for( int i=0 ; iter.hasNext() ; ++i ) {
             NetMeshObject current = (NetMeshObject) iter.next();
-            
+
             externalizedNetMeshObjects[i] = current.asExternalized( true );
         }
-        
+
         SimpleExternalizedShadowMeshBase ret = SimpleExternalizedShadowMeshBase.create(
                 (NetMeshBaseIdentifier) theMeshBaseIdentifier,
                 externalizedProxies,
                 externalizedNetMeshObjects );
-        
+
         return ret;
     }
-    
+
     /**
      * Obtain the ShadowMeshBase's non-standard verifier for SSL certificates.
      *
      * @return the verifier, if any
      */
+    @Override
     public HostnameVerifier getHostnameVerifier()
     {
         return theHostnameVerifier;
@@ -522,7 +543,7 @@ public abstract class AShadowMeshBase
      * The ProbeManager that this ShadowMeshBase belongs to.
      */
     protected ProbeManager theProbeManager;
-    
+
     /**
      * The ProbeDispatcher to which we delegate most of the work.
      */

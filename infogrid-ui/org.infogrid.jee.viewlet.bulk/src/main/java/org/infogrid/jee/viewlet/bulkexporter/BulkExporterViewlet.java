@@ -25,7 +25,6 @@ import org.infogrid.jee.viewlet.JeeViewedMeshObjects;
 import org.infogrid.jee.viewlet.SimpleJeeViewlet;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.externalized.xml.BulkExternalizedMeshObjectXmlEncoder;
-import org.infogrid.meshbase.IterableMeshBase;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.model.primitives.externalized.EncodingException;
 import org.infogrid.util.CursorIterator;
@@ -95,7 +94,7 @@ public class BulkExporterViewlet
     }
 
     /**
-     * Process the incoming request. 
+     * Process the incoming request.
      * Set the mime type in the real response so the structured response remains empty.
      * Stream out the XML.
      *
@@ -117,7 +116,7 @@ public class BulkExporterViewlet
         BulkExternalizedMeshObjectXmlEncoder theParser = new BulkExternalizedMeshObjectXmlEncoder();
         OutputStream outStream = response.getOutputStream();
         outStream.write(XML.getBytes( "UTF-8" ));
-        IterableMeshBase meshBase = (IterableMeshBase) getSubject().getMeshBase(); // derive from the subject, so we can do any MeshBase
+        MeshBase meshBase = getSubject().getMeshBase(); // derive from the subject, so we can do any MeshBase
         CursorIterator<MeshObject> ret = meshBase.iterator();
         try {
             theParser.bulkWrite(ret, outStream);

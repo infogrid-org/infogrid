@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -26,7 +26,7 @@ import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.meshbase.store.net.NetStoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.util.logging.Log;
 import org.junit.After;
 import org.junit.Before;
@@ -51,11 +51,11 @@ public class StoreNetMeshBaseTest2
     {
 // first section: Make sure things work while in memory
 // second section: Make sure things get restored correctly from Store
-        
+
         log.info( "Setting up entities" );
 
         MeshObjectIdentifier obj1Name = mb1.getMeshObjectIdentifierFactory().fromExternalForm( "obj1" );
-        
+
         Transaction tx = mb1.createTransactionAsap();
 
         NetMeshBaseLifecycleManager life1 = mb1.getMeshBaseLifecycleManager();
@@ -72,7 +72,7 @@ public class StoreNetMeshBaseTest2
         checkEquals( mb1ProxyStore.size(), 0, "Wrong number of entries in mb1ProxyStore" );
         checkEquals( mb2MeshStore.size(),  1, "Wrong number of entries in mb2MeshStore" );
         checkEquals( mb2ProxyStore.size(), 0, "Wrong number of entries in mb2ProxyStore" );
-        
+
         //
 
         log.info( "replicating and checking" );
@@ -92,25 +92,25 @@ public class StoreNetMeshBaseTest2
         checkEquals( mb2ProxyStore.size(), 1, "Wrong number of entries in mb2ProxyStore" );
 
         //
-        
+
         log.info( "now erasing cache" );
 
-        WeakReference<Proxy> p1Ref = new WeakReference<Proxy>( mb1.proxies().next() );
+        WeakReference<Proxy> p1Ref = new WeakReference<>( mb1.proxies().next() );
         checkCondition( p1Ref.get() != null, "no mb1 proxy found" );
-        WeakReference<Proxy> p2Ref = new WeakReference<Proxy>( mb2.proxies().next() );
+        WeakReference<Proxy> p2Ref = new WeakReference<>( mb2.proxies().next() );
         checkCondition( p2Ref.get() != null, "no mb2 proxy found" );
 
-        WeakReference<MeshObject> obj1_mb1Ref = new WeakReference<MeshObject>( obj1_mb1 );
-        WeakReference<MeshObject> obj1_mb2Ref = new WeakReference<MeshObject>( obj1_mb2 );
+        WeakReference<MeshObject> obj1_mb1Ref = new WeakReference<>( obj1_mb1 );
+        WeakReference<MeshObject> obj1_mb2Ref = new WeakReference<>( obj1_mb2 );
 
         obj1_mb1 = null;
         obj1_mb2 = null;
-        
+
         collectGarbage();
 
         checkCondition( p1Ref.get() == null, "mb1 proxy found" );
         checkCondition( p2Ref.get() == null, "mb2 proxy found" );
-        
+
         checkCondition( obj1_mb1Ref.get() == null, "obj1_mb1 found" );
         checkCondition( obj1_mb2Ref.get() == null, "obj1_mb2 found" );
 
@@ -120,17 +120,17 @@ public class StoreNetMeshBaseTest2
         checkEquals( mb2ProxyStore.size(), 1, "Wrong number of entries in mb2ProxyStore" );
 
         //
-        
+
         log.info( "Recreating and checking objects" );
-        
+
         obj1_mb1 = mb1.findMeshObjectByIdentifier( obj1Name );
         obj1_mb2 = mb2.findMeshObjectByIdentifier( obj1Name );
-        
+
         checkObject( obj1_mb1, "obj1_mb1 not found" );
         checkObject( obj1_mb2, "obj1_mb2 not found" );
 
         //
-        
+
         log.info( "checking proxies" );
 
         checkProxies( obj1_mb1, new NetMeshBase[] { mb2 }, null, null, "obj1_mb1 has wrong proxies" );
@@ -139,43 +139,43 @@ public class StoreNetMeshBaseTest2
         checkEquals( mb1ProxyStore.size(), 1, "Wrong number of entries in mb1ProxyStore" );
         checkEquals( mb2MeshStore.size(),  2, "Wrong number of entries in mb2MeshStore" );
         checkEquals( mb2ProxyStore.size(), 1, "Wrong number of entries in mb2ProxyStore" );
-        
+
         //
-        
+
         log.info( "moving the lock around without changing the semantics, i.e. no transactions involved" );
-        
+
         checkCondition( obj1_mb2.tryToObtainLock(), "Failed to obtain lock" );
-        
+
         checkProxies( obj1_mb1, new NetMeshBase[] { mb2 }, null, mb2,  "obj1_mb1 has wrong proxies" );
         checkProxies( obj1_mb2, new NetMeshBase[] { mb1 }, mb1,  null, "obj1_mb2 has wrong proxies" );
-        
+
         //
-        
+
         log.info( "now erasing cache" );
 
-        obj1_mb1Ref = new WeakReference<MeshObject>( obj1_mb1 );
-        obj1_mb2Ref = new WeakReference<MeshObject>( obj1_mb2 );
+        obj1_mb1Ref = new WeakReference<>( obj1_mb1 );
+        obj1_mb2Ref = new WeakReference<>( obj1_mb2 );
 
         obj1_mb1 = null;
         obj1_mb2 = null;
-        
+
         collectGarbage();
 
         checkCondition( obj1_mb1Ref.get() == null, "obj1_mb1 found" );
         checkCondition( obj1_mb2Ref.get() == null, "obj1_mb2 found" );
 
         //
-        
+
         log.info( "Recreating and checking objects" );
-        
+
         obj1_mb1 = mb1.findMeshObjectByIdentifier( obj1Name );
         obj1_mb2 = mb2.findMeshObjectByIdentifier( obj1Name );
-        
+
         checkObject( obj1_mb1, "obj1_mb1 not found" );
         checkObject( obj1_mb2, "obj1_mb2 not found" );
 
         //
-        
+
         log.info( "checking proxies" );
 
         checkProxies( obj1_mb1, new NetMeshBase[] { mb2 }, null, mb2,  "obj1_mb1 has wrong proxies" );
@@ -188,6 +188,7 @@ public class StoreNetMeshBaseTest2
      * @throws Exception anything can go wrong in a test
      */
     @Before
+    @Override
     public void setup()
         throws
             Exception
@@ -204,14 +205,14 @@ public class StoreNetMeshBaseTest2
 
         theSqlStore.initializeHard();
 
-        mb1MeshStore  = IterablePrefixingStore.create( "mb1-mesh-",  theSqlStore );
-        mb1ProxyStore = IterablePrefixingStore.create( "mb1-proxy-", theSqlStore );
-        mb2MeshStore  = IterablePrefixingStore.create( "mb2-mesh-",  theSqlStore );
-        mb2ProxyStore = IterablePrefixingStore.create( "mb2-proxy-", theSqlStore );
-        
+        mb1MeshStore  = PrefixingStore.create( "mb1-mesh-",  theSqlStore );
+        mb1ProxyStore = PrefixingStore.create( "mb1-proxy-", theSqlStore );
+        mb2MeshStore  = PrefixingStore.create( "mb2-mesh-",  theSqlStore );
+        mb2ProxyStore = PrefixingStore.create( "mb2-proxy-", theSqlStore );
+
         mb1 = NetStoreMeshBase.create( net1, theModelBase, null, endpointFactory, mb1MeshStore, mb1ProxyStore, rootContext );
         mb2 = NetStoreMeshBase.create( net2, theModelBase, null, endpointFactory, mb2MeshStore, mb2ProxyStore, rootContext );
-        
+
         theNameServer.put( mb1.getIdentifier(), mb1 );
         theNameServer.put( mb2.getIdentifier(), mb2 );
     }
@@ -224,7 +225,7 @@ public class StoreNetMeshBaseTest2
     {
         mb1.die();
         mb2.die();
-        
+
         exec.shutdown();
     }
 
@@ -251,22 +252,22 @@ public class StoreNetMeshBaseTest2
     /**
      * The Store storing NetMeshBase mb1's MeshObjects.
      */
-    protected IterablePrefixingStore mb1MeshStore;
-    
+    protected PrefixingStore mb1MeshStore;
+
     /**
      * The Store storing NetMeshBase mb1's Proxies.
      */
-    protected IterablePrefixingStore mb1ProxyStore;
+    protected PrefixingStore mb1ProxyStore;
 
     /**
      * The Store storing NetMeshBase mb2's MeshObjects.
      */
-    protected IterablePrefixingStore mb2MeshStore;
-    
+    protected PrefixingStore mb2MeshStore;
+
     /**
      * The Store storing NetMeshBase mb2's Proxies.
      */
-    protected IterablePrefixingStore mb2ProxyStore;
+    protected PrefixingStore mb2ProxyStore;
 
     /**
      * Our ThreadPool.
@@ -274,5 +275,5 @@ public class StoreNetMeshBaseTest2
     protected ScheduledExecutorService exec = createThreadPool( 1 );
 
     // Our Logger
-    private static Log log = Log.getLogInstance( StoreNetMeshBaseTest2.class );
+    private static final Log log = Log.getLogInstance( StoreNetMeshBaseTest2.class );
 }

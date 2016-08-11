@@ -272,7 +272,7 @@ public abstract class AbstractStoreNetMeshBaseTest
     /**
      * Factory for NetMeshBaseIdentifiers.
      */
-    protected static NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
+    protected static final NetMeshBaseIdentifierFactory theMeshBaseIdentifierFactory = DefaultNetMeshBaseIdentifierFactory.create(
             new Scheme[] {
                     new HttpScheme(),
                     new StrictRegexScheme( "test", Pattern.compile( "test:.*" ))

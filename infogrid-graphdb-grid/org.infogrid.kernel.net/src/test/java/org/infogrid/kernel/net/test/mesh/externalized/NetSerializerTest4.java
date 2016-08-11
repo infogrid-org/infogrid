@@ -20,7 +20,6 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.m.NetMMeshBase;
 import org.infogrid.meshbase.net.proxy.DefaultProxyFactory;
 import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
-import org.infogrid.meshbase.transaction.TransactionAction;
 import org.infogrid.util.context.SimpleContext;
 import org.infogrid.util.logging.Log;
 import org.junit.Test;
@@ -54,15 +53,11 @@ public class NetSerializerTest4
                 SimpleContext.createRoot( "root" ));
 
         NetMeshObject one = mb.getHomeObject();
-        NetMeshObject two
-                = mb.executeNow( new TransactionAction<NetMeshObject>() {
-                    public NetMeshObject execute()
-                        throws
-                            Throwable
-                    {
-                        return (NetMeshObject) life.createMeshObject( mb.getMeshObjectIdentifierFactory().fromExternalForm( "#1234" ));
-                    }
-                });
+        NetMeshObject two = mb.executeNow( t ->
+            {
+                return (NetMeshObject) mb.createMeshObject( mb.fromExternalForm( "#1234" ));
+            }
+        );
 
         //
 

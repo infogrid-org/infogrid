@@ -16,7 +16,6 @@ package org.infogrid.store.util;
 
 import java.text.ParseException;
 import java.util.NoSuchElementException;
-import org.infogrid.store.IterableStoreCursor;
 import org.infogrid.store.StoreEntryMapper;
 import org.infogrid.store.StoreValue;
 import org.infogrid.util.AbstractCursorIterator;
@@ -24,6 +23,7 @@ import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
+import org.infogrid.store.StoreCursor;
 
 /**
  * Iterator over all keys in an InterableStoreBackedMap.
@@ -46,7 +46,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
      * @param arrayComponentClass the Class to use when returning arrays
      */
     public StoreBackedSwappingHashMapKeysIterator(
-            IterableStoreCursor             delegate,
+            StoreCursor             delegate,
             StoreBackedSwappingHashMap<K,V> cache,
             StoreEntryMapper<K,V>           mapper,
             Class<K>                        arrayComponentClass )
@@ -423,7 +423,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
     /**
      * The underlying Iterator over the Store content.
      */
-    protected IterableStoreCursor theDelegate;
+    protected StoreCursor theDelegate;
     
     /**
      * The cache to use.

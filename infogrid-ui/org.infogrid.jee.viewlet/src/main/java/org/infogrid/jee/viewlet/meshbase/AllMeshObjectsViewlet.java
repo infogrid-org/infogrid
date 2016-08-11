@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -24,7 +24,6 @@ import org.infogrid.jee.viewlet.DefaultJeeViewletFactoryChoice;
 import org.infogrid.jee.viewlet.JeeMeshObjectsToView;
 import org.infogrid.jee.viewlet.JeeViewedMeshObjects;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.IterableMeshBase;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.MeshType;
@@ -47,7 +46,7 @@ import org.infogrid.viewlet.ViewletFactoryChoice;
 
 /**
  * A Viewlet that shows all MeshObjects in a MeshBase.
- */ 
+ */
 public class AllMeshObjectsViewlet
         extends
             AbstractPagingCursorIterableViewlet
@@ -85,6 +84,7 @@ public class AllMeshObjectsViewlet
             double               matchQuality )
     {
         return new DefaultJeeViewletFactoryChoice( toView, AllMeshObjectsViewlet.class, matchQuality ) {
+                @Override
                 public Viewlet instantiateViewlet()
                     throws
                         CannotViewException
@@ -121,8 +121,8 @@ public class AllMeshObjectsViewlet
     {
         super.view( toView );
 
-        IterableMeshBase meshBase = (IterableMeshBase) getSubject().getMeshBase(); // derive from the subject, so we can do any MeshBase
-        ModelBase        mb       = meshBase.getModelBase();
+        MeshBase  meshBase = getSubject().getMeshBase(); // derive from the subject, so we can do any MeshBase
+        ModelBase mb       = meshBase.getModelBase();
 
         // first reset
         theIdRegex     = null;
@@ -171,8 +171,8 @@ public class AllMeshObjectsViewlet
     @Override
     protected CursorIterator<MeshObject> determineCursorIterator()
     {
-        IterableMeshBase meshBase = (IterableMeshBase) getSubject().getMeshBase(); // derive from the subject, so we can do any MeshBase
-        
+        MeshBase meshBase = getSubject().getMeshBase(); // derive from the subject, so we can do any MeshBase
+
         CursorIterator<MeshObject> ret = meshBase.iterator();
         if( theIdRegex != null || theEntityTypes != null ) {
             ret = FilteringCursorIterator.create(
@@ -182,7 +182,7 @@ public class AllMeshObjectsViewlet
                                     MeshObject obj )
                             {
                                 if( obj == null ) {
-                                    return false; 
+                                    return false;
                                 }
                                 if( theIdRegex != null ) {
                                     Matcher m = theIdRegex.matcher( obj.getIdentifier().toExternalForm() );

@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -29,7 +29,7 @@ import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.probe.manager.store.StoreScheduledExecutorProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.store.StoreShadowMeshBaseFactory;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.logging.Log;
 import org.junit.After;
@@ -48,7 +48,7 @@ public class StoreShadowMeshBaseTest4
 {
     /**
      * Test parameters.
-     * 
+     *
      * @return test parameters
      */
     @Parameterized.Parameters
@@ -80,39 +80,39 @@ public class StoreShadowMeshBaseTest4
         startClock();
 
         log.info( "accessing test files with meshBase: " + testFile1Id.toExternalForm() );
-        
+
         ShadowMeshBase meshBase1 = theProbeManager1.obtainFor(
                     testFile1Id,
                     new CoherenceSpecification.Periodic( 3000L ));
         checkObject( meshBase1, "MeshBase1 not created" );
-        
+
         MeshObject home1 = meshBase1.getHomeObject();
         checkObject( home1, "no home object found" );
         checkCondition( !home1.isBlessedBy( TestSubjectArea.AA ), "Home object 1 incorrectly blessed" );
         checkEquals( home1.getPropertyValue( ProbeSubjectArea.PROBEUPDATESPECIFICATION_PROBERUNCOUNTER ), IntegerValue.create( 1 ), "Wrong number of probe runs" );
-        
+
         //
-        
+
         log.info( "Checking that Shadow goes away when not referenced" );
 
         WeakReference<ShadowMeshBase> meshBase1Ref = new WeakReference<ShadowMeshBase>( meshBase1 );
 
         meshBase1 = null;
         home1     = null;
-        
+
         sleepUntilIsGone( meshBase1Ref, 4000L, "ShadowMeshBase still here, should have been garbage collected" );
-        
+
         copyFile(theTestFile1b, theTestFile1 );
 
         sleepUntil( 3000L * 3 + 1000L );
 
         //
-        
+
         log.info( "Checking that update has been performed" );
-        
+
         ShadowMeshBase meshBase2 = theProbeManager1.get( testFile1Id );
         checkObject( meshBase2, "MeshBase1 not recovered" );
-        
+
         MeshObject home2 = meshBase2.getHomeObject();
         checkObject( home2, "no home object found" );
         checkCondition( home2.isBlessedBy( TestSubjectArea.AA ), "Home object 1 incorrectly not blessed" );
@@ -121,10 +121,10 @@ public class StoreShadowMeshBaseTest4
 
     /**
      * Constructor with parameters.
-     * 
-     * @param testFile0 filename of test
+     *
      * @param testFile1 filename of test
-     * @param testFile2 filename of test
+     * @param testFile1a filename of test
+     * @param testFile1b filename of test
      */
     public StoreShadowMeshBaseTest4(
             String testFile1,
@@ -133,12 +133,12 @@ public class StoreShadowMeshBaseTest4
     {
         theTestFile1  = testFile1;
         theTestFile1a = testFile1a;
-        theTestFile1b = testFile1b;        
+        theTestFile1b = testFile1b;
     }
 
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @Before
@@ -152,17 +152,17 @@ public class StoreShadowMeshBaseTest4
         testFile1Id    = theMeshBaseIdentifierFactory.obtain( new File( theTestFile1 ) );
 
         //
-        
+
         log.info( "Deleting old database and creating new database" );
 
         theSqlStore.initializeHard();
 
         theSqlStore.addDirectStoreListener( theTestStoreListener );
-        
-        IterablePrefixingStore theShadowStore      = IterablePrefixingStore.create( "Shadow",      theSqlStore );
-        IterablePrefixingStore theShadowProxyStore = IterablePrefixingStore.create( "ShadowProxy", theSqlStore );
-        
-        // 
+
+        PrefixingStore theShadowStore      = PrefixingStore.create( "Shadow",      theSqlStore );
+        PrefixingStore theShadowProxyStore = PrefixingStore.create( "ShadowProxy", theSqlStore );
+
+        //
 
         exec = createThreadPool( 1 );
 
@@ -191,7 +191,7 @@ public class StoreShadowMeshBaseTest4
     {
         theProbeManager1.die( true );
         theProbeManager1 = null;
-        
+
         exec.shutdown();
         exec = null;
     }
@@ -228,7 +228,7 @@ public class StoreShadowMeshBaseTest4
      * The ProbeManager.
      */
     protected StoreScheduledExecutorProbeManager theProbeManager1;
-    
+
     /**
      * StoreListener for debugging purposes.
      */

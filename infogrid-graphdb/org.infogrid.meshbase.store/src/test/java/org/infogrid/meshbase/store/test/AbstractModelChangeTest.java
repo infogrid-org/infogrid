@@ -34,9 +34,10 @@ import org.infogrid.meshbase.MeshObjectIdentifierFactory;
 import org.infogrid.meshbase.a.AMeshBaseLifecycleManager;
 import org.infogrid.mesh.a.DefaultAMeshObjectIdentifierFactory;
 import org.infogrid.meshbase.security.AccessManager;
-import org.infogrid.meshbase.store.IterableStoreMeshBase;
+import org.infogrid.meshbase.store.StoreMeshBase;
 import org.infogrid.meshbase.store.StoreMeshBaseEntryMapper;
 import org.infogrid.meshbase.store.StoreMeshBaseSwappingHashMap;
+import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionAction;
 import org.infogrid.model.primitives.BooleanValue;
 import org.infogrid.model.primitives.EntityType;
@@ -56,7 +57,7 @@ import org.infogrid.modelbase.m.MMeshTypeIdentifierFactory;
 import org.infogrid.modelbase.m.MMeshTypeLifecycleManager;
 import org.infogrid.modelbase.m.MMeshTypeSynonymDictionary;
 import org.infogrid.modelbase.m.MModelBase;
-import org.infogrid.store.IterableStore;
+import org.infogrid.store.Store;
 import org.infogrid.store.sql.AbstractSqlStore;
 import org.infogrid.store.sql.mysql.MysqlStore;
 import org.infogrid.testharness.AbstractTest;
@@ -78,7 +79,7 @@ public abstract class AbstractModelChangeTest
 {
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -90,10 +91,10 @@ public abstract class AbstractModelChangeTest
         ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
 
         registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.meshbase.store" ))).activateRecursively();
-        
+
         Log4jLog.configure( "org/infogrid/meshbase/store/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/meshbase/store/test/ResourceHelper",
                 Locale.getDefault(),
@@ -223,7 +224,8 @@ public abstract class AbstractModelChangeTest
         final MeshBaseLifecycleManager    life   = mb.getMeshBaseLifecycleManager();
 
         mb.executeNow( new TransactionAction<Void>() {
-            public Void execute()
+            public Void execute(
+                    Transaction tx )
                 throws
                     Throwable
             {
@@ -250,7 +252,7 @@ public abstract class AbstractModelChangeTest
     protected TestingStoreMeshBase createTestStoreMeshBase(
             MeshBaseIdentifier identifier,
             ModelBase          modelBase,
-            IterableStore      meshObjectStore,
+            Store              meshObjectStore,
             Context            context )
     {
         StoreMeshBaseEntryMapper objectMapper = new StoreMeshBaseEntryMapper();
@@ -328,7 +330,7 @@ public abstract class AbstractModelChangeTest
      */
     public static class TestingStoreMeshBase
             extends
-                IterableStoreMeshBase
+                StoreMeshBase
     {
         public TestingStoreMeshBase(
                 MeshBaseIdentifier                                            identifier,
@@ -366,7 +368,7 @@ public abstract class AbstractModelChangeTest
             super(  MMeshTypeLifecycleManager.create(),
                     MMeshTypeIdentifierFactory.create(),
                     MMeshTypeSynonymDictionary.create());
-            
+
             theName = name;
         }
 

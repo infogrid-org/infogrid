@@ -61,29 +61,29 @@ import org.infogrid.util.logging.Log;
   * (and is certainly easier to program) to generate and process both (i.e. ignore the second
   * one), so that's what we do.</p>
   */
-public class IterableMeshBaseDifferencer
+public class MeshBaseDifferencer
         implements
             CanBeDumped
 {
-    private static final Log log = Log.getLogInstance( IterableMeshBaseDifferencer.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance(MeshBaseDifferencer.class ); // our own, private logger
 
     /**
      * Constructor.
      *
-     * @param baselineBase the IterableMeshBase that forms the "base" against which compare
+     * @param baselineBase the MeshBase that forms the "base" against which compare
      */
-    public IterableMeshBaseDifferencer(
-            IterableMeshBase baselineBase )
+    public MeshBaseDifferencer(
+            MeshBase baselineBase )
     {
         theBaselineBase = baselineBase;
     }
 
     /**
-     * Obtain the base IterableMeshBase against which we compare, and onto which we apply changes.
+     * Obtain the base MeshBase against which we compare, and onto which we apply changes.
      *
-     * @return the base IterableMeshBase
+     * @return the base MeshBase
      */
-    public IterableMeshBase getBaselineMeshBase()
+    public MeshBase getBaselineMeshBase()
     {
         return theBaselineBase;
     }
@@ -99,7 +99,7 @@ public class IterableMeshBaseDifferencer
      * @return the ChangeSet between the baseline IterableMeshBase and the comparison IterableMeshBase
      */
     public ChangeSet determineChangeSet(
-            IterableMeshBase comparisonBase )
+            MeshBase comparisonBase )
     {
         return determineChangeSet( comparisonBase, false );
     }
@@ -116,8 +116,8 @@ public class IterableMeshBaseDifferencer
      * @return the ChangeSet between the baseline IterableMeshBase and the comparison IterableMeshBase
      */
     public ChangeSet determineChangeSet(
-            IterableMeshBase comparisonBase,
-            boolean          checkDates )
+            MeshBase comparisonBase,
+            boolean  checkDates )
     {
         if( log.isTraceEnabled() ) {
             log.traceMethodCallEntry( this, "determineChangeSet" );
@@ -781,7 +781,7 @@ public class IterableMeshBaseDifferencer
     }
 
     /**
-     * The IterableMeshBase against which we are comparing, and to which we apply any changes.
+     * The MeshBase against which we are comparing, and to which we apply any changes.
      */
-    protected IterableMeshBase theBaselineBase;
+    protected MeshBase theBaselineBase;
 }

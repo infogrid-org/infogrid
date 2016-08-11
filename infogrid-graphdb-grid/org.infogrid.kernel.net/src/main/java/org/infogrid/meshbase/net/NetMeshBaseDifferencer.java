@@ -21,7 +21,7 @@ import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
-import org.infogrid.meshbase.IterableMeshBaseDifferencer;
+import org.infogrid.meshbase.MeshBaseDifferencer;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectDeletedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectNeighborAddedEvent;
@@ -40,17 +40,17 @@ import org.infogrid.model.primitives.RoleType;
  * This subclasses IterableMeshBaseDifferencer to take account of the specifics of
  * NetMeshBases.
  */
-public class IterableNetMeshBaseDifferencer
+public class NetMeshBaseDifferencer
         extends
-            IterableMeshBaseDifferencer
+            MeshBaseDifferencer
 {
     /**
      * Constructor.
      *
      * @param baseline the baseline IterableNetMeshBase against which we compare.
      */
-    public IterableNetMeshBaseDifferencer(
-            IterableNetMeshBase baseline )
+    public NetMeshBaseDifferencer(
+            NetMeshBase baseline )
     {
         super( baseline );
     }

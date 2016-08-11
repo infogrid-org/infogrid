@@ -21,7 +21,7 @@ import java.util.NoSuchElementException;
 /**
  * Adds a few methods to <code>CursorIterator&lt;StoreValue&gt;</code> that make life easier.
  */
-public interface IterableStoreCursor
+public interface StoreCursor
         extends
             CursorIterator<StoreValue>
 {
@@ -56,5 +56,5 @@ public interface IterableStoreCursor
      *
      * @return identical new instance
      */
-    public IterableStoreCursor createCopy();
+    public StoreCursor createCopy();
 }

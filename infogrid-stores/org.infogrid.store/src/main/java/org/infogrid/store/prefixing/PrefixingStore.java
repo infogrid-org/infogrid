@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,13 +15,17 @@
 package org.infogrid.store.prefixing;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import org.infogrid.store.AbstractStore;
 import org.infogrid.store.Store;
 import org.infogrid.store.StoreKeyDoesNotExistException;
 import org.infogrid.store.StoreKeyExistsAlreadyException;
 import org.infogrid.store.StoreValue;
+import org.infogrid.util.CursorIterator;
+import org.infogrid.util.FilteringCursorIterator;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
+import org.infogrid.store.StoreCursor;
 
 /**
  * This {@link Store} delegates to another <code>Store</code>, but prefixes all keys with
@@ -65,23 +69,25 @@ public class PrefixingStore
     /**
      * Initialize the Store. If the Store was initialized earlier, this will delete all
      * contained information. This operation is similar to unconditionally formatting a hard drive.
-     * 
+     *
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void initializeHard()
             throws
                 IOException
     {
         throw new UnsupportedOperationException( "Cannot initialize PrefixingStore; initialize underlying Store instead." );
     }
-    
+
     /**
      * Initialize the Store if needed. If the Store was initialized earlier, this will do
      * nothing. This operation is equivalent to {@link #initializeHard} if and only if
      * the Store had not been initialized earlier.
-     * 
+     *
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void initializeIfNecessary()
             throws
                 IOException
@@ -120,7 +126,7 @@ public class PrefixingStore
             IOException
     {
         String delegatedKey = constructDelegatedKey( key );
-        
+
         StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
         try {
             theDelegate.put( delegatedKey, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
@@ -144,6 +150,7 @@ public class PrefixingStore
      * @see #update if a data element with this key exists already
      * @see #putOrUpdate if a data element with this key may exist already
      */
+    @Override
     public void put(
             StoreValue toStore )
         throws
@@ -151,7 +158,7 @@ public class PrefixingStore
             IOException
     {
         String delegatedKey = constructDelegatedKey( toStore.getKey() );
-        
+
         try {
             theDelegate.put(
                     delegatedKey,
@@ -201,7 +208,7 @@ public class PrefixingStore
             IOException
     {
         String delegatedKey = constructDelegatedKey( key );
-        
+
         StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
 
         try {
@@ -226,6 +233,7 @@ public class PrefixingStore
      * @see #put if a data element with this key does not exist already
      * @see #putOrUpdate if a data element with this key may exist already
      */
+    @Override
     public void update(
             StoreValue toUpdate )
         throws
@@ -233,7 +241,7 @@ public class PrefixingStore
             IOException
     {
         String delegatedKey = constructDelegatedKey( toUpdate.getKey() );
-        
+
         try {
             theDelegate.update(
                     delegatedKey,
@@ -281,17 +289,17 @@ public class PrefixingStore
             IOException
     {
         String delegatedKey = constructDelegatedKey( key );
-        
+
         boolean updated = theDelegate.putOrUpdate( delegatedKey, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
 
         StoreValue value = new StoreValue( key, encodingId, timeCreated, timeUpdated, timeRead, timeExpires, data );
-        
+
         if( !updated ) {
             firePutPerformed( value );
         } else {
             fireUpdatePerformed( value );
         }
-        
+
         return updated;
     }
 
@@ -305,13 +313,14 @@ public class PrefixingStore
      * @see #put if a data element with this key does not exist already
      * @see #update if a data element with this key exists already
      */
+    @Override
     public boolean putOrUpdate(
             StoreValue toStoreOrUpdate )
         throws
             IOException
     {
         String delegatedKey = constructDelegatedKey( toStoreOrUpdate.getKey() );
-        
+
         boolean updated = theDelegate.putOrUpdate(
                     delegatedKey,
                     toStoreOrUpdate.getEncodingId(),
@@ -326,7 +335,7 @@ public class PrefixingStore
         } else {
             fireUpdatePerformed( toStoreOrUpdate );
         }
-        
+
         return updated;
     }
 
@@ -341,6 +350,7 @@ public class PrefixingStore
      *
      * @see #put to initially store a data element
      */
+    @Override
     public StoreValue get(
             String key )
         throws
@@ -348,7 +358,7 @@ public class PrefixingStore
             IOException
     {
         String delegatedKey = constructDelegatedKey( key );
-        
+
         StoreValue ret = null;
         try {
             StoreValue delegateValue = theDelegate.get( delegatedKey );
@@ -376,6 +386,7 @@ public class PrefixingStore
      * @throws PrefixingStoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void delete(
             String key )
         throws
@@ -383,7 +394,7 @@ public class PrefixingStore
             IOException
     {
         String delegatedKey = constructDelegatedKey( key );
-        
+
         try {
             theDelegate.delete( delegatedKey );
 
@@ -414,12 +425,40 @@ public class PrefixingStore
      * @param prefix the String the key starts with
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void deleteAll(
             String prefix )
         throws
             IOException
     {
         theDelegate.deleteAll( thePrefixAndSeparator + prefix );
+    }
+
+    /**
+     * Obtain an Iterator over the content of this Store.
+     *
+     * @return the Iterator
+     */
+    @Override
+    public StoreCursor iterator()
+    {
+        return new MyIterator( theDelegate.iterator() );
+    }
+
+    /**
+     * Determine the number of StoreValues in this Store with this prefix.
+     *
+     * @param prefix the prefix
+     * @return the number of StoreValues in this Store with this prefix
+     * @throws IOException thrown if an I/O error occurred
+     */
+    @Override
+    public int size(
+            String prefix )
+        throws
+            IOException
+    {
+        return theDelegate.size( thePrefixAndSeparator + prefix );
     }
 
     /**
@@ -440,7 +479,7 @@ public class PrefixingStore
                 delegateValue.getTimeRead(),
                 delegateValue.getTimeExpires(),
                 delegateValue.getData() );
-        
+
         return ret;
     }
 
@@ -462,7 +501,7 @@ public class PrefixingStore
                 value.getTimeRead(),
                 value.getTimeExpires(),
                 value.getData() );
-        
+
         return ret;
     }
 
@@ -498,6 +537,7 @@ public class PrefixingStore
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {
@@ -523,7 +563,542 @@ public class PrefixingStore
     protected Store theDelegate;
 
     /**
+     * The filter to use.
+     */
+    protected FilteringCursorIterator.Filter<StoreValue> myFilter = ( StoreValue v ) -> {
+        String  key = v.getKey();
+        boolean ret = matches( key );
+
+        return ret;
+    };
+
+    /**
      * The default separator between the prefix and the key.
      */
     public static final String DEFAULT_SEPARATOR = " ";
-}
+
+    /**
+     * Our IterableStoreCursor implementation.
+     */
+    class MyIterator
+            implements
+                StoreCursor
+    {
+        /**
+         * Constructor.
+         *
+         * @param delegateIter an Iterator over the underlying delegate IterableStore
+         */
+        public MyIterator(
+                StoreCursor delegateIter )
+        {
+            theFilterIterator = new MyFilteringIterator( delegateIter );
+        }
+
+        /**
+         * Obtain the next element, without iterating forward.
+         *
+         * @return the next element
+         * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+         */
+        @Override
+        public StoreValue peekNext()
+        {
+            StoreValue ret = translateDelegateStoreValue( theFilterIterator.peekNext() );
+            return ret;
+        }
+
+        /**
+         * Obtain the previous element, without iterating backwards.
+         *
+         * @return the previous element
+         * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
+         */
+        @Override
+        public StoreValue peekPrevious()
+        {
+            StoreValue ret = translateDelegateStoreValue( theFilterIterator.peekPrevious() );
+            return ret;
+        }
+
+        /**
+         * Returns <tt>true</tt> if the iteration has more elements in the forward direction.
+         *
+         * @return <tt>true</tt> if the iterator has more elements in the forward direction.
+         * @see #hasPrevious()
+         * @see #hasPrevious(int)
+         * @see #hasNext(int)
+         */
+        @Override
+        public boolean hasNext()
+        {
+            return theFilterIterator.hasNext();
+        }
+
+        /**
+         * Returns <tt>true</tt> if the iteration has more elements in the backwards direction.
+         *
+         * @return <tt>true</tt> if the iterator has more elements in the backwards direction.
+         * @see #hasNext()
+         * @see #hasPrevious(int)
+         * @see #hasNext(int)
+         */
+        @Override
+        public boolean hasPrevious()
+        {
+            return theFilterIterator.hasPrevious();
+        }
+
+        /**
+         * Returns <tt>true</tt> if the iteration has at least N more elements in the forward direction.
+         *
+         * @param n the number of elements for which to check
+         * @return <tt>true</tt> if the iterator has at least N more elements in the forward direction.
+         * @see #hasNext()
+         * @see #hasPrevious()
+         * @see #hasPrevious(int)
+         */
+        @Override
+        public boolean hasNext(
+                int n )
+        {
+            return theFilterIterator.hasNext( n );
+        }
+
+        /**
+         * Returns <tt>true</tt> if the iteration has at least N more elements in the backwards direction.
+         *
+         * @param n the number of elements for which to check
+         * @return <tt>true</tt> if the iterator has at least N more elements in the backwards direction.
+         * @see #hasNext()
+         * @see #hasPrevious()
+         * @see #hasNext(int)
+         */
+        @Override
+        public boolean hasPrevious(
+                int n )
+        {
+            return theFilterIterator.hasPrevious( n );
+        }
+
+        /**
+         * Returns the next element in the iteration.
+         *
+         * @return the next element in the iteration.
+         * @throws NoSuchElementException iteration has no more elements.
+         */
+        @Override
+        public StoreValue next()
+        {
+            StoreValue ret = translateDelegateStoreValue( theFilterIterator.next() );
+            return ret;
+        }
+
+        /**
+         * <p>Obtain the next N elements. If fewer than N elements are available, return
+         * as many elements are available in a shorter array.</p>
+         *
+         * @param n the number of elements to return
+         * @return the next no more than N elements
+         * @see #previous(int)
+         */
+        @Override
+        public StoreValue [] next(
+                int n )
+        {
+            StoreValue [] found = theFilterIterator.next( n );
+            StoreValue [] ret   = new StoreValue[ found.length ];
+            for( int i=0 ; i<found.length ; ++i ) {
+                ret[i] = translateDelegateStoreValue( found[i] );
+            }
+            return ret;
+        }
+
+        /**
+         * Returns the previous element in the iteration.
+         *
+         * @return the previous element in the iteration.
+         * @see #next()
+         */
+        @Override
+        public StoreValue previous()
+        {
+            StoreValue ret = translateDelegateStoreValue( theFilterIterator.previous() );
+            return ret;
+        }
+
+        /**
+         * <p>Obtain the previous N elements. If fewer than N elements are available, return
+         * as many elements are available in a shorter array.</p>
+         *
+         * <p>Note that the elements
+         * will be ordered in the opposite direction as you might expect: they are
+         * returned in the sequence in which the CursorIterator visits them, not in the
+         * sequence in which the underlying Iterable stores them.</p>
+         *
+         * @param n the number of elements to return
+         * @return the previous no more than N elements
+         * @see #next(int)
+         */
+        @Override
+        public StoreValue [] previous(
+                int  n )
+        {
+            StoreValue [] found = theFilterIterator.previous( n );
+            StoreValue [] ret   = new StoreValue[ found.length ];
+            for( int i=0 ; i<found.length ; ++i ) {
+                ret[i] = translateDelegateStoreValue( found[i] );
+            }
+            return ret;
+        }
+
+        /**
+         * Move the cursor by N positions. Positive numbers indicate forward movemement;
+         * negative numbers indicate backward movement. This can move all the way forward
+         * to the position "past last" and all the way backward to the position "before first".
+         *
+         * @param n the number of positions to move
+         * @throws NoSuchElementException thrown if the position does not exist
+         */
+        @Override
+        public void moveBy(
+                int n )
+            throws
+                NoSuchElementException
+        {
+            theFilterIterator.moveBy( n );
+        }
+
+        /**
+         * Move the cursor to just before this element, i.e. return this element when {@link #next next} is invoked
+         * right afterwards.
+         *
+         * @param pos the element to move the cursor to
+         * @return the number of steps that were taken to move. Positive number means forward, negative backward
+         * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
+         */
+        @Override
+        public int moveToBefore(
+                StoreValue pos )
+            throws
+                NoSuchElementException
+        {
+            StoreValue delegatedPos = translateToDelegateStoreValue( pos );
+            int        ret          = theFilterIterator.moveToBefore( delegatedPos );
+
+            return ret;
+        }
+
+        /**
+         * Move the cursor to just after this element, i.e. return this element when {@link #previous previous} is invoked
+         * right afterwards.
+         *
+         * @param pos the element to move the cursor to
+         * @return the number of steps that were taken to move. Positive number means forward, negative backward
+         * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
+         */
+        @Override
+        public int moveToAfter(
+                StoreValue pos )
+            throws
+                NoSuchElementException
+        {
+            StoreValue delegatedPos = translateToDelegateStoreValue( pos );
+            int        ret          = theFilterIterator.moveToAfter( delegatedPos );
+
+            return ret;
+        }
+
+        /**
+         *
+         * Removes from the underlying collection the last element returned by the
+         * iterator (optional operation). This is the same as the current element.
+         *
+         * @throws UnsupportedOperationException if the <tt>remove</tt>
+         *        operation is not supported by this Iterator.
+
+         * @throws IllegalStateException if the <tt>next</tt> method has not
+         *        yet been called, or the <tt>remove</tt> method has already
+         *        been called after the last call to the <tt>next</tt>
+         *        method.
+         */
+        @Override
+        public void remove()
+        {
+            theFilterIterator.remove();
+        }
+
+        /**
+         * Clone this position.
+         *
+         * @return identical new instance
+         */
+        @Override
+        public MyIterator createCopy()
+        {
+            return new MyIterator( theFilterIterator.createCopy() );
+        }
+
+        /**
+         * Set this CursorIterator to the position represented by the provided CursorIterator.
+         *
+         * @param position the position to set this CursorIterator to
+         * @throws IllegalArgumentException thrown if the provided CursorIterator did not work on the same CursorIterable,
+         *         or the implementations were incompatible.
+         */
+        @Override
+        public void setPositionTo(
+                CursorIterator<StoreValue> position )
+            throws
+                IllegalArgumentException
+        {
+            StoreValue delegatedPos = translateToDelegateStoreValue( position.next() );
+
+            theFilterIterator.moveToAfter( delegatedPos );
+        }
+
+        /**
+         * Move the cursor to this element, i.e. return this element when {@link #next next} is invoked
+         * right afterwards.
+         *
+         * @param key the key of the element to move the cursor to
+         * @return the number of steps that were taken to move. Positive number means forward, negative backward
+         * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
+         */
+        @Override
+        public int moveToBefore(
+                String key )
+            throws
+                NoSuchElementException
+        {
+            String delegatedKey = constructDelegatedKey( key );
+            int    ret          = theFilterIterator.moveToBefore( delegatedKey );
+
+            return ret;
+        }
+
+        /**
+         * Move the cursor to this element, i.e. return this element when {@link #previous previous} is invoked
+         * right afterwards.
+         *
+         * @param key the key of the element to move the cursor to
+         * @return the number of steps that were taken to move. Positive number means forward, negative backward
+         * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
+         */
+        @Override
+        public int moveToAfter(
+                String key )
+            throws
+                NoSuchElementException
+        {
+            String delegatedKey = constructDelegatedKey( key );
+            int    ret          = theFilterIterator.moveToAfter( delegatedKey );
+
+            return ret;
+        }
+
+       /**
+         * Move the cursor to just before the first element, i.e. return the first element when
+         * {@link #next next} is invoked right afterwards.
+         *
+         * @return the number of steps that were taken to move. Positive number means
+         *         forward, negative backward
+         */
+        @Override
+        public int moveToBeforeFirst()
+        {
+            int ret = theFilterIterator.moveToBeforeFirst();
+            return ret;
+        }
+
+        /**
+         * Move the cursor to just after the last element, i.e. return the last element when
+         * {@link #previous previous} is invoked right afterwards.
+         *
+         * @return the number of steps that were taken to move. Positive number means
+         *         forward, negative backward
+         */
+        @Override
+        public int moveToAfterLast()
+        {
+            int ret = theFilterIterator.moveToAfterLast();
+            return ret;
+        }
+
+        /**
+          * Do we have more elements?
+          *
+          * @return true if we have more elements
+          */
+        @Override
+        public final boolean hasMoreElements()
+        {
+            return hasNext();
+        }
+
+        /**
+          * Return next element and iterate.
+          *
+          * @return the next element
+          */
+        @Override
+        public final StoreValue nextElement()
+        {
+            return next();
+        }
+
+        /**
+         * Obtain a CursorIterable instead of an Iterator.
+         *
+         * @return the CursorIterable
+         */
+        @Override
+        public CursorIterator<StoreValue> iterator()
+        {
+            return this;
+        }
+
+        /**
+         * Obtain a CursorIterable. This performs the exact same operation as
+         * @link #iterator iterator}, but is friendlier towards JSPs and other software
+         * that likes to use JavaBeans conventions.
+         *
+         * @return the CursorIterable
+         */
+        @Override
+        public final CursorIterator<StoreValue> getIterator()
+        {
+            return iterator();
+        }
+
+        /**
+         * Determine the type of array that is returned by the iteration methods that
+         * return arrays.
+         *
+         * @return the type of array
+         */
+        @Override
+        public Class<StoreValue> getArrayComponentType()
+        {
+            return StoreValue.class;
+        }
+
+        /**
+         * The underlying FilteringIterator.
+         */
+        protected MyFilteringIterator theFilterIterator;
+    }
+
+    /**
+     * The FilteringIterator that MyIterator uses.
+     */
+    class MyFilteringIterator
+            extends
+                FilteringCursorIterator<StoreValue>
+            implements
+                StoreCursor
+    {
+        /**
+         * Constructor.
+         *
+         * @param delegateIter the Iterator over the underlying Store
+         */
+        public MyFilteringIterator(
+                StoreCursor delegateIter )
+        {
+            super( delegateIter, myFilter, StoreValue.class );
+        }
+
+        /**
+         * Move the cursor to this element, i.e. return this element when {@link #next next} is invoked
+         * right afterwards.
+         *
+         * @param pos the element to move the cursor to
+         * @return the number of steps that were taken to move. Positive number means forward, negative backward
+         * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
+         */
+        @Override
+        public int moveToBefore(
+                String pos )
+            throws
+                NoSuchElementException
+        {
+            // see moveToBefore in superclass
+
+            CursorIterator<StoreValue> currentPosition = createCopy();
+
+            int count = 0;
+            while( hasNext() ) {
+                StoreValue found = peekNext();
+                if( pos.equals( found.getKey() )) {
+                    return count;
+                }
+                ++count;
+                next();
+            }
+
+            setPositionTo( currentPosition );
+
+            count = 0;
+            while( hasPrevious() ) {
+                StoreValue found = previous();
+                --count;
+                if( pos.equals( found.getKey() )) {
+                    return count;
+                }
+            }
+            throw new NoSuchElementException();
+        }
+
+        /**
+         * Move the cursor to this element, i.e. return this element when {@link #previous previous} is invoked
+         * right afterwards.
+         *
+         * @param pos the element to move the cursor to
+         * @return the number of steps that were taken to move. Positive number means forward, negative backward
+         * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
+         */
+        @Override
+        public int moveToAfter(
+                String pos )
+            throws
+                NoSuchElementException
+        {
+            // see moveToBefore in superclass
+
+            CursorIterator<StoreValue> currentPosition = createCopy();
+
+            int count = 0;
+            while( hasNext() ) {
+                StoreValue found = next();
+                ++count;
+                if( pos.equals( found.getKey() )) {
+                    return count;
+                }
+            }
+
+            setPositionTo( currentPosition );
+
+            count = 0;
+            while( hasPrevious() ) {
+                StoreValue found = peekPrevious();
+                if( pos.equals( found.getKey() )) {
+                    return count;
+                }
+                --count;
+                previous();
+            }
+            throw new NoSuchElementException();
+        }
+
+        /**
+         * Clone this position.
+         *
+         * @return identical new instance
+         */
+        @Override
+        public MyFilteringIterator createCopy()
+        {
+            return new MyFilteringIterator( (StoreCursor) theDelegate.createCopy() );
+        }
+    }}

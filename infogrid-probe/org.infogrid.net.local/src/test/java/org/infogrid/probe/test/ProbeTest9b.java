@@ -59,11 +59,13 @@ public class ProbeTest9b
 
         Runnable [] runnables = new Runnable[] {
                 new MyRunnable( test1_URL ) {
+                    @Override
                     protected void recordResult(
                             MeshObject result )
                     {
                         foundObject1 = result;
                     }
+                    @Override
                     protected void recordException(
                             Throwable t )
                     {
@@ -71,11 +73,13 @@ public class ProbeTest9b
                     }
                 },
                 new MyRunnable( test1_URL ) {
+                    @Override
                     protected void recordResult(
                             MeshObject result )
                     {
                         foundObject2 = result;
                     }
+                    @Override
                     protected void recordException(
                             Throwable t )
                     {
@@ -155,7 +159,7 @@ public class ProbeTest9b
 
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things may happen during a test
      */
     @Before
@@ -167,7 +171,7 @@ public class ProbeTest9b
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( ProbeTest9b.class );
+    private static final Log log = Log.getLogInstance( ProbeTest9b.class );
 
     /**
      * The test Probe superclass.
@@ -176,6 +180,7 @@ public class ProbeTest9b
         implements
             ApiProbe
     {
+        @Override
         public void readFromApi(
                 NetMeshBaseIdentifier  networkId,
                 CoherenceSpecification coherence,

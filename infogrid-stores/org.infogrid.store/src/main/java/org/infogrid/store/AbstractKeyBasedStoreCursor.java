@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -24,21 +24,21 @@ import org.infogrid.util.logging.Log;
  * Collects functionality common to IterableStoreCursor implementations that work on
  * IterableStores whose stored data is organized by ordered keys.
  */
-public abstract class AbstractKeyBasedIterableStoreCursor
+public abstract class AbstractKeyBasedStoreCursor
         implements
-            IterableStoreCursor
+            StoreCursor
 {
-    private static final Log log = Log.getLogInstance( AbstractKeyBasedIterableStoreCursor.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance(AbstractKeyBasedStoreCursor.class ); // our own, private logger
 
     /**
      * Constructor, for subclasses only.
-     * 
-     * @param store    the IterableStore to iterate over.
+     *
+     * @param store    the Store to iterate over.
      * @param position the key for the current position.
      */
-    protected AbstractKeyBasedIterableStoreCursor(
-            IterableStore store,
-            String        position )
+    protected AbstractKeyBasedStoreCursor(
+            Store  store,
+            String position )
     {
         theStore    = store;
         thePosition = position;
@@ -50,17 +50,18 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @return the next element
      * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public StoreValue peekNext()
     {
         StoreValue [] found = findNextIncluding( thePosition, 1 );
-        
+
         if( found.length == 1 ) {
             return found[0];
         } else {
             throw new NoSuchElementException();
         }
     }
-    
+
     /**
      * Obtain the next key, without iterating forward.
      *
@@ -70,24 +71,25 @@ public abstract class AbstractKeyBasedIterableStoreCursor
     public String peekNextKey()
     {
         String [] found = findNextKeyIncluding( thePosition, 1 );
-        
+
         if( found.length == 1 ) {
             return found[0];
         } else {
             throw new NoSuchElementException();
         }
     }
-    
+
     /**
      * Obtain the previous element, without iterating backwards.
      *
      * @return the previous element
      * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public StoreValue peekPrevious()
     {
         StoreValue [] found = findPreviousExcluding( thePosition, 1 );
-        
+
         if( found.length == 1 ) {
             return found[0];
         } else {
@@ -104,7 +106,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
     public String peekPreviousKey()
     {
         String [] found = findPreviousKeyExcluding( thePosition, 1 );
-        
+
         if( found.length == 1 ) {
             return found[0];
         } else {
@@ -120,6 +122,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @see #hasPrevious(int)
      * @see #hasNext(int)
      */
+    @Override
     public boolean hasNext()
     {
         return hasNext( 1 );
@@ -133,11 +136,12 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @see #hasPrevious(int)
      * @see #hasNext(int)
      */
+    @Override
     public boolean hasPrevious()
     {
         return hasPrevious( 1 );
     }
-    
+
     /**
      * Returns <tt>true</tt> if the iteration has at least N more elements in the forward direction.
      *
@@ -147,6 +151,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @see #hasPrevious()
      * @see #hasPrevious(int)
      */
+    @Override
     public boolean hasNext(
             int n )
     {
@@ -167,6 +172,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @see #hasPrevious()
      * @see #hasNext(int)
      */
+    @Override
     public boolean hasPrevious(
             int n )
     {
@@ -184,6 +190,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @return the next element in the iteration.
      * @throws NoSuchElementException iteration has no more elements.
      */
+    @Override
     public StoreValue next()
     {
         StoreValue [] found = next( 1 );
@@ -213,11 +220,12 @@ public abstract class AbstractKeyBasedIterableStoreCursor
     /**
      * <p>Obtain the next N elements. If fewer than N elements are available, return
      * as many elements are available in a shorter array.</p>
-     * 
+     *
      * @param n the number of elements to obtain
      * @return the next no more than N elements
      * @see #previous(int)
      */
+    @Override
     public StoreValue [] next(
             int n )
     {
@@ -236,7 +244,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
     /**
      * <p>Obtain the next N keys. If fewer than N elements are available, return
      * as many keys are available in a shorter array.</p>
-     * 
+     *
      * @param n the number of keys to obtain
      * @return the next no more than N keys
      * @see #previousKey(int)
@@ -262,6 +270,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @return the previous element in the iteration.
      * @see #next()
      */
+    @Override
     public StoreValue previous()
     {
         StoreValue [] found = previous( 1 );
@@ -291,7 +300,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
     /**
      * <p>Obtain the previous N elements. If fewer than N elements are available, return
      * as many elements are available in a shorter array.</p>
-     * 
+     *
      * <p>Note that the elements
      * will be ordered in the opposite direction as you might expect: they are
      * returned in the sequence in which the CursorIterator visits them, not in the
@@ -301,6 +310,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @return the previous no more than N elements
      * @see #next(int)
      */
+    @Override
     public StoreValue [] previous(
             int n )
     {
@@ -316,7 +326,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
     /**
      * <p>Obtain the previous N keys. If fewer than N elements are available, return
      * as many keys are available in a shorter array.</p>
-     * 
+     *
      * <p>Note that the keys
      * will be ordered in the opposite direction as you might expect: they are
      * returned in the sequence in which the CursorIterator visits them, not in the
@@ -346,6 +356,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @param n the number of positions to move
      * @throws NoSuchElementException thrown if the position does not exist
      */
+    @Override
     public void moveBy(
             int n )
         throws
@@ -357,7 +368,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
         String newPosition = findKeyAt( thePosition, n );
         thePosition = newPosition;
     }
-    
+
     /**
      * Move the cursor to just before this element, i.e. return this element when {@link #next next} is invoked
      * right afterwards.
@@ -366,6 +377,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @return the number of steps that were taken to move. Positive number means forward, negative backward
      * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
      */
+    @Override
     public int moveToBefore(
             StoreValue pos )
         throws
@@ -382,6 +394,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @return the number of steps that were taken to move. Positive number means forward, negative backward
      * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
      */
+    @Override
     public int moveToAfter(
             StoreValue pos )
         throws
@@ -398,6 +411,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @return the number of steps that were taken to move. Positive number means forward, negative backward
      * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
      */
+    @Override
     public int moveToBefore(
             String key )
         throws
@@ -428,6 +442,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @return the number of steps that were taken to move. Positive number means forward, negative backward
      * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
      */
+    @Override
     public int moveToAfter(
             String key )
         throws
@@ -445,6 +460,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @return the number of steps that were taken to move. Positive number means
      *         forward, negative backward
      */
+    @Override
     public int moveToBeforeFirst()
     {
         int ret;
@@ -469,11 +485,12 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @return the number of steps that were taken to move. Positive number means
      *         forward, negative backward
      */
+    @Override
     public int moveToAfterLast()
     {
         String newPosition = getAfterLastPosition();
         int    ret         = determineDistance( thePosition, newPosition );
-        
+
         thePosition = newPosition;
         return ret;
     }
@@ -484,17 +501,18 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      *
      * @throws UnsupportedOperationException if the <tt>remove</tt>
      *        operation is not supported by this Iterator.
-     
+
      * @throws IllegalStateException if the <tt>next</tt> method has not
      *        yet been called, or the <tt>remove</tt> method has already
      *        been called after the last call to the <tt>next</tt>
      *        method.
      */
+    @Override
     public void remove()
     {
         try {
             theStore.delete( thePosition );
-        
+
             // we don't need to adjust the position
         } catch( StoreKeyDoesNotExistException ex ) {
             log.error( ex );
@@ -502,8 +520,8 @@ public abstract class AbstractKeyBasedIterableStoreCursor
             log.error( ex );
         }
     }
-    
-    
+
+
     /**
      * Set this CursorIterator to the position represented by the provided CursorIterator.
      *
@@ -511,28 +529,30 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      * @throws ClassCastException thrown if the provided CursorIterator did not work on the same CursorIterable,
      *         or the implementations were incompatible.
      */
+    @Override
     public void setPositionTo(
             CursorIterator<StoreValue> position )
         throws
             ClassCastException
     {
-        if( !( position instanceof AbstractKeyBasedIterableStoreCursor )) {
+        if( !( position instanceof AbstractKeyBasedStoreCursor )) {
             throw new ClassCastException( "Wrong type of CursorIterator: " + position );
         }
-        AbstractKeyBasedIterableStoreCursor realPosition = (AbstractKeyBasedIterableStoreCursor) position;
+        AbstractKeyBasedStoreCursor realPosition = (AbstractKeyBasedStoreCursor) position;
 
         if( theStore != realPosition.theStore ) {
             throw new IllegalArgumentException( "Not the same instance of Store" );
         }
-        
+
         thePosition = realPosition.thePosition;
     }
-    
+
     /**
      * Obtain a CursorIterable instead of an Iterator.
      *
      * @return the CursorIterable
      */
+    @Override
     public CursorIterator<StoreValue> iterator()
     {
         return this;
@@ -545,16 +565,18 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      *
      * @return the CursorIterable
      */
+    @Override
     public final CursorIterator<StoreValue> getIterator()
     {
         return iterator();
     }
-    
+
     /**
       * Do we have more elements?
       *
       * @return true if we have more elements
       */
+    @Override
     public final boolean hasMoreElements()
     {
         return hasNext();
@@ -565,6 +587,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
       *
       * @return the next element
       */
+    @Override
     public final StoreValue nextElement()
     {
         return next();
@@ -576,6 +599,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
      *
      * @return the type of array
      */
+    @Override
     public Class<StoreValue> getArrayComponentType()
     {
         return StoreValue.class;
@@ -592,7 +616,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
     protected abstract StoreValue [] findNextIncluding(
             String key,
             int    n );
-    
+
     /**
      * Find the next n keys, including key. This method
      * will return fewer values if only fewer values could be found.
@@ -604,7 +628,7 @@ public abstract class AbstractKeyBasedIterableStoreCursor
     protected abstract String [] findNextKeyIncluding(
             String key,
             int    n );
-    
+
     /**
      * Find the previous n StoreValues, excluding the StoreValue for key. This method
      * will return fewer values if only fewer values could be found.
@@ -674,22 +698,22 @@ public abstract class AbstractKeyBasedIterableStoreCursor
 
     /**
      * Determine the key at the very beginning.
-     * 
+     *
      * @return the key
      */
     protected abstract String getBeforeFirstPosition();
-    
+
     /**
      * Determine the key at the very end.
-     * 
+     *
      * @return the key
      */
     protected abstract String getAfterLastPosition();
-    
+
     /**
-     * The IterableStore to iterate over.
+     * The Store to iterate over.
      */
-    protected IterableStore theStore;
+    protected Store theStore;
 
     /**
      * The key for the current position.

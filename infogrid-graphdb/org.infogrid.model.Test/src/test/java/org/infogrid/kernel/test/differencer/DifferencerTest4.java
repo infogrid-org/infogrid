@@ -16,7 +16,7 @@ package org.infogrid.kernel.test.differencer;
 
 import org.infogrid.util.logging.Log;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.IterableMeshBaseDifferencer;
+import org.infogrid.meshbase.MeshBaseDifferencer;
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
 import org.infogrid.meshbase.transaction.ChangeSet;
 import org.infogrid.meshbase.transaction.Transaction;
@@ -82,7 +82,7 @@ public class DifferencerTest4
 
         log.info( "now differencing" );
 
-        IterableMeshBaseDifferencer diffA = new IterableMeshBaseDifferencer( theMeshBase1 );
+        MeshBaseDifferencer diffA = new MeshBaseDifferencer( theMeshBase1 );
 
         ChangeSet theChangeSetA = diffA.determineChangeSet( theMeshBase2, false );
 
@@ -94,7 +94,7 @@ public class DifferencerTest4
         
         log.info( "now differencing in the reverse direction" );
         
-        IterableMeshBaseDifferencer diffB = new IterableMeshBaseDifferencer( theMeshBase2 );
+        MeshBaseDifferencer diffB = new MeshBaseDifferencer( theMeshBase2 );
 
         ChangeSet theChangeSetB = diffB.determineChangeSet( theMeshBase1, false );
 

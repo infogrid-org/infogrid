@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -35,7 +35,6 @@ import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.mesh.set.active.ActiveMeshObjectSet;
-import org.infogrid.mesh.set.active.ActiveMeshObjectSetFactory;
 import org.infogrid.mesh.set.active.ActiveMeshObjectSetListener;
 import org.infogrid.mesh.set.active.MeshObjectAddedEvent;
 import org.infogrid.mesh.set.active.MeshObjectRemovedEvent;
@@ -56,7 +55,7 @@ import org.infogrid.util.logging.Log;
 
 /**
  * Tests that an ActiveMeshObjectSet gets updated correctly based on changes in data source read by a Probe.
- * 
+ *
  * FIXME: currently broken
  */
 public class ShadowEventTest1
@@ -80,7 +79,7 @@ public class ShadowEventTest1
                 new ProbeDirectory.ExactMatchDescriptor(
                         test1_URL.toExternalForm(),
                         TestApiProbe.class ));
-        
+
         LocalNetMMeshBase base = LocalNetMMeshBase.create(
                 here,
                 theModelBase,
@@ -88,12 +87,12 @@ public class ShadowEventTest1
                 probeDirectory,
                 exec,
                 rootContext );
-        
-        MeshObjectSetFactory       passiveFactory = base.getMeshObjectSetFactory();
-        ActiveMeshObjectSetFactory activeFactory  = ActiveMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
+
+        MeshObjectSetFactory        passiveFactory = base.getMeshObjectSetFactory();
+        ActiveMMeshObjectSetFactory activeFactory  = ActiveMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
 
         activeFactory.setMeshBase( base );
-        
+
         //
 
         log.info( "Running for probeRunCounter: " + probeRunCounter );
@@ -101,22 +100,25 @@ public class ShadowEventTest1
         MeshObject home = base.accessLocally( test1_URL );
 
         MeshObjectSet destPassiveSet = home.traverse( TestSubjectArea.RR.getSource() );
-        
+
         ActiveMeshObjectSet destActiveSet  = activeFactory.createActiveMeshObjectSet( home, TestSubjectArea.RR.getSource() );
 
         meshObjectAddedCount   = 1; // we have one element already
         meshObjectRemovedCount = 0;
         ActiveMeshObjectSetListener listener = new ActiveMeshObjectSetListener() {
+            @Override
             public void meshObjectAdded(
                     MeshObjectAddedEvent event )
             {
                 ++meshObjectAddedCount;
             }
+            @Override
             public void meshObjectRemoved(
                     MeshObjectRemovedEvent event )
             {
                 ++meshObjectRemovedCount;
             }
+            @Override
             public void orderedMeshObjectSetReordered(
                     OrderedActiveMeshObjectSetReorderedEvent event )
             {
@@ -142,7 +144,7 @@ public class ShadowEventTest1
             log.debug( "Entering loop (" + probeRunCounter + "/" + nProbeRuns + ")" );
 
             shadow.doUpdateNow();
-            
+
             Thread.sleep( PINGPONG_ROUNDTRIP_DURATION ); // wait for ping-pong to do its magic
 
             destPassiveSet = home.traverse( TestSubjectArea.RR.getSource() );
@@ -164,10 +166,10 @@ public class ShadowEventTest1
     public void setup()
     {
         exec = createThreadPool( 2 );
-        
+
         meshObjectAddedCount = 0;
         meshObjectRemovedCount = 0;
-        
+
         probeRunCounter = 0;
     }
 
@@ -182,13 +184,13 @@ public class ShadowEventTest1
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( ShadowEventTest1.class);
+    private static final Log log = Log.getLogInstance( ShadowEventTest1.class);
 
     /**
      * Our ThreadPool.
      */
     protected ScheduledExecutorService exec;
-    
+
     /**
      * The first URL that we are accessing.
      */
@@ -200,7 +202,7 @@ public class ShadowEventTest1
 
         } catch( Exception ex ) {
             log.error( ex );
-            
+
             test1_URL = null; // make compiler happy
         }
     }
@@ -234,6 +236,7 @@ public class ShadowEventTest1
             implements
                 ApiProbe
     {
+       @Override
        public void readFromApi(
                 NetMeshBaseIdentifier  networkId,
                 CoherenceSpecification coherence,

@@ -15,13 +15,13 @@
 package org.infogrid.store.util;
 
 import java.util.NoSuchElementException;
-import org.infogrid.store.IterableStoreCursor;
 import org.infogrid.store.StoreEntryMapper;
 import org.infogrid.util.AbstractCursorIterator;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
+import org.infogrid.store.StoreCursor;
 
 /**
  * Iterates over the values in a StoreBackedSwappingHashMap.
@@ -45,7 +45,7 @@ public class StoreBackedSwappingHashMapValuesIterator<K,V>
      * @param valuesArrayComponentClass the Class to use when returning arrays of values
      */
     public StoreBackedSwappingHashMapValuesIterator(
-            IterableStoreCursor   delegate,
+            StoreCursor   delegate,
             StoreBackedSwappingHashMap<K,V>   cache,
             StoreEntryMapper<K,V> mapper,
             Class<K>              keysArrayComponentClass,

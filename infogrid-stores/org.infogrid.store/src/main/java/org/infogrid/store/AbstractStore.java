@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -42,6 +42,7 @@ public abstract class AbstractStore
      * @see #update if a data element with this key exists already
      * @see #putOrUpdate if a data element with this key may exist already
      */
+    @Override
     public void put(
             final String  key,
             final String  encodingId,
@@ -80,6 +81,7 @@ public abstract class AbstractStore
      * @see #put if a data element with this key does not exist already
      * @see #putOrUpdate if a data element with this key may exist already
      */
+    @Override
     public void update(
             final String  key,
             final String  encodingId,
@@ -101,7 +103,7 @@ public abstract class AbstractStore
         update( toPut );
     }
 
-    
+
     /**
      * Put (if does not exist already) or update (if it does exist) a data element in the Store.
      *
@@ -118,6 +120,7 @@ public abstract class AbstractStore
      * @see #put if a data element with this key does not exist already
      * @see #update if a data element with this key exists already
      */
+    @Override
     public boolean putOrUpdate(
             final String  key,
             final String  encodingId,
@@ -138,17 +141,57 @@ public abstract class AbstractStore
         boolean ret = putOrUpdate( toPutOrUpdate );
         return ret;
     }
-    
+
     /**
      * Remove all data in this Store.
      *
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void deleteAll()
         throws
             IOException
     {
         deleteAll( "" );
+    }
+
+    /**
+     * Obtain an Iterator over the content of this Store.
+     *
+     * @return the Iterator
+     */
+    @Override
+    public StoreCursor getIterator()
+    {
+        return iterator();
+    }
+
+    /**
+     * Determine the number of StoreValues in this Store.
+     *
+     * @return the number of StoreValues in this Store
+     * @throws IOException thrown if an I/O error occurred
+     */
+    @Override
+    public int size()
+        throws
+            IOException
+    {
+        return size( "" );
+    }
+
+    /**
+     * Determine whether this Store is empty.
+     *
+     * @return true if this Store is empty
+     * @throws IOException thrown if an I/O error occurred
+     */
+    @Override
+    public boolean isEmpty()
+        throws
+            IOException
+    {
+        return size() == 0;
     }
 
     /**
@@ -161,6 +204,7 @@ public abstract class AbstractStore
       * @see #addWeakStoreListener
       * @see #removeStoreListener
       */
+    @Override
     public void addDirectStoreListener(
             StoreListener newListener )
     {
@@ -170,7 +214,7 @@ public abstract class AbstractStore
     /**
      * Throw an IllegalArgumentException if an invalid key was handed to the Store API.
      * This may be overridden by subclasses.
-     * 
+     *
      * @param key the candidate key
      * @throws IllegalArgumentException if the candidate key is invalid
      */
@@ -187,7 +231,7 @@ public abstract class AbstractStore
     /**
      * Throw an IllegalArgumentException if an invalid encoding was handed to the Store API.
      * This may be overridden by subclasses.
-     * 
+     *
      * @param encoding the candidate encoding
      * @throws IllegalArgumentException if the candidate encoding is invalid
      */
@@ -204,7 +248,7 @@ public abstract class AbstractStore
     /**
      * Throw an IllegalArgumentException if  invalid data was handed to the Store API.
      * This may be overridden by subclasses.
-     * 
+     *
      * @param data the candidate data
      * @throws IllegalArgumentException if the candidate data is invalid
      */
@@ -229,6 +273,7 @@ public abstract class AbstractStore
       * @see #addWeakStoreListener
       * @see #removeStoreListener
       */
+    @Override
     public void addSoftStoreListener(
             StoreListener newListener )
     {
@@ -246,6 +291,7 @@ public abstract class AbstractStore
       * @see #addSoftStoreListener
       * @see #removeStoreListener
       */
+    @Override
     public void addWeakStoreListener(
             StoreListener newListener )
     {
@@ -255,12 +301,13 @@ public abstract class AbstractStore
     /**
       * Remove a listener.
       * This method is the same regardless how the listener was subscribed to events.
-      * 
+      *
       * @param oldListener the to-be-removed listener
       * @see #addDirectStoreListener
       * @see #addSoftStoreListener
       * @see #addWeakStoreListener
       */
+    @Override
     public void removeStoreListener(
             StoreListener oldListener )
     {
@@ -277,7 +324,7 @@ public abstract class AbstractStore
     {
         theStoreListeners.fireEvent( value, 0 );
     }
-    
+
     /**
      * Fire a Store update event.
      *
@@ -288,7 +335,7 @@ public abstract class AbstractStore
     {
         theStoreListeners.fireEvent( value, 1 );
     }
-    
+
     /**
      * Fire a Store get successed event.
      *
@@ -299,7 +346,7 @@ public abstract class AbstractStore
     {
         theStoreListeners.fireEvent( value, 2 );
     }
-    
+
     /**
      * Fire a Store get failed event.
      *
@@ -310,7 +357,7 @@ public abstract class AbstractStore
     {
         theStoreListeners.fireEvent( key, 3 );
     }
-    
+
     /**
      * Fire a Store delete event.
      *
@@ -321,7 +368,7 @@ public abstract class AbstractStore
     {
         theStoreListeners.fireEvent( key, 4 );
     }
-    
+
     /**
      * Fire a Store deleteAll event.
      *
@@ -332,12 +379,13 @@ public abstract class AbstractStore
     {
         theStoreListeners.fireEvent( prefix, 5 );
     }
-    
+
     /**
      * The StoreListeners.
      */
-    private FlexibleListenerSet<StoreListener,Object,Integer> theStoreListeners
+    private final FlexibleListenerSet<StoreListener,Object,Integer> theStoreListeners
             = new FlexibleListenerSet<StoreListener,Object,Integer>() {
+                    @Override
                     protected void fireEventToListener(
                             StoreListener l,
                             Object        e,

@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -26,8 +26,8 @@ import org.infogrid.probe.shadow.AbstractShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.ShadowMeshBaseFactory;
 import org.infogrid.probe.shadow.ShadowParameters;
-import org.infogrid.store.IterableStore;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.store.Store;
+import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.context.Context;
@@ -43,7 +43,7 @@ public class StoreShadowMeshBaseFactory
 {
     /**
      * Factory method for the StoreShadowMeshBaseFactory itself.
-     * 
+     *
      * @param meshBaseIdentifierFactory the factory for NetMeshBaseIdentifiers
      * @param endpointFactory factory for communications endpoints, to be used by all created StoreShadowMeshBase
      * @param modelBase the ModelBase containing type information to be used by all created StoreShadowMeshBases
@@ -56,8 +56,8 @@ public class StoreShadowMeshBaseFactory
             NetMeshBaseIdentifierFactory            meshBaseIdentifierFactory,
             ProxyMessageEndpointFactory             endpointFactory,
             ModelBase                               modelBase,
-            IterableStore                           shadowStore,
-            IterableStore                           shadowProxyStore,
+            Store                                   shadowStore,
+            Store                                   shadowProxyStore,
             Context                                 context )
     {
         return new StoreShadowMeshBaseFactory(
@@ -71,7 +71,7 @@ public class StoreShadowMeshBaseFactory
 
     /**
      * Constructor.
-     * 
+     *
      * @param meshBaseIdentifierFactory the factory for NetMeshBaseIdentifiers
      * @param modelBase the ModelBase containing type information to be used by all created StoreShadowMeshBases
      * @param endpointFactory factory for communications endpoints, to be used by all created StoreShadowMeshBase
@@ -83,17 +83,17 @@ public class StoreShadowMeshBaseFactory
             NetMeshBaseIdentifierFactory            meshBaseIdentifierFactory,
             ProxyMessageEndpointFactory             endpointFactory,
             ModelBase                               modelBase,
-            IterableStore                           shadowStore,
-            IterableStore                           shadowProxyStore,
+            Store                                   shadowStore,
+            Store                                   shadowProxyStore,
             Context                                 context )
     {
         super(  endpointFactory,
                 modelBase,
                 theResourceHelper.getResourceLongOrDefault( "TimeNotNeededTillExpires", 10L * 60L * 1000L ), // 10 minutes
                 context );
-        
+
         theMeshBaseIdentifierFactory = meshBaseIdentifierFactory;
-        
+
         theShadowStore      = shadowStore;
         theShadowProxyStore = shadowProxyStore;
     }
@@ -105,6 +105,7 @@ public class StoreShadowMeshBaseFactory
      * @param argument any information required for object creation, if any
      * @return the created object
      */
+    @Override
     public ShadowMeshBase obtainFor(
             NetMeshBaseIdentifier key,
             ProxyParameters       argument )
@@ -120,7 +121,7 @@ public class StoreShadowMeshBaseFactory
                 key,
                 theMeshBaseIdentifierFactory );
 
-        IterablePrefixingStore thisProxyStore = IterablePrefixingStore.create( key.toExternalForm(), theShadowProxyStore );
+        PrefixingStore thisProxyStore = PrefixingStore.create( key.toExternalForm(), theShadowProxyStore );
 
         StoreShadowMeshBase ret = StoreShadowMeshBase.create(
                 key,
@@ -134,7 +135,7 @@ public class StoreShadowMeshBaseFactory
                 mappingPolicy,
                 thisProxyStore,
                 theMeshBaseContext );
-        
+
         ret.setFactory( this );
 
         Long next; // out here for debugging
@@ -144,10 +145,10 @@ public class StoreShadowMeshBaseFactory
         } catch( Throwable ex ) {
             throw new FactoryException( this, ex );
         }
-        
+
         return ret;
     }
-    
+
     /**
      * Factory method to create an ShadowMeshBase that later will be restored from an ExternalizedShadowMeshBase object.
      *
@@ -161,7 +162,7 @@ public class StoreShadowMeshBaseFactory
                 key,
                 theMeshBaseIdentifierFactory );
 
-        IterablePrefixingStore thisProxyStore = IterablePrefixingStore.create( key.toExternalForm(), theShadowProxyStore );
+        PrefixingStore thisProxyStore = PrefixingStore.create( key.toExternalForm(), theShadowProxyStore );
 
         StoreShadowMeshBase ret = StoreShadowMeshBase.create(
                 key,
@@ -175,15 +176,15 @@ public class StoreShadowMeshBaseFactory
                 theProbeManager.getProbeDirectory().getHttpMappingPolicy(),
                 thisProxyStore,
                 theMeshBaseContext );
-        
+
         ret.setFactory( this );
-        
+
         return ret;
     }
 
     /**
      * Obtain a factory for NetMeshBaseIdentifiers.
-     * 
+     *
      * @return the factory
      */
     public NetMeshBaseIdentifierFactory getNetMeshBaseIdentifierFactory()
@@ -199,13 +200,13 @@ public class StoreShadowMeshBaseFactory
     /**
      * The Store where ShadowMeshBases are stored (but not their Proxies).
      */
-    protected IterableStore theShadowStore;
-    
+    protected Store theShadowStore;
+
     /**
      * The Store in which Shadow proxy data is stored.
      */
-    protected IterableStore theShadowProxyStore;
-    
+    protected Store theShadowProxyStore;
+
     /**
      * Our ResourceHelper.
      */

@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.util.Iterator;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.externalized.xml.BulkExternalizedMeshObjectXmlEncoder;
-import org.infogrid.meshbase.store.IterableStoreMeshBase;
+import org.infogrid.meshbase.store.StoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.util.logging.Log;
@@ -42,16 +42,16 @@ public class StoreBulkLoaderTest1
             Exception
     {
         //
-        
+
         log.info( "Deleting old database and creating new database" );
 
         theSqlStore.initializeHard();
-        
+
         //
 
         log.info( "Creating MeshBase" );
 
-        IterableStoreMeshBase mb = IterableStoreMeshBase.create(
+        StoreMeshBase mb = StoreMeshBase.create(
                 theMeshBaseIdentifierFactory.fromExternalForm( "MeshBase" ),
                 ModelBaseSingleton.getSingleton(),
                 null,
@@ -61,9 +61,9 @@ public class StoreBulkLoaderTest1
         InputStream inStream = StoreBulkLoaderTest1.class.getResourceAsStream( "StoreBulkLoaderTest1.xml" );
 
         Transaction tx = mb.createTransactionNow();
-        
+
         BulkExternalizedMeshObjectXmlEncoder theParser = new BulkExternalizedMeshObjectXmlEncoder();
-        
+
         Iterator<? extends ExternalizedMeshObject> iter = theParser.bulkLoad(
                 inStream,
                 mb );
@@ -71,14 +71,14 @@ public class StoreBulkLoaderTest1
         while( iter.hasNext() ) {
             mb.getMeshBaseLifecycleManager().loadExternalizedMeshObject( iter.next() );
         }
-        
+
         tx.commitTransaction();
-        
+
         sleepFor( 2000L );
         collectGarbage();
-        
+
         //
-        
+
         checkEquals( mb.size(), 5+1, "Wrong number of MeshObjects found" ); // don't forget home object
     }
 

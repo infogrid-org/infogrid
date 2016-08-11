@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -17,7 +17,6 @@ package org.infogrid.store.filesystem;
 import java.io.File;
 import java.io.IOException;
 import java.util.NoSuchElementException;
-import org.infogrid.store.IterableStoreCursor;
 import org.infogrid.store.StoreValue;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.FilteringCursorIterator;
@@ -25,19 +24,20 @@ import org.infogrid.util.logging.Log;
 import org.infogrid.util.tree.FileTreeFacade;
 import org.infogrid.util.tree.TreeFacade;
 import org.infogrid.util.tree.TreeFacadeCursorIterator;
+import org.infogrid.store.StoreCursor;
 
 /**
  * Iterates over the content of a FilesystemStore.
  */
 public class FilesystemStoreIterator
         implements
-            IterableStoreCursor
+            StoreCursor
 {
     private static final Log log = Log.getLogInstance( FilesystemStoreIterator.class ); // our own, private logger
 
     /**
      * Factory method.
-     * 
+     *
      * @param store the FilesystemStore to iterate over
      * @return the created FilesystemStoreIterator
      */
@@ -46,9 +46,9 @@ public class FilesystemStoreIterator
     {
         TreeFacade<File>     facade   = FileTreeFacade.create( store.getTopDirectory() );
         CursorIterator<File> delegate = TreeFacadeCursorIterator.create( facade, File.class );
-        
+
         delegate = FilteringCursorIterator.create( delegate, theFilesOnlyFilter, File.class );
-        
+
         return new FilesystemStoreIterator( store, delegate );
     }
 
@@ -65,13 +65,14 @@ public class FilesystemStoreIterator
         theStore    = store;
         theDelegate = delegate;
     }
-    
+
     /**
      * Obtain the next element, without iterating forward.
      *
      * @return the next element
      * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public StoreValue peekNext()
         throws
             NoSuchElementException
@@ -94,6 +95,7 @@ public class FilesystemStoreIterator
      * @return the previous element
      * @throws NoSuchElementException iteration has no current element (e.g. because the end of the iteration was reached)
      */
+    @Override
     public StoreValue peekPrevious()
         throws
             NoSuchElementException
@@ -118,6 +120,7 @@ public class FilesystemStoreIterator
      * @see #hasPrevious(int)
      * @see #hasNext(int)
      */
+    @Override
     public boolean hasNext()
     {
         return theDelegate.hasNext();
@@ -131,11 +134,12 @@ public class FilesystemStoreIterator
      * @see #hasPrevious(int)
      * @see #hasNext(int)
      */
+    @Override
     public boolean hasPrevious()
     {
         return theDelegate.hasPrevious();
     }
-    
+
     /**
      * Returns <tt>true</tt> if the iteration has at least N more elements in the forward direction.
      *
@@ -145,6 +149,7 @@ public class FilesystemStoreIterator
      * @see #hasPrevious()
      * @see #hasPrevious(int)
      */
+    @Override
     public boolean hasNext(
             int n )
     {
@@ -160,6 +165,7 @@ public class FilesystemStoreIterator
      * @see #hasPrevious()
      * @see #hasNext(int)
      */
+    @Override
     public boolean hasPrevious(
             int n )
     {
@@ -173,6 +179,7 @@ public class FilesystemStoreIterator
      * @throws NoSuchElementException iteration has no more elements.
      * @see #previous()
      */
+    @Override
     public StoreValue next()
         throws
             NoSuchElementException
@@ -192,11 +199,12 @@ public class FilesystemStoreIterator
     /**
      * <p>Obtain the next N elements. If fewer than N elements are available, return
      * as many elements are available in a shorter array.</p>
-     * 
+     *
      * @param n the number of elements to return
      * @return the next no more than N elements
      * @see #previous(int)
      */
+    @Override
     public StoreValue [] next(
             int n )
     {
@@ -219,6 +227,7 @@ public class FilesystemStoreIterator
      * @throws NoSuchElementException iteration has no more elements.
      * @see #next()
      */
+    @Override
     public StoreValue previous()
         throws
             NoSuchElementException
@@ -238,7 +247,7 @@ public class FilesystemStoreIterator
     /**
      * <p>Obtain the previous N elements. If fewer than N elements are available, return
      * as many elements are available in a shorter array.</p>
-     * 
+     *
      * <p>Note that the elements
      * will be ordered in the opposite direction as you might expect: they are
      * returned in the sequence in which the CursorIterator visits them, not in the
@@ -248,6 +257,7 @@ public class FilesystemStoreIterator
      * @return the previous no more than N elements
      * @see #next(int)
      */
+    @Override
     public StoreValue [] previous(
             int n )
     {
@@ -271,6 +281,7 @@ public class FilesystemStoreIterator
      * @param n the number of positions to move
      * @throws NoSuchElementException thrown if the position does not exist
      */
+    @Override
     public void moveBy(
             int n )
         throws
@@ -289,6 +300,7 @@ public class FilesystemStoreIterator
      * @throws NoSuchElementException thrown if this element is not actually part
      *         of the underlying <code>CursorIterable</code>
      */
+    @Override
     public int moveToBefore(
             StoreValue pos )
         throws
@@ -307,6 +319,7 @@ public class FilesystemStoreIterator
      * @throws NoSuchElementException thrown if this element is not actually part
      *         of the underlying <code>CursorIterable</code>
      */
+    @Override
     public int moveToAfter(
             StoreValue pos )
         throws
@@ -320,12 +333,13 @@ public class FilesystemStoreIterator
      * iterator (optional operation). This is the same as the current element.
      *
      * @throws UnsupportedOperationException if the <tt>remove</tt>
-     *        operation is not supported by this Iterator.     
+     *        operation is not supported by this Iterator.
      * @throws IllegalStateException if the <tt>next</tt> method has not
      *        yet been called, or the <tt>remove</tt> method has already
      *        been called after the last call to the <tt>next</tt>
      *        method.
      */
+    @Override
     public void remove()
         throws
             UnsupportedOperationException,
@@ -333,7 +347,7 @@ public class FilesystemStoreIterator
     {
         theDelegate.remove();
     }
-    
+
     /**
      * Set this CursorIterator to the position represented by the provided CursorIterator.
      *
@@ -341,6 +355,7 @@ public class FilesystemStoreIterator
      * @throws IllegalArgumentException thrown if the provided CursorIterator does
      *         not work on the same CursorIterable, or the implementations were incompatible.
      */
+    @Override
     public void setPositionTo(
             CursorIterator<StoreValue> position )
         throws
@@ -348,21 +363,21 @@ public class FilesystemStoreIterator
     {
         if( position.hasNext() ) {
             StoreValue next = position.peekNext();
-            
+
             File delegateNext = theStore.getKeyFileMapper().keyToFile( next.getKey() );
             theDelegate.moveToBefore( delegateNext );
-            
+
         } else if( position.hasPrevious() ) {
             StoreValue next = position.peekPrevious();
-            
+
             File delegateNext = theStore.getKeyFileMapper().keyToFile( next.getKey() );
             theDelegate.moveToAfter( delegateNext );
-            
+
         } else {
             theDelegate.moveToBeforeFirst();
         }
     }
-    
+
     /**
      * Move the cursor to this element, i.e. return this element when {@link #next next} is invoked
      * right afterwards.
@@ -371,6 +386,7 @@ public class FilesystemStoreIterator
      * @return the number of steps that were taken to move. Positive number means forward, negative backward
      * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
      */
+    @Override
     public int moveToBefore(
             String key )
         throws
@@ -390,13 +406,14 @@ public class FilesystemStoreIterator
      * @return the number of steps that were taken to move. Positive number means forward, negative backward
      * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
      */
+    @Override
     public int moveToAfter(
             String key )
         throws
             NoSuchElementException
     {
         File delegatePos = theStore.getKeyFileMapper().keyToFile( key );
-        
+
         int ret = theDelegate.moveToAfter( delegatePos );
         return ret;
     }
@@ -406,10 +423,11 @@ public class FilesystemStoreIterator
      *
      * @return identical new instance
      */
+    @Override
     public FilesystemStoreIterator createCopy()
     {
         CursorIterator<File> delegateCopy = theDelegate.createCopy();
-        
+
         return new FilesystemStoreIterator( theStore, delegateCopy );
     }
 
@@ -420,6 +438,7 @@ public class FilesystemStoreIterator
      * @return the number of steps that were taken to move. Positive number means
      *         forward, negative backward
      */
+    @Override
     public int moveToBeforeFirst()
     {
         int ret = theDelegate.moveToBeforeFirst();
@@ -433,6 +452,7 @@ public class FilesystemStoreIterator
      * @return the number of steps that were taken to move. Positive number means
      *         forward, negative backward
      */
+    @Override
     public int moveToAfterLast()
     {
         int ret = theDelegate.moveToAfterLast();
@@ -446,6 +466,7 @@ public class FilesystemStoreIterator
      *           contains at least one more element to provide;
      *          <code>false</code> otherwise.
      */
+    @Override
     public final boolean hasMoreElements()
     {
         return hasNext();
@@ -458,6 +479,7 @@ public class FilesystemStoreIterator
      * @return     the next element of this enumeration.
      * @throws  NoSuchElementException  if no more elements exist.
      */
+    @Override
     public StoreValue nextElement()
     {
         return next();
@@ -468,6 +490,7 @@ public class FilesystemStoreIterator
      *
      * @return the <code>CursorIterable</code>
      */
+    @Override
     public final FilesystemStoreIterator iterator()
     {
         return this;
@@ -480,6 +503,7 @@ public class FilesystemStoreIterator
      *
      * @return the <code>CursorIterable</code>
      */
+    @Override
     public final FilesystemStoreIterator getIterator()
     {
         return iterator();
@@ -491,6 +515,7 @@ public class FilesystemStoreIterator
      *
      * @return the type of array
      */
+    @Override
     public Class<StoreValue> getArrayComponentType()
     {
         return StoreValue.class;
@@ -505,23 +530,20 @@ public class FilesystemStoreIterator
      * The delegate iterator.
      */
     protected CursorIterator<File> theDelegate;
-    
+
     /**
      * This Filter only returns regular data files, not directories.
      */
     protected static final FilteringCursorIterator.Filter<File> theFilesOnlyFilter
-            = new FilteringCursorIterator.Filter<File>() {
-                    /**
-                      * Determine whether or not to accept a candidate Object.
-                      *
-                      * @param candidate the candidate Object
-                      * @return true if this Object shall be accepted according to this Filter
-                      */
-                    public boolean accept(
-                            File candidate )
-                    {
-                        boolean ret = !candidate.isDirectory();
-                        return ret;
-                    }
-            };
+            = ( File candidate ) -> {
+                boolean ret = !candidate.isDirectory();
+                return ret;
+            }
+
+    /**
+     * Determine whether or not to accept a candidate Object.
+     *
+     * @param candidate the candidate Object
+     * @return true if this Object shall be accepted according to this Filter
+     */ ;
 }

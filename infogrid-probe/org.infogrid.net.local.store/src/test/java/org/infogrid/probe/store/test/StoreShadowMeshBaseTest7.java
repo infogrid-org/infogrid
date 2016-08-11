@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -42,7 +42,7 @@ import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.store.AbstractStoreListener;
 import org.infogrid.store.Store;
 import org.infogrid.store.StoreValue;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.util.logging.Log;
 import org.junit.After;
 import org.junit.Before;
@@ -67,16 +67,16 @@ public class StoreShadowMeshBaseTest7
     {
         log.info( "Creating Stores" );
 
-        IterablePrefixingStore theMeshStore        = IterablePrefixingStore.create( "Mesh",        theSqlStore );
-        IterablePrefixingStore theProxyStore       = IterablePrefixingStore.create( "Proxy",       theSqlStore );
-        IterablePrefixingStore theShadowStore      = IterablePrefixingStore.create( "Shadow",      theSqlStore );
-        IterablePrefixingStore theShadowProxyStore = IterablePrefixingStore.create( "ShadowProxy", theSqlStore );
-        
+        PrefixingStore theMeshStore        = PrefixingStore.create( "Mesh",        theSqlStore );
+        PrefixingStore theProxyStore       = PrefixingStore.create( "Proxy",       theSqlStore );
+        PrefixingStore theShadowStore      = PrefixingStore.create( "Shadow",      theSqlStore );
+        PrefixingStore theShadowProxyStore = PrefixingStore.create( "ShadowProxy", theSqlStore );
+
         checkEquals( theMeshStore.size(),        0, "MeshStore not empty" );
         checkEquals( theProxyStore.size(),       0, "ProxyStore not empty" );
         checkEquals( theShadowStore.size(),      0, "ShadowStore not empty" );
         checkEquals( theShadowProxyStore.size(), 0, "ShadowProxyStore not empty" );
-        
+
         AbstractStoreListener listener = new AbstractStoreListener() {
                 @Override
                 public void putPerformed(
@@ -86,16 +86,16 @@ public class StoreShadowMeshBaseTest7
                     log.debug( "Put performed on " + store + " with key: " + value.getKey() );
                 }
         };
-        
+
         theMeshStore.addDirectStoreListener( listener );
         theProxyStore.addDirectStoreListener( listener );
         theShadowStore.addDirectStoreListener( listener );
         theShadowProxyStore.addDirectStoreListener( listener );
-        
+
         //
-        
+
         log.info( "Creating MeshBase" );
-        
+
         NetMeshBaseIdentifier             baseIdentifier     = theMeshBaseIdentifierFactory.fromExternalForm(  "http://here.local/" );
 
         LocalNetStoreMeshBase base = LocalNetStoreMeshBase.create(
@@ -113,34 +113,34 @@ public class StoreShadowMeshBaseTest7
                 exec,
                 true,
                 rootContext );
-        
+
         checkEquals( theMeshStore.size(),        1, "No home object in MeshStore" );
         checkEquals( theProxyStore.size(),       0, "ProxyStore not empty" );
         checkEquals( theShadowStore.size(),      0, "ShadowStore not empty" );
         checkEquals( theShadowProxyStore.size(), 0, "ShadowProxyStore not empty" );
 
         //
-        
+
         log.info( "Doing AccessLocally" );
-        
+
         MeshObject found = base.accessLocally( test_NETWORK_IDENTIFIER );
-        
+
         checkObject( found, "Object not found" );
         checkCondition( found.isBlessedBy( TestSubjectArea.AA ), "Not blessed correctly" );
 
         //
-        
+
         log.info( "Checking stores" );
-        
+
         checkEquals( theMeshStore.size(),        2, "MeshStore content wrong" );
         checkEquals( theProxyStore.size(),       1, "ProxyStore content wrong" );
         checkEquals( theShadowStore.size(),      1, "ShadowStore content wrong" );
         checkEquals( theShadowProxyStore.size(), 1, "ShadowProxyStore content wrong" );
     }
-        
+
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @Before
@@ -155,7 +155,7 @@ public class StoreShadowMeshBaseTest7
                 test_NETWORK_IDENTIFIER.toExternalForm(),
                 TestApiProbe.class ));
         //
-        
+
         log.info( "Deleting old database and creating new database" );
 
         theSqlStore.initializeHard();
@@ -174,7 +174,7 @@ public class StoreShadowMeshBaseTest7
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( StoreShadowMeshBaseTest7.class);
+    private static final Log log = Log.getLogInstance( StoreShadowMeshBaseTest7.class);
 
     /**
      * Our ThreadPool.
@@ -203,6 +203,7 @@ public class StoreShadowMeshBaseTest7
             implements
                 ApiProbe
     {
+        @Override
         public void readFromApi(
                 NetMeshBaseIdentifier  networkId,
                 CoherenceSpecification coherence,

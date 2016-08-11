@@ -550,14 +550,9 @@
     public void renew(
             final long duration )
     {
-        get_MeshBase().executeNow( new org.infogrid.meshbase.transaction.TransactionAction<Void>() {
-                public Void execute()
-                    throws
-                        Throwable
-                {
-                    setValidUntil( TimeStampValue.nowWithOffset( duration ));
-                    return null;
-                }
+        get_MeshBase().executeNow( tx -> {
+                setValidUntil( TimeStampValue.nowWithOffset( duration ));
+                return null;
         } );
     }
 
@@ -566,15 +561,10 @@
      */
     public void cancel()
     {
-        get_MeshBase().executeNow( new org.infogrid.meshbase.transaction.TransactionAction<Void>() {
-                public Void execute()
-                    throws
-                        Throwable
-                {
-                    setValidUntil( TimeStampValue.nowWithOffset( -1L ));
-                    setTimeExpires( getValidUntil().getAsMillis() );
-                    return null;
-                }
+        get_MeshBase().executeNow( tx -> {
+                setValidUntil( TimeStampValue.nowWithOffset( -1L ));
+                setTimeExpires( getValidUntil().getAsMillis() );
+                return null;
         } );
     }
 

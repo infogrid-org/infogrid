@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -61,7 +61,7 @@ public class BlobProbe
      * error in the Probe implementation (e.g. IsAbstractException).</p>
      * <p>The Probe framework invokes this method with an open Transaction on the current Thread;
      * the Probe developer does not have to worry about Transactions.</p>
-     * 
+     *
      * @param dataSourceIdentifier identifies the data source that is being accessed
      * @param coherenceSpecification the type of data coherence that is requested by the application. Probe
      *         implementors may ignore this parameter, letting the Probe framework choose its own policy.
@@ -98,6 +98,7 @@ public class BlobProbe
      * @throws TransactionException a Transaction problem occurred. Throwing this typically indicates a programming error.
      * @throws URISyntaxException thrown if a URI was constructed in an invalid way
      */
+    @Override
     public void readFromStream(
             NetMeshBaseIdentifier  dataSourceIdentifier,
             CoherenceSpecification coherenceSpecification,
@@ -124,7 +125,7 @@ public class BlobProbe
 
         // create a new Blob object
         MeshObject theBlobObject = freshMeshBase.getHomeObject();
-        
+
         theBlobObject.bless( BlobSubjectArea.BLOBOBJECT );
 
         theBlobObject.setPropertyValue( BlobSubjectArea.BLOBOBJECT_CONTENT,  BlobSubjectArea.BLOBOBJECT_CONTENT_type.createBlobValue( buf, contentType ));

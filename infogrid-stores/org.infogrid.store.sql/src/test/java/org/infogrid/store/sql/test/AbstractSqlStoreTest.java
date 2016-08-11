@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -16,8 +16,8 @@ package org.infogrid.store.sql.test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import org.infogrid.store.IterableStore;
-import org.infogrid.store.encrypted.IterableEncryptedStore;
+import org.infogrid.store.Store;
+import org.infogrid.store.encrypted.EncryptedStore;
 import org.infogrid.store.sql.AbstractSqlStore;
 import org.infogrid.testharness.AbstractTest;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public abstract class AbstractSqlStoreTest
 {
     /**
      * Run the test encrypted.
-     * 
+     *
      * @throws Exception all sorts of things can go wrong in a test
      */
     @Test
@@ -41,16 +41,16 @@ public abstract class AbstractSqlStoreTest
     {
         String    transformation = "DES";
         SecretKey key            = KeyGenerator.getInstance( transformation ).generateKey();
-        
-        theEncryptedStore = IterableEncryptedStore.create( transformation, key, theSqlStore );
+
+        theEncryptedStore = EncryptedStore.create( transformation, key, theSqlStore );
         theTestStore      = theEncryptedStore;
-        
+
         run();
     }
-    
+
     /**
      * Run the test.
-     * 
+     *
      * @throws Exception all sorts of things can go wrong in a test
      */
     public abstract void run()
@@ -61,17 +61,17 @@ public abstract class AbstractSqlStoreTest
      * The AbstractSqlStore to be tested.
      */
     protected AbstractSqlStore theSqlStore;
-    
+
     /**
      * The actual Store to be tested. This may or may not be pointed to theSqlStore
      * by subclasses.
      */
-    protected IterableStore theTestStore;
+    protected Store theTestStore;
 
     /**
      * Encrypted Store, if the encrypted test is being run.
      */
-    protected IterableStore theEncryptedStore;
+    protected Store theEncryptedStore;
 
     /**
      * The name of the database that we use to store test data.

@@ -16,17 +16,15 @@ package org.infogrid.kernel.net.test.xpriso;
 
 import java.text.ParseException;
 import java.util.concurrent.ScheduledExecutorService;
-import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.net.NetMeshObject;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
 import org.infogrid.meshbase.net.m.NetMMeshBase;
 import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.meshbase.net.xpriso.logging.LogXprisoMessageLogger;
-import org.infogrid.meshbase.transaction.TransactionAction;
 import org.infogrid.meshbase.transaction.TransactionActionException;
-import org.infogrid.meshbase.transaction.TransactionException;
 import org.infogrid.util.logging.Log;
 import org.junit.After;
 import org.junit.Before;
@@ -53,21 +51,16 @@ public class XprisoTest15
 
         NetMeshObject [] instantiated = new NetMeshObject[ otherMbs.length ];
         for( int i=0 ; i<otherMbs.length ; ++i ) {
-            instantiated[i] = otherMbs[i].executeNow( new TransactionAction<NetMeshObject>() {
-                    public NetMeshObject execute()
-                        throws
-                            MeshObjectGraphModificationException,
-                            TransactionException,
-                            TransactionActionException
-                    {
+            MeshBase otherMb = otherMbs[i];
+            instantiated[i] = otherMbs[i].executeNow(
+                    t -> {
                         try {
-                            return (NetMeshObject) life.createMeshObject( idFact.fromExternalForm( "#obj" ));
+                            return (NetMeshObject) otherMb.createMeshObject( otherMb.fromExternalForm( "#obj" ));
 
                         } catch( ParseException ex ) {
                             throw new TransactionActionException.Error( ex );
                         }
-                    }
-            });
+                    });
         }
 
         //
@@ -113,20 +106,20 @@ public class XprisoTest15
             Exception
     {
         super.setup();
-        
+
         net1 = theMeshBaseIdentifierFactory.fromExternalForm( "test://one.local" );
 
         MPingPongNetMessageEndpointFactory endpointFactory = MPingPongNetMessageEndpointFactory.create( 1000L, PINGPONG_ROUNDTRIP_DURATION/2, 500L, 10000L, 0.f, exec );
         endpointFactory.setNameServer( theNameServer );
 
         mb1 = NetMMeshBase.create( net1, theModelBase, null, endpointFactory, rootContext );
-        
+
         theNameServer.put( mb1.getIdentifier(), mb1 );
 
         if( log.isInfoEnabled() ) {
             mb1.setXprisoMessageLogger( LogXprisoMessageLogger.create( log ));
         }
-        
+
         for( int i=0 ; i<otherMbs.length ; ++i ) {
             NetMeshBaseIdentifier currentId = theMeshBaseIdentifierFactory.fromExternalForm( "test://" + i + ".local" );
             otherMbs[i] = NetMMeshBase.create( currentId, theModelBase, null, endpointFactory, rootContext );
@@ -146,7 +139,7 @@ public class XprisoTest15
     public void cleanup()
     {
         mb1.die();
-        
+
         if( otherMbs != null ) {
             for( int i=0 ; i<otherMbs.length ; ++i ) {
                 if( otherMbs[i] != null ) {

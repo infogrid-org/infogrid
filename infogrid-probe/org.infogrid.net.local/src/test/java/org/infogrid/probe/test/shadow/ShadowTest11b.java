@@ -19,7 +19,7 @@ import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.transaction.ChangeSet;
-import org.infogrid.meshbase.transaction.TransactionAction;
+import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.probe.WritableProbe;
@@ -56,12 +56,9 @@ public class ShadowTest11b
 
         log.info( "Deleting relationship and checking it's unrelated immediately after" );
 
-        base.executeNow( new TransactionAction<Void>() {
-                public Void execute() throws Throwable
-                {
-                    writableHome.unrelate( writableNeighbor );
-                    return null;
-                }
+        base.executeNow( (Transaction tx ) -> {
+                writableHome.unrelate( writableNeighbor );
+                return null;
         });
         checkCondition( !writableHome.isRelated( writableNeighbor), "Still related" );
 
@@ -92,7 +89,7 @@ public class ShadowTest11b
 
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @Before

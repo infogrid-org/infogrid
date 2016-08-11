@@ -16,8 +16,8 @@ package org.infogrid.probe;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.net.NetMeshObject;
-import org.infogrid.meshbase.net.IterableNetMeshBaseDifferencer;
 import org.infogrid.meshbase.net.NetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBaseDifferencer;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.transaction.ForwardReferenceCreatedEvent;
 import org.infogrid.meshbase.net.transaction.NetMeshObjectCreatedEvent;
@@ -28,7 +28,7 @@ import org.infogrid.probe.shadow.ShadowMeshBase;
  */
 public class ProbeDifferencer
         extends
-            IterableNetMeshBaseDifferencer
+            NetMeshBaseDifferencer
 {
     /**
      * Constructor.

@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -16,7 +16,6 @@ package org.infogrid.kernel.net.test.xpriso;
 
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.net.NetMeshObject;
-import org.infogrid.meshbase.net.IterableNetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseLifecycleManager;
@@ -26,7 +25,7 @@ import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
-import org.infogrid.meshbase.net.sweeper.DefaultNetIterableSweeper;
+import org.infogrid.meshbase.net.sweeper.DefaultNetSweeper;
 import org.infogrid.util.logging.Log;
 import org.junit.After;
 import org.junit.Before;
@@ -54,10 +53,10 @@ public class XprisoTest9
             Exception
     {
         UnnecessaryReplicasSweepPolicy sweepPolicy2 = UnnecessaryReplicasSweepPolicy.create( 0L );
-        mb2.setSweeper( DefaultNetIterableSweeper.create( mb2, sweepPolicy2 ));
+        mb2.setSweeper( DefaultNetSweeper.create( mb2, sweepPolicy2 ));
 
         //
-        
+
         log.info( "Setting up objects in mb1" );
 
         Transaction tx = mb1.createTransactionAsap();
@@ -82,10 +81,10 @@ public class XprisoTest9
 
         checkTypesReplication(      obj1_mb1, obj1_mb2, "accessLocally() types replication didn't work" );
         checkPropertiesReplication( obj1_mb1, obj1_mb2, "accessLocally() properties replication didn't work" );
-        
+
         checkEquals( obj1_mb1.getAllProxies().length, 1, "Wrong number of Proxies on obj1_mb1" );
         checkEquals( obj1_mb2.getAllProxies().length, 1, "Wrong number of Proxies on obj1_mb2" );
-        
+
         checkProxies( obj1_mb1, new NetMeshBase[] { mb2 }, null, null, "obj1_mb1 has wrong proxies" );
         checkProxies( obj1_mb2, new NetMeshBase[] { mb1 },  mb1,  mb1, "obj1_mb2 has wrong proxies" );
 
@@ -96,12 +95,12 @@ public class XprisoTest9
         tx = mb2.createTransactionAsap();
         boolean lockAcquired = obj1_mb2.tryToObtainLock();
         checkCondition( lockAcquired, "failed acquiring the lock" );
-        
+
         tx.commitTransaction();
 
         checkCondition(  obj1_mb2.hasLock(), "does not have lock" );
         checkCondition( !obj1_mb1.hasLock(), "has lock" );
-        
+
         //
 
         log.info( "counting objects, sweeping, and counting again in mb2" );
@@ -113,7 +112,7 @@ public class XprisoTest9
         mb2.getSweeper().sweepAllNow();
 
         Thread.sleep( PINGPONG_ROUNDTRIP_DURATION );
-        
+
         checkEquals( mb2.size(), 1, "wrong number of objects after sweeping" );
 
         checkEquals(    obj1_mb1.getAllProxies(), null, "Wrong number of Proxies on obj1_mb1" );
@@ -133,13 +132,13 @@ public class XprisoTest9
             Exception
     {
         super.setup();
-        
+
         net1 = theMeshBaseIdentifierFactory.fromExternalForm( "test://one.local" );
         net2 = theMeshBaseIdentifierFactory.fromExternalForm( "test://two.local" );
-        
+
         MPingPongNetMessageEndpointFactory endpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
         endpointFactory.setNameServer( theNameServer );
-        
+
         mb1 = NetMMeshBase.create( net1, theModelBase, null, endpointFactory, rootContext );
         mb2 = NetMMeshBase.create( net2, theModelBase, null, endpointFactory, rootContext );
 
@@ -155,7 +154,7 @@ public class XprisoTest9
     {
         mb1.die();
         mb2.die();
-        
+
         exec.shutdown();
     }
 
@@ -172,18 +171,18 @@ public class XprisoTest9
     /**
      * The first NetMeshBase.
      */
-    protected IterableNetMeshBase mb1;
+    protected NetMeshBase mb1;
 
     /**
      * The second NetMeshBase.
      */
-    protected IterableNetMeshBase mb2;
+    protected NetMeshBase mb2;
 
     /**
      * Our ThreadPool.
      */
     protected ScheduledExecutorService exec = createThreadPool( 2 ); // I think we need three
-        
+
     // Our Logger
     private static Log log = Log.getLogInstance( XprisoTest9.class );
 }

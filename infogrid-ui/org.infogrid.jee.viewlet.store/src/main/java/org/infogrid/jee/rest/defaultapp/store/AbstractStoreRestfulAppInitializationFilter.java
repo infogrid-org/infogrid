@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -30,10 +30,10 @@ import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.MeshBaseIdentifierFactory;
 import org.infogrid.meshbase.m.MMeshBaseNameServer;
 import org.infogrid.meshbase.security.AccessManager;
-import org.infogrid.meshbase.store.IterableStoreMeshBase;
+import org.infogrid.meshbase.store.StoreMeshBase;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
-import org.infogrid.store.IterableStore;
+import org.infogrid.store.Store;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.text.StringRepresentationDirectory;
@@ -55,7 +55,7 @@ public abstract class AbstractStoreRestfulAppInitializationFilter
 
     /**
      * <p>Perform initialization.</p>
-     * 
+     *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
      * @throws Throwable something bad happened that cannot be fixed by re-invoking this method
@@ -68,7 +68,7 @@ public abstract class AbstractStoreRestfulAppInitializationFilter
     {
         HttpServletRequest realRequest = (HttpServletRequest) request;
         SaneRequest        saneRequest = SaneServletRequest.create( realRequest );
-        
+
         InfoGridWebApp app        = getInfoGridWebApp();
         Context        appContext = app.getApplicationContext();
 
@@ -128,7 +128,7 @@ public abstract class AbstractStoreRestfulAppInitializationFilter
             IOException,
             AppInitializationException
     {
-        IterableStoreMeshBase meshBase = null;
+        StoreMeshBase meshBase = null;
 
         try {
             initializeDataSources();
@@ -138,7 +138,7 @@ public abstract class AbstractStoreRestfulAppInitializationFilter
             if( theMeshStore != null ) {
                 AccessManager accessMgr = createAccessManager();
 
-                meshBase = IterableStoreMeshBase.create( mbId, modelBase, accessMgr, theMeshStore, app.getApplicationContext() );
+                meshBase = StoreMeshBase.create( mbId, modelBase, accessMgr, theMeshStore, app.getApplicationContext() );
                 populateMeshBase( saneRequest, meshBase );
             }
         }
@@ -194,5 +194,5 @@ public abstract class AbstractStoreRestfulAppInitializationFilter
     /**
      * The Store for MeshObjects. This must be set by a subclass.
      */
-    protected IterableStore theMeshStore;
+    protected Store theMeshStore;
 }

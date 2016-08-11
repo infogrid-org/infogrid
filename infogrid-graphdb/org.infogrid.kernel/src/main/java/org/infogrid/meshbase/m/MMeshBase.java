@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -23,7 +23,7 @@ import org.infogrid.mesh.set.m.ImmutableMMeshObjectSetFactory;
 import org.infogrid.meshbase.DefaultMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.MeshBaseIdentifier;
 import org.infogrid.meshbase.MeshObjectIdentifierFactory;
-import org.infogrid.meshbase.a.AIterableMeshBase;
+import org.infogrid.meshbase.a.AMeshBase;
 import org.infogrid.meshbase.a.AMeshBaseLifecycleManager;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.modelbase.ModelBase;
@@ -42,7 +42,7 @@ import org.infogrid.util.text.StringRepresentationParseException;
   */
 public class MMeshBase
         extends
-            AIterableMeshBase
+            AMeshBase
 {
     private static final Log log = Log.getLogInstance( MMeshBase.class ); // our own, private logger
 
@@ -157,10 +157,9 @@ public class MMeshBase
         super( identifier, identifierFactory, setFactory, modelBase, life, accessMgr, cache, context );
     }
 
-
     /**
      * Returns a CursorIterator over the content of this MeshBase.
-     * 
+     *
      * @return a CursorIterator.
      */
     @Override

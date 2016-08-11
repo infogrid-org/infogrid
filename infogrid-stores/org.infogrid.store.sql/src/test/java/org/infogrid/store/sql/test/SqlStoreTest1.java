@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -16,8 +16,8 @@ package org.infogrid.store.sql.test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import org.infogrid.store.IterableStoreCursor;
 import org.infogrid.store.Store;
+import org.infogrid.store.StoreCursor;
 import org.infogrid.store.StoreKeyDoesNotExistException;
 import org.infogrid.store.StoreListener;
 import org.infogrid.store.StoreValue;
@@ -39,21 +39,22 @@ public abstract class SqlStoreTest1
      * @throws Exception thrown if an Exception occurred during the test
      */
     @Test
+    @Override
     public void run()
         throws
             Exception
     {
         //
-        
+
         log.info( "Deleting old database and creating new database" );
-        
+
         theSqlStore.initializeHard();
 
         MyListener listener = new MyListener();
         theTestStore.addDirectStoreListener( listener );
 
         //
-        
+
         log.info( "Inserting data and checking it's there" );
 
         for( int i=0 ; i<firstSet.length ; ++i ) {
@@ -94,11 +95,11 @@ public abstract class SqlStoreTest1
         listener.reset();
 
         //
-        
+
         log.info( "Iterating over what's in the Store" );
-        
+
         int count = 0;
-        IterableStoreCursor iter = theTestStore.iterator();
+        StoreCursor iter = theTestStore.iterator();
         while( iter.hasNext() ) {
             StoreValue current = iter.next();
 
@@ -118,7 +119,7 @@ public abstract class SqlStoreTest1
         checkEquals( count, firstSet.length, "wrong length of set" );
 
         //
-        
+
         log.info( "Updating data and checking it's there" );
 
         for( int i=0 ; i<secondSet.length ; ++i ) {
@@ -160,7 +161,7 @@ public abstract class SqlStoreTest1
         listener.reset();
 
         //
-        
+
         log.info( "Deleting some data and checking it's gone" );
 
         for( int i=0 ; i<thirdSet.length ; ++i ) {
@@ -179,7 +180,7 @@ public abstract class SqlStoreTest1
             TestData current = thirdSet[i];
             try {
                 theTestStore.get( current.theKey );
-                
+
                 reportError( "delete was unsuccessful", current );
 
             } catch( StoreKeyDoesNotExistException ex ) {
@@ -196,7 +197,7 @@ public abstract class SqlStoreTest1
 
     // Our Logger
     private static Log log = Log.getLogInstance( SqlStoreTest1.class);
-    
+
     /**
      * Test data.
      */
@@ -260,7 +261,7 @@ public abstract class SqlStoreTest1
         long    theTimeExpires;
         byte [] theData;
     }
-    
+
     /**
      * Test listener.
      */
@@ -349,7 +350,7 @@ public abstract class SqlStoreTest1
         {
             // no op
         }
-        
+
         /**
          * Reset the listener.
          */

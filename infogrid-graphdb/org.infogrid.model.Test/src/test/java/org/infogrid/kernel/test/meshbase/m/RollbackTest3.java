@@ -16,7 +16,7 @@ package org.infogrid.kernel.test.meshbase.m;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
-import org.infogrid.meshbase.IterableMeshBase;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshObjectIdentifierFactory;
 import org.infogrid.meshbase.m.MMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
@@ -44,7 +44,7 @@ public class RollbackTest3
         throws
             Exception
     {
-        IterableMeshBase            theMeshBase = MMeshBase.create( theMeshBaseIdentifierFactory.fromExternalForm( "MeshBase"), theModelBase, null, rootContext );
+        MeshBase                    theMeshBase = MMeshBase.create( theMeshBaseIdentifierFactory.fromExternalForm( "MeshBase"), theModelBase, null, rootContext );
         MeshObjectIdentifierFactory idFact      = theMeshBase.getMeshObjectIdentifierFactory();
 
         final MeshObjectIdentifier fixed1Id   = idFact.fromExternalForm( "fixed1" );

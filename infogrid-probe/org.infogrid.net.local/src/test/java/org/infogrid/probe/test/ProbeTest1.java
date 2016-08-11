@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -22,8 +22,8 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.IterableMeshBase;
-import org.infogrid.meshbase.IterableMeshBaseDifferencer;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseDifferencer;
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
 import org.infogrid.meshbase.m.MMeshBase;
 import org.infogrid.meshbase.net.CoherenceSpecification;
@@ -56,7 +56,7 @@ public class ProbeTest1
 {
     /**
      * Test parameters.
-     * 
+     *
      * @return test parameters
      */
     @Parameterized.Parameters
@@ -80,7 +80,7 @@ public class ProbeTest1
             Exception
     {
         log.info( "accessing test file with meshBase" );
-        
+
         ShadowMeshBase meshBase1 = theProbeManager1.obtainFor( testFile1Id, CoherenceSpecification.ONE_TIME_ONLY );
 
         checkObject( meshBase1, "could not find meshBase1" );
@@ -90,8 +90,8 @@ public class ProbeTest1
         //
 
         log.info( "creating the same data independently" );
-        
-        IterableMeshBase meshBase2 = MMeshBase.create(
+
+        MeshBase meshBase2 = MMeshBase.create(
                 theMeshBaseIdentifierFactory.fromExternalForm( PROTOCOL_NAME + "://meshBase2" ),
                 theModelBase,
                 null,
@@ -99,7 +99,7 @@ public class ProbeTest1
         MeshBaseLifecycleManager life2 = meshBase2.getMeshBaseLifecycleManager();
 
         Transaction tx2 = meshBase2.createTransactionNow();
-        
+
         Calendar cal = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ));
 
         cal.set( 2007, 1-1, 2, 3, 4, 5 ); // month is -1
@@ -119,7 +119,7 @@ public class ProbeTest1
         cal.set( Calendar.YEAR, 2009 );
         cal.set( Calendar.MILLISECOND, 191 );
         long ts5 = cal.getTimeInMillis();
-        
+
         MeshObject objAbc = life2.createMeshObject(
                 meshBase2.getMeshObjectIdentifierFactory().fromExternalForm( testFile1Id.getCanonicalForm() + "#abc" ),
                 ts1, ts1, ts1, -1L );
@@ -143,7 +143,7 @@ public class ProbeTest1
 
         log.info( "diff'ing meshBase1 and meshBase3" );
 
-        IterableMeshBaseDifferencer diff = new IterableMeshBaseDifferencer( meshBase1 );
+        MeshBaseDifferencer diff = new MeshBaseDifferencer( meshBase1 );
         ChangeSet changes = diff.determineChangeSet( meshBase2 );
 
         checkEquals( changes.size(), 2, "more than two changes (2 Home Objects)" );
@@ -165,7 +165,7 @@ public class ProbeTest1
     {
         testFile1Id = theMeshBaseIdentifierFactory.obtain( new File( testFile1 ) );
     }
-    
+
     /**
      * Setup.
      */
@@ -182,7 +182,7 @@ public class ProbeTest1
                 shadowEndpointFactory,
                 theModelBase,
                 rootContext );
-        
+
         theProbeManager1 = MPassiveProbeManager.create( theShadowFactory, theProbeDirectory );
         shadowEndpointFactory.setNameServer( theProbeManager1.getNetMeshBaseNameServer() );
         theShadowFactory.setProbeManager( theProbeManager1 );
@@ -213,7 +213,7 @@ public class ProbeTest1
      * The NetworkIdentifer of the first test file.
      */
     protected NetMeshBaseIdentifier testFile1Id;
-    
+
     /**
      * The ProbeManager that we use for the first Probe.
      */

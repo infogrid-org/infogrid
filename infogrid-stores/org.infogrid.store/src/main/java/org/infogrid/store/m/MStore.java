@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -19,8 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
-import org.infogrid.store.AbstractIterableStore;
-import org.infogrid.store.IterableStoreCursor;
+import org.infogrid.store.AbstractStore;
 import org.infogrid.store.StoreKeyDoesNotExistException;
 import org.infogrid.store.StoreKeyExistsAlreadyException;
 import org.infogrid.store.StoreValue;
@@ -30,6 +29,7 @@ import org.infogrid.util.MapCursorIterator;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
+import org.infogrid.store.StoreCursor;
 
 /**
  * A "fake" Store implementation that keeps the {@link org.infogrid.store.Store} content in memory only.
@@ -38,12 +38,12 @@ import org.infogrid.util.logging.Log;
  */
 public class MStore
         extends
-            AbstractIterableStore
+            AbstractStore
         implements
             CanBeDumped
 {
     private static final Log log = Log.getLogInstance( MStore.class ); // our own, private logger
-    
+
     /**
      * Factory method.
      *
@@ -64,23 +64,25 @@ public class MStore
     /**
      * Initialize the Store. If the Store was initialized earlier, this will delete all
      * contained information. This operation is similar to unconditionally formatting a hard drive.
-     * 
+     *
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void initializeHard()
             throws
                 IOException
     {
         theDelegate.clear();
     }
-    
+
     /**
      * Initialize the Store if needed. If the Store was initialized earlier, this will do
      * nothing. This operation is equivalent to {@link #initializeHard} if and only if
      * the Store had not been initialized earlier.
-     * 
+     *
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void initializeIfNecessary()
             throws
                 IOException
@@ -136,6 +138,7 @@ public class MStore
      * @see #update if a data element with this key exists already
      * @see #putOrUpdate if a data element with this key may exist already
      */
+    @Override
     public synchronized void put(
             StoreValue toStore )
         throws
@@ -205,6 +208,7 @@ public class MStore
      * @see #put if a data element with this key does not exist already
      * @see #putOrUpdate if a data element with this key may exist already
      */
+    @Override
     public synchronized void update(
             StoreValue toUpdate )
         throws
@@ -225,7 +229,7 @@ public class MStore
             fireUpdatePerformed( toUpdate );
         }
     }
-    
+
     /**
      * Put (if does not exist already) or update (if it does exist) a data element in the Store.
      *
@@ -271,6 +275,7 @@ public class MStore
      * @see #put if a data element with this key does not exist already
      * @see #update if a data element with this key exists already
      */
+    @Override
     public synchronized boolean putOrUpdate(
             StoreValue toStoreOrUpdate )
         throws
@@ -281,7 +286,7 @@ public class MStore
         }
 
         StoreValue already = theDelegate.put( toStoreOrUpdate.getKey(), toStoreOrUpdate );
-        
+
         if( already != null ) {
             fireUpdatePerformed( toStoreOrUpdate );
             return true;
@@ -302,6 +307,7 @@ public class MStore
      *
      * @see #put to initially store a data element
      */
+    @Override
     public synchronized StoreValue get(
             String key )
         throws
@@ -320,7 +326,7 @@ public class MStore
         } else {
             fireGetFailed( key );
         }
-        
+
         if( ret == null ) {
             throw new StoreKeyDoesNotExistException( this, key );
         }
@@ -334,6 +340,7 @@ public class MStore
      * @throws StoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void delete(
             String key )
         throws
@@ -380,6 +387,7 @@ public class MStore
      * @param startsWith the String the key starts with
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public synchronized void deleteAll(
             String startsWith )
         throws
@@ -403,7 +411,8 @@ public class MStore
      *
      * @return the CursorIterable
      */
-    public synchronized IterableStoreCursor iterator()
+    @Override
+    public synchronized StoreCursor iterator()
     {
         return MyIterableStoreCursor.create( theDelegate );
     }
@@ -414,6 +423,7 @@ public class MStore
      * @param startsWith the String the key starts with
      * @return the number of StoreValues in this Store whose key starts with this String
      */
+    @Override
     public synchronized int size(
             String startsWith )
     {
@@ -431,6 +441,7 @@ public class MStore
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {
@@ -446,8 +457,8 @@ public class MStore
     /**
      * The in-memory storage.
      */
-    protected HashMap<String,StoreValue> theDelegate = new HashMap<String,StoreValue>();
-    
+    protected HashMap<String,StoreValue> theDelegate = new HashMap<>();
+
     /**
      * Cursor implementation for this class.
      */
@@ -455,11 +466,11 @@ public class MStore
             extends
                 MapCursorIterator.Values<String,StoreValue>
            implements
-                IterableStoreCursor
+                StoreCursor
     {
         /**
          * Factory method.
-         * 
+         *
          * @param delegate the HashMap that stores the content
          * @return the IterableStoreCursor
          */
@@ -475,7 +486,7 @@ public class MStore
 
         /**
          * Constructor.
-         * 
+         *
          * @param delegate the HashMap that stores the content
          * @param entries the entries in the HashMap, in a sequence
          * @param delegateIter the delegate iterator over the entries in a sequence
@@ -496,6 +507,7 @@ public class MStore
          * @return the number of steps that were taken to move. Positive number means forward, negative backward
          * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
          */
+        @Override
         public int moveToBefore(
                 String key )
             throws
@@ -512,7 +524,7 @@ public class MStore
                     return newPos - oldPos;
                 }
             }
-            throw new NoSuchElementException( "No such element: " + key ); 
+            throw new NoSuchElementException( "No such element: " + key );
         }
 
         /**
@@ -523,6 +535,7 @@ public class MStore
          * @return the number of steps that were taken to move. Positive number means forward, negative backward
          * @throws NoSuchElementException thrown if this element is not actually part of the collection to iterate over
          */
+        @Override
         public int moveToAfter(
                 String key )
             throws
@@ -539,7 +552,7 @@ public class MStore
                     return newPos - oldPos;
                 }
             }
-            throw new NoSuchElementException( "No such element: " + key ); 
+            throw new NoSuchElementException( "No such element: " + key );
         }
 
         /**

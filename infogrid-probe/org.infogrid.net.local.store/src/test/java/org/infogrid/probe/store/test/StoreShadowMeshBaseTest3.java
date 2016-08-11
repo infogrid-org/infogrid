@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -30,7 +30,7 @@ import org.infogrid.meshbase.net.proxy.m.MPingPongNetMessageEndpointFactory;
 import org.infogrid.probe.manager.store.StoreScheduledExecutorProbeManager;
 import org.infogrid.probe.shadow.ShadowMeshBase;
 import org.infogrid.probe.shadow.store.StoreShadowMeshBaseFactory;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.logging.Log;
 import org.junit.After;
@@ -50,7 +50,7 @@ public class StoreShadowMeshBaseTest3
 {
     /**
      * Test parameters.
-     * 
+     *
      * @return test parameters
      */
     @Parameterized.Parameters
@@ -80,55 +80,55 @@ public class StoreShadowMeshBaseTest3
         //
 
         log.info( "accessing test file with meshBase" );
-        
+
         ShadowMeshBase meshBase1 = theProbeManager1.obtainFor(theTestFile0Id, CoherenceSpecification.ONE_TIME_ONLY );
         checkObject( meshBase1, "MeshBase1 not created" );
-        
+
         MeshObject home1 = meshBase1.getHomeObject();
         checkObject( home1, "no home object found" );
         checkCondition( home1.isBlessedBy( TestSubjectArea.AA ), "Home object not blessed" );
         checkEquals( home1.getPropertyValue( ProbeSubjectArea.PROBEUPDATESPECIFICATION_PROBERUNCOUNTER ), IntegerValue.create( 1 ), "Wrong number of probe runs" );
-        
+
         MeshObject other1 = home1.traverseToNeighborMeshObjects().getSingleMember();
         checkObject( other1, "no other object found" );
         checkCondition( other1.isBlessedBy( TestSubjectArea.B ), "Other object not blessed" );
 
         //
-        
+
         log.info( "Checking that Shadow goes away when not referenced" );
 
-        WeakReference<ShadowMeshBase> meshBase1Ref = new WeakReference<ShadowMeshBase>( meshBase1 );
+        WeakReference<ShadowMeshBase> meshBase1Ref = new WeakReference<>( meshBase1 );
         meshBase1 = null;
         home1     = null;
         other1    = null;
-        
+
         sleepUntilIsGone( meshBase1Ref, 12000L, "ShadowMeshBase still here, should have been garbage collected" );
-        
+
         //
-        
+
         log.info( "updating file and recreating MeshBase" );
 
         copyFile(theTestFile2, theTestFile0 );
-        
+
         ShadowMeshBase meshBase2 = theProbeManager1.obtainFor(theTestFile0Id, CoherenceSpecification.ONE_TIME_ONLY );
         meshBase2.doUpdateNow();
 
         //
-        
+
         log.info( "Check that changes have propagated" );
-        
+
         MeshObject home2 = meshBase2.getHomeObject();
         checkObject( home2, "no home object found" );
         checkCondition( home2.isBlessedBy( TestSubjectArea.B ), "Home object not blessed" );
         checkEquals( home2.getPropertyValue( ProbeSubjectArea.PROBEUPDATESPECIFICATION_PROBERUNCOUNTER ), IntegerValue.create( 2 ), "Wrong number of probe runs" );
-        
+
         MeshObjectSet others2 = home2.traverseToNeighborMeshObjects();
         checkEquals( others2.size(), 2, "wrong number of neighbors found" );
     }
 
     /**
      * Constructor with parameters.
-     * 
+     *
      * @param testFile0 filename of test
      * @param testFile1 filename of test
      * @param testFile2 filename of test
@@ -140,12 +140,12 @@ public class StoreShadowMeshBaseTest3
     {
         theTestFile0 = testFile0;
         theTestFile1 = testFile1;
-        theTestFile2 = testFile2;        
+        theTestFile2 = testFile2;
     }
 
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @Before
@@ -161,18 +161,18 @@ public class StoreShadowMeshBaseTest3
         theTestFile2Id    = theMeshBaseIdentifierFactory.obtain( new File( theTestFile2 ) );
 
         //
-        
+
         log.info( "Deleting old database and creating new database" );
 
         theSqlStore.initializeHard();
 
-        IterablePrefixingStore theShadowStore      = IterablePrefixingStore.create( "Shadow",      theSqlStore );
-        IterablePrefixingStore theShadowProxyStore = IterablePrefixingStore.create( "ShadowProxy", theSqlStore );
-        
-        // 
+        PrefixingStore theShadowStore      = PrefixingStore.create( "Shadow",      theSqlStore );
+        PrefixingStore theShadowProxyStore = PrefixingStore.create( "ShadowProxy", theSqlStore );
+
+        //
 
         exec = createThreadPool( 1 );
-        
+
         MPingPongNetMessageEndpointFactory shadowEndpointFactory = MPingPongNetMessageEndpointFactory.create( exec );
 
         StoreShadowMeshBaseFactory shadowFactory = StoreShadowMeshBaseFactory.create(
@@ -204,7 +204,7 @@ public class StoreShadowMeshBaseTest3
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( StoreShadowMeshBaseTest3.class);
+    private static final Log log = Log.getLogInstance( StoreShadowMeshBaseTest3.class);
 
     /**
      * Our ThreadPool.
@@ -230,7 +230,7 @@ public class StoreShadowMeshBaseTest3
      * The NetworkIdentifer of the test file in the read position.
      */
     protected NetMeshBaseIdentifier theTestFile0Id;
-    
+
     /**
      * The NetworkIdentifer of the first test file.
      */

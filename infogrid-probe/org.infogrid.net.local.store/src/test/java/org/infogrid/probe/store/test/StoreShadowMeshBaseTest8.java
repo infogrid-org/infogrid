@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -26,11 +26,10 @@ import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.DefaultNetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
-import org.infogrid.meshbase.net.local.store.IterableLocalNetStoreMeshBase;
 import org.infogrid.meshbase.net.local.store.LocalNetStoreMeshBase;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.probe.shadow.ShadowMeshBase;
-import org.infogrid.store.prefixing.IterablePrefixingStore;
+import org.infogrid.store.prefixing.PrefixingStore;
 import org.infogrid.testharness.AbstractTest;
 import org.infogrid.util.logging.Log;
 import org.junit.After;
@@ -49,7 +48,7 @@ public class StoreShadowMeshBaseTest8
 {
     /**
      * Test parameters.
-     * 
+     *
      * @return test parameters
      */
     @Parameterized.Parameters
@@ -77,21 +76,21 @@ public class StoreShadowMeshBaseTest8
         copyFile(theTestFile1a, theTestFile1 );
 
         //
-        
+
         log.info( "Creating Stores" );
 
-        IterablePrefixingStore theMeshStore        = IterablePrefixingStore.create( "Mesh",        theSqlStore );
-        IterablePrefixingStore theProxyStore       = IterablePrefixingStore.create( "Proxy",       theSqlStore );
-        IterablePrefixingStore theShadowStore      = IterablePrefixingStore.create( "Shadow",      theSqlStore );
-        IterablePrefixingStore theShadowProxyStore = IterablePrefixingStore.create( "ShadowProxy", theSqlStore );
-        
+        PrefixingStore theMeshStore        = PrefixingStore.create( "Mesh",        theSqlStore );
+        PrefixingStore theProxyStore       = PrefixingStore.create( "Proxy",       theSqlStore );
+        PrefixingStore theShadowStore      = PrefixingStore.create( "Shadow",      theSqlStore );
+        PrefixingStore theShadowProxyStore = PrefixingStore.create( "ShadowProxy", theSqlStore );
+
         //
-        
+
         log.info( "Creating MeshBase" );
-        
+
         NetMeshBaseIdentifier baseIdentifier = theMeshBaseIdentifierFactory.fromExternalForm( "http://here.local/" );
-        
-        IterableLocalNetStoreMeshBase base = IterableLocalNetStoreMeshBase.create(
+
+        LocalNetStoreMeshBase base = LocalNetStoreMeshBase.create(
                 baseIdentifier,
                 DefaultNetMeshObjectAccessSpecificationFactory.create(
                         baseIdentifier,
@@ -106,21 +105,21 @@ public class StoreShadowMeshBaseTest8
                 exec,
                 true,
                 rootContext );
-        
+
         checkEquals( base.getShadowMeshBases().size(), 0, "Wrong number of shadows" );
-        
+
         //
-        
+
         log.info( "Doing AccessLocally" );
-        
+
         NetMeshObject found = base.accessLocally(theTestFile1Id, new CoherenceSpecification.Periodic( 4000L ));
-        
+
         checkObject( found, "Object not found" );
         checkCondition( !found.isBlessedBy( TestSubjectArea.AA ), "Not blessed correctly" );
 
         checkEquals( base.getShadowMeshBases().size(), 1, "Wrong number of shadows" );
 
-        
+
         ShadowMeshBase shadow = base.getShadowMeshBaseFor( found.getProxyTowardsHomeReplica().getPartnerMeshBaseIdentifier() );
         checkObject( shadow, "Shadow not found" );
 
@@ -133,13 +132,13 @@ public class StoreShadowMeshBaseTest8
         checkProxies( foundInShadow, new NetMeshBase[] { base },   null,   null,   "Wrong proxies in shadow" );
 
         //
-        
+
         log.info( "Shutting down the MeshBase" );
 
-        WeakReference<LocalNetStoreMeshBase> baseRef          = new WeakReference<LocalNetStoreMeshBase>( base );
-        WeakReference<MeshObject>            foundRef         = new WeakReference<MeshObject>( found );
-        WeakReference<MeshBase>              shadowRef        = new WeakReference<MeshBase>( shadow );
-        WeakReference<MeshObject>            foundInShadowRef = new WeakReference<MeshObject>( foundInShadow );
+        WeakReference<LocalNetStoreMeshBase> baseRef          = new WeakReference<>( base );
+        WeakReference<MeshObject>            foundRef         = new WeakReference<>( found );
+        WeakReference<MeshBase>              shadowRef        = new WeakReference<>( shadow );
+        WeakReference<MeshObject>            foundInShadowRef = new WeakReference<>( foundInShadow );
 
         found         = null;
         shadow        = null;
@@ -153,10 +152,10 @@ public class StoreShadowMeshBaseTest8
         sleepUntilIsGone( shadowRef,         1000L, "Shadow still here, should have been garbage collected" );
 
         //
-        
+
         log.info( "Re-creating Meshbase" );
 
-        IterableLocalNetStoreMeshBase base2 = IterableLocalNetStoreMeshBase.create(
+        LocalNetStoreMeshBase base2 = LocalNetStoreMeshBase.create(
                 baseIdentifier,
                 DefaultNetMeshObjectAccessSpecificationFactory.create(
                         baseIdentifier,
@@ -171,10 +170,10 @@ public class StoreShadowMeshBaseTest8
                 exec,
                 true,
                 rootContext );
-        
+
         checkEquals( base2.size(), 2, "Wrong number of MeshObjects found in recreated MeshBase" );
         checkEquals( base2.getShadowMeshBases().size(), 1, "Wrong number of shadows" );
-        
+
         NetMeshObject found2 = base2.findMeshObjectByIdentifier( base2.getMeshObjectIdentifierFactory().fromExternalForm( foundIdentifier ));
         checkObject( found2, "Object not found" );
         checkCondition( !found2.isBlessedBy( TestSubjectArea.AA ), "Not blessed correctly" );
@@ -188,15 +187,15 @@ public class StoreShadowMeshBaseTest8
 
         checkProxies( found2,         new NetMeshBase[] { shadow2 }, shadow2, shadow2, "Wrong proxies in main NetMeshBase" );
         checkProxies( foundInShadow2, new NetMeshBase[] { base2 },   null,    null,    "Wrong proxies in shadow" );
-        
+
         //
-        
+
         log.info( "Updating data source, waiting, and checking" );
-                
+
         copyFile(theTestFile1b, theTestFile1 );
-        
+
         Thread.sleep( 7000L );
-        
+
         checkCondition( found2.isBlessedBy(         TestSubjectArea.AA ), "Not blessed correctly" );
         checkCondition( foundInShadow2.isBlessedBy( TestSubjectArea.AA ), "Not blessed correctly in shadow" );
 
@@ -205,10 +204,10 @@ public class StoreShadowMeshBaseTest8
 
     /**
      * Constructor with parameters.
-     * 
+     *
      * @param testFile1 filename of test
      * @param testFile1a filename of test
-     * @param testFile2b filename of test
+     * @param testFile1b filename of test
      */
     public StoreShadowMeshBaseTest8(
             String testFile1,
@@ -222,7 +221,7 @@ public class StoreShadowMeshBaseTest8
 
     /**
      * Setup.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @Before
@@ -238,11 +237,11 @@ public class StoreShadowMeshBaseTest8
         theTestFile1Id  = theMeshBaseIdentifierFactory.obtain( new File( theTestFile1 ) );
 
         //
-        
+
         log.info( "Deleting old database and creating new database" );
-        
+
         theSqlStore.initializeHard();
-        
+
         exec = createThreadPool( 1 );
     }
 
@@ -257,7 +256,7 @@ public class StoreShadowMeshBaseTest8
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( StoreShadowMeshBaseTest8.class);
+    private static final Log log = Log.getLogInstance( StoreShadowMeshBaseTest8.class);
 
     /**
      * Our ThreadPool.

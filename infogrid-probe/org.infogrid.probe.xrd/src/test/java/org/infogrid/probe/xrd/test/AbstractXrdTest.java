@@ -20,7 +20,7 @@ import org.diet4j.core.ModuleRegistry;
 import org.diet4j.core.ModuleRequirement;
 import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.IterableMeshBase;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.modelbase.ModelBase;
@@ -41,7 +41,7 @@ public abstract class AbstractXrdTest
 {
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -53,10 +53,10 @@ public abstract class AbstractXrdTest
         ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
 
         registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.probe.xrd" ))).activateRecursively();
-        
+
         Log4jLog.configure( "org/infogrid/probe/xrd/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/probe/xrd/test/ResourceHelper",
                 Locale.getDefault(),
@@ -74,9 +74,9 @@ public abstract class AbstractXrdTest
      * @throws Exception all sorts of things may go wrong during a test
      */
     protected final void dumpMeshBase(
-            IterableMeshBase mb,
-            String           prefix,
-            Log              mylog )
+            MeshBase mb,
+            String   prefix,
+            Log      mylog )
         throws
             Exception
     {

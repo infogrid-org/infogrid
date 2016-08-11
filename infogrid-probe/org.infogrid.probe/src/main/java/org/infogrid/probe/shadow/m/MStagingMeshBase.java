@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -54,10 +54,10 @@ public class MStagingMeshBase
             StagingMeshBase
 {
     private static final Log log = Log.getLogInstance( MStagingMeshBase.class ); // our own, private logger
-    
+
     /**
      * Factory method.
-     * 
+     *
      * @param shadow the ShadowMeshBase for which this StagingMeshBase is created
      * @return the created MStagingMeshBase
      */
@@ -75,7 +75,7 @@ public class MStagingMeshBase
 
         NetMeshObjectAccessSpecificationFactory netMeshObjectAccessSpecificationFactory
                 = DefaultNetMeshObjectAccessSpecificationFactory.create( shadow.getIdentifier() );
-        MeshObjectSetFactory setFactory
+        ImmutableMMeshObjectSetFactory setFactory
                 = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
 
         AStagingMeshBaseLifecycleManager life      = AStagingMeshBaseLifecycleManager.create();
@@ -92,9 +92,10 @@ public class MStagingMeshBase
                 proxyManager,
                 shadow );
 
+        setFactory.setMeshBase( ret );
         proxyFactory.setNetMeshBase( ret );
         // do not initialize home object here: Shadows behave differently
-        
+
         if( log.isDebugEnabled() ) {
             log.debug( "created " + ret );
         }
@@ -137,15 +138,15 @@ public class MStagingMeshBase
                 placeholderProxyManager,
                 shadow.getContext() );
 
-        getMeshObjectSetFactory().setMeshBase( this );
         theShadowMeshBase = shadow;
     }
 
     /**
      * Returns a CursorIterator over the content of this MeshBase.
-     * 
+     *
      * @return a CursorIterator.
      */
+    @Override
     public CursorIterator<MeshObject> iterator()
     {
         MapCursorIterator.Values<MeshObjectIdentifier,MeshObject> ret = MapCursorIterator.createForValues(
@@ -160,15 +161,17 @@ public class MStagingMeshBase
      *
      * @return the time, in System.currentTimeMillis() format
      */
+    @Override
     public long getCurrentUpdateStartedTime()
     {
         return theShadowMeshBase.getCurrentUpdateStartedTime();
     }
-    
+
     /**
      * Allow a Proxy to tell this StagingMeshBase that it performed an operation that
      * modified data in the StagingMeshBase, and the StagingMeshBase may have to be flushed to disk.
      */
+    @Override
     public void flushMeshBase()
     {
         // no op, we are in memory only

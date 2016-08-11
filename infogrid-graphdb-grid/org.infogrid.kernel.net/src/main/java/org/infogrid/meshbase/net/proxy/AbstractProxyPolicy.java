@@ -23,7 +23,6 @@ import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
 import org.infogrid.mesh.net.externalized.ExternalizedNetMeshObject;
 import org.infogrid.meshbase.net.CoherenceSpecification;
-import org.infogrid.meshbase.net.IterableNetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshObjectAccessException;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecification;
@@ -147,24 +146,17 @@ public abstract class AbstractProxyPolicy
             ret.setCeaseCommunications( true );
 
             // FIXME, very inefficient
-            if( proxy.getNetMeshBase() instanceof IterableNetMeshBase ) {
-                IterableNetMeshBase mb = (IterableNetMeshBase) proxy.getNetMeshBase();
-                CursorIterator<MeshObject> iter = mb.iterator();
-                while( iter.hasNext()) {
-                    MeshObject [] batch = iter.next( 100 ); // more efficient
-                    for( int i=0 ; i<batch.length ; ++i ) {
-                        NetMeshObject current = (NetMeshObject) batch[i];
-                        // current should not be null, but it is if a read error occurred from Store
-                        if( current != null && current.getProxyTowardsHomeReplica() == proxy ) {
-                            ret.addToKill( current );
-                        }
+            CursorIterator<MeshObject> iter = proxy.getNetMeshBase().iterator();
+            while( iter.hasNext()) {
+                MeshObject [] batch = iter.next( 100 ); // more efficient
+                for( int i=0 ; i<batch.length ; ++i ) {
+                    NetMeshObject current = (NetMeshObject) batch[i];
+                    // current should not be null, but it is if a read error occurred from Store
+                    if( current != null && current.getProxyTowardsHomeReplica() == proxy ) {
+                        ret.addToKill( current );
                     }
                 }
-
-            } else {
-                log.warn( "Cannot clean up, not IterableNetMeshBase", proxy );
             }
-
         }
 
         return ret;

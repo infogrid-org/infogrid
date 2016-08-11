@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,7 +15,7 @@
 package org.infogrid.probe.shadow;
 
 import javax.net.ssl.HostnameVerifier;
-import org.infogrid.meshbase.net.IterableNetMeshBase;
+import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.proxy.ProxyParameters;
 import org.infogrid.meshbase.net.proxy.ProxyPolicyFactory;
@@ -33,7 +33,7 @@ import org.infogrid.util.IsDeadException;
  */
 public interface ShadowMeshBase
         extends
-            IterableNetMeshBase,
+            NetMeshBase,
             StagingMeshBase,
             FactoryCreatedObject<NetMeshBaseIdentifier,ShadowMeshBase,ProxyParameters>
 {
@@ -43,7 +43,7 @@ public interface ShadowMeshBase
      * @return the ProbeManager
      */
     public abstract ProbeManager getProbeManager();
-    
+
     /**
      * Update the HTTP mapping policy.
      *
@@ -91,7 +91,7 @@ public interface ShadowMeshBase
 
     /**
      * Determine whether at the last run, this ShadowMeshBase used a WritableProbe.
-     * 
+     *
      * @return true if at the last run, this ShadowMeshBase used a WritableProbe
      */
     public boolean usesWritableProbe();
@@ -208,7 +208,7 @@ public interface ShadowMeshBase
 
     /**
      * Obtain the same MeshBase as ExternalizedMeshBase so it can be easily serialized.
-     * 
+     *
      * @return this MeshObject as ExternalizedMeshBase
      */
     public abstract ExternalizedShadowMeshBase asExternalized();

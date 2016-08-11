@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -25,9 +25,9 @@ import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.NetMeshObjectAccessSpecificationFactory;
 import org.infogrid.meshbase.net.NetMeshObjectIdentifierFactory;
+import org.infogrid.meshbase.net.a.AnetMeshBase;
 import org.infogrid.meshbase.net.proxy.Proxy;
 import org.infogrid.meshbase.net.proxy.ProxyManager;
-import org.infogrid.meshbase.net.a.AIterableNetMeshBase;
 import org.infogrid.meshbase.net.a.AnetMeshBaseLifecycleManager;
 import org.infogrid.meshbase.net.proxy.DefaultProxyFactory;
 import org.infogrid.meshbase.net.proxy.NiceAndTrustingProxyPolicyFactory;
@@ -46,7 +46,7 @@ import org.infogrid.util.logging.Log;
  */
 public class NetMMeshBase
         extends
-            AIterableNetMeshBase
+            AnetMeshBase
 {
     private static final Log log = Log.getLogInstance(NetMMeshBase.class); // our own, private logger
 
@@ -68,7 +68,7 @@ public class NetMMeshBase
             Context                                 context )
     {
         NiceAndTrustingProxyPolicyFactory proxyPolicyFactory = NiceAndTrustingProxyPolicyFactory.create();
-        
+
         NetMMeshBase ret = create(
                 identifier,
                 modelBase,
@@ -137,7 +137,7 @@ public class NetMMeshBase
     {
         MCachingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = MCachingHashMap.create();
         MCachingHashMap<NetMeshBaseIdentifier,Proxy>     proxyStorage  = MCachingHashMap.create();
-        
+
         DefaultProxyFactory            proxyFactory = DefaultProxyFactory.create( endpointFactory, proxyPolicyFactory );
         ProxyManager                   proxyManager = ProxyManager.create( proxyFactory, proxyStorage );
         AnetMeshBaseLifecycleManager   life         = AnetMeshBaseLifecycleManager.create();
@@ -159,13 +159,13 @@ public class NetMMeshBase
         setFactory.setMeshBase( ret );
         proxyFactory.setNetMeshBase( ret );
         ret.initializeHomeObject();
-        
+
         if( log.isDebugEnabled() ) {
             log.debug( "created " + ret );
         }
         return ret;
     }
-    
+
     /**
      * Factory method.
      *
@@ -187,7 +187,7 @@ public class NetMMeshBase
     {
         MCachingHashMap<MeshObjectIdentifier,MeshObject> objectStorage = MCachingHashMap.create();
         MCachingHashMap<NetMeshBaseIdentifier,Proxy>     proxyStorage  = MCachingHashMap.create();
-        
+
         ProxyManager                   proxyManager = ProxyManager.create( proxyFactory, proxyStorage );
         AnetMeshBaseLifecycleManager   life         = AnetMeshBaseLifecycleManager.create();
         ImmutableMMeshObjectSetFactory setFactory   = ImmutableMMeshObjectSetFactory.create( NetMeshObject.class, NetMeshObjectIdentifier.class );
@@ -208,7 +208,7 @@ public class NetMMeshBase
         setFactory.setMeshBase( ret );
         proxyFactory.setNetMeshBase( ret );
         ret.initializeHomeObject();
-        
+
         if( log.isDebugEnabled() ) {
             log.debug( "created " + ret );
         }
@@ -217,7 +217,7 @@ public class NetMMeshBase
 
     /**
      * Constructor.
-     * 
+     *
      * @param identifier the NetMeshBaseIdentifier of this NetMeshBase
      * @param identifierFactory the factory for NetMeshObjectIdentifiers appropriate for this NetMeshBase
      * @param meshBaseIdentifierFactory the factory for NetMeshBaseIdentifiers

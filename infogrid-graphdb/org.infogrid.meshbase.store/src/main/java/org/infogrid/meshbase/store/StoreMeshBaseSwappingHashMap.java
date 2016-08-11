@@ -17,11 +17,9 @@ package org.infogrid.meshbase.store;
 import java.lang.ref.Reference;
 import java.util.HashSet;
 import java.util.Set;
-import org.infogrid.store.IterableStore;
-import org.infogrid.store.IterableStoreCursor;
 import org.infogrid.store.Store;
+import org.infogrid.store.StoreCursor;
 import org.infogrid.store.StoreEntryMapper;
-import org.infogrid.store.util.IterableStoreBackedSwappingHashMap;
 import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.store.util.StoreBackedSwappingHashMapKeysIterator;
 import org.infogrid.store.util.StoreBackedSwappingHashMapValuesIterator;
@@ -163,7 +161,7 @@ public class StoreMeshBaseSwappingHashMap<K,V>
         cleanup();
 
         if( theKeySet == null ) {
-            theKeySet = new IterableStoreBackedSwappingHashMap.MyKeySet<K,V>( (IterableStore) theStore, theMapper );
+            theKeySet = new StoreBackedSwappingHashMap.MyKeySet<>( theStore, theMapper );
         }
         return theKeySet;
     }
@@ -180,9 +178,9 @@ public class StoreMeshBaseSwappingHashMap<K,V>
             Class<K> keyArrayComponentType,
             Class<V> valueArrayComponentType )
     {
-        IterableStoreCursor delegate = ((IterableStore)theStore).iterator();
+        StoreCursor delegate = theStore.iterator();
 
-        CursorIterator<K> ret = new StoreBackedSwappingHashMapKeysIterator<K,V>( delegate, this, theMapper, keyArrayComponentType );
+        CursorIterator<K> ret = new StoreBackedSwappingHashMapKeysIterator<>( delegate, this, theMapper, keyArrayComponentType );
         return ret;
     }
 
@@ -198,9 +196,9 @@ public class StoreMeshBaseSwappingHashMap<K,V>
             Class<K> keyArrayComponentType,
             Class<V> valueArrayComponentType )
     {
-        IterableStoreCursor delegate = ((IterableStore)theStore).iterator();
+        StoreCursor delegate = theStore.iterator();
 
-        CursorIterator<V> ret = new StoreBackedSwappingHashMapValuesIterator<K,V>( delegate, this, theMapper, keyArrayComponentType, valueArrayComponentType );
+        CursorIterator<V> ret = new StoreBackedSwappingHashMapValuesIterator<>( delegate, this, theMapper, keyArrayComponentType, valueArrayComponentType );
         return ret;
     }
 
@@ -224,13 +222,8 @@ public class StoreMeshBaseSwappingHashMap<K,V>
     }
 
     /**
-     * Set of keys in this IterableStoreBackedSwappingHashMap.
-     */
-    protected IterableStoreBackedSwappingHashMap.MyKeySet<K,V> theKeySet;
-
-    /**
      * Keep track of MeshObjects that were removed during a Transaction, to avoid recreating them from the storage
      * although they were deleted during a transaction.
      */
-    protected HashSet<Object> theRemoved = new HashSet<Object>();
+    protected HashSet<Object> theRemoved = new HashSet<>();
 }

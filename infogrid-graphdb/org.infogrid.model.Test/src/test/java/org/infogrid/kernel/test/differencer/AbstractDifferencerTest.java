@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -25,7 +25,7 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.meshbase.DefaultMeshBaseIdentifierFactory;
-import org.infogrid.meshbase.IterableMeshBase;
+import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifierFactory;
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
 import org.infogrid.meshbase.m.MMeshBase;
@@ -58,7 +58,7 @@ public abstract class AbstractDifferencerTest
 {
     /**
      * Initialize Module Framework, and initialize statics.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in tests
      */
     @BeforeClass
@@ -73,7 +73,7 @@ public abstract class AbstractDifferencerTest
 
         Log4jLog.configure( "org/infogrid/kernel/test/differencer/Log.properties", cl  );
         Log.setLogFactory( new Log4jLogFactory());
-        
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/kernel/test/differencer/ResourceHelper",
                 Locale.getDefault(),
@@ -82,7 +82,7 @@ public abstract class AbstractDifferencerTest
         theModelBase = ModelBaseSingleton.getSingleton();
 
         SubjectArea sa = theModelBase.findSubjectArea( "org.infogrid.model.Test" );
-        
+
         EntityType typeA = theModelBase.findEntityType( sa, "A" );
         typeAA   = theModelBase.findEntityType(       sa,     "AA" );
         typeB    = theModelBase.findEntityType(       sa,     "B" );
@@ -98,7 +98,7 @@ public abstract class AbstractDifferencerTest
 
     /**
      * Set up.
-     * 
+     *
      * @throws Exception all sorts of things may go wrong in a test
      */
     @Before
@@ -117,10 +117,10 @@ public abstract class AbstractDifferencerTest
                 null,
                 rootContext );
     }
-    
+
     /**
      * Helper method to create a MeshObject.
-     * 
+     *
      * @param life the MeshBaseLifecycleManager to use
      * @param identifier the identifier for the MeshObject,
      * @param type the EntitType for the MeshObject
@@ -148,7 +148,7 @@ public abstract class AbstractDifferencerTest
 
     /**
      * Helper method to create a MeshObject.
-     * 
+     *
      * @param life the MeshBaseLifecycleManager to use
      * @param identifier the identifier for the MeshObject,
      * @param now the creation time
@@ -172,13 +172,13 @@ public abstract class AbstractDifferencerTest
 
     /**
      * Helper to print the contents of a MeshBase.
-     * 
+     *
      * @param useThis the Log to print to
      * @param theMeshBase the MeshBase to print
      */
     protected void printMeshBase(
-            Log              useThis,
-            IterableMeshBase theMeshBase )
+            Log      useThis,
+            MeshBase theMeshBase )
     {
         if( useThis.isDebugEnabled() ) {
             useThis.debug( "MeshBase content: " + theMeshBase.size() + " MeshObjects" );
@@ -193,7 +193,7 @@ public abstract class AbstractDifferencerTest
 
     /**
      * Helper to print a ChangeSet.
-     * 
+     *
      * @param useThis the Log to print to
      * @param theChangeSet the ChangeSet to print
      */
@@ -226,12 +226,12 @@ public abstract class AbstractDifferencerTest
     /**
      * The first MeshBase for the test.
      */
-    protected IterableMeshBase theMeshBase1;
+    protected MeshBase theMeshBase1;
 
     /**
      * The second MeshBase for the test.
      */
-    protected IterableMeshBase theMeshBase2;
+    protected MeshBase theMeshBase2;
 
     /**
      * The ModelBase.

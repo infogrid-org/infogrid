@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -31,17 +31,16 @@ import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseNameServer;
 import org.infogrid.meshbase.net.DefaultNetMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.net.DefaultNetMeshObjectAccessSpecificationFactory;
-import org.infogrid.meshbase.net.IterableNetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifierFactory;
-import org.infogrid.meshbase.net.local.store.IterableLocalNetStoreMeshBase;
+import org.infogrid.meshbase.net.local.store.LocalNetStoreMeshBase;
 import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.probe.ProbeDirectory;
 import org.infogrid.probe.m.MProbeDirectory;
-import org.infogrid.store.IterableStore;
+import org.infogrid.store.Store;
 import org.infogrid.util.AbstractQuitListener;
 import org.infogrid.util.NamedThreadFactory;
 import org.infogrid.util.QuitManager;
@@ -67,11 +66,12 @@ public abstract class AbstractStoreNetLocalRestfulAppInitializationFilter
 
     /**
      * <p>Perform initialization.</p>
-     * 
+     *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
      * @throws Throwable something bad happened that cannot be fixed by re-invoking this method
      */
+    @Override
     protected void initialize(
             ServletRequest  request,
             ServletResponse response )
@@ -80,7 +80,7 @@ public abstract class AbstractStoreNetLocalRestfulAppInitializationFilter
     {
         HttpServletRequest realRequest = (HttpServletRequest) request;
         SaneRequest        saneRequest = SaneServletRequest.create( realRequest );
-        
+
         InfoGridWebApp app        = getInfoGridWebApp();
         Context        appContext = app.getApplicationContext();
 
@@ -93,8 +93,8 @@ public abstract class AbstractStoreNetLocalRestfulAppInitializationFilter
         appContext.addContextObject( meshBaseIdentifierFactory );
 
         // Main MeshBase
-        NetMeshBaseIdentifier         mbId = (NetMeshBaseIdentifier) determineMainMeshBaseIdentifier( saneRequest, meshBaseIdentifierFactory );
-        IterableLocalNetStoreMeshBase mb   = null;
+        NetMeshBaseIdentifier mbId = (NetMeshBaseIdentifier) determineMainMeshBaseIdentifier( saneRequest, meshBaseIdentifierFactory );
+        LocalNetStoreMeshBase mb   = null;
 
         try {
             mb = setupMeshBase( saneRequest, mbId, modelBase, app );
@@ -109,7 +109,7 @@ public abstract class AbstractStoreNetLocalRestfulAppInitializationFilter
                 appContext.addContextObject( nameServer );
 
                 initializeContextObjects( saneRequest, appContext );
-                
+
             } else {
                 try {
                     initializeContextObjects( saneRequest, appContext );
@@ -128,8 +128,12 @@ public abstract class AbstractStoreNetLocalRestfulAppInitializationFilter
      * @param modelBase the ModelBase for the MeshBase
      * @param app the InfoGridWebApp that is being set up
      * @return the set up MeshBase
+     * @throws javax.naming.NamingException
+     * @throws java.io.IOException
+     * @throws java.net.URISyntaxException
+     * @throws org.infogrid.jee.templates.defaultapp.AppInitializationException
      */
-    protected IterableLocalNetStoreMeshBase setupMeshBase(
+    protected LocalNetStoreMeshBase setupMeshBase(
             SaneRequest           saneRequest,
             NetMeshBaseIdentifier mbId,
             ModelBase             modelBase,
@@ -140,7 +144,7 @@ public abstract class AbstractStoreNetLocalRestfulAppInitializationFilter
             URISyntaxException,
             AppInitializationException
     {
-        IterableLocalNetStoreMeshBase meshBase = null;
+        LocalNetStoreMeshBase meshBase = null;
 
         try {
             initializeDataSources();
@@ -165,7 +169,7 @@ public abstract class AbstractStoreNetLocalRestfulAppInitializationFilter
                     });
                 }
 
-                meshBase = IterableLocalNetStoreMeshBase.create(
+                meshBase = LocalNetStoreMeshBase.create(
                         mbId,
                         DefaultNetMeshObjectAccessSpecificationFactory.create(
                                 mbId,
@@ -251,7 +255,7 @@ public abstract class AbstractStoreNetLocalRestfulAppInitializationFilter
             SaneRequest incomingRequest,
             MeshBase    mb )
     {
-        populateNetMeshBase( incomingRequest, (IterableNetMeshBase) mb );
+        populateNetMeshBase( incomingRequest, (NetMeshBase) mb );
     }
 
     /**
@@ -261,8 +265,8 @@ public abstract class AbstractStoreNetLocalRestfulAppInitializationFilter
      * @param mb the NetMeshBase to initialize
      */
     protected void populateNetMeshBase(
-            SaneRequest         incomingRequest,
-            IterableNetMeshBase mb )
+            SaneRequest incomingRequest,
+            NetMeshBase mb )
     {
         // nothing on this level
     }
@@ -310,22 +314,22 @@ public abstract class AbstractStoreNetLocalRestfulAppInitializationFilter
     /**
      * The Store for MeshObjects. This must be set by a subclass.
      */
-    protected IterableStore theMeshStore;
+    protected Store theMeshStore;
 
     /**
      * The Store for Proxies. This must be set by a subclass.
      */
-    protected IterableStore theProxyStore;
+    protected Store theProxyStore;
 
     /**
      * The Store for ShadowMeshBases. This must be set by a subclass.
      */
-    protected IterableStore theShadowStore;
+    protected Store theShadowStore;
 
     /**
      * The Store for the ShadowMeshBases' Proxies. This must be set by a subclass.
      */
-    protected IterableStore theShadowProxyStore;
+    protected Store theShadowProxyStore;
 
     /**
      * Our ResourceHelper.

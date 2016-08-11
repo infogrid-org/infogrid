@@ -20,7 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.infogrid.store.AbstractIterableStore;
+import org.infogrid.store.AbstractStore;
 import org.infogrid.store.StoreKeyDoesNotExistException;
 import org.infogrid.store.StoreKeyExistsAlreadyException;
 import org.infogrid.store.StoreValue;
@@ -39,7 +39,7 @@ import org.infogrid.util.tree.TreeFacadeCursorIterator;
  */
 public class FilesystemStore
         extends
-            AbstractIterableStore
+            AbstractStore
         implements
             CanBeDumped
 {
@@ -48,7 +48,7 @@ public class FilesystemStore
     /**
      * Factory method.
      *
-     * @param subDir the subdirectory in the file system that becomes the top mapping directory. 
+     * @param subDir the subdirectory in the file system that becomes the top mapping directory.
      * @return the created FilesystemStore
      */
     public static FilesystemStore create(
@@ -91,7 +91,7 @@ public class FilesystemStore
         theSubDir           = subDir;
         theKeyMapper        = keyMapper;
         theStoreValueMapper = storeValueMapper;
-        
+
         if( log.isTraceEnabled() ) {
             log.traceMethodCallEntry( this, "constructor" );
         }
@@ -100,9 +100,10 @@ public class FilesystemStore
     /**
      * Initialize the Store. If the Store was initialized earlier, this will delete all
      * contained information. This operation is similar to unconditionally formatting a hard drive.
-     * 
+     *
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void initializeHard()
             throws
                 IOException
@@ -120,29 +121,30 @@ public class FilesystemStore
             }
         }
     }
-    
+
     /**
      * Initialize the Store if needed. If the Store was initialized earlier, this will do
      * nothing. This operation is equivalent to {@link #initializeHard} if and only if
      * the Store had not been initialized earlier.
-     * 
+     *
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void initializeIfNecessary()
             throws
                 IOException
     {
         if( !theSubDir.exists() ) {
             theSubDir.mkdirs();
-            
+
         } else if( !theSubDir.isDirectory() ) {
             throw new IOException( "Cannot initialize FilesystemStore at " + theSubDir.getAbsolutePath() + ": file is in the way" );
         }
     }
-    
+
     /**
      * Obtain the top-level directory underneath which all data is stored.
-     * 
+     *
      * @return the top-level directory
      */
     public File getTopDirectory()
@@ -152,17 +154,17 @@ public class FilesystemStore
 
     /**
      * Obtain the KeyFileMapper.
-     * 
+     *
      * @return the KeyFileMapper
      */
     public KeyFileMapper getKeyFileMapper()
     {
         return theKeyMapper;
     }
-    
+
     /**
      * Obtain the StoreValueMapper.
-     * 
+     *
      * @return the StoreValueMapper
      */
     public StoreValueMapper getStoreValueMapper()
@@ -181,6 +183,7 @@ public class FilesystemStore
      * @see #update if a data element with this key exists already
      * @see #putOrUpdate if a data element with this key may exist already
      */
+    @Override
     public void put(
             StoreValue toStore )
         throws
@@ -193,17 +196,17 @@ public class FilesystemStore
         try {
             String key  = toStore.getKey();
             File   file = theKeyMapper.keyToFile( key );
-            
+
             if( file.exists() ) {
                 throw new StoreKeyExistsAlreadyException( this, key );
             }
             file.getParentFile().mkdirs();
             file.createNewFile();
-            
-            OutputStream stream = new FileOutputStream( file );
-            theStoreValueMapper.writeStoreValue( toStore, stream );
-            stream.close();
-            
+
+            try (OutputStream stream = new FileOutputStream( file )) {
+                theStoreValueMapper.writeStoreValue( toStore, stream );
+            }
+
         } finally {
             firePutPerformed( toStore );
         }
@@ -220,6 +223,7 @@ public class FilesystemStore
      * @see #put if a data element with this key does not exist already
      * @see #putOrUpdate if a data element with this key may exist already
      */
+    @Override
     public void update(
             StoreValue toUpdate )
         throws
@@ -233,15 +237,15 @@ public class FilesystemStore
         try {
             String key  = toUpdate.getKey();
             File   file = theKeyMapper.keyToFile( key );
-            
+
             if( !file.exists() ) {
                 throw new StoreKeyDoesNotExistException( this, key );
             }
-            
-            OutputStream stream = new FileOutputStream( file );
-            theStoreValueMapper.writeStoreValue( toUpdate, stream );
-            stream.close();
-            
+
+            try (OutputStream stream = new FileOutputStream( file )) {
+                theStoreValueMapper.writeStoreValue( toUpdate, stream );
+            }
+
         } finally {
             fireUpdatePerformed( toUpdate );
         }
@@ -257,6 +261,7 @@ public class FilesystemStore
      * @see #put if a data element with this key does not exist already
      * @see #update if a data element with this key exists already
      */
+    @Override
     public boolean putOrUpdate(
             StoreValue toStoreOrUpdate )
         throws
@@ -271,15 +276,15 @@ public class FilesystemStore
 
             String key  = toStoreOrUpdate.getKey();
             File   file = theKeyMapper.keyToFile( key );
-            
+
             ret = file.exists();
-            
+
             if( !ret ) {
                 file.createNewFile();
             }
-            OutputStream stream = new FileOutputStream( file );
-            theStoreValueMapper.writeStoreValue( toStoreOrUpdate, stream );
-            stream.close();
+            try (OutputStream stream = new FileOutputStream( file )) {
+                theStoreValueMapper.writeStoreValue( toStoreOrUpdate, stream );
+            }
 
             return ret;
 
@@ -289,7 +294,7 @@ public class FilesystemStore
             } else {
                 firePutPerformed( toStoreOrUpdate );
             }
-        }        
+        }
     }
 
     /**
@@ -300,6 +305,7 @@ public class FilesystemStore
      * @throws StoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public StoreValue get(
             final String key )
         throws
@@ -313,14 +319,14 @@ public class FilesystemStore
         StoreValue ret = null;
         try {
             File file = theKeyMapper.keyToFile( key );
-            
+
             if( !file.exists()) {
                 throw new StoreKeyDoesNotExistException( this, key );
             }
-            
-            InputStream stream = new FileInputStream( file );
-            ret = theStoreValueMapper.readStoreValue( stream );
-            stream.close();
+
+            try (InputStream stream = new FileInputStream( file )) {
+                ret = theStoreValueMapper.readStoreValue( stream );
+            }
 
             return ret;
 
@@ -332,7 +338,7 @@ public class FilesystemStore
             }
         }
     }
-    
+
     /**
      * Delete the StoreValue that is stored using this key.
      *
@@ -340,6 +346,7 @@ public class FilesystemStore
      * @throws StoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void delete(
             final String key )
         throws
@@ -351,7 +358,7 @@ public class FilesystemStore
         }
         try {
             File file = theKeyMapper.keyToFile( key );
-            
+
             if( !file.exists()) {
                 throw new StoreKeyDoesNotExistException( this, key );
             }
@@ -368,6 +375,7 @@ public class FilesystemStore
      * @param startsWith the String the key starts with
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public void deleteAll(
             final String startsWith )
         throws
@@ -404,7 +412,7 @@ public class FilesystemStore
 
     /**
      * Helper method to recursively delete a File.
-     * 
+     *
      * @param root the root file
      * @throws IOException thrown if one or more files could not be deleted
      */
@@ -418,7 +426,7 @@ public class FilesystemStore
                 deleteRecursively( current );
             }
         }
-    
+
         if( !root.delete()) {
             throw new IOException( "Unable to delete file " + root );
         }
@@ -429,6 +437,7 @@ public class FilesystemStore
      *
      * @return the Iterator
      */
+    @Override
     public FilesystemStoreIterator iterator()
     {
         return FilesystemStoreIterator.create( this );
@@ -440,15 +449,16 @@ public class FilesystemStore
      * @param startsWith the String the key starts with
      * @return the number of StoreValues in this Store whose key starts with this String
      */
+    @Override
     public int size(
             final String startsWith )
     {
         FilesystemStoreIterator iter = iterator();
         int                     ret  = 0;
-        
+
         while( iter.hasNext() ) {
             StoreValue found = iter.next();
-            
+
             if( found.getKey().startsWith( startsWith )) {
                 ++ret;
             }
@@ -461,6 +471,7 @@ public class FilesystemStore
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {
@@ -486,7 +497,7 @@ public class FilesystemStore
      * Maps Store keys to paths in the local file system and vice versa.
      */
     protected KeyFileMapper theKeyMapper;
-    
+
     /**
      * Maps StoreValues to file content, and vice versa.
      */

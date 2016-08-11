@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,8 +15,7 @@
 package org.infogrid.kernel.test.differencer;
 
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.meshbase.IterableMeshBase;
-import org.infogrid.meshbase.IterableMeshBaseDifferencer;
+import org.infogrid.meshbase.MeshBaseDifferencer;
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
 import org.infogrid.meshbase.m.MMeshBase;
 import org.infogrid.meshbase.transaction.Change;
@@ -51,7 +50,7 @@ public class DifferencerTest8
         //
 
         log.info( "Creating MeshObjects in MeshBase1" );
-        
+
         MeshBaseLifecycleManager life1 = theMeshBase1.getMeshBaseLifecycleManager();
 
         Transaction tx1 = theMeshBase1.createTransactionNow();
@@ -72,9 +71,9 @@ public class DifferencerTest8
         tx1.commitTransaction();
 
         //
-        
+
         log.info( "Creating MeshObjects in MeshBase2" );
-        
+
         MeshBaseLifecycleManager life2 = theMeshBase2.getMeshBaseLifecycleManager();
 
         Transaction tx2 = theMeshBase2.createTransactionNow();
@@ -93,14 +92,14 @@ public class DifferencerTest8
         a2_mb2.relateAndBless( typeAR1A.getSource(), a1_mb2 ); // DIFFERENCE: switch source and destination
         a1_mb2.relateAndBless( typeAR1A.getSource(), a3_mb2 ); // DIFFERENCE: different external name
         a1_mb2.relateAndBless( typeAR1A.getSource(), a5_mb2 ); // DIFFERENCE: new relationship
-        
+
         tx2.commitTransaction();
 
         //
 
         log.info( "now differencing" );
 
-        IterableMeshBaseDifferencer diff = new IterableMeshBaseDifferencer( theMeshBase1 );
+        MeshBaseDifferencer diff = new MeshBaseDifferencer( theMeshBase1 );
 
         ChangeSet theChangeSet = diff.determineChangeSet( theMeshBase2, false );
         Change [] theChanges = theChangeSet.getChanges();
