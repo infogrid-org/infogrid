@@ -213,15 +213,30 @@ public abstract class AbstractSqlStore
     @Override
     public StoreCursor iterator()
     {
+        return iterator( "" );
+    }
+
+    /**
+     * Obtain an iterator over the subset of the elements in the Store whose
+     * key starts with this String.
+     *
+     * @param startsWith the String the key starts with
+     * @return the Iterator
+     */
+    @Override
+    public StoreCursor iterator(
+            String startsWith )
+    {
+        String pattern = startsWith + "%";
         try {
-            if( isEmpty() ) {
-                return new SqlStoreIterator( this, null ); // past last position
+            if( isEmpty( startsWith ) ) {
+                return new SqlStoreIterator( this, null, pattern ); // past last position
             } else {
-                return new SqlStoreIterator( this, findFirstKey() );
+                return new SqlStoreIterator( this, findFirstKey( pattern ), pattern );
             }
         } catch( IOException ex ) {
             log.error( ex );
-            return new SqlStoreIterator( this, null ); // gotta be somewhere
+            return new SqlStoreIterator( this, null, pattern ); // gotta be somewhere
         }
     }
 
@@ -229,9 +244,11 @@ public abstract class AbstractSqlStore
      * Find the very first key.
      *
      * @return the first key
+     * @param pattern the pattern to filter by
      * @throws NoSuchElementException thrown if the Store is empty
      */
-    protected abstract String findFirstKey()
+    protected abstract String findFirstKey(
+            String pattern )
         throws
             NoSuchElementException;
 
@@ -240,12 +257,14 @@ public abstract class AbstractSqlStore
      *
      * @param key the current key
      * @param delta the number of rows up (positive) or down (negative)
+     * @param pattern the pattern to filter by
      * @return the found key, or null
      * @throws NoSuchElementException thrown if the delta went beyond the "after last" or "before first" element
      */
     protected abstract String findKeyAt(
             String key,
-            int    delta )
+            int    delta,
+            String pattern )
         throws
             NoSuchElementException;
 
@@ -255,14 +274,16 @@ public abstract class AbstractSqlStore
      *
      * @param key the first key
      * @param n the number of keys to find
+     * @param pattern the pattern to filter by
      * @return the found keys
      */
     protected String [] findNextKeyIncluding(
             String key,
-            int    n )
+            int    n,
+            String pattern )
     {
         // FIXME, this can be made more efficient
-        StoreValue [] values = findNextIncluding( key, n );
+        StoreValue [] values = findNextIncluding( key, n, pattern );
         String     [] ret    = new String[0];
         for( int i=0 ; i<values.length ; ++i ) {
             ret[i] = values[i].getKey();
@@ -276,11 +297,13 @@ public abstract class AbstractSqlStore
      *
      * @param key key for the first StoreValue
      * @param n the number of StoreValues to find
+     * @param pattern the pattern to filter by
      * @return the found StoreValues
      */
     protected abstract StoreValue [] findNextIncluding(
             String key,
-            int    n );
+            int    n,
+            String pattern );
 
     /**
      * Find the previous n keys, excluding the key for key. This method
@@ -288,14 +311,16 @@ public abstract class AbstractSqlStore
      *
      * @param key the first key NOT to be returned
      * @param n the number of keys to find
+     * @param pattern the pattern to filter by
      * @return the found keys
      */
     protected String [] findPreviousKeyExcluding(
             String key,
-            int    n )
+            int    n,
+            String pattern )
     {
         // FIXME, this can be made more efficient
-        StoreValue [] values = findPreviousExcluding( key, n );
+        StoreValue [] values = findPreviousExcluding( key, n, pattern );
         String     [] ret    = new String[0];
         for( int i=0 ; i<values.length ; ++i ) {
             ret[i] = values[i].getKey();
@@ -309,40 +334,48 @@ public abstract class AbstractSqlStore
      *
      * @param key key for the first StoreValue NOT to be returned
      * @param n the number of StoreValues to find
+     * @param pattern the pattern to filter by
      * @return the found StoreValues
      */
     protected abstract StoreValue [] findPreviousExcluding(
             String key,
-            int    n );
+            int    n,
+            String pattern );
 
     /**
      * Count the number of rows following and including the one with the key.
      *
      * @param key the key
+     * @param pattern the pattern to filter by
      * @return the number of rows
      */
     protected abstract int hasNextIncluding(
-            String key );
+            String key,
+            String pattern );
 
     /**
      * Count the number of rows preceding and excluding the one with the key.
      *
      * @param key the key
+     * @param pattern the pattern to filter by
      * @return the number of rows
      */
     protected abstract int hasPreviousExcluding(
-            String key );
+            String key,
+            String pattern );
 
     /**
      * Determine the number of rows between two keys.
      *
      * @param from the start key
      * @param to the end key
+     * @param pattern the pattern to filter by
      * @return the distance
      */
     protected abstract int determineDistance(
-            final String from,
-            final String to );
+            String from,
+            String to,
+            String pattern );
 
     /**
      * Helper method to convert the SQL values back into System.currentTimeMillis() format.
@@ -367,6 +400,7 @@ public abstract class AbstractSqlStore
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {

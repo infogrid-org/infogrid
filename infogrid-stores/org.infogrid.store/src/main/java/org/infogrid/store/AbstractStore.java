@@ -167,6 +167,20 @@ public abstract class AbstractStore
     }
 
     /**
+     * Obtain an Iterator over the subset of the elements in the Store whose
+     * key starts with this String.
+     *
+     * @param startsWith the String the key starts with
+     * @return the Iterator
+     */
+    @Override
+    public StoreCursor getIterator(
+            String startsWith )
+    {
+        return iterator( startsWith );
+    }
+
+    /**
      * Determine the number of StoreValues in this Store.
      *
      * @return the number of StoreValues in this Store
@@ -192,6 +206,23 @@ public abstract class AbstractStore
             IOException
     {
         return size() == 0;
+    }
+
+    /**
+     * Determine whether the set of elements in this Store whose key
+     * starts with this String is empty
+     *
+     * @param startsWith the String the key starts with
+     * @return true if this Store is empty
+     * @throws IOException thrown if an I/O error occurred
+     */
+    @Override
+    public boolean isEmpty(
+            String startsWith )
+        throws
+            IOException
+    {
+        return size( startsWith ) == 0;
     }
 
     /**

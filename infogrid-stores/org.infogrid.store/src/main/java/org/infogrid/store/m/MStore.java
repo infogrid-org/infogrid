@@ -412,9 +412,23 @@ public class MStore
      * @return the CursorIterable
      */
     @Override
-    public synchronized StoreCursor iterator()
+    public StoreCursor iterator()
     {
-        return MyIterableStoreCursor.create( theDelegate );
+        return iterator( "" );
+    }
+
+    /**
+     * Obtain an iterator over the subset of the elements in the Store whose
+     * key starts with this String.
+     *
+     * @param startsWith the String the key starts with
+     * @return the Iterator
+     */
+    @Override
+    public synchronized StoreCursor iterator(
+            String startsWith )
+    {
+        return MyIterableStoreCursor.create( theDelegate, startsWith );
     }
 
     /**
@@ -472,14 +486,30 @@ public class MStore
          * Factory method.
          *
          * @param delegate the HashMap that stores the content
+         * @param startsWith additional prefix to filter the keys by
          * @return the IterableStoreCursor
          */
         @SuppressWarnings(value={"unchecked"})
         public static MyIterableStoreCursor create(
-                HashMap<String,StoreValue> delegate )
+                HashMap<String,StoreValue> delegate,
+                String                     startsWith )
         {
             Entry<String,StoreValue> [] entries  = (Entry<String,StoreValue> []) ArrayHelper.createArray( Entry.class, delegate.size() );
             entries  = delegate.entrySet().toArray( entries );
+
+            // filter
+            if( !"".equals( startsWith )) {
+                int count = 0;
+                for( int i=0 ; i<entries.length ; ++i ) {
+                    if( entries[i].getKey().startsWith( startsWith )) {
+                        entries[count] = entries[i];
+                        ++count;
+                    }
+                }
+                if( count < entries.length ) {
+                    entries = ArrayHelper.copyIntoNewArray( entries, 0, count, Entry.class );
+                }
+            }
 
             return new MyIterableStoreCursor( delegate, entries, ArrayCursorIterator.<Entry<String,StoreValue>>create( entries ));
         }

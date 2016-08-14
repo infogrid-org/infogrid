@@ -39,17 +39,44 @@ public class FilesystemStoreIterator
      * Factory method.
      *
      * @param store the FilesystemStore to iterate over
+     * @param startsWith the prefix to filter the keys by
      * @return the created FilesystemStoreIterator
      */
     public static FilesystemStoreIterator create(
-            FilesystemStore store )
+            FilesystemStore store,
+            String          startsWith )
     {
-        TreeFacade<File>     facade   = FileTreeFacade.create( store.getTopDirectory() );
-        CursorIterator<File> delegate = TreeFacadeCursorIterator.create( facade, File.class );
+//        try {
+            String topPrefix = store.getTopDirectory().getAbsolutePath() + '/';
 
-        delegate = FilteringCursorIterator.create( delegate, theFilesOnlyFilter, File.class );
+            TreeFacade<File>     facade   = FileTreeFacade.create( store.getTopDirectory() );
+            CursorIterator<File> delegate = TreeFacadeCursorIterator.create( facade, File.class );
 
-        return new FilesystemStoreIterator( store, delegate );
+            delegate = FilteringCursorIterator.create(
+                    delegate,
+                    ( File candidate ) -> {
+//                        try {
+                            if( !candidate.getAbsolutePath().startsWith( topPrefix + startsWith )) {
+                                return false;
+                            }
+                            if( candidate.isDirectory()) {
+                                return false;
+                            }
+                            return true;
+//                        } catch( IOException ex ) {
+//                            return false;
+//                        }
+                    },
+                    File.class );
+
+            return new FilesystemStoreIterator( store, delegate );
+
+//        } catch( IOException ex ) {
+//            log.error( ex );
+//
+//            return new FilesystemStoreIterator(
+//                    store, ZeroElementCursorIterator.create());
+//        }
     }
 
     /**
@@ -530,20 +557,4 @@ public class FilesystemStoreIterator
      * The delegate iterator.
      */
     protected CursorIterator<File> theDelegate;
-
-    /**
-     * This Filter only returns regular data files, not directories.
-     */
-    protected static final FilteringCursorIterator.Filter<File> theFilesOnlyFilter
-            = ( File candidate ) -> {
-                boolean ret = !candidate.isDirectory();
-                return ret;
-            }
-
-    /**
-     * Determine whether or not to accept a candidate Object.
-     *
-     * @param candidate the candidate Object
-     * @return true if this Object shall be accepted according to this Filter
-     */ ;
 }

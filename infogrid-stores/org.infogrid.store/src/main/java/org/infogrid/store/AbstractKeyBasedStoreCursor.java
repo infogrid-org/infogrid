@@ -35,13 +35,16 @@ public abstract class AbstractKeyBasedStoreCursor
      *
      * @param store    the Store to iterate over.
      * @param position the key for the current position.
+     * @param startsWith only return those elements whose keys starts with this string
      */
     protected AbstractKeyBasedStoreCursor(
             Store  store,
-            String position )
+            String position,
+            String startsWith )
     {
-        theStore    = store;
-        thePosition = position;
+        theStore      = store;
+        thePosition   = position;
+        thePattern = startsWith;
     }
 
     /**
@@ -53,7 +56,7 @@ public abstract class AbstractKeyBasedStoreCursor
     @Override
     public StoreValue peekNext()
     {
-        StoreValue [] found = findNextIncluding( thePosition, 1 );
+        StoreValue [] found = findNextIncluding(thePosition, 1, thePattern );
 
         if( found.length == 1 ) {
             return found[0];
@@ -70,7 +73,7 @@ public abstract class AbstractKeyBasedStoreCursor
      */
     public String peekNextKey()
     {
-        String [] found = findNextKeyIncluding( thePosition, 1 );
+        String [] found = findNextKeyIncluding(thePosition, 1, thePattern );
 
         if( found.length == 1 ) {
             return found[0];
@@ -88,7 +91,7 @@ public abstract class AbstractKeyBasedStoreCursor
     @Override
     public StoreValue peekPrevious()
     {
-        StoreValue [] found = findPreviousExcluding( thePosition, 1 );
+        StoreValue [] found = findPreviousExcluding(thePosition, 1, thePattern );
 
         if( found.length == 1 ) {
             return found[0];
@@ -105,7 +108,7 @@ public abstract class AbstractKeyBasedStoreCursor
      */
     public String peekPreviousKey()
     {
-        String [] found = findPreviousKeyExcluding( thePosition, 1 );
+        String [] found = findPreviousKeyExcluding(thePosition, 1, thePattern );
 
         if( found.length == 1 ) {
             return found[0];
@@ -155,7 +158,7 @@ public abstract class AbstractKeyBasedStoreCursor
     public boolean hasNext(
             int n )
     {
-        int found = hasNextIncluding( thePosition );
+        int found = hasNextIncluding(thePosition, thePattern );
         if( found >= n ) {
             return true;
         } else {
@@ -176,7 +179,7 @@ public abstract class AbstractKeyBasedStoreCursor
     public boolean hasPrevious(
             int n )
     {
-        int found = hasPreviousExcluding( thePosition );
+        int found = hasPreviousExcluding(thePosition, thePattern );
         if( found >= n ) {
             return true;
         } else {
@@ -230,7 +233,7 @@ public abstract class AbstractKeyBasedStoreCursor
             int n )
     {
         // we have to go forward by one more, so we can set the new position right after what's returned here
-        StoreValue [] found = findNextIncluding( thePosition, n+1 );
+        StoreValue [] found = findNextIncluding(thePosition, n+1, thePattern );
         StoreValue [] ret   = ArrayHelper.copyIntoNewArray( found, 0, Math.min( n, found.length ), StoreValue.class );
 
         if( found.length == n+1 ) {
@@ -253,7 +256,7 @@ public abstract class AbstractKeyBasedStoreCursor
             int n )
     {
         // we have to go forward by one more, so we can set the new position right after what's returned here
-        String [] found = findNextKeyIncluding( thePosition, n+1 );
+        String [] found = findNextKeyIncluding(thePosition, n+1, thePattern );
         String [] ret   = ArrayHelper.copyIntoNewArray( found, 0, Math.min( n, found.length ), String.class );
 
         if( found.length == n+1 ) {
@@ -314,7 +317,7 @@ public abstract class AbstractKeyBasedStoreCursor
     public StoreValue [] previous(
             int n )
     {
-        StoreValue [] found = findPreviousExcluding( thePosition, n );
+        StoreValue [] found = findPreviousExcluding(thePosition, n, thePattern );
         if( found.length > 0 ) {
             thePosition = found[found.length-1].getKey();
         } else{
@@ -339,7 +342,7 @@ public abstract class AbstractKeyBasedStoreCursor
     public String [] previousKey(
             int n )
     {
-        String [] found = findPreviousKeyExcluding( thePosition, n );
+        String [] found = findPreviousKeyExcluding(thePosition, n, thePattern );
         if( found.length > 0 ) {
             thePosition = found[found.length-1];
         } else{
@@ -365,7 +368,7 @@ public abstract class AbstractKeyBasedStoreCursor
         if( n == 0 ) {
             return;
         }
-        String newPosition = findKeyAt( thePosition, n );
+        String newPosition = findKeyAt(thePosition, n, thePattern );
         thePosition = newPosition;
     }
 
@@ -422,9 +425,9 @@ public abstract class AbstractKeyBasedStoreCursor
         }
 
         // FIXME this does not look right
-        int distance = determineDistance( thePosition, key );
+        int distance = determineDistance(thePosition, key, thePattern );
         if( distance < 0 ) {
-            distance = -determineDistance( key, thePosition );
+            distance = -determineDistance(key, thePosition, thePattern );
             if( distance > 0 ) {
                 throw new NoSuchElementException();
             }
@@ -466,9 +469,9 @@ public abstract class AbstractKeyBasedStoreCursor
         int ret;
 
         try {
-            String newPosition = getBeforeFirstPosition();
+            String newPosition = getBeforeFirstPosition(thePattern );
 
-            ret         = determineDistance( thePosition, newPosition );
+            ret         = determineDistance(thePosition, newPosition, thePattern );
             thePosition = newPosition;
 
         } catch( NoSuchElementException ex ) {
@@ -488,8 +491,8 @@ public abstract class AbstractKeyBasedStoreCursor
     @Override
     public int moveToAfterLast()
     {
-        String newPosition = getAfterLastPosition();
-        int    ret         = determineDistance( thePosition, newPosition );
+        String newPosition = getAfterLastPosition(thePattern );
+        int    ret         = determineDistance(thePosition, newPosition, thePattern );
 
         thePosition = newPosition;
         return ret;
@@ -611,11 +614,13 @@ public abstract class AbstractKeyBasedStoreCursor
      *
      * @param key key for the first StoreValue
      * @param n the number of StoreValues to find
+     * @param pattern the pattern to filter by
      * @return the found StoreValues
      */
     protected abstract StoreValue [] findNextIncluding(
             String key,
-            int    n );
+            int    n,
+            String pattern );
 
     /**
      * Find the next n keys, including key. This method
@@ -623,11 +628,13 @@ public abstract class AbstractKeyBasedStoreCursor
      *
      * @param key the first key
      * @param n the number of keys to find
+     * @param pattern the pattern to filter by
      * @return the found keys
      */
     protected abstract String [] findNextKeyIncluding(
             String key,
-            int    n );
+            int    n,
+            String pattern );
 
     /**
      * Find the previous n StoreValues, excluding the StoreValue for key. This method
@@ -635,11 +642,13 @@ public abstract class AbstractKeyBasedStoreCursor
      *
      * @param key key for the first StoreValue NOT to be returned
      * @param n the number of StoreValues to find
+     * @param pattern the pattern to filter by
      * @return the found StoreValues
      */
     protected abstract StoreValue [] findPreviousExcluding(
             String key,
-            int    n );
+            int    n,
+            String pattern );
 
     /**
      * Find the previous n keys, excluding the key for key. This method
@@ -647,41 +656,49 @@ public abstract class AbstractKeyBasedStoreCursor
      *
      * @param key the first key NOT to be returned
      * @param n the number of keys to find
+     * @param pattern the pattern to filter by
      * @return the found keys
      */
     protected abstract String [] findPreviousKeyExcluding(
             String key,
-            int    n );
+            int    n,
+            String pattern );
 
     /**
      * Count the number of elements following and including the one with the key.
      *
      * @param key the key
+     * @param pattern the pattern to filter by
      * @return the number of elements
      */
     protected abstract int hasNextIncluding(
-            String key );
+            String key,
+            String pattern );
 
     /**
      * Count the number of elements preceding and excluding the one with the key.
      *
      * @param key the key
+     * @param pattern the pattern to filter by
      * @return the number of elements
      */
     protected abstract int hasPreviousExcluding(
-            String key );
+            String key,
+            String pattern );
 
     /**
      * Find the key N elements up or down from the current key.
      *
      * @param key the current key
      * @param delta the number of elements up (positive) or down (negative)
+     * @param pattern the pattern to filter by
      * @return the found key, or null
      * @throws NoSuchElementException thrown if the delta went beyond the "after last" or "before first" element
      */
     protected abstract String findKeyAt(
             String key,
-            int    delta )
+            int    delta,
+            String pattern )
        throws
             NoSuchElementException;
 
@@ -690,25 +707,31 @@ public abstract class AbstractKeyBasedStoreCursor
      *
      * @param from the start key
      * @param to the end key
+     * @param pattern the pattern to filter by
      * @return the distance
      */
     protected abstract int determineDistance(
             String from,
-            String to );
+            String to,
+            String pattern );
 
     /**
      * Determine the key at the very beginning.
      *
      * @return the key
+     * @param pattern the pattern to filter by
      */
-    protected abstract String getBeforeFirstPosition();
+    protected abstract String getBeforeFirstPosition(
+            String pattern );
 
     /**
      * Determine the key at the very end.
      *
      * @return the key
+     * @param pattern the pattern to filter by
      */
-    protected abstract String getAfterLastPosition();
+    protected abstract String getAfterLastPosition(
+            String pattern );
 
     /**
      * The Store to iterate over.
@@ -719,4 +742,10 @@ public abstract class AbstractKeyBasedStoreCursor
      * The key for the current position.
      */
     protected String thePosition;
+
+    /**
+     * Only return those elements whose keys match this pattern. The syntax of this
+     * pattern is defined by the subclass where it is used.
+     */
+    protected String thePattern;
 }

@@ -12,27 +12,29 @@
 // All rights reserved.
 //
 
-package org.infogrid.store.sql.mysql.test;
+package org.infogrid.store.sql.postgresql.test;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-import org.infogrid.store.test.AbstractStoreIteratorTest3;
-import org.infogrid.store.sql.mysql.MysqlStore;
+import org.infogrid.store.sql.postgresql.PostgresqlStore;
 import org.infogrid.store.sql.test.AbstractSqlStoreTest;
+import org.infogrid.store.test.AbstractStoreIteratorTest4;
 import org.junit.Before;
+import org.postgresql.ds.PGSimpleDataSource;
 
 /**
- * Tests the MysqlStoreIterator.
+ *
  */
-public class MysqlStoreIteratorTest3
-        extends
-            AbstractStoreIteratorTest3
+public class PostgresqlStoreIteratorTest4
+    extends
+        AbstractStoreIteratorTest4
 {
     @Before
     public void setup()
     {
-        MysqlDataSource theDataSource = new MysqlDataSource();
+        PGSimpleDataSource theDataSource = new PGSimpleDataSource();
         theDataSource.setDatabaseName( AbstractSqlStoreTest.test_DATABASE_NAME );
+        theDataSource.setUser( "test" );
+        theDataSource.setPassword( "" );
 
-        theTestStore = MysqlStore.create( theDataSource, AbstractSqlStoreTest.test_TABLE_NAME );
+        theTestStore = PostgresqlStore.create( theDataSource, AbstractSqlStoreTest.test_TABLE_NAME );
     }
 }

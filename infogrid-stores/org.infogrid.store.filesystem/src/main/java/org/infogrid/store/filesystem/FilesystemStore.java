@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -440,7 +440,21 @@ public class FilesystemStore
     @Override
     public FilesystemStoreIterator iterator()
     {
-        return FilesystemStoreIterator.create( this );
+        return iterator( "" );
+    }
+
+    /**
+     * Obtain an iterator over the subset of the elements in the Store whose
+     * key starts with this String.
+     *
+     * @param startsWith the String the key starts with
+     * @return the Iterator
+     */
+    @Override
+    public FilesystemStoreIterator iterator(
+            String startsWith )
+    {
+        return FilesystemStoreIterator.create( this, startsWith );
     }
 
     /**

@@ -49,6 +49,9 @@ public class PrefixingStore
             String prefix,
             Store  delegate )
     {
+        if( prefix.contains( DEFAULT_SEPARATOR )) {
+            throw new IllegalArgumentException( "Prefix must not contain DEFAULT_SEPARATOR: " + prefix );
+        }
         return new PrefixingStore( prefix + DEFAULT_SEPARATOR, delegate );
     }
 
@@ -442,7 +445,21 @@ public class PrefixingStore
     @Override
     public StoreCursor iterator()
     {
-        return new MyIterator( theDelegate.iterator() );
+        return iterator( "" );
+    }
+
+    /**
+     * Obtain an iterator over the subset of the elements in the Store whose
+     * key starts with this String.
+     *
+     * @param startsWith the String the key starts with
+     * @return the Iterator
+     */
+    @Override
+    public StoreCursor iterator(
+            String startsWith )
+    {
+        return new MyBridgingIterator( new MyFilteringIterator( theDelegate.iterator(), thePrefixAndSeparator, startsWith ));
     }
 
     /**
@@ -521,18 +538,6 @@ public class PrefixingStore
     }
 
     /**
-     * Determine whether this delegate key matches one of the local keys.
-     *
-     * @param delegateKey the delegate key
-     * @return true if it matches
-     */
-    protected boolean matches(
-            String delegateKey )
-    {
-        return delegateKey.startsWith( thePrefixAndSeparator );
-    }
-
-    /**
      * Dump this object.
      *
      * @param d the Dumper to dump to
@@ -563,16 +568,6 @@ public class PrefixingStore
     protected Store theDelegate;
 
     /**
-     * The filter to use.
-     */
-    protected FilteringCursorIterator.Filter<StoreValue> myFilter = ( StoreValue v ) -> {
-        String  key = v.getKey();
-        boolean ret = matches( key );
-
-        return ret;
-    };
-
-    /**
      * The default separator between the prefix and the key.
      */
     public static final String DEFAULT_SEPARATOR = " ";
@@ -580,7 +575,7 @@ public class PrefixingStore
     /**
      * Our IterableStoreCursor implementation.
      */
-    class MyIterator
+    class MyBridgingIterator
             implements
                 StoreCursor
     {
@@ -588,11 +583,12 @@ public class PrefixingStore
          * Constructor.
          *
          * @param delegateIter an Iterator over the underlying delegate IterableStore
+         * @param startsWith filter by this additional prefix
          */
-        public MyIterator(
-                StoreCursor delegateIter )
+        public MyBridgingIterator(
+                MyFilteringIterator filterIterator )
         {
-            theFilterIterator = new MyFilteringIterator( delegateIter );
+            theFilterIterator = filterIterator;
         }
 
         /**
@@ -742,7 +738,7 @@ public class PrefixingStore
          */
         @Override
         public StoreValue [] previous(
-                int  n )
+                int n )
         {
             StoreValue [] found = theFilterIterator.previous( n );
             StoreValue [] ret   = new StoreValue[ found.length ];
@@ -834,9 +830,9 @@ public class PrefixingStore
          * @return identical new instance
          */
         @Override
-        public MyIterator createCopy()
+        public MyBridgingIterator createCopy()
         {
-            return new MyIterator( theFilterIterator.createCopy() );
+            return new MyBridgingIterator( theFilterIterator.createCopy() );
         }
 
         /**
@@ -990,9 +986,10 @@ public class PrefixingStore
     }
 
     /**
-     * The FilteringIterator that MyIterator uses.
+     * The FilteringIterator that MyBridgingIterator delegates to. This used to be a non-static class,
+     * but I ran into a compiler bug that would cause a java.lang.VerifyError at run-time!
      */
-    class MyFilteringIterator
+    static class MyFilteringIterator
             extends
                 FilteringCursorIterator<StoreValue>
             implements
@@ -1002,11 +999,25 @@ public class PrefixingStore
          * Constructor.
          *
          * @param delegateIter the Iterator over the underlying Store
+         * @param prefixAndSeparator copied from the outer class
+         * @param startsWith filter by this additional prefix
          */
         public MyFilteringIterator(
-                StoreCursor delegateIter )
+                StoreCursor delegateIter,
+                String      prefixAndSeparator,
+                String      startsWith )
         {
-            super( delegateIter, myFilter, StoreValue.class );
+            super( delegateIter,
+                   ( StoreValue v ) -> {
+                          String  key = v.getKey();
+                          boolean ret = key.startsWith( prefixAndSeparator + startsWith );
+
+                          return ret;
+                   },
+                   StoreValue.class );
+
+            thePrefixAndSeparator = prefixAndSeparator;
+            theStartsWith = startsWith;
         }
 
         /**
@@ -1099,6 +1110,17 @@ public class PrefixingStore
         @Override
         public MyFilteringIterator createCopy()
         {
-            return new MyFilteringIterator( (StoreCursor) theDelegate.createCopy() );
+            return new MyFilteringIterator( (StoreCursor) theDelegate.createCopy(), thePrefixAndSeparator, theStartsWith );
         }
-    }}
+
+        /**
+         * Copied from the outer class.
+         */
+        protected String thePrefixAndSeparator;
+
+        /**
+         * The additional key prefix to filter by.
+         */
+        protected String theStartsWith;
+    }
+}

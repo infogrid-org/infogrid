@@ -18,11 +18,10 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import org.infogrid.store.test.AbstractStoreIteratorTest2;
 import org.infogrid.store.sql.mysql.MysqlStore;
 import org.infogrid.store.sql.test.AbstractSqlStoreTest;
-import org.infogrid.util.logging.Log;
 import org.junit.Before;
 
 /**
- * Tests the FilesystemStoreIterator.
+ * Tests the MysqlStoreIterator.
  */
 public class MysqlStoreIteratorTest2
         extends
@@ -36,7 +35,4 @@ public class MysqlStoreIteratorTest2
 
         theTestStore = MysqlStore.create( theDataSource, AbstractSqlStoreTest.test_TABLE_NAME );
     }
-
-    // Our Logger
-    private static Log log = Log.getLogInstance(MysqlStoreIteratorTest2.class);
 }

@@ -272,7 +272,8 @@ public interface Store
             IOException;
 
     /**
-     * Return a more specific subtype of CursorIterable as an iterator.
+     * Return a more specific subtype of CursorIterator as an iterator over
+     * the entire Store.
      *
      * @return the Iterator
      */
@@ -280,12 +281,33 @@ public interface Store
     public abstract StoreCursor iterator();
 
     /**
-     * Return a more specific subtype of CursorIterable as an iterator.
+     * Return a more specific subtype of CursorIterator as an iterator over
+     * the entire Store.
      *
      * @return the Iterator
      */
     @Override
     public abstract StoreCursor getIterator();
+
+    /**
+     * Obtain an iterator over the subset of the elements in the Store whose
+     * key starts with this String.
+     *
+     * @param startsWith the String the key starts with
+     * @return the Iterator
+     */
+    public abstract StoreCursor iterator(
+            String startsWith );
+
+    /**
+     * Obtain an iterator over the subset of the elements in the Store whose
+     * key starts with this String.
+     *
+     * @param startsWith the String the key starts with
+     * @return the Iterator
+     */
+    public abstract StoreCursor getIterator(
+            String startsWith );
 
     /**
      * Determine the number of data elements in this Store. Some classes implementing
@@ -317,6 +339,19 @@ public interface Store
      * @throws IOException thrown if an I/O error occurred
      */
     public abstract boolean isEmpty()
+        throws
+            IOException;
+
+    /**
+     * Determine whether the set of elements in this Store whose key
+     * starts with this String is empty
+     *
+     * @param startsWith the String the key starts with
+     * @return true if this Store is empty
+     * @throws IOException thrown if an I/O error occurred
+     */
+    public abstract boolean isEmpty(
+            String startsWith )
         throws
             IOException;
 

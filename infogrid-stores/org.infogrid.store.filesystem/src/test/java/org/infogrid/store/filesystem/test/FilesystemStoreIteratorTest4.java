@@ -12,27 +12,27 @@
 // All rights reserved.
 //
 
-package org.infogrid.store.sql.mysql.test;
+package org.infogrid.store.filesystem.test;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-import org.infogrid.store.test.AbstractStoreIteratorTest3;
-import org.infogrid.store.sql.mysql.MysqlStore;
-import org.infogrid.store.sql.test.AbstractSqlStoreTest;
+import java.io.File;
+import org.infogrid.store.test.AbstractStoreIteratorTest4;
+import org.infogrid.store.filesystem.FilesystemStore;
 import org.junit.Before;
 
 /**
- * Tests the MysqlStoreIterator.
+ * Tests the FilesystemStoreIterator.
  */
-public class MysqlStoreIteratorTest3
+public class FilesystemStoreIteratorTest4
         extends
-            AbstractStoreIteratorTest3
+            AbstractStoreIteratorTest4
 {
     @Before
     public void setup()
     {
-        MysqlDataSource theDataSource = new MysqlDataSource();
-        theDataSource.setDatabaseName( AbstractSqlStoreTest.test_DATABASE_NAME );
+        File subdir = new File( AbstractFilesystemStoreTest.test_SUBDIR_NAME );
+        deleteFile( subdir );
+        subdir.mkdirs();
 
-        theTestStore = MysqlStore.create( theDataSource, AbstractSqlStoreTest.test_TABLE_NAME );
+        theTestStore = FilesystemStore.create( subdir );
     }
 }

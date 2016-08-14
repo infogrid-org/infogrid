@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -69,7 +69,7 @@ public class MysqlStore
             String     tableName )
     {
         SqlDatabase db = SqlDatabase.create( "MysqlStore of " + ds.toString() + ", table " + tableName, ds );
-        
+
         return new MysqlStore( db, tableName );
     }
 
@@ -84,7 +84,7 @@ public class MysqlStore
             String      tableName )
     {
         super( db, tableName );
-        
+
         theCreateTablesPreparedStatement           = new SqlPreparedStatement( theDatabase, CREATE_TABLES_SQL,             tableName );
         theDropTablesPreparedStatement             = new SqlPreparedStatement( theDatabase, DROP_TABLES_SQL,               tableName );
         theHasTablesPreparedStatement              = new SqlPreparedStatement( theDatabase, HAS_TABLES_SQL,                tableName );
@@ -107,7 +107,7 @@ public class MysqlStore
         theFindKeyAtEndPreparedStatement           = new SqlPreparedStatement( theDatabase, FIND_KEY_AT_END_SQL,           tableName );
         theDetermineDistancePreparedStatement      = new SqlPreparedStatement( theDatabase, DETERMINE_DISTANCE_SQL,        tableName );
         theDetermineDistanceToEndPreparedStatement = new SqlPreparedStatement( theDatabase, DETERMINE_DISTANCE_TO_END_SQL, tableName );
-        
+
         if( log.isTraceEnabled() ) {
             log.traceConstructor( this );
         }
@@ -115,9 +115,10 @@ public class MysqlStore
 
     /**
      * Determine whether the SqlStore has the SQL tables it needs.
-     * 
+     *
      * @return true if the Store yhas the SQL tables it needs
      */
+    @Override
     protected boolean hasTables()
     {
         if( log.isTraceEnabled() ) {
@@ -126,6 +127,7 @@ public class MysqlStore
 
         try {
             new SqlExecutionAction<Object>( theHasTablesPreparedStatement ) {
+                @Override
                 protected Object perform(
                         PreparedStatement stm,
                         Connection        conn )
@@ -136,18 +138,19 @@ public class MysqlStore
                     return null;
                 }
             }.execute();
-            
+
             return true;
-                    
+
         } catch( Throwable ex ) {
             log.warn( ex );
         }
         return false;
     }
-    
+
     /**
      * Drop all tables that this SqlStore needs. Do nothing if there are none.
      */
+    @Override
     protected void dropTables()
     {
         if( log.isTraceEnabled() ) {
@@ -156,6 +159,7 @@ public class MysqlStore
 
         try {
             new SqlExecutionAction<Object>( theDropTablesPreparedStatement ) {
+                @Override
                 protected Object perform(
                         PreparedStatement stm,
                         Connection        conn )
@@ -166,17 +170,18 @@ public class MysqlStore
                     return null;
                 }
             }.execute();
-            
+
         } catch( Throwable ex ) {
             log.warn( ex );
-        }        
+        }
     }
-    
+
     /**
      * Create all tables that this SqlStore needs.
-     * 
+     *
      * @throws IOException thrown if creating the tables was not possible
      */
+    @Override
     protected void createTables()
             throws
                 IOException
@@ -187,6 +192,7 @@ public class MysqlStore
 
         try {
             new SqlExecutionAction<Object>( theCreateTablesPreparedStatement ) {
+                @Override
                 protected Object perform(
                         PreparedStatement stm,
                         Connection        conn )
@@ -197,7 +203,7 @@ public class MysqlStore
                     return null;
                 }
             }.execute();
-            
+
         } catch( SQLException ex ) {
             throw new SqlStoreIOException( this, "createTables", ex );
         }
@@ -239,9 +245,10 @@ public class MysqlStore
         checkKey(      key );
         checkEncoding( encodingId );
         checkData(     data );
-        
+
         try {
             boolean success = new SqlExecutionAction<Boolean>( thePutPreparedStatement ) {
+                @Override
                 protected Boolean perform(
                         PreparedStatement stm,
                         Connection        conn )
@@ -296,7 +303,7 @@ public class MysqlStore
                     return success;
                 }
             }.execute();
-            
+
             if( !success ) {
                 throw new StoreKeyExistsAlreadyException( this, key );
             }
@@ -309,7 +316,7 @@ public class MysqlStore
             firePutPerformed( value );
         }
     }
-    
+
     /**
      * Update a data element that already exists in the Store, by overwriting it with a new value. Throw an
      * Exception if a data element with this key does not exist already.
@@ -349,6 +356,7 @@ public class MysqlStore
 
         try {
             boolean success = new SqlExecutionAction<Boolean>( theUpdatePreparedStatement ) {
+                @Override
                 protected Boolean perform(
                         PreparedStatement stm,
                         Connection        conn )
@@ -402,7 +410,7 @@ public class MysqlStore
                     return success;
                 }
             }.execute();
-            
+
             if( !success ) {
                 throw new StoreKeyDoesNotExistException( MysqlStore.this, key  );
             }
@@ -455,6 +463,7 @@ public class MysqlStore
         boolean ret = false;
         try {
             ret = new SqlExecutionAction<Boolean>( thePutOrUpdatePreparedStatement ) {
+                @Override
                 protected Boolean perform(
                         PreparedStatement stm,
                         Connection        conn )
@@ -526,9 +535,9 @@ public class MysqlStore
 
                     return ret;
                 }
-            
+
             }.execute();
-            
+
             return ret;
 
         } catch( SQLException ex ) {
@@ -542,9 +551,9 @@ public class MysqlStore
             } else {
                 firePutPerformed( value );
             }
-        }        
+        }
     }
-    
+
     /**
      * Obtain a data element and associated meta-data from the Store, given a key.
      *
@@ -553,6 +562,7 @@ public class MysqlStore
      * @throws StoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
      * @throws SqlStoreIOException thrown if the database could not be read
      */
+    @Override
     public StoreValue get(
             final String key )
         throws
@@ -568,6 +578,7 @@ public class MysqlStore
         StoreValue ret = null;
         try {
             ret = new SqlExecutionAction<StoreValue>( theGetPreparedStatement ) {
+                @Override
                 protected StoreValue perform(
                         PreparedStatement stm,
                         Connection        conn )
@@ -629,7 +640,7 @@ public class MysqlStore
             }
         }
     }
-    
+
     /**
      * Delete the StoreValue that is stored using this key.
      *
@@ -637,6 +648,7 @@ public class MysqlStore
      * @throws StoreKeyDoesNotExistException thrown if currently there is no data element in the Store using this key
      * @throws SqlStoreIOException thrown if the database could not be written
      */
+    @Override
     public void delete(
             final String key )
         throws
@@ -651,6 +663,7 @@ public class MysqlStore
 
         try {
             boolean success = new SqlExecutionAction<Boolean>( theDeletePreparedStatement ) {
+                @Override
                 protected Boolean perform(
                         PreparedStatement stm,
                         Connection        conn )
@@ -683,6 +696,7 @@ public class MysqlStore
      * @param startsWith the String the key starts with
      * @throws SqlStoreIOException thrown if the database could not be written
      */
+    @Override
     public void deleteAll(
             final String startsWith )
         throws
@@ -695,6 +709,7 @@ public class MysqlStore
 
         try {
             new SqlExecutionAction<Object>( theDeleteAllPreparedStatement ) {
+                @Override
                 protected Object perform(
                         PreparedStatement stm,
                         Connection        conn )
@@ -706,56 +721,64 @@ public class MysqlStore
                     return null;
                 }
             }.execute();
-            
+
         } catch( SQLException ex ) {
             throw new SqlStoreIOException( this, "deleteAll", startsWith, ex );
         }
     }
-    
+
     /**
      * Find the next n StoreValues, including the StoreValue for key. This method
      * will return fewer values if only fewer values could be found.
      *
      * @param key key for the first StoreValue
      * @param n the number of StoreValues to find
+     * @param pattern the pattern to filter by
      * @return the found StoreValues
      */
+    @Override
     protected StoreValue [] findNextIncluding(
-            final String key,
-            final int    n )
+            String key,
+            int    n,
+            String pattern )
     {
         if( key == null ) {
             return new StoreValue[0];
         }
-        return findValues( theFindNextIncludingPreparedStatement, key, n );
+        return findValues( theFindNextIncludingPreparedStatement, key, n, pattern );
     }
-    
+
     /**
      * Find the previous n StoreValues, excluding the StoreValue for key. This method
      * will return fewer values if only fewer values could be found.
      *
      * @param key key for the first StoreValue NOT to be returned
      * @param n the number of StoreValues to find
+     * @param pattern the pattern to filter by
      * @return the found StoreValues
      */
+    @Override
     protected StoreValue [] findPreviousExcluding(
             final String key,
-            final int    n )
+            final int    n,
+            final String pattern )
     {
         if( key != null ) {
-            return findValues( theFindPreviousExcludingPreparedStatement, key, n );
+            return findValues( theFindPreviousExcludingPreparedStatement, key, n, pattern );
         }
-        
+
         StoreValue [] ret = new StoreValue[ n ];
         try {
             ResultSet set = new SqlExecutionAction<ResultSet>( theFindLastValuesPreparedStatement ) {
+                @Override
                 protected ResultSet perform(
                         PreparedStatement stm,
                         Connection        conn )
                     throws
                         SQLException
                 {
-                    stm.setInt(    1, n );
+                    stm.setString( 1, pattern );
+                    stm.setInt(    2, n );
 
                     stm.execute();
                     return stm.getResultSet();
@@ -786,34 +809,37 @@ public class MysqlStore
                         reconstructTime( timeExpires, timeExpiresMillis ),
                         data );
             }
-            
+
             set.close();
 
             if( count < ret.length ) {
                 ret = ArrayHelper.copyIntoNewArray( ret, 0, count, StoreValue.class );
             }
-            
+
         } catch( SQLException ex ) {
             log.error( ex );
         }
-        return ret;           
+        return ret;
     }
-    
+
     /**
      * Find the next n StoreValues, using the provided PreparedStatement.
      *
      * @param stm the SQL to use
      * @param key key for the first StoreValue
      * @param n the number of StoreValues to find
+     * @param pattern the pattern to filter by
      * @return the found StoreValues
      */
     protected StoreValue [] findValues(
             SqlPreparedStatement stm,
-            final String              key,
-            final int                 n )
+            final String         key,
+            final int            n,
+            final String         pattern )
     {
         try {
             StoreValue [] ret = new SqlExecutionAction<StoreValue[]>( stm ) {
+                @Override
                 protected StoreValue [] perform(
                         PreparedStatement stm,
                         Connection        conn )
@@ -821,7 +847,8 @@ public class MysqlStore
                         SQLException
                 {
                     stm.setString( 1, key );
-                    stm.setInt(    2, n );
+                    stm.setString( 2, pattern );
+                    stm.setInt(    3, n );
 
                     stm.execute();
                     ResultSet set = stm.getResultSet();
@@ -854,7 +881,7 @@ public class MysqlStore
                                 data );
                     }
                     set.close();
-                    
+
                     if( count < temp.length ) {
                         temp = ArrayHelper.copyIntoNewArray( temp, 0, count, StoreValue.class );
                     }
@@ -862,8 +889,8 @@ public class MysqlStore
                 }
             }.execute();
 
-            return ret;        
-            
+            return ret;
+
         } catch( SQLException ex ) {
             log.error( ex );
 
@@ -875,51 +902,60 @@ public class MysqlStore
      * Count the number of rows following and including the one with the key.
      *
      * @param key the key
+     * @param pattern the pattern to filter by
      * @return the number of rows
      */
+    @Override
     protected int hasNextIncluding(
-            String key )
+            String key,
+            String pattern )
     {
         if( key == null ) {
             return 0;
         }
-        return countRows( theHasNextIncludingPreparedStatement, key );
+        return countRows( theHasNextIncludingPreparedStatement, key, pattern );
     }
 
     /**
      * Count the number of rows preceding and excluding the one with the key.
      *
      * @param key the key
+     * @param pattern the pattern to filter by
      * @return the number of rows
      */
+    @Override
     protected int hasPreviousExcluding(
-            String key )
+            String key,
+            String pattern )
     {
         if( key == null ) {
             try {
-                int ret = size();
+                int ret = sizeWithPattern( pattern );
                 return ret;
             } catch( IOException ex ) {
                 log.error( ex );
                 return 0;
             }
         }
-        return countRows( theHasPreviousExcludingPreparedStatement, key );
+        return countRows( theHasPreviousExcludingPreparedStatement, key, pattern );
     }
-    
+
     /**
      * Count the number of rows that meet the condition in the SQL statement.
      *
      * @param stm the SQL statement
      * @param key key parameter
+     * @param pattern the pattern to filter by
      * @return the number of rows
      */
     protected int countRows(
             SqlPreparedStatement stm,
-            final String              key )
+            final String         key,
+            final String         pattern )
     {
         try {
             int ret = new SqlExecutionAction<Integer>( stm ) {
+                @Override
                 protected Integer perform(
                         PreparedStatement stm,
                         Connection        conn )
@@ -927,8 +963,9 @@ public class MysqlStore
                         SQLException
                 {
                     stm.setString( 1, key );
+                    stm.setString( 2, pattern );
                     stm.execute();
-                    
+
                     ResultSet set = stm.getResultSet();
                     int ret;
                     if( set.next() ) {
@@ -946,27 +983,32 @@ public class MysqlStore
         } catch( SQLException ex ) {
             log.error( ex );
         }
-        return Integer.MAX_VALUE; // Is this a reasonable default?        
+        return Integer.MAX_VALUE; // Is this a reasonable default?
     }
 
     /**
      * Find the very first key.
      *
      * @return the first key
+     * @param pattern the pattern to filter by
      * @throws NoSuchElementException thrown if the Store is empty
      */
-    protected String findFirstKey()
+    @Override
+    protected String findFirstKey(
+            final String pattern )
         throws
             NoSuchElementException
     {
         try {
             String ret = new SqlExecutionAction<String>( theFindFirstKeyPreparedStatement ) {
+                @Override
                 protected String perform(
                         PreparedStatement stm,
                         Connection        conn )
                     throws
                         SQLException
                 {
+                    stm.setString( 1, pattern );
                     stm.execute();
 
                     ResultSet set = stm.getResultSet();
@@ -998,17 +1040,19 @@ public class MysqlStore
      *
      * @param key the current key
      * @param delta the number of rows up (positive) or down (negative)
+     * @param pattern the pattern to filter by
      * @return the found key, or null
      * @throws NoSuchElementException thrown if the delta went beyond the "after last" or "before first" element
      */
+    @Override
     protected String findKeyAt(
             final String key,
-            final int    delta )
+            final int    delta,
+            final String pattern )
         throws
             NoSuchElementException
     {
         if( key != null ) {
-
             SqlPreparedStatement stm;
             final int distance;
             if( delta >= 0 ) {
@@ -1022,6 +1066,7 @@ public class MysqlStore
                 final String TOO_FAR_MARKER = "";
 
                 String ret = new SqlExecutionAction<String>( stm ) {
+                    @Override
                     protected String perform(
                             PreparedStatement stm,
                             Connection        conn )
@@ -1029,7 +1074,8 @@ public class MysqlStore
                             SQLException
                     {
                         stm.setString( 1, key );
-                        stm.setInt(    2, distance );
+                        stm.setString( 2, pattern );
+                        stm.setInt(    3, distance );
                         stm.execute();
 
                         ResultSet set = stm.getResultSet();
@@ -1059,7 +1105,7 @@ public class MysqlStore
             } catch( SQLException ex ) {
                 log.error( ex );
             }
-            
+
         } else {
             if( delta >= 0 ) {
                 return null;
@@ -1067,6 +1113,7 @@ public class MysqlStore
             final int distance = -delta;
             try {
                 String ret = new SqlExecutionAction<String>( theFindKeyAtEndPreparedStatement ) {
+                    @Override
                     protected String perform(
                             PreparedStatement stm,
                             Connection        conn )
@@ -1074,6 +1121,7 @@ public class MysqlStore
                             SQLException
                     {
                         stm.setInt(    1, distance );
+                        stm.setString( 2, pattern );
                         stm.execute();
 
                         ResultSet set = stm.getResultSet();
@@ -1092,7 +1140,7 @@ public class MysqlStore
 
             } catch( SQLException ex ) {
                 log.error( ex );
-            }            
+            }
         }
         return null;
     }
@@ -1102,17 +1150,21 @@ public class MysqlStore
      *
      * @param from the start key
      * @param to the end key
+     * @param pattern the pattern to filter by
      * @return the distance
      */
+    @Override
     protected int determineDistance(
             final String from,
-            final String to )
+            final String to,
+            final String pattern )
     {
         try {
             int ret;
 
             if( to != null ) {
                 ret = new SqlExecutionAction<Integer>( theDetermineDistancePreparedStatement ) {
+                    @Override
                     protected Integer perform(
                             PreparedStatement stm,
                             Connection        conn )
@@ -1120,7 +1172,8 @@ public class MysqlStore
                             SQLException
                     {
                         stm.setString( 1, from );
-                        stm.setString( 2, to );
+                        stm.setString( 2, pattern );
+                        stm.setString( 3, to );
                         stm.execute();
 
                         ResultSet set = stm.getResultSet();
@@ -1136,6 +1189,7 @@ public class MysqlStore
                 }.execute();
             } else {
                 ret = new SqlExecutionAction<Integer>( theDetermineDistanceToEndPreparedStatement ) {
+                    @Override
                     protected Integer perform(
                             PreparedStatement stm,
                             Connection        conn )
@@ -1143,6 +1197,7 @@ public class MysqlStore
                             SQLException
                     {
                         stm.setString( 1, from );
+                        stm.setString( 2, pattern );
                         stm.execute();
 
                         ResultSet set = stm.getResultSet();
@@ -1173,24 +1228,42 @@ public class MysqlStore
      * @return the number of StoreValues in this Store whose key starts with this String
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public int size(
-            final String startsWith )
+            String startsWith )
         throws
             IOException
     {
         checkKey( startsWith );
 
+        return sizeWithPattern( startsWith + '%' ); // trailing wild card
+    }
+
+    /**
+     * Helper method to determine the number of StoreValues in this Store whose key
+     * matches the provided pattern.
+     *
+     * @param pattern the pattern
+     * @return the number of StoreValues in this Store whose key matches this pattern
+     * @throws IOException thrown if an I/O error occurred
+     */
+    protected int sizeWithPattern(
+            final String pattern )
+        throws
+            IOException
+    {
         try {
             int ret = new SqlExecutionAction<Integer>( theSizePreparedStatement ) {
+                @Override
                 protected Integer perform(
                         PreparedStatement stm,
                         Connection        conn )
                     throws
                         SQLException
                 {
-                    stm.setString( 1, startsWith + '%' ); // trailing wild card
+                    stm.setString( 1, pattern );
                     stm.execute();
-                    
+
                     ResultSet set = stm.getResultSet();
                     int ret;
                     if( set.next() ) {
@@ -1225,7 +1298,7 @@ public class MysqlStore
      * The hasTables PreparedStatement.
      */
     protected SqlPreparedStatement theHasTablesPreparedStatement;
-    
+
     /**
      * The put PreparedStatement.
      */
@@ -1270,17 +1343,17 @@ public class MysqlStore
      * The PreparedStatement to obtain the previous N rows excluding the specified key's.
      */
     protected SqlPreparedStatement theFindPreviousExcludingPreparedStatement;
-    
+
     /**
      * The PreparedStatement to obtain the last N rows in the table.
      */
     protected SqlPreparedStatement theFindLastValuesPreparedStatement;
-    
+
     /**
      * The PreparedStatement to obtain the number of rows including and after this key.
      */
     protected SqlPreparedStatement theHasNextIncludingPreparedStatement;
-    
+
     /**
      * The PreparedStatement to obtain the number of rows excluding and before this key.
      */
@@ -1295,17 +1368,17 @@ public class MysqlStore
      * The PreparedStatement to find the key of N rows ahead.
      */
     protected SqlPreparedStatement theFindKeyAtPositivePreparedStatement;
-    
+
     /**
      * The PreparedStatement to find the key of N rows back.
      */
     protected SqlPreparedStatement theFindKeyAtNegativePreparedStatement;
-    
+
     /**
      * The PreparedStatement to find the key of N rows from the end of the table;
      */
     protected SqlPreparedStatement theFindKeyAtEndPreparedStatement;
-    
+
     /**
      * The PreparedStatement to find the number of rows between two keys.
      */
@@ -1333,13 +1406,13 @@ public class MysqlStore
             + "    timeExpiresMillis     SMALLINT,\n"
             + "    content               LONGBLOB"
             + ");";
-    
+
     /**
      * The SQL to drop the tables in the database.
      */
     protected static final String DROP_TABLES_SQL
             = "DROP TABLE {0};";
-    
+
     /**
      * The SQL to detect whether or not the tables exist in the database.
      */
@@ -1390,7 +1463,7 @@ public class MysqlStore
             + "    timeExpires           = ?,\n"
             + "    timeExpiresMillis     = ?,\n"
             + "    content = ?"
-            + "WHERE id = ? ;";
+            + "WHERE id = ?;";
 
     /**
      * The SQL to put data into the Store (if it isn't there yet) or update data in the Store (if it is there already).
@@ -1430,85 +1503,85 @@ public class MysqlStore
             + "    timeReadMillis        = ?,\n" // 18
             + "    timeExpires           = ?,\n" // 19
             + "    timeExpiresMillis     = ?,\n" // 20
-            + "    content = ?";                 // 21
-    
+            + "    content = ?;";                 // 21
+
     /**
      * The SQL to get data from the Store.
      */
     protected static final String GET_SQL
-            = "SELECT * from {0} WHERE id = ?";
+            = "SELECT * from {0} WHERE id = ?;";
 
     /**
      * The SQL to delete data in the Store.
      */
     protected static final String DELETE_SQL
-            = "DELETE FROM {0} WHERE id = ?";
+            = "DELETE FROM {0} WHERE id = ?;";
 
     /**
      * The SQL to obtain the next n StoreValues in the Store.
      */
     protected static final String FIND_NEXT_INCLUDING_SQL
-            = "SELECT * from {0} WHERE id >= ? ORDER BY id LIMIT ?;";
+            = "SELECT * from {0} WHERE id >= ? AND id LIKE ? ORDER BY id LIMIT ?;";
 
     /**
      * The SQL to obtain the previous n StoreValues in the Store.
      */
     protected static final String FIND_PREVIOUS_EXCLUDING_SQL
-            = "SELECT * from {0} WHERE id < ? ORDER BY id DESC LIMIT ?;";
+            = "SELECT * from {0} WHERE id < ? AND id LIKE ? ORDER BY id DESC LIMIT ?;";
 
     /**
      * The SQL to obtain the last n StoreValues in the Store.
      */
     protected static final String FIND_LAST_VALUES_SQL
-            = "SELECT * from {0} ORDER BY id DESC LIMIT ?;";
-    
+            = "SELECT * from {0} WHERE id LIKE ? ORDER BY id DESC LIMIT ?;";
+
     /**
      * The SQL to obtain the number of rows including and after this key.
      */
     protected static final String HAS_NEXT_INCLUDING_SQL
-            = "SELECT COUNT(*) from {0} WHERE id >= ?;";
-            
+            = "SELECT COUNT(*) from {0} WHERE id >= ? AND id LIKE ?;";
+
     /**
      * The SQL to obtain the number of rows excluding and before this key.
      */
     protected static final String HAS_PREVIOUS_EXCLUDING_SQL
-            = "SELECT COUNT(*) from {0} WHERE id < ?;";
+            = "SELECT COUNT(*) from {0} WHERE id < ? AND id LIKE ?;";
 
     /**
      * The SQL to find the first key in the Store.
      */
     protected static final String FIND_FIRST_KEY_SQL
-            = "SELECT id from {0} ORDER BY id LIMIT 1";
+            = "SELECT id from {0} WHERE id LIKE ? ORDER BY id LIMIT 1;";
 
     /**
      * The SQL to find the key N rows ahead.
      */
     protected static final String FIND_KEY_AT_POSITIVE_SQL
-            = "SELECT id from {0} WHERE id > ? ORDER BY id LIMIT ?";
+            = "SELECT id from {0} WHERE id > ? AND id LIKE ? ORDER BY id LIMIT ?";
 
     /**
      * The SQL to find the key N rows back.
      */
     protected static final String FIND_KEY_AT_NEGATIVE_SQL
-            = "SELECT id from {0} WHERE id < ? ORDER BY id DESC LIMIT ?";
+            = "SELECT id from {0} WHERE id < ? AND id LIKE ? ORDER BY id DESC LIMIT ?;";
 
     /**
      * The SQL to find the key N rows from the end of the table.
      */
     protected static final String FIND_KEY_AT_END_SQL
-            = "SELECT id from {0} ORDER BY id DESC LIMIT ?";
-    
+            = "SELECT id from {0} WHERE id LIKE ? ORDER BY id DESC LIMIT ?;";
+
     /**
      * The SQL to determine the distance, in rows, between a first and a second key.
      */
     protected static final String DETERMINE_DISTANCE_SQL
-            = "SELECT COUNT(*) from {0} WHERE id >= ? AND id < ?";
+            = "SELECT COUNT(*) from {0} WHERE id >= ? AND id < ? AND id LIKE ?;";
 
     /**
      * The SQL to determine the distance, in rows, between a key and the end of the table.
      */
     protected static final String DETERMINE_DISTANCE_TO_END_SQL
-            = "SELECT COUNT(*) from {0} WHERE id >= ?";
+            = "SELECT COUNT(*) from {0} WHERE id >= ? AND id LIKE ?;";
 
     /**
      * The SQL to delete ALL data in the Store.

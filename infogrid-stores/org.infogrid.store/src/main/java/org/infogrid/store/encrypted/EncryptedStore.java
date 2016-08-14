@@ -423,6 +423,22 @@ public class EncryptedStore
     }
 
     /**
+     * Obtain an iterator over the subset of the elements in the Store whose
+     * key starts with this String.
+     *
+     * @param startsWith the String the key starts with
+     * @return the Iterator
+     */
+    @Override
+    public StoreCursor iterator(
+            String startsWith )
+    {
+        StoreCursor delegateIter = theDelegate.iterator( startsWith );
+
+        return new MyIterator( delegateIter );
+    }
+
+    /**
      * Determine the number of data elements in this Store. Some classes implementing
      * this interface may only return an approximation.
      *

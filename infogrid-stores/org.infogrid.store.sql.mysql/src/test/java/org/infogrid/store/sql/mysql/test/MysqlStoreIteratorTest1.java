@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -21,7 +21,7 @@ import org.infogrid.store.test.AbstractStoreIteratorTest1;
 import org.junit.Before;
 
 /**
- * Tests the FilesystemStoreIterator.
+ * Tests the MysqlStoreIterator.
  */
 public class MysqlStoreIteratorTest1
         extends

@@ -17,7 +17,6 @@ package org.infogrid.store.filesystem.test;
 import java.io.File;
 import org.infogrid.store.test.AbstractStoreIteratorTest2;
 import org.infogrid.store.filesystem.FilesystemStore;
-import org.infogrid.util.logging.Log;
 import org.junit.Before;
 
 /**
@@ -36,7 +35,4 @@ public class FilesystemStoreIteratorTest2
 
         theTestStore = FilesystemStore.create( subdir );
     }
-
-    // Our Logger
-    private static Log log = Log.getLogInstance( FilesystemStoreIteratorTest2.class);
 }

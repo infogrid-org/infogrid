@@ -15,17 +15,17 @@
 package org.infogrid.store.sql.mysql.test;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-import org.infogrid.store.test.AbstractStoreIteratorTest3;
 import org.infogrid.store.sql.mysql.MysqlStore;
 import org.infogrid.store.sql.test.AbstractSqlStoreTest;
+import org.infogrid.store.test.AbstractStoreIteratorTest4;
 import org.junit.Before;
 
 /**
  * Tests the MysqlStoreIterator.
  */
-public class MysqlStoreIteratorTest3
+public class MysqlStoreIteratorTest4
         extends
-            AbstractStoreIteratorTest3
+            AbstractStoreIteratorTest4
 {
     @Before
     public void setup()

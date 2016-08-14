@@ -34,12 +34,14 @@ class SqlStoreIterator
      *
      * @param store the AbstractSqlStore to iterate over
      * @param position the key of the current position
+     * @param pattern the pattern to filter by
      */
     protected SqlStoreIterator(
             AbstractSqlStore store,
-            String           position )
+            String           position,
+            String           pattern )
     {
-        super( store, position );
+        super( store, position, pattern );
     }
 
     /**
@@ -48,13 +50,16 @@ class SqlStoreIterator
      *
      * @param key key for the first StoreValue
      * @param n the number of StoreValues to find
+     * @param pattern the pattern to filter by
      * @return the found StoreValues
      */
+    @Override
     protected StoreValue [] findNextIncluding(
             String key,
-            int    n )
+            int    n,
+            String pattern )
     {
-        StoreValue [] ret = ((AbstractSqlStore)theStore).findNextIncluding( key, n );
+        StoreValue [] ret = ((AbstractSqlStore)theStore).findNextIncluding( key, n, pattern );
         return ret;
     }
 
@@ -64,13 +69,16 @@ class SqlStoreIterator
      *
      * @param key the first key
      * @param n the number of keys to find
+     * @param pattern the pattern to filter by
      * @return the found keys
      */
+    @Override
     protected String [] findNextKeyIncluding(
             String key,
-            int    n )
+            int    n,
+            String pattern )
     {
-        String [] ret = ((AbstractSqlStore)theStore).findNextKeyIncluding( key, n );
+        String [] ret = ((AbstractSqlStore)theStore).findNextKeyIncluding( key, n, pattern );
         return ret;
     }
 
@@ -80,13 +88,16 @@ class SqlStoreIterator
      *
      * @param key key for the first StoreValue NOT to be returned
      * @param n the number of StoreValues to find
+     * @param pattern the pattern to filter by
      * @return the found StoreValues
      */
+    @Override
     protected StoreValue [] findPreviousExcluding(
             String key,
-            int    n )
+            int    n,
+            String pattern )
     {
-        StoreValue [] ret = ((AbstractSqlStore)theStore).findPreviousExcluding( key, n );
+        StoreValue [] ret = ((AbstractSqlStore)theStore).findPreviousExcluding( key, n, pattern );
         return ret;
     }
 
@@ -96,13 +107,16 @@ class SqlStoreIterator
      *
      * @param key the first key NOT to be returned
      * @param n the number of keys to find
+     * @param pattern the pattern to filter by
      * @return the found keys
      */
+    @Override
     protected String [] findPreviousKeyExcluding(
             String key,
-            int    n )
+            int    n,
+            String pattern )
     {
-        String [] ret = ((AbstractSqlStore)theStore).findPreviousKeyExcluding( key, n );
+        String [] ret = ((AbstractSqlStore)theStore).findPreviousKeyExcluding( key, n, pattern );
         return ret;
     }
 
@@ -110,12 +124,15 @@ class SqlStoreIterator
      * Count the number of elements following and including the one with the key.
      *
      * @param key the key
+     * @param pattern the pattern to filter by
      * @return the number of elements
      */
+    @Override
     protected int hasNextIncluding(
-            String key )
+            String key,
+            String pattern )
     {
-        int ret = ((AbstractSqlStore)theStore).hasNextIncluding( key );
+        int ret = ((AbstractSqlStore)theStore).hasNextIncluding( key, pattern );
         return ret;
     }
 
@@ -123,12 +140,15 @@ class SqlStoreIterator
      * Count the number of elements preceding and excluding the one with the key.
      *
      * @param key the key
+     * @param pattern the pattern to filter by
      * @return the number of elements
      */
+    @Override
     protected int hasPreviousExcluding(
-            String key )
+            String key,
+            String pattern )
     {
-        int ret = ((AbstractSqlStore)theStore).hasPreviousExcluding( key );
+        int ret = ((AbstractSqlStore)theStore).hasPreviousExcluding( key, pattern );
         return ret;
     }
 
@@ -137,16 +157,19 @@ class SqlStoreIterator
      *
      * @param key the current key
      * @param delta the number of elements up (positive) or down (negative)
+     * @param pattern the pattern to filter by
      * @return the found key, or null
      * @throws NoSuchElementException thrown if the delta went beyond the "after last" or "before first" element
      */
+    @Override
     protected String findKeyAt(
             String key,
-            int    delta )
+            int    delta,
+            String pattern )
         throws
             NoSuchElementException
     {
-        String ret = ((AbstractSqlStore)theStore).findKeyAt( key, delta );
+        String ret = ((AbstractSqlStore)theStore).findKeyAt( key, delta, pattern );
         return ret;
     }
 
@@ -155,13 +178,16 @@ class SqlStoreIterator
      *
      * @param from the start key
      * @param to the end key
+     * @param pattern the pattern to filter by
      * @return the distance
      */
+    @Override
     protected int determineDistance(
             String from,
-            String to )
+            String to,
+            String pattern )
     {
-        int ret = ((AbstractSqlStore)theStore).determineDistance( from, to );
+        int ret = ((AbstractSqlStore)theStore).determineDistance( from, to, pattern );
         return ret;
     }
 
@@ -169,13 +195,16 @@ class SqlStoreIterator
      * Determine the key at the very beginning.
      *
      * @return the key
+     * @param pattern the pattern to filter by
      * @throws NoSuchElementException thrown if the Store is empty
      */
-    protected String getBeforeFirstPosition()
+    @Override
+    protected String getBeforeFirstPosition(
+            String pattern )
         throws
             NoSuchElementException
     {
-        String ret = ((AbstractSqlStore)theStore).findFirstKey();
+        String ret = ((AbstractSqlStore)theStore).findFirstKey( pattern );
         return ret;
     }
 
@@ -183,8 +212,11 @@ class SqlStoreIterator
      * Determine the key at the very end.
      *
      * @return the key
+     * @param pattern the pattern to filter by
      */
-    protected String getAfterLastPosition()
+    @Override
+    protected String getAfterLastPosition(
+            String pattern )
     {
         return null;
     }
@@ -194,8 +226,9 @@ class SqlStoreIterator
      *
      * @return identical new instance
      */
+    @Override
     public SqlStoreIterator createCopy()
     {
-        return new SqlStoreIterator( (AbstractSqlStore) theStore, thePosition );
+        return new SqlStoreIterator( (AbstractSqlStore) theStore, thePosition, thePattern );
     }
 }
