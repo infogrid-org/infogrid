@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -21,7 +21,7 @@ import java.util.NoSuchElementException;
  * CursorIterator. The position of the Iterator is assumed to be on the next element
  * to be returned going forward, and one after than the next element to be returned
  * going backwards.
- * 
+ *
  * @param <E> the type of element to iterate over
  */
 public class FilteringCursorIterator<E>
@@ -42,7 +42,7 @@ public class FilteringCursorIterator<E>
             Filter<E>         filter,
             Class<E>          arrayComponentType )
     {
-        return new FilteringCursorIterator<E>( delegate, filter, arrayComponentType );
+        return new FilteringCursorIterator<>( delegate, filter, arrayComponentType );
     }
 
     /**
@@ -58,13 +58,13 @@ public class FilteringCursorIterator<E>
             Class<E>          arrayComponentType )
     {
         super( arrayComponentType );
-        
+
         theDelegate = delegate;
         theFilter   = filter;
-        
+
         theIsAhead = false;
         theIsBack  = false;
- 
+
         try {
             if( filter.accept( delegate.peekNext() )) {
                 theIsAhead = true;
@@ -100,14 +100,14 @@ public class FilteringCursorIterator<E>
             boolean           isBack )
     {
         super( arrayComponentType );
-        
+
         theDelegate = delegate;
         theFilter   = filter;
 
         theIsAhead = isAhead;
         theIsBack  = isBack;
     }
-    
+
     /**
      * Obtain the next element, without iterating forward.
      *
@@ -123,7 +123,7 @@ public class FilteringCursorIterator<E>
         E ret = theDelegate.peekNext();
         return ret;
     }
-    
+
     /**
      * Obtain the previous element, without iterating backwards.
      *
@@ -173,7 +173,7 @@ public class FilteringCursorIterator<E>
         }
         return theDelegate.hasPrevious();
     }
-    
+
     /**
      * Returns <tt>true</tt> if the iteration has at least N more elements in the forward direction.
      *
@@ -183,6 +183,7 @@ public class FilteringCursorIterator<E>
      * @see #hasPrevious()
      * @see #hasPrevious(int)
      */
+    @Override
     public boolean hasNext(
             int n )
     {
@@ -191,7 +192,7 @@ public class FilteringCursorIterator<E>
             moveAhead();
         }
         CursorIterator<E> temp = theDelegate.createCopy();
-        
+
         int count = 0;
         while( count < n && temp.hasNext() ) {
             E current = temp.next();
@@ -215,6 +216,7 @@ public class FilteringCursorIterator<E>
      * @see #hasPrevious()
      * @see #hasNext(int)
      */
+    @Override
     public boolean hasPrevious(
             int n )
     {
@@ -223,7 +225,7 @@ public class FilteringCursorIterator<E>
             moveBack();
         }
         CursorIterator<E> temp = theDelegate.createCopy();
-        
+
         int count = 0;
         while( count < n && temp.hasPrevious() ) {
             E current = temp.previous();
@@ -244,6 +246,7 @@ public class FilteringCursorIterator<E>
      * @return the next element in the iteration.
      * @throws NoSuchElementException iteration has no more elements.
      */
+    @Override
     public E next()
     {
         if( !theIsAhead ) {
@@ -251,7 +254,7 @@ public class FilteringCursorIterator<E>
         }
         E ret = theDelegate.next();
         theIsAhead = false; // it might be true, but moveAhead will catch this the next time
-        return ret;        
+        return ret;
     }
 
     // use default implementations for next(int) and previous(int) from superclass
@@ -262,6 +265,7 @@ public class FilteringCursorIterator<E>
      * @return the previous element in the iteration.
      * @see #next()
      */
+    @Override
     public E previous()
     {
         if( !theIsBack ) {
@@ -269,7 +273,7 @@ public class FilteringCursorIterator<E>
         }
         E ret = theDelegate.previous();
         theIsBack = false; // it might be true, but moveBack will catch this the next time
-        return ret;        
+        return ret;
     }
 
     /**
@@ -277,16 +281,17 @@ public class FilteringCursorIterator<E>
      *
      * @return identical new instance
      */
+    @Override
     public CursorIterator<E> createCopy()
     {
-        return new FilteringCursorIterator<E>(
+        return new FilteringCursorIterator<>(
                 theDelegate.createCopy(),
                 theFilter,
                 theArrayComponentType,
                 theIsAhead,
                 theIsBack );
     }
-    
+
     /**
      * Set this CursorIterator to the position represented by the provided CursorIterator.
      *
@@ -294,6 +299,7 @@ public class FilteringCursorIterator<E>
      * @throws IllegalArgumentException thrown if the provided CursorIterator did not work on the same CursorIterable,
      *         or the implementations were incompatible.
      */
+    @Override
     public void setPositionTo(
             CursorIterator<E> position )
         throws
@@ -307,9 +313,9 @@ public class FilteringCursorIterator<E>
         if( theFilter != realPosition.theFilter ) {
             throw new IllegalArgumentException( "Not the same instance of Filter" );
         }
-        
+
         theDelegate.setPositionTo( realPosition.theDelegate ); // this may throw
-        
+
         theIsAhead = realPosition.theIsAhead;
         theIsBack  = realPosition.theIsBack;
     }
@@ -351,6 +357,7 @@ public class FilteringCursorIterator<E>
      * @return the number of steps that were taken to move. Positive number means
      *         forward, negative backward
      */
+    @Override
     public int moveToBeforeFirst()
     {
         int ret = 0;
@@ -372,6 +379,7 @@ public class FilteringCursorIterator<E>
      * @return the number of steps that were taken to move. Positive number means
      *         forward, negative backward
      */
+    @Override
     public int moveToAfterLast()
     {
         int ret = 0;
@@ -382,7 +390,7 @@ public class FilteringCursorIterator<E>
             }
         }
         theIsBack = false;
-        
+
         return ret;
     }
 
@@ -390,17 +398,17 @@ public class FilteringCursorIterator<E>
      * The filter.
      */
     protected Filter<E> theFilter;
-    
+
     /**
      * The delegate iterator.
      */
     protected CursorIterator<E> theDelegate;
-    
+
     /**
      * If true, the delegate iterator is as far ahead as possible.
      */
     protected boolean theIsAhead;
-    
+
     /**
      * If true, the delegate iterator is as far back as possible.
      */
@@ -409,7 +417,7 @@ public class FilteringCursorIterator<E>
     /**
      * This inner interface is implemented by users of FilteringIterator to determine whether
      * or not we should accept a certain Object.
-     * 
+     *
      * @param <E> the type of element to iterate over
      */
     public static interface Filter<E>

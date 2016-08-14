@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -26,7 +26,7 @@ public class FileTreeFacade
 {
     /**
      * Factory method.
-     * 
+     *
      * @param top the top-most file
      * @return the created FileTreeFacade
      */
@@ -38,7 +38,7 @@ public class FileTreeFacade
 
     /**
      * Private constructor, for subclasses only.
-     * 
+     *
      * @param top the top-most file
      */
     protected FileTreeFacade(
@@ -49,20 +49,22 @@ public class FileTreeFacade
 
     /**
      * Determine the top node of the tree.
-     * 
+     *
      * @return the top node
      */
+    @Override
     public File getTopNode()
     {
         return theTop;
     }
-    
+
     /**
      * Determine whether the provided node has child nodes.
-     * 
+     *
      * @param node the node
      * @return true if the node has children
      */
+    @Override
     public boolean hasChildNodes(
             File node )
     {
@@ -72,13 +74,14 @@ public class FileTreeFacade
         int length = node.list().length;
         return length > 0;
     }
-    
+
     /**
      * Obtain the child nodes of a provided node.
-     * 
+     *
      * @param node the node
      * @return the child nodes
      */
+    @Override
     public File [] getChildNodes(
             File node )
     {
@@ -86,19 +89,20 @@ public class FileTreeFacade
             return new File[0];
         }
         File [] ret = node.listFiles();
-        
+
         // need to order them in the same sequence as defined by forward and back operations
         Arrays.sort( ret );
         return ret;
     }
-    
+
     /**
      * Obtain the parent node of the provided node. This returns null for the top
      * node.
-     * 
+     *
      * @param node the node
      * @return the parent node, or null
      */
+    @Override
     public File getParentNode(
             File node )
     {
@@ -108,25 +112,26 @@ public class FileTreeFacade
             return node.getParentFile();
         }
     }
-    
+
     /**
      * Obtain the "forward" sibling of the provided node.
-     * 
+     *
      * @param node the node
      * @return the forward node, or null if none
      * @see #getBackwardSiblingNode
      */
+    @Override
     public File getForwardSiblingNode(
             File node )
     {
         // This algorithm also works if the given node doesn't exist.
-        
+
         if( theTop.equals( node )) {
             return null;
         }
         File    parent   = node.getParentFile();
         File [] siblings = parent.listFiles();
-        
+
         // we can't make any assumptions about order
         File best = null;
         for( int i=0 ; i<siblings.length ; ++i ) {
@@ -140,25 +145,26 @@ public class FileTreeFacade
         }
         return best;
     }
-    
+
     /**
      * Obtain the "backward" sibling of the provided node.
-     * 
+     *
      * @param node the node
      * @return the backward node, or null if none
      * @see #getForwardSiblingNode
      */
+    @Override
     public File getBackwardSiblingNode(
             File node )
     {
         // This algorithm also works if the given node doesn't exist.
-        
+
         if( theTop.equals( node )) {
             return null;
         }
         File    parent   = node.getParentFile();
         File [] siblings = parent.listFiles();
-        
+
         // we can't make any assumptions about order
         File best = null;
         for( int i=0 ; i<siblings.length ; ++i ) {
@@ -172,17 +178,18 @@ public class FileTreeFacade
         }
         return best;
     }
-    
+
     /**
      * Obtain a CursorIterator over all nodes in this tree.
-     * 
+     *
      * @return the CursorIterator
      */
+    @Override
     public TreeFacadeCursorIterator<File> iterator()
     {
         return TreeFacadeCursorIterator.create( this, File.class );
     }
-    
+
     /**
      * The top node.
      */
