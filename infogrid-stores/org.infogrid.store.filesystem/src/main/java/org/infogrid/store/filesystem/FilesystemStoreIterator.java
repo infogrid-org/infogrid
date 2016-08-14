@@ -46,37 +46,25 @@ public class FilesystemStoreIterator
             FilesystemStore store,
             String          startsWith )
     {
-//        try {
-            String topPrefix = store.getTopDirectory().getAbsolutePath() + '/';
+        String topPrefix = store.getTopDirectory().getAbsolutePath() + '/';
 
-            TreeFacade<File>     facade   = FileTreeFacade.create( store.getTopDirectory() );
-            CursorIterator<File> delegate = TreeFacadeCursorIterator.create( facade, File.class );
+        TreeFacade<File>     facade   = FileTreeFacade.create( store.getTopDirectory() );
+        CursorIterator<File> delegate = TreeFacadeCursorIterator.create( facade, File.class );
 
-            delegate = FilteringCursorIterator.create(
-                    delegate,
-                    ( File candidate ) -> {
-//                        try {
-                            if( !candidate.getAbsolutePath().startsWith( topPrefix + startsWith )) {
-                                return false;
-                            }
-                            if( candidate.isDirectory()) {
-                                return false;
-                            }
-                            return true;
-//                        } catch( IOException ex ) {
-//                            return false;
-//                        }
-                    },
-                    File.class );
+        delegate = FilteringCursorIterator.create(
+                delegate,
+                ( File candidate ) -> {
+                        if( !candidate.getAbsolutePath().startsWith( topPrefix + startsWith )) {
+                            return false;
+                        }
+                        if( candidate.isDirectory()) {
+                            return false;
+                        }
+                        return true;
+                },
+                File.class );
 
-            return new FilesystemStoreIterator( store, delegate );
-
-//        } catch( IOException ex ) {
-//            log.error( ex );
-//
-//            return new FilesystemStoreIterator(
-//                    store, ZeroElementCursorIterator.create());
-//        }
+        return new FilesystemStoreIterator( store, delegate );
     }
 
     /**
