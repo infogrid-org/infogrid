@@ -407,7 +407,7 @@ public class MStore
     }
 
     /**
-     * Obtain a CursorIterable instead of an Iterator.
+     * Obtain a C instead of an Iterator.
      *
      * @return the CursorIterable
      */

@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -17,7 +17,7 @@ package org.infogrid.util;
 /**
  * This interface is supported by those <code>java.lang.Iterable</code>s that return a
  * {@link CursorIterator CursorIterator} instead of just a plain <code>Iterator</code>.
- * 
+ *
  * @param <T> the type of element to iterate over
  */
 public interface CursorIterable<T>
@@ -29,6 +29,7 @@ public interface CursorIterable<T>
      *
      * @return the <code>CursorIterable</code>
      */
+    @Override
     public CursorIterator<T> iterator();
 
     /**
