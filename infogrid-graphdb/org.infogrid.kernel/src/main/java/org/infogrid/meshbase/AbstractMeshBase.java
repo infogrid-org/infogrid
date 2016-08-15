@@ -1206,6 +1206,7 @@ public abstract class AbstractMeshBase
      * @param selector determines which candidates are included
      * @return the created MeshObjectSet
      */
+    @Override
     public ImmutableMeshObjectSet createImmutableMeshObjectSet(
             MeshObject []      candidates,
             MeshObjectSelector selector )
@@ -1282,6 +1283,7 @@ public abstract class AbstractMeshBase
      * @param two the second set to unify
      * @return the created MeshObjectSet
      */
+    @Override
     public CompositeImmutableMeshObjectSet createImmutableMeshObjectSetUnification(
             MeshObjectSet one,
             MeshObject    two )
@@ -1685,6 +1687,49 @@ public abstract class AbstractMeshBase
     public CursorIterator<MeshObject> getIterator()
     {
         return iterator();
+    }
+
+    /**
+     * Returns a CursorIterator over the MeshObjects in this MeshBase whose
+     * identifier starts with this identifier.
+     *
+     * @param startsWith the String the identifier starts with
+     * @return a CursorIterator.
+     */
+    @Override
+    public CursorIterator<MeshObject> getIterator(
+            MeshObjectIdentifier startsWith )
+    {
+        return iterator( startsWith );
+    }
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase. This redundant method
+     * is provided to make life easier for JavaBeans-aware software.
+     *
+     * @return the number of MeshObjects in this MeshBase
+     * @see #size()
+     */
+    @Override
+    public int getSize()
+    {
+        return size();
+    }
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase whose identifier
+     * starts with the provided identifier.
+     *
+     * @param startsWith the prefix
+     * @return the number of MeshObjects in this MeshBase whose identifier starts
+     * with the provided prefix
+     * @see #size(String)
+     */
+    @Override
+    public int getSize(
+            MeshObjectIdentifier startsWith )
+    {
+        return size( startsWith );
     }
 
     /**

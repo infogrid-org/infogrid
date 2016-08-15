@@ -12,7 +12,7 @@
 // All rights reserved.
 //
 
-package org.infogrid.meshbase.store.test;
+package org.infogrid.meshbase.store.test.model;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import java.util.Locale;

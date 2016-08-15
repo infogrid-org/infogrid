@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -47,11 +47,11 @@ public class StoreMeshBaseTest1
         PropertyType ptX    = theModelBase.findPropertyType( "org.infogrid.model.Test", "A",  "X" );
 
         //
-        
+
         log.info( "Deleting old database and creating new database" );
 
         theSqlStore.initializeHard();
-        
+
         RecordingStoreListener listener = new RecordingStoreListener();
         theSqlStore.addDirectStoreListener( listener );
 
@@ -80,19 +80,19 @@ public class StoreMeshBaseTest1
         //
 
         log.info( "Creating MeshObjects" );
-        
+
         Transaction tx = mb.createTransactionNow();
 
         MeshObject []           mesh  = new MeshObject[ theTestSize ];
         MeshObjectIdentifier [] names = new MeshObjectIdentifier[ theTestSize ];
-        
+
         WeakReference [] refs = new WeakReference<?>[ theTestSize ];
-        
+
         for( int i=0 ; i<mesh.length ; ++i ) {
             mesh[i]  = life.createMeshObject();
             names[i] = mesh[i].getIdentifier();
-            refs[i]  = new WeakReference<MeshObject>( mesh[i] );
-            
+            refs[i]  = new WeakReference<>( mesh[i] );
+
             if( i % 3 == 1 ) {
                 mesh[i].bless( typeAA );
             } else if( i % 3 == 2 ) {
@@ -112,9 +112,9 @@ public class StoreMeshBaseTest1
         listener.reset();
 
         //
-        
+
         log.info( "Clearing cache, and loading MeshObjects again" );
-        
+
         mesh = new MeshObject[ names.length ]; // forget old references
         mb.clearMemoryCache();
         collectGarbage();
@@ -122,10 +122,10 @@ public class StoreMeshBaseTest1
         for( int i=0 ; i<refs.length ; ++i ) {
             checkCondition( refs[i].get() == null, "MeshObject " + i + " still found" );
         }
-        
+
         for( int i=0 ; i<names.length ; ++i ) {
             mesh[i] = mb.findMeshObjectByIdentifier( names[i] );
-            
+
             checkObject( mesh[i], "Could not retrieve MeshObject with Identifier " + names[i] );
         }
 
@@ -143,7 +143,5 @@ public class StoreMeshBaseTest1
     protected int theTestSize = 1000;
 
     // Our Logger
-    private static Log log = Log.getLogInstance( StoreMeshBaseTest1.class );
-    
-
+    private static final Log log = Log.getLogInstance( StoreMeshBaseTest1.class );
 }

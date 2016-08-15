@@ -321,6 +321,17 @@ public interface Store
                 IOException;
 
     /**
+     * Determine the number of data elements in this Store. Some classes implementing
+     * this interface may only return an approximation.
+     *
+     * @return the number of data elements in this Store
+     * @throws IOException thrown if an I/O error occurred
+     */
+    public abstract int getSize()
+            throws
+                IOException;
+
+    /**
      * Determine the number of StoreValues in this Store whose key starts with this String
      *
      * @param startsWith the String the key starts with
@@ -328,6 +339,18 @@ public interface Store
      * @throws IOException thrown if an I/O error occurred
      */
     public abstract int size(
+            String startsWith )
+        throws
+            IOException;
+
+    /**
+     * Determine the number of StoreValues in this Store whose key starts with this String
+     *
+     * @param startsWith the String the key starts with
+     * @return the number of StoreValues in this Store whose key starts with this String
+     * @throws IOException thrown if an I/O error occurred
+     */
+    public abstract int getSize(
             String startsWith )
         throws
             IOException;

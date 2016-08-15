@@ -337,6 +337,20 @@ public class NetStoreMeshBase
     }
 
     /**
+     * Returns a CursorIterator over the MeshObjects in this MeshBase whose
+     * identifier starts with this identifier.
+     *
+     * @param startsWith the String the identifier starts with
+     * @return a CursorIterator.
+     */
+    @Override
+    public CursorIterator<MeshObject> iterator(
+            MeshObjectIdentifier startsWith )
+    {
+        return getCachingMap().valuesIterator( startsWith, MeshObjectIdentifier.class, MeshObject.class );
+    }
+
+    /**
      * Determine the number of MeshObjects in this MeshBase.
      *
      * @return the number of MeshObjects in this MeshBase
@@ -346,6 +360,28 @@ public class NetStoreMeshBase
     {
         try {
             return getCachingMap().getStore().size();
+
+        } catch( IOException ex ) {
+            log.error( ex );
+            return 0;
+        }
+    }
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase whose identifier
+     * starts with the provided prefix.
+     *
+     * @param startsWith the prefix
+     * @return the number of MeshObjects in this MeshBase whose identifier starts
+     * with the provided prefix
+     * @see #getSize(String)
+     */
+    @Override
+    public int size(
+            MeshObjectIdentifier startsWith )
+    {
+        try {
+            return getCachingMap().getStore().size( startsWith.toExternalForm() );
 
         } catch( IOException ex ) {
             log.error( ex );

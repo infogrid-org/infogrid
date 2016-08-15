@@ -12,16 +12,19 @@
 // All rights reserved.
 //
 
-package org.infogrid.meshbase.store.test;
+package org.infogrid.meshbase.store.test.model;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.meshbase.store.StoreMeshBase;
 import org.infogrid.model.primitives.BooleanValue;
 import org.infogrid.model.primitives.EntityType;
+import org.infogrid.model.primitives.FloatValue;
 import org.infogrid.model.primitives.L10PropertyValueMapImpl;
 import org.infogrid.model.primitives.MultiplicityValue;
+import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.RelationshipType;
 import org.infogrid.model.primitives.RoleType;
+import org.infogrid.model.primitives.StringDataType;
 import org.infogrid.model.primitives.StringValue;
 import org.infogrid.model.primitives.SubjectArea;
 import org.infogrid.modelbase.MeshTypeIdentifierFactory;
@@ -32,9 +35,9 @@ import org.junit.Test;
 
 /**
  * Models are not supposed to change. But sometimes, they do, such as during development.
- * Tests that a supertype can be removed without bad consequences.
+ * Tests that a supertype can be added without bad consequences.
  */
-public class ModelChangeTest5
+public class ModelChangeTest4
     extends
         AbstractModelChangeTest
 {
@@ -78,13 +81,41 @@ public class ModelChangeTest5
                 BooleanValue.TRUE,
                 BooleanValue.TRUE );
 
+        final EntityType ent1 = typeLife.createEntityType(
+                typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/Ent1" ),
+                StringValue.create( "Ent1" ),
+                L10PropertyValueMapImpl.create( StringValue.create( "Ent1") ),
+                null, null,
+                sa,
+                null, null, null, null, null, null, null,
+                BooleanValue.TRUE, // abstract
+                BooleanValue.TRUE,
+                BooleanValue.TRUE,
+                BooleanValue.TRUE,
+                BooleanValue.TRUE );
+
+        final PropertyType ent1_prop1 = typeLife.createPropertyType(
+                typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/Ent1_Prop1" ),
+                StringValue.create( "Ent1_Prop1" ),
+                L10PropertyValueMapImpl.create( StringValue.create( "Ent1_Prop1") ),
+                null,
+                ent1,
+                sa,
+                StringDataType.theDefault,
+                null, null, null,
+                BooleanValue.TRUE,
+                BooleanValue.FALSE,
+                BooleanValue.TRUE,
+                BooleanValue.TRUE,
+                FloatValue.create( 1. ) );
+
         final EntityType ent2 = typeLife.createEntityType(
                 typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/Ent2" ),
                 StringValue.create( "Ent2" ),
                 L10PropertyValueMapImpl.create( StringValue.create( "Ent2") ),
                 null, null,
                 sa,
-                new EntityType[] {}, // no supertype
+                new EntityType[] { ent1 },
                 null, null, null, null, null, null,
                 BooleanValue.TRUE, // abstract
                 BooleanValue.TRUE,
@@ -92,13 +123,42 @@ public class ModelChangeTest5
                 BooleanValue.TRUE,
                 BooleanValue.TRUE );
 
+        final EntityType entNew = typeLife.createEntityType(
+                typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/EntNew" ),
+                StringValue.create( "EntNew" ),
+                L10PropertyValueMapImpl.create( StringValue.create( "EntNew") ),
+                null, null,
+                sa,
+                null, null, null, null, null, null, null,
+                BooleanValue.FALSE, // not abstract
+                BooleanValue.TRUE,
+                BooleanValue.TRUE,
+                BooleanValue.TRUE,
+                BooleanValue.TRUE );
+
+        final PropertyType entNew_prop1 = typeLife.createPropertyType(
+                typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/EntNew_Prop1" ),
+                StringValue.create( "EntNew_Prop1" ),
+                L10PropertyValueMapImpl.create( StringValue.create( "EntNew_Prop1") ),
+                null,
+                ent1,
+                sa,
+                StringDataType.theDefault,
+                StringValue.create( "Default value of EntNew_Prop1" ),
+                null, null,
+                BooleanValue.FALSE, // mandatory
+                BooleanValue.FALSE,
+                BooleanValue.TRUE,
+                BooleanValue.TRUE,
+                FloatValue.create( 2. ) );
+
         final EntityType ent3 = typeLife.createEntityType(
                 typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/Ent3" ),
                 StringValue.create( "Ent3" ),
                 L10PropertyValueMapImpl.create( StringValue.create( "Ent3") ),
                 null, null,
                 sa,
-                new EntityType[] { ent2 },
+                new EntityType[] { ent2, entNew },
                 null, null, null, null, null, null,
                 BooleanValue.FALSE, // not abstract
                 BooleanValue.TRUE,
@@ -147,10 +207,18 @@ public class ModelChangeTest5
         // Read all elements
         log.info( "Traversing mb2" );
 
+        boolean found = false;
         for( MeshObject current : mb2 ) {
             if( log.isDebugEnabled() ) {
                 log.debug( "Found", current );
             }
+            if( current.getIdentifier().toExternalForm().equals( "#a" )) {
+                checkEquals( current.getPropertyValue( entNew_prop1 ), entNew_prop1.getDefaultValue(), "wrong value" );
+                found = true;
+            }
+        }
+        if( !found ) {
+            reportError( "Could not find #a" );
         }
 
         mb2.die();
@@ -158,5 +226,5 @@ public class ModelChangeTest5
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( ModelChangeTest5.class );
+    private static Log log = Log.getLogInstance( ModelChangeTest4.class );
 }

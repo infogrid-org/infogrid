@@ -14,6 +14,7 @@
 
 package org.infogrid.probe.shadow.a;
 
+import java.util.HashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
@@ -28,6 +29,9 @@ import org.infogrid.meshbase.net.security.NetAccessManager;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.probe.StagingMeshBase;
 import org.infogrid.util.CachingMap;
+import org.infogrid.util.CursorIterator;
+import org.infogrid.util.FilteringCursorIterator;
+import org.infogrid.util.MapCursorIterator;
 import org.infogrid.util.context.Context;
 
 /**
@@ -103,6 +107,79 @@ public abstract class AStagingMeshBase
             long timeCreated )
     {
         super.initializeHomeObject( timeCreated, timeCreated, timeCreated );
+    }
+
+    /**
+     * Returns a CursorIterator over the content of this MeshBase.
+     *
+     * @return a CursorIterator.
+     */
+    @Override
+    public CursorIterator<MeshObject> iterator()
+    {
+        MapCursorIterator.Values<MeshObjectIdentifier,MeshObject> ret = MapCursorIterator.createForValues(
+                (HashMap<MeshObjectIdentifier,MeshObject>) theCache,
+                MeshObjectIdentifier.class,
+                MeshObject.class );
+        return ret;
+    }
+
+    /**
+     * Returns a CursorIterator over the MeshObjects in this MeshBase whose
+     * identifier starts with this identifier.
+     *
+     * @param startsWith the String the identifier starts with
+     * @return a CursorIterator.
+     */
+    @Override
+    public CursorIterator<MeshObject> iterator(
+            MeshObjectIdentifier startsWith )
+    {
+        FilteringCursorIterator<MeshObject> ret = FilteringCursorIterator.create(
+                MapCursorIterator.createForValues(
+                        theCache,
+                        MeshObjectIdentifier.class,
+                        MeshObject.class ),
+                (MeshObject o) -> {
+                            return o.getIdentifier().startsWith( startsWith );
+                        },
+                MeshObject.class );
+        return ret;
+    }
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase.
+     *
+     * @return the number of MeshObjects in this MeshBase
+     */
+    @Override
+    public int size()
+    {
+        return theCache.size();
+    }
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase whose identifier
+     * starts with the provided prefix.
+     *
+     * @param startsWith the prefix
+     * @return the number of MeshObjects in this MeshBase whose identifier starts
+     * with the provided prefix
+     * @see #getSize(String)
+     */
+    @Override
+    public int size(
+            MeshObjectIdentifier startsWith )
+    {
+        HashMap<MeshObjectIdentifier,MeshObject> realCache = (HashMap) theCache;
+
+        int ret = 0;
+        for( MeshObjectIdentifier id : realCache.keySet() ) {
+            if( id.startsWith( startsWith )) {
+                ++ret;
+            }
+        }
+        return ret;
     }
 
     /**

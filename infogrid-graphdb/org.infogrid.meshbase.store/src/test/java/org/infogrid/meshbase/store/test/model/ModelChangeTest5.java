@@ -12,7 +12,7 @@
 // All rights reserved.
 //
 
-package org.infogrid.meshbase.store.test;
+package org.infogrid.meshbase.store.test.model;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.meshbase.store.StoreMeshBase;
@@ -32,9 +32,9 @@ import org.junit.Test;
 
 /**
  * Models are not supposed to change. But sometimes, they do, such as during development.
- * Tests that a PropertyType can be removed without too bad consequences.
+ * Tests that a supertype can be removed without bad consequences.
  */
-public class ModelChangeTest1
+public class ModelChangeTest5
     extends
         AbstractModelChangeTest
 {
@@ -78,28 +78,13 @@ public class ModelChangeTest1
                 BooleanValue.TRUE,
                 BooleanValue.TRUE );
 
-        final EntityType ent1 = typeLife.createEntityType(
-                typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/Ent1" ),
-                StringValue.create( "Ent1" ),
-                L10PropertyValueMapImpl.create( StringValue.create( "Ent1") ),
-                null, null,
-                sa,
-                null, null, null, null, null, null, null,
-                BooleanValue.TRUE, // abstract
-                BooleanValue.TRUE,
-                BooleanValue.TRUE,
-                BooleanValue.TRUE,
-                BooleanValue.TRUE );
-
-        // removed PropertyType
-
         final EntityType ent2 = typeLife.createEntityType(
                 typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/Ent2" ),
                 StringValue.create( "Ent2" ),
                 L10PropertyValueMapImpl.create( StringValue.create( "Ent2") ),
                 null, null,
                 sa,
-                new EntityType[] { ent1 },
+                new EntityType[] {}, // no supertype
                 null, null, null, null, null, null,
                 BooleanValue.TRUE, // abstract
                 BooleanValue.TRUE,
@@ -173,5 +158,5 @@ public class ModelChangeTest1
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( ModelChangeTest1.class );
+    private static Log log = Log.getLogInstance( ModelChangeTest5.class );
 }

@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.net.local.store;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -55,6 +56,8 @@ import org.infogrid.probe.shadow.store.StoreShadowMeshBaseFactory;
 import org.infogrid.store.Store;
 import org.infogrid.store.util.StoreBackedSwappingHashMap;
 import org.infogrid.util.CursorIterator;
+import org.infogrid.util.FilteringCursorIterator;
+import org.infogrid.util.MapCursorIterator;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.logging.Log;
 
@@ -445,14 +448,41 @@ public class LocalNetStoreMeshBase
     }
 
     /**
-     * Obtain an Iterator over all MeshObjects in the Store.
+     * Returns a CursorIterator over the content of this MeshBase.
      *
-     * @return the Iterator
+     * @return a CursorIterator.
      */
     @Override
     public CursorIterator<MeshObject> iterator()
     {
-        return getCachingMap().valuesIterator( MeshObjectIdentifier.class, MeshObject.class );
+        MapCursorIterator.Values<MeshObjectIdentifier,MeshObject> ret = MapCursorIterator.createForValues(
+                (HashMap<MeshObjectIdentifier,MeshObject>) theCache,
+                MeshObjectIdentifier.class,
+                MeshObject.class );
+        return ret;
+    }
+
+    /**
+     * Returns a CursorIterator over the MeshObjects in this MeshBase whose
+     * identifier starts with this identifier.
+     *
+     * @param startsWith the String the identifier starts with
+     * @return a CursorIterator.
+     */
+    @Override
+    public CursorIterator<MeshObject> iterator(
+            MeshObjectIdentifier startsWith )
+    {
+        FilteringCursorIterator<MeshObject> ret = FilteringCursorIterator.create(
+                MapCursorIterator.createForValues(
+                        theCache,
+                        MeshObjectIdentifier.class,
+                        MeshObject.class ),
+                (MeshObject o) -> {
+                            return o.getIdentifier().startsWith( startsWith );
+                        },
+                MeshObject.class );
+        return ret;
     }
 
     /**
@@ -463,13 +493,31 @@ public class LocalNetStoreMeshBase
     @Override
     public int size()
     {
-        try {
-            return getCachingMap().getStore().size();
+        return theCache.size();
+    }
 
-        } catch( IOException ex ) {
-            log.error( ex );
-            return 0;
+    /**
+     * Determine the number of MeshObjects in this MeshBase whose identifier
+     * starts with the provided prefix.
+     *
+     * @param startsWith the prefix
+     * @return the number of MeshObjects in this MeshBase whose identifier starts
+     * with the provided prefix
+     * @see #getSize(String)
+     */
+    @Override
+    public int size(
+            MeshObjectIdentifier startsWith )
+    {
+        HashMap<MeshObjectIdentifier,MeshObject> realCache = (HashMap) theCache;
+
+        int ret = 0;
+        for( MeshObjectIdentifier id : realCache.keySet() ) {
+            if( id.startsWith( startsWith )) {
+                ++ret;
+            }
         }
+        return ret;
     }
 
     /**

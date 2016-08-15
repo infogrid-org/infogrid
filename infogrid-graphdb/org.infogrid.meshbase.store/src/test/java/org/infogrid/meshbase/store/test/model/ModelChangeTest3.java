@@ -12,7 +12,7 @@
 // All rights reserved.
 //
 
-package org.infogrid.meshbase.store.test;
+package org.infogrid.meshbase.store.test.model;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.meshbase.store.StoreMeshBase;
@@ -35,9 +35,9 @@ import org.junit.Test;
 
 /**
  * Models are not supposed to change. But sometimes, they do, such as during development.
- * Tests that a supertype can be added without bad consequences.
+ * Tests that a PropertyType can turn read-only without too bad consequences.
  */
-public class ModelChangeTest4
+public class ModelChangeTest3
     extends
         AbstractModelChangeTest
 {
@@ -104,7 +104,7 @@ public class ModelChangeTest4
                 StringDataType.theDefault,
                 null, null, null,
                 BooleanValue.TRUE,
-                BooleanValue.FALSE,
+                BooleanValue.TRUE, // read-only
                 BooleanValue.TRUE,
                 BooleanValue.TRUE,
                 FloatValue.create( 1. ) );
@@ -123,42 +123,13 @@ public class ModelChangeTest4
                 BooleanValue.TRUE,
                 BooleanValue.TRUE );
 
-        final EntityType entNew = typeLife.createEntityType(
-                typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/EntNew" ),
-                StringValue.create( "EntNew" ),
-                L10PropertyValueMapImpl.create( StringValue.create( "EntNew") ),
-                null, null,
-                sa,
-                null, null, null, null, null, null, null,
-                BooleanValue.FALSE, // not abstract
-                BooleanValue.TRUE,
-                BooleanValue.TRUE,
-                BooleanValue.TRUE,
-                BooleanValue.TRUE );
-
-        final PropertyType entNew_prop1 = typeLife.createPropertyType(
-                typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/EntNew_Prop1" ),
-                StringValue.create( "EntNew_Prop1" ),
-                L10PropertyValueMapImpl.create( StringValue.create( "EntNew_Prop1") ),
-                null,
-                ent1,
-                sa,
-                StringDataType.theDefault,
-                StringValue.create( "Default value of EntNew_Prop1" ),
-                null, null,
-                BooleanValue.FALSE, // mandatory
-                BooleanValue.FALSE,
-                BooleanValue.TRUE,
-                BooleanValue.TRUE,
-                FloatValue.create( 2. ) );
-
         final EntityType ent3 = typeLife.createEntityType(
                 typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/Ent3" ),
                 StringValue.create( "Ent3" ),
                 L10PropertyValueMapImpl.create( StringValue.create( "Ent3") ),
                 null, null,
                 sa,
-                new EntityType[] { ent2, entNew },
+                new EntityType[] { ent2 },
                 null, null, null, null, null, null,
                 BooleanValue.FALSE, // not abstract
                 BooleanValue.TRUE,
@@ -207,18 +178,10 @@ public class ModelChangeTest4
         // Read all elements
         log.info( "Traversing mb2" );
 
-        boolean found = false;
         for( MeshObject current : mb2 ) {
             if( log.isDebugEnabled() ) {
                 log.debug( "Found", current );
             }
-            if( current.getIdentifier().toExternalForm().equals( "#a" )) {
-                checkEquals( current.getPropertyValue( entNew_prop1 ), entNew_prop1.getDefaultValue(), "wrong value" );
-                found = true;
-            }
-        }
-        if( !found ) {
-            reportError( "Could not find #a" );
         }
 
         mb2.die();
@@ -226,5 +189,5 @@ public class ModelChangeTest4
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( ModelChangeTest4.class );
+    private static Log log = Log.getLogInstance( ModelChangeTest3.class );
 }

@@ -376,7 +376,7 @@ public abstract class StoreBackedSwappingHashMap<K,V>
         cleanup();
 
         if( theKeySet == null ) {
-            theKeySet = new MyKeySet<K,V>( theStore, theMapper );
+            theKeySet = new MyKeySet<>( theStore, theMapper );
         }
         return theKeySet;
     }
@@ -400,6 +400,25 @@ public abstract class StoreBackedSwappingHashMap<K,V>
     }
 
     /**
+     * Obtain a CursorIterator on the keys of this Map that start with the provided prefix.
+     *
+     * @param prefix the required prefix for the keys
+     * @param keyArrayComponentType the class using which arrays of keys are allocated
+     * @param valueArrayComponentType the class using which arrays of values are allocated
+     * @return the CursorIterator
+     */
+    public CursorIterator<K> keysIterator(
+            K        prefix,
+            Class<K> keyArrayComponentType,
+            Class<V> valueArrayComponentType )
+    {
+        StoreCursor delegate = theStore.iterator( theMapper.keyToString( prefix ));
+
+        CursorIterator<K> ret = new StoreBackedSwappingHashMapKeysIterator<>( delegate, this, theMapper, keyArrayComponentType );
+        return ret;
+    }
+
+    /**
      * Obtain a CursorIterator on the values of this Map.
      *
      * @param keyArrayComponentType the class using which arrays of keys are allocated
@@ -413,7 +432,26 @@ public abstract class StoreBackedSwappingHashMap<K,V>
     {
         StoreCursor delegate = theStore.iterator();
 
-        CursorIterator<V> ret = new StoreBackedSwappingHashMapValuesIterator<K,V>( delegate, this, theMapper, keyArrayComponentType, valueArrayComponentType );
+        CursorIterator<V> ret = new StoreBackedSwappingHashMapValuesIterator<>( delegate, this, theMapper, keyArrayComponentType, valueArrayComponentType );
+        return ret;
+    }
+
+    /**
+     * Obtain a CursorIterator on the values of this Map whose keys start with the provided prefix.
+     *
+     * @param prefix the required prefix for the keys
+     * @param keyArrayComponentType the class using which arrays of keys are allocated
+     * @param valueArrayComponentType the class using which arrays of values are allocated
+     * @return the CursorIterator
+     */
+    public CursorIterator<V> valuesIterator(
+            K        prefix,
+            Class<K> keyArrayComponentType,
+            Class<V> valueArrayComponentType )
+    {
+        StoreCursor delegate = theStore.iterator( theMapper.keyToString( prefix ));
+
+        CursorIterator<V> ret = new StoreBackedSwappingHashMapValuesIterator<>( delegate, this, theMapper, keyArrayComponentType, valueArrayComponentType );
         return ret;
     }
 
@@ -501,7 +539,7 @@ public abstract class StoreBackedSwappingHashMap<K,V>
         @Override
         public Iterator<K> iterator()
         {
-            return new MyKeyIterator<K,V>( theStore.iterator(), theMapper );
+            return new MyKeyIterator<>( theStore.iterator(), theMapper );
         }
 
         /**

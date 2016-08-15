@@ -274,6 +274,26 @@ public interface MeshBase
     public CursorIterator<MeshObject> iterator();
 
     /**
+     * Returns a CursorIterator over the MeshObjects in this MeshBase whose
+     * identifier starts with this identifier.
+     *
+     * @param startsWith the String the identifier starts with
+     * @return a CursorIterator.
+     */
+    public abstract CursorIterator<MeshObject> iterator(
+            MeshObjectIdentifier startsWith );
+
+    /**
+     * Returns a CursorIterator over the MeshObjects in this MeshBase whose
+     * identifier starts with this identifier.
+     *
+     * @param startsWith the String the identifier starts with
+     * @return a CursorIterator.
+     */
+    public abstract CursorIterator<MeshObject> getIterator(
+            MeshObjectIdentifier startsWith );
+
+    /**
      * Determine the number of MeshObjects in this MeshBase.
      *
      * @return the number of MeshObjects in this MeshBase
@@ -289,6 +309,30 @@ public interface MeshBase
      * @see #size()
      */
     public abstract int getSize();
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase whose identifier
+     * starts with the provided identifier.
+     *
+     * @param startsWith the prefix
+     * @return the number of MeshObjects in this MeshBase whose identifier starts
+     * with the provided prefix
+     * @see #getSize(String)
+     */
+    public abstract int size(
+            MeshObjectIdentifier startsWith );
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase whose identifier
+     * starts with the provided identifier.
+     *
+     * @param startsWith the prefix
+     * @return the number of MeshObjects in this MeshBase whose identifier starts
+     * with the provided prefix
+     * @see #size(String)
+     */
+    public abstract int getSize(
+            MeshObjectIdentifier startsWith );
 
     /**
      * Factory method for a IterableMeshBaseDifferencer, with this IterableMeshBase

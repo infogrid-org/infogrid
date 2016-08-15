@@ -244,19 +244,24 @@ public class StoreMeshBase
      *
      * @return the Iterator
      */
+    @Override
     public CursorIterator<MeshObject> iterator()
     {
         return getCachingMap().valuesIterator( MeshObjectIdentifier.class, MeshObject.class );
     }
 
     /**
-     * Obtain an Iterator over all MeshObjects in the Store.
+     * Returns a CursorIterator over the MeshObjects in this MeshBase whose
+     * identifier starts with this identifier.
      *
-     * @return the Iterator
+     * @param startsWith the String the identifier starts with
+     * @return a CursorIterator.
      */
-    final public CursorIterator<MeshObject> getIterator()
+    @Override
+    public CursorIterator<MeshObject> iterator(
+            MeshObjectIdentifier startsWith )
     {
-        return iterator();
+        return getCachingMap().valuesIterator( startsWith, MeshObjectIdentifier.class, MeshObject.class );
     }
 
     /**
@@ -264,6 +269,7 @@ public class StoreMeshBase
      *
      * @return the number of MeshObjects in this MeshBase
      */
+    @Override
     public int size()
     {
         try {
@@ -276,15 +282,25 @@ public class StoreMeshBase
     }
 
     /**
-     * Determine the number of MeshObjects in this MeshBase. This redundant method
-     * is provided to make life easier for JavaBeans-aware software.
+     * Determine the number of MeshObjects in this MeshBase whose identifier
+     * starts with the provided prefix.
      *
-     * @return the number of MeshObjects in this MeshBase
-     * @see #size()
+     * @param startsWith the prefix
+     * @return the number of MeshObjects in this MeshBase whose identifier starts
+     * with the provided prefix
+     * @see #getSize(String)
      */
-    public final int getSize()
+    @Override
+    public int size(
+            MeshObjectIdentifier startsWith )
     {
-        return size();
+        try {
+            return getCachingMap().getStore().size( startsWith.toExternalForm() );
+
+        } catch( IOException ex ) {
+            log.error( ex );
+            return 0;
+        }
     }
 
     /**
@@ -293,6 +309,7 @@ public class StoreMeshBase
      *
      * @return the IterableMeshBaseDifferencer
      */
+    @Override
     public MeshBaseDifferencer getDifferencer()
     {
         return new MeshBaseDifferencer( this );

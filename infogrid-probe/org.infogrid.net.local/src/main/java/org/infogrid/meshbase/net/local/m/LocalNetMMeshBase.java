@@ -46,6 +46,7 @@ import org.infogrid.probe.manager.m.MScheduledExecutorProbeManager;
 import org.infogrid.probe.shadow.m.MShadowMeshBaseFactory;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CursorIterator;
+import org.infogrid.util.FilteringCursorIterator;
 import org.infogrid.util.MCachingHashMap;
 import org.infogrid.util.MapCursorIterator;
 import org.infogrid.util.context.Context;
@@ -375,13 +376,71 @@ public class LocalNetMMeshBase
      *
      * @return a CursorIterator.
      */
+    @Override
     public CursorIterator<MeshObject> iterator()
     {
-        // not sure why these type casts are needed, they should not be
         MapCursorIterator.Values<MeshObjectIdentifier,MeshObject> ret = MapCursorIterator.createForValues(
                 (HashMap<MeshObjectIdentifier,MeshObject>) theCache,
                 MeshObjectIdentifier.class,
                 MeshObject.class );
+        return ret;
+    }
+
+    /**
+     * Returns a CursorIterator over the MeshObjects in this MeshBase whose
+     * identifier starts with this identifier.
+     *
+     * @param startsWith the String the identifier starts with
+     * @return a CursorIterator.
+     */
+    @Override
+    public CursorIterator<MeshObject> iterator(
+            MeshObjectIdentifier startsWith )
+    {
+        FilteringCursorIterator<MeshObject> ret = FilteringCursorIterator.create(
+                MapCursorIterator.createForValues(
+                        theCache,
+                        MeshObjectIdentifier.class,
+                        MeshObject.class ),
+                (MeshObject o) -> {
+                            return o.getIdentifier().startsWith( startsWith );
+                        },
+                MeshObject.class );
+        return ret;
+    }
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase.
+     *
+     * @return the number of MeshObjects in this MeshBase
+     */
+    @Override
+    public int size()
+    {
+        return theCache.size();
+    }
+
+    /**
+     * Determine the number of MeshObjects in this MeshBase whose identifier
+     * starts with the provided prefix.
+     *
+     * @param startsWith the prefix
+     * @return the number of MeshObjects in this MeshBase whose identifier starts
+     * with the provided prefix
+     * @see #getSize(String)
+     */
+    @Override
+    public int size(
+            MeshObjectIdentifier startsWith )
+    {
+        HashMap<MeshObjectIdentifier,MeshObject> realCache = (HashMap) theCache;
+
+        int ret = 0;
+        for( MeshObjectIdentifier id : realCache.keySet() ) {
+            if( id.startsWith( startsWith )) {
+                ++ret;
+            }
+        }
         return ret;
     }
 }

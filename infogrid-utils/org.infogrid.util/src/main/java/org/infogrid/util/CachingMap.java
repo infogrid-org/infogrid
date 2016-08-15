@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -80,7 +80,7 @@ public interface CachingMap<K,V>
      * Obtain the keys for an existing value. This is the opposite operation
      * of {@link #get}. Depending on the implementation of this interface,
      * this operation may take a long time.
-     * 
+     *
      * @param value the value whose keys need to be found
      * @return an Iterator over the keys
      */
@@ -159,7 +159,7 @@ public interface CachingMap<K,V>
     /**
       * Remove a listener.
       * This method is the same regardless how the listener was subscribed to events.
-      * 
+      *
       * @param oldListener the to-be-removed listener
       * @see #addDirectCachingMapListener
       * @see #addSoftCachingMapListener

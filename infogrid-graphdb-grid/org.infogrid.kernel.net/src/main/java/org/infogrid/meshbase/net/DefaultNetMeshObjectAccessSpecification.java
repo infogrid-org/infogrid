@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.net;
 
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.text.StringRepresentation;
@@ -29,8 +30,6 @@ public class DefaultNetMeshObjectAccessSpecification
             NetMeshObjectAccessSpecification,
             CanBeDumped
 {
-    private final static long serialVersionUID = 1L; // helps with serialization
-
     /**
      * Constructor. Use factory class to instantiate.
      *
@@ -49,7 +48,7 @@ public class DefaultNetMeshObjectAccessSpecification
         theAccessPath       = accessPath != null ? accessPath : new NetMeshBaseAccessSpecification[0];
         theRemoteIdentifier = remoteIdentifier;
         theAsEntered        = asEnteredByUser;
-        
+
         for( int i=0 ; i<theAccessPath.length ; ++i ) {
             if( theAccessPath[i] == null ) {
                 throw new IllegalArgumentException( "No AccessPath component in NetMeshObjectAccessSpecification must be null" );
@@ -65,6 +64,7 @@ public class DefaultNetMeshObjectAccessSpecification
      *
      * @return the factory
      */
+    @Override
     public NetMeshObjectAccessSpecificationFactory getFactory()
     {
         return theFactory;
@@ -72,9 +72,10 @@ public class DefaultNetMeshObjectAccessSpecification
 
     /**
      * Obtain the NetMeshBaseAccessSpecification path.
-     * 
+     *
      * @return the path we traverse to the MeshObject we want to access. May be of length 0.
      */
+    @Override
     public NetMeshBaseAccessSpecification [] getAccessPath()
     {
         return theAccessPath;
@@ -86,6 +87,7 @@ public class DefaultNetMeshObjectAccessSpecification
      *
      * @return the Identifier of the NetMeshObject that we are looking for
      */
+    @Override
     public NetMeshObjectIdentifier getNetMeshObjectIdentifier()
     {
         return theRemoteIdentifier;
@@ -97,6 +99,7 @@ public class DefaultNetMeshObjectAccessSpecification
      *
      * @return String form, as entered by the user, if any
      */
+    @Override
     public String getAsEntered()
     {
         return theAsEntered;
@@ -104,9 +107,10 @@ public class DefaultNetMeshObjectAccessSpecification
 
     /**
      * Obtain an externalized version of this NetMeshObjectAccessSpecification.
-     * 
+     *
      * @return external form of this NetMeshObjectAccessSpecification similar to URL.toExternalForm()
      */
+    @Override
     public String toExternalForm()
     {
         if( theAccessPath.length == 0 ) {
@@ -143,6 +147,7 @@ public class DefaultNetMeshObjectAccessSpecification
      *
      * @return external form of this Identifier
      */
+    @Override
     public String getExternalForm()
     {
         return toExternalForm();
@@ -154,6 +159,7 @@ public class DefaultNetMeshObjectAccessSpecification
      *
      * @return colloquial external form of this Identifier
      */
+    @Override
     public String toColloquialExternalForm()
     {
         return getExternalForm();
@@ -165,9 +171,25 @@ public class DefaultNetMeshObjectAccessSpecification
      *
      * @return colloquial external form of this Identifier
      */
+    @Override
     public final String getColloquialExternalForm()
     {
         return toColloquialExternalForm();
+    }
+
+    /**
+     * Determine whether the provided identifier is higher up in
+     * the name space as this identifier. This is equivalent to
+     * toExternalForm().startsWith( other.toExternalForm().
+     *
+     * @param other the identifier to test against
+     * @return true if this provided identifier is higher up in the name space
+     */
+    @Override
+    public boolean startsWith(
+            Identifier other )
+    {
+        return getExternalForm().startsWith( other.getExternalForm() );
     }
 
     /**
@@ -190,7 +212,7 @@ public class DefaultNetMeshObjectAccessSpecification
                 default:
                     ret.append( c );
                     break;
-            }            
+            }
         }
         return ret.toString();
     }
@@ -206,7 +228,7 @@ public class DefaultNetMeshObjectAccessSpecification
     {
         int           len = s.length();
         StringBuilder ret = new StringBuilder( len );
-        
+
         int startAt = 0;
         int foundAt;
         while( ( foundAt = s.indexOf( ESCAPED_HASH, startAt )) >= 0 ) {
@@ -235,7 +257,7 @@ public class DefaultNetMeshObjectAccessSpecification
             return false;
         }
         NetMeshObjectAccessSpecification realOther = (NetMeshObjectAccessSpecification) other;
-        
+
         if( theAccessPath.length != realOther.getAccessPath().length ) {
             return false;
         }
@@ -256,7 +278,7 @@ public class DefaultNetMeshObjectAccessSpecification
 
     /**
      * Determine hash code.
-     * 
+     *
      * @return hash code
      */
     @Override
@@ -281,6 +303,7 @@ public class DefaultNetMeshObjectAccessSpecification
      * @return String representation
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      */
+    @Override
     public String toStringRepresentation(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
@@ -312,6 +335,7 @@ public class DefaultNetMeshObjectAccessSpecification
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      * @return String representation
      */
+    @Override
     public String toStringRepresentationLinkStart(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
@@ -330,6 +354,7 @@ public class DefaultNetMeshObjectAccessSpecification
      * @throws StringifierException thrown if there was a problem when attempting to stringify
      * @return String representation
      */
+    @Override
     public String toStringRepresentationLinkEnd(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
@@ -344,6 +369,7 @@ public class DefaultNetMeshObjectAccessSpecification
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {

@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -27,7 +27,7 @@ import org.infogrid.store.StoreCursor;
 
 /**
  * Iterator over all keys in an InterableStoreBackedMap.
- * 
+ *
  * @param <K> the type of key
  * @param <V> the type of value
  */
@@ -46,7 +46,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
      * @param arrayComponentClass the Class to use when returning arrays
      */
     public StoreBackedSwappingHashMapKeysIterator(
-            StoreCursor             delegate,
+            StoreCursor                     delegate,
             StoreBackedSwappingHashMap<K,V> cache,
             StoreEntryMapper<K,V>           mapper,
             Class<K>                        arrayComponentClass )
@@ -88,7 +88,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
             throw new NoSuchElementException();
         }
     }
-    
+
     /**
      * Obtain the previous element, without iterating backwards.
      *
@@ -137,7 +137,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
     {
         return theDelegate.hasPrevious();
     }
-    
+
     /**
      * Returns <tt>true</tt> if the iteration has at least N more elements in the forward direction.
      *
@@ -147,6 +147,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
      * @see #hasPrevious()
      * @see #hasPrevious(int)
      */
+    @Override
     public boolean hasNext(
             int n )
     {
@@ -162,6 +163,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
      * @see #hasPrevious()
      * @see #hasNext(int)
      */
+    @Override
     public boolean hasPrevious(
             int n )
     {
@@ -174,6 +176,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
      * @return the next element in the iteration.
      * @throws NoSuchElementException iteration has no more elements.
      */
+    @Override
     public K next()
     {
         try {
@@ -191,7 +194,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
     /**
      * <p>Obtain the next N elements. If fewer than N elements are available, return
      * as many elements are available in a shorter array.</p>
-     * 
+     *
      * @return the next no more than N elements
      * @see #previous(int)
      */
@@ -201,7 +204,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
     {
         StoreValue [] values  = theDelegate.next( n );
         K          [] ret     = ArrayHelper.createArray( theArrayComponentType, Math.min( values.length, n ));
-        
+
         for( int i=0 ; i<ret.length ; ++i ) {
             try {
                 ret[i] = theMapper.stringToKey( values[i].getKey() );
@@ -211,7 +214,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
                 throw new NoSuchElementException();
             }
         }
-        
+
         return ret;
     }
 
@@ -221,6 +224,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
      * @return the previous element in the iteration.
      * @see #next()
      */
+    @Override
     public K previous()
     {
         try {
@@ -238,7 +242,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
     /**
      * <p>Obtain the previous N elements. If fewer than N elements are available, return
      * as many elements are available in a shorter array.</p>
-     * 
+     *
      * <p>Note that the elements
      * will be ordered in the opposite direction as you might expect: they are
      * returned in the sequence in which the CursorIterator visits them, not in the
@@ -253,7 +257,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
     {
         StoreValue [] values  = theDelegate.previous( n );
         K          [] ret     = ArrayHelper.createArray( theArrayComponentType, n );
-        
+
         for( int i=0 ; i<values.length ; ++i ) {
             try {
                 ret[i] = theMapper.stringToKey( values[i].getKey() );
@@ -263,7 +267,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
                 throw new NoSuchElementException();
             }
         }
-        
+
         return ret;
     }
 
@@ -326,7 +330,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
      *
      * @throws UnsupportedOperationException if the <tt>remove</tt>
      *        operation is not supported by this Iterator.
-     
+
      * @throws IllegalStateException if the <tt>next</tt> method has not
      *        yet been called, or the <tt>remove</tt> method has already
      *        been called after the last call to the <tt>next</tt>
@@ -337,17 +341,18 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
     {
         theDelegate.remove();
     }
-    
+
     /**
      * Clone this position.
      *
      * @return identical new instance
      */
+    @Override
     public StoreBackedSwappingHashMapKeysIterator<K,V> createCopy()
     {
-        return new StoreBackedSwappingHashMapKeysIterator<K,V>( theDelegate.createCopy(), theCache, theMapper, theArrayComponentType );
+        return new StoreBackedSwappingHashMapKeysIterator<>( theDelegate.createCopy(), theCache, theMapper, theArrayComponentType );
     }
-    
+
     /**
      * Set this CursorIterator to the position represented by the provided CursorIterator.
      *
@@ -355,6 +360,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
      * @throws IllegalArgumentException thrown if the provided CursorIterator did not work on the same CursorIterable,
      *         or the implementations were incompatible.
      */
+    @Override
     public void setPositionTo(
             CursorIterator<K> position )
         throws
@@ -371,7 +377,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
         if( theMapper != realPosition.theMapper ) {
             throw new IllegalArgumentException( "Not the same instance of mapper" );
         }
-        
+
         theDelegate.setPositionTo( realPosition.theDelegate ); // this may throw
     }
 
@@ -382,6 +388,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
      * @return the number of steps that were taken to move. Positive number means
      *         forward, negative backward
      */
+    @Override
     public int moveToBeforeFirst()
     {
         int ret = theDelegate.moveToBeforeFirst();
@@ -395,6 +402,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
      * @return the number of steps that were taken to move. Positive number means
      *         forward, negative backward
      */
+    @Override
     public int moveToAfterLast()
     {
         int ret = theDelegate.moveToAfterLast();
@@ -424,7 +432,7 @@ public class StoreBackedSwappingHashMapKeysIterator<K,V>
      * The underlying Iterator over the Store content.
      */
     protected StoreCursor theDelegate;
-    
+
     /**
      * The cache to use.
      */

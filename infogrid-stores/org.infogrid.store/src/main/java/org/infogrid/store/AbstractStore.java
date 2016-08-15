@@ -195,6 +195,37 @@ public abstract class AbstractStore
     }
 
     /**
+     * Determine the number of data elements in this Store. Some classes implementing
+     * this interface may only return an approximation.
+     *
+     * @return the number of data elements in this Store
+     * @throws IOException thrown if an I/O error occurred
+     */
+    @Override
+    public int getSize()
+            throws
+                IOException
+    {
+        return size();
+    }
+
+    /**
+     * Determine the number of StoreValues in this Store whose key starts with this String
+     *
+     * @param startsWith the String the key starts with
+     * @return the number of StoreValues in this Store whose key starts with this String
+     * @throws IOException thrown if an I/O error occurred
+     */
+    @Override
+    public int getSize(
+            String startsWith )
+        throws
+            IOException
+    {
+        return size( startsWith );
+    }
+
+    /**
      * Determine whether this Store is empty.
      *
      * @return true if this Store is empty

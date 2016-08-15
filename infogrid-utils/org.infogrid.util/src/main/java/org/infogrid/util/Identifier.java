@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -55,4 +55,15 @@ public interface Identifier
      * @return colloquial external form of this Identifier
      */
     public abstract String getColloquialExternalForm();
+
+    /**
+     * Determine whether the provided identifier is higher up in
+     * the name space as this identifier. This is equivalent to
+     * toExternalForm().startsWith( other.toExternalForm().
+     *
+     * @param other the identifier to test against
+     * @return true if this provided identifier is higher up in the name space
+     */
+    public abstract boolean startsWith(
+            Identifier other );
 }

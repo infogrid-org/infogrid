@@ -246,57 +246,6 @@ public abstract class AnetMeshBase
     }
 
     /**
-     * Map iterator.
-     *
-     * @return the iterator
-     */
-    @Override
-    public final CursorIterator<MeshObject> getIterator()
-    {
-        return iterator();
-    }
-
-    /**
-     * Returns a CursorIterator over the content of this MeshBase.
-     *
-     * @return a CursorIterator.
-     */
-    @Override
-    public CursorIterator<MeshObject> iterator()
-    {
-        // not sure why these type casts are needed, they should not be
-        MapCursorIterator.Values<MeshObjectIdentifier,MeshObject> ret = MapCursorIterator.createForValues(
-                (HashMap<MeshObjectIdentifier,MeshObject>) theCache,
-                MeshObjectIdentifier.class,
-                MeshObject.class );
-        return ret;
-    }
-
-    /**
-     * Determine the number of MeshObjects in this MeshBase.
-     *
-     * @return the number of MeshObjects in this MeshBase
-     */
-    @Override
-    public int size()
-    {
-        return theCache.size();
-    }
-
-    /**
-     * Determine the number of MeshObjects in this MeshBase. This redundant method
-     * is provided to make life easier for JavaBeans-aware software.
-     *
-     * @return the number of MeshObjects in this MeshBase
-     * @see #size()
-     */
-    @Override
-    public final int getSize()
-    {
-        return size();
-    }
-
-    /**
      * Factory method for a IterableMeshBaseDifferencer, with this IterableMeshBase
      * being the comparison base.
      *

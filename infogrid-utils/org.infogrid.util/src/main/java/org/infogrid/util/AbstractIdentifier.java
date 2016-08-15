@@ -38,6 +38,7 @@ public abstract class AbstractIdentifier
      *
      * @return String form, as entered by the user, if any
      */
+    @Override
     public String getAsEntered()
     {
         return theAsEntered;
@@ -50,6 +51,7 @@ public abstract class AbstractIdentifier
      *
      * @return external form of this Identifier
      */
+    @Override
     public final String getExternalForm()
     {
         return toExternalForm();
@@ -61,6 +63,7 @@ public abstract class AbstractIdentifier
      *
      * @return colloquial external form of this Identifier
      */
+    @Override
     public String toColloquialExternalForm()
     {
         String ret = toExternalForm();
@@ -84,9 +87,26 @@ public abstract class AbstractIdentifier
      *
      * @return colloquial external form of this Identifier
      */
+    @Override
     public final String getColloquialExternalForm()
     {
         return toColloquialExternalForm();
+    }
+
+    /**
+     * Determine whether the provided identifier is higher up in
+     * the name space as this identifier. This is equivalent to
+     * toExternalForm().startsWith( other.toExternalForm().
+     *
+     * @param other the identifier to test against
+     * @return true if this provided identifier is higher up in the name space
+     */
+    @Override
+    public boolean startsWith(
+            Identifier other )
+    {
+        // subclasses might be able to be more efficient
+        return toExternalForm().startsWith( other.getExternalForm() );
     }
 
     /**

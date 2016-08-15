@@ -12,7 +12,7 @@
 // All rights reserved.
 //
 
-package org.infogrid.meshbase.store.test;
+package org.infogrid.meshbase.store.test.model;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.meshbase.store.StoreMeshBase;
@@ -35,9 +35,9 @@ import org.junit.Test;
 
 /**
  * Models are not supposed to change. But sometimes, they do, such as during development.
- * Tests that a PropertyType can turn read-only without too bad consequences.
+ * Tests that a mandatory PropertyType can be added without too bad consequences.
  */
-public class ModelChangeTest3
+public class ModelChangeTest2
     extends
         AbstractModelChangeTest
 {
@@ -104,7 +104,24 @@ public class ModelChangeTest3
                 StringDataType.theDefault,
                 null, null, null,
                 BooleanValue.TRUE,
-                BooleanValue.TRUE, // read-only
+                BooleanValue.FALSE,
+                BooleanValue.TRUE,
+                BooleanValue.TRUE,
+                FloatValue.create( 1. ) );
+
+        // added mandatory PropertyType
+        final PropertyType ent1_prop2 = typeLife.createPropertyType(
+                typeIdFact.fromExternalForm( "org.infogrid.meshbase.store.test.model/Ent1_Prop2" ),
+                StringValue.create( "Ent1_Prop2" ),
+                L10PropertyValueMapImpl.create( StringValue.create( "Ent1_Prop2") ),
+                null,
+                ent1,
+                sa,
+                StringDataType.theDefault,
+                StringValue.create( "Default value of mandatory new PropertyType" ),
+                null, null,
+                BooleanValue.FALSE, // not optional
+                BooleanValue.FALSE,
                 BooleanValue.TRUE,
                 BooleanValue.TRUE,
                 FloatValue.create( 1. ) );
@@ -178,16 +195,23 @@ public class ModelChangeTest3
         // Read all elements
         log.info( "Traversing mb2" );
 
+        boolean found = false;
         for( MeshObject current : mb2 ) {
             if( log.isDebugEnabled() ) {
                 log.debug( "Found", current );
             }
+            if( current.getIdentifier().toExternalForm().equals( "#a" )) {
+                checkEquals( current.getPropertyValue( ent1_prop2 ), ent1_prop2.getDefaultValue(), "wrong value" );
+                found = true;
+            }
         }
+        if( !found ) {
+            reportError( "Could not find #a" );}
 
         mb2.die();
         mb2 = null;
     }
 
     // Our Logger
-    private static Log log = Log.getLogInstance( ModelChangeTest3.class );
+    private static Log log = Log.getLogInstance( ModelChangeTest2.class );
 }

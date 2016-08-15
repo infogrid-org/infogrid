@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A <code>org.infogrid.util.CachingMap} whose cache is either entirely empty or complete,
+ * A {@link org.infogrid.util.CachingMap} whose cache is either entirely empty or complete,
  * and if empty, is transparently reloaded from the specified {@link org.infogrid.store.Store}.
- * 
+ *
  * @param <K> the type of key
  * @param <V> the type of value
  */
@@ -40,7 +40,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
             AbstractCachingMap<K,V>
 {
     private static final Log log = Log.getLogInstance( DynamicLoadFromStoreMap.class ); // our own, private logger
-    
+
     /**
      * Constructor.
      *
@@ -59,6 +59,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
     /**
      * Clear the local cache.
      */
+    @Override
     public synchronized void clearLocalCache()
     {
         saveToStore();
@@ -70,16 +71,18 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      *
      * @return true if it is persistent
      */
+    @Override
     public boolean isPersistent()
     {
         return true;
     }
-    
+
     /**
      * Returns the number of key-value mappings in this map.
      *
      * @return the number of key-value mappings in this map.
      */
+    @Override
     public int size()
     {
         HashMap<K,V> delegate = theDelegate; // trick to get around a synchronized statement
@@ -95,6 +98,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      *
      * @return <tt>true</tt> if this map contains no key-value mappings.
      */
+    @Override
     public boolean isEmpty()
     {
         HashMap<K,V> delegate = theDelegate; // trick to get around a synchronized statement
@@ -112,6 +116,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      * @param valueArrayComponentType the class using which arrays of values are allocated
      * @return the CursorIterator
      */
+    @Override
     public CursorIterator<K> keysIterator(
             Class<K> keyArrayComponentType,
             Class<V> valueArrayComponentType )
@@ -121,7 +126,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
         if( delegate == null ) {
             delegate = ensureLoaded();
         }
-        
+
         CursorIterator<K> ret = MapCursorIterator.createForKeys( delegate, keyArrayComponentType, valueArrayComponentType );
 
         return ret;
@@ -134,6 +139,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      * @param valueArrayComponentType the class using which arrays of values are allocated
      * @return the CursorIterator
      */
+    @Override
     public CursorIterator<V> valuesIterator(
             Class<K> keyArrayComponentType,
             Class<V> valueArrayComponentType )
@@ -143,7 +149,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
         if( delegate == null ) {
             delegate = ensureLoaded();
         }
-        
+
         CursorIterator<V> ret = MapCursorIterator.createForValues( delegate, keyArrayComponentType, valueArrayComponentType );
 
         return ret;
@@ -158,6 +164,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      *         key.
      */
     @SuppressWarnings("element-type-mismatch")
+    @Override
     public boolean containsKey(
             Object key )
     {
@@ -178,6 +185,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      *         specified value.
      */
     @SuppressWarnings("element-type-mismatch")
+    @Override
     public boolean containsValue(
             Object value )
     {
@@ -197,6 +205,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      *         <tt>null</tt> if the map contains no mapping for this key.
      */
     @SuppressWarnings("element-type-mismatch")
+    @Override
     public V get(
             Object key )
     {
@@ -210,11 +219,12 @@ public abstract class DynamicLoadFromStoreMap<K,V>
 
     /**
      * Associates the specified value with the specified key in this map.
-     * 
+     *
      * @param key the key
      * @param value the value
      * @return the old value previously stored using the same key, if any
      */
+    @Override
     public V put(
             K key,
             V value )
@@ -237,6 +247,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      * @param key key with which the specified value is to be associated.
      * @param value value to be associated with the specified key.
      */
+    @Override
     public void putIgnorePrevious(
             K key,
             V value )
@@ -246,11 +257,12 @@ public abstract class DynamicLoadFromStoreMap<K,V>
 
     /**
      * Removes the mapping for this key from this map if it is present.
-     * 
+     *
      * @param key the key
      * @return the old value previously stored using the same key, if any
      */
     @SuppressWarnings("element-type-mismatch")
+    @Override
     public V remove(
             Object key )
     {
@@ -267,6 +279,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      *
      * @param t Mappings to be stored in this map.
      */
+    @Override
     public void putAll(
             Map<? extends K, ? extends V> t )
     {
@@ -281,10 +294,11 @@ public abstract class DynamicLoadFromStoreMap<K,V>
     /**
      * Removes all mappings from this map.
      */
+    @Override
     public synchronized void clear()
     {
         theDelegate = null;
-        
+
         try {
             theStore.deleteAll();
 
@@ -298,6 +312,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      *
      * @return a set view of the keys contained in this map.
      */
+    @Override
     public Set<K> keySet()
     {
         HashMap<K,V> delegate = theDelegate; // trick to get around a synchronized statement
@@ -313,6 +328,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      *
      * @return a collection view of the values contained in this map.
      */
+    @Override
     public Collection<V> values()
     {
         HashMap<K,V> delegate = theDelegate; // trick to get around a synchronized statement
@@ -328,6 +344,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      *
      * @return a set view of the mappings contained in this map.
      */
+    @Override
     public Set<Map.Entry<K, V>> entrySet()
     {
         HashMap<K,V> delegate = theDelegate; // trick to get around a synchronized statement
@@ -354,7 +371,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
 
     /**
      * Hash code.
-     * 
+     *
      * @return hash code
      */
     @Override
@@ -376,13 +393,13 @@ public abstract class DynamicLoadFromStoreMap<K,V>
 
             } catch( StoreKeyDoesNotExistException ex ) {
                 // that's fine
-                theDelegate = new HashMap<K,V>(); // empty
-                
+                theDelegate = new HashMap<>(); // empty
+
             } catch( IOException ex ) {
                 throw new RuntimeException( ex );
             }
         }
-        
+
         return theDelegate;
     }
 
@@ -398,7 +415,7 @@ public abstract class DynamicLoadFromStoreMap<K,V>
             } catch( IOException ex ) {
                 throw new RuntimeException( ex );
             }
-        }        
+        }
     }
 
     /**
@@ -426,12 +443,12 @@ public abstract class DynamicLoadFromStoreMap<K,V>
      * The underlying HashMap if currently available.
      */
     protected HashMap<K,V> theDelegate;
-    
+
     /**
      * The Store to save from/to.
      */
     protected Store theStore;
-    
+
     /**
      * The key of the StoreValue into which to write the entire content of this Map.
      */

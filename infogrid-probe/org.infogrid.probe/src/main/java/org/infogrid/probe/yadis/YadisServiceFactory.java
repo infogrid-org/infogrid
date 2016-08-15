@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -16,7 +16,6 @@ package org.infogrid.probe.yadis;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -132,7 +131,7 @@ public class YadisServiceFactory
     {
         try {
             NetMeshObject subject = base.getHomeObject();
-        
+
             addYadisServicesFromHtml( dataSourceIdentifier, content, subject, base );
 
         } catch( NotPermittedException ex ) {
@@ -143,7 +142,7 @@ public class YadisServiceFactory
             log.warn( ex );
         }
     }
-        
+
     /**
      * Instantiate the Services from an HTML document.
      *
@@ -358,7 +357,7 @@ public class YadisServiceFactory
 
             } catch( BlessedAlreadyException ex ) {
                 // happens if both OpenID V1 and V2 are supported
-                
+
             } catch( IsAbstractException ex ) {
                 log.error( ex );
             }
