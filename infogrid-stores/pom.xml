@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
     <artifactId>infogrid-stores</artifactId>
-    <version><!-- PKGVER -->2.9.9<!-- /PKGVER --></version>
+    <version><!-- PKGVER -->2.9.10<!-- /PKGVER --></version>
     <packaging>pom</packaging>
     <name>infogrid-stores</name>
     <url>http://infogrid.org/</url>
