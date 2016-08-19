@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -25,6 +25,7 @@ import org.infogrid.jee.viewlet.DefaultJeeViewletFactoryChoice;
 import org.infogrid.jee.viewlet.JeeMeshObjectsToView;
 import org.infogrid.jee.viewlet.JeeViewedMeshObjects;
 import org.infogrid.jee.viewlet.SimpleJeeViewlet;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.externalized.xml.BulkExternalizedMeshObjectXmlEncoder;
 import org.infogrid.meshbase.BulkLoadException;
@@ -97,13 +98,13 @@ public class BulkLoaderViewlet
     {
         super( viewed, c );
     }
-    
+
     /**
      * <p>Invoked prior to the execution of the Servlet if the POST method has been requested
      *    and the SafeUnsafePostFilter determined that the incoming POST was safe.
      *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
      *    the POST execution of the servlet, e.g. the evaluation of POST commands.</p>
-     * 
+     *
      * @param request the incoming request
      * @param response the response to be assembled
      * @return if true, the result of the viewlet processing has been deposited into the response object
@@ -119,13 +120,13 @@ public class BulkLoaderViewlet
     {
         return performPost( request, response );
     }
-    
+
     /**
      * <p>Invoked prior to the execution of the Servlet if the POST method has been requested
      *    and no SafeUnsafePostFilter has been used.
      *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
      *    the POST execution of the servlet.</p>
-     * 
+     *
      * @param request the incoming request
      * @param response the response to be assembled
      * @return if true, the result of the viewlet processing has been deposited into the response object
@@ -144,7 +145,7 @@ public class BulkLoaderViewlet
 
     /**
      * Perform the post operation.
-     * 
+     *
      * @param request the incoming request
      * @param response the response to be assembled
      * @return if true, the result of the viewlet processing has been deposited into the response object
@@ -165,7 +166,7 @@ public class BulkLoaderViewlet
             tx = base.createTransactionAsapIfNeeded();
 
             InputStream inStream = new ByteArrayInputStream( bulkXml.getBytes( "UTF-8" ));
-            
+
             BulkExternalizedMeshObjectXmlEncoder theParser = new BulkExternalizedMeshObjectXmlEncoder();
 
             Iterator<? extends ExternalizedMeshObject> iter = theParser.bulkLoad(
@@ -175,7 +176,7 @@ public class BulkLoaderViewlet
             while( iter.hasNext() ) {
                 base.getMeshBaseLifecycleManager().loadExternalizedMeshObject( iter.next() );
             }
-            
+
         } catch( BulkLoadException ex ) {
             theBulkXml = bulkXml;
             throw new ServletException( ex );
@@ -187,10 +188,14 @@ public class BulkLoaderViewlet
         } catch( Exception ex ) {
             log.error( ex );
             theBulkXml = bulkXml;
-            
+
         } finally {
             if( tx != null ) {
-                tx.commitTransaction();
+                try {
+                    tx.commitTransaction();
+                } catch( MeshObjectGraphModificationException ex2 ) {
+                    throw new ServletException( ex2 );
+                }
             }
         }
         return defaultPerformPost( request, response );
@@ -205,12 +210,12 @@ public class BulkLoaderViewlet
     {
         return theBulkXml;
     }
-    
+
     /**
      * The bulk XML to show.
      */
     protected String theBulkXml;
-    
+
     /**
      * Name of the HTTP Post argument that contains the XML to load.
      */

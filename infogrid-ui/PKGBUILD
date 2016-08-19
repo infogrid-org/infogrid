@@ -1,5 +1,5 @@
 pkgname=$(basename $(pwd))
-pkgver=2.9.10
+pkgver=2.9.11
 pkgrel=1
 pkgdesc='InfoGrid UI'
 arch=('any')
@@ -16,7 +16,7 @@ depends=(
 
 prepare() {
     # Set pom.xml versions correctly; depends on XML-comment-based markup in pom.xml files
-    find ${startdir} -path ./pkg -o -name pom.xml -exec perl -pi -e "s/(?<=\<\!-- PKGVER -->)(\d+(\.\d+)+)(?=\<\!-- \/PKGVER -->)/${pkgver}/g" {} \;
+    find ${startdir} -path ${startdir}/pkg -prune -o -name pom.xml -exec perl -pi -e "s/(?<=\<\!-- PKGVER -->)(\d+(\.\d+)+)(?=\<\!-- \/PKGVER -->)/${pkgver}/g" {} \;
 }
 
 build() {

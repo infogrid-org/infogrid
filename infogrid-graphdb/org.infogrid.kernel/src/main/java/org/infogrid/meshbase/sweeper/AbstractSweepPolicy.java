@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.sweeper;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.security.ThreadIdentityManager;
 import org.infogrid.meshbase.MeshBase;
@@ -38,7 +39,7 @@ public abstract class AbstractSweepPolicy
     {
         // noop
     }
-    
+
     /**
      * Determine whether this candidate MeshObject should be swept, according
      * to this Sweeper.
@@ -48,7 +49,7 @@ public abstract class AbstractSweepPolicy
      */
     public abstract boolean shouldBeDeleted(
             MeshObject candidate );
-    
+
     /**
      * Enable a MeshBase to filter this candidate MeshObject. If the filter lets
      * pass the MeshObject, this MeshObject will returned to a MeshBase client.
@@ -106,20 +107,24 @@ public abstract class AbstractSweepPolicy
         Transaction tx = null;
         try {
             ThreadIdentityManager.sudo();
-            
+
             tx = base.createTransactionAsapIfNeeded();
-            
+
             base.getMeshBaseLifecycleManager().deleteMeshObject( toDelete );
 
         } catch( TransactionException ex ) {
             log.error( ex );
-            
+
         } catch( NotPermittedException ex ) {
             log.error( ex );
-            
+
         } finally {
             if( tx != null ) {
-                tx.commitTransaction();
+                try {
+                    tx.commitTransaction();
+                } catch( MeshObjectGraphModificationException ex ) {
+                    log.error( ex );
+                }
             }
             ThreadIdentityManager.sudone();
         }

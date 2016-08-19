@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
@@ -38,7 +39,7 @@ public class MeshObjectPropertyChangeEvent
 
     /**
      * Constructor.
-     * 
+     *
      * @param source the MeshObject that is the source of the event
      * @param property an object representing the property of the event
      * @param oldValue the old value of the property, prior to the event
@@ -68,9 +69,9 @@ public class MeshObjectPropertyChangeEvent
 
     /**
      * Constructor for the case where we don't have an old value, only the new value.
-     * This perhaps should trigger some exception if it is attempted to read old 
+     * This perhaps should trigger some exception if it is attempted to read old
      * values later. (FIXME?)
-     * 
+     *
      * @param sourceIdentifier the identifier of the MeshObject that is the source of the event
      * @param propertyIdentifier the identifier of an object representing the property of the event
      * @param newValue the new value of the property, after the event
@@ -97,7 +98,7 @@ public class MeshObjectPropertyChangeEvent
                 timeEventOccurred,
                 resolver );
     }
-    
+
     /**
      * Constructor.
      *
@@ -132,7 +133,7 @@ public class MeshObjectPropertyChangeEvent
 
     /**
      * Constructor.
-     * 
+     *
      * @param source the object that is the source of the event
      * @param sourceIdentifier the identifier representing the source of the event
      * @param property an object representing the property of the event
@@ -171,7 +172,7 @@ public class MeshObjectPropertyChangeEvent
                 newValue,
                 newValueIdentifier,
                 timeEventOccurred );
-        
+
         theResolver = resolver;
     }
 
@@ -180,6 +181,7 @@ public class MeshObjectPropertyChangeEvent
      *
      * @return the Identifier of the MeshObject affected by this Change
      */
+    @Override
     public MeshObjectIdentifier getAffectedMeshObjectIdentifier()
     {
         return getSourceIdentifier();
@@ -190,6 +192,7 @@ public class MeshObjectPropertyChangeEvent
      *
      * @return obtain the MeshObject affected by this Change
      */
+    @Override
     public MeshObject getAffectedMeshObject()
     {
         return getSource();
@@ -198,7 +201,7 @@ public class MeshObjectPropertyChangeEvent
     /**
      * Determine whether another MeshObjectPropertyChangeEvent affects the same
      * Property (i.e. same MeshObject, same PropertyType) as this one.
-     * 
+     *
      * @param candidate the candidate MeshObjectPropertyChangeEvent
      * @return true if the candidate affects the same Property as this
      */
@@ -226,13 +229,17 @@ public class MeshObjectPropertyChangeEvent
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in MeshBase base
+     * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not
+     *         conform to the model
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
+    @Override
     public MeshObject applyTo(
             MeshBase base )
         throws
             CannotApplyChangeException,
+            MeshObjectGraphModificationException,
             TransactionException
     {
         setResolver( base );
@@ -273,6 +280,7 @@ public class MeshObjectPropertyChangeEvent
      *
      * @return the inverse Change, or null if no inverse Change could be constructed.
      */
+    @Override
     public MeshObjectPropertyChangeEvent inverse()
     {
         return new MeshObjectPropertyChangeEvent(
@@ -289,6 +297,7 @@ public class MeshObjectPropertyChangeEvent
      * @param candidate the candidate Change
      * @return true if the candidate Change is the inverse of this Change
      */
+    @Override
     public boolean isInverse(
             Change candidate )
     {
@@ -334,6 +343,7 @@ public class MeshObjectPropertyChangeEvent
      *
      * @param mb the MeshBase
      */
+    @Override
     public void setResolver(
             MeshBase mb )
     {
@@ -345,9 +355,10 @@ public class MeshObjectPropertyChangeEvent
 
     /**
      * Obtain the MeshBase that is currently set as resolver for the identifiers carried by this event.
-     * 
+     *
      * @return the MeshBase, if any
      */
+    @Override
     public MeshBase getResolver()
     {
         return theResolver;
@@ -359,6 +370,7 @@ public class MeshObjectPropertyChangeEvent
      * @return the source of the event
      * @throws PropertyUnresolvedException thrown if the property cannot be resolved
      */
+    @Override
     protected MeshObject resolveSource()
         throws
             PropertyUnresolvedException
@@ -366,7 +378,7 @@ public class MeshObjectPropertyChangeEvent
         if( theResolver == null ) {
             throw new PropertyUnresolvedException( this );
         }
-        
+
         MeshObject ret = theResolver.findMeshObjectByIdentifier( getSourceIdentifier() );
         return ret;
     }
@@ -377,6 +389,7 @@ public class MeshObjectPropertyChangeEvent
      * @return the property of the event
      * @throws PropertyUnresolvedException thrown if the property cannot be resolved
      */
+    @Override
     protected PropertyType resolveProperty()
         throws
             PropertyUnresolvedException
@@ -384,7 +397,7 @@ public class MeshObjectPropertyChangeEvent
         if( theResolver == null ) {
             throw new PropertyUnresolvedException( this );
         }
-        
+
         try {
             PropertyType ret = theResolver.getModelBase().findPropertyTypeByIdentifier( getPropertyIdentifier() );
             return ret;
@@ -393,18 +406,19 @@ public class MeshObjectPropertyChangeEvent
             throw new PropertyUnresolvedException( this, ex );
         }
     }
-    
+
     /**
      * Resolve the new value of the event.
      *
      * @return the new value of the event
      */
+    @Override
     protected PropertyValue resolveValue(
             PropertyValue vid )
     {
         return vid;
     }
-    
+
     /**
      * Determine equality.
      *
@@ -436,7 +450,7 @@ public class MeshObjectPropertyChangeEvent
 
     /**
      * Determine hash code.
-     * 
+     *
      * @return the hash code
      */
     @Override

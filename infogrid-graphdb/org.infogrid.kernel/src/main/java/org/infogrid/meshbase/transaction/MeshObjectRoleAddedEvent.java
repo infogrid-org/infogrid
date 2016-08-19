@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
@@ -66,7 +67,7 @@ public class MeshObjectRoleAddedEvent
 
     /**
      * Constructor.
-     * 
+     *
      * @param source the MeshObject that is the source of the event
      * @param oldValues the old values of the RoleType, prior to the event
      * @param deltaValues the RoleTypes that changed
@@ -98,7 +99,7 @@ public class MeshObjectRoleAddedEvent
 
     /**
      * Constructor.
-     * 
+     *
      * @param sourceIdentifier the identifier representing the source MeshObject of the event
      * @param oldValueIdentifiers the identifier representing the old values of the RoleType, prior to the event
      * @param deltaValueIdentifiers the identifiers of the RoleTypes that changed
@@ -132,7 +133,7 @@ public class MeshObjectRoleAddedEvent
 
     /**
      * Pass-through constructor for subclasses.
-     * 
+     *
      * @param source the MeshObject that is the source of the event
      * @param sourceIdentifier the identifier representing the source MeshObject of the event
      * @param oldValues the old values of the RoleType, prior to the event
@@ -173,12 +174,13 @@ public class MeshObjectRoleAddedEvent
                 timeEventOccurred,
                 resolver );
     }
-    
+
     /**
      * Determine whether this is an addition or a removal of a RoleType.
      *
      * @return true if this is an addition
      */
+    @Override
     public boolean isAdditionalRoleUpdate()
     {
         return true;
@@ -196,13 +198,17 @@ public class MeshObjectRoleAddedEvent
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in MeshBase base
+     * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not
+     *         conform to the model
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
+    @Override
     public MeshObject applyTo(
             MeshBase base )
         throws
             CannotApplyChangeException,
+            MeshObjectGraphModificationException,
             TransactionException
     {
         setResolver( base );
@@ -237,6 +243,7 @@ public class MeshObjectRoleAddedEvent
      *
      * @return the inverse Change, or null if no inverse Change could be constructed.
      */
+    @Override
     public MeshObjectRoleRemovedEvent inverse()
     {
         return new MeshObjectRoleRemovedEvent(
@@ -254,6 +261,7 @@ public class MeshObjectRoleAddedEvent
      * @param candidate the candidate Change
      * @return true if the candidate Change is the inverse of this Change
      */
+    @Override
     public boolean isInverse(
             Change candidate )
     {
@@ -278,6 +286,7 @@ public class MeshObjectRoleAddedEvent
      * Determine equality.
      *
      * @param other the Object to compare with
+     * @return true if the objects are equal
      */
     @Override
     public boolean equals(
@@ -287,7 +296,7 @@ public class MeshObjectRoleAddedEvent
             return false;
         }
         MeshObjectRoleAddedEvent realOther = (MeshObjectRoleAddedEvent) other;
-        
+
         if( !getSourceIdentifier().equals( realOther.getSourceIdentifier() )) {
             return false;
         }

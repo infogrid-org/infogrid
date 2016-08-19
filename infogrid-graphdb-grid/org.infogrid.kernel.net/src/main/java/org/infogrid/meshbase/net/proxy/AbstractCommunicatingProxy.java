@@ -22,10 +22,12 @@ import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.comm.ReturnSynchronizerEndpoint;
 import org.infogrid.comm.SendingMessageEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.net.NetMeshObjectIdentifier;
+import org.infogrid.mesh.security.ThreadIdentityManager;
 import org.infogrid.meshbase.net.CoherenceSpecification;
 import org.infogrid.meshbase.net.NetMeshBase;
 import org.infogrid.meshbase.net.NetMeshBaseIdentifier;
@@ -554,13 +556,12 @@ public abstract class AbstractCommunicatingProxy
                         Throwable
                 {
                     Transaction tx = theMeshBase.createTransactionAsapIfNeeded();
-
-                    tx.sudo();
-
                     return tx;
                 }
         };
         try {
+            ThreadIdentityManager.sudo();
+
             for( RippleInstructions current : instructions.getRippleCreates() ) {
                 perhapsTx.obtain();  // can ignore return value
                 NetMeshObject obj = null;
@@ -705,8 +706,13 @@ public abstract class AbstractCommunicatingProxy
             log.error( ex );
         } finally {
             if( perhapsTx.hasBeenCreated() ) {
-                perhapsTx.obtain().commitTransaction();
+                try {
+                    perhapsTx.obtain().commitTransaction();
+                } catch( MeshObjectGraphModificationException ex2 ) {
+                    log.error( ex2 );
+                }
             }
+            ThreadIdentityManager.sudone();
         }
 
         for( NetMeshObject current : instructions.getCancels() ) {

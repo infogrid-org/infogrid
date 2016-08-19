@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -47,6 +47,7 @@ import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotBlessedException;
 import org.infogrid.mesh.NotPermittedException;
@@ -107,7 +108,7 @@ public class ProbeDispatcher
 
     /**
      * Constructor.
-     * 
+     *
      * @param meshBase the ShadowMeshBase on whose behalf the ProbeDispatcher works
      * @param directory the ProbeDirectory to use
      * @param timeCreated the time the home object is supposed to be created
@@ -177,14 +178,14 @@ public class ProbeDispatcher
         CoherenceSpecification coherence        = par != null ? par.getCoherenceSpecification() : null;
 
         theCurrentUpdate = System.currentTimeMillis();
-        
+
         if( !isFirstRun ) {
             fireUpdateStarted();
         }
 
         try {
             // Determine which kind of Probe to run
-            
+
             boolean isDirectory = false;
             boolean isStream    = false;
             // there is no "isApi" because it is the default if none of the others is set
@@ -218,7 +219,7 @@ public class ProbeDispatcher
                 tx = newBase.createTransactionAsap();
 
                 newBase.initializeHomeObject( theCurrentUpdate );
-                
+
                 if( isDirectory ) {
                     probeResult = handleDirectory( oldBase, newBase, coherence );
                 } else if( isStream ) {
@@ -226,9 +227,9 @@ public class ProbeDispatcher
                 } else {
                     probeResult = handleApi( oldBase, newBase, coherence );
                 }
-                
+
                 updated = probeResult.getUpdated();
-                
+
                 if( newBase != theShadowMeshBase ) {
                     copyProbeUpdateSpecification( theShadowMeshBase.getHomeObject(), newBase.getHomeObject() );
                     // otherwise we lose what was there previously
@@ -264,14 +265,14 @@ public class ProbeDispatcher
 
             } finally {
                 // this is a long finally block, so we enclose everything in a try/catch and put the commit into the final finally
-                
+
                 Transaction tx2 = null;
                 try {
                     if( problem == null && !isFirstRun && updated ) {
 
                         // get all the locks back
                         theUpdateInProgress = true;
-                        
+
                         forceLockRecovery( theShadowMeshBase );
 
                         ProbeDifferencer diff = new ProbeDifferencer( theShadowMeshBase );
@@ -292,7 +293,7 @@ public class ProbeDispatcher
                     // Deal with the update policy. We apply this to theShadow rather than base, because that way
                     // we can do it after the Differencer has run, and correctly invoke whether or not there
                     // were changes.
-                    
+
                     MeshObject home = theShadowMeshBase.getHomeObject();
                     if( !home.isBlessedBy( ProbeSubjectArea.PROBEUPDATESPECIFICATION )) {
                         // Probe did not do it, so we do it
@@ -302,7 +303,7 @@ public class ProbeDispatcher
                         }
                         blessMeshObjectWithCoherence( coherence, home );
                     }
-                    
+
                     if( probeResult != null ) {
                         if( newBase != theShadowMeshBase && tx2 == null ) {
                             tx2 = theShadowMeshBase.createTransactionAsap();
@@ -314,7 +315,7 @@ public class ProbeDispatcher
                             home.setPropertyValue(
                                     ProbeSubjectArea.PROBEUPDATESPECIFICATION_LASTRUNUSEDPROBECLASS,
                                     StringValue.createOrNull( probeResult.getUsedProbeClass() != null ? probeResult.getUsedProbeClass().getName() : null ));
-                            
+
                         } catch( IllegalPropertyTypeException ex3 ) {
                             log.error( ex3 );
                         } catch( IllegalPropertyValueException ex3 ) {
@@ -330,7 +331,7 @@ public class ProbeDispatcher
                             if( newBase != theShadowMeshBase && tx2 == null ) {
                                 tx2 = theShadowMeshBase.createTransactionAsap();
                             }
-                            
+
                             if( problem != null ) {
                                 spec.performedUnsuccessfulRun( tookTime, problem );
                             } else if( updated ) {
@@ -355,6 +356,9 @@ public class ProbeDispatcher
                         }
                     }
                 } catch( NotBlessedException ex2 ) {
+                    throw new ProbeException.Other( sourceIdentifier, ex2 ); // should never happen
+
+                } catch( MeshObjectGraphModificationException ex2 ) {
                     throw new ProbeException.Other( sourceIdentifier, ex2 ); // should never happen
 
                 } catch( TransactionException ex2 ) {
@@ -383,7 +387,7 @@ public class ProbeDispatcher
         } finally {
 
             theLastUpdate = theCurrentUpdate;
-            
+
             if( problem != null ) {
                 // do not set theLastSuccessfulUpdate
                 if( !isFirstRun ) {
@@ -421,7 +425,7 @@ public class ProbeDispatcher
 
     /**
      * The data source refers to a directory in a fie system, probe the directory.
-     * 
+     *
      * @param oldBase the StagingMeshBase after the most recent successful run, if any
      * @param newBase the new StagingMeshBase into which to instantiate the data
      * @param coherence the CoherenceSpecification specified by the client, if any
@@ -549,7 +553,7 @@ public class ProbeDispatcher
 
             if( httpResponse.isSuccess() && XRDS_MIME_TYPE.equals( httpResponse.getContentType() )) {
                 // found XRDS content via MIME type
-                
+
                 yadisServicesXml  = httpResponse.getContent();
                 yadisServicesType = httpResponse.getContentType();
 
@@ -578,7 +582,7 @@ public class ProbeDispatcher
             if( newResponse != null ) {
                 httpResponse = newResponse;
             }
-            
+
             streamDataCreated      = httpResponse.getLastModified(); // FIXME? No API for that ...
             streamDataLastModified = httpResponse.getLastModified();
 
@@ -716,7 +720,7 @@ public class ProbeDispatcher
                     log.error( ex );
                 }
             }
-            
+
         }
         return new ProbeResult(
                 updated, // we don't know, we always say we might have been updated because that's safer
@@ -763,7 +767,7 @@ public class ProbeDispatcher
             if( log.isDebugEnabled() ) {
                 log.debug( this + ": based on match, found name for Probe class: " + foundClassName );
             }
-            
+
         } else {
             ProbeDirectory.ApiProbeDescriptor desc2 = theProbeDirectory.getApiProbeDescriptorByProtocol( sourceIdentifier.toUri().getScheme() );
 
@@ -838,7 +842,7 @@ public class ProbeDispatcher
                 changesToWriteBack    = theChangesToWriteBack;
                 theChangesToWriteBack = null;
             }
-            
+
             try {
                 if( probe instanceof WritableProbe && changesToWriteBack != null ) {
                     ((WritableProbe) probe).write( sourceIdentifier, changesToWriteBack, oldBase );
@@ -900,7 +904,7 @@ public class ProbeDispatcher
                 probe instanceof WritableProbe,
                 probe.getClass() );
     }
-    
+
     /**
      * The data source refers to an XML file or stream, parse the XML.
      *
@@ -936,7 +940,7 @@ public class ProbeDispatcher
         XmlErrorHandler       errorListener    = new XmlErrorHandler( sourceIdentifier, log );
 
         DocumentBuilder theDocumentBuilder = getDocumentBuilder();
-        
+
         theDocumentBuilder.setErrorHandler( errorListener );
 
         Document doc;
@@ -1005,7 +1009,7 @@ public class ProbeDispatcher
                         log.debug( this + ": based on tagtype, found name for probe class: " + foundClassName );
                     }
                 }
-                
+
             } else {
                 if( log.isDebugEnabled() ) {
                   log.info( this + ".handleXml - localName is null - no probe found" );
@@ -1068,7 +1072,7 @@ public class ProbeDispatcher
             if( log.isDebugEnabled() ) {
                 log.debug( this + ": invoking the probe" );
             }
-        
+
             ChangeSet changesToWriteBack;
             synchronized( this ) {
                 changesToWriteBack    = theChangesToWriteBack;
@@ -1131,7 +1135,7 @@ public class ProbeDispatcher
         } else {
             throw new ProbeException.DontHaveXmlStreamProbe( sourceIdentifier, docType != null ? docType.getName() : null, namespace, localName, null );
         }
-        
+
         return probe;
     }
 
@@ -1301,7 +1305,7 @@ public class ProbeDispatcher
         } else {
             throw new ProbeException.DontHaveNonXmlStreamProbe( sourceIdentifier, contentType, null );
         }
-        
+
         return probe;
     }
 
@@ -1340,10 +1344,10 @@ public class ProbeDispatcher
         } catch( MeshObjectIdentifierNotUniqueException ex ) {
             throw new ProbeException.ErrorInProbe( sourceIdentifier, ex, DomMeshObjectSetProbe.class );
         }
-        
+
         return theProbe;
     }
-    
+
     /**
      * Helper method to determine a CoherenceSpecification from a MeshObject, if it is suitably blessed.
      *
@@ -1411,7 +1415,7 @@ public class ProbeDispatcher
         }
         return ret;
     }
-    
+
     /**
      * Helper method to bless a MeshObject with a suitable MeshType, given the provided CoherenceSpecification.
      *
@@ -1495,7 +1499,7 @@ public class ProbeDispatcher
             log.error( ex ); // we can't copy if it ain't there.
             return;
         }
-        
+
         try {
             EntityType destinationSubtype = destination.determineSingleBlessedSubtype( ProbeSubjectArea.PROBEUPDATESPECIFICATION );
             if( destinationSubtype != null ) {
@@ -1625,7 +1629,7 @@ public class ProbeDispatcher
 
     /**
      * Determine whether at the last run, this ProbeDispatcher used a WritableProbe.
-     * 
+     *
      * @return true if at the last run, this ProbeDispatcher used a WritableProbe
      */
     public boolean usesWritableProbe()
@@ -1667,17 +1671,17 @@ public class ProbeDispatcher
         }
         return false;
     }
-    
+
     /**
      * Forcefully reacquire all locks.
-     * 
+     *
      * @param base the NetMeshBase for whose content the locks shall be acquired
      */
     protected void forceLockRecovery(
             IterableNetMeshBase base )
     {
         HashMap<Proxy,ArrayList<NetMeshObject>> buckets = new HashMap<Proxy,ArrayList<NetMeshObject>>();
-        
+
         for( MeshObject current : theShadowMeshBase ) {
             NetMeshObject realCurrent = (NetMeshObject) current;
             Proxy         towardsLock = realCurrent.getProxyTowardsLockReplica();
@@ -1742,7 +1746,7 @@ public class ProbeDispatcher
     {
         return theUpdateInProgress;
     }
-    
+
     /**
      * Obtain the current problem with updating this ShadowMeshBase, if any. This
      * is a "bound" property.
@@ -1769,7 +1773,7 @@ public class ProbeDispatcher
             theChangesToWriteBack.append( newChangeSet );
         }
     }
-    
+
     /**
      * Add a listener to listen to ShadowMeshBase-specific events.
      *
@@ -1828,13 +1832,13 @@ public class ProbeDispatcher
 
     /**
      * Obtain an XML DocumentBuilder.
-     * 
+     *
      * @return the DocumentBuilder
      */
     protected synchronized DocumentBuilder getDocumentBuilder()
     {
         DocumentBuilder ret = null;
-        
+
         if( theDocumentBuilderRef != null ) {
             ret = theDocumentBuilderRef.get();
         }
@@ -1907,7 +1911,7 @@ public class ProbeDispatcher
 
     /**
      * Determine whether a given NetMeshBaseIdentifier refers to a directory or not.
-     * 
+     *
      * @param id the NetMeshBaseIdentifier
      * @return true if this references a directory that exists
      */
@@ -1928,7 +1932,7 @@ public class ProbeDispatcher
                 return false;
             }
             return true;
-            
+
         } catch( MalformedURLException ex ) {
             return false;
         } catch( IllegalArgumentException ex ) { // thrown if the NetMeshBaseIdentifier does not have a protocol, for example
@@ -1950,7 +1954,7 @@ public class ProbeDispatcher
             String proto = id.toUri().getScheme();
 
            return "http".equals( proto ) || "https".equals( proto ) ||"ftp".equals( proto ) || "file".equals( proto );
-           
+
         } catch( IllegalArgumentException ex ) {
             return false;
         }
@@ -1989,7 +1993,7 @@ public class ProbeDispatcher
             log.traceMethodCallEntry( this, "fireUpdateFinishedSuccessfully" );
         }
 
-        theShadowListeners.fireEvent( new ShadowMeshBaseEvent( theShadowMeshBase ), 2 );        
+        theShadowListeners.fireEvent( new ShadowMeshBaseEvent( theShadowMeshBase ), 2 );
     }
 
     /**
@@ -2004,7 +2008,7 @@ public class ProbeDispatcher
             log.traceMethodCallEntry( this, "fireUpdateFinishedUnsuccessfully", problem );
         }
 
-        theShadowListeners.fireEvent( new ShadowMeshBaseEvent( theShadowMeshBase ), 3 );        
+        theShadowListeners.fireEvent( new ShadowMeshBaseEvent( theShadowMeshBase ), 3 );
     }
 
     /**
@@ -2016,7 +2020,7 @@ public class ProbeDispatcher
      * The time at which this shadow was created.
      */
     protected long theTimeCreated;
-    
+
     /**
      * The time at which the last successful update of this shadow was started.
      * This is in System.currentTimeMillis() format.
@@ -2034,13 +2038,13 @@ public class ProbeDispatcher
      * This is in System.currentTimeMillis() format.
      */
     protected long theCurrentUpdate;
-    
+
     /**
      * The time at which the next update is supposed to start, or -1 if none.
      * This is in System.currentTimeMillis() format.
      */
     protected long theDelayUntilNextUpdate = MAGIC_UNINITIALIZED_DELAY_UNTIL_NEXT_UPDATE;
-    
+
     /**
      * The last modification date of the data source in question.
      */
@@ -2117,12 +2121,12 @@ public class ProbeDispatcher
      * it as the default object creation time.
      */
     protected long theStartOfThisRun;
-    
+
     /**
      * If true, an update from the ProbeDispatcher is currently in progress.
      */
     protected boolean theUpdateInProgress;
-    
+
     /**
      * The time this ShadowMeshBase is not needed until it expires.
      */
@@ -2145,7 +2149,7 @@ public class ProbeDispatcher
 
     /**
      * We expect this MIME type to indicate that a stream is XML.
-     * This may be a bit too lenient? 
+     * This may be a bit too lenient?
      */
     public static final Pattern XML_MIME_TYPE_PATTERN = Pattern.compile( ".*application/(.+\\+)?xml.*" );
 
@@ -2158,7 +2162,7 @@ public class ProbeDispatcher
      * This MIME type indicates a Yadis file.
      */
     public static final String XRDS_MIME_TYPE = "application/xrds+xml";
-    
+
     /**
      * This is the default accept header for HTTP requests.
      */
@@ -2168,7 +2172,7 @@ public class ProbeDispatcher
      * The default time, in milliseconds, until a timeout occurs on accessing the AccessSemaphore.
      */
     public static final long DEFAULT_ACCESS_SEMAPHORE_TIMEOUT = 10000L;
-    
+
     /**
      * Magic number indicating a non-initialized theDelayUntilNextUpdate.
      */

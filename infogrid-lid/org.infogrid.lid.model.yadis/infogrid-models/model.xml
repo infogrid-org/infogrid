@@ -6,7 +6,7 @@
     have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
     or you do not consent to all aspects of the license and the disclaimers,
     no license is granted; do not use this file.
- 
+
     For more information about InfoGrid go to http://infogrid.org/
 
     Copyright 1998-2015 by Johannes Ernst
@@ -48,7 +48,7 @@
             <userdescription>This represents a Yadis/XRDS Service. Known ServiceTypes are
 expressed by subclasses of this EntityType. Also, an XrdsServiceType EntityType is instantiated
 for both known and unknown ServiceTypes.</userdescription>
-            
+
             <propertytype ID="org.infogrid.lid.model.yadis/XrdsService_Priority">
                 <name>Priority</name>
                 <username>Priority</username>
@@ -114,7 +114,7 @@ to the XRDS Service Collection itself.</userdescription>
             <userdescription>Relates an XRDS Service to an object capturing the Yadis ServiceType identifier.</userdescription>
             <src>
               <e>org.infogrid.lid.model.yadis/XrdsService</e>
-              <MultiplicityValue>1:1</MultiplicityValue>
+              <MultiplicityValue>0:N</MultiplicityValue>
             </src>
             <dest>
               <e>org.infogrid.lid.model.yadis/XrdsServiceType</e>

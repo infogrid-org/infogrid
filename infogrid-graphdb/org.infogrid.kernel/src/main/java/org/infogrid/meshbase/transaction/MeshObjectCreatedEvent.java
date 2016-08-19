@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -16,6 +16,7 @@ package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
@@ -63,7 +64,7 @@ public class MeshObjectCreatedEvent
                 createdObject,
                 createdObject.getIdentifier(),
                 timeEventOccurred );
-        
+
         theExternalizedMeshObject = createdObject.asExternalized();
     }
 
@@ -86,13 +87,13 @@ public class MeshObjectCreatedEvent
                 null,
                 createdObject.getIdentifier(),
                 timeEventOccurred );
-        
+
         theExternalizedMeshObject = createdObject;
     }
 
     /**
      * Obtain the ExternalizedMeshObject that captures the newly created MeshObject.
-     * 
+     *
      * @return the ExternalizedMeshObject
      */
     public ExternalizedMeshObject getExternalizedMeshObject()
@@ -159,13 +160,17 @@ public class MeshObjectCreatedEvent
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in MeshBase base
+     * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not
+     *         conform to the model
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
+    @Override
     public MeshObject applyTo(
             MeshBase base )
         throws
             CannotApplyChangeException,
+            MeshObjectGraphModificationException,
             TransactionException
     {
         setResolver( base );
@@ -208,7 +213,7 @@ public class MeshObjectCreatedEvent
             } else {
                 log.warn( "Second or later Exception", ex );
             }
-                
+
         } finally {
             if( tx != null ) {
                 tx.commitTransaction();
@@ -258,6 +263,7 @@ public class MeshObjectCreatedEvent
      *
      * @return the inverse Change, or null if no inverse Change could be constructed.
      */
+    @Override
     public MeshObjectDeletedEvent inverse()
     {
         return new MeshObjectDeletedEvent(
@@ -275,6 +281,7 @@ public class MeshObjectCreatedEvent
      * @param candidate the candidate Change
      * @return true if the candidate Change is the inverse of this Change
      */
+    @Override
     public boolean isInverse(
             Change candidate )
     {
@@ -363,7 +370,7 @@ public class MeshObjectCreatedEvent
      * Externalized version.
      */
     protected ExternalizedMeshObject theExternalizedMeshObject;
-    
+
     /**
      * The EntityTypes, once resolved.
      */

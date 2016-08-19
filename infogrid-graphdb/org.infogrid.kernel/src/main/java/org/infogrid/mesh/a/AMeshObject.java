@@ -1109,6 +1109,87 @@ public class AMeshObject
     }
 
     /**
+      * Traverse a RoleType from this MeshObject to obtain the identifiers of the
+      * set of destination MeshObjects.
+      *
+      * @param theTraverseSpec the TraversalSpecification to traverse
+      * @return the set of MeshObjects found as a result of the traversal
+      */
+    @Override
+    public MeshObjectIdentifier [] traverseToIdentifiers(
+            RoleType theTraverseSpec )
+    {
+        checkAlive();
+
+        MeshObject [] starts = new MeshObject[] { this };
+
+        AMeshObjectNeighborManager nMgr = getNeighborManager();
+
+        AMeshBase                 realBase            = (AMeshBase) theMeshBase;
+        MeshObjectIdentifier [][] neighborIdentifiers = createMeshObjectIdentifierArrayArray( starts.length );
+        RoleType [][][]           roleTypes           = new RoleType[ starts.length ][][];
+
+        int n = 0;
+        for( int s=0 ; s<starts.length ; ++s ) {
+            AMeshObject current = (AMeshObject) starts[s];
+            synchronized( current ) {
+                neighborIdentifiers[s] = nMgr.getNeighborIdentifiers( current );
+                roleTypes[s]           = nMgr.getRoleTypes( current );
+            }
+            if( neighborIdentifiers[s] != null ) {
+                n += neighborIdentifiers[s].length;
+            }
+        }
+
+        MeshObjectIdentifier [] ret;
+        if( n == 0 ) {
+            ret = new MeshObjectIdentifier[0];
+        } else {
+            MeshObjectIdentifier [] almost = createMeshObjectIdentifierArray( n );
+            int                     max    = 0;
+
+            // it's more efficient to first assemble all possible neighbors, and then subset based on permissions
+            for( int s=0 ; s<neighborIdentifiers.length ; ++s ) {
+                for( int i=0 ; i<neighborIdentifiers[s].length ; ++i ) {
+                    if( roleTypes[s][i] != null ) {
+                        for( int j=0 ; j<roleTypes[s][i].length ; ++j ) {
+                            if( roleTypes[s][i][j].isSpecializationOfOrEquals( theTraverseSpec ) ) {
+                                if( !ArrayHelper.isIn( neighborIdentifiers[s][i], almost, 0, max, true )) {
+                                    almost[max++] = neighborIdentifiers[s][i];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if( max < almost.length ) {
+                almost = ArrayHelper.copyIntoNewArray( almost, 0, max, MeshObjectIdentifier.class );
+            }
+            ret = new MeshObjectIdentifier[ almost.length ];
+
+            int index = 0;
+            for( MeshObjectIdentifier current : almost ) {
+                try {
+                    checkPermittedTraversal( theTraverseSpec, getIdentifier(), null );
+                    ret[ index++ ] = current;
+                } catch( NotPermittedException ex ) {
+                    log.info( this, current, index, ex );
+                } catch( Throwable t ) {
+                    log.error( this, current, index, t );
+                }
+            }
+            if( index < ret.length ) {
+                ret = ArrayHelper.copyIntoNewArray( ret, 0, index, MeshObjectIdentifier.class );
+            }
+        }
+
+        updateLastRead();
+        return ret;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectUtils;
 import org.infogrid.meshbase.MeshBase;
@@ -67,7 +68,7 @@ public class MeshObjectNeighborAddedEvent
 
     /**
      * Constructor.
-     * 
+     *
      * @param meshObject the MeshObject that is the source of the event
      * @param addedRoleTypes the RoleTypes added on the source MeshObject, with respect to the deltaNeighbor
      * @param oldNeighborIdentifiers the identifiers of the neighbor MeshObjects prior to the event
@@ -187,13 +188,17 @@ public class MeshObjectNeighborAddedEvent
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in MeshBase base
+     * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not
+     *         conform to the model
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
+    @Override
     public MeshObject applyTo(
             MeshBase base )
         throws
             CannotApplyChangeException,
+            MeshObjectGraphModificationException,
             TransactionException
     {
         setResolver( base );
@@ -232,12 +237,13 @@ public class MeshObjectNeighborAddedEvent
             }
         }
     }
-    
+
     /**
      * <p>Create a Change that undoes this Change.</p>
      *
      * @return the inverse Change, or null if no inverse Change could be constructed.
      */
+    @Override
     public MeshObjectNeighborRemovedEvent inverse()
     {
         return new MeshObjectNeighborRemovedEvent(
@@ -254,6 +260,7 @@ public class MeshObjectNeighborAddedEvent
      * @param candidate the candidate Change
      * @return true if the candidate Change is the inverse of this Change
      */
+    @Override
     public boolean isInverse(
             Change candidate )
     {

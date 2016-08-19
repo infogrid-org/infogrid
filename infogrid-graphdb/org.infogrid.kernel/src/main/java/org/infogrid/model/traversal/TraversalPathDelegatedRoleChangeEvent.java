@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,6 +15,7 @@
 package org.infogrid.model.traversal;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.transaction.AbstractMeshObjectRoleChangeEvent;
@@ -56,7 +57,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
                 org.getNeighborMeshObjectIdentifier(),
                 org.getTimeEventOccurred(),
                 org.getResolver() );
-        
+
         thePath          = path;
         theOriginalEvent = org;
     }
@@ -66,6 +67,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
      *
      * @return the TraversalPath that forwarded this event
      */
+    @Override
     public TraversalPath getTraversalPath()
     {
         return thePath;
@@ -73,7 +75,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
 
     /**
      * Obtain the underlying original AbstractMeshObjectRoleChangeEvent.
-     * 
+     *
      * @return the underlying original MAbstractMeshObjectRoleChangeEvent
      */
     public AbstractMeshObjectRoleChangeEvent getOriginalEvent()
@@ -92,12 +94,16 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
      * @param base the other MeshBase in which to apply the change
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in the other MeshBase
+     * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not
+     *         conform to the model
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and could not be created
      */
+    @Override
     public MeshObject applyTo(
             MeshBase base )
         throws
             CannotApplyChangeException,
+            MeshObjectGraphModificationException,
             TransactionException
     {
         MeshObject ret = theOriginalEvent.applyTo( base );
@@ -106,7 +112,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
 
     /**
      * Determine equality.
-     * 
+     *
      * @param other the Object to compare with
      * @return true if the Objects are equal
      */
@@ -116,7 +122,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
 
     /**
      * Hash code.
-     * 
+     *
      * @return hash code
      */
     @Override
@@ -154,7 +160,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
 
         /**
          * Constructor.
-         * 
+         *
          * @param path the TraversalPath that forwarded this event
          * @param org the original MeshObjectRolePlayerUpdateEvent
          */
@@ -210,7 +216,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
 
         /**
          * Determine equality.
-         * 
+         *
          * @param other the Object to compare with
          * @return true if the Objects are equal
          */
@@ -222,7 +228,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
                 return false;
             }
             Added realOther = (Added) other;
-            
+
             if( thePath != null ) {
                 if( !thePath.equals( realOther.thePath )) {
                     return false;
@@ -230,7 +236,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
             } else if( realOther.thePath != null ) {
                 return false;
             }
-            
+
             if( theOriginalEvent != null ) {
                 if( !theOriginalEvent.equals( realOther.theOriginalEvent )) {
                     return false;
@@ -243,7 +249,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
 
         /**
          * Hash code.
-         * 
+         *
          * @return hash code
          */
         @Override
@@ -252,7 +258,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
             return super.hashCode();
         }
     }
-    
+
     /**
      * This indicates a TraversalPathDelegatedRoleChangeEvent in which the MeshObject plays one
      * role less.
@@ -265,7 +271,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
 
         /**
          * Constructor.
-         * 
+         *
          * @param path the TraversalPath that forwarded this event
          * @param org the original MeshObjectRolePlayerUpdateEvent
          */
@@ -322,7 +328,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
 
         /**
          * Determine equality.
-         * 
+         *
          * @param other the Object to compare with
          * @return true if the Objects are equal
          */
@@ -334,7 +340,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
                 return false;
             }
             Removed realOther = (Removed) other;
-            
+
             if( thePath != null ) {
                 if( !thePath.equals( realOther.thePath )) {
                     return false;
@@ -342,7 +348,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
             } else if( realOther.thePath != null ) {
                 return false;
             }
-            
+
             if( theOriginalEvent != null ) {
                 if( !theOriginalEvent.equals( realOther.theOriginalEvent )) {
                     return false;
@@ -355,7 +361,7 @@ public abstract class TraversalPathDelegatedRoleChangeEvent
 
         /**
          * Hash code.
-         * 
+         *
          * @return hash code
          */
         @Override

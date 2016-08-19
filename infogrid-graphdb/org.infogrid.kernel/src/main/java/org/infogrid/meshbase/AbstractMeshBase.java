@@ -200,7 +200,11 @@ public abstract class AbstractMeshBase
 
             } finally {
                 if( tx != null ) {
-                    tx.commitTransaction();
+                    try {
+                        tx.commitTransaction();
+                    } catch( MeshObjectGraphModificationException ex ) {
+                        log.error( ex );
+                    }
                 }
                 ThreadIdentityManager.sudone();
             }

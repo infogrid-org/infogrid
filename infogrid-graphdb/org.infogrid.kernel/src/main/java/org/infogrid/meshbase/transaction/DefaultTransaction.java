@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -34,37 +34,14 @@ public class DefaultTransaction
     /**
      * Constructor. Transactions should only be created by the
      * corresponding MeshBase.
-     * 
-     * @param rep the Aidentifiersthat created this Transaction, and which is
+     *
+     * @param rep the AbstractMeshBase that created this Transaction, and which is
      *            guarded by this Transaction
      */
     public DefaultTransaction(
             AbstractMeshBase rep )
     {
         super( rep );
-    }
-
-    /**
-      * Commit a started Transaction.
-      */
-    @Override
-    public synchronized void commitTransaction()
-    {
-        super.commitTransaction();
-        ((AbstractMeshBase)theTransactable).transactionCommitted();
-    }
-
-    /**
-     * Roll back all changes performed within this Transaction so far.
-     *
-     * @param thrown the Throwable that caused us to attempt to rollback the Transaction
-     */
-    @Override
-    public synchronized void rollbackTransaction(
-            Throwable thrown )
-    {
-        super.rollbackTransaction( thrown );
-        ((AbstractMeshBase)theTransactable).transactionRolledback( thrown );
     }
 
     /**
@@ -130,7 +107,7 @@ public class DefaultTransaction
             EventObject              event )
     {
         if( theDirtyRecords == null ) {
-            theDirtyRecords = new ArrayList<DirtyRecord>();
+            theDirtyRecords = new ArrayList<>();
         }
 
         DirtyRecord newRecord = new DirtyRecord( newDirtyMeshObject, howToUpdate, event );
@@ -140,6 +117,41 @@ public class DefaultTransaction
         }
     }
 
+    /**
+     * This hook is invoked after the Transaction has been committed. This allows subclasses to hook
+     * in once we know that the commit actually happened.
+     */
+    @Override
+    protected void postCommitSucceededHook()
+    {
+        ((AbstractMeshBase)theTransactable).transactionCommitted();
+    }
+
+    /**
+     * This hook is invoked after an attempt to commit the Transaction failed. This allows subclasses to hook
+     * in once we know that the attempted commit failed.
+     *
+     * @param thrown the Throwable that caused us to rollback the Transaction
+     */
+    @Override
+    protected void postCommitFailedHook(
+            Throwable thrown )
+    {
+        ((AbstractMeshBase)theTransactable).transactionRolledback( thrown );
+    }
+
+    /**
+     * This hook is invoked after the Transaction has been rolled back. This allows subclasses to hook
+     * in once we know that the rollback actually happened.
+     *
+     * @param thrown the Throwable that caused us to rollback the Transaction
+     */
+    @Override
+    protected void postRollbackSucceededHook(
+            Throwable thrown )
+    {
+        ((AbstractMeshBase)theTransactable).transactionRolledback( thrown );
+    }
 
     /**
      * The set of MeshObjects (plus supporting info) which may now be dirty as a result
@@ -199,7 +211,7 @@ public class DefaultTransaction
 
         /**
          * Hash code.
-         * 
+         *
          * @return hash code
          */
         @Override
@@ -217,12 +229,12 @@ public class DefaultTransaction
          * The dirty MeshObject.
          */
         MeshObject theDirtyMeshObject;
-        
+
         /**
          * The code that will update the projected property.
          */
         ProjectedPropertyUpdater theProjectionWatcher;
-        
+
         /**
          * The event that caused this DirtyRecord to come into existence.
          */
