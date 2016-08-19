@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.infogrid</groupId>
         <artifactId>infogrid-lid</artifactId>
-        <version><!-- PKGVER -->2.9.10<!-- /PKGVER --></version>
+        <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
     </parent>
 
     <dependencies>

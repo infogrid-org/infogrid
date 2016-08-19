@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
     <artifactId>infogrid-ui</artifactId>
-    <version><!-- PKGVER -->2.9.10<!-- /PKGVER --></version>
+    <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
     <packaging>pom</packaging>
     <name>infogrid-ui</name>
     <url>http://infogrid.org/</url>
