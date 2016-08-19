@@ -15,7 +15,7 @@ depends=(
 
 prepare() {
     # Set pom.xml versions correctly; depends on XML-comment-based markup in pom.xml files
-    find ${startdir} -name pom.xml -exec perl -pi -e "s/(?<=\<\!-- PKGVER -->)(\d+(\.\d+)+)(?=\<\!-- \/PKGVER -->)/${pkgver}/g" {} \;
+    find ${startdir} -path ./pkg -o -name pom.xml -exec perl -pi -e "s/(?<=\<\!-- PKGVER -->)(\d+(\.\d+)+)(?=\<\!-- \/PKGVER -->)/${pkgver}/g" {} \;
 }
 
 build() {

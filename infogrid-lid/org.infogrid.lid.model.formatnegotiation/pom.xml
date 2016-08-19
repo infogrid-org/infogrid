@@ -51,7 +51,7 @@
                                 <argument>org.infogrid:org.infogrid.codegen</argument>
                                 <argument>${basedir}/infogrid-models/model.xml</argument>
                                 <argument>-o</argument>
-                                <argument>${basedir}/target/infogrid-generated</argument>
+                                <argument>${basedir}/target/generated-sources/infogrid</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -70,7 +70,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${basedir}/target/infogrid-generated</source>
+                                    <source>${basedir}/target/generated-sources/infogrid</source>
                             </sources>
                         </configuration>
                     </execution>
