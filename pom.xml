@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.infogrid</groupId>
+    <artifactId>infogrid-all</artifactId>
+    <version><!-- PKGVER -->2.9.10<!-- /PKGVER --></version>
+    <packaging>pom</packaging>
+    <name>infogrid-all</name>
+    <url>http://infogrid.org/</url>
+    <modules>
+        <module>infogrid-graphdb</module>
+        <module>infogrid-graphdb-grid</module>
+        <module>infogrid-lid</module>
+        <module>infogrid-model-library</module>
+        <module>infogrid-probe</module>
+        <module>infogrid-stores</module>
+        <module>infogrid-ui</module>
+        <module>infogrid-utils</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <diet4j.version>[0.13]</diet4j.version>
+    </properties>
+</project>

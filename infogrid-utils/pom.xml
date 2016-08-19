@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
     <artifactId>infogrid-utils</artifactId>
-    <version><!-- PKGVER -->2.9.10<!-- /PKGVER --></version>
+    <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
     <packaging>pom</packaging>
     <name>infogrid-utils</name>
     <url>http://infogrid.org/</url>
@@ -41,6 +41,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <diet4j.version>0.12</diet4j.version>
+        <diet4j.version>0.13</diet4j.version>
     </properties>
 </project>

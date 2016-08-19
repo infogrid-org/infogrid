@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -27,8 +27,8 @@ import org.infogrid.util.logging.Dumper;
  * This Exception indicates a violation in the multiplicity of a RoleType. In other
  * words, this Exception is thrown if a relationship between MeshObjects A and B is
  * supposed to be blessed with a RelationshipType X, as a result of which A would
- * participate in more relationships of type X than allowed per the definition of
- * the RelationshipType.
+ * participate in more or fewer RoleTypes of RelationshipType type X than allowed per
+ * the definition of the RoleType.
  */
 public class MultiplicityException
         extends
@@ -47,8 +47,6 @@ public class MultiplicityException
      * @param meshObjectIdentifier the MeshObjectIdentifier for the MeshObject where the multiplicity violation was discovered
      * @param roleType the RoleType whose multiplicity was violated, if available
      * @param roleTypeIdentifier the MeshTypeIdentifier for the RoleType whose multiplicity was violated
-     * @param other the MeshObject at the other end of the relationship that was supposed to be blessed, if available
-     * @param otherIdentifier the MeshObjectIdentifier for the MeshObject at the other end of the relationship that was supposed to be blessed
      */
     public MultiplicityException(
             MeshBase             mb,
@@ -56,18 +54,14 @@ public class MultiplicityException
             MeshObject           meshObject,
             MeshObjectIdentifier meshObjectIdentifier,
             RoleType             roleType,
-            MeshTypeIdentifier   roleTypeIdentifier,
-            MeshObject           other,
-            MeshObjectIdentifier otherIdentifier )
+            MeshTypeIdentifier   roleTypeIdentifier )
     {
         super( mb, originatingMeshBaseIdentifier );
-        
+
         theMeshObject           = meshObject;
         theMeshObjectIdentifier = meshObjectIdentifier;
         theRoleType             = roleType;
         theRoleTypeIdentifier   = roleTypeIdentifier;
-        theOther                = other;
-        theOtherIdentifier      = otherIdentifier;
     }
 
     /**
@@ -75,26 +69,22 @@ public class MultiplicityException
      *
      * @param meshObject the MeshObject where the multiplicity violation was discovered, if available
      * @param roleType the RoleType whose multiplicity was violated, if available
-     * @param other the MeshObject at the other end of the relationship that was supposed to be blessed, if available
      */
     public MultiplicityException(
             MeshObject           meshObject,
-            RoleType             roleType,
-            MeshObject           other )
+            RoleType             roleType )
     {
         this(   meshObject.getMeshBase(),
                 meshObject.getMeshBase().getIdentifier(),
                 meshObject,
                 meshObject.getIdentifier(),
                 roleType,
-                roleType.getIdentifier(),
-                other,
-                other.getIdentifier() );
+                roleType.getIdentifier());
     }
 
     /**
      * Obtain the MeshObject where the multiplicity violation was discovered.
-     * 
+     *
      * @return the MeshObject
      * @throws MeshObjectAccessException thrown if the MeshObject could not be found
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
@@ -124,7 +114,7 @@ public class MultiplicityException
 
     /**
      * Obtain the RoleType whose multiplicity was violated.
-     * 
+     *
      * @return the RoleType
      * @throws MeshTypeWithIdentifierNotFoundException thrown if the RoleType could not be found
      * @throws IllegalStateException thrown if no resolving MeshBase is available
@@ -152,40 +142,11 @@ public class MultiplicityException
     }
 
     /**
-     * Obtain the MeshObject at the other end of the relationship that was supposed to be blessed.
-     * 
-     * @return the other MeshObject
-     * @throws MeshObjectAccessException thrown if the MeshObject could not be found
-     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
-     * @throws IllegalStateException thrown if no resolving MeshBase is available
-     */
-    public synchronized MeshObject getOtherMeshObject()
-        throws
-            MeshObjectAccessException,
-            NotPermittedException,
-            IllegalStateException
-    {
-        if( theOther == null ) {
-            theOther = resolve( theOtherIdentifier );
-        }
-        return theOther;
-    }
-
-    /**
-     * Obtain the MeshObjectIdentifier of the MeshObject at the other end of the relationship that was supposed to be blessed.
-      *
-      * @return the MeshObjectIdentifier
-      */
-    public MeshObjectIdentifier getOtherMeshObjectIdentifier()
-    {
-        return theOtherIdentifier;
-    }
-
-    /**
      * Dump this object.
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {
@@ -194,17 +155,13 @@ public class MultiplicityException
                     "theMeshObject",
                     "theMeshObjectIdentifier",
                     "theRoleType",
-                    "theRoleTypeIdentifier",
-                    "theOther",
-                    "theOtherIdentifier",
+                    "theRoleTypeIdentifier"
                 },
                 new Object[] {
                     theMeshObject,
                     theMeshObjectIdentifier,
                     theRoleType,
-                    theRoleTypeIdentifier,
-                    theOther,
-                    theOtherIdentifier
+                    theRoleTypeIdentifier
                 });
     }
 
@@ -213,9 +170,10 @@ public class MultiplicityException
      *
      * @return the parameters
      */
+    @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theMeshObjectIdentifier, theRoleTypeIdentifier, theOtherIdentifier };
+        return new Object[] { theMeshObjectIdentifier, theRoleTypeIdentifier };
     }
 
     /**
@@ -232,19 +190,9 @@ public class MultiplicityException
      * The RoleType for which we discovered a violation.
      */
     protected transient RoleType theRoleType;
-    
+
     /**
      * The MeshTypeIdentifier for the RoleType for which we discovered a violation.
      */
     protected MeshTypeIdentifier theRoleTypeIdentifier;
-
-    /**
-     * The MeshObject at the other end of the relationship for which we discovered a violation.
-     */
-    protected transient MeshObject theOther;
-
-    /**
-     * The MeshObjectIdentifier of the MeshObject at the other end of the relationship for which we discovered a violation.
-     */
-    protected MeshObjectIdentifier theOtherIdentifier;
 }

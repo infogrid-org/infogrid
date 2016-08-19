@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 
@@ -30,7 +31,7 @@ public class MeshObjectBecameDeadStateEvent
     /**
      * Constructor. This must be invoked with both the MeshObject and the canonical MeshObjectIdentifier,
      * because it is not possible to construct the canonical MeshObjectIdentifier after the MeshObject is dead.
-     * 
+     *
      * @param theMeshObject the MeshObject whose state changed
      * @param canonicalIdentifier the canonical MeshObjectIdentifier of the MeshObject that became dead
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
@@ -54,6 +55,7 @@ public class MeshObjectBecameDeadStateEvent
      * @param vid the valid identifier
      * @return a value of the event
      */
+    @Override
     protected MeshObjectState resolveValue(
             String vid )
     {
@@ -89,13 +91,17 @@ public class MeshObjectBecameDeadStateEvent
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in MeshBase base
+     * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not
+     *         conform to the model
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
+    @Override
     public MeshObject applyTo(
             MeshBase base )
         throws
             CannotApplyChangeException,
+            MeshObjectGraphModificationException,
             TransactionException
     {
         setResolver( base );
@@ -109,25 +115,26 @@ public class MeshObjectBecameDeadStateEvent
             base.getMeshBaseLifecycleManager().deleteMeshObject( otherObject );
 
             return otherObject;
-            
+
         } catch( TransactionException ex ) {
             throw ex;
 
         } catch( Throwable ex ) {
             throw new CannotApplyChangeException.ExceptionOccurred( base, ex );
-            
+
         } finally {
             if( tx != null ) {
                 tx.commitTransaction();
             }
         }
     }
-    
+
     /**
      * <p>Create a Change that undoes this Change.</p>
      *
      * @return the inverse Change, or null if no inverse Change could be constructed.
      */
+    @Override
     public Change inverse()
     {
         return null;
@@ -139,6 +146,7 @@ public class MeshObjectBecameDeadStateEvent
      * @param candidate the candidate Change
      * @return true if the candidate Change is the inverse of this Change
      */
+    @Override
     public boolean isInverse(
             Change candidate )
     {
@@ -158,7 +166,7 @@ public class MeshObjectBecameDeadStateEvent
             return false;
         }
         MeshObjectBecameDeadStateEvent realOther = (MeshObjectBecameDeadStateEvent) other;
-        
+
         if( !getSourceIdentifier().equals( realOther.getSourceIdentifier() )) {
             return false;
         }

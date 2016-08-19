@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.infogrid</groupId>
         <artifactId>infogrid-graphdb</artifactId>
-        <version><!-- PKGVER -->2.9.10<!-- /PKGVER --></version>
+        <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
     </parent>
 
     <dependencies>
@@ -64,7 +64,7 @@
                                 <argument>org.infogrid:org.infogrid.codegen</argument>
                                 <argument>${basedir}/infogrid-models/model.xml</argument>
                                 <argument>-o</argument>
-                                <argument>${basedir}/target/infogrid-generated</argument>
+                                <argument>${basedir}/target/generated-sources/infogrid</argument>
                             </arguments>
                         </configuration>
                     </execution>

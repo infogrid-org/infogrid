@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
     <artifactId>infogrid-model-library</artifactId>
-    <version><!-- PKGVER -->2.9.10<!-- /PKGVER --></version>
+    <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
     <packaging>pom</packaging>
     <name>infogrid-model-library</name>
     <url>http://infogrid.org/</url>
@@ -42,7 +42,7 @@
                             <argument>org.infogrid:org.infogrid.codegen</argument>
                             <argument>${basedir}/infogrid-models/model.xml</argument>
                             <argument>-o</argument>
-                            <argument>${basedir}/target/infogrid-generated</argument>
+                                <argument>${basedir}/target/generated-sources/infogrid</argument>
                         </arguments>
                     </configuration>
                 </plugin>
@@ -59,7 +59,7 @@
                             </goals>
                             <configuration>
                                 <sources>
-                                    <source>${basedir}/target/infogrid-generated</source>
+                                    <source>${basedir}/target/generated-sources/infogrid</source>
                                 </sources>
                             </configuration>
                         </execution>
@@ -84,6 +84,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <diet4j.version>0.12</diet4j.version>
+        <diet4j.version>0.13</diet4j.version>
     </properties>
 </project>

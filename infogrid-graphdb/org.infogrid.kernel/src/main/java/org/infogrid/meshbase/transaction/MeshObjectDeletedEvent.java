@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.meshbase.MeshBase;
@@ -34,7 +35,7 @@ public class MeshObjectDeletedEvent
 
     /**
      * Constructor.
-     * 
+     *
      * @param source the MeshBase that is the source of the event
      * @param sourceIdentifier the MeshBaseIdentifier representing the source of the event
      * @param deltaValue the MeshObject whose lifecycle changed
@@ -55,14 +56,14 @@ public class MeshObjectDeletedEvent
                 deltaValue,
                 deltaValueIdentifier,
                 timeEventOccurred );
-        
+
         theExternalizedMeshObject = externalized;
     }
 
     /**
      * Obtain an externalized representation of the MeshObject as it was just before it
      * was deleted.
-     * 
+     *
      * @return externalized form of the deleted MeshObject
      */
     public ExternalizedMeshObject getExternalizedMeshObject()
@@ -95,13 +96,17 @@ public class MeshObjectDeletedEvent
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in MeshBase base
+     * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not
+     *         conform to the model
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
+    @Override
     public MeshObject applyTo(
             MeshBase base )
         throws
             CannotApplyChangeException,
+            MeshObjectGraphModificationException,
             TransactionException
     {
         setResolver( base );
@@ -122,19 +127,20 @@ public class MeshObjectDeletedEvent
 
         } catch( Throwable ex ) {
             throw new CannotApplyChangeException.ExceptionOccurred( base, ex );
-            
+
         } finally {
             if( tx != null ) {
                 tx.commitTransaction();
             }
         }
     }
-    
+
     /**
      * <p>Create a Change that undoes this Change.</p>
      *
      * @return the inverse Change, or null if no inverse Change could be constructed.
      */
+    @Override
     public MeshObjectCreatedEvent inverse()
     {
         return new MeshObjectCreatedEvent(
@@ -150,6 +156,7 @@ public class MeshObjectDeletedEvent
      * @param candidate the candidate Change
      * @return true if the candidate Change is the inverse of this Change
      */
+    @Override
     public boolean isInverse(
             Change candidate )
     {
@@ -175,7 +182,7 @@ public class MeshObjectDeletedEvent
             return false;
         }
         MeshObjectDeletedEvent realOther = (MeshObjectDeletedEvent) other;
-        
+
         if( !getDeltaValueIdentifier().equals( realOther.getDeltaValueIdentifier() )) {
             return false;
         }
@@ -187,7 +194,7 @@ public class MeshObjectDeletedEvent
 
     /**
      * Determine hash code.
-     * 
+     *
      * @return hash code
      */
     @Override
@@ -195,7 +202,7 @@ public class MeshObjectDeletedEvent
     {
         return getAffectedMeshObjectIdentifier().hashCode();
     }
-    
+
     /**
      * The deleted MeshObject in externalized form, as it was just before the deletion.
      */

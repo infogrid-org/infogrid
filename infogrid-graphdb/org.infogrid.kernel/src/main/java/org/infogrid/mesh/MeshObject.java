@@ -749,6 +749,16 @@ public interface MeshObject
             TraversalSpecification theTraverseSpec );
 
     /**
+      * Traverse a RoleType from this MeshObject to obtain the identifiers of the
+      * set of destination MeshObjects.
+      *
+      * @param theTraverseSpec the TraversalSpecification to traverse
+      * @return the set of MeshObjects found as a result of the traversal
+      */
+    public abstract MeshObjectIdentifier [] traverseToIdentifiers(
+            RoleType theTraverseSpec );
+
+    /**
      * Obtain the RoleTypes that this MeshObject currently participates in. This will return only one
      * instance of the same RoleType object, even if the MeshObject participates in this RoleType
      * multiple times with different other MeshObjects.

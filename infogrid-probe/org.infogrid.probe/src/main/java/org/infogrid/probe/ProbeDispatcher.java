@@ -47,6 +47,7 @@ import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotBlessedException;
 import org.infogrid.mesh.NotPermittedException;
@@ -357,6 +358,9 @@ public class ProbeDispatcher
                         }
                     }
                 } catch( NotBlessedException ex2 ) {
+                    throw new ProbeException.Other( sourceIdentifier, ex2 ); // should never happen
+
+                } catch( MeshObjectGraphModificationException ex2 ) {
                     throw new ProbeException.Other( sourceIdentifier, ex2 ); // should never happen
 
                 } catch( TransactionException ex2 ) {

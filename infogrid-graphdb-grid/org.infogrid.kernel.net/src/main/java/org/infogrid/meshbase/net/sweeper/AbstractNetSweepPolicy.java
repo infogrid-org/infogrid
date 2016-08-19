@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase.net.sweeper;
 
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.security.MustNotDeleteHomeObjectException;
 import org.infogrid.meshbase.net.NetMeshBase;
@@ -49,6 +50,7 @@ public abstract class AbstractNetSweepPolicy
      * @param candidate the NetMeshObject that is a candidate for purged
      * @return true if the MeshObject was purged
      */
+    @Override
     public boolean potentiallyPurge(
             NetMeshObject candidate )
     {
@@ -78,7 +80,7 @@ public abstract class AbstractNetSweepPolicy
         Transaction tx = null;
         try {
             tx = base.createTransactionAsapIfNeeded();
-            
+
             base.getMeshBaseLifecycleManager().purgeReplica( toPurge );
 
         } catch( TransactionException ex ) {
@@ -89,7 +91,11 @@ public abstract class AbstractNetSweepPolicy
 
         } finally {
             if( tx != null ) {
-                tx.commitTransaction();
+                try {
+                    tx.commitTransaction();
+                } catch( MeshObjectGraphModificationException ex2 ) {
+                    log.error( ex2 );
+                }
             }
         }
     }

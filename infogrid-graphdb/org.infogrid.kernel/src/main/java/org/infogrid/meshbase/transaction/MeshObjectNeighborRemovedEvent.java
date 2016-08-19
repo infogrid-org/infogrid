@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectUtils;
 import org.infogrid.meshbase.MeshBase;
@@ -32,7 +33,7 @@ public class MeshObjectNeighborRemovedEvent
 
     /**
      * Constructor.
-     * 
+     *
      * @param meshObject the MeshObject that is the source of the event
      * @param oldNeighbors the set of neighbor MeshObjects prior to the event
      * @param deltaNeighbor the neighbor MeshObject affected by this event
@@ -60,7 +61,7 @@ public class MeshObjectNeighborRemovedEvent
 
     /**
      * Constructor.
-     * 
+     *
      * @param meshObject the MeshObject that is the source of the event
      * @param oldNeighborIdentifiers the identifiers of the neighbor MeshObjects prior to the event
      * @param deltaNeighborIdentifier the identifier of the neighbor MeshObject affected by this event
@@ -88,7 +89,7 @@ public class MeshObjectNeighborRemovedEvent
 
     /**
      * Constructor.
-     * 
+     *
      * @param meshObjectIdentifier the identifier of the MeshObject that is the source of the event
      * @param oldNeighborIdentifiers the identifiers of the neighbor MeshObjects prior to the event
      * @param deltaNeighborIdentifier the identifier of the neighbor MeshObject affected by this event
@@ -155,7 +156,7 @@ public class MeshObjectNeighborRemovedEvent
                 timeEventOccurred,
                 resolver );
     }
-    
+
     /**
      * <p>Apply this Change to a MeshObject in this MeshBase. This method
      *    is intended to make it easy to reproduce Changes that were made in
@@ -168,6 +169,7 @@ public class MeshObjectNeighborRemovedEvent
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in MeshBase base
+     * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not conform to the model
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
@@ -175,6 +177,7 @@ public class MeshObjectNeighborRemovedEvent
             MeshBase base )
         throws
             CannotApplyChangeException,
+            MeshObjectGraphModificationException,
             TransactionException
     {
         setResolver( base );
@@ -208,7 +211,7 @@ public class MeshObjectNeighborRemovedEvent
             }
         }
     }
-    
+
     /**
      * <p>Create a Change that undoes this Change.</p>
      *
@@ -259,7 +262,7 @@ public class MeshObjectNeighborRemovedEvent
             return false;
         }
         MeshObjectNeighborRemovedEvent realOther = (MeshObjectNeighborRemovedEvent) other;
-        
+
         if( !getSourceIdentifier().equals( realOther.getSourceIdentifier() )) {
             return false;
         }

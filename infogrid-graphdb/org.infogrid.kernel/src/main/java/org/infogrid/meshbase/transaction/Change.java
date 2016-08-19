@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -15,6 +15,7 @@
 package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.util.event.ExternalizableEvent;
@@ -23,7 +24,7 @@ import org.infogrid.util.event.ExternalizableEvent;
  * This interface represents the concept of a Change that may occur to a
  * {@link org.infogrid.mesh.MeshObject} during a {@link Transaction}. Any instance of Change
  * represents an "elemental" change, there are no composites.
- * 
+ *
  * @param <S> the type of the event source
  * @param <SID> the type of the identifier of the event source
  * @param <V> the type of the value
@@ -43,7 +44,7 @@ public interface Change<S,SID,V,VID>
 
     /**
      * Obtain the MeshBase that is currently set as resolver for the identifiers carried by this event.
-     * 
+     *
      * @return the MeshBase, if any
      */
     public MeshBase getResolver();
@@ -74,6 +75,8 @@ public interface Change<S,SID,V,VID>
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in MeshBase base
+     * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not
+     *         conform to the model
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
@@ -81,6 +84,7 @@ public interface Change<S,SID,V,VID>
             MeshBase base )
         throws
             CannotApplyChangeException,
+            MeshObjectGraphModificationException,
             TransactionException;
 
     /**

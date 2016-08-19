@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import org.infogrid.mesh.BlessedAlreadyException;
 import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.NotBlessedException;
 import org.infogrid.mesh.NotPermittedException;
@@ -463,11 +464,14 @@ public class MeshBaseDifferencer
       * ignores most Exceptions in order to apply as many Changes as possible.
       *
       * @param theChangeSet the ChangeSet whose changes we apply
+      * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not
+      *         conform to the model
       * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
       */
     public void applyChangeSet(
             ChangeSet theChangeSet )
         throws
+            MeshObjectGraphModificationException,
             TransactionException
     {
         if( log.isInfoEnabled() ) {

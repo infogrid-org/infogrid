@@ -16,6 +16,9 @@ package org.infogrid.meshbase.transaction;
 
 import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
+import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.MultiplicityException;
 import org.infogrid.mesh.NotRelatedException;
 import org.infogrid.mesh.RelatedAlreadyException;
 import org.infogrid.mesh.RoleTypeBlessedAlreadyException;
@@ -23,6 +26,9 @@ import org.infogrid.mesh.RoleTypeNotBlessedException;
 import org.infogrid.mesh.security.PropertyReadOnlyException;
 import org.infogrid.mesh.security.ThreadIdentityManager;
 import org.infogrid.meshbase.MeshBase;
+import org.infogrid.model.primitives.EntityType;
+import org.infogrid.model.primitives.MultiplicityValue;
+import org.infogrid.model.primitives.RoleType;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.FlexibleListenerSet;
 import org.infogrid.util.Pair;
@@ -76,24 +82,13 @@ public abstract class Transaction
     }
 
     /**
-     * If invoked, this will attempt to elevate all operations while the Transaction
-     * is open to super-user privileges. The super-user status is reset when the
-     * Transaction ends. If the current Thread already has super-user status, nothing
-     * happens.
-     */
-    public void sudo()
-    {
-        if( !ThreadIdentityManager.isSu() ) {
-            theResetToCaller = ThreadIdentityManager.getCallerAndGroups();
-            ThreadIdentityManager.sudo();
-        }
-    }
-
-    /**
-      * Commit a started Transaction. At this time, committing is the only way of
-      * ending an opened Transaction; rollback is not supported (see documentation).
+      * Commit a started Transaction.
+      *
+      * @throws MeshObjectGraphModificationException thrown if the changes made during this Transaction do not conform to the rules of the model
       */
-    public synchronized void commitTransaction()
+    public final synchronized void commitTransaction()
+        throws
+            MeshObjectGraphModificationException
     {
         if( log.isTraceEnabled() ) {
             log.traceMethodCallEntry( this, "commitTransaction" );
@@ -109,50 +104,79 @@ public abstract class Transaction
             log.error( "illegal state for transaction: " + status );
         }
 
-        preCommitHook();
+        ThreadIdentityManager.sudo();
 
-        status = Status.TRANSACTION_COMMITTED;
+        try {
+            preCommitHook();
 
-        theChangeSet.freeze();
+            checkTransactionValid();
 
-        if( theResetToCaller != null ) {
-            try {
-                ThreadIdentityManager.setCaller( theResetToCaller );
+            theChangeSet.freeze(); // only freeze here, otherwise can can't do the rollback
 
-            } catch( NullPointerException ex ) {
-                log.error( "Cannot find AccessManager", this );
-            }
+            status = Status.TRANSACTION_COMMITTED;
+
+            postCommitSucceededHook();
+
+        } catch( MultiplicityException t ) {
+            doRollback();
+
+            postCommitFailedHook( t );
+
+            throw t;
+
+        } finally {
+            ThreadIdentityManager.sudone();
         }
-    }
-
-    /**
-     * This hook is invoked just prior to committing the Transaction. This allows subclasses to hook
-     * in before the commit actually happens.
-     */
-    protected void preCommitHook()
-    {
-        // no op on this level
     }
 
     /**
      * Roll back all changes performed within this Transaction so far.
      *
-     * @param thrown the Throwable that caused us to attempt to rollback the Transaction
+     * @param thrown the Throwable that caused us to rollback the Transaction
      */
-    public void rollbackTransaction(
+    public final synchronized void rollbackTransaction(
             Throwable thrown )
     {
         if( log.isInfoEnabled() ) {
             log.info( ToStringDumperFactory.create( ToStringDumper.DEFAULT_MAXLEVEL, Integer.MAX_VALUE ), this, "rollbackTransaction", thrown );
         }
 
-        sudo();
+        try {
+            checkThreadIsAllowed();
+        } catch( IllegalTransactionThreadException ex ) {
+            throw new IllegalStateException( "trying to rollback transaction from wrong thread" );
+        }
 
+        if( !( status == Status.TRANSACTION_STARTED || status == Status.TRANSACTION_VOTED )) {
+            log.error( "illegal state for transaction: " + status );
+        }
+
+        ThreadIdentityManager.sudo();
+
+        try {
+            preRollbackHook();
+
+            doRollback();
+
+            status = Status.TRANSACTION_ROLLEDBACK;
+
+            postRollbackSucceededHook( thrown );
+
+        } finally {
+            ThreadIdentityManager.sudone();
+        }
+    }
+
+    /**
+     * Internal method to perform the actual rollback.
+     */
+    protected void doRollback()
+    {
         // go backwards in the change set
         CursorIterator<Change> iter = ChangeSet.createCopy( theChangeSet ).iterator();
         iter.moveToAfterLast();
         while( iter.hasPrevious() ) {
-            Change current  = iter.previous();
+            Change current = iter.previous();
             try {
                 Change inverted = current.inverse();
 
@@ -176,18 +200,12 @@ public abstract class Transaction
                     // that's the best we can do
                 }
 
+            } catch( MeshObjectGraphModificationException ex ) {
+                log.error( ex );
+                // that's the best we can do
             } catch( TransactionException ex ) {
                 log.error( ex );
                 // that's the best we can do
-            }
-        }
-
-        if( theResetToCaller != null ) {
-            try {
-                ThreadIdentityManager.setCaller( theResetToCaller );
-
-            } catch( NullPointerException ex ) {
-                log.error( "Cannot find AccessManager", this );
             }
         }
     }
@@ -242,6 +260,89 @@ public abstract class Transaction
     public ChangeSet getChangeSet()
     {
         return theChangeSet;
+    }
+
+    /**
+     * Check that changes made during the Transaction lead to a valid graph.
+     *
+     * @throws MultiplicityException a RoleType's multiplicity was violated
+     */
+    protected void checkTransactionValid()
+        throws
+            MultiplicityException
+    {
+        // go through the changes, and make sure all MeshObjects touched still meet all the constraints
+        for( Change change : theChangeSet ) {
+            MeshObject affected = change.getAffectedMeshObject();
+            if( affected.getIsDead() ) {
+                continue;
+            }
+
+            for( EntityType entityType : affected.getTypes()) {
+                for( RoleType roleType : entityType.getAllRoleTypes()) {
+                    MultiplicityValue mult = roleType.getMultiplicity();
+
+                    MeshObjectIdentifier [] others = affected.traverseToIdentifiers( roleType );
+                    if( mult.getMinimum() > others.length ) {
+                        throw new MultiplicityException( affected, roleType );
+                    }
+                    if( mult.getMaximum() != MultiplicityValue.N && others.length > mult.getMaximum() ) {
+                        throw new MultiplicityException( affected, roleType );
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * This hook is invoked just prior to committing the Transaction. This allows subclasses to hook
+     * in before the commit actually happens.
+     */
+    protected void preCommitHook()
+    {
+        // no op on this level
+    }
+
+    /**
+     * This hook is invoked after the Transaction has been committed. This allows subclasses to hook
+     * in once we know that the commit actually happened.
+     */
+    protected void postCommitSucceededHook()
+    {
+
+    }
+
+    /**
+     * This hook is invoked after an attempt to commit the Transaction failed. This allows subclasses to hook
+     * in once we know that the attempted commit failed.
+     *
+     * @param thrown the Throwable that caused us to rollback the Transaction
+     */
+    protected void postCommitFailedHook(
+            Throwable thrown )
+    {
+
+    }
+
+    /**
+     * This hook is invoked just prior to rolling back the Transaction. This allows subclasses to hook in
+     * before the rollback actually happens.
+     */
+    protected void preRollbackHook()
+    {
+
+    }
+
+    /**
+     * This hook is invoked after the Transaction has been rolled back. This allows subclasses to hook
+     * in once we know that the rollback actually happened.
+     *
+     * @param thrown the Throwable that caused us to rollback the Transaction
+     */
+    protected void postRollbackSucceededHook(
+            Throwable thrown )
+    {
+
     }
 
     /**
@@ -307,6 +408,7 @@ public abstract class Transaction
                          * @param event the sent event
                          * @param parameter dispatch parameter
                          */
+                        @Override
                         protected void fireEventToListener(
                                 TransactionListener listener,
                                 Transaction         event,
@@ -359,6 +461,7 @@ public abstract class Transaction
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {
@@ -414,11 +517,6 @@ public abstract class Transaction
       * The transactable that we belong to.
       */
     protected MeshBase theTransactable;
-
-    /**
-     * If set, reset this Thread back to this caller when the Transaction is done.
-     */
-    protected Pair<MeshObject,String[]> theResetToCaller;
 
     /**
       * The set of TransactionListeners. Allocated as needed.

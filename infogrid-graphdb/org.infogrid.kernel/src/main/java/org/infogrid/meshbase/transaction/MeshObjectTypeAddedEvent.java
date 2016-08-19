@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -18,6 +18,7 @@ import java.util.Map;
 import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.model.primitives.EntityType;
@@ -66,7 +67,7 @@ public class MeshObjectTypeAddedEvent
                 MeshTypeUtils.meshTypeIdentifiersOrNull( newValues ),
                 timeEventOccurred,
                 source.getMeshBase() );
-        
+
         theInitialProperties = initialProperties;
     }
 
@@ -74,7 +75,7 @@ public class MeshObjectTypeAddedEvent
      * Constructor for the case where we don't have old and new values, only the delta.
      * This perhaps should trigger some exception if it is attempted to read old or
      * new values later. (FIXME?)
-     * 
+     *
      * @param sourceIdentifier the identifier for the MeshObject whose type changed
      * @param deltaValues the EntityTypes that were added
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
@@ -95,7 +96,7 @@ public class MeshObjectTypeAddedEvent
                 null,
                 null,
                 timeEventOccurred,
-                resolver );        
+                resolver );
     }
 
     /**
@@ -140,18 +141,22 @@ public class MeshObjectTypeAddedEvent
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in MeshBase base
+     * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not
+     *         conform to the model
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
+    @Override
     public MeshObject applyTo(
             MeshBase base )
         throws
             CannotApplyChangeException,
+            MeshObjectGraphModificationException,
             TransactionException
     {
         setResolver( base );
 
-        Transaction tx = null; 
+        Transaction tx = null;
         MeshObject  otherObject = null;
         try {
             tx = base.createTransactionNowIfNeeded();
@@ -160,13 +165,13 @@ public class MeshObjectTypeAddedEvent
 
             EntityType [] types = getDeltaValue();
             otherObject.bless( types );
-            
+
             if( theInitialProperties != null ) {
                 for( Map.Entry<PropertyType,PropertyValue> current : theInitialProperties.entrySet() ) {
                     otherObject.setPropertyValue( current.getKey(), current.getValue() );
                 }
             }
-            
+
             return otherObject;
 
         } catch( TransactionException ex ) {
@@ -195,6 +200,7 @@ public class MeshObjectTypeAddedEvent
      *
      * @return the inverse Change, or null if no inverse Change could be constructed.
      */
+    @Override
     public MeshObjectTypeRemovedEvent inverse()
     {
         return new MeshObjectTypeRemovedEvent(
@@ -212,6 +218,7 @@ public class MeshObjectTypeAddedEvent
      * @param candidate the candidate Change
      * @return true if the candidate Change is the inverse of this Change
      */
+    @Override
     public boolean isInverse(
             Change candidate )
     {
@@ -247,7 +254,7 @@ public class MeshObjectTypeAddedEvent
 
         if( !super.getSourceIdentifier().equals( realOther.getSourceIdentifier() )) {
             return false;
-        }        
+        }
         if( !ArrayHelper.hasSameContentOutOfOrder( getDeltaValueIdentifier(), realOther.getDeltaValueIdentifier(), true )) {
             return false;
         }
@@ -255,7 +262,7 @@ public class MeshObjectTypeAddedEvent
             return false;
         }
         // FIXME? compare theInitialProperties
-        
+
         return true;
     }
 

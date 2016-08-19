@@ -24,6 +24,7 @@ import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
@@ -694,6 +695,7 @@ public class AnetMeshObject
      * @return if true, this replica will give up home replica status when asked
      * @see #setWillGiveUpHomeReplica
      */
+    @Override
     public boolean getWillGiveUpHomeReplica()
     {
         return theGiveUpHomeReplica;
@@ -1344,7 +1346,11 @@ public class AnetMeshObject
                         log.error( ex );
                     } finally {
                         if( tx != null ) {
-                            tx.commitTransaction();
+                            try {
+                                tx.commitTransaction();
+                            } catch( MeshObjectGraphModificationException ex2 ) {
+                                log.error( ex2 );
+                            }
                         }
                     }
                 } else {
@@ -1769,6 +1775,7 @@ public class AnetMeshObject
      * @throws TransactionException thrown if this method is invoked outside of proper Transaction boundaries
      * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
      */
+    @Override
     public void rippleBless(
             RoleType []             theTypes,
             NetMeshObjectIdentifier neighborIdentifier,

@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -16,6 +16,7 @@ package org.infogrid.meshbase.transaction;
 
 import java.util.Map;
 import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.model.primitives.EntityType;
@@ -62,7 +63,7 @@ public class MeshObjectTypeRemovedEvent
                 MeshTypeUtils.meshTypeIdentifiersOrNull( newValues ),
                 timeEventOccurred,
                 source.getMeshBase() );
-        
+
         theRemovedProperties = removedProperties;
     }
 
@@ -70,7 +71,7 @@ public class MeshObjectTypeRemovedEvent
      * Constructor for the case where we don't have old and new values, only the delta.
      * This perhaps should trigger some exception if it is attempted to read old or
      * new values later. (FIXME?)
-     * 
+     *
      * @param sourceIdentifier the identifier for the MeshObject whose type changed
      * @param deltaValues the EntityTypes that were removed
      * @param timeEventOccurred the time at which the event occurred, in <code>System.currentTimeMillis</code> format
@@ -91,9 +92,9 @@ public class MeshObjectTypeRemovedEvent
                 null,
                 null,
                 timeEventOccurred,
-                resolver );        
+                resolver );
     }
-    
+
     /**
      * Constructor.
      *
@@ -136,13 +137,17 @@ public class MeshObjectTypeRemovedEvent
      * @return the MeshObject to which the Change was applied
      * @throws CannotApplyChangeException thrown if the Change could not be applied, e.g because
      *         the affected MeshObject did not exist in MeshBase base
+     * @throws MeshObjectGraphModificationException thrown if at commit time, the graph did not
+     *         conform to the model
      * @throws TransactionException thrown if a Transaction didn't exist on this Thread and
      *         could not be created
      */
+    @Override
     public MeshObject applyTo(
             MeshBase base )
         throws
             CannotApplyChangeException,
+            MeshObjectGraphModificationException,
             TransactionException
     {
         setResolver( base );
@@ -170,12 +175,13 @@ public class MeshObjectTypeRemovedEvent
             }
         }
     }
-    
+
     /**
      * <p>Create a Change that undoes this Change.</p>
      *
      * @return the inverse Change, or null if no inverse Change could be constructed.
      */
+    @Override
     public MeshObjectTypeAddedEvent inverse()
     {
         return new MeshObjectTypeAddedEvent(
@@ -193,6 +199,7 @@ public class MeshObjectTypeRemovedEvent
      * @param candidate the candidate Change
      * @return true if the candidate Change is the inverse of this Change
      */
+    @Override
     public boolean isInverse(
             Change candidate )
     {
@@ -225,10 +232,10 @@ public class MeshObjectTypeRemovedEvent
             return false;
         }
         MeshObjectTypeRemovedEvent realOther = (MeshObjectTypeRemovedEvent) other;
-        
+
         if( !super.getSourceIdentifier().equals( realOther.getSourceIdentifier() )) {
             return false;
-        }        
+        }
         if( !ArrayHelper.hasSameContentOutOfOrder( getDeltaValueIdentifier(), realOther.getDeltaValueIdentifier(), true )) {
             return false;
         }
@@ -236,7 +243,7 @@ public class MeshObjectTypeRemovedEvent
             return false;
         }
         // FIXME? compare theRemovedProperties
-        
+
         return true;
     }
 

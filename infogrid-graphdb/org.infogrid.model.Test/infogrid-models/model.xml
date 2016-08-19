@@ -6,7 +6,7 @@
     have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
     or you do not consent to all aspects of the license and the disclaimers,
     no license is granted; do not use this file.
- 
+
     For more information about InfoGrid go to http://infogrid.org/
 
     Copyright 1998-2015 by Johannes Ernst
@@ -75,12 +75,12 @@
                 <defaultvalue>12.34</defaultvalue>
             </propertytype>
         </entitytype>
-        
+
         <entitytype ID="org.infogrid.model.Test/B">
             <name>B</name>
             <username>The B EntityType</username>
             <userdescription>This EntityType is a test EntityType.</userdescription>
-            
+
             <propertytype ID="org.infogrid.model.Test/B_Z">
                 <name>Z</name>
                 <username>The Z PropertyType of the B EntityType</username>
@@ -122,7 +122,7 @@
             <name>D</name>
             <supertype>org.infogrid.model.Test/C</supertype>
         </entitytype>
-        
+
         <entitytype ID="org.infogrid.model.Test/Simple1">
             <name>Simple1</name>
         </entitytype>
@@ -454,7 +454,7 @@
         <entitytype ID="org.infogrid.model.Test/AllProperties">
             <name>AllProperties</name>
             <userdescription>Holds properties of all InfoGrid PropertyTypes.</userdescription>
-            
+
             <propertytype ID="org.infogrid.model.Test/AllProperties_OptionalBlobDataTypeAny">
                 <name>OptionalBlobDataTypeAny</name>
                 <datatype>
@@ -533,7 +533,7 @@
                         <enum>
                             <name>Value3</name>
                             <username>Third value of Z</username>
-                        </enum>                        
+                        </enum>
                     </EnumeratedDataType>
                 </datatype>
                 <isoptional/>
@@ -1364,7 +1364,7 @@
             </src>
             <dest>
               <e>org.infogrid.model.Test/B</e>
-              <MultiplicityValue>0:1</MultiplicityValue>
+              <MultiplicityValue>0:N</MultiplicityValue>
             </dest>
         </relationshiptype>
 
@@ -1372,7 +1372,7 @@
             <name>RR</name>
             <username>The RR RelationshipType</username>
             <userdescription>This RelationshipType is a test RelationshipType.</userdescription>
-            
+
             <src>
               <e>org.infogrid.model.Test/AA</e>
               <refines>org.infogrid.model.Test/R-S</refines>
@@ -1437,6 +1437,32 @@
             </src>
             <dest>
               <MultiplicityValue>0:N</MultiplicityValue>
+            </dest>
+        </relationshiptype>
+
+        <entitytype ID="org.infogrid.model.Test/One">
+            <name>One</name>
+            <username>The One EntityType</username>
+            <userdescription>This EntityType is a test EntityType.</userdescription>
+        </entitytype>
+
+        <entitytype ID="org.infogrid.model.Test/Three">
+            <name>Three</name>
+            <username>The Three EntityType</username>
+            <userdescription>This EntityType is a test EntityType.</userdescription>
+        </entitytype>
+
+        <relationshiptype ID="org.infogrid.model.Test/OneThree">
+            <name>OneThree</name>
+            <username>The OneThree RelationshipType</username>
+            <userdescription>This RelationshipType is a test RelationshipType.</userdescription>
+            <src>
+              <e>org.infogrid.model.Test/One</e>
+              <MultiplicityValue>1:1</MultiplicityValue>
+            </src>
+            <dest>
+              <e>org.infogrid.model.Test/Three</e>
+              <MultiplicityValue>3:3</MultiplicityValue>
             </dest>
         </relationshiptype>
     </subjectarea>
