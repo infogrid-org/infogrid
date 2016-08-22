@@ -334,7 +334,7 @@
             </src>
             <dest>
               <e>org.infogrid.lid.model.account/Account</e>
-              <MultiplicityValue>1:1</MultiplicityValue>
+              <MultiplicityValue>0:1</MultiplicityValue>
             </dest>
         </relationshiptype>
 
@@ -685,7 +685,7 @@
             <userdescription>Enumerates the identities possibly used by this Account</userdescription>
             <src>
               <e>org.infogrid.lid.model.account/Account</e>
-              <MultiplicityValue>1:n</MultiplicityValue>
+              <MultiplicityValue>0:n</MultiplicityValue>
             </src>
             <dest>
               <MultiplicityValue>0:n</MultiplicityValue>
@@ -699,7 +699,7 @@
             in order to reduce dependencies.</userdescription>
             <src>
               <e>org.infogrid.lid.model.account/Account</e>
-              <MultiplicityValue>1:1</MultiplicityValue>
+              <MultiplicityValue>0:1</MultiplicityValue>
             </src>
             <dest>
               <MultiplicityValue>0:n</MultiplicityValue>
