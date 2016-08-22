@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -115,6 +115,28 @@ public final class MultiplicityValue
     }
 
     /**
+     * Determine whether this MultiplicityValue is the same, or a sub range of another
+     * MultiplicityValue.
+     *
+     * @param other the other MultiplicityValue
+     * @return true if this MultiplicityValue is the same, or a sub range of the other
+     */
+    public boolean isSubrangeOf(
+            MultiplicityValue other )
+    {
+        if( minimum < other.minimum ) {
+            return false;
+        }
+        if( other.maximum == N ) {
+            return true; // doesn't matter what our is
+        }
+        if( maximum == N ) {
+            return false;
+        }
+        return maximum <= other.maximum;
+    }
+
+    /**
       * Determine equality of two objects.
       *
       * @param otherValue the object to test against
@@ -147,6 +169,7 @@ public final class MultiplicityValue
      *
      * @return the underlying value
      */
+    @Override
     public String value()
     {
         return toString();
@@ -182,7 +205,7 @@ public final class MultiplicityValue
         StringBuilder buf = new StringBuilder( 32 );
         buf.append( className );
         buf.append( DataType.CREATE_STRING );
-        
+
         if( minimum == N ) {
             buf.append( className );
             buf.append( ".N" );
@@ -267,11 +290,11 @@ public final class MultiplicityValue
       * The value for the maximum.
       */
     protected int maximum;
-    
+
     /**
      * Symbol to use when displaying N.
      */
-    public static final String N_SYMBOL = ResourceHelper.getInstance( MultiplicityValue.class ).getResourceStringOrDefault( 
+    public static final String N_SYMBOL = ResourceHelper.getInstance( MultiplicityValue.class ).getResourceStringOrDefault(
             "NSymbol",
             "*" );
 }
