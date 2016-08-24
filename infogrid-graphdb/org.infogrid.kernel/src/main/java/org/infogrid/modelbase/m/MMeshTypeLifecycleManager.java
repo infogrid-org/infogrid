@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -88,7 +88,7 @@ public class MMeshTypeLifecycleManager
 
     /**
      * Create an EntityType.
-     * 
+     *
      * @param identifier globally unique identifier of this EntityType
      * @param theName programmatic name of this EntityType
      * @param theUserNames internalionalized names of this EntityType
@@ -106,6 +106,7 @@ public class MMeshTypeLifecycleManager
      * @param doGenerateImplementationCode if BooleanValue.TRUE, instructs code generator to generate implementation code
      * @return the newly created EntityType
      */
+    @Override
     public EntityType createEntityType(
             MeshTypeIdentifier      identifier,
             StringValue             theName,
@@ -196,7 +197,7 @@ public class MMeshTypeLifecycleManager
         ret.setDeclaredMethods(      declaredMethods );
         ret.setImplementedMethods(   implementedMethods );
         ret.setAdditionalInterfaces( additionalInterfaces );
-        
+
         theModelBase.theCluster.addObject( ret );
 
         for( MeshTypeIdentifier current : synonyms ) {
@@ -208,7 +209,7 @@ public class MMeshTypeLifecycleManager
 
     /**
      * Create a binary RelationshipType.
-     * 
+     *
      * @param identifier globally unique identifier of this RelationshipType
      * @param theName programmatic name of this RelationshipType
      * @param theUserNames internalionalized names of this RelationshipType
@@ -227,6 +228,7 @@ public class MMeshTypeLifecycleManager
      * @param doGenerateImplementationCode if BooleanValue.TRUE, instructs code generator to generate implementation code
      * @return the newly created RelationshipType
      */
+    @Override
     public RelationshipType createRelationshipType(
             MeshTypeIdentifier        identifier,
             StringValue               theName, // full name
@@ -285,6 +287,18 @@ public class MMeshTypeLifecycleManager
                 throw new IllegalArgumentException( "To-be-created RelationshipType with Identifier " + identifier + " cannot override RoleTypes from different RelationshipTypes simultaneously" );
             }
         }
+        // cannot widen the multiplicity
+        for( int i=0 ; i<sourceSuperRoleTypes.length ; ++i ) {
+            if( !sourceMultiplicity.isSubrangeOf( sourceSuperRoleTypes[i].getMultiplicity() )) {
+                throw new IllegalArgumentException( "To-be-created RelationshipType with Identifier " + identifier + " cannot override source RoleType with Identifier " + sourceSuperRoleTypes[i].getIdentifier() + " with a narrower multiplicity" );
+            }
+        }
+        for( int i=0 ; i<destinationSuperRoleTypes.length ; ++i ) {
+            if( !destinationMultiplicity.isSubrangeOf( destinationSuperRoleTypes[i].getMultiplicity() )) {
+                throw new IllegalArgumentException( "To-be-created RelationshipType with Identifier " + identifier + " cannot override destination RoleType with Identifier " + destinationSuperRoleTypes[i].getIdentifier() + " with a narrower multiplicity" );
+            }
+        }
+
         if( isAbstract == null ) {
             throw new IllegalArgumentException( "To-be-created RelationshipType with Identifier " + identifier + " cannot have null IsAbstract" );
         }
@@ -328,7 +342,7 @@ public class MMeshTypeLifecycleManager
         sourceRole.setDirectSuperRoleTypes( realSourceSuperRoleTypes );
         destinationRole.setDirectSuperRoleTypes( realDestinationSuperRoleTypes );
 
-        ArrayList<MRelationshipType> supertypes = new ArrayList<MRelationshipType>(
+        ArrayList<MRelationshipType> supertypes = new ArrayList<>(
                 sourceSuperRoleTypes.length + destinationSuperRoleTypes.length );
 
         if( sourceSuperRoleTypes != null ) {
@@ -379,7 +393,7 @@ public class MMeshTypeLifecycleManager
      * Create a binary RelationshipType. This is a convenience method for those RelationshipTypes that
      * refine exactly one RoleType as source and one RoleType as destination, i.e. those RelationshipTypes
      * that use single inheritance.
-     * 
+     *
      * @param identifier globally unique identifier of this RelationshipType
      * @param theName programmatic name of this RelationshipType
      * @param theUserNames internalionalized names of this RelationshipType
@@ -398,6 +412,7 @@ public class MMeshTypeLifecycleManager
      * @param doGenerateImplementationCode if BooleanValue.TRUE, instructs code generator to generate implementation code
      * @return the newly created RelationshipType
      */
+    @Override
     public RelationshipType createRelationshipType(
             MeshTypeIdentifier        identifier,
             StringValue               theName, // full name
@@ -437,7 +452,7 @@ public class MMeshTypeLifecycleManager
 
     /**
      * Create a unary RelationshipType.
-     * 
+     *
      * @param identifier globally unique identifier of this RelationshipType
      * @param theName programmatic name of this RelationshipType
      * @param theUserNames internalionalized names of this RelationshipType
@@ -452,6 +467,7 @@ public class MMeshTypeLifecycleManager
      * @param doGenerateImplementationCode if BooleanValue.TRUE, instructs code generator to generate implementation code
      * @return the newly created RelationshipType
      */
+    @Override
     public RelationshipType createRelationshipType(
             MeshTypeIdentifier        identifier,
             StringValue               theName,
@@ -483,7 +499,7 @@ public class MMeshTypeLifecycleManager
 
      /**
      * Create the top-most RelationshipType in the inheritance hierarchy.
-     * 
+     *
      * @param identifier globally unique identifier of this RelationshipType
      * @param theName programmatic name of this RelationshipType
      * @param theUserNames internalionalized names of this RelationshipType
@@ -544,7 +560,7 @@ public class MMeshTypeLifecycleManager
         } catch( MeshTypeNotFoundException ex ) {
             // great
         }
-        
+
         MEntityType  realSourceAndDestination = (MEntityType) sourceDest;
         MEntityType  realRootObject           = (MEntityType) rootObject;
         MSubjectArea realSubjectArea          = (MSubjectArea) theSubjectArea;
@@ -576,7 +592,7 @@ public class MMeshTypeLifecycleManager
     /**
      * Create a unary RelationshipType. This is a convenience method for those unary RelationshipTypes that
      * refine exactly one RoleType , i.e. those unary RelationshipTypes that use single inheritance.
-     * 
+     *
      * @param identifier globally unique identifier of this RelationshipType
      * @param theName programmatic name of this RelationshipType
      * @param theUserNames internalionalized names of this RelationshipType
@@ -591,6 +607,7 @@ public class MMeshTypeLifecycleManager
      * @param doGenerateImplementationCode if BooleanValue.TRUE, instructs code generator to generate implementation code
      * @return the newly created RelationshipType
      */
+    @Override
     public RelationshipType createRelationshipType(
             MeshTypeIdentifier        identifier,
             StringValue               theName, // full name
@@ -674,7 +691,7 @@ public class MMeshTypeLifecycleManager
 
     /**
      * Create a PropertyType.
-     * 
+     *
      * @param identifier globally unique identifier of this PropertyType
      * @param theName programmatic name of this PropertyType
      * @param theUserNames internalionalized names of this PropertyType
@@ -692,6 +709,7 @@ public class MMeshTypeLifecycleManager
      * @param theSequenceNumber determines the sequence of display in things like property sheets etc.
      * @return the newly created PropertyType
      */
+    @Override
     public PropertyType createPropertyType(
             MeshTypeIdentifier        identifier,
             StringValue               theName,
@@ -796,7 +814,7 @@ public class MMeshTypeLifecycleManager
 
     /**
      * Create a PropertyType that overrides another PropertyType.
-     * 
+     *
      * @param toOverride set of PropertyTypes to override. All PropertyType given must have the same ancestor PropertyType,
      *        and each PropertyType must be declared in a different supertype of our parent AttributableMeshType that uses
      *        multiple inheritance. For single inheritance, the length of this array must be 1.
@@ -815,6 +833,7 @@ public class MMeshTypeLifecycleManager
      * @return the newly created PropertyType
      * @throws InheritanceConflictException thrown if the overridden PropertyTypes are wrong
      */
+    @Override
     public PropertyType createOverridingPropertyType(
             PropertyType []           toOverride,
             MeshTypeIdentifier        overriddenIdentifier,
@@ -966,7 +985,7 @@ public class MMeshTypeLifecycleManager
 
     /**
      * Create a ProjectedPropertyType.
-     * 
+     *
      * @param identifier globally unique identifier of this ProjectedPropertyType
      * @param theName programmatic name of this ProjectedPropertyType
      * @param theUserNames internalionalized names of this ProjectedPropertyType
@@ -988,6 +1007,7 @@ public class MMeshTypeLifecycleManager
      * @param theSequenceNumber determines the sequence of display in things like property sheets etc.
      * @return the newly created ProjectedPropertyType
      */
+    @Override
     public ProjectedPropertyTypePatcher createProjectedPropertyType(
             MeshTypeIdentifier                  identifier,
             StringValue                         theName,
@@ -1080,7 +1100,7 @@ public class MMeshTypeLifecycleManager
 
     /**
      * Create a ProjectedPropertyType that overrides another PropertyType.
-     * 
+     *
      * @param toOverride set of PropertyTypes to override. All PropertyType given must have the same ancestor PropertyType,
      *        and each PropertyType must be declared in a different supertype of our parent AttributableMeshType that uses
      *        multiple inheritance. For single inheritance, the length of this array must be 1.
@@ -1103,6 +1123,7 @@ public class MMeshTypeLifecycleManager
      * @return the newly created ProjectedPropertyType
      * @throws InheritanceConflictException thrown if the overridden PropertyTypes are wrong
      */
+    @Override
     public ProjectedPropertyTypePatcher createOverridingProjectedPropertyType(
             PropertyType []                     toOverride,
             MeshTypeIdentifier                  overriddenIdentifier,
@@ -1146,7 +1167,7 @@ public class MMeshTypeLifecycleManager
         if( toOverride == null || toOverride.length == 0 ) {
             throw new IllegalArgumentException( "Cannot override empty PropertyType list" );
         }
-        
+
         MAttributableMeshType realParent      = (MAttributableMeshType) theParent;
         MSubjectArea          realSubjectArea = (MSubjectArea) theSubjectArea;
         MPropertyType []      realOverride    = copyIntoNewArray( toOverride, MPropertyType.class );
@@ -1205,7 +1226,7 @@ public class MMeshTypeLifecycleManager
         if( theDefaultValueCode != null ) {
             ret.setDefaultValueCode( theDefaultValueCode );
         }
-        
+
         ret.setIsOptional( BooleanValue.TRUE );
         ret.setIsReadOnly( BooleanValue.TRUE );
         ret.setDoGenerateInterfaceCode( doGenerateInterfaceCode );
@@ -1232,7 +1253,7 @@ public class MMeshTypeLifecycleManager
 
     /**
      * Create a PropertyTypeGroup.
-     * 
+     *
      * @param identifier globally unique identifier of this PropertyTypeGroup
      * @param theName programmatic name of this PropertyTypeGroup
      * @param theUserNames internalionalized names of this PropertyTypeGroup
@@ -1246,6 +1267,7 @@ public class MMeshTypeLifecycleManager
      * @param theSequenceNumber determines the sequence of display in things like property sheets etc.
      * @return the newly created PropertyTypeGroup
      */
+    @Override
     public PropertyTypeGroup createPropertyTypeGroup(
             MeshTypeIdentifier        identifier,
             StringValue               theName,
@@ -1284,7 +1306,7 @@ public class MMeshTypeLifecycleManager
         } catch( MeshTypeNotFoundException ex ) {
             // great
         }
-        
+
         MAttributableMeshType realParent      = (MAttributableMeshType) theParent;
         MSubjectArea          realSubjectArea = (MSubjectArea) theSubjectArea;
 
@@ -1311,7 +1333,7 @@ public class MMeshTypeLifecycleManager
 
     /**
      * Create a SubjectArea.
-     * 
+     *
      * @param identifier globally unique identifier of this SubjectArea
      * @param theName programmatic name of this SubjectArea
      * @param theUserNames internalionalized names of this SubjectArea
@@ -1322,6 +1344,7 @@ public class MMeshTypeLifecycleManager
      * @param doGenerateImplementationCode if BooleanValue.TRUE, instructs code generator to generate implementation code
      * @return the newly created SubjectArea
      */
+    @Override
     public SubjectArea createSubjectArea(
             MeshTypeIdentifier        identifier,
             StringValue               theName,
