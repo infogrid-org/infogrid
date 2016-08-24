@@ -644,6 +644,12 @@ public class MMeshTypeLifecycleManager
 //        if( sourceDestSuperRoleTypes == null || sourceDestSuperRoleTypes.length == 0 ) {
 //            throw new IllegalArgumentException( "To-be-created RelationshipType with Identifier " + identifier + " cannot have null super RoleTypes" );
 //        }
+        // cannot widen the multiplicity
+        for( int i=0 ; i<sourceDestSuperRoleTypes.length ; ++i ) {
+            if( !sourceDestMultiplicity.isSubrangeOf( sourceDestSuperRoleTypes[i].getMultiplicity() )) {
+                throw new IllegalArgumentException( "To-be-created RelationshipType with Identifier " + identifier + " cannot override sourcedest RoleType with Identifier " + sourceDestSuperRoleTypes[i].getIdentifier() + " with a narrower multiplicity" );
+            }
+        }
         if( isAbstract == null ) {
             throw new IllegalArgumentException( "To-be-created RelationshipType with Identifier " + identifier + " cannot have null IsAbstract" );
         }
