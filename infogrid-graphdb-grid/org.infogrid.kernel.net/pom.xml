@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.infogrid</groupId>
         <artifactId>infogrid-graphdb-grid</artifactId>
-        <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
+        <version><!-- PKGVER -->2.10.1<!-- /PKGVER --></version>
     </parent>
 
     <dependencies>

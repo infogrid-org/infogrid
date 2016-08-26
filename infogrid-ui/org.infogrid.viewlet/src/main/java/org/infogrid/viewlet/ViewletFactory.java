@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -38,7 +38,7 @@ public interface ViewletFactory
             Factory<MeshObjectsToView,Viewlet,Void>
 {
     /**
-     * Factory method. This is inhereted from the <code>Factory</code> interface, but
+     * Factory method. This is inherited from the <code>Factory</code> interface, but
      * repeated here for clarity.
      *
      * @param key the MeshObjectsToView with this Viewlet
@@ -51,7 +51,7 @@ public interface ViewletFactory
             Void              argument )
         throws
             FactoryException;
-    
+
     /**
      * Find the ViewletFactoryChoices that apply to these MeshObjectsToView.
      *

@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -37,7 +37,7 @@ public abstract class StructuredResponseSection
 
     /**
      * Constructor for subclasses only.
-     * 
+     *
      * @param sectionTemplate the template that defines this section
      */
     protected StructuredResponseSection(
@@ -48,7 +48,7 @@ public abstract class StructuredResponseSection
 
     /**
      * Obtain the StructuredResponseSectionTemplate that defines this section.
-     * 
+     *
      * @return the StructuredResponseSectionTemplate
      */
     public StructuredResponseSectionTemplate getSectionTemplate()
@@ -58,14 +58,14 @@ public abstract class StructuredResponseSection
 
     /**
      * Determine whether this section is empty.
-     * 
+     *
      * @return true if this section is empty
      */
     public abstract boolean isEmpty();
 
     /**
      * Stream this StructuredResponseSection to an OutputStream.
-     * 
+     *
      * @param s the OutputStream to write to
      * @return true if something was output, false otherwise
      * @throws IOException thrown if an I/O error occurred
@@ -77,9 +77,10 @@ public abstract class StructuredResponseSection
 
     /**
      * Determine whether problems have been reported.
-     * 
+     *
      * @return true if at least one problem has been reported
      */
+    @Override
     public boolean haveProblemsBeenReported()
     {
         return !theCurrentProblems.isEmpty();
@@ -90,6 +91,7 @@ public abstract class StructuredResponseSection
      *
      * @param t the Throwable indicating the problem
      */
+    @Override
     public void reportProblem(
             Throwable t )
     {
@@ -107,6 +109,7 @@ public abstract class StructuredResponseSection
      *
      * @param ts [] the Throwables indicating the problems
      */
+    @Override
     public void reportProblems(
             Throwable [] ts )
     {
@@ -123,9 +126,10 @@ public abstract class StructuredResponseSection
 
     /**
      * Obtain the problems reported so far.
-     * 
+     *
      * @return problems reported so far, in sequence
      */
+    @Override
     public Iterator<Throwable> problems()
     {
         return theCurrentProblems.iterator();
@@ -136,6 +140,7 @@ public abstract class StructuredResponseSection
      *
      * @param t the THrowable indicating the message
      */
+    @Override
     public void reportInfoMessage(
             Throwable t )
     {
@@ -156,6 +161,7 @@ public abstract class StructuredResponseSection
      *
      * @param ts [] the Throwables indicating the informational messages
      */
+    @Override
     public void reportInfoMessages(
             Throwable [] ts )
     {
@@ -175,6 +181,7 @@ public abstract class StructuredResponseSection
      *
      * @return true if at least one informational message has been reported
      */
+    @Override
     public boolean haveInfoMessagesBeenReported()
     {
         return !theCurrentInfoMessages.isEmpty();
@@ -185,6 +192,7 @@ public abstract class StructuredResponseSection
      *
      * @return informational messages reported so far, in sequence
      */
+    @Override
     public Iterator<Throwable> infoMessages()
     {
         return theCurrentInfoMessages.iterator();
@@ -192,7 +200,7 @@ public abstract class StructuredResponseSection
 
     /**
      * Set the MIME type of the StructuredResponse.
-     * 
+     *
      * @param newValue the new value
      */
     public void setMimeType(
@@ -200,12 +208,13 @@ public abstract class StructuredResponseSection
     {
         theMimeType = newValue;
     }
-    
+
     /**
      * Obtain the MIME type of the StructuredResponse.
-     * 
+     *
      * @return the MIME type
      */
+    @Override
     public String getMimeType()
     {
         return theMimeType;
@@ -213,14 +222,14 @@ public abstract class StructuredResponseSection
 
     /**
      * Add a cookie to the response.
-     * 
+     *
      * @param newCookie the new cookie
      */
     public void addCookie(
             Cookie newCookie )
     {
         Cookie found = theOutgoingCookies.put( newCookie.getName(), newCookie );
-        
+
         if( found != null ) {
             log.error( "Setting the same cookie again: " + newCookie + " vs. " + found );
         }
@@ -228,7 +237,7 @@ public abstract class StructuredResponseSection
 
     /**
      * Convenience method to delete a cookie with this response.
-     * 
+     *
      * @param name name of the Cookie to delete
      */
     public void addDeleteCookie(
@@ -245,9 +254,10 @@ public abstract class StructuredResponseSection
 
     /**
      * Obtain the getCookies.
-     * 
+     *
      * @return the getCookies
      */
+    @Override
     public Collection<Cookie> getCookies()
     {
         return theOutgoingCookies.values();
@@ -255,7 +265,7 @@ public abstract class StructuredResponseSection
 
     /**
      * Set the location header.
-     * 
+     *
      * @param newValue the new value
      */
     public void setLocation(
@@ -263,12 +273,13 @@ public abstract class StructuredResponseSection
     {
         theLocation = newValue;
     }
-    
+
     /**
      * Obtain the location header.
-     * 
+     *
      * @return the currently set location header
      */
+    @Override
     public String getLocation()
     {
         return theLocation;
@@ -276,7 +287,7 @@ public abstract class StructuredResponseSection
 
     /**
      * Set the HTTP response code.
-     * 
+     *
      * @param code the HTTP response code
      */
     public void setHttpResponseCode(
@@ -287,17 +298,18 @@ public abstract class StructuredResponseSection
 
     /**
      * Obtain the HTTP response code.
-     * 
+     *
      * @return the HTTP response code
      */
+    @Override
     public int getHttpResponseCode()
     {
         return theHttpResponseCode;
     }
-    
+
     /**
      * Set the locale.
-     * 
+     *
      * @param newValue the new value
      */
     public void setLocale(
@@ -305,12 +317,13 @@ public abstract class StructuredResponseSection
     {
         theLocale = newValue;
     }
-    
+
     /**
      * Obtain the locale.
-     * 
+     *
      * @return the locale
      */
+    @Override
     public Locale getLocale()
     {
         return theLocale;
@@ -318,7 +331,7 @@ public abstract class StructuredResponseSection
 
     /**
      * Set the character encoding.
-     * 
+     *
      * @param newValue the new value
      */
     public void setCharacterEncoding(
@@ -326,12 +339,13 @@ public abstract class StructuredResponseSection
     {
         theCharacterEncoding = newValue;
     }
-    
+
     /**
      * Obtain the character encoding.
-     * 
+     *
      * @return the character encoding
      */
+    @Override
     public String getCharacterEncoding()
     {
         return theCharacterEncoding;
@@ -371,6 +385,7 @@ public abstract class StructuredResponseSection
      *
      * @return the headers, as Map
      */
+    @Override
     public Map<String,String[]> getHeaders()
     {
         return theOutgoingHeaders;
@@ -395,7 +410,7 @@ public abstract class StructuredResponseSection
      * The getCookies to be sent. This is represented as a HashMap in order to easily be
      * able to detect that the same cookie has been set again.
      */
-    protected HashMap<String,Cookie> theOutgoingCookies = new HashMap<String,Cookie>();
+    protected HashMap<String,Cookie> theOutgoingCookies = new HashMap<>();
 
     /**
      * The outgoing HTTP response code. -1 stands for "not set".
@@ -415,15 +430,15 @@ public abstract class StructuredResponseSection
     /**
      * The outgoing headers.
      */
-    protected HashMap<String,String[]> theOutgoingHeaders = new HashMap<String,String[]>();
+    protected HashMap<String,String[]> theOutgoingHeaders = new HashMap<>();
 
     /**
      * The current problems, in sequence of occurrence.
      */
-    protected ArrayList<Throwable> theCurrentProblems = new ArrayList<Throwable>();
+    protected ArrayList<Throwable> theCurrentProblems = new ArrayList<>();
 
     /**
      * The current informational messages, in sequence of occurrence.
      */
-    protected ArrayList<Throwable> theCurrentInfoMessages = new ArrayList<Throwable>();
+    protected ArrayList<Throwable> theCurrentInfoMessages = new ArrayList<>();
 }

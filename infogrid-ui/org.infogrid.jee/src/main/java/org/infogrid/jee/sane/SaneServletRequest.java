@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -16,18 +16,32 @@ package org.infogrid.jee.sane;
 
 import org.infogrid.util.http.MimePart;
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Part;
 import org.infogrid.util.ArrayCursorIterator;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.CompositeIterator;
@@ -54,10 +68,11 @@ public class SaneServletRequest
         extends
             AbstractSaneRequest
         implements
-            CanBeDumped
+            CanBeDumped,
+            HttpServletRequest
 {
     private static final Log log = Log.getLogInstance( SaneServletRequest.class ); // our own, private logger
-    
+
     /**
       * Smart factory method.
       *
@@ -78,16 +93,16 @@ public class SaneServletRequest
 
     /**
       * Internal factory method.
-      * 
+      *
       * @param sRequest the HttpServletRequest from which to create a SaneRequest.
       * @return the created SaneServletRequest
       */
     protected static SaneServletRequest internalCreate(
              HttpServletRequest sRequest )
     {
-        Map<String,String[]>   urlArguments    = new HashMap<String,String[]>();
-        Map<String,String[]>   postedArguments = new HashMap<String,String[]>();
-        Map<String,MimePart[]> mimeParts       = new HashMap<String,MimePart[]>();
+        Map<String,String[]>   urlArguments    = new HashMap<>();
+        Map<String,String[]>   postedArguments = new HashMap<>();
+        Map<String,MimePart[]> mimeParts       = new HashMap<>();
 
         String postData = null;
 
@@ -191,7 +206,7 @@ public class SaneServletRequest
                     protocolAtProxy = protocol;
                 }
 
-                int portAtProxy = -1;
+                int portAtProxy;
                 if( tmp != null ) {
                     portAtProxy = Integer.parseInt( tmp );
                 } else {
@@ -311,7 +326,7 @@ public class SaneServletRequest
         theMimeType         = mimeType;
         theClientIp         = clientIp;
     }
-    
+
     /**
      * Helper to parse formdata-encoded POST data, and put them in the right places.
      *
@@ -341,7 +356,7 @@ public class SaneServletRequest
         outer:
         while( hasData ) { // for all parts
 
-            HashMap<String,String> partHeaders = new HashMap<String,String>();
+            HashMap<String,String> partHeaders = new HashMap<>();
             String currentLogicalLine = null;
             while( true ) { // for all headers in this part
                 String line = FormDataUtils.readStringLine( inStream, FORM_CHARSET );
@@ -447,6 +462,7 @@ public class SaneServletRequest
      *
      * @return the HTTP method
      */
+    @Override
     public String getMethod()
     {
         return theMethod;
@@ -458,6 +474,7 @@ public class SaneServletRequest
      * @param argName name of the argument
      * @return the values, or <code>null</code>
      */
+    @Override
     public String [] getMultivaluedPostedArgument(
             String argName )
     {
@@ -473,17 +490,19 @@ public class SaneServletRequest
      *
      * @return a Map of name to value mappings for all POST'd arguments
      */
+    @Override
     public Map<String,String[]> getPostedArguments()
     {
         return Collections.unmodifiableMap( thePostedArguments );
-    }    
+    }
 
     /**
      * Obtain the cookies that were sent as part of this request.
      *
      * @return the cookies that were sent as part of this request.
      */
-    public synchronized IncomingSaneCookie[] getCookies()
+    @Override
+    public synchronized IncomingSaneCookie[] getSaneCookies()
     {
         if( theCookies == null ) {
             Cookie [] delegateCookies = theDelegate.getCookies();
@@ -492,7 +511,7 @@ public class SaneServletRequest
             for( int i=0 ; i<delegateCookies.length ; ++i ) {
                 theCookies[i] = new IncomingCookieAdapter( delegateCookies[i] );
             }
-        } 
+        }
         return theCookies;
     }
 
@@ -502,6 +521,7 @@ public class SaneServletRequest
      *
      * @return the request content type
      */
+    @Override
     public String getContentType()
     {
         return theMimeType;
@@ -512,6 +532,7 @@ public class SaneServletRequest
      *
      * @return the content of the request, or <code>null</code>
      */
+    @Override
     public String getPostData()
     {
         return thePostData;
@@ -519,9 +540,10 @@ public class SaneServletRequest
 
     /**
      * Obtain the client IP address.
-     * 
+     *
      * @return the client IP address
      */
+    @Override
     public String getClientIp()
     {
         return theClientIp;
@@ -544,7 +566,7 @@ public class SaneServletRequest
         if( c != null ) {
             String s = c.getValue();
             String [] parts = s.split( "-" );
-            
+
             Locale cookieLocale;
             switch( parts.length ) {
                 case 1:
@@ -557,7 +579,7 @@ public class SaneServletRequest
                     cookieLocale = new Locale( parts[0], parts[1], parts[2] );
                     break;
             }
-            
+
             return CompositeIterator.<Locale>createFromEnumerations(
                 OneElementIterator.<Locale>create( cookieLocale ),
                 (Enumeration<Locale>) fromHttp,
@@ -576,6 +598,7 @@ public class SaneServletRequest
      *
      * @return Iterator over the requested MIME types, if any.
      */
+    @Override
     public Iterator<String> requestedMimeTypesIterator()
     {
         if( theRequestedMimeTypes == null ) {
@@ -583,42 +606,37 @@ public class SaneServletRequest
             String header = theDelegate.getHeader( ACCEPT_HEADER );
             if( header != null ) {
                 theRequestedMimeTypes = header.split( "," );
-                
-                Arrays.sort( theRequestedMimeTypes, new Comparator<String>() {
-                    public int compare(
-                            String o1,
-                            String o2 )
-                    {
-                        final String qString = ";q=";
 
-                        float priority1;
-                        float priority2;
-                        
-                        int semi1 = o1.indexOf( qString );
-                        if( semi1 >= 0 ) {
-                            priority1 = Float.parseFloat( o1.substring( semi1 + qString.length() ));
-                        } else {
-                            priority1 = 1.f;
-                        }
-                        int semi2 = o2.indexOf( qString );
-                        if( semi2 >= 0 ) {
-                            priority2 = Float.parseFloat( o2.substring( semi2 + qString.length() ));
-                        } else {
-                            priority2 = 1.f;
-                        }
+                Arrays.sort(theRequestedMimeTypes, ( String o1, String o2 ) -> {
+                    final String qString = ";q=";
 
-                        int ret;
-                        if( semi1 > semi2 ) {
-                            ret = 1;
-                        } else if( semi1 == semi2 ) {
-                            ret = 0;
-                        } else {
-                            ret = -1;
-                        }
-                        return ret;
+                    float priority1;
+                    float priority2;
+
+                    int semi1 = o1.indexOf( qString );
+                    if( semi1 >= 0 ) {
+                        priority1 = Float.parseFloat( o1.substring( semi1 + qString.length() ));
+                    } else {
+                        priority1 = 1.f;
                     }
+                    int semi2 = o2.indexOf( qString );
+                    if( semi2 >= 0 ) {
+                        priority2 = Float.parseFloat( o2.substring( semi2 + qString.length() ));
+                    } else {
+                        priority2 = 1.f;
+                    }
+
+                    int ret;
+                    if( semi1 > semi2 ) {
+                        ret = 1;
+                    } else if( semi1 == semi2 ) {
+                        ret = 0;
+                    } else {
+                        ret = -1;
+                    }
+                    return ret;
                 });
-                
+
             } else {
                 theRequestedMimeTypes = new String[0];
             }
@@ -631,6 +649,7 @@ public class SaneServletRequest
      *
      * @return the value of the accept header
      */
+    @Override
     public String getAcceptHeader()
     {
         String ret = theDelegate.getHeader( "Accept" );
@@ -657,6 +676,7 @@ public class SaneServletRequest
      * @see #removeAttribute
      * @see #getAttributeNames
      */
+    @Override
     public void setAttribute(
             String name,
             Object value )
@@ -674,6 +694,7 @@ public class SaneServletRequest
      * @see #removeAttribute
      * @see #getAttributeNames
      */
+    @Override
     public Object getAttribute(
             String name )
     {
@@ -690,6 +711,7 @@ public class SaneServletRequest
      * @see #getAttribute
      * @see #getAttributeNames
      */
+    @Override
     public void removeAttribute(
             String name )
     {
@@ -705,6 +727,7 @@ public class SaneServletRequest
      * @see #removeAttribute
      */
     @SuppressWarnings("unchecked")
+    @Override
     public Enumeration<String> getAttributeNames()
     {
         return theDelegate.getAttributeNames();
@@ -715,6 +738,7 @@ public class SaneServletRequest
      *
      * @return the names of the MimeParts
      */
+    @Override
     public CursorIterator<String> getMimePartNames()
     {
         if( theMimeParts != null ) {
@@ -730,6 +754,7 @@ public class SaneServletRequest
      * @param argName name of the MimePart
      * @return the values, or <code>null</code>
      */
+    @Override
     public MimePart [] getMultivaluedMimeParts(
             String argName )
     {
@@ -738,6 +763,585 @@ public class SaneServletRequest
         }
         MimePart [] ret = theMimeParts.get( argName );
         return ret;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCharacterEncoding()
+    {
+        return theDelegate.getCharacterEncoding();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCharacterEncoding(
+            String env )
+        throws
+            UnsupportedEncodingException
+    {
+        theDelegate.setCharacterEncoding( env );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getContentLength()
+    {
+        return theDelegate.getContentLength();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getContentLengthLong()
+    {
+        return theDelegate.getContentLengthLong();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ServletInputStream getInputStream()
+        throws
+            IOException
+    {
+        return theDelegate.getInputStream();
+    }
+
+   /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getParameter(
+            String name )
+    {
+        return theDelegate.getParameter( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Enumeration<String> getParameterNames()
+    {
+        return theDelegate.getParameterNames();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getParameterValues(
+            String name )
+    {
+        return theDelegate.getParameterValues( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String[]> getParameterMap()
+    {
+        return theDelegate.getParameterMap();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getScheme()
+    {
+        return theDelegate.getScheme();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getServerName(){
+        return theDelegate.getServerName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getServerPort()
+    {
+        return theDelegate.getServerPort();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BufferedReader getReader()
+            throws IOException
+    {
+        return theDelegate.getReader();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRemoteAddr()
+    {
+        return theDelegate.getRemoteAddr();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRemoteHost()
+    {
+        return theDelegate.getRemoteHost();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Locale getLocale()
+    {
+        return theDelegate.getLocale();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Enumeration<Locale> getLocales()
+    {
+        return theDelegate.getLocales();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSecure()
+    {
+        return theDelegate.isSecure();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RequestDispatcher getRequestDispatcher(
+            String path )
+    {
+        return theDelegate.getRequestDispatcher( path );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRealPath(
+            String path )
+    {
+        return theDelegate.getRealPath( path );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getRemotePort()
+    {
+        return theDelegate.getRemotePort();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLocalName()
+    {
+        return theDelegate.getLocalName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLocalAddr()
+    {
+        return theDelegate.getLocalAddr();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getLocalPort()
+    {
+        return theDelegate.getLocalPort();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ServletContext getServletContext()
+    {
+        return theDelegate.getServletContext();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AsyncContext startAsync()
+            throws IllegalStateException
+    {
+        return theDelegate.startAsync();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AsyncContext startAsync(
+            ServletRequest  servletRequest,
+            ServletResponse servletResponse )
+        throws
+            IllegalStateException
+    {
+        return theDelegate.startAsync( servletRequest, servletResponse );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAsyncStarted()
+    {
+        return theDelegate.isAsyncStarted();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAsyncSupported()
+    {
+        return theDelegate.isAsyncSupported();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AsyncContext getAsyncContext()
+    {
+        return theDelegate.getAsyncContext();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DispatcherType getDispatcherType()
+    {
+        return theDelegate.getDispatcherType();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getAuthType()
+    {
+        return theDelegate.getAuthType();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Cookie[] getCookies()
+    {
+        return theDelegate.getCookies();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getDateHeader(
+            String name )
+    {
+        return theDelegate.getDateHeader( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getHeader(
+            String name )
+    {
+        return theDelegate.getHeader( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Enumeration<String> getHeaders(
+            String name )
+    {
+        return theDelegate.getHeaders( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Enumeration<String> getHeaderNames()
+    {
+        return theDelegate.getHeaderNames();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getIntHeader(
+            String name )
+    {
+        return theDelegate.getIntHeader( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPathInfo()
+    {
+        return theDelegate.getPathInfo();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPathTranslated()
+    {
+        return theDelegate.getPathTranslated();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRemoteUser()
+    {
+        return theDelegate.getRemoteUser();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isUserInRole(
+            String role )
+    {
+        return theDelegate.isUserInRole( role );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Principal getUserPrincipal()
+    {
+        return theDelegate.getUserPrincipal();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRequestedSessionId()
+    {
+        return theDelegate.getRequestedSessionId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRequestURI()
+    {
+        return theDelegate.getRequestURI();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StringBuffer getRequestURL()
+    {
+        return theDelegate.getRequestURL();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getServletPath()
+    {
+        return theDelegate.getServletPath();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HttpSession getSession(
+            boolean create )
+    {
+        return theDelegate.getSession( create );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HttpSession getSession()
+    {
+        return theDelegate.getSession();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String changeSessionId()
+    {
+        return theDelegate.changeSessionId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isRequestedSessionIdValid()
+    {
+        return theDelegate.isRequestedSessionIdValid();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isRequestedSessionIdFromCookie()
+    {
+        return theDelegate.isRequestedSessionIdFromCookie();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isRequestedSessionIdFromURL()
+    {
+        return theDelegate.isRequestedSessionIdFromURL();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isRequestedSessionIdFromUrl()
+    {
+        return theDelegate.isRequestedSessionIdFromUrl();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean authenticate(
+            HttpServletResponse response )
+        throws
+            IOException,
+            ServletException
+    {
+        return theDelegate.authenticate( response );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void login(
+            String username,
+            String password )
+        throws
+            ServletException
+    {
+        theDelegate.login( username, password );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void logout()
+        throws
+            ServletException
+    {
+        theDelegate.logout();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Part> getParts()
+        throws
+            IOException,
+            ServletException
+    {
+        return theDelegate.getParts();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Part getPart(
+            String name )
+        throws
+            IOException,
+            ServletException
+    {
+        return theDelegate.getPart( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends HttpUpgradeHandler> T upgrade( Class<T> handlerClass )
+            throws IOException,
+                   ServletException
+    {
+        return theDelegate.upgrade( handlerClass );
     }
 
     /**
@@ -756,6 +1360,7 @@ public class SaneServletRequest
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {
@@ -802,7 +1407,7 @@ public class SaneServletRequest
      * The underlying HttpServletRequest.
      */
     protected HttpServletRequest theDelegate;
-    
+
     /**
      * The http method, such as GET.
      */
@@ -812,7 +1417,7 @@ public class SaneServletRequest
      * The cookies on this request. Allocated when needed.
      */
     protected IncomingSaneCookie[] theCookies;
-    
+
     /**
      * The data that was posted, if any.
      */
@@ -932,6 +1537,7 @@ public class SaneServletRequest
          *
          * @return the Cookie name
          */
+        @Override
         public String getName()
         {
             if( theName == null ) {
@@ -946,6 +1552,7 @@ public class SaneServletRequest
          *
          * @return the Cookie value
          */
+        @Override
         public String getValue()
         {
             if( theValue == null ) {
@@ -960,6 +1567,7 @@ public class SaneServletRequest
          *
          * @param d the Dumper to dump to
          */
+        @Override
         public void dump(
                 Dumper d )
         {
@@ -978,12 +1586,12 @@ public class SaneServletRequest
          * The Servlet Cookie we delegate to.
          */
         protected Cookie theDelegate;
-        
+
         /**
          * The decoded name.
          */
         protected String theName;
-        
+
         /**
          * The decoded value.
          */

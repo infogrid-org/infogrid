@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -40,7 +40,7 @@ public class TextStructuredResponseSection
 
     /**
      * Constructor for subclasses only, use factory method.
-     * 
+     *
      * @param sectionTemplate the template that defines this section
      */
     protected TextStructuredResponseSection(
@@ -51,7 +51,7 @@ public class TextStructuredResponseSection
 
     /**
      * Obtain the StructuredResponseSectionTemplate that defines this section.
-     * 
+     *
      * @return the StructuredResponseSectionTemplate
      */
     @Override
@@ -62,9 +62,10 @@ public class TextStructuredResponseSection
 
     /**
      * Determine whether this section is empty.
-     * 
+     *
      * @return true if this section is empty
      */
+    @Override
     public boolean isEmpty()
     {
         if( theHttpResponseCode > 0 && theHttpResponseCode != 200 ) {
@@ -81,14 +82,15 @@ public class TextStructuredResponseSection
         }
         return true;
     }
-    
+
     /**
      * Stream this StructuredResponseSection to an OutputStream.
-     * 
+     *
      * @param s the OutputStream to write to
      * @return true if something was output, false otherwise
      * @throws IOException thrown if an I/O error occurred
      */
+    @Override
     public boolean doOutput(
             OutputStream s )
         throws
@@ -113,7 +115,7 @@ public class TextStructuredResponseSection
 
     /**
      * Obtain the current content of this section.
-     * 
+     *
      * @return the current content of this section, or null
      */
     public String getContent()
@@ -123,7 +125,7 @@ public class TextStructuredResponseSection
 
     /**
      * Set the content of this section.
-     * 
+     *
      * @param newValue the new content of this section
      */
     public void setContent(
@@ -131,10 +133,10 @@ public class TextStructuredResponseSection
     {
         theContent = newValue;
     }
-    
+
     /**
      * Append to the content of this section.
-     * 
+     *
      * @param toAppend the content to append to this section
      */
     public void appendContent(

@@ -95,7 +95,7 @@ public interface SaneRequest
      *
      * @return the cookies that were sent as part of this Request.
      */
-    public abstract IncomingSaneCookie [] getCookies();
+    public abstract IncomingSaneCookie [] getSaneCookies();
 
     /**
      * Obtain a named cookie, or null if not present.

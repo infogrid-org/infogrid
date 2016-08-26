@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -14,15 +14,17 @@
 
 package org.infogrid.jee.templates;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import org.infogrid.jee.ProblemReporter;
@@ -40,6 +42,7 @@ public class StructuredResponse
         implements
             HasHeaderPreferences,
             ProblemReporter,
+            HttpServletResponse,
             CanBeDumped
 {
     private static final Log log = Log.getLogInstance( StructuredResponse.class ); // our own, private logger
@@ -97,10 +100,10 @@ public class StructuredResponse
         theMaxProblems     = maxProblems;
         theMaxInfoMessages = maxInfoMessages;
     }
-    
+
     /**
      * Obtain the underlying HttpServletResponse.
-     * 
+     *
      * @return the delegate
      */
     public HttpServletResponse getDelegate()
@@ -110,7 +113,7 @@ public class StructuredResponse
 
     /**
      * Obtain the default text section.
-     * 
+     *
      * @return the default text section
      */
     public TextStructuredResponseSection getDefaultTextSection()
@@ -120,7 +123,7 @@ public class StructuredResponse
 
     /**
      * Obtain the default binary section.
-     * 
+     *
      * @return the default binary section
      */
     public BinaryStructuredResponseSection getDefaultBinarySection()
@@ -130,7 +133,7 @@ public class StructuredResponse
 
     /**
      * Obtain a text section; if the section does not exist, create it.
-     * 
+     *
      * @param template the section type
      * @return the section
      */
@@ -150,7 +153,7 @@ public class StructuredResponse
 
     /**
      * Obtain a binary section; if the section does not exist, create it.
-     * 
+     *
      * @param template the section type
      * @return the section
      */
@@ -202,7 +205,7 @@ public class StructuredResponse
 
     /**
      * Obtain a text section by name; if the section does not exist, create it.
-     * 
+     *
      * @param name the name of the section
      * @return the section
      */
@@ -219,7 +222,7 @@ public class StructuredResponse
 
     /**
      * Obtain a binary section by name; if the section does not exist, create it.
-     * 
+     *
      * @param name the name of the section
      * @return the section
      */
@@ -400,10 +403,11 @@ public class StructuredResponse
      *
      * @param t the Throwable indicating the problem
      */
+    @Override
     public void reportProblem(
             Throwable t )
     {
-        if( log.isDebugEnabled() ) { 
+        if( log.isDebugEnabled() ) {
             log.debug( "Reporting problem: ", t );
         }
         if( theCurrentProblems.size() <= theMaxProblems ) {
@@ -420,6 +424,7 @@ public class StructuredResponse
      *
      * @param ts [] the Throwables indicating the problems
      */
+    @Override
     public void reportProblems(
             Throwable [] ts )
     {
@@ -427,12 +432,13 @@ public class StructuredResponse
             reportProblem( ts[i] );
         }
     }
-    
+
     /**
      * Determine whether problems have been reported.
-     * 
+     *
      * @return true if at least one problem has been reported
      */
+    @Override
     public boolean haveProblemsBeenReported()
     {
         if( !theCurrentProblems.isEmpty() ) {
@@ -443,7 +449,7 @@ public class StructuredResponse
 
     /**
      * Determine whether problems have been reported here and in all contained sections.
-     * 
+     *
      * @return true if at least one problem has been reported
      */
     public boolean haveProblemsBeenReportedAggregate()
@@ -451,7 +457,7 @@ public class StructuredResponse
         if( !theCurrentProblems.isEmpty() ) {
             return true;
         }
-        
+
         for( TextStructuredResponseSection current : theTextSections.values() ) {
             if( current.haveProblemsBeenReported() ) {
                 return true;
@@ -468,9 +474,10 @@ public class StructuredResponse
 
     /**
      * Obtain the problems reported so far.
-     * 
+     *
      * @return problems reported so far, in sequence
      */
+    @Override
     public Iterator<Throwable> problems()
     {
         return theCurrentProblems.iterator();
@@ -478,12 +485,12 @@ public class StructuredResponse
 
     /**
      * Obtain the problems reported so far here and in all contained sections.
-     * 
+     *
      * @return problems reported so far
      */
     public Iterator<Throwable> problemsAggregate()
     {
-        ArrayList<Throwable> ret =  new ArrayList<Throwable>();
+        ArrayList<Throwable> ret =  new ArrayList<>();
         ret.addAll( theCurrentProblems );
 
         for( TextStructuredResponseSection current : theTextSections.values() ) {
@@ -507,6 +514,7 @@ public class StructuredResponse
      *
      * @param t the THrowable indicating the message
      */
+    @Override
     public void reportInfoMessage(
             Throwable t )
     {
@@ -527,6 +535,7 @@ public class StructuredResponse
      *
      * @param ts [] the Throwables indicating the informational messages
      */
+    @Override
     public void reportInfoMessages(
             Throwable [] ts )
     {
@@ -540,6 +549,7 @@ public class StructuredResponse
      *
      * @return true if at least one informational message has been reported
      */
+    @Override
     public boolean haveInfoMessagesBeenReported()
     {
         if( !theCurrentInfoMessages.isEmpty() ) {
@@ -578,6 +588,7 @@ public class StructuredResponse
      *
      * @return informational messages reported so far, in sequence
      */
+    @Override
     public Iterator<Throwable> infoMessages()
     {
         return theCurrentInfoMessages.iterator();
@@ -590,7 +601,7 @@ public class StructuredResponse
      */
     public Iterator<Throwable> infoMessagesAggregate()
     {
-        ArrayList<Throwable> ret =  new ArrayList<Throwable>();
+        ArrayList<Throwable> ret =  new ArrayList<>();
         ret.addAll( theCurrentInfoMessages );
 
         for( TextStructuredResponseSection current : theTextSections.values() ) {
@@ -611,9 +622,10 @@ public class StructuredResponse
 
     /**
      * Obtain the desired MIME type.
-     * 
+     *
      * @return the desired MIME type
      */
+    @Override
     public String getMimeType()
     {
         return theMimeType;
@@ -632,9 +644,10 @@ public class StructuredResponse
 
     /**
      * Obtain the Cookies.
-     * 
+     *
      * @return the Cookies
      */
+    @Override
     public Collection<Cookie> getCookies()
     {
         return theCookies;
@@ -645,6 +658,7 @@ public class StructuredResponse
      *
      * @param toAdd the Cookie to add
      */
+    @Override
     public void addCookie(
             Cookie toAdd )
     {
@@ -653,9 +667,10 @@ public class StructuredResponse
 
     /**
      * Obtain the location header.
-     * 
+     *
      * @return the currently set location header
      */
+    @Override
     public String getLocation()
     {
         return theLocation;
@@ -674,9 +689,10 @@ public class StructuredResponse
 
     /**
      * Obtain the HTTP response code.
-     * 
+     *
      * @return the HTTP response code
      */
+    @Override
     public int getHttpResponseCode()
     {
         return theHttpResponseCode;
@@ -695,9 +711,10 @@ public class StructuredResponse
 
     /**
      * Obtain the locale.
-     * 
+     *
      * @return the locale
      */
+    @Override
     public Locale getLocale()
     {
         return theLocale;
@@ -708,6 +725,7 @@ public class StructuredResponse
      *
      * @param newValue the new value
      */
+    @Override
     public void setLocale(
             Locale newValue )
     {
@@ -716,9 +734,10 @@ public class StructuredResponse
 
     /**
      * Obtain the character encoding.
-     * 
+     *
      * @return the character encoding
      */
+    @Override
     public String getCharacterEncoding()
     {
         return theCharacterEncoding;
@@ -729,6 +748,7 @@ public class StructuredResponse
      *
      * @param newValue the new value
      */
+    @Override
     public void setCharacterEncoding(
             String newValue )
     {
@@ -736,8 +756,8 @@ public class StructuredResponse
     }
 
     /**
-     * Obtain the ServletContext whithin this response is being assembled.
-     * 
+     * Obtain the ServletContext within this response is being assembled.
+     *
      * @return the ServletContext
      */
     public ServletContext getServletContext()
@@ -747,7 +767,7 @@ public class StructuredResponse
 
     /**
      * Set the name of the template that is being requested. Null represents "default".
-     * 
+     *
      * @param newValue the name of the template that is being requested
      */
     public void setRequestedTemplateName(
@@ -755,10 +775,10 @@ public class StructuredResponse
     {
         theRequestedTemplateName = newValue;
     }
-    
+
     /**
      * Obtain the name of the template that is being requested. Null represents "default".
-     * 
+     *
      * @return the name of the template that is being requested
      */
     public String getRequestedTemplateName()
@@ -772,6 +792,7 @@ public class StructuredResponse
      * @param name name of the header to add
      * @param value value of the header to add
      */
+    @Override
     public void addHeader(
             String name,
             String value )
@@ -800,14 +821,333 @@ public class StructuredResponse
      *
      * @return the headers, as Map
      */
+    @Override
     public Map<String,String[]> getHeaders()
     {
         return theOutgoingHeaders;
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean containsHeader(
+            String name )
+    {
+        return theDelegate.containsHeader( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getContentType()
+    {
+        return theDelegate.getContentType();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ServletOutputStream getOutputStream()
+        throws
+            IOException
+    {
+        return theDelegate.getOutputStream();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PrintWriter getWriter()
+        throws
+            IOException
+    {
+        return theDelegate.getWriter();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setContentLength(
+            int len )
+    {
+        theDelegate.setContentLength( len );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setContentLengthLong(
+            long len )
+    {
+        theDelegate.setContentLengthLong( len );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setContentType(
+            String type )
+    {
+        theDelegate.setContentType( type );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setBufferSize(
+            int size )
+    {
+        theDelegate.setBufferSize( size );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getBufferSize()
+    {
+        return theDelegate.getBufferSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void flushBuffer()
+        throws
+            IOException
+    {
+        theDelegate.flushBuffer();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void resetBuffer()
+    {
+        theDelegate.resetBuffer();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCommitted()
+    {
+        return theDelegate.isCommitted();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset()
+    {
+        theDelegate.reset();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String encodeURL(
+            String url )
+    {
+        return theDelegate.encodeURL( url );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String encodeRedirectURL(
+            String url )
+    {
+        return theDelegate.encodeRedirectURL( url );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String encodeUrl(
+            String url )
+    {
+        return theDelegate.encodeUrl( url );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String encodeRedirectUrl(
+            String url )
+    {
+        return theDelegate.encodeRedirectUrl( url );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sendError(
+            int    sc,
+            String msg )
+        throws
+            IOException
+    {
+        theDelegate.sendError( sc, msg );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sendError(
+            int sc )
+        throws
+            IOException
+    {
+        theDelegate.sendError( sc );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sendRedirect(
+            String location )
+        throws
+            IOException
+    {
+        theDelegate.sendRedirect( location );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setDateHeader(
+            String name,
+            long   date )
+    {
+        theDelegate.setDateHeader( name, date );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addDateHeader(
+            String name,
+            long   date )
+    {
+        theDelegate.addDateHeader( name, date );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setHeader(
+            String name,
+            String value )
+    {
+        theDelegate.setHeader( name, value );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setIntHeader(
+            String name,
+            int    value )
+    {
+        theDelegate.setIntHeader( name, value );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addIntHeader(
+            String name,
+            int    value )
+    {
+        theDelegate.addIntHeader( name, value );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setStatus(
+            int sc )
+    {
+        theDelegate.setStatus( sc );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setStatus(
+            int    sc,
+            String sm )
+    {
+        theDelegate.setStatus( sc, sm );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getStatus()
+    {
+        return theDelegate.getStatus();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getHeader(
+            String name )
+    {
+        return theDelegate.getHeader( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<String> getHeaders(
+            String name )
+    {
+        return theDelegate.getHeaders( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<String> getHeaderNames()
+    {
+        return theDelegate.getHeaderNames();
+    }
+
+    /**
      * Determine whether this StructuredResponse is empty.
-     * 
+     *
      * @return true if it is empty
      */
     public boolean isEmpty()
@@ -841,6 +1181,7 @@ public class StructuredResponse
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {
@@ -880,13 +1221,13 @@ public class StructuredResponse
      * The sections of the response that are represented as text.
      */
     protected HashMap<TextStructuredResponseSectionTemplate,TextStructuredResponseSection> theTextSections
-            = new HashMap<TextStructuredResponseSectionTemplate,TextStructuredResponseSection>();
+            = new HashMap<>();
 
     /**
      * The sections of the response that are represented as binary.
      */
     protected HashMap<BinaryStructuredResponseSectionTemplate,BinaryStructuredResponseSection> theBinarySections
-            = new HashMap<BinaryStructuredResponseSectionTemplate,BinaryStructuredResponseSection>();
+            = new HashMap<>();
 
     /**
      * The ServletContext within which this response is assembled.
@@ -901,12 +1242,12 @@ public class StructuredResponse
     /**
      * The current problems, in sequence of occurrence.
      */
-    protected ArrayList<Throwable> theCurrentProblems = new ArrayList<Throwable>();
+    protected ArrayList<Throwable> theCurrentProblems = new ArrayList<>();
 
     /**
      * The current informational messages, in sequence of occurrence.
      */
-    protected ArrayList<Throwable> theCurrentInfoMessages = new ArrayList<Throwable>();
+    protected ArrayList<Throwable> theCurrentInfoMessages = new ArrayList<>();
 
     /**
      * The maximum number of problems to store in this type of section.
@@ -922,11 +1263,11 @@ public class StructuredResponse
      * The desired MIME type. Currently not used.
      */
     protected String theMimeType;
-    
+
     /**
      * The desired cookies. Currently not used.
      */
-    protected Collection<Cookie> theCookies = new ArrayList<Cookie>();
+    protected Collection<Cookie> theCookies = new ArrayList<>();
 
     /**
      * The desired location header.
@@ -937,7 +1278,7 @@ public class StructuredResponse
      * The desired HTTP response code.
      */
     protected int theHttpResponseCode = -1;
-    
+
     /**
      * The desired locale.
      */
@@ -951,7 +1292,7 @@ public class StructuredResponse
     /**
      * The outgoing headers.
      */
-    protected HashMap<String,String[]> theOutgoingHeaders = new HashMap<String,String[]>();
+    protected HashMap<String,String[]> theOutgoingHeaders = new HashMap<>();
 
     /**
      * Name of the request attribute that contains the StructuredResponse. Make sure

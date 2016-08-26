@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -47,7 +47,7 @@ public abstract class JeeTemplateUtils
 
     /**
      * Invoke the RequestDispatcher and put the results in the default section of the StructuredResponse.
-     * 
+     *
      * @param dispatcher the RequestDispatcher to invoke
      * @param request the incoming request
      * @param structured the outgoing response
@@ -72,7 +72,7 @@ public abstract class JeeTemplateUtils
 
     /**
      * Invoke the RequestDispatcher and put the results in a specified section.
-     * 
+     *
      * @param dispatcher the RequestDispatcher to invoke
      * @param textSectionTemplate the section to put text results into
      * @param binarySectionTemplate the section to put binary results into
@@ -99,7 +99,7 @@ public abstract class JeeTemplateUtils
             // It does process is for forwarded requests. We do need the content type to drive the
             // selection of the right template.
             ServletRequest sRequest = ((SaneServletRequest)request).getDelegate();
-            
+
             dispatcher.forward( sRequest, bufferedResponse );
 
         } catch( Throwable ex ) {

@@ -17,7 +17,7 @@ package org.infogrid.meshbase.store.test;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
-import org.infogrid.meshbase.store.IterableStoreMeshBase;
+import org.infogrid.meshbase.store.StoreMeshBase;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.util.logging.Log;
@@ -50,7 +50,7 @@ public class MultiplicityTest1
 
         super.startClock();
 
-        IterableStoreMeshBase mb = IterableStoreMeshBase.create(
+        StoreMeshBase mb = StoreMeshBase.create(
                 theMeshBaseIdentifierFactory.fromExternalForm( "MeshBase" ),
                 theModelBase,
                 null,

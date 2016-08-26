@@ -138,7 +138,7 @@ public abstract class AbstractSaneRequest
     public IncomingSaneCookie getCookie(
             String name )
     {
-        IncomingSaneCookie [] cookies = getCookies();
+        IncomingSaneCookie [] cookies = getSaneCookies();
         if( cookies != null ) {
             for( int i=0 ; i<cookies.length ; ++i ) {
                 if( cookies[i].getName().equals( name )) {

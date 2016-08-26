@@ -430,6 +430,7 @@ public class LocalNetMMeshBase
      * @see #getSize(String)
      */
     @Override
+    @SuppressWarnings(value={"unchecked"})
     public int size(
             MeshObjectIdentifier startsWith )
     {

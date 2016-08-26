@@ -5,7 +5,7 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-// 
+//
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
@@ -56,7 +56,7 @@ public class TemplatesFilter
 
     /**
      * Main filter method.
-     * 
+     *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
      * @param chain The filter chain we are processing
@@ -115,7 +115,7 @@ public class TemplatesFilter
         if( lastException != null ) {
             structured.reportProblem( lastException );
         }
-        
+
         if( structured.isEmpty() ) {
             // traditional processing, it ignored the StructuredResponse. We simply copy.
             bufferedResponse.copyTo( realResponse );
@@ -148,7 +148,7 @@ public class TemplatesFilter
             }
         }
     }
-    
+
     /**
      * Overridable method to create a structured response.
      *
@@ -174,7 +174,7 @@ public class TemplatesFilter
     public void destroy()
     {
     }
-    
+
     /**
      * Initialize and get the log.
      *
