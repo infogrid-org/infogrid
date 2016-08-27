@@ -118,9 +118,14 @@ public abstract class Transaction
             postCommitSucceededHook();
 
         } catch( MultiplicityException t ) {
-            doRollback();
-
-            postCommitFailedHook( t );
+            try {
+                doRollback();
+            } catch( Throwable t2 ) {
+                log.error( "MultiplicityException leading to failed rollback", t );
+                log.error( "Failed rollback", t2 );
+            } finally {
+                postCommitFailedHook( t ); // don't leave any transactions open
+            }
 
             throw t;
 
@@ -204,6 +209,9 @@ public abstract class Transaction
                 log.error( ex );
                 // that's the best we can do
             } catch( TransactionException ex ) {
+                log.error( ex );
+                // that's the best we can do
+            } catch( Throwable ex ) {
                 log.error( ex );
                 // that's the best we can do
             }

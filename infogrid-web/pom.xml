@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.infogrid</groupId>
+    <artifactId>infogrid-web</artifactId>
+    <packaging>pom</packaging>
+    <name>infogrid-web</name>
+    <url>http://infogrid.org/</url>
+
+    <parent>
+        <groupId>org.infogrid</groupId>
+        <artifactId>infogrid-all</artifactId>
+        <version><!-- PKGVER -->2.10.1<!-- /PKGVER --></version>
+    </parent>
+
+    <modules>
+        <module>org.infogrid.model.Viewlet</module>
+        <module>org.infogrid.viewlet</module>
+        <module>org.infogrid.web</module>
+    </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>1.4.0</version>
+                    <executions>
+                        <execution>
+                            <id>copy-pom</id>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <configuration>
+                                <executable>bash</executable>
+                                <arguments>
+                                    <argument>-c</argument>
+                                    <argument>mkdir -p ${project.build.directory}/test-classes/META-INF/maven; cp ${project.basedir}/pom.xml ${project.build.directory}/test-classes/META-INF/maven/this-pom.xml</argument>
+                                </arguments>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>1.9.1</version>
+                    <executions>
+                        <execution>
+                            <id>add-source</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>${basedir}/target/generated-sources/infogrid</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
