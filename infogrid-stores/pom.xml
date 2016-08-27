@@ -3,10 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
     <artifactId>infogrid-stores</artifactId>
-    <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
     <packaging>pom</packaging>
     <name>infogrid-stores</name>
     <url>http://infogrid.org/</url>
+
+    <parent>
+        <groupId>org.infogrid</groupId>
+        <artifactId>infogrid-all</artifactId>
+        <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
+    </parent>
 
     <modules>
         <module>org.infogrid.store</module>
@@ -16,26 +21,4 @@
         <module>org.infogrid.store.sql.mysql</module>
         <module>org.infogrid.store.sql.postgresql</module>
     </modules>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
-                <configuration>
-                    <includes>
-                        <include>**/*Test*.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <diet4j.version>0.13</diet4j.version>
-    </properties>
 </project>

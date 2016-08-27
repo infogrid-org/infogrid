@@ -3,10 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
     <artifactId>infogrid-lid</artifactId>
-    <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
     <packaging>pom</packaging>
     <name>infogrid-lid</name>
     <url>http://infogrid.org/</url>
+
+    <parent>
+        <groupId>org.infogrid</groupId>
+        <artifactId>infogrid-all</artifactId>
+        <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
+    </parent>
 
     <modules>
         <module>org.infogrid.lid</module>
@@ -23,11 +28,4 @@
         <module>org.infogrid.lid.openid.store</module>
         <module>org.infogrid.lid.store</module>
     </modules>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <diet4j.version>0.13</diet4j.version>
-    </properties>
 </project>

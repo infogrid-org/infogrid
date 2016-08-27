@@ -3,10 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
     <artifactId>infogrid-model-library</artifactId>
-    <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
     <packaging>pom</packaging>
     <name>infogrid-model-library</name>
     <url>http://infogrid.org/</url>
+
+    <parent>
+        <groupId>org.infogrid</groupId>
+        <artifactId>infogrid-all</artifactId>
+        <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
+    </parent>
 
     <modules>
         <module>org.infogrid.model.Annotation</module>
@@ -65,25 +70,7 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <artifactId>maven-clean-plugin</artifactId>
-                    <version>2.6.1</version>
-                    <configuration>
-                        <filesets>
-                            <fileset>
-                                <directory>src/generated</directory>
-                            </fileset>
-                        </filesets>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <diet4j.version>0.13</diet4j.version>
-    </properties>
 </project>
