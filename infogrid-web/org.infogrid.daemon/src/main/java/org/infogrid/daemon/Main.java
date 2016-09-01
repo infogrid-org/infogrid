@@ -14,17 +14,13 @@
 
 package org.infogrid.daemon;
 
-import org.infogrid.web.app.InfoGridApp;
-import org.infogrid.web.app.InfoGridAccessory;
+import org.infogrid.web.app.InfoGridWebApp;
 import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspFactory;
 import org.diet4j.core.Module;
 import org.diet4j.core.ModuleActivationException;
@@ -32,7 +28,6 @@ import org.diet4j.core.ModuleDeactivationException;
 import org.diet4j.core.ModuleRegistry;
 import org.diet4j.core.ModuleRequirement;
 import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.session.SessionHandler;
@@ -43,6 +38,7 @@ import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.logging.log4j.Log4jLog;
 import org.infogrid.util.logging.log4j.Log4jLogFactory;
+import org.infogrid.web.app.InfoGridWebAccessory;
 
 /**
  * Main program of the InfoGrid daemon. Activate using diet4j.
@@ -98,21 +94,21 @@ public class Main
 
         ModuleRequirement [] accReqs = theConfig.getAccessoryModuleRequirements();
         theAccessoryModules = new Module[ accReqs.length ];
-        theAccessories      = new InfoGridAccessory[ accReqs.length ];
+        theAccessories      = new InfoGridWebAccessory[ accReqs.length ];
 
         for( int i=0 ; i<accReqs.length ; ++i ) {
             theAccessoryModules[i] = reg.resolve( reg.determineSingleResolutionCandidate( accReqs[i] ) );
         }
         
         theAppModule.activateRecursively();
-        theApp = (InfoGridApp) theAppModule.getContextObject();
+        theApp = (InfoGridWebApp) theAppModule.getContextObject();
         theApp.initialize( theConfig );
 
         for( int i=0 ; i<accReqs.length ; ++i ) {
             theAccessoryModules[i].activateRecursively();
             Object co = theAccessoryModules[i].getContextObject();
-            if( co instanceof InfoGridAccessory ) {
-                theAccessories[i] = (InfoGridAccessory) co;
+            if( co instanceof InfoGridWebAccessory ) {
+                theAccessories[i] = (InfoGridWebAccessory) co;
                 theAccessories[i].initialize( theConfig, theApp );
             }
         }
@@ -129,7 +125,8 @@ public class Main
         // class via the ServletHolder instead of directly (which incorrectly
         // goes through Class.getName() per 
         // https://github.com/eclipse/jetty.project/issues/894
-//        contextHandler.setClassLoader( Main.class.getClassLoader() );
+        // contextHandler.setClassLoader( Main.class.getClassLoader() );
+
         contextHandler.setSessionHandler( new SessionHandler() );
 
         String virtualHost = theConfig.getAppVirtualHost();
@@ -155,7 +152,7 @@ public class Main
                 }
                 return instance;
             }
-            protected InfoGridApp theInfoGridApp;
+            protected InfoGridWebApp theInfoGridApp;
         };
         myHolder.setHeldClass( CentralDaemonServlet.class );
 
@@ -195,6 +192,12 @@ public class Main
         }
     }
 
+    /**
+     * Helper method to activate logging.
+     * 
+     * @param thisModule the Module being activated
+     * @throws ModuleActivationException a problem occurred during activation
+     */
     private static void activateLogging(
             Module thisModule )
         throws
@@ -222,6 +225,12 @@ public class Main
         Log.setLogFactory( new Log4jLogFactory() );
     }
 
+    /**
+     * Helper method to activate the application-level ResourceHelper.
+     * 
+     * @param thisModule the Module being activated
+     * @throws ModuleActivationException a problem occurred during activation
+     */
     private static void activateResourceHelper(
             Module thisModule )
         throws
@@ -239,14 +248,38 @@ public class Main
         ResourceHelper.initializeLogging();
     }
 
+    /**
+     * dietj4 Module representing the daemon.
+     */
     protected static Module theDaemonModule;
+    
+    /**
+     * diet4j Module representing the main application.
+     */
     protected static Module theAppModule;
+    
+    /**
+     * diet4j Modules representing the accessories for the main application.
+     */
     protected static Module [] theAccessoryModules;
 
-    protected static InfoGridApp theApp;
-    protected static InfoGridAccessory [] theAccessories; // same sequence as theAccessoryModules, possibly containing nulls
+    /**
+     * The main application.
+     */
+    protected static InfoGridWebApp theApp;
+    
+    /**
+     * The accessories for the main application.
+     */
+    protected static InfoGridWebAccessory [] theAccessories; // same sequence as theAccessoryModules, possibly containing nulls
 
+    /**
+     * The configuration provided to the daemon by means of a config file.
+     */
     protected static DaemonConfiguration theConfig;
 
+    /**
+     * The HTTP server.
+     */
     protected static Server theJettyServer;
 }

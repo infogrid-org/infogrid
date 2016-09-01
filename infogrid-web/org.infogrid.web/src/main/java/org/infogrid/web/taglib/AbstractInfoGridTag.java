@@ -22,7 +22,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagSupport;
 import org.infogrid.web.JeeFormatter;
-import org.infogrid.web.app.InfoGridApp;
+import org.infogrid.web.app.InfoGridWebApp;
 
 /**
  * <p>Factors out common functionality for regular Tags. Also redefines the JEE Tag
@@ -431,9 +431,9 @@ public abstract class AbstractInfoGridTag
      *
      * @return the InfoGridWebApp object
      */
-    protected InfoGridApp getInfoGridWebApp()
+    protected InfoGridWebApp getInfoGridWebApp()
     {
-        InfoGridApp app = (InfoGridApp) pageContext.getServletContext().getAttribute(INFOGRID_APP_NAME );
+        InfoGridWebApp app = (InfoGridWebApp) pageContext.getServletContext().getAttribute(INFOGRID_APP_NAME );
         return app;
     }
 
@@ -445,7 +445,7 @@ public abstract class AbstractInfoGridTag
     protected JeeFormatter getFormatter()
     {
         if( theFormatter == null ) {
-            InfoGridApp app = getInfoGridWebApp();
+            InfoGridWebApp app = getInfoGridWebApp();
             theFormatter    = app.getContext().findContextObjectOrThrow( JeeFormatter.class );
         }
         return theFormatter;
@@ -484,5 +484,5 @@ public abstract class AbstractInfoGridTag
     /**
      * Name of the InfoGridWebApp object in the request context.
      */
-    public static final String INFOGRID_APP_NAME = InfoGridApp.class.getName().replace( '.', '-' );
+    public static final String INFOGRID_APP_NAME = InfoGridWebApp.class.getName().replace( '.', '-' );
 }

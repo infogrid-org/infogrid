@@ -37,7 +37,7 @@ import org.infogrid.util.logging.Log;
 import org.infogrid.viewlet.CannotViewException;
 import org.infogrid.viewlet.MeshObjectsToView;
 import org.infogrid.viewlet.ViewletFactory;
-import org.infogrid.web.app.InfoGridApp;
+import org.infogrid.web.app.InfoGridWebApp;
 import org.infogrid.web.sane.SaneServletRequest;
 import org.infogrid.web.security.SafeUnsafePostFilter;
 import org.infogrid.web.security.UnsafePostException;

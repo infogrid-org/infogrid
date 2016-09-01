@@ -14,21 +14,13 @@
 
 package org.infogrid.web.app;
 
+import org.infogrid.app.InfoGridAccessory;
+
 /**
- *
- * @author buildmaster
+ * An accessory to an InfoGridWebApp.
  */
-public interface InfoGridAccessory
+public abstract class InfoGridWebAccessory
+    extends
+        InfoGridAccessory
 {
-    /**
-     * Invoked by the framework, run the various initialization methods with
-     * the configuration options provided. Also provides the InfoGridApp that
-     * this is an accessory for.
-     * 
-     * @param config the configuration options
-     * @param app the InfoGridApp that this is an accessory for
-     */
-    public void initialize(
-            AppConfiguration config,
-            InfoGridApp      app );
 }

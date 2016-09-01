@@ -17,23 +17,21 @@ package org.infogrid.web.viewlet.propertysheet;
 import jsps.org.infogrid.web.viewlet.propertysheet.PropertySheetViewlet_jsp;
 import org.diet4j.core.Module;
 import org.diet4j.core.ModuleActivationException;
-import org.infogrid.viewlet.CannotViewException;
+import org.infogrid.app.AppConfiguration;
+import org.infogrid.app.InfoGridApp;
 import org.infogrid.viewlet.MeshObjectsToView;
-import org.infogrid.viewlet.Viewlet;
 import org.infogrid.viewlet.ViewletFactoryChoice;
-import org.infogrid.web.app.AppConfiguration;
-import org.infogrid.web.app.InfoGridAccessory;
-import org.infogrid.web.app.InfoGridApp;
-import org.infogrid.web.viewlet.DefaultJspViewlet;
 import org.infogrid.web.viewlet.DefaultJspViewletFactoryChoice;
 import org.infogrid.web.viewlet.WebMeshObjectsToView;
+import org.infogrid.web.app.InfoGridWebAccessory;
+import org.infogrid.web.app.InfoGridWebApp;
 
 /**
  * A PropertySheet packaged as an InfoGridAccessory.
  */
 public class PropertySheetAccessory
-    implements
-        InfoGridAccessory
+    extends
+        InfoGridWebAccessory
 {
     /**
      * Diet4j module activation.
@@ -62,17 +60,12 @@ public class PropertySheetAccessory
     {
         app.registerViewlet(
                 (MeshObjectsToView toView) -> new DefaultJspViewletFactoryChoice(
-                        (WebMeshObjectsToView) toView, PropertySheetViewlet_jsp.class, ViewletFactoryChoice.BAD_MATCH_QUALITY )
-                {
-                    @Override
-                    public Viewlet instantiateViewlet()
-                            throws
-                            CannotViewException
-                    {
-                        return DefaultJspViewlet.create( theServletClass, toView.getMeshBase(), toView.getContext() );
-                    }
-                }
+                        (WebMeshObjectsToView) toView, PropertySheetViewlet_jsp.class, ViewletFactoryChoice.BAD_MATCH_QUALITY ),
+                this
         );
-        app.registerAsset( "org/infogrid/web/viewlet/propertysheet/PropertySheetViewlet.css", PropertySheetAccessory.class.getClassLoader() );
+        ((InfoGridWebApp)app).registerAsset(
+                "/s/org/infogrid/web/viewlet/propertysheet/PropertySheetViewlet.css",
+                PropertySheetAccessory.class.getClassLoader(),
+                this );
     }
 }

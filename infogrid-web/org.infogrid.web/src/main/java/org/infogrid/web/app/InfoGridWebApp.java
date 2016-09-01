@@ -1,36 +1,44 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+//
+// This file is part of InfoGrid(tm). You may not use this file except in
+// compliance with the InfoGrid license. The InfoGrid license and important
+// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+// or you do not consent to all aspects of the license and the disclaimers,
+// no license is granted; do not use this file.
+// 
+// For more information about InfoGrid go to http://infogrid.org/
+//
+// Copyright 1998-2015 by Johannes Ernst
+// All rights reserved.
+//
 
 package org.infogrid.web.app;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.Servlet;
+import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.infogrid.app.AppConfiguration;
+import org.infogrid.app.InfoGridApp;
+import org.infogrid.app.InfoGridInstallable;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.meshbase.DefaultMeshBaseIdentifierFactory;
-import org.infogrid.meshbase.MeshBase;
-import org.infogrid.meshbase.MeshBaseIdentifier;
-import org.infogrid.meshbase.MeshBaseNameServer;
 import org.infogrid.meshbase.MeshObjectAccessException;
-import org.infogrid.meshbase.m.MMeshBase;
-import org.infogrid.meshbase.m.MMeshBaseNameServer;
 import org.infogrid.model.primitives.text.ModelPrimitivesStringRepresentationDirectorySingleton;
 import org.infogrid.model.traversal.TraversalTranslator;
 import org.infogrid.model.traversal.xpath.XpathTraversalTranslator;
 import org.infogrid.util.FactoryException;
-import org.infogrid.util.context.Context;
-import org.infogrid.util.context.ObjectInContext;
-import org.infogrid.util.context.SimpleContext;
+import org.infogrid.util.Pair;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.text.StringRepresentationDirectory;
 import org.infogrid.util.text.StringRepresentationDirectorySingleton;
@@ -45,6 +53,7 @@ import org.infogrid.web.sane.SaneServletRequest;
 import org.infogrid.web.security.SafeUnsafePostFilter;
 import org.infogrid.web.security.UnsafePostException;
 import org.infogrid.web.taglib.viewlet.IncludeViewletTag;
+import org.infogrid.web.templates.BinaryStructuredResponseSection;
 import org.infogrid.web.templates.DefaultStructuredResponseTemplateFactory;
 import org.infogrid.web.templates.StructuredResponse;
 import org.infogrid.web.templates.StructuredResponseTemplate;
@@ -55,20 +64,18 @@ import org.infogrid.web.viewlet.WebMeshObjectsToViewFactory;
 import org.infogrid.web.viewlet.WebViewlet;
 
 /**
- * The superclass of all InfoGridApps.
+ * The superclass of all InfoGridWebApps. May also be used directly.
  */
-public class InfoGridApp
+public class InfoGridWebApp
     extends
-        InfoGridInstallable
-    implements
-        ObjectInContext
+        InfoGridApp
 {
-    private static final Log log = Log.getLogInstance( InfoGridApp.class ); // our own, private logger
+    private static final Log log = Log.getLogInstance(InfoGridWebApp.class ); // our own, private logger
 
     /**
      * This constructor can be used directly, or the class may be subclassed.
      */
-    public InfoGridApp()
+    public InfoGridWebApp()
     {
     }
     
@@ -78,34 +85,21 @@ public class InfoGridApp
      * 
      * @param config the configuration options
      */
+    @Override
     public void initialize(
             AppConfiguration config )
     {
         initializeMeshBase( config );
-        initializeUi( config );
+        initializeUi( (WebAppConfiguration) config );
     }
     
-    /**
-     * Overridable method to initialize the MeshBase and related.
-     * 
-     * @param config the configuration options
-     */
-    protected void initializeMeshBase(
-            AppConfiguration config )
-    {
-        theMeshBase = MMeshBase.create();
-
-        theMeshBaseNameServer = MMeshBaseNameServer.create();
-        ((MMeshBaseNameServer)theMeshBaseNameServer).put( theMeshBase.getIdentifier(), theMeshBase );
-    }
-
     /**
      * Overridable method to initialize the user interface.
      * 
      * @param config the configuration options
      */
     protected void initializeUi(
-            AppConfiguration config )
+            WebAppConfiguration config )
     {
         theViewletFactory = DefaultViewletFactory.create( WebViewlet.class.getName() );
         
@@ -132,16 +126,13 @@ public class InfoGridApp
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Context getContext()
-    {
-        return theRootContext;
-    }
-
-    /**
-     * {@inheritDoc}
+     * An incoming request for the App has arrived; produce the response.
+     * 
+     * @param servletRequest the incoming request
+     * @param servletResponse the response to be assembled
+     * @param servletContext the ServletContext
+     * @throws ServletException a Servlet problem
+     * @throws IOException an I/O problem
      */
     public void service(
             HttpServletRequest  servletRequest,
@@ -162,40 +153,13 @@ public class InfoGridApp
         // HttpShellFilter
         // RegexDispatcherFilter
 
-        // org.infogrid.jee.viewlet.servlet.ViewletDispatcherServlet
-        Deque<? extends MeshObjectsToView> toViewStack = null; // make compiler happy
-        try {
-            toViewStack = theToViewFactory.obtainStackFor( request );
-            
-        } catch( FactoryException ex ) {
-            handleMeshObjectsToViewFactoryException( ex );
+        String relativeBaseUri = request.getRelativeBaseUri();
+        if( theAssetRegex.matcher( relativeBaseUri ).matches() ) {
+            processAsset( request, response, servletContext );
+        } else {
+            processMeshObject( request, response, servletContext );
         }
 
-        request.setAttribute( IncludeViewletTag.TO_INCLUDE_STACK_ATTRIBUTE_NAME, toViewStack );
-        
-        WebMeshObjectsToView toView = (WebMeshObjectsToView) toViewStack.pop();
-
-        WebViewlet viewlet = null;
-        if( toView != null ) {
-            request.setAttribute( WebViewlet.SUBJECT_ATTRIBUTE_NAME, toView.getSubject() );
-
-            try {
-                viewlet = (WebViewlet) theViewletFactory.obtainFor( toView );
-
-            } catch( FactoryException ex ) {
-                throw new ServletException( ex ); // pass on
-            }
-            request.setAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
-        }
-
-        Throwable thrown = null;
-
-        if( viewlet != null ) {
-            processViewlet( toView, viewlet, request, response, servletContext );
-        }
-        if( thrown != null ) {
-            response.reportProblem( thrown );
-        }
         if( response.isStructuredEmpty() ) {
             // traditional processing, it ignored the StructuredResponse. We simply copy.
             response.copyTo( (HttpServletResponse) servletResponse );
@@ -216,12 +180,82 @@ public class InfoGridApp
         }
     }
     
+    protected void processAsset(
+            SaneServletRequest request,
+            StructuredResponse response,
+            ServletContext     servletContext )
+        throws
+            ServletException,
+            IOException
+    {
+        String relativeBaseUri = request.getRelativeBaseUri();
+        
+        BinaryStructuredResponseSection section = response.getDefaultBinarySection();
+
+        Pair<URL,InfoGridInstallable> found = theAssets.get( relativeBaseUri );
+        
+        if( found != null ) {
+            InputStream inStream = new BufferedInputStream( found.getName().openStream() );
+            byte []     buf      = new byte[8192];
+            while( true ) {
+                int read = inStream.read( buf );
+                if( read <= 0 ) {
+                    break;
+                }
+                section.appendContent( buf, read );
+            }
+        }
+    }
+
+    protected void processMeshObject(
+            SaneServletRequest request,
+            StructuredResponse response,
+            ServletContext     servletContext )
+        throws
+            ServletException,
+            IOException
+    {
+        // org.infogrid.jee.viewlet.servlet.ViewletDispatcherServlet
+        Deque<? extends MeshObjectsToView> toViewStack;
+        WebMeshObjectsToView               toView = null; // make compiler happy
+        try {
+            toViewStack = theToViewFactory.obtainStackFor( request );
+            toView      = (WebMeshObjectsToView) toViewStack.pop();
+
+            request.setAttribute( IncludeViewletTag.TO_INCLUDE_STACK_ATTRIBUTE_NAME, toViewStack );
+
+        } catch( FactoryException ex ) {
+            handleMeshObjectsToViewFactoryException( ex ); // always throws
+        }
+
+        WebViewlet viewlet = null;
+        if( toView != null ) {
+
+            try {
+                viewlet = (WebViewlet) theViewletFactory.obtainFor( toView );
+
+            } catch( FactoryException ex ) {
+                throw new ServletException( ex ); // pass on
+            }
+            request.setAttribute( WebViewlet.SUBJECT_ATTRIBUTE_NAME, toView.getSubject() );
+            request.setAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
+        }
+
+        if( viewlet != null ) {
+            processViewlet( toView, viewlet, request, response, servletContext );
+        }
+    }
+    
     /**
      * Overridable method to perform Viewlet processing.
      * 
-     * @param viewlet the Viewlet to process
+     * @param toView the objects to view
+     * @param viewlet the Viewlet to use
      * @param request the incoming SaneRequest
      * @param response the structured response
+     * @param servletContext the ServletContext
+     * @throws ServletException Servlet processing problem
+     * @throws IOException I/O problem
      */
     protected void processViewlet(
             WebMeshObjectsToView toView,
@@ -256,6 +290,8 @@ public class InfoGridApp
 
         } catch( RuntimeException | ServletException | IOException t ) {
             thrown = t;
+            response.reportProblem( thrown );
+
             throw t;
 
         } catch( UnsafePostException | CannotViewException ex ) {
@@ -272,6 +308,9 @@ public class InfoGridApp
      * @param request the incoming SaneRequest
      * @param response the structured response
      * @param servletResponse the ultimate response
+     * @param servletContext the ServletContext
+     * @throws ServletException Servlet processing problem
+     * @throws IOException I/O problem
      */
     protected void processTemplate(
             SaneServletRequest  request,
@@ -293,22 +332,60 @@ public class InfoGridApp
     }
 
     /**
-     * Allows an InfoGridAccessory to register additional Viewlets with the
-     * app. The app decides whether or not, or how to make those Viewlets
-     * available. 
-     * 
-     * @param matcher the ViewletMatcher leading to the Viewlet being registered
+     * {@inheritDoc}
      */
+    @Override
     public void registerViewlet(
-            ViewletMatcher matcher )
+            ViewletMatcher      matcher,
+            InfoGridInstallable installable )
     {
-        theViewletFactory.registerViewlet( matcher );
+        theViewletFactory.registerViewlet( matcher, installable );
     }
 
+    /**
+     * Allows an InfoGridAccessory or InfoGridApp to register assets with the
+     * app. The app decides whether or not, or how to make those assets
+     * available. 
+     * 
+     * @param path the relative path of the asset
+     * @param url the URL of the asset
+     * @param installable the registering InfoGridAccessory or InfoGridApp
+     */
     public void registerAsset(
-            String      path,
-            ClassLoader loader )
+            String              path,
+            URL                 url,
+            InfoGridInstallable installable )
     {
+        if( path == null || path.length() < 3 || path.charAt( 0 ) != '/' ) {
+            throw new IllegalArgumentException( "Invalid path when attempting to register asset: " + path );
+        }
+        if( url == null ) {
+            throw new IllegalArgumentException( "Cannot register asset with null URL: " + path + ", " + installable.getName() );
+        }
+        theAssets.put( path, new Pair<>( url, installable ) );
+    }
+
+    /**
+     * Allows an InfoGridAccessory or InfoGridApp to register assets with the
+     * app. The app decides whether or not, or how to make those assets
+     * available. 
+     * 
+     * This method assumes that the path in which the asset is available
+     * relative to the ClassLoader is the same as the relative URL at which
+     * it is supposed to be served.
+     * 
+     * @param path the relative path of the asset
+     * @param loader the ClassLoader to resove the path against
+     * @param installable the registering InfoGridAccessory or InfoGridApp
+     */
+    public void registerAsset(
+            String              path,
+            ClassLoader         loader,
+            InfoGridInstallable installable )
+    {
+        String pathWithoutSlash = path.substring( 1 );
+
+        registerAsset( path, loader.getResource( pathWithoutSlash ), installable );
     }
 
     /**
@@ -344,22 +421,6 @@ public class InfoGridApp
     }
 
     /**
-     * The root context.
-     */
-    protected Context theRootContext = SimpleContext.createRoot( "root context" );
-
-    /**
-     * The main MeshBase for this app.
-     */
-    protected MeshBase theMeshBase;
-
-    /**
-     * If there are several MeshBases in this app, allows lookup of MeshBases
-     * by their identifier.
-     */
-    protected MeshBaseNameServer<MeshBaseIdentifier,MeshBase> theMeshBaseNameServer;
-
-    /**
      * Knows how to parse an incoming HTTP request into MeshObjectsToView.
      */    
     protected WebMeshObjectsToViewFactory theToViewFactory;
@@ -378,5 +439,17 @@ public class InfoGridApp
      * Knows how to find the right response template for the incoming request.
      */
     protected StructuredResponseTemplateFactory theResponseTemplateFactory;
+    
+    /**
+     * The known assets, keyed by their relative request URLs and mapped to the
+     * URLs from which they can be obtained.
+     */
+    protected Map<String,Pair<URL,InfoGridInstallable>> theAssets = new HashMap<>();
+
+    /**
+     * The regular expression that distinguishes between assets and MeshObject URLs.
+     * This is used as an exact match.
+     */
+    protected static final Pattern theAssetRegex = Pattern.compile( "/[a-z]/.*" );
 }
     

@@ -22,7 +22,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.Tag;
 import org.infogrid.web.JeeFormatter;
-import org.infogrid.web.app.InfoGridApp;
+import org.infogrid.web.app.InfoGridWebApp;
 
 /**
  * <p>Factors out common functionality for BodyTags. Also redefines the JEE Tag
@@ -477,9 +477,9 @@ public abstract class AbstractInfoGridBodyTag
      *
      * @return the InfoGridWebApp object
      */
-    protected InfoGridApp getInfoGridWebApp()
+    protected InfoGridWebApp getInfoGridWebApp()
     {
-        InfoGridApp app = (InfoGridApp) pageContext.getServletContext().getAttribute(AbstractInfoGridTag.INFOGRID_APP_NAME );
+        InfoGridWebApp app = (InfoGridWebApp) pageContext.getServletContext().getAttribute(AbstractInfoGridTag.INFOGRID_APP_NAME );
         return app;
     }
 
@@ -491,7 +491,7 @@ public abstract class AbstractInfoGridBodyTag
     protected JeeFormatter getFormatter()
     {
         if( theFormatter == null ) {
-            InfoGridApp app = getInfoGridWebApp();
+            InfoGridWebApp app = getInfoGridWebApp();
             theFormatter    = app.getContext().findContextObjectOrThrow( JeeFormatter.class );
 
         }

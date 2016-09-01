@@ -24,7 +24,7 @@ import org.infogrid.util.http.HTTP;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.viewlet.AbstractViewlet;
 import org.infogrid.viewlet.CannotViewException;
-import org.infogrid.web.app.InfoGridApp;
+import org.infogrid.web.app.InfoGridWebApp;
 import org.infogrid.web.security.UnsafePostException;
 import org.infogrid.web.taglib.viewlet.IncludeViewletTag;
 import org.infogrid.web.templates.StructuredResponse;
@@ -272,7 +272,7 @@ public abstract class AbstractWebViewlet
         }
         TextStructuredResponseSection titleSection = response.obtainTextSection( StructuredResponse.HTML_TITLE_SECTION );
         if( titleSection.isEmpty() ) {
-            InfoGridApp app = getContext().findContextObjectOrThrow( InfoGridApp.class );
+            InfoGridWebApp app = getContext().findContextObjectOrThrow(InfoGridWebApp.class );
 
             String name                     = getName();
             String userVisibleName          = getUserVisibleName();

@@ -12,7 +12,7 @@
 // All rights reserved.
 //
 
-package org.infogrid.web.app;
+package org.infogrid.app;
 
 import org.infogrid.util.ResourceHelper;
 
@@ -22,7 +22,7 @@ import org.infogrid.util.ResourceHelper;
 public abstract class InfoGridInstallable
 {
     /**
-     * Obtain the name of the application.
+     * Obtain the name of the installable.
      *
      * @return the name
      */
@@ -32,14 +32,12 @@ public abstract class InfoGridInstallable
     }
 
     /**
-     * Obtain the user-visible name of the application.
+     * Obtain the user-visible name of the installable.
      *
-     * @return the user-visible name of the application
+     * @return the user-visible name
      */
     public String getUserVisibleName()
     {
         return ResourceHelper.getInstance( getClass() ).getResourceStringOrNull( "UserVisibleName" );
     }
-
-    
 }

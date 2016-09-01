@@ -366,7 +366,6 @@ public class SaneServletRequest
             while( true ) { // for all headers in this part
                 String line = FormDataUtils.readStringLine( inStream, FORM_CHARSET );
                 if( line == null ) {
-                    hasData = false;
                     break outer; // end of stream -- we don't want heads and no content
                 }
                 if( line.startsWith( stringBoundary )) {
@@ -394,7 +393,7 @@ public class SaneServletRequest
             // have headers now, let's get the data
             byte [] partData = StreamUtils.slurpUntilBoundary( inStream, byteBoundary );
             if( partData == null || partData.length == 0 ) {
-                hasData = false;
+                hasData = false; // this is redundant, but here for clarity
                 break outer; // end of stream -- we don't want heads and no content
             }
             partData = FormDataUtils.stripTrailingBoundary( partData, byteBoundary );

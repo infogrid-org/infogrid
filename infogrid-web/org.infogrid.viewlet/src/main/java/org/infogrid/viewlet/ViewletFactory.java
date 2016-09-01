@@ -14,6 +14,7 @@
 
 package org.infogrid.viewlet;
 
+import org.infogrid.app.InfoGridInstallable;
 import org.infogrid.util.Factory;
 import org.infogrid.util.FactoryException;
 
@@ -76,7 +77,9 @@ public interface ViewletFactory
      * Register a new Viewlet by way of its ViewletMatcher.
      * 
      * @param matcher the ViewletMatcher
+     * @param installable the InfoGridApp or InfoGridAccessory performing the registration
      */
     public void registerViewlet(
-            ViewletMatcher matcher );
+            ViewletMatcher      matcher,
+            InfoGridInstallable installable );
 }

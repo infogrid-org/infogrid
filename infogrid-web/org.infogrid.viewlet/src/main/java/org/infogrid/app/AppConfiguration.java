@@ -12,7 +12,7 @@
 // All rights reserved.
 //
 
-package org.infogrid.web.app;
+package org.infogrid.app;
 
 import java.util.Properties;
 import org.diet4j.core.ModuleRequirement;
@@ -22,28 +22,6 @@ import org.diet4j.core.ModuleRequirement;
  */
 public abstract class AppConfiguration
 {
-    /**
-     * Determine the virtual hostname at which the app should run.
-     * Example: example.com
-     * 
-     * @return the virtual hostname
-     */
-    public String getAppVirtualHost()
-    {
-        return theAppVirtualHost;
-    }
-
-    /**
-     * Determine the relative context path at which the app should run.
-     * Example: /blog
-     * 
-     * @return the relative context path with no trailing slash, not even at root
-     */
-    public String getAppContextPath()
-    {
-        return theAppContextPath;
-    }
-    
     /**
      * The module for the app, expressed as a ModuleRequirement.
      * 
@@ -94,18 +72,8 @@ public abstract class AppConfiguration
     /**
      * Set of properties known by this AppConfiguration.
      */
-    protected Properties theProperties= new Properties();
+    protected Properties theProperties = new Properties();
 
-    /**
-     * The application's virtual host.
-     */
-    protected String theAppVirtualHost;
-    
-    /**
-     * The application's relative context path.
-     */
-    protected String theAppContextPath;
-    
     /**
      * Application module.
      */
@@ -115,6 +83,4 @@ public abstract class AppConfiguration
      * Accessory modules, if any.
      */
     protected ModuleRequirement [] theAccessoryModuleRequirements;
-
-        Properties p = new Properties();
 }

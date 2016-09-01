@@ -21,15 +21,16 @@ import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationParameters;
 import org.infogrid.util.text.StringifierException;
+import org.infogrid.viewlet.CannotViewException;
+import org.infogrid.viewlet.Viewlet;
 
 /**
  * <p>A ViewletFactoryChoice that instantiates the SimpleJeeViewlet as default, pretending to
  *    be a Viewlet class with a certain name, called the <code>pseudoClassName</code>. This
  *    is identical to creating a DefaultViewletFactoryChoice with a Viewlet class named
  *    pseudoClassName that does not add any functionality itself.</p>
- * <p>The main purpose of this class is to avoid having to write empty Viewlet classes.</p>
  */
-public abstract class DefaultJspViewletFactoryChoice
+public class DefaultJspViewletFactoryChoice
         extends
             DefaultWebViewletFactoryChoice
 {
@@ -40,7 +41,7 @@ public abstract class DefaultJspViewletFactoryChoice
      * @param servletClass the name of the (non-exististing) Viewlet class
      * @param matchQuality the match quality
      */
-    protected DefaultJspViewletFactoryChoice(
+    public DefaultJspViewletFactoryChoice(
             WebMeshObjectsToView     toView,
             Class<? extends Servlet> servletClass,
             double                   matchQuality )
@@ -106,6 +107,14 @@ public abstract class DefaultJspViewletFactoryChoice
         /* 3 */ theMatchQuality );
 
         return ret;
+    }
+
+    @Override
+    public Viewlet instantiateViewlet()
+            throws
+            CannotViewException
+    {
+        return DefaultJspViewlet.create( theServletClass, theToView.getMeshBase(), theToView.getContext() );
     }
 
     /**

@@ -14,8 +14,9 @@
 
 package org.infogrid.viewlet;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import org.infogrid.app.InfoGridInstallable;
 import org.infogrid.util.ArrayHelper;
 
 /**
@@ -67,7 +68,7 @@ public class DefaultViewletFactory
         ViewletFactoryChoice [] ret   = new ViewletFactoryChoice[ theViewletMatchers.size() ];
         int                     count = 0;
         
-        for( ViewletMatcher matcher : theViewletMatchers ) {
+        for( ViewletMatcher matcher : theViewletMatchers.keySet() ) {
             ViewletFactoryChoice choice = matcher.match( theObjectsToView );
             if( choice != null ) {
                 ret[count++] = choice;
@@ -83,16 +84,18 @@ public class DefaultViewletFactory
      * Register a new Viewlet by way of its ViewletMatcher.
      * 
      * @param matcher the ViewletMatcher
+     * @param installable the registering InfoGridInstallable
      */
     @Override
     public void registerViewlet(
-            ViewletMatcher matcher )
+            ViewletMatcher      matcher,
+            InfoGridInstallable installable )
     {
-        theViewletMatchers.add( matcher );
+        theViewletMatchers.put( matcher, installable );
     }
     
     /**
-     * The known ViewletMatchers.
+     * The known ViewletMatchers, mapped to their registering InfoGridInstallable.
      */
-    protected List<ViewletMatcher> theViewletMatchers = new ArrayList<>();
+    protected Map<ViewletMatcher,InfoGridInstallable> theViewletMatchers = new HashMap<>();
 }

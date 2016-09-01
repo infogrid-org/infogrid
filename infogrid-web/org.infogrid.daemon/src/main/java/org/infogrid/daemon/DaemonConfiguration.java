@@ -17,14 +17,14 @@ package org.infogrid.daemon;
 import java.io.FileInputStream;
 import java.io.IOException;
 import org.diet4j.core.ModuleRequirement;
-import org.infogrid.web.app.AppConfiguration;
+import org.infogrid.web.app.WebAppConfiguration;
 
 /**
  * Encapsulates the configuration of the InfoGrid daemon.
  */
-public final class DaemonConfiguration
+public class DaemonConfiguration
     extends
-        AppConfiguration
+        WebAppConfiguration
 {
     /**
      * Factory method.
@@ -38,10 +38,7 @@ public final class DaemonConfiguration
         throws
             IOException
     {
-        if( theSingleton == null ) {
-            theSingleton = new DaemonConfiguration( configFile );
-        }
-        return theSingleton;
+        return new DaemonConfiguration( configFile );
     }
 
     /**
@@ -93,8 +90,13 @@ public final class DaemonConfiguration
         return theHttpServerThreads;
     }
 
+    /**
+     * Requested HTTP server port.
+     */
     private final int theHttpServerPort;
+    
+    /**
+     * Requested number of threads for the HTTP server.
+     */
     private final int theHttpServerThreads;
-
-    private static DaemonConfiguration theSingleton;
 }

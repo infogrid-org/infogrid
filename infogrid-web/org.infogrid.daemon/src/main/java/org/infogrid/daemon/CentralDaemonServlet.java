@@ -21,7 +21,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.infogrid.web.app.InfoGridApp;
+import org.infogrid.web.app.InfoGridWebApp;
 
 /**
  * This is the only Servlet being invoked. It contains the logic to dispatch
@@ -37,7 +37,7 @@ public class CentralDaemonServlet
      * @param app the InfoGrid app.
      */
     public void setApp(
-            InfoGridApp app )
+            InfoGridWebApp app )
     {
         theApp = app;
     }
@@ -59,5 +59,5 @@ public class CentralDaemonServlet
     /**
      * The InfoGridApp.
      */
-    protected InfoGridApp theApp;
+    protected InfoGridWebApp theApp;
 }

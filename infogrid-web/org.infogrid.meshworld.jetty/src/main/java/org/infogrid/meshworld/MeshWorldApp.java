@@ -14,14 +14,14 @@
 
 package org.infogrid.meshworld;
 
-import org.infogrid.web.app.InfoGridApp;
+import org.infogrid.web.app.InfoGridWebApp;
 
 /**
  * The MeshWorld app.
  */
 public class MeshWorldApp
     extends
-        InfoGridApp
+        InfoGridWebApp
 {
     /**
      * Constructor.

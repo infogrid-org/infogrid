@@ -116,13 +116,27 @@ public class BinaryStructuredResponseSection
     public void appendContent(
             byte [] toAppend )
     {
+        appendContent( toAppend, toAppend.length );
+    }
+
+    /**
+     * Append to the content of this section.
+     * 
+     * @param toAppend the content to append to this section
+     * @param len   the number of bytes
+     */
+    public void appendContent(
+            byte [] toAppend,
+            int     len )
+    {
         if( theContent == null ) {
-            theContent = toAppend;
+            theContent = new byte[ len ];
+            System.arraycopy( toAppend, 0, theContent, 0, len );
         } else {
             byte [] old = theContent;
-            theContent = new byte[ old.length + toAppend.length ];
+            theContent = new byte[ old.length + len ];
             System.arraycopy( old,      0, theContent, 0,          old.length );
-            System.arraycopy( toAppend, 0, theContent, old.length, old.length );
+            System.arraycopy( toAppend, 0, theContent, old.length, len );
         }
     }
 
