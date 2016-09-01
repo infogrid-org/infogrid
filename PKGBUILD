@@ -75,25 +75,6 @@ package() {
     installJar 'infogrid-stores' 'org.infogrid.store.sql.mysql'
     installJar 'infogrid-stores' 'org.infogrid.store.sql.postgresql'
 
-    installJar 'infogrid-ui' 'org.infogrid.jee'
-    installJar 'infogrid-ui' 'org.infogrid.jee.lid'
-    installJar 'infogrid-ui' 'org.infogrid.jee.net.testapp'
-    installJar 'infogrid-ui' 'org.infogrid.jee.probe'
-    installJar 'infogrid-ui' 'org.infogrid.jee.security.aclbased'
-    installJar 'infogrid-ui' 'org.infogrid.jee.shell.http'
-    installJar 'infogrid-ui' 'org.infogrid.jee.templates'
-    installJar 'infogrid-ui' 'org.infogrid.jee.testapp'
-    installJar 'infogrid-ui' 'org.infogrid.jee.viewlet'
-    installJar 'infogrid-ui' 'org.infogrid.jee.viewlet.bulk'
-    installJar 'infogrid-ui' 'org.infogrid.jee.viewlet.json'
-    installJar 'infogrid-ui' 'org.infogrid.jee.viewlet.log4j'
-    installJar 'infogrid-ui' 'org.infogrid.jee.viewlet.net'
-    installJar 'infogrid-ui' 'org.infogrid.jee.viewlet.net.local'
-    installJar 'infogrid-ui' 'org.infogrid.jee.viewlet.net.local.store'
-    installJar 'infogrid-ui' 'org.infogrid.jee.viewlet.store'
-    installJar 'infogrid-ui' 'org.infogrid.model.Viewlet'
-    installJar 'infogrid-ui' 'org.infogrid.viewlet'
-
     installJar 'infogrid-utils' 'org.infogrid.comm.pingpong'
     installJar 'infogrid-utils' 'org.infogrid.comm.smtp'
     installJar 'infogrid-utils' 'org.infogrid.comm'
@@ -105,6 +86,13 @@ package() {
     installJar 'infogrid-utils' 'org.infogrid.util.logging.log4j'
     installJar 'infogrid-utils' 'org.infogrid.util.sql'
     installJar 'infogrid-utils' 'org.infogrid.util'
+
+    installJar 'infogrid-web' 'org.infogrid.daemon'
+    installJar 'infogrid-web' 'org.infogrid.meshworld.jetty'
+    installJar 'infogrid-web' 'org.infogrid.model.Viewlet'
+    installJar 'infogrid-web' 'org.infogrid.viewlet'
+    installJar 'infogrid-web' 'org.infogrid.web'
+    installJar 'infogrid-web' 'org.infogrid.web.viewlet.propertysheet'
 }
 
 installJar() {

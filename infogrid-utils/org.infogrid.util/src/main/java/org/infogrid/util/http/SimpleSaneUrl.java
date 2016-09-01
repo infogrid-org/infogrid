@@ -78,7 +78,7 @@ public class SimpleSaneUrl
             }
             String serverPlusNonDefaultPort = constructServerPlusNonDefaultPort( server, protocol, realPort );
 
-            HashMap<String,String[]> urlArguments = new HashMap<String,String[]>();
+            HashMap<String,String[]> urlArguments = new HashMap<>();
             addUrlEncodedArguments( queryString, urlArguments );
 
             SimpleSaneUrl ret = new SimpleSaneUrl(
@@ -126,7 +126,7 @@ public class SimpleSaneUrl
             String file        = m.group( 1 );
             String queryString = m.group( 3 );
 
-            HashMap<String,String[]> urlArguments = new HashMap<String,String[]>();
+            HashMap<String,String[]> urlArguments = new HashMap<>();
             addUrlEncodedArguments( queryString, urlArguments );
 
             SimpleSaneUrl ret = new SimpleSaneUrl(

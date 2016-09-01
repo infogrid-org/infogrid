@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.infogrid</groupId>
+    <artifactId>infogrid-tools</artifactId>
+    <packaging>pom</packaging>
+    <name>infogrid-tools</name>
+    <url>http://infogrid.org/</url>
+
+    <parent>
+        <groupId>org.infogrid</groupId>
+        <artifactId>infogrid-all</artifactId>
+        <version><!-- PKGVER -->2.10.1<!-- /PKGVER --></version>
+    </parent>
+
+    <modules>
+        <module>org.infogrid.tools.jspc-maven-plugin</module>
+    </modules>
+</project>

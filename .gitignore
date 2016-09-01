@@ -1,2 +1,12 @@
 infogrid-*-any.pkg*
 nb-configuration.xml
+/infogrid-web/org.infogrid.daemon/nbproject/private/
+/infogrid-web/org.infogrid.model.Viewlet/target/
+/infogrid-web/org.infogrid.web/target/
+/infogrid-web/org.infogrid.viewlet/target/
+/infogrid-web/org.infogrid.meshworld.jetty/target/
+/infogrid-web/org.infogrid.daemon/target/
+/infogrid-web/org.infogrid.web.viewlet.propertysheet/target/
+/infogrid-tools/org.infogrid.tools.jspc-maven-plugin/target/
+/infogrid-web/target/
+/target/

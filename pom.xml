@@ -15,8 +15,12 @@
         <module>infogrid-model-library</module>
         <module>infogrid-probe</module>
         <module>infogrid-stores</module>
+        <module>infogrid-tools</module>
+<!--
         <module>infogrid-ui</module>
+-->
         <module>infogrid-utils</module>
+        <module>infogrid-web</module>
     </modules>
 
     <build>
@@ -48,6 +52,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+
         <diet4j.version>[0.15]</diet4j.version>
+        <jetty.version>[9.3.11.v20160721]</jetty.version>
+        <jasper.version>[8.5.4]</jasper.version>
     </properties>
 </project>

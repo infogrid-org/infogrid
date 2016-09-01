@@ -1,0 +1,516 @@
+//
+// This file is part of InfoGrid(tm). You may not use this file except in
+// compliance with the InfoGrid license. The InfoGrid license and important
+// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+// or you do not consent to all aspects of the license and the disclaimers,
+// no license is granted; do not use this file.
+// 
+// For more information about InfoGrid go to http://infogrid.org/
+//
+// Copyright 1998-2015 by Johannes Ernst
+// All rights reserved.
+//
+
+package org.infogrid.web.taglib.rest;
+
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.PageContext;
+import org.infogrid.mesh.IllegalPropertyTypeException;
+import org.infogrid.mesh.MeshObject;
+import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.NotPermittedException;
+import org.infogrid.mesh.TypedMeshObjectFacade;
+import org.infogrid.model.primitives.DataType;
+import org.infogrid.model.primitives.MeshType;
+import org.infogrid.model.primitives.PropertyType;
+import org.infogrid.model.primitives.PropertyValue;
+import org.infogrid.model.traversal.TraversalSpecification;
+import org.infogrid.util.text.StringifierException;
+import org.infogrid.web.rest.RestfulJeeFormatter;
+import org.infogrid.web.taglib.AbstractInfoGridBodyTag;
+import org.infogrid.web.taglib.IgnoreException;
+
+/**
+ * Adds REST awareness to the AbstractInfoGridBodyTag.
+ */
+public abstract class AbstractRestInfoGridBodyTag
+        extends
+            AbstractInfoGridBodyTag
+{
+    /**
+     * Constructor for subclasses only.
+     */
+    protected AbstractRestInfoGridBodyTag()
+    {
+        // nothing
+    }
+
+    /**
+     * Look up a bean in the scope given by the scope attribute.
+     *
+     * @param name name of the bean
+     * @return the bean
+     * @throws JspException thrown if a processing error occurred
+     */
+    protected final MeshObject lookupMeshObject(
+            String name )
+        throws
+            JspException
+    {
+        Object almost = lookup( name );
+        if( almost instanceof MeshObject ) {
+            return (MeshObject) almost;
+        } else if( almost instanceof TypedMeshObjectFacade ) {
+            return ((TypedMeshObjectFacade)almost).get_Delegate();
+        } else if( almost == null ) {
+            return null;
+        } else {
+            throw new ClassCastException( "Found object named " + name + " is not a MeshObject: " + almost );
+        }
+    }
+
+    /**
+     * Look up a bean in the scope given by the scope attribute, and
+     * throw an exception if not found.
+     *
+     * @param name name of the bean
+     * @return the bean
+     * @throws JspException if the bean was not found and the ignore attribute was not set
+     * @throws IgnoreException thrown if the bean could not be found but the ignore attribute was set
+     */
+    protected final MeshObject lookupMeshObjectOrThrow(
+            String name )
+        throws
+            JspException,
+            IgnoreException
+    {
+        Object almost = lookupOrThrow( name );
+        if( almost instanceof MeshObject ) {
+            return (MeshObject) almost;
+        } else if( almost instanceof TypedMeshObjectFacade ) {
+            return ((TypedMeshObjectFacade)almost).get_Delegate();
+        } else if( almost == null ) {
+            return null;
+        } else {
+            throw new ClassCastException( "Found object named " + name + " is not a MeshObject: " + almost );
+        }
+    }
+
+    /**
+     * Look up the property of a bean in the specified scope, and throw an exception if not found.
+     *
+     * @param name name of the bean
+     * @param propertyName name of the property of the bean
+     * @return the bean's property
+     * @throws JspException if the bean was not found and the ignore attribute was not set
+     * @throws IgnoreException thrown if the bean could not be found but the ignore attribute was set
+     */
+    protected final MeshObject lookupMeshObjectOrThrow(
+            String name,
+            String propertyName )
+        throws
+            JspException,
+            IgnoreException
+    {
+        Object almost = lookupOrThrow( name, propertyName );
+        if( almost instanceof MeshObject ) {
+            return (MeshObject) almost;
+        } else if( almost instanceof TypedMeshObjectFacade ) {
+            return ((TypedMeshObjectFacade)almost).get_Delegate();
+        } else if( almost == null ) {
+            return null;
+        } else {
+            throw new ClassCastException( "Found object named " + name + " is not a MeshObject: " + almost );
+        }
+    }
+
+    /**
+     * Look up a MeshObject from the values or two conjoined XXX and XXXName properties, such as
+     * meshObject and meshObjectName. The first may contain a MeshObject directly, or a MeshObjectIdentifier
+     * for a MeshObject, or a String which is the stringified version of the MeshObject's identifier. The
+     * second is the name of a bean that contains a MeshObject. Only one may be specified.
+     *
+     * @param propertyLabel the name of the property, e.g. "meshObject"
+     * @param propertyValue the value of the property
+     * @param propertyNameLabel the name of the corresponding bean property, e.g. "meshObjectName"
+     * @param propertyNameValue the value of the corresponding bean property
+     * @return the found MeshObject
+     * @throws JspException if the bean was not found and the ignore attribute was not set
+     * @throws IgnoreException thrown if the bean could not be found but the ignore attribute was set
+     */
+    protected final MeshObject lookupMeshObject(
+            String propertyLabel,
+            Object propertyValue,
+            String propertyNameLabel,
+            String propertyNameValue )
+        throws
+            JspException,
+            IgnoreException
+    {
+        if( propertyValue != null && propertyNameValue != null ) {
+            throw new JspException( "Must specify either " + propertyLabel + " or " + propertyNameLabel + ", not both." );
+        }
+
+        if( propertyValue != null ) {
+            RestfulJeeFormatter formatter = getFormatter();
+            if( propertyValue instanceof MeshObject ) {
+                return (MeshObject) propertyValue;
+            } else if( propertyValue instanceof TypedMeshObjectFacade ) {
+                return ((TypedMeshObjectFacade)propertyValue).get_Delegate();
+            } else if( propertyValue instanceof MeshObjectIdentifier ) {
+                return formatter.findMeshObject( (MeshObjectIdentifier)propertyValue );
+            } else if( propertyValue instanceof String ) {
+                return formatter.findMeshObject( (String) propertyValue );
+            } else {
+                throw new JspException( "Unexpected type " + propertyValue.getClass().getName() + ": " + propertyValue );
+            }
+        } else {
+            return lookupMeshObject( propertyNameValue );
+        }
+    }
+
+    /**
+     * Look up a MeshObject from the values or two conjoined XXX and XXXName properties, such as
+     * meshObject and meshObjectName. The first may contain a MeshObject directly, or a MeshObjectIdentifier
+     * for a MeshObject, or a String which is the stringified version of the MeshObject's identifier. The
+     * second is the name of a bean that contains a MeshObject. Only one may be specified.
+     *
+     * @param propertyLabel the name of the property, e.g. "meshObject"
+     * @param propertyValue the value of the property
+     * @param propertyNameLabel the name of the corresponding bean property, e.g. "meshObjectName"
+     * @param propertyNameValue the value of the corresponding bean property
+     * @return the found MeshObject
+     * @throws JspException if the bean was not found and the ignore attribute was not set
+     * @throws IgnoreException thrown if the bean could not be found but the ignore attribute was set
+     */
+    protected final MeshObject lookupMeshObjectOrThrow(
+            String propertyLabel,
+            Object propertyValue,
+            String propertyNameLabel,
+            String propertyNameValue )
+        throws
+            JspException,
+            IgnoreException
+    {
+        if( propertyValue != null && propertyNameValue != null ) {
+            throw new JspException( "Must specify either " + propertyLabel + " or " + propertyNameLabel + ", not both." );
+        }
+
+        RestfulJeeFormatter formatter = getFormatter();
+        if( propertyValue != null ) {
+            if( propertyValue instanceof MeshObject ) {
+                return (MeshObject) propertyValue;
+            } else if( propertyValue instanceof TypedMeshObjectFacade ) {
+                return ((TypedMeshObjectFacade)propertyValue).get_Delegate();
+            } else if( propertyValue instanceof MeshObjectIdentifier ) {
+                if( formatter.isTrue( getIgnore() )) {
+                    return formatter.findMeshObject( (MeshObjectIdentifier)propertyValue );
+                } else {
+                    return formatter.findMeshObjectOrThrow( (MeshObjectIdentifier)propertyValue );
+                }
+            } else if( propertyValue instanceof String ) {
+                if( formatter.isTrue( getIgnore() )) {
+                    return formatter.findMeshObject( (String) propertyValue );
+                } else {
+                    return formatter.findMeshObjectOrThrow( (String) propertyValue );
+                }
+            } else {
+                throw new JspException( "Unexpected type " + propertyValue.getClass().getName() + ": " + propertyValue );
+            }
+        } else {
+            if( formatter.isTrue( getIgnore() )) {
+                return lookupMeshObject( propertyNameValue );
+            } else {
+                return lookupMeshObjectOrThrow( propertyNameValue );
+            }
+        }
+    }
+
+    /**
+     * Format a PropertyValue.
+     *
+     * @param pageContext the PageContext in which to format the PropertyValue
+     * @param value the PropertyValue
+     * @param nullString the String to display of the value is null
+     * @param stringRepresentation the StringRepresentation for PropertyValues
+     * @param overrideFormatString if given, use this String as format String instead of the default
+     * @param theMaxLength the maximum length of an emitted String
+     * @param colloquial if applicable, output in colloquial form
+     * @return the String to display
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
+     */
+    protected final String formatPropertyValue(
+            PageContext   pageContext,
+            PropertyValue value,
+            String        nullString,
+            String        stringRepresentation,
+            String        overrideFormatString,
+            int           theMaxLength,
+            boolean       colloquial )
+        throws
+            StringifierException
+    {
+        String ret = getFormatter().formatPropertyValue(
+                pageContext,
+                value,
+                nullString,
+                stringRepresentation,
+                overrideFormatString,
+                theMaxLength,
+                colloquial );
+        return ret;
+    }
+
+    /**
+     * Format a Property.
+     *
+     * @param pageContext the PageContext in which to format the Property
+     * @param owningMeshObject the MeshObject that owns this Property
+     * @param propertyType the PropertyType of the Property
+     * @param editVar name of the HTML form elements to use
+     * @param editIndex index further qualifying the HTML form elements to use
+     * @param nullString the String to display of the value is null
+     * @param stringRepresentation the StringRepresentation for PropertyValues
+     * @param overrideFormatString if given, use this String as format String instead of the default
+     * @param theMaxLength the maximum length of an emitted String
+     * @param colloquial if applicable, output in colloquial form
+     * @param allowNull if applicable, allow null values to be entered in edit mode
+     * @param defaultValue if given, use this as the default value instead what is specified in the model
+     * @param addText any text to add
+     * @return the String to display
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
+     * @throws IllegalPropertyTypeException thrown if the PropertyType does not exist on this MeshObject
+     *         because the MeshObject has not been blessed with a MeshType that provides this PropertyType
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    protected final String formatProperty(
+            PageContext   pageContext,
+            MeshObject    owningMeshObject,
+            PropertyType  propertyType,
+            String        editVar,
+            int           editIndex,
+            String        nullString,
+            String        stringRepresentation,
+            String        overrideFormatString,
+            int           theMaxLength,
+            boolean       colloquial,
+            boolean       allowNull,
+            PropertyValue defaultValue,
+            String        addText )
+        throws
+            StringifierException,
+            IllegalPropertyTypeException,
+            NotPermittedException
+    {
+        String ret = getFormatter().formatProperty(
+                pageContext,
+                owningMeshObject,
+                propertyType,
+                editVar,
+                editIndex,
+                nullString,
+                stringRepresentation,
+                overrideFormatString,
+                theMaxLength,
+                colloquial,
+                allowNull,
+                defaultValue,
+                addText );
+        return ret;
+    }
+
+    /**
+     * Format a DataType.
+     *
+     * @param pageContext the PageContext in which to format the Property
+     * @param type the DataType to format
+     * @param stringRepresentation the StringRepresentation to use
+     * @param maxLength maximum length of emitted String. -1 means unlimited.
+     * @return the String to display
+     * @throws StringifierException thrown if there was a problem when attempting to stringify
+     */
+    protected final String formatDataType(
+            PageContext pageContext,
+            DataType    type,
+            String      stringRepresentation,
+            int         maxLength )
+        throws
+            StringifierException
+    {
+        String ret = getFormatter().formatDataType(
+                pageContext,
+                type,
+                stringRepresentation,
+                maxLength );
+        return ret;
+    }
+
+    /**
+     * Find a MeshObject with the given identifier, or return null.
+
+     * @param identifier the MeshObjectIdentifier in String form
+     * @return the found MeshObject, or null
+     * @throws JspException thrown if the identifier could not be parsed
+     */
+    protected MeshObject findMeshObject(
+            String identifier )
+        throws
+            JspException
+    {
+        return getFormatter().findMeshObject( identifier );
+    }
+
+    /**
+     * Find a MeshObject with the given identifier, or throw an Exception.
+
+     * @param identifier the MeshObjectIdentifier in String form
+     * @return the found MeshObject
+     * @throws JspException thrown if the identifier could not be parsed or the MeshObject could not be found
+     */
+    protected MeshObject findMeshObjectOrThrow(
+            String identifier )
+        throws
+            JspException
+    {
+        return getFormatter().findMeshObjectOrThrow( identifier );
+    }
+
+    /**
+     * Find a MeshType by its identifier, or return null.
+     *
+     * @param identifier the MeshTypeIdentifier in String form
+     * @return the found MeshType, or null
+     * @throws JspException thrown if the identifier could not be parsed
+     */
+    protected MeshType findMeshTypeByIdentifier(
+            String identifier )
+        throws
+            JspException
+    {
+        return getFormatter().findMeshTypeByIdentifier( identifier );
+    }
+
+    /**
+     * Find a MeshType by its identifier, or throw an Exception
+     *
+     * @param identifier the MeshTypeIdentifier in String form
+     * @return the found MeshType, or null
+     * @throws JspException thrown if the identifier could not be parsed
+     */
+    protected MeshType findMeshTypeByIdentifierOrThrow(
+            String identifier )
+        throws
+            JspException
+    {
+        return getFormatter().findMeshTypeByIdentifierOrThrow( identifier );
+    }
+
+    /**
+     * Find a PropertyType, or return null. This will consider the
+     * EntityTypes that the MeshObject is currently blessed with, and look for
+     * a PropertyType with the given name.
+     *
+     * @param obj the MeshObject
+     * @param name name of the PropertyType
+     * @return the found PropertyType, or null
+     */
+    protected PropertyType findPropertyType(
+            MeshObject obj,
+            String     name )
+    {
+        return getFormatter().findPropertyType( obj, name );
+    }
+
+    /**
+     * Find a PropertyType, or throw an Exception. This will consider the
+     * EntityTypes that the MeshObject is currently blessed with, and look for
+     * a PropertyType with the given name.
+     *
+     * @param obj the MeshObject
+     * @param name name of the PropertyType
+     * @return the found PropertyType
+     * @throws JspException thrown if the PropertyType could not be found
+     */
+    protected PropertyType findPropertyTypeOrThrow(
+            MeshObject obj,
+            String     name )
+        throws
+            JspException
+    {
+        return getFormatter().findPropertyTypeOrThrow( obj, name );
+    }
+
+    /**
+     * Find a TraversalSpecification, or return null.
+     *
+     * @param startObject the start MeshObject
+     * @param traversalTerm the serialized TraversalSpecification
+     * @return the found TraversalSpecification, or null
+     */
+    protected TraversalSpecification findTraversalSpecification(
+            MeshObject startObject,
+            String     traversalTerm )
+    {
+        return getFormatter().findTraversalSpecification( startObject, traversalTerm );
+    }
+
+    /**
+     * Find a TraversalSpecification, or throw an Exception.
+     *
+     * @param startObject the start MeshObject
+     * @param traversalTerm the serialized TraversalSpecification
+     * @return the found TraversalSpecification
+     * @throws JspException thrown if the TraversalSpecification could not be found
+     */
+    protected TraversalSpecification findTraversalSpecificationOrThrow(
+            MeshObject startObject,
+            String     traversalTerm )
+        throws
+            JspException
+    {
+        return getFormatter().findTraversalSpecificationOrThrow( startObject, traversalTerm );
+    }
+
+    /**
+     * Find a sequence of TraversalSpecifications, or return null.
+     *
+     * @param startObject the start MeshObject
+     * @param traversalTerm the serialized TraversalSpecification
+     * @return the found sequence of TraversalSpecifications, or null
+     */
+    protected TraversalSpecification [] findTraversalSpecificationSequence(
+            MeshObject startObject,
+            String     traversalTerm )
+    {
+        return getFormatter().findTraversalSpecificationSequence( startObject, traversalTerm );
+    }
+
+    /**
+     * Find a sequence of TraversalSpecifications, or throw an Exception.
+     *
+     * @param startObject the start MeshObject
+     * @param traversalTerm the serialized TraversalSpecification
+     * @return the found sequence of TraversalSpecifications
+     * @throws JspException thrown if the TraversalSpecification could not be found
+     */
+    protected TraversalSpecification [] findTraversalSpecificationSequenceOrThrow(
+            MeshObject startObject,
+            String     traversalTerm )
+        throws
+            JspException
+    {
+        return getFormatter().findTraversalSpecificationSequenceOrThrow( startObject, traversalTerm );
+    }
+
+    /**
+     * Get the formatter to use.
+     *
+     * @return the formatter
+     */
+    @Override
+    protected RestfulJeeFormatter getFormatter()
+    {
+        return (RestfulJeeFormatter) super.getFormatter();
+    }
+}

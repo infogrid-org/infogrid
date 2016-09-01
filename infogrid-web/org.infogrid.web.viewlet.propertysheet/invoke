@@ -1,0 +1,2 @@
+/usr/lib/jvm/java-8-openjdk/bin/java -Xdebug -Xrunjdwp:transport=dt_socket,address=8888,server=y,suspend=y -Xmx512m -classpath /opt/maven/boot/plexus-classworlds-2.5.2.jar -Dclassworlds.conf=/opt/maven/bin/m2.conf -Dmaven.home=/opt/maven -Dmaven.multiModuleProjectDirectory=/home/buildmaster/git-next/github.com/infogrid-org/infogrid/infogrid-web/org.infogrid.web.viewlet.propertysheet org.codehaus.plexus.classworlds.launcher.Launcher -s /home/buildmaster/.m2-next/settings.xml install
+

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.infogrid</groupId>
+    <artifactId>org.infogrid.web</artifactId>
+    <packaging>jar</packaging>
+    <name>org.infogrid.web</name>
+    <url>http://infogrid.org/</url>
+
+    <parent>
+        <groupId>org.infogrid</groupId>
+        <artifactId>infogrid-web</artifactId>
+        <version><!-- PKGVER -->2.10.1<!-- /PKGVER --></version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>org.infogrid.kernel</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>org.infogrid.viewlet</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mortbay.jasper</groupId>
+            <artifactId>apache-jsp</artifactId>
+            <version>${jasper.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.diet4j</groupId>
+            <artifactId>diet4j-core</artifactId>
+            <version>${diet4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>

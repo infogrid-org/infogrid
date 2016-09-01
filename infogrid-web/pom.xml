@@ -14,9 +14,12 @@
     </parent>
 
     <modules>
+        <module>org.infogrid.daemon</module>
+        <module>org.infogrid.meshworld.jetty</module>
         <module>org.infogrid.model.Viewlet</module>
         <module>org.infogrid.viewlet</module>
         <module>org.infogrid.web</module>
+        <module>org.infogrid.web.viewlet.propertysheet</module>
     </modules>
 
     <build>

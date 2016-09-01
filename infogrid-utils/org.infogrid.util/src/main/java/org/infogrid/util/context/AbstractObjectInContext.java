@@ -37,6 +37,7 @@ public abstract class AbstractObjectInContext
       *
       * @return the Context in which this <code>ObjectInContext</code> runs.
       */
+    @Override
     public final Context getContext()
     {
         return theContext;
@@ -45,5 +46,5 @@ public abstract class AbstractObjectInContext
     /**
      * The Context.
      */
-    private Context theContext;
+    private final Context theContext;
 }

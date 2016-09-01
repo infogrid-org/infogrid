@@ -21,7 +21,7 @@ package org.infogrid.util.context;
   */
 public interface ObjectInContext
 {
-     /**
+    /**
       * Obtain the context in which this <code>ObjectInContext</code> runs.
       *
       * @return the Context in which this <code>ObjectInContext</code> runs.

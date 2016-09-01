@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.infogrid</groupId>
+    <artifactId>org.infogrid.daemon</artifactId>
+    <name>org.infogrid.daemon</name>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.infogrid</groupId>
+        <artifactId>infogrid-web</artifactId>
+        <version><!-- PKGVER -->2.10.1<!-- /PKGVER --></version>
+    </parent>
+
+    <dependencies>
+      <!-- jetty -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>apache-jsp</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>apache-jstl</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+
+      <!-- infogrid -->
+        <dependency>
+            <groupId>org.infogrid</groupId>
+            <artifactId>org.infogrid.web</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.infogrid</groupId>
+            <artifactId>org.infogrid.util.logging.log4j</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+      <!-- diet4j -->
+        <dependency>
+            <groupId>org.diet4j</groupId>
+            <artifactId>diet4j-core</artifactId>
+            <version>${diet4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${diet4j.activationclass}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <diet4j.activationclass>org.infogrid.daemon.Main</diet4j.activationclass>
+    </properties>
+</project>

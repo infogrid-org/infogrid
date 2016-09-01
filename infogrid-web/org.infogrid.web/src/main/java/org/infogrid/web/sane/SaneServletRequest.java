@@ -1,0 +1,1607 @@
+//
+// This file is part of InfoGrid(tm). You may not use this file except in
+// compliance with the InfoGrid license. The InfoGrid license and important
+// disclaimers are contained in the file LICENSE.InfoGrid.txt that you should
+// have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
+// or you do not consent to all aspects of the license and the disclaimers,
+// no license is granted; do not use this file.
+//
+// For more information about InfoGrid go to http://infogrid.org/
+//
+// Copyright 1998-2015 by Johannes Ernst
+// All rights reserved.
+//
+
+package org.infogrid.web.sane;
+
+import org.infogrid.web.FormDataUtils;
+import org.infogrid.util.http.MimePart;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Part;
+import org.infogrid.util.ArrayCursorIterator;
+import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.CompositeIterator;
+import org.infogrid.util.CursorIterator;
+import org.infogrid.util.MapCursorIterator;
+import org.infogrid.util.OneElementIterator;
+import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.StreamUtils;
+import org.infogrid.util.ZeroElementCursorIterator;
+import org.infogrid.util.http.AbstractSaneCookie;
+import org.infogrid.util.http.AbstractSaneRequest;
+import org.infogrid.util.http.HTTP;
+import org.infogrid.util.http.IncomingSaneCookie;
+import org.infogrid.util.http.SaneCookie;
+import org.infogrid.util.http.SaneRequest;
+import org.infogrid.util.logging.CanBeDumped;
+import org.infogrid.util.logging.Dumper;
+import org.infogrid.util.logging.Log;
+
+/**
+ * A ServletRequest following the <code>SaneRequest</code> API.
+ */
+public class SaneServletRequest
+        extends
+            AbstractSaneRequest
+        implements
+            CanBeDumped,
+            HttpServletRequest
+{
+    private static final Log log = Log.getLogInstance( SaneServletRequest.class ); // our own, private logger
+
+    /**
+      * Smart factory method.
+      *
+      * @param sRequest the HttpServletRequest from which to create a SaneRequest.
+      * @return the created SaneServletRequest
+      */
+    public static SaneServletRequest create(
+             HttpServletRequest sRequest )
+    {
+        if( sRequest instanceof SaneServletRequest ) {
+            return (SaneServletRequest) sRequest; // no need to do anything
+        }
+
+        SaneServletRequest ret = (SaneServletRequest) sRequest.getAttribute( SANE_SERVLET_REQUEST_ATTRIBUTE_NAME );
+        if( ret == null ) {
+            ret = SaneServletRequest.internalCreate( sRequest );
+            sRequest.setAttribute( SANE_SERVLET_REQUEST_ATTRIBUTE_NAME, ret );
+        }
+
+        return ret;
+    }
+
+    /**
+      * Internal factory method.
+      *
+      * @param sRequest the HttpServletRequest from which to create a SaneRequest.
+      * @return the created SaneServletRequest
+      */
+    protected static SaneServletRequest internalCreate(
+             HttpServletRequest sRequest )
+    {
+        Map<String,String[]>   urlArguments    = new HashMap<>();
+        Map<String,String[]>   postedArguments = new HashMap<>();
+        Map<String,MimePart[]> mimeParts       = new HashMap<>();
+
+        String postData = null;
+
+        String queryString      = sRequest.getQueryString();
+        String method           = sRequest.getMethod();
+        String server           = sRequest.getServerName();
+        int    port             = sRequest.getServerPort();
+        String protocol         = sRequest.getScheme().equalsIgnoreCase( "https" ) ? "https" : "http";
+        String relativeBaseUri  = sRequest.getRequestURI();
+        String contextPath      = sRequest.getContextPath();
+        String clientIp         = sRequest.getRemoteAddr();
+
+        String serverWithNonDefaultPort = constructServerPlusNonDefaultPort( server, protocol, port );
+
+        Cookie []             servletCookies = sRequest.getCookies();
+        IncomingSaneCookie [] cookies;
+
+        if( servletCookies != null ) {
+            cookies = new IncomingCookieAdapter[ servletCookies.length ];
+            for( int i=0 ; i<servletCookies.length ; ++i ) {
+                cookies[i] = new IncomingCookieAdapter( servletCookies[i] );
+            }
+        } else {
+            cookies = new IncomingCookieAdapter[0];
+        }
+
+        String mimeType;
+        // URL parameters override POSTed fields: more intuitive for the user
+        if( "POST".equalsIgnoreCase( method ) ) { // we do our own parsing
+
+            mimeType = sRequest.getContentType();
+            try {
+                BufferedInputStream inStream = new BufferedInputStream( sRequest.getInputStream() );
+                if( mimeType == null || mimeType.startsWith( FORM_DATA_MIME_URLENCODED )) {
+                    int     length = sRequest.getContentLength();
+                    byte [] buf    = StreamUtils.slurp( inStream, length );
+
+                    postData = new String( buf, "utf-8" );
+
+                    try {
+                        addUrlEncodedArguments( postData, postedArguments );
+                    } catch( Throwable t ) {
+                        if( mimeType == null ) {
+                            log.info( t );
+                        } else {
+                            log.warn( t );
+                        }
+                    }
+
+                } else if( mimeType.startsWith( FORM_DATA_MIME_MULTIPART )) {
+                    addFormDataArguments( inStream, mimeType, postedArguments, mimeParts );
+                } else {
+                    int     length = sRequest.getContentLength();
+                    byte [] buf    = StreamUtils.slurp( inStream, length );
+
+                    postData = new String( buf, "utf-8" );
+                }
+                postedArguments.remove( LID_SUBMIT_PARAMETER_NAME ); // delete the contribution of the submit button
+
+            } catch( IOException ex ) {
+                log.error( ex );
+            }
+        } else {
+            mimeType = null;
+        }
+
+        addUrlEncodedArguments( queryString, urlArguments );
+        urlArguments.remove( LID_SUBMIT_PARAMETER_NAME ); // delete the contribution of the submit button
+
+        SaneRequest requestAtProxy = null;
+        if( theDetermineRequestFromProxyOriginalRequest ) {
+            // We might be behind a reverse proxy. If the appropriate headers are set, use them for
+            // an original request. If not, use the local ones.
+
+            String clientIpAtProxy     = sRequest.getHeader( HTTP_PROXY_HEADER_FORWARDED_FOR );
+            String serverAtProxy       = sRequest.getHeader( HTTP_PROXY_FORWARDED_SERVER );
+            String protocolAtProxy     = sRequest.getHeader( HTTP_PROXY_FORWARDED_PROTOCOL );
+            String contextPathAtProxy  = sRequest.getHeader( HTTP_PROXY_FORWARDED_CONTEXT );
+            String tmp                 = sRequest.getHeader( HTTP_PROXY_FORWARDED_PORT );
+
+            if(    clientIpAtProxy     != null
+                || serverAtProxy       != null
+                || serverAtProxy       != null
+                || protocolAtProxy     != null
+                || contextPathAtProxy  != null
+                || tmp                 != null )
+            {
+                if( clientIpAtProxy == null ) {
+                    clientIpAtProxy = clientIp;
+                }
+                if( serverAtProxy == null ) {
+                    serverAtProxy = server;
+                }
+                if( contextPathAtProxy == null ) {
+                    contextPathAtProxy = contextPath;
+                }
+
+                if( protocolAtProxy != null ) {
+                    protocolAtProxy = protocolAtProxy.equalsIgnoreCase( "https" ) ? "https" : "http";
+                } else {
+                    protocolAtProxy = protocol;
+                }
+
+                int portAtProxy;
+                if( tmp != null ) {
+                    portAtProxy = Integer.parseInt( tmp );
+                } else {
+                    portAtProxy = port;
+                }
+
+                String serverWithNonDefaultPortAtProxy = constructServerPlusNonDefaultPort( serverAtProxy, protocolAtProxy, portAtProxy );
+                if( serverWithNonDefaultPortAtProxy == null ) {
+                    serverWithNonDefaultPortAtProxy = serverWithNonDefaultPort;
+                }
+
+                String relativeBaseUriAtProxy;
+                if( contextPathAtProxy != null ) {
+                    if( contextPathAtProxy.endsWith( "/" )) {
+                        // supposed to be given without slash, but then it not always is, particularly for "/" itself
+                        contextPathAtProxy = contextPathAtProxy.substring( 0, contextPathAtProxy.length()-1 );
+                    }
+                    relativeBaseUriAtProxy = contextPathAtProxy + relativeBaseUri.substring( contextPath.length() );
+                } else {
+                    relativeBaseUriAtProxy = relativeBaseUri;
+                }
+
+                requestAtProxy = new SaneServletRequest(
+                        sRequest,
+                        method,
+                        protocolAtProxy,
+                        serverAtProxy,
+                        portAtProxy,
+                        serverWithNonDefaultPortAtProxy,
+                        relativeBaseUriAtProxy,
+                        queryString,
+                        urlArguments,
+                        postData,
+                        postedArguments,
+                        mimeParts,
+                        cookies,
+                        mimeType,
+                        clientIpAtProxy,
+                        contextPathAtProxy,
+                        null );
+            }
+        }
+
+        SaneServletRequest ret = new SaneServletRequest(
+                sRequest,
+                method,
+                protocol,
+                server,
+                port,
+                serverWithNonDefaultPort,
+                relativeBaseUri,
+                queryString,
+                urlArguments,
+                postData,
+                postedArguments,
+                mimeParts,
+                cookies,
+                mimeType,
+                clientIp,
+                contextPath,
+                requestAtProxy );
+
+        if( log.isTraceEnabled() ) {
+            log.traceConstructor( ret, ret );
+        }
+        return ret;
+    }
+
+    /**
+     * Private constructor, use factory method
+     *
+     * @param sRequest the HttpServletRequest from which the SaneServletRequest is created
+     * @param method the HTTP method
+     * @param protocol http or https
+     * @param server the server
+     * @param port the server port
+     * @param serverPlusNonDefaultPort the server, plus, if the port is non-default, a colon and the port number
+     * @param relativeBaseUri the relative base URI
+     * @param queryString the string past the ? in the URL
+     * @param urlArguments the arguments given in the URL, if any
+     * @param postData the data HTTP POST'd, if any
+     * @param postedArguments the arguments given via HTTP POST, if any
+     * @param mimeParts the MimeParts given via HTTP POST, if any
+     * @param cookies the sent cookies
+     * @param mimeType the sent MIME type, if any
+     * @param clientIp the client's IP address
+     * @param contextPath the JEE context path
+     * @param requestAtProxy the SaneRequest received by the reverse proxy, if any
+     */
+    protected SaneServletRequest(
+            HttpServletRequest     sRequest,
+            String                 method,
+            String                 protocol,
+            String                 server,
+            int                    port,
+            String                 serverPlusNonDefaultPort,
+            String                 relativeBaseUri,
+            String                 queryString,
+            Map<String,String[]>   urlArguments,
+            String                 postData,
+            Map<String,String[]>   postedArguments,
+            Map<String,MimePart[]> mimeParts,
+            IncomingSaneCookie []  cookies,
+            String                 mimeType,
+            String                 clientIp,
+            String                 contextPath,
+            SaneRequest            requestAtProxy )
+    {
+        super( protocol, server, port, serverPlusNonDefaultPort, relativeBaseUri, queryString, urlArguments, contextPath, requestAtProxy );
+
+        theDelegate         = sRequest;
+        theMethod           = method;
+        thePostData         = postData;
+        thePostedArguments  = postedArguments;
+        theMimeParts        = mimeParts;
+        theCookies          = cookies;
+        theMimeType         = mimeType;
+        theClientIp         = clientIp;
+    }
+
+    /**
+     * Helper to parse formdata-encoded POST data, and put them in the right places.
+     *
+     * @param inStream the incoming data
+     * @param mime the MIME type of the incoming content
+     * @param arguments the URL arguments in the process of being assembled
+     * @param mimeParts the MIME parts in the process of being assembled
+     * @throws IOException thrown if an I/O error occurred
+     */
+    protected static void addFormDataArguments(
+            BufferedInputStream    inStream,
+            String                 mime,
+            Map<String,String[]>   arguments,
+            Map<String,MimePart[]> mimeParts )
+        throws
+            IOException
+    {
+        // determine boundary
+        String  stringBoundary = FormDataUtils.determineBoundaryString( mime );
+        byte [] byteBoundary   = FormDataUtils.constructByteBoundary( stringBoundary, FORM_CHARSET );
+
+        // forward to first boundary
+        StreamUtils.slurpUntilBoundary( inStream, byteBoundary );
+        boolean hasData = FormDataUtils.advanceToBeginningOfLine( inStream );
+
+        // past first boundary now
+        outer:
+        while( hasData ) { // for all parts
+
+            HashMap<String,String> partHeaders = new HashMap<>();
+            String currentLogicalLine = null;
+            while( true ) { // for all headers in this part
+                String line = FormDataUtils.readStringLine( inStream, FORM_CHARSET );
+                if( line == null ) {
+                    hasData = false;
+                    break outer; // end of stream -- we don't want heads and no content
+                }
+                if( line.startsWith( stringBoundary )) {
+                    // not sure why it would do this here, but let's be safe
+                    break;
+                }
+                if( line.length() == 0 ) {
+                    break; // done with headers
+                }
+                if( Character.isWhitespace( line.charAt( 0 ) )) {
+                    // continuation line
+                    currentLogicalLine += line; // will throw if no currentLogicalLine, which is fine
+                } else {
+                    if( currentLogicalLine != null ) {
+                        FormDataUtils.addNameValuePairTo( currentLogicalLine, partHeaders );
+                    }
+                    currentLogicalLine = line;
+                }
+            }
+            if( currentLogicalLine != null ) {
+                // don't forget the last line
+                FormDataUtils.addNameValuePairTo( currentLogicalLine, partHeaders );
+            }
+
+            // have headers now, let's get the data
+            byte [] partData = StreamUtils.slurpUntilBoundary( inStream, byteBoundary );
+            if( partData == null || partData.length == 0 ) {
+                hasData = false;
+                break outer; // end of stream -- we don't want heads and no content
+            }
+            partData = FormDataUtils.stripTrailingBoundary( partData, byteBoundary );
+            hasData  = FormDataUtils.advanceToBeginningOfLine( inStream );
+
+            String partMime = partHeaders.get( "content-type" );
+            if( partMime == null ) {
+                partMime = "text/plain"; // apparently the default
+            }
+
+            String partCharset     = FORM_CHARSET; // FIXME?
+            String partName        = null;
+            String partDisposition = null;
+            String disposition     = partHeaders.get( "content-disposition" );
+            if( disposition != null ) {
+                String [] dispositionData = disposition.split( ";" );
+                partDisposition = dispositionData[0];
+
+                for( int i=1 ; i<dispositionData.length ; ++i ) { // ignore first, that's different
+                    String current = dispositionData[i];
+                    int    equals  = current.indexOf( '=' );
+                    if( equals > 0 ) {
+                        String key   = current.substring( 0, equals ).trim().toLowerCase();
+                        String value = current.substring( equals+1 ).trim();
+
+                        if( value.startsWith( "\"" ) && value.endsWith( "\"" )) {
+                            value = value.substring( 1, value.length()-1 );
+                        }
+
+                        if( "name".equals( key )) {
+                            partName = value;
+                        }
+                    }
+                }
+            }
+
+            if( partName != null ) {
+                MimePart part = MimePart.create( partName, partHeaders, partDisposition, partData, partMime, partCharset );
+
+                MimePart [] already = mimeParts.get( partName );
+                MimePart [] toPut;
+                if( already != null ) {
+                    toPut = ArrayHelper.append( already, part, MimePart.class );
+                } else {
+                    toPut = new MimePart[] { part };
+                }
+                mimeParts.put( partName, toPut );
+            } else {
+                log.warn( "Skipping unnamed part" );
+            }
+
+            // adding to post parameters too
+            if( partName != null && "form-data".equals( partDisposition ) && partMime.startsWith( "text/" )) {
+                String    value   = new String( partData, partCharset );
+                String [] already = arguments.get( partName );
+                String [] toPut;
+
+                if( already != null ) {
+                    toPut = ArrayHelper.append( already, value, String.class );
+                } else {
+                    toPut = new String[] { value };
+                }
+                arguments.put( partName, toPut );
+            }
+        }
+    }
+
+    /**
+     * Determine the HTTP method (such as GET).
+     *
+     * @return the HTTP method
+     */
+    @Override
+    public String getMethod()
+    {
+        return theMethod;
+    }
+
+    /**
+     * Obtain all values of a multi-valued POST'd argument.
+     *
+     * @param argName name of the argument
+     * @return the values, or <code>null</code>
+     */
+    @Override
+    public String [] getMultivaluedPostedArgument(
+            String argName )
+    {
+        if( thePostedArguments == null ) {
+            return null;
+        }
+        String [] ret = thePostedArguments.get( argName );
+        return ret;
+    }
+
+    /**
+     * Obtain all POST'd arguments of this request.
+     *
+     * @return a Map of name to value mappings for all POST'd arguments
+     */
+    @Override
+    public Map<String,String[]> getPostedArguments()
+    {
+        return Collections.unmodifiableMap( thePostedArguments );
+    }
+
+    /**
+     * Obtain the cookies that were sent as part of this request.
+     *
+     * @return the cookies that were sent as part of this request.
+     */
+    @Override
+    public synchronized IncomingSaneCookie[] getSaneCookies()
+    {
+        if( theCookies == null ) {
+            Cookie [] delegateCookies = theDelegate.getCookies();
+
+            theCookies = new IncomingCookieAdapter[ delegateCookies.length ];
+            for( int i=0 ; i<delegateCookies.length ; ++i ) {
+                theCookies[i] = new IncomingCookieAdapter( delegateCookies[i] );
+            }
+        }
+        return theCookies;
+    }
+
+    /**
+     * Obtain the request content type, if any. This only applies in
+     * case of HTTP POST.
+     *
+     * @return the request content type
+     */
+    @Override
+    public String getContentType()
+    {
+        return theMimeType;
+    }
+
+    /**
+     * Obtain the content of the request, e.g. HTTP POST data.
+     *
+     * @return the content of the request, or <code>null</code>
+     */
+    @Override
+    public String getPostData()
+    {
+        return thePostData;
+    }
+
+    /**
+     * Obtain the client IP address.
+     *
+     * @return the client IP address
+     */
+    @Override
+    public String getClientIp()
+    {
+        return theClientIp;
+    }
+
+    /**
+     * Obtain an Iterator over the user's Locale preferences, in order of preference.
+     * This Iterator takes into account a Locale cookie that might be set by the application,
+     * followed by the value of the Accept-Language header in the HTTP request and
+     * the default locale of the VM
+     *
+     * @return Iterator
+     */
+    @Override
+    @SuppressWarnings(value={"unchecked"})
+    public Iterator<Locale> acceptLanguageIterator()
+    {
+        SaneCookie  c        = getCookie( ACCEPT_LANGUAGE_COOKIE_NAME );
+        Enumeration fromHttp = theDelegate.getLocales();
+        if( c != null ) {
+            String s = c.getValue();
+            String [] parts = s.split( "-" );
+
+            Locale cookieLocale;
+            switch( parts.length ) {
+                case 1:
+                    cookieLocale = new Locale( parts[0] );
+                    break;
+                case 2:
+                    cookieLocale = new Locale( parts[0], parts[2] );
+                    break;
+                default:
+                    cookieLocale = new Locale( parts[0], parts[1], parts[2] );
+                    break;
+            }
+
+            return CompositeIterator.<Locale>createFromEnumerations(
+                OneElementIterator.<Locale>create( cookieLocale ),
+                (Enumeration<Locale>) fromHttp,
+                OneElementIterator.<Locale>create( Locale.getDefault() ) );
+
+        } else {
+            return CompositeIterator.<Locale>createFromEnumerations(
+                (Enumeration<Locale>) fromHttp,
+                OneElementIterator.<Locale>create( Locale.getDefault() ) );
+        }
+    }
+
+    /**
+     * Obtain an Iterator over the requested MIME types, if any. Return the higher-priority
+     * MIME types first.
+     *
+     * @return Iterator over the requested MIME types, if any.
+     */
+    @Override
+    public Iterator<String> requestedMimeTypesIterator()
+    {
+        if( theRequestedMimeTypes == null ) {
+            // first split by comma, then by semicolon
+            String header = theDelegate.getHeader( ACCEPT_HEADER );
+            if( header != null ) {
+                theRequestedMimeTypes = header.split( "," );
+
+                Arrays.sort(theRequestedMimeTypes, ( String o1, String o2 ) -> {
+                    final String qString = ";q=";
+
+                    float priority1;
+                    float priority2;
+
+                    int semi1 = o1.indexOf( qString );
+                    if( semi1 >= 0 ) {
+                        priority1 = Float.parseFloat( o1.substring( semi1 + qString.length() ));
+                    } else {
+                        priority1 = 1.f;
+                    }
+                    int semi2 = o2.indexOf( qString );
+                    if( semi2 >= 0 ) {
+                        priority2 = Float.parseFloat( o2.substring( semi2 + qString.length() ));
+                    } else {
+                        priority2 = 1.f;
+                    }
+
+                    int ret;
+                    if( semi1 > semi2 ) {
+                        ret = 1;
+                    } else if( semi1 == semi2 ) {
+                        ret = 0;
+                    } else {
+                        ret = -1;
+                    }
+                    return ret;
+                });
+
+            } else {
+                theRequestedMimeTypes = new String[0];
+            }
+        }
+        return ArrayCursorIterator.<String>create( theRequestedMimeTypes );
+    }
+
+    /**
+     * Obtain the value of the accept header, if any.
+     *
+     * @return the value of the accept header
+     */
+    @Override
+    public String getAcceptHeader()
+    {
+        String ret = theDelegate.getHeader( "Accept" );
+        return ret;
+    }
+
+    /**
+     * Obtain the delegate request.
+     *
+     * @return the delegate
+     */
+    public HttpServletRequest getDelegate()
+    {
+        return theDelegate;
+    }
+
+    /**
+     * Set a request-context attribute. The semantics are equivalent to setting
+     * an attribute on an HttpServletRequest.
+     *
+     * @param name the name of the attribute
+     * @param value the value of the attribute
+     * @see #getAttribute
+     * @see #removeAttribute
+     * @see #getAttributeNames
+     */
+    @Override
+    public void setAttribute(
+            String name,
+            Object value )
+    {
+        theDelegate.setAttribute( name, value );
+    }
+
+    /**
+     * Get a request-context attribute. The semantics are equivalent to getting
+     * an attribute on an HttpServletRequest.
+     *
+     * @param name the name of the attribute
+     * @return the value of the attribute
+     * @see #setAttribute
+     * @see #removeAttribute
+     * @see #getAttributeNames
+     */
+    @Override
+    public Object getAttribute(
+            String name )
+    {
+        Object ret = theDelegate.getAttribute( name );
+        return ret;
+    }
+
+    /**
+     * Remove a request-context attribute. The semantics are equivalent to removing
+     * an attribute on an HttpServletRequest.
+     *
+     * @param name the name of the attribute
+     * @see #setAttribute
+     * @see #getAttribute
+     * @see #getAttributeNames
+     */
+    @Override
+    public void removeAttribute(
+            String name )
+    {
+        theDelegate.removeAttribute( name );
+    }
+
+    /**
+     * Iterate over all request-context attributes currently set.
+     *
+     * @return an Iterator over the names of all the request-context attributes
+     * @see #setAttribute
+     * @see #getAttribute
+     * @see #removeAttribute
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public Enumeration<String> getAttributeNames()
+    {
+        return theDelegate.getAttributeNames();
+    }
+
+    /**
+     * Obtain the names of the MimeParts conveyed.
+     *
+     * @return the names of the MimeParts
+     */
+    @Override
+    public CursorIterator<String> getMimePartNames()
+    {
+        if( theMimeParts != null ) {
+            return MapCursorIterator.createForKeys( theMimeParts, String.class, MimePart[].class );
+        } else {
+            return ZeroElementCursorIterator.create();
+        }
+    }
+
+    /**
+     * Obtain all MimeParts with a given name
+     *
+     * @param argName name of the MimePart
+     * @return the values, or <code>null</code>
+     */
+    @Override
+    public MimePart [] getMultivaluedMimeParts(
+            String argName )
+    {
+        if( theMimeParts == null ) {
+            return null;
+        }
+        MimePart [] ret = theMimeParts.get( argName );
+        return ret;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCharacterEncoding()
+    {
+        return theDelegate.getCharacterEncoding();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCharacterEncoding(
+            String env )
+        throws
+            UnsupportedEncodingException
+    {
+        theDelegate.setCharacterEncoding( env );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getContentLength()
+    {
+        return theDelegate.getContentLength();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getContentLengthLong()
+    {
+        return theDelegate.getContentLengthLong();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ServletInputStream getInputStream()
+        throws
+            IOException
+    {
+        return theDelegate.getInputStream();
+    }
+
+   /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getParameter(
+            String name )
+    {
+        return theDelegate.getParameter( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Enumeration<String> getParameterNames()
+    {
+        return theDelegate.getParameterNames();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getParameterValues(
+            String name )
+    {
+        return theDelegate.getParameterValues( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String[]> getParameterMap()
+    {
+        return theDelegate.getParameterMap();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getScheme()
+    {
+        return theDelegate.getScheme();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getServerName(){
+        return theDelegate.getServerName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getServerPort()
+    {
+        return theDelegate.getServerPort();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BufferedReader getReader()
+            throws IOException
+    {
+        return theDelegate.getReader();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRemoteAddr()
+    {
+        return theDelegate.getRemoteAddr();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRemoteHost()
+    {
+        return theDelegate.getRemoteHost();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Locale getLocale()
+    {
+        return theDelegate.getLocale();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Enumeration<Locale> getLocales()
+    {
+        return theDelegate.getLocales();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSecure()
+    {
+        return theDelegate.isSecure();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RequestDispatcher getRequestDispatcher(
+            String path )
+    {
+        return theDelegate.getRequestDispatcher( path );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("deprecation")
+    public String getRealPath(
+            String path )
+    {
+        return theDelegate.getRealPath( path );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getRemotePort()
+    {
+        return theDelegate.getRemotePort();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLocalName()
+    {
+        return theDelegate.getLocalName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLocalAddr()
+    {
+        return theDelegate.getLocalAddr();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getLocalPort()
+    {
+        return theDelegate.getLocalPort();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ServletContext getServletContext()
+    {
+        return theDelegate.getServletContext();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AsyncContext startAsync()
+            throws IllegalStateException
+    {
+        return theDelegate.startAsync();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AsyncContext startAsync(
+            ServletRequest  servletRequest,
+            ServletResponse servletResponse )
+        throws
+            IllegalStateException
+    {
+        return theDelegate.startAsync( servletRequest, servletResponse );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAsyncStarted()
+    {
+        return theDelegate.isAsyncStarted();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAsyncSupported()
+    {
+        return theDelegate.isAsyncSupported();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AsyncContext getAsyncContext()
+    {
+        return theDelegate.getAsyncContext();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DispatcherType getDispatcherType()
+    {
+        return theDelegate.getDispatcherType();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getAuthType()
+    {
+        return theDelegate.getAuthType();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Cookie[] getCookies()
+    {
+        return theDelegate.getCookies();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getDateHeader(
+            String name )
+    {
+        return theDelegate.getDateHeader( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getHeader(
+            String name )
+    {
+        return theDelegate.getHeader( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Enumeration<String> getHeaders(
+            String name )
+    {
+        return theDelegate.getHeaders( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Enumeration<String> getHeaderNames()
+    {
+        return theDelegate.getHeaderNames();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getIntHeader(
+            String name )
+    {
+        return theDelegate.getIntHeader( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPathInfo()
+    {
+        return theDelegate.getPathInfo();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPathTranslated()
+    {
+        return theDelegate.getPathTranslated();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRemoteUser()
+    {
+        return theDelegate.getRemoteUser();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isUserInRole(
+            String role )
+    {
+        return theDelegate.isUserInRole( role );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Principal getUserPrincipal()
+    {
+        return theDelegate.getUserPrincipal();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRequestedSessionId()
+    {
+        return theDelegate.getRequestedSessionId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRequestURI()
+    {
+        return theDelegate.getRequestURI();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StringBuffer getRequestURL()
+    {
+        return theDelegate.getRequestURL();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getServletPath()
+    {
+        return theDelegate.getServletPath();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HttpSession getSession(
+            boolean create )
+    {
+        return theDelegate.getSession( create );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HttpSession getSession()
+    {
+        return theDelegate.getSession();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String changeSessionId()
+    {
+        return theDelegate.changeSessionId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isRequestedSessionIdValid()
+    {
+        return theDelegate.isRequestedSessionIdValid();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isRequestedSessionIdFromCookie()
+    {
+        return theDelegate.isRequestedSessionIdFromCookie();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isRequestedSessionIdFromURL()
+    {
+        return theDelegate.isRequestedSessionIdFromURL();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("deprecation")
+    public boolean isRequestedSessionIdFromUrl()
+    {
+        return theDelegate.isRequestedSessionIdFromUrl();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean authenticate(
+            HttpServletResponse response )
+        throws
+            IOException,
+            ServletException
+    {
+        return theDelegate.authenticate( response );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void login(
+            String username,
+            String password )
+        throws
+            ServletException
+    {
+        theDelegate.login( username, password );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void logout()
+        throws
+            ServletException
+    {
+        theDelegate.logout();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Part> getParts()
+        throws
+            IOException,
+            ServletException
+    {
+        return theDelegate.getParts();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Part getPart(
+            String name )
+        throws
+            IOException,
+            ServletException
+    {
+        return theDelegate.getPart( name );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends HttpUpgradeHandler> T upgrade( Class<T> handlerClass )
+            throws IOException,
+                   ServletException
+    {
+        return theDelegate.upgrade( handlerClass );
+    }
+
+    /**
+     * Convert to String representation, for debugging reasons only.
+     *
+     * @return String representation
+     */
+    @Override
+    public String toString()
+    {
+        return getAbsoluteFullUri();
+    }
+
+    /**
+     * Dump this object.
+     *
+     * @param d the Dumper to dump to
+     */
+    @Override
+    public void dump(
+            Dumper d )
+    {
+        d.dump( this,
+                new String[] {
+                    "theDetermineRequestFromProxyOriginalRequest",
+                    "theDelegate",
+                    "theMethod",
+                    "theServer",
+                    "thePort",
+                    "theRelativeBaseUri",
+                    "theCookies",
+                    "theProtocol",
+                    "theQueryString",
+                    "theAbsoluteContextUri",
+                    "theContextPath",
+                    "theUrlArguments",
+                    "thePostedArguments",
+                    "theRequestedMimeTypes",
+                    "theClientIp",
+                    "theRequestAtProxy"
+                },
+                new Object[] {
+                    theDetermineRequestFromProxyOriginalRequest,
+                    theDelegate,
+                    theMethod,
+                    theServer,
+                    thePort,
+                    theRelativeBaseUri,
+                    theCookies,
+                    theProtocol,
+                    theQueryString,
+                    theAbsoluteContextUri,
+                    theContextPath,
+                    theUrlArguments,
+                    thePostedArguments,
+                    theRequestedMimeTypes,
+                    theClientIp,
+                    theRequestAtProxy
+                } );
+    }
+
+    /**
+     * The underlying HttpServletRequest.
+     */
+    protected HttpServletRequest theDelegate;
+
+    /**
+     * The http method, such as GET.
+     */
+    protected String theMethod;
+
+    /**
+     * The cookies on this request. Allocated when needed.
+     */
+    protected IncomingSaneCookie[] theCookies;
+
+    /**
+     * The data that was posted, if any.
+     */
+    protected String thePostData;
+
+    /**
+     * The arguments to the Request that were POST'd, if any.
+     */
+    protected Map<String,String[]> thePostedArguments;
+
+    /**
+     * The MIME type, if any.
+     */
+    protected String theMimeType;
+
+    /**
+     * Name of the request attribute that contains an instance of SaneServletRequest.
+     */
+    public static final String SANE_SERVLET_REQUEST_ATTRIBUTE_NAME = classToAttributeName( SaneServletRequest.class );
+
+    /**
+     * The requested MIME types, in sequence of prioritization. Allocated as needed.
+     */
+    protected String [] theRequestedMimeTypes;
+
+    /**
+     * The conveyed MimeParts, if any.
+     */
+    protected Map<String,MimePart[]> theMimeParts;
+
+    /**
+     * The IP address of the client.
+     */
+    protected String theClientIp;
+
+    /**
+     * Name of the form MIME type that JEE does know how to parse. :-(
+     */
+    public static final String FORM_DATA_MIME_URLENCODED = "application/x-www-form-urlencoded";
+
+    /**
+     * Name of the form MIME type that JEE does not know how to parse. :-(
+     */
+    public static final String FORM_DATA_MIME_MULTIPART = "multipart/form-data";
+
+    /**
+     * If true, determine the SaneServletRequest from non-standard HTTP headers set by a reverse proxy.
+     */
+    public static final boolean theDetermineRequestFromProxyOriginalRequest
+            = ResourceHelper.getInstance( SaneServletRequest.class ).getResourceBooleanOrDefault(
+                    "DetermineRequestFromProxyOriginalRequest",
+                    false );
+
+    /**
+     * HTTP header name for the client IP address in a reverse proxy configuration.
+     */
+    public static final String HTTP_PROXY_HEADER_FORWARDED_FOR = "X-Forwarded-For";
+
+    /**
+     * HTTP header name for the host in a reverse proxy configuration.
+     */
+    public static final String HTTP_PROXY_HEADER_FORWARDED_HOST = "X-Forwarded-Host";
+
+    /**
+     * HTTP header name for the server in a reverse proxy configuration.
+     */
+    public static final String HTTP_PROXY_FORWARDED_SERVER = "X-Forwarded-Server";
+
+    /**
+     * HTTP header name for the protocol in a reverse proxy configuration.
+     */
+    public static final String HTTP_PROXY_FORWARDED_PROTOCOL = "X-Forwarded-Proto";
+
+    /**
+     * HTTP header name for the port in a reverse proxy configuration.
+     */
+    public static final String HTTP_PROXY_FORWARDED_PORT = "X-Forwarded-Port";
+
+    /**
+     * HTTP header name for the context path in a reverse proxy configuration.
+     */
+    public static final String HTTP_PROXY_FORWARDED_CONTEXT = "X-Forwarded-Context";
+
+    /**
+     * Name of a POSTed parameter that represents the submit button.
+     */
+    public static final String LID_SUBMIT_PARAMETER_NAME = "lid-submit";
+
+    /**
+     * The character set for forms.
+     */
+    public static final String FORM_CHARSET = "UTF-8";
+
+    /**
+     * Bridges the SaneCookie interface into the servlet cookies.
+     */
+    static class IncomingCookieAdapter
+        extends
+            AbstractSaneCookie
+        implements
+            IncomingSaneCookie,
+            CanBeDumped
+    {
+        /**
+         * Constructor.
+         *
+         * @param delegate the Servlet Cookie we delegate to
+         */
+        public IncomingCookieAdapter(
+                javax.servlet.http.Cookie delegate )
+        {
+            theDelegate = delegate;
+        }
+
+        /**
+         * Get the Cookie name.
+         *
+         * @return the Cookie name
+         */
+        @Override
+        public String getName()
+        {
+            if( theName == null ) {
+                String delegateName = theDelegate.getName();
+                theName = HTTP.decodeCookieName( delegateName );
+            }
+            return theName;
+        }
+
+        /**
+         * Get the Cookie value.
+         *
+         * @return the Cookie value
+         */
+        @Override
+        public String getValue()
+        {
+            if( theValue == null ) {
+                String delegateValue = theDelegate.getValue();
+                theValue = HTTP.decodeFromQuotedString( delegateValue );
+            }
+            return theValue;
+        }
+
+        /**
+         * Dump this object.
+         *
+         * @param d the Dumper to dump to
+         */
+        @Override
+        public void dump(
+                Dumper d )
+        {
+            d.dump( this,
+                    new String[] {
+                            "getName()",
+                            "getValue()"
+                    },
+                    new Object[] {
+                            getName(),
+                            getValue()
+                    });
+        }
+
+        /**
+         * The Servlet Cookie we delegate to.
+         */
+        protected Cookie theDelegate;
+
+        /**
+         * The decoded name.
+         */
+        protected String theName;
+
+        /**
+         * The decoded value.
+         */
+        protected String theValue;
+    }
+}
