@@ -14,6 +14,7 @@
 
 package org.infogrid.meshworld;
 
+import org.infogrid.app.AppConfiguration;
 import org.infogrid.web.app.InfoGridWebApp;
 
 /**
@@ -29,5 +30,32 @@ public class MeshWorldApp
     public MeshWorldApp()
     {
         super();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void registerResources(
+            AppConfiguration config )
+    {
+        reg( "/s/images/bin_closed.png" );
+        reg( "/s/images/link_add.png" );
+        reg( "/s/images/link_delete.png" );
+        reg( "/s/images/medal_bronze_add.png" );
+        reg( "/s/images/medal_bronze_delete.png" );
+        reg( "/s/images/medal_silver_add.png" );
+        reg( "/s/images/medal_silver_delete.png" );
+    }
+    
+    /**
+     * Helper method to make invocations shorter.
+     * 
+     * @param name name/path of the asset
+     */
+    protected void reg(
+            String name )
+    {
+        registerAsset( name, getClass().getClassLoader(), this );
     }
 }

@@ -73,6 +73,13 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/assets</directory>
+            </resource>
+        </resources>
+    </build>
     <properties>
         <diet4j.activationclass>org.infogrid.meshworld.jetty.Activate</diet4j.activationclass>
     </properties>

@@ -121,8 +121,9 @@ public abstract class AbstractJspViewlet
      * 
      * @param request the incoming request
      * @param response the StructuredResponse into which to write the result
-     * @throws javax.servlet.ServletException processing failed
-     * @throws java.io.IOException I/O error
+     * @param servletContext the ServletContext
+     * @throws ServletException processing failed
+     * @throws IOException I/O error
      */
     @Override
     public void processRequest(
@@ -182,33 +183,47 @@ public abstract class AbstractJspViewlet
      */
     protected SaneRequest theCurrentRequest;
 
+    /**
+     * We use this as the ServletConfig object.
+     */
     static class MyServletConfig
             implements
                 ServletConfig
     {
+        /**
+         * Constructor.
+         * 
+         * @param name name of this servlet instance
+         * @param servletContext the ServletContext
+         */
         public MyServletConfig(
-                String name,
+                String         name,
                 ServletContext servletContext )
         {
-            theName = name;
+            theName           = name;
             theServletContext = servletContext;
         }
 
+        @Override
         public String getServletName()
         {
             return theName;
         }
 
+        @Override
         public ServletContext getServletContext()
         {
             return theServletContext;
         }
 
-        public String getInitParameter( String name )
+        @Override
+        public String getInitParameter(
+                String name )
         {
             return null;
         }
 
+        @Override
         public Enumeration<String> getInitParameterNames()
         {
             return ZeroElementCursorIterator.create();

@@ -10,10 +10,10 @@
 --%>
 <%@ taglib prefix="c"     uri="http://java.sun.com/jsp/jstl/core"
  %>
-<tmpl:stylesheet href="${CONTEXT}/v/org/infogrid/jee/viewlet/propertysheet/PropertySheetViewlet.css"/>
-<tmpl:stylesheet href="${CONTEXT}/v/org/infogrid/jee/taglib/viewlet/ChangeViewletStateTag.css"/>
-<tmpl:stylesheet href="${CONTEXT}/v/org/infogrid/jee/taglib/mesh/PropertyTag.css"/>
-<tmpl:script src="${CONTEXT}/v/org/infogrid/jee/taglib/mesh/PropertyTag.js"/>
+<tmpl:stylesheet href="${CONTEXT}/v/org/infogrid/web/viewlet/propertysheet/PropertySheetViewlet.css"/>
+<tmpl:stylesheet href="${CONTEXT}/v/org/infogrid/web/taglib/viewlet/ChangeViewletStateTag.css"/>
+<tmpl:stylesheet href="${CONTEXT}/v/org/infogrid/web/taglib/mesh/PropertyTag.css"/>
+<tmpl:script src="${CONTEXT}/v/org/infogrid/web/taglib/mesh/PropertyTag.js"/>
 
 <v:viewletAlternatives />
 <v:changeViewletState viewletStates="edit" display="compact"/>

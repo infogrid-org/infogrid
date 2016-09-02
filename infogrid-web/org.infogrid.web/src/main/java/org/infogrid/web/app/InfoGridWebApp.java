@@ -29,6 +29,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.infogrid.app.AppConfiguration;
+import org.infogrid.app.InfoGridAccessory;
 import org.infogrid.app.InfoGridApp;
 import org.infogrid.app.InfoGridInstallable;
 import org.infogrid.mesh.NotPermittedException;
@@ -89,10 +90,22 @@ public class InfoGridWebApp
     public void initialize(
             AppConfiguration config )
     {
+        registerResources( config );
         initializeMeshBase( config );
         initializeUi( (WebAppConfiguration) config );
     }
-    
+
+    /**
+     * Overridable method to register available resources with this app.
+     * 
+     * @param config the configuration options
+     */
+    protected void registerResources(
+            AppConfiguration config )
+    {
+        
+    }
+
     /**
      * Overridable method to initialize the user interface.
      * 
@@ -192,10 +205,16 @@ public class InfoGridWebApp
         
         BinaryStructuredResponseSection section = response.getDefaultBinarySection();
 
-        Pair<URL,InfoGridInstallable> found = theAssets.get( relativeBaseUri );
-        
-        if( found != null ) {
-            InputStream inStream = new BufferedInputStream( found.getName().openStream() );
+        // app assets override accessory assets
+        URL assetUrl = theAppAssets.get( relativeBaseUri );
+        if( assetUrl == null ) {
+            Pair<URL,InfoGridAccessory> found = theAccessoryAssets.get( relativeBaseUri );
+            if( found != null ) {
+                assetUrl = found.getName();
+            }
+        }
+        if( assetUrl != null ) {
+            InputStream inStream = new BufferedInputStream( assetUrl.openStream() );
             byte []     buf      = new byte[8192];
             while( true ) {
                 int read = inStream.read( buf );
@@ -362,7 +381,18 @@ public class InfoGridWebApp
         if( url == null ) {
             throw new IllegalArgumentException( "Cannot register asset with null URL: " + path + ", " + installable.getName() );
         }
-        theAssets.put( path, new Pair<>( url, installable ) );
+        if( installable == null ) {
+            throw new IllegalArgumentException( "Cannot register asset with unidentified installable: " + path + ", " + url.toExternalForm() );
+        }
+        if( installable == this ) {
+            theAppAssets.put( path, url );
+            
+        } else if( installable instanceof InfoGridAccessory ) {
+            theAccessoryAssets.put( path, new Pair<>( url, (InfoGridAccessory) installable ) );
+
+        } else {
+            throw new IllegalArgumentException( "Cannot register asset from a different app: " + installable.getName() + " vs " + getName() );
+        }
     }
 
     /**
@@ -441,10 +471,16 @@ public class InfoGridWebApp
     protected StructuredResponseTemplateFactory theResponseTemplateFactory;
     
     /**
-     * The known assets, keyed by their relative request URLs and mapped to the
-     * URLs from which they can be obtained.
+     * The known assets of the app, keyed by their relative request URLs and
+     * mapped to the URLs from which they can be obtained.
      */
-    protected Map<String,Pair<URL,InfoGridInstallable>> theAssets = new HashMap<>();
+    protected Map<String,URL> theAppAssets = new HashMap<>();
+
+    /**
+     * The known assets of the accessories, keyed by their relative request URLs
+     * and mapped to the URLs from which they can be obtained.
+     */
+    protected Map<String,Pair<URL,InfoGridAccessory>> theAccessoryAssets = new HashMap<>();
 
     /**
      * The regular expression that distinguishes between assets and MeshObject URLs.

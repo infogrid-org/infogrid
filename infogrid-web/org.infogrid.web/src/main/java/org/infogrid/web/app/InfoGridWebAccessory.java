@@ -14,7 +14,9 @@
 
 package org.infogrid.web.app;
 
+import org.infogrid.app.AppConfiguration;
 import org.infogrid.app.InfoGridAccessory;
+import org.infogrid.app.InfoGridApp;
 
 /**
  * An accessory to an InfoGridWebApp.
@@ -23,4 +25,27 @@ public abstract class InfoGridWebAccessory
     extends
         InfoGridAccessory
 {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initialize(
+            AppConfiguration config,
+            InfoGridApp      app )
+    {
+        registerResources( config, app );
+    }
+
+    /**
+     * Overridable method to register available resources with this app.
+     * 
+     * @param config the configuration options
+     * @param app the InfoGridApp that this is an accessory for
+     */
+    protected void registerResources(
+            AppConfiguration config,
+            InfoGridApp      app )
+    {
+        
+    }
 }

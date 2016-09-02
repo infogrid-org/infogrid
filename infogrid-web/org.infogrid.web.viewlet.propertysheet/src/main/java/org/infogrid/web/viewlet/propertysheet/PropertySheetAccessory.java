@@ -54,7 +54,7 @@ public class PropertySheetAccessory
      * {@inheritDoc}
      */
     @Override
-    public void initialize(
+    protected void registerResources(
             AppConfiguration config,
             InfoGridApp      app )
     {
@@ -64,8 +64,8 @@ public class PropertySheetAccessory
                 this
         );
         ((InfoGridWebApp)app).registerAsset(
-                "/s/org/infogrid/web/viewlet/propertysheet/PropertySheetViewlet.css",
-                PropertySheetAccessory.class.getClassLoader(),
+                "/v/org/infogrid/web/viewlet/propertysheet/PropertySheetViewlet.css",
+                getClass().getClassLoader(),
                 this );
     }
 }
