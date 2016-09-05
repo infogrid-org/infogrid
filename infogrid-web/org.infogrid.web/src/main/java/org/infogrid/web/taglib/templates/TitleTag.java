@@ -68,7 +68,7 @@ public class TitleTag
             JspException,
             IgnoreException
     {
-        theSection.setContent( null ); // reset what was there before
+        theSection.setTextContent( (String) null ); // reset what was there before
 
         BodyContent body     = getBodyContent();
         String      theTitle = body != null ? body.getString() : null;

@@ -94,22 +94,22 @@ public class InlineErrorsTag
         StructuredResponseSection section = evaluate();
         if( section != null ) {
             reportedProblemsIter = section.problems();
+
         } else {
-            StructuredResponse structured = (StructuredResponse) lookup( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
-            if( structured == null ) {
-                throw new JspException( "Cannot find StructuredResponse in the request context" );
-            }
+            StructuredResponse structured = (StructuredResponse) pageContext.getResponse();
 
             reportedProblemsIter = structured.problemsAggregate();
         }
-        SaneRequest sane = SaneServletRequest.create( (HttpServletRequest) pageContext.getRequest() );
+        if( reportedProblemsIter != null ) {
+            SaneRequest sane = SaneServletRequest.create( (HttpServletRequest) pageContext.getRequest() );
 
-        try {
-            String content = getFormatter().formatProblems( sane, reportedProblemsIter, theStringRepresentation, false );
-            print( content );
+            try {
+                String content = getFormatter().formatProblems( sane, reportedProblemsIter, theStringRepresentation, false );
+                print( content );
 
-        } catch( StringifierException ex ) {
-            throw new JspException( ex );
+            } catch( StringifierException ex ) {
+                throw new JspException( ex );
+            }
         }
 
         return SKIP_BODY;

@@ -15,6 +15,7 @@
 package org.infogrid.web.templates;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
 import javax.servlet.http.Cookie;
@@ -87,9 +88,7 @@ public abstract class AbstractStructuredResponseTemplate
             StructuredResponse structured )
     {
         HasHeaderPreferences [] toConsider = {
-                structured,
-                structured.obtainTextSection(   StructuredResponse.TEXT_DEFAULT_SECTION ),
-                structured.obtainBinarySection( StructuredResponse.BINARY_DEFAULT_SECTION )
+            structured.getDefaultSection(),
         };
         return toConsider;
     }
@@ -112,19 +111,21 @@ public abstract class AbstractStructuredResponseTemplate
 
         int status = -1;
         outer: for( HasHeaderPreferences current : toConsider( structured ) ) {
-            status = current.getHttpResponseCode();
+            status = current.getStatus();
             if( status > 0 ) {
                 break;
             }
 
             Iterator<Throwable> problemIter = current.problems();
-            while( problemIter.hasNext() ) {
-                Throwable t = problemIter.next();
+            if( problemIter != null ) {
+                while( problemIter.hasNext() ) {
+                    Throwable t = problemIter.next();
 
-                if( t instanceof CarriesHttpStatusCodeException ) {
-                    status = ((CarriesHttpStatusCodeException)t).getDesiredHttpStatusCode();
-                    if( status > 0 ) {
-                        break outer;
+                    if( t instanceof CarriesHttpStatusCodeException ) {
+                        status = ((CarriesHttpStatusCodeException)t).getDesiredHttpStatusCode();
+                        if( status > 0 ) {
+                            break outer;
+                        }
                     }
                 }
             }
@@ -159,7 +160,7 @@ public abstract class AbstractStructuredResponseTemplate
     }
 
     /**
-     * Default implentation for how to handle getCookies.
+     * Default implementation for how to handle cookies.
      *
      * @param delegate the underlying HttpServletResponse
      * @param structured the StructuredResponse that contains the response
@@ -172,14 +173,17 @@ public abstract class AbstractStructuredResponseTemplate
             IOException
     {
         for( HasHeaderPreferences current : toConsider( structured ) ) {
-            for( Cookie c : current.getCookies()) {
-                delegate.addCookie( c );
+            Collection<Cookie> cookies = current.getCookies();
+            if( cookies != null ) {
+                for( Cookie c : current.getCookies()) {
+                    delegate.addCookie( c );
+                }
             }
         }
     }
 
     /**
-     * Default implentation for how to handle the MIME type.
+     * Default implementation for how to handle the MIME type.
      *
      * @param delegate the underlying HttpServletResponse
      * @param structured the StructuredResponse that contains the response
@@ -193,7 +197,7 @@ public abstract class AbstractStructuredResponseTemplate
     {
         String mime = null;
         for( HasHeaderPreferences current : toConsider( structured ) ) {
-            mime = current.getMimeType();
+            mime = current.getContentType();
             if( mime != null ) {
                 break;
             }
@@ -244,13 +248,16 @@ public abstract class AbstractStructuredResponseTemplate
             IOException
     {
         for( HasHeaderPreferences current : toConsider( structured ) ) {
-            for( String key : current.getHeaders().keySet() ) {
-                if( HasHeaderPreferences.LOCATION_HEADER.equalsIgnoreCase( key )) {
-                    continue; // we already did this
-                }
-                String [] values = current.getHeaders().get( key );
-                for( String value : values ) {
-                    delegate.addHeader( key, value );
+            Collection<String> headerNames = current.getHeaderNames();
+            if( headerNames != null ) {
+                for( String key : headerNames ) {
+                    if( HasHeaderPreferences.LOCATION_HEADER.equalsIgnoreCase( key )) {
+                        continue; // we already did this
+                    }
+                    Collection<String> values = current.getFullHeaders().get( key );
+                    for( String value : values ) {
+                        delegate.addHeader( key, value );
+                    }
                 }
             }
         }

@@ -17,7 +17,7 @@ import javax.servlet.jsp.JspException;
 import org.infogrid.web.taglib.IgnoreException;
 
 /**
- * <p>Write a piece of text to a named TextStructuredResponseSection, overwriting what was there already (if any).</p>
+ * <p>Write a piece of text to a named StructuredResponseSection, overwriting what was there already (if any).</p>
  * <p>Implementation inheritance here leads to the shortest amount of code to write.</p>
  * @see <a href="package-summary.html">Details in package documentation</a>
  */
@@ -48,7 +48,7 @@ public class DefineSectionTag
             JspException,
             IgnoreException
     {
-        theSection.setContent( null );
+        theSection.setTextContent( (String) null );
 
         return super.determineBodyText();
     }

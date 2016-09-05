@@ -83,12 +83,14 @@ public class MMeshBase
     {
         DefaultAMeshObjectIdentifierFactory identifierFactory = DefaultAMeshObjectIdentifierFactory.create();
 
-        return create(
+        MMeshBase ret = create(
                 identifier,
                 identifierFactory,
                 modelBase,
                 accessMgr,
                 c );
+        identifierFactory.setMeshBase( ret );
+        return ret;
     }
 
     /**

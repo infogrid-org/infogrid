@@ -17,11 +17,10 @@ package org.infogrid.web.taglib.mesh;
 import javax.servlet.jsp.JspException;
 import java.io.IOException;
 import org.infogrid.util.http.SaneRequest;
-import org.infogrid.web.sane.SaneServletRequest;
 import org.infogrid.web.taglib.AbstractInfoGridTag;
 import org.infogrid.web.taglib.IgnoreException;
 import org.infogrid.web.templates.StructuredResponse;
-import org.infogrid.web.templates.TextStructuredResponseSection;
+import org.infogrid.web.templates.StructuredResponseSection;
    
 /**
  * <p>Generates a consistent refresh button.</p>
@@ -88,10 +87,10 @@ public class RefreshTag
             JspException,
             IgnoreException
     {
-        StructuredResponse theResponse = (StructuredResponse) lookupOrThrow( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
-        SaneRequest        saneRequest = (SaneRequest)        lookupOrThrow( SaneServletRequest.SANE_SERVLET_REQUEST_ATTRIBUTE_NAME );
+        StructuredResponse theResponse = (StructuredResponse) pageContext.getResponse();
+        SaneRequest        saneRequest = (SaneRequest)        pageContext.getRequest();
 
-        String href = saneRequest.getAbsoluteFullUri();
+        String href = saneRequest.getOriginalSaneRequest().getAbsoluteFullUri();
         href = getFormatter().filter( href );
         
         StringBuilder buf = new StringBuilder();
@@ -112,8 +111,8 @@ public class RefreshTag
         css.append( ".css" );
         css.append( "\" />\n" );
 
-        TextStructuredResponseSection headSection = theResponse.obtainTextSection( StructuredResponse.HTML_HEAD_SECTION );
-        headSection.appendContent( css.toString() );
+        StructuredResponseSection headSection = theResponse.obtainSection( StructuredResponse.HTML_HEAD_SECTION );
+        headSection.appendTextContent( css.toString() );
 
         return EVAL_BODY_INCLUDE;
     }

@@ -87,12 +87,7 @@ public class SaneServletRequest
             return (SaneServletRequest) sRequest; // no need to do anything
         }
 
-        SaneServletRequest ret = (SaneServletRequest) sRequest.getAttribute( SANE_SERVLET_REQUEST_ATTRIBUTE_NAME );
-        if( ret == null ) {
-            ret = SaneServletRequest.internalCreate( sRequest );
-            sRequest.setAttribute( SANE_SERVLET_REQUEST_ATTRIBUTE_NAME, ret );
-        }
-
+        SaneServletRequest ret = SaneServletRequest.internalCreate( sRequest );
         return ret;
     }
 
@@ -1438,11 +1433,6 @@ public class SaneServletRequest
      * The MIME type, if any.
      */
     protected String theMimeType;
-
-    /**
-     * Name of the request attribute that contains an instance of SaneServletRequest.
-     */
-    public static final String SANE_SERVLET_REQUEST_ATTRIBUTE_NAME = classToAttributeName( SaneServletRequest.class );
 
     /**
      * The requested MIME types, in sequence of prioritization. Allocated as needed.

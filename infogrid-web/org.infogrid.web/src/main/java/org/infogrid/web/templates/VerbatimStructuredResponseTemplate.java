@@ -15,11 +15,9 @@
 package org.infogrid.web.templates;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Iterator;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletResponse;
 import org.infogrid.web.JeeFormatter;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
@@ -93,29 +91,25 @@ public class VerbatimStructuredResponseTemplate
      * {@inheritDoc}
      */
     @Override
-    public void doOutput(
-            HttpServletResponse delegate,
+    public void applyTemplate(
             ServletContext      servletContext,
             SaneServletRequest  request,
             StructuredResponse  response )
         throws
             IOException
     {
-        outputStatusCode(  delegate, response );
-        outputLocale(      delegate, response );
-        outputCookies(     delegate, response );
-        outputMimeType(    delegate, response );
-        outputLocation(    delegate, response );
-        outputAdditionalHeaders( delegate, response );
+        StructuredResponseSection oldDefaultSection = response.getDefaultSection();
 
-        // stream default section(s)
+        response.setDefaultSection( response.obtainSection( StructuredResponse.FINAL_ASSEMBLY_SECTION ));
+
+        oldDefaultSection.copyHeaderItemsTo( response.getDefaultSection() );
 
         Iterator<Throwable> reportedProblemsIter = response.problems();
         if( reportedProblemsIter != null && reportedProblemsIter.hasNext() ) {
             try {
                 String errorContent = theFormatter.formatProblems( theRequest, reportedProblemsIter, StringRepresentationDirectory.TEXT_PLAIN_NAME, false );
                 if( errorContent != null ) {
-                    Writer w = delegate.getWriter();
+                    Writer w = response.getDefaultSection().getWriter();
                     w.write( errorContent );
                     w.flush();
                 }
@@ -124,19 +118,7 @@ public class VerbatimStructuredResponseTemplate
             }
         }
 
-        String textContent = response.getDefaultTextSection().getContent();
-        if( textContent != null ) {
-            Writer w = delegate.getWriter();
-            w.write( textContent );
-            w.flush();
-        }
-
-        byte [] binaryContent = response.getDefaultBinarySection().getContent();
-        if( binaryContent != null ) {
-            OutputStream o = delegate.getOutputStream();
-            o.write( binaryContent );
-            o.flush();
-        }
+        oldDefaultSection.copyContentTo( response.getDefaultSection() );
     }
     
     /**

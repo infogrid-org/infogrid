@@ -94,7 +94,7 @@ public class ReportProblemTag
             return SKIP_BODY;
         }
 
-        StructuredResponse response = (StructuredResponse) lookup( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
+        StructuredResponse response = (StructuredResponse) pageContext.getResponse();
         if( response == null ) {
             return SKIP_BODY;
         }

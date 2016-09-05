@@ -1,0 +1,24 @@
+<%@    page contentType="text/html"
+ %><%@ taglib prefix="mesh"  uri="/org/infogrid/web/taglib/mesh/mesh.tld"
+ %><%@ taglib prefix="u"     uri="/org/infogrid/web/taglib/util/util.tld"
+ %>
+
+<u:jspo>
+ <u:jspoParam name="toBless" type="org.infogrid.mesh.MeshObject"/>
+
+ <h2>Bless a MeshObject</h2>
+ <table>
+  <tr>
+   <td class="label">MeshObject:</td>
+   <td>
+    <input type="text" autocorrect="off" autocapitalization="off" class="subject" name="shell.subject" size="32" readonly="readonly" value="<mesh:meshObjectId meshObjectName="toBless" stringRepresentation="HttpPost" />" />
+   </td>
+  </tr>
+  <tr>
+   <td class="label">Type:</td>
+   <td>
+    <mesh:blessableBy meshObjectName="Viewlet.subject"/>
+   </td>
+  </tr>
+ </table>
+</u:jspo>

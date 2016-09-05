@@ -1,0 +1,48 @@
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-delete-button:before {
+    content: url(../images/bin_closed.png);
+}
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-delete-button > span {
+    display: none;
+}
+
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-bless-button:before {
+    content: url(../images/medal_bronze_add.png);
+}
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-bless-button > span {
+    display: none;
+}
+
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unbless-button:before {
+    content: url(../images/medal_bronze_delete.png);
+}
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unbless-button > span {
+    display: none;
+}
+
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addneighbor-button:before {
+    content: url(../images/link_add.png);
+}
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addneighbor-button > span {
+    display: none;
+}
+
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addrole-button:before {
+    content: url(../images/medal_silver_add.png);
+}
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addrole-button > span {
+    display: none;
+}
+
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-deleterole-button:before {
+    content: url(../images/medal_silver_delete.png);
+}
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-deleterole-button > span {
+    display: none;
+}
+
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unrelate-button:before {
+    content: url(../images/link_delete.png);
+}
+div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unrelate-button > span {
+    display: none;
+}

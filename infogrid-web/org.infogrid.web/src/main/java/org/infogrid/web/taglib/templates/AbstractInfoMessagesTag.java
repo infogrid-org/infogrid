@@ -53,7 +53,7 @@ public abstract class AbstractInfoMessagesTag
         if( section != null ) {
             ret = section.haveInfoMessagesBeenReported();
         } else {
-            StructuredResponse response = (StructuredResponse) lookup( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
+            StructuredResponse response = (StructuredResponse) pageContext.getResponse();
             if( response != null ) {
                 ret = response.haveInfoMessagesBeenReportedAggregate();
             } else {

@@ -53,7 +53,7 @@ public class CentralDaemonServlet
             ServletException,
             IOException
     {
-        theApp.service( (HttpServletRequest) request, (HttpServletResponse) response, getServletContext() );
+        theApp.serviceIncomingRequest( (HttpServletRequest) request, (HttpServletResponse) response, getServletContext() );
     }
 
     /**

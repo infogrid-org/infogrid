@@ -25,13 +25,19 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
-
+import javax.servlet.ServletContext;
 import org.apache.jasper.JspC;
 import org.apache.jasper.servlet.JspCServletContext;
 import org.apache.jasper.servlet.TldScanner;
@@ -40,11 +46,15 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
+import org.apache.tomcat.JarScannerCallback;
+import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.util.resource.Resource;
+import org.xml.sax.SAXException;
 
 /**
  * This goal will compile jsps for a webapp so that they can be used from InfoGrid.
@@ -55,51 +65,6 @@ import org.eclipse.jetty.util.resource.Resource;
  */
 public class JspcMojo extends AbstractMojo
 {
-    /**
-     * JettyJspC
-     *
-     * Add some extra setters to standard JspC class to help configure it
-     * for running in maven.
-     * 
-     * TODO move all setters on the plugin onto this jspc class instead.
-     */
-    public static class InfoGridJspC extends JspC
-    {
-   
-        private boolean scanAll;
-        
-        public void setClassLoader (ClassLoader loader)
-        {
-            this.loader = loader;
-        }
-        
-       public void setScanAllDirectories (boolean scanAll)
-       {
-           this.scanAll = scanAll;
-       }
-       
-       public boolean getScanAllDirectories ()
-       {
-           return this.scanAll;
-       }
-       
-
-        @Override
-        protected TldScanner newTldScanner(JspCServletContext context, boolean namespaceAware, boolean validate, boolean blockExternal)
-        {
-            if (context != null && context.getAttribute(JarScanner.class.getName()) == null) 
-            {
-                StandardJarScanner jarScanner = new StandardJarScanner();             
-                jarScanner.setScanAllDirectories(getScanAllDirectories());
-                context.setAttribute(JarScanner.class.getName(), jarScanner);
-            }
-                
-            return super.newTldScanner(context, namespaceAware, validate, blockExternal);
-        }      
-
-    }
-    
-    
     /**
      * Whether or not to include dependencies on the plugin's classpath with &lt;scope&gt;provided&lt;/scope&gt;
      * Use WITH CAUTION as you may wind up with duplicate jars/classes.
@@ -163,13 +128,19 @@ public class JspcMojo extends AbstractMojo
      */
     private String webAppSourceDirectory;
     
-   
+    /**
+     * Root directory for tld files.
+     * 
+     * @parameter default-value="${basedir}/src/main/tlds/META-INF"
+     */
+    private String tldDirectory;
     
     /**
      * The comma separated list of patterns for file extensions to be processed. By default
      * will include all .jsp and .jspx files.
      * 
-     * @parameter default-value="**\/*.jsp, **\/*.jspx"
+     * @parameter default-value="**\/*.jsp, **\/*.jspf, **\/*.jspo"
+     * (not .jspi)
      */
     private String includes;
 
@@ -223,6 +194,7 @@ public class JspcMojo extends AbstractMojo
      */
     private boolean scanAllDirectories;
     
+    private static final String TLD_EXT = ".tld";
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -469,5 +441,127 @@ public class JspcMojo extends AbstractMojo
             }
         }
         return providedJars;
+    }
+
+    public class InfoGridJspC extends JspC
+    {
+   
+        private boolean scanAll;
+        
+        public void setClassLoader (ClassLoader loader)
+        {
+            this.loader = loader;
+        }
+        
+       public void setScanAllDirectories (boolean scanAll)
+       {
+           this.scanAll = scanAll;
+       }
+       
+       public boolean getScanAllDirectories ()
+       {
+           return this.scanAll;
+       }
+
+
+        @Override
+        protected TldScanner newTldScanner(JspCServletContext context, boolean namespaceAware, boolean validate, boolean blockExternal)
+        {
+            return new MyTldScanner( context, namespaceAware, validate, blockExternal );
+//            if (context != null && context.getAttribute(JarScanner.class.getName()) == null) 
+//            {
+//                StandardJarScanner jarScanner = new StandardJarScanner();             
+//                jarScanner.setScanAllDirectories(getScanAllDirectories());
+//                context.setAttribute(JarScanner.class.getName(), jarScanner);
+//            }
+//                
+//            return super.newTldScanner(context, namespaceAware, validate, blockExternal);
+        }      
+
+    }
+    
+    
+    class MyTldScanner
+        extends
+            TldScanner
+    {
+        public MyTldScanner(
+                ServletContext context,
+                boolean        namespaceAware,
+                boolean        validation,
+                boolean        blockExternal )
+        {
+            super( context, namespaceAware, validation, blockExternal );
+
+            context.setAttribute( JarScanner.class.getName(), new MyJarScanner());            
+        }
+
+        @Override
+        public void scan()
+            throws
+                IOException,
+                SAXException
+        {
+            // do not look anywhere else
+//            scanLocalTldsDir()
+            scanJars();
+        }
+
+        @Override
+        protected void parseTld(
+                TldResourcePath path )
+            throws
+                IOException,
+                SAXException
+        {
+            super.parseTld( path );
+        }
+    
+        class MyJarScanner
+            extends
+                StandardJarScanner
+        {
+            @Override
+            public void scan(
+                    JarScanType        scanType,
+                    ServletContext     context,
+                    JarScannerCallback callback )
+            {
+                if( scanType.equals( JarScanType.TLD )) {
+                    try {
+                        File tldDir = new File( tldDirectory );
+                        if( tldDir.isDirectory() ) {
+                            Files.walkFileTree( tldDir.toPath(), new SimpleFileVisitor<Path>() {
+                                @Override
+                                public FileVisitResult visitFile(
+                                        Path file,
+                                        BasicFileAttributes attrs)
+                                    throws
+                                        IOException
+                                {
+                                    Path fileName = file.getFileName();
+                                    if (fileName == null || !fileName.toString().toLowerCase(Locale.ENGLISH).endsWith(TLD_EXT)) {
+                                        return FileVisitResult.CONTINUE;
+                                    }
+
+                                   try {
+                                        URL url = file.toUri().toURL();
+                                        TldResourcePath path = new TldResourcePath(url, null);
+                                        parseTld(path);
+                                    } catch (SAXException e) {
+                                        throw new IOException(e);
+                                    }
+                                    return FileVisitResult.CONTINUE;
+                                }
+                            });
+                        }
+ 
+                    } catch( IOException ex ) {
+                        getLog().error( ex );
+                    }
+                }
+                super.scan( scanType, context, callback );
+             }
+        }
     }
 }

@@ -14,11 +14,8 @@
 
 package org.infogrid.web.templates;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,23 +27,20 @@ import java.util.TimeZone;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import org.infogrid.web.ProblemReporter;
-import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.ResourceHelper;
-import org.infogrid.util.http.SaneRequestUtils;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
-import org.infogrid.util.logging.Log;
 
 /**
- * Encapsulates the content of an HTTP response in structured form. It is also
- * a HttpServletResponse that buffers its content.
+ * Encapsulates the content of an HTTP response in structured form. The structure
+ * consists of at least one StructuredResponseSection (the default) and any number
+ * of additional named StructuredResponseSections.
  * 
- * Both a byte[] and a String buffer may be created, in order to avoid converting
- * to and from String and byte [] all the time.
+ * It is also acts as a HttpServletResponse that buffers its content by writing
+ * to the default StructuredResponseSection.
  */
 public class StructuredResponse
         implements
@@ -55,8 +49,6 @@ public class StructuredResponse
             HttpServletResponse,
             CanBeDumped
 {
-    private static final Log log = Log.getLogInstance( StructuredResponse.class ); // our own, private logger
-
     /**
      * Factory method.
      *
@@ -64,26 +56,11 @@ public class StructuredResponse
      * @return the created StructuredResponse
      */
     public static StructuredResponse create(
-            ServletContext      servletContext )
+            ServletContext servletContext )
     {
-        StructuredResponse ret = new StructuredResponse( servletContext, DEFAULT_MAX_PROBLEMS, DEFAULT_MAX_INFO_MESSAGES );
-        return ret;
-    }
+        StructuredResponse ret = new StructuredResponse( servletContext );
+        ret.setDefaultSection( ret.obtainSection( StructuredResponse.DEFAULT_SECTION ));
 
-    /**
-     * Factory method.
-     *
-     * @param servletContext the ServletContext in which the StructuredResponse is created
-     * @param maxProblems the maxmimum number of problems to report in this StructuredResponse
-     * @param maxInfoMessages the maximum number of informational messages to report in this StructuredResponse
-     * @return the created StructuredResponse
-     */
-    public static StructuredResponse create(
-            ServletContext      servletContext,
-            int                 maxProblems,
-            int                 maxInfoMessages )
-    {
-        StructuredResponse ret = new StructuredResponse( servletContext, maxProblems, maxInfoMessages );
         return ret;
     }
 
@@ -91,129 +68,78 @@ public class StructuredResponse
      * Constructor for subclasses only, use factory method.
      *
      * @param servletContext the ServletContext in which the StructuredResponse is created
-     * @param maxProblems the maximum number of problems to report in this StructuredResponse
-     * @param maxInfoMessages the maximum number of informational messages to report in this StructuredResponse
      */
     protected StructuredResponse(
-            ServletContext      servletContext,
-            int                 maxProblems,
-            int                 maxInfoMessages )
+            ServletContext servletContext )
     {
-        theServletContext  = servletContext;
-        theMaxProblems     = maxProblems;
-        theMaxInfoMessages = maxInfoMessages;
+        theServletContext = servletContext;
     }
 
     /**
-     * Obtain the default text section.
+     * Obtain the default section.
      *
-     * @return the default text section
+     * @return the default section
      */
-    public TextStructuredResponseSection getDefaultTextSection()
+    public StructuredResponseSection getDefaultSection()
     {
-        return obtainTextSection( TEXT_DEFAULT_SECTION );
+        return theDefaultSection;
     }
 
     /**
-     * Obtain the default binary section.
-     *
-     * @return the default binary section
+     * Set the default section to something else.
+     * 
+     * @param newValue the new default section
      */
-    public BinaryStructuredResponseSection getDefaultBinarySection()
+    public void setDefaultSection(
+            StructuredResponseSection newValue )
     {
-        return obtainBinarySection( BINARY_DEFAULT_SECTION );
+        theDefaultSection = newValue;
     }
 
     /**
-     * Obtain a text section; if the section does not exist, create it.
+     * Obtain a section; if the section does not exist, create it.
      *
-     * @param template the section type
+     * @param name the section name
      * @return the section
      */
-    public TextStructuredResponseSection obtainTextSection(
-            String template )
+    public StructuredResponseSection obtainSection(
+            String name )
     {
-        if( template == null ) {
+        if( name == null ) {
             throw new NullPointerException( "Cannot obtain null section" );
         }
-        TextStructuredResponseSection ret = theTextSections.get( template );
+        StructuredResponseSection ret = theSections.get( name );
         if( ret == null ) {
-            ret = TextStructuredResponseSection.create();
-            theTextSections.put( template, ret );
+            ret = StructuredResponseSection.create( DEFAULT_MAX_PROBLEMS, DEFAULT_MAX_INFO_MESSAGES );
+            theSections.put( name, ret );
         }
         return ret;
     }
 
     /**
-     * Obtain a binary section; if the section does not exist, create it.
+     * Get a section; if the section does not exist, return null.
      *
-     * @param template the section type
-     * @return the section
-     */
-    public BinaryStructuredResponseSection obtainBinarySection(
-            String template )
-    {
-        if( template == null ) {
-            throw new NullPointerException( "Cannot obtain null section" );
-        }
-        BinaryStructuredResponseSection ret = theBinarySections.get( template );
-        if( ret == null ) {
-            ret = BinaryStructuredResponseSection.create();
-            theBinarySections.put( template, ret );
-        }
-        return ret;
-    }
-
-    /**
-     * Get a text section; if the section does not exist, return null.
-     *
-     * @param template the section type
+     * @param name the section name
      * @return the section, or null
      */
-    public TextStructuredResponseSection getTextSection(
-            String template )
+    public StructuredResponseSection getSection(
+            String name )
     {
-        if( template == null ) {
+        if( name == null ) {
             throw new NullPointerException( "Cannot obtain null section" );
         }
-        TextStructuredResponseSection ret = theTextSections.get( template );
+        StructuredResponseSection ret = theSections.get( name );
         return ret;
     }
 
     /**
-     * Obtain a binary section; if the section does not exist, return null.
-     *
-     * @param template the section type
-     * @return the section, or null
-     */
-    public BinaryStructuredResponseSection getBinarySection(
-            String template )
-    {
-        if( template == null ) {
-            throw new NullPointerException( "Cannot obtain null section" );
-        }
-        BinaryStructuredResponseSection ret = theBinarySections.get( template );
-        return ret;
-    }
-
-    /**
-     * Obtain an Iterator over the text section templates currently used.
+     * Obtain an Iterator over the text section names currently used.
      *
      * @return the Iterator
      */
-    public Iterator<String> textSectionTemplateIterator()
+    public Iterator<String> sectionNameIterator()
     {
-        return theTextSections.keySet().iterator();
-    }
-
-    /**
-     * Obtain an Iterator over the binary section templates currently used.
-     *
-     * @return the Iterator
-     */
-    public Iterator<String> binarySectionTemplateIterator()
-    {
-        return theBinarySections.keySet().iterator();
+        return theSections.keySet().iterator();
     }
 
     /**
@@ -236,20 +162,6 @@ public class StructuredResponse
     }
 
     /**
-     * Quote HTML angle brackets so we can insert them into a &lt;pre&gt; element.
-     *
-     * @param in the unquoted String
-     * @return the quoted String
-     */
-    protected String quoteAngleBrackets(
-            String in )
-    {
-        String ret = in.replaceAll( "<", "&lt;" );
-        ret = ret.replaceAll( ">", "&gt;" );
-        return ret;
-    }
-
-    /**
      * Report a problem that should be shown to the user.
      *
      * @param t the Throwable indicating the problem
@@ -258,16 +170,7 @@ public class StructuredResponse
     public void reportProblem(
             Throwable t )
     {
-        if( log.isDebugEnabled() ) {
-            log.debug( "Reporting problem: ", t );
-        }
-        if( theCurrentProblems.size() <= theMaxProblems ) {
-            // make sure we aren't growing this indefinitely
-            theCurrentProblems.add( t );
-
-        } else {
-            log.error( "Too many problems. Ignored ", t ); // late initialization
-        }
+        getDefaultSection().reportProblem( t );
     }
 
     /**
@@ -279,9 +182,7 @@ public class StructuredResponse
     public void reportProblems(
             Throwable [] ts )
     {
-        for( int i=0 ; i<ts.length ; ++i ) {
-            reportProblem( ts[i] );
-        }
+        getDefaultSection().reportProblems( ts );
     }
 
     /**
@@ -292,10 +193,7 @@ public class StructuredResponse
     @Override
     public boolean haveProblemsBeenReported()
     {
-        if( !theCurrentProblems.isEmpty() ) {
-            return true;
-        }
-        return false;
+        return getDefaultSection().haveProblemsBeenReported();
     }
 
     /**
@@ -305,33 +203,23 @@ public class StructuredResponse
      */
     public boolean haveProblemsBeenReportedAggregate()
     {
-        if( !theCurrentProblems.isEmpty() ) {
-            return true;
-        }
-
-        for( TextStructuredResponseSection current : theTextSections.values() ) {
+        for( StructuredResponseSection current : theSections.values() ) {
             if( current.haveProblemsBeenReported() ) {
                 return true;
             }
         }
-        for( BinaryStructuredResponseSection current : theBinarySections.values() ) {
-            if( current.haveProblemsBeenReported() ) {
-                return true;
-            }
-        }
-
         return false;
     }
 
     /**
      * Obtain the problems reported so far.
      *
-     * @return problems reported so far, in sequence
+     * @return problems reported so far, in sequence. For efficiency, may return null;
      */
     @Override
     public Iterator<Throwable> problems()
     {
-        return theCurrentProblems.iterator();
+        return getDefaultSection().problems();
     }
 
     /**
@@ -342,18 +230,13 @@ public class StructuredResponse
     public Iterator<Throwable> problemsAggregate()
     {
         ArrayList<Throwable> ret =  new ArrayList<>();
-        ret.addAll( theCurrentProblems );
 
-        for( TextStructuredResponseSection current : theTextSections.values() ) {
+        for( StructuredResponseSection current : theSections.values() ) {
             Iterator<Throwable> problemIter = current.problems();
-            while( problemIter.hasNext() ) {
-                ret.add( problemIter.next() );
-            }
-        }
-        for( BinaryStructuredResponseSection current : theBinarySections.values() ) {
-            Iterator<Throwable> problemIter = current.problems();
-            while( problemIter.hasNext() ) {
-                ret.add( problemIter.next() );
+            if( problemIter != null ) {
+                while( problemIter.hasNext() ) {
+                    ret.add( problemIter.next() );
+                }
             }
         }
 
@@ -369,16 +252,7 @@ public class StructuredResponse
     public void reportInfoMessage(
             Throwable t )
     {
-        if( log.isDebugEnabled() ) {
-            log.debug( "Reporting info message: ", t );
-        }
-        if( theCurrentInfoMessages.size() <= theMaxInfoMessages ) {
-            // make sure we aren't growing this indefinitely
-            theCurrentInfoMessages.add( t );
-
-        } else {
-            log.error( "Too many info messages. Ignored ", t ); // late initialization
-        }
+        getDefaultSection().reportInfoMessage( t );
     }
 
     /**
@@ -390,9 +264,7 @@ public class StructuredResponse
     public void reportInfoMessages(
             Throwable [] ts )
     {
-        for( int i=0 ; i<ts.length ; ++i ) {
-            reportInfoMessage( ts[i] );
-        }
+        getDefaultSection().reportInfoMessages( ts );
     }
 
     /**
@@ -403,10 +275,7 @@ public class StructuredResponse
     @Override
     public boolean haveInfoMessagesBeenReported()
     {
-        if( !theCurrentInfoMessages.isEmpty() ) {
-            return true;
-        }
-        return false;
+        return getDefaultSection().haveInfoMessagesBeenReported();
     }
 
     /**
@@ -416,16 +285,7 @@ public class StructuredResponse
      */
     public boolean haveInfoMessagesBeenReportedAggregate()
     {
-        if( !theCurrentInfoMessages.isEmpty() ) {
-            return true;
-        }
-
-        for( TextStructuredResponseSection current : theTextSections.values() ) {
-            if( current.haveInfoMessagesBeenReported() ) {
-                return true;
-            }
-        }
-        for( BinaryStructuredResponseSection current : theBinarySections.values() ) {
+        for( StructuredResponseSection current : theSections.values() ) {
             if( current.haveInfoMessagesBeenReported() ) {
                 return true;
             }
@@ -442,7 +302,7 @@ public class StructuredResponse
     @Override
     public Iterator<Throwable> infoMessages()
     {
-        return theCurrentInfoMessages.iterator();
+        return getDefaultSection().infoMessages();
     }
 
     /**
@@ -452,16 +312,9 @@ public class StructuredResponse
      */
     public Iterator<Throwable> infoMessagesAggregate()
     {
-        ArrayList<Throwable> ret =  new ArrayList<>();
-        ret.addAll( theCurrentInfoMessages );
+        ArrayList<Throwable> ret = new ArrayList<>();
 
-        for( TextStructuredResponseSection current : theTextSections.values() ) {
-            Iterator<Throwable> infoMessageIter = current.infoMessages();
-            while( infoMessageIter.hasNext() ) {
-                ret.add( infoMessageIter.next() );
-            }
-        }
-        for( BinaryStructuredResponseSection current : theBinarySections.values() ) {
+        for( StructuredResponseSection current : theSections.values() ) {
             Iterator<Throwable> infoMessageIter = current.infoMessages();
             while( infoMessageIter.hasNext() ) {
                 ret.add( infoMessageIter.next() );
@@ -472,28 +325,6 @@ public class StructuredResponse
     }
 
     /**
-     * Obtain the desired MIME type.
-     *
-     * @return the desired MIME type
-     */
-    @Override
-    public String getMimeType()
-    {
-        return theMimeType;
-    }
-
-    /**
-     * Set the desired MIME type.
-     *
-     * @param newValue the new value
-     */
-    public void setMimeType(
-            String newValue )
-    {
-        theMimeType = newValue;
-    }
-
-    /**
      * Obtain the Cookies.
      *
      * @return the Cookies
@@ -501,7 +332,7 @@ public class StructuredResponse
     @Override
     public Collection<Cookie> getCookies()
     {
-        return theCookies;
+        return getDefaultSection().getCookies();
     }
 
     /**
@@ -513,7 +344,7 @@ public class StructuredResponse
     public void addCookie(
             Cookie toAdd )
     {
-        theCookies.add( toAdd );
+        getDefaultSection().addCookie( toAdd );
     }
 
     /**
@@ -524,15 +355,7 @@ public class StructuredResponse
     @Override
     public String getLocation()
     {
-        String [] found = theOutgoingHeaders.get( LOCATION_HEADER );
-        if( found == null ) {
-            return null;
-        } else if( found.length == 1 ) {
-            return found[0];
-        } else {
-            log.error( "More than one location header:", found );
-            return null;
-        }
+        return getDefaultSection().getLocation();
     }
 
     /**
@@ -543,7 +366,7 @@ public class StructuredResponse
     public void setLocation(
             String newValue )
     {
-        addHeader( LOCATION_HEADER, newValue );
+        getDefaultSection().setLocation( newValue );
     }
 
     /**
@@ -552,9 +375,9 @@ public class StructuredResponse
      * @return the HTTP response code
      */
     @Override
-    public int getHttpResponseCode()
+    public int getStatus()
     {
-        return theHttpResponseCode;
+        return getDefaultSection().getStatus();
     }
 
     /**
@@ -565,7 +388,7 @@ public class StructuredResponse
     public void setHttpResponseCode(
             int newValue )
     {
-        theHttpResponseCode = newValue;
+        getDefaultSection().setStatus( newValue );
     }
 
     /**
@@ -576,7 +399,7 @@ public class StructuredResponse
     @Override
     public Locale getLocale()
     {
-        return theLocale;
+        return getDefaultSection().getLocale();
     }
 
     /**
@@ -588,7 +411,7 @@ public class StructuredResponse
     public void setLocale(
             Locale newValue )
     {
-        theLocale = newValue;
+        getDefaultSection().setLocale( newValue );
     }
 
     /**
@@ -599,7 +422,7 @@ public class StructuredResponse
     @Override
     public String getCharacterEncoding()
     {
-        return theCharacterEncoding;
+        return getDefaultSection().getCharacterEncoding();
     }
 
     /**
@@ -611,7 +434,7 @@ public class StructuredResponse
     public void setCharacterEncoding(
             String newValue )
     {
-        theCharacterEncoding = newValue;
+        getDefaultSection().setCharacterEncoding( newValue );
     }
 
     /**
@@ -656,34 +479,16 @@ public class StructuredResponse
             String name,
             String value )
     {
-        addHeader( name, new String[] { value } );
+        getDefaultSection().addHeader( name, value );
     }
 
     /**
-     * Add an additional header.
-     *
-     * @param name name of the header to add
-     * @param value value of the header to add
-     */
-    public void addHeader(
-            String    name,
-            String [] value )
-    {
-        String [] already = theOutgoingHeaders.put( name, value );
-        if( already != null && already.length > 0 ) {
-            theOutgoingHeaders.put( name, ArrayHelper.append( already, value, String.class ));
-        }
-    }
-
-    /**
-     * Obtain the additional headers.
-     *
-     * @return the headers, as Map
+     * {@inheritDoc}
      */
     @Override
-    public Map<String,String[]> getHeaders()
+    public Map<String,Collection<String>> getFullHeaders()
     {
-        return theOutgoingHeaders;
+        return getDefaultSection().getFullHeaders();
     }
 
     /**
@@ -693,7 +498,7 @@ public class StructuredResponse
     public boolean containsHeader(
             String name )
     {
-        return theOutgoingHeaders.containsKey( name );
+        return getDefaultSection().containsHeader( name );
     }
 
     /**
@@ -702,7 +507,7 @@ public class StructuredResponse
     @Override
     public String getContentType()
     {
-        return theContentType;
+        return getDefaultSection().getContentType();
     }
 
     /**
@@ -713,13 +518,7 @@ public class StructuredResponse
         throws
             IOException
     {
-        if( theServletOutputStream == null ) {
-            if( theOutputStream == null ) {
-                theOutputStream = new ByteArrayOutputStream( 2048 );
-            }
-            theServletOutputStream = new MyServletOutputStream( theOutputStream );
-        }
-        return theServletOutputStream;        
+        return getDefaultSection().getOutputStream();
     }
 
     /**
@@ -730,13 +529,7 @@ public class StructuredResponse
         throws
             IOException
     {
-        if( thePrintWriter == null ) {
-            if( theWriter == null ) {
-                theWriter = new StringWriter( 2048 );
-            }
-            thePrintWriter = new PrintWriter( theWriter );
-        }
-        return thePrintWriter;
+        return getDefaultSection().getWriter();
     }
 
     /**
@@ -746,7 +539,7 @@ public class StructuredResponse
     public void setContentLength(
             int len )
     {
-        theContentLength = len;
+        // ignore
     }
 
     /**
@@ -756,7 +549,7 @@ public class StructuredResponse
     public void setContentLengthLong(
             long len )
     {
-        theContentLength = len;
+        // ignore
     }
 
     /**
@@ -766,7 +559,7 @@ public class StructuredResponse
     public void setContentType(
             String type )
     {
-        theContentType = type;
+        getDefaultSection().setContentType( type );
     }
 
     /**
@@ -796,12 +589,7 @@ public class StructuredResponse
         throws
             IOException
     {
-        if( thePrintWriter != null ) {
-            thePrintWriter.flush();
-        }
-        if( theOutputStream != null ) {
-            theOutputStream.flush();
-        }
+        // no op
     }
 
     /**
@@ -810,7 +598,7 @@ public class StructuredResponse
     @Override
     public void resetBuffer()
     {
-        resetCache();
+        getDefaultSection().resetBuffer();
     }
 
     /**
@@ -828,9 +616,7 @@ public class StructuredResponse
     @Override
     public void reset()
     {
-        resetCache();
-        theOutgoingHeaders.clear();
-        theStatusCode = -1;
+        getDefaultSection().resetBuffer();
     }
 
     /**
@@ -885,8 +671,7 @@ public class StructuredResponse
         throws
             IOException
     {
-        theStatusCode    = sc;
-        theStatusMessage = msg;
+        getDefaultSection().setStatus( sc );
     }
 
     /**
@@ -898,7 +683,7 @@ public class StructuredResponse
         throws
             IOException
     {
-        sendError( sc, null );
+        getDefaultSection().setStatus( sc );
     }
 
     /**
@@ -912,10 +697,7 @@ public class StructuredResponse
     {
         resetBuffer();
 
-        theStatusCode = 302; // Found code
-        if( theOutgoingHeaders.put( LOCATION_HEADER, new String[] { location } ) != null ) {
-            log.warn( "Replacing location header" );
-        }
+        getDefaultSection().setLocation( location );
     }
 
     /**
@@ -948,7 +730,7 @@ public class StructuredResponse
             String name,
             String value )
     {
-        Object already = theOutgoingHeaders.put( name, new String[] { value } ); // return value for debugging only
+        getDefaultSection().setHeader( name, value );
     }
 
     /**
@@ -980,7 +762,7 @@ public class StructuredResponse
     public void setStatus(
             int sc )
     {
-        setStatus( sc, null );
+        getDefaultSection().setStatus( sc );
     }
 
     /**
@@ -992,17 +774,7 @@ public class StructuredResponse
             int    sc,
             String sm )
     {
-        theStatusCode    = sc;
-        theStatusMessage = sm;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getStatus()
-    {
-        return theStatusCode;
+        getDefaultSection().setStatus( sc );
     }
 
     /**
@@ -1012,11 +784,7 @@ public class StructuredResponse
     public String getHeader(
             String name )
     {
-        String [] values = theOutgoingHeaders.get( name );
-        if( values == null || values.length == 0 ) {
-            return null;
-        }
-        return values[0];
+        return getDefaultSection().getHeader( name );
     }
 
     /**
@@ -1026,13 +794,7 @@ public class StructuredResponse
     public Collection<String> getHeaders(
             String name )
     {
-        String [] values = theOutgoingHeaders.get( name );
-        ArrayList<String> ret = new ArrayList<>( values.length );
-        
-        for( int i=0 ; i<values.length ; ++i ) {
-            ret.add( values[i] );
-        }
-        return ret;
+        return getDefaultSection().getHeaders( name );
     }
 
     /**
@@ -1041,7 +803,7 @@ public class StructuredResponse
     @Override
     public Collection<String> getHeaderNames()
     {
-        return theOutgoingHeaders.keySet();
+        return getDefaultSection().getHeaderNames();
     }
 
     /**
@@ -1049,23 +811,9 @@ public class StructuredResponse
      *
      * @return true if the structure is empty
      */
-    public boolean isStructuredEmpty()
+    public boolean isEmpty()
     {
-        if( theHttpResponseCode > 0 && theHttpResponseCode != 200 ) {
-            return false;
-        }
-        if( haveProblemsBeenReported()) {
-            return false;
-        }
-        if( haveInfoMessagesBeenReported()) {
-            return false;
-        }
-        for( TextStructuredResponseSection value : theTextSections.values() ) {
-            if( !value.isEmpty() ) {
-                return false;
-            }
-        }
-        for( BinaryStructuredResponseSection value : theBinarySections.values() ) {
+        for( StructuredResponseSection value : theSections.values() ) {
             if( !value.isEmpty() ) {
                 return false;
             }
@@ -1074,149 +822,17 @@ public class StructuredResponse
     }
     
     /**
-     * Determine whether the buffers are empty.
-     * 
-     * @return true if the buffers are empty.
-     */
-    public boolean isBuffersEmpty()
-    {
-        if( theOutputStream != null && theOutputStream.size() > 0 ) {
-            return false;
-        }
-        if( theWriter != null && theWriter.getBuffer().length() > 0 ) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Obtain the entire buffered output that was written via the PrintWriter.
-     *
-     * @return the buffered output, or null
-     * @throws IOException an I/O problem occurred
-     */
-    public String getBufferedPrintWriterOutput()
-        throws
-            IOException
-    {
-        if( thePrintWriter != null ) {
-            thePrintWriter.flush();
-        }
-        if( theWriter != null ) {
-            String ret = theWriter.getBuffer().toString();
-            return ret;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Obtain the entire buffered output that was written via the ServletOutputStream.
-     *
-     * @return the buffered output, or null
-     * @throws IOException an I/O problem occurred
-     */
-    public byte [] getBufferedServletOutputStreamOutput()
-        throws
-            IOException
-    {
-        if( theServletOutputStream != null ) {
-            theServletOutputStream.flush();
-        }
-        if( theOutputStream != null ) {
-            byte [] ret = theOutputStream.toByteArray();
-            return ret;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Reset the locally held cache.
-     */
-    protected void resetCache()
-    {
-        if( thePrintWriter != null ) {
-            thePrintWriter = null;
-        }
-        if( theWriter != null ) {
-            theWriter = null;
-        }
-        if( theServletOutputStream != null ) {
-            theServletOutputStream = null;
-        }
-        if( theOutputStream != null ) {
-            theOutputStream = null;
-        }
-    }
-
-    /**
-     * Determine whether or not this context type is text.
-     *
-     * @return true if this content type is text
-     */
-    public boolean isText()
-    {
-        String type = theContentType.toLowerCase();
-        if( type.startsWith( "text/" )) {
-            return true;
-        }
-        if( type.startsWith( "application/xhtml" )) {
-            return true;
-        }
-        if( type.startsWith( "application/xml" )) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Copy the buffer into this HttpServletResponse.
      * 
      * @param destination the HttpServletResponse to copy to
      * @throws IOException thown if an input/output error occurred
      */
-    @SuppressWarnings( "unchecked" )
     public void copyTo(
             HttpServletResponse destination )
         throws
             IOException
     {
-        if( theStatusCode > 0 ) {
-            destination.setStatus( theStatusCode ); // FIXME? Status code
-        }
-        if( theContentType != null ) {
-            destination.setContentType( theContentType );
-        }
-        if( theLocale != null ) {
-            destination.setLocale( theLocale );
-        }
-        // if( theCharacterEncoding != null ) {
-        //     destination.setCharacterEncoding( theCharacterEncoding );
-        // The version of JEE I have does not seem to have this method
-        // }
-        if( theContentLength > 0 ) {
-            destination.setContentLengthLong( theContentLength );
-        }
-        for( String key : theOutgoingHeaders.keySet() ) {
-            for( String value : theOutgoingHeaders.get( key )) {
-                destination.addHeader( key, value );
-            }
-        }
-        for( Cookie c : theCookies ) {
-            destination.addCookie( c );
-        }
-        
-        String  stringContent = getBufferedPrintWriterOutput();
-        byte [] byteContent   = getBufferedServletOutputStreamOutput();
-        
-        if( stringContent != null ) {
-            destination.getOutputStream().print( stringContent );
-        } else if( byteContent != null ) {
-            destination.getOutputStream().write( byteContent );
-        } else {
-            // do nothing
-        }
+        getDefaultSection().copyAllTo( destination );
     }
 
     /**
@@ -1230,38 +846,22 @@ public class StructuredResponse
     {
         d.dump( this,
                 new String [] {
-                    "theRequestedTemplateName",
-                    "theCurrentProblems",
-                    "theCurrentInfoMessages",
-                    "theMimeType",
-                    "theCookies",
-                    "theHttpResponseCode",
-                    "theLocale",
-                    "theCharacterEncoding",
-                    "theOutgoingHeaders"
+                    "theRequestedTemplateName"
                 },
                 new Object [] {
-                    theRequestedTemplateName,
-                    theCurrentProblems,
-                    theCurrentInfoMessages,
-                    theMimeType,
-                    theCookies,
-                    theHttpResponseCode,
-                    theLocale,
-                    theCharacterEncoding,
-                    theOutgoingHeaders
+                    theRequestedTemplateName
                 });
     }
 
     /**
-     * The sections of the response that are represented as text.
+     * The sections of the response.
      */
-    protected HashMap<String,TextStructuredResponseSection> theTextSections = new HashMap<>();
+    protected HashMap<String,StructuredResponseSection> theSections = new HashMap<>();
 
     /**
-     * The sections of the response that are represented as binary.
+     * The section currently identified as the default section.
      */
-    protected HashMap<String,BinaryStructuredResponseSection> theBinarySections = new HashMap<>();
+    protected StructuredResponseSection theDefaultSection;
 
     /**
      * The ServletContext within which this response is assembled.
@@ -1272,104 +872,6 @@ public class StructuredResponse
      * Name of the template that is being requested, if any.
      */
     protected String theRequestedTemplateName = null;
-
-    /**
-     * The current problems, in sequence of occurrence.
-     */
-    protected ArrayList<Throwable> theCurrentProblems = new ArrayList<>();
-
-    /**
-     * The current informational messages, in sequence of occurrence.
-     */
-    protected ArrayList<Throwable> theCurrentInfoMessages = new ArrayList<>();
-
-    /**
-     * The maximum number of problems to store in this type of section.
-     */
-    protected int theMaxProblems;
-
-    /**
-     * The maximum number of informational messages to store in this type of section.
-     */
-    protected int theMaxInfoMessages;
-
-    /**
-     * The desired MIME type. Currently not used.
-     */
-    protected String theMimeType;
-
-    /**
-     * The desired cookies. Currently not used.
-     */
-    protected Collection<Cookie> theCookies = new ArrayList<>();
-
-    /**
-     * The desired HTTP response code.
-     */
-    protected int theHttpResponseCode = -1;
-
-    /**
-     * The desired locale.
-     */
-    protected Locale theLocale;
-
-    /**
-     * The desired character encoding.
-     */
-    protected String theCharacterEncoding;
-
-    /**
-     * Content type of this response.
-     */
-    protected String theContentType;
-    
-    /**
-     * The HTTP content length, if not -1.
-     */
-    protected long theContentLength;
-
-    /**
-     * The outgoing headers.
-     */
-    protected HashMap<String,String[]> theOutgoingHeaders = new HashMap<>();
-
-    /**
-     * The HTTP status code.
-     */
-    protected int theStatusCode;
-    
-    /**
-     * The HTTP status message.
-     */
-    protected String theStatusMessage;
-
-    /**
-     * Byte-buffer to write into.
-     */
-    protected ByteArrayOutputStream theOutputStream;
-    
-    /**
-     * ServletOutputStream on top of theOutputStream.
-     */
-    protected ServletOutputStream theServletOutputStream;
-    
-    /**
-     * String-buffer to write into.
-     */
-    protected StringWriter theWriter;
-    
-    /**
-     * PrintWriter on top of the theWriter.
-     */
-    protected PrintWriter thePrintWriter;
-
-    /**
-     * Name of the request attribute that contains the StructuredResponse. Make sure
-     * this constant does not contain any characters that might make some processor
-     * interpret it as being an expression.
-     */
-    public static final String STRUCTURED_RESPONSE_ATTRIBUTE_NAME
-            = SaneRequestUtils.classToAttributeName( StructuredResponse.class );
 
     /**
      * Our ResourceHelper.
@@ -1396,16 +898,10 @@ public class StructuredResponse
     }
 
     /**
-     * The single default section for text content. Output will be written into this section
+     * The default section. Output will be written into this section
      * unless otherwise specified.
      */
-    public static final String TEXT_DEFAULT_SECTION = "text-default";
-
-    /**
-     * The single default section for binary content. Binary output will be written into this section
-     * unless otherwise specified.
-     */
-    public static final String BINARY_DEFAULT_SECTION = "binary-default";
+    public static final String DEFAULT_SECTION = "default";
 
     /**
      * The section representing the head of an HTML document.
@@ -1420,6 +916,11 @@ public class StructuredResponse
     public static final String HTML_TITLE_SECTION = "html-title";
 
     /**
+     * The section representing the app icon and top-headline of an HTML document.
+     */
+    public static final String HTML_APP_HEADER_SECTION = "html-app-header";
+
+    /**
      * The section representing the messages section of an HTML document.
      */
     public static final String HTML_MESSAGES_SECTION = "html-messages";
@@ -1429,67 +930,14 @@ public class StructuredResponse
      * such a section, but it is common enough that we make it explicit here.
      */
     public static final String HTML_MAIN_MENU_SECTION = "html-main-menu";
-
+    
+    /**
+     * The section representing the copyright or other footer in an HTML document.
+     */
+    public static final String HTML_FOOTER_SECTION = "html-footer";
 
     /**
-     * Simple implementation of ServletOutputStream.
+     * The section that represents the final assembly of the output.
      */
-    static class MyServletOutputStream
-            extends
-                ServletOutputStream
-    {
-        /**
-         * Constructor.
-         *
-         * @param delegate the OutputStream to write to.
-         */
-        public MyServletOutputStream(
-                OutputStream delegate )
-        {
-            theDelegate = delegate;
-        }
-        
-        /**
-         * Write method.
-         *
-         * @param i the integer to write
-         * @throws IOException
-         */
-        @Override
-        public void write(
-                int i )
-            throws
-                IOException
-        {
-            theDelegate.write( i );
-        }
-
-        /**
-         * Can data be written without blocking.
-         * 
-         * @return true or false
-         */
-        @Override
-        public boolean isReady()
-        {
-            return true;
-        }
-
-        /**
-         * Set a listener
-         * 
-         * @param writeListener 
-         */
-        @Override
-        public void setWriteListener(
-                WriteListener writeListener )
-        {
-            throw new UnsupportedOperationException(); // FIXME?
-        }
-
-        /**
-         * The underlying stream.
-         */
-        protected OutputStream theDelegate;
-    }
+    public static final String FINAL_ASSEMBLY_SECTION = "final-assembly";
 }

@@ -1,0 +1,19 @@
+<%@    page contentType="text/html"
+ %><%@ taglib prefix="mesh"  uri="/org/infogrid/web/taglib/mesh/mesh.tld"
+ %><%@ taglib prefix="u"     uri="/org/infogrid/web/taglib/util/util.tld"
+ %>
+
+<u:jspo>
+ <u:jspoParam name="toDelete" type="org.infogrid.mesh.MeshObject"/>
+
+ <h2>Do you really want to delete this MeshObject?</h2>
+ <table>
+  <tr>
+   <td class="label">MeshObject:</td>
+   <td>
+    <input type="hidden" name="shell.toDelete.access" value="delete" />
+    <input type="text" autocorrect="off" autocapitalization="off" name="shell.toDelete" value="<mesh:meshObjectId meshObjectName="toDelete" stringRepresentation="HttpPost" />" />
+   </td>
+  </tr>
+ </table>
+</u:jspo>

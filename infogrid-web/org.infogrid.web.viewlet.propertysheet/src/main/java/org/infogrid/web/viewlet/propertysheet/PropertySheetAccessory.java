@@ -18,7 +18,6 @@ import jsps.org.infogrid.web.viewlet.propertysheet.PropertySheetViewlet_jsp;
 import org.diet4j.core.Module;
 import org.diet4j.core.ModuleActivationException;
 import org.infogrid.app.AppConfiguration;
-import org.infogrid.app.InfoGridApp;
 import org.infogrid.viewlet.MeshObjectsToView;
 import org.infogrid.viewlet.ViewletFactoryChoice;
 import org.infogrid.web.viewlet.DefaultJspViewletFactoryChoice;
@@ -56,16 +55,24 @@ public class PropertySheetAccessory
     @Override
     protected void registerResources(
             AppConfiguration config,
-            InfoGridApp      app )
+            InfoGridWebApp   app )
     {
         app.registerViewlet(
                 (MeshObjectsToView toView) -> new DefaultJspViewletFactoryChoice(
-                        (WebMeshObjectsToView) toView, PropertySheetViewlet_jsp.class, ViewletFactoryChoice.BAD_MATCH_QUALITY ),
+                        (WebMeshObjectsToView) toView,
+                        "org.infogrid.web.viewlet.propertysheet.PropertySheetViewlet",
+                        PropertySheetViewlet_jsp.class,
+                        ViewletFactoryChoice.BAD_MATCH_QUALITY ),
                 this
         );
-        ((InfoGridWebApp)app).registerAsset(
-                "/v/org/infogrid/web/viewlet/propertysheet/PropertySheetViewlet.css",
-                getClass().getClassLoader(),
-                this );
+        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/PropertySheetViewlet.css", this );
+
+        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/bin_closed.png",          this );
+        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/medal_bronze_add.png",    this );
+        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/medal_bronze_delete.png", this );
+        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/medal_silver_add.png",    this );
+        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/medal_silver_delete.png", this );
+        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/link_add.png",            this );
+        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/link_delete.png",         this );
     }
 }

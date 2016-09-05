@@ -20,7 +20,7 @@ import javax.servlet.jsp.tagext.BodyContent;
 import org.infogrid.web.taglib.AbstractInfoGridBodyTag;
 import org.infogrid.web.taglib.IgnoreException;
 import org.infogrid.web.templates.StructuredResponse;
-import org.infogrid.web.templates.TextStructuredResponseSection;
+import org.infogrid.web.templates.StructuredResponseSection;
 
 /**
  * <p>Abstract superclass for all tags that insert tag body content into the HTML header
@@ -89,17 +89,16 @@ public abstract class AbstractInsertIntoSectionTag
     {
         String sectionName = getSectionName();
 
-        theResponse = (StructuredResponse) lookupOrThrow(
-                StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
-        theSection = theResponse.obtainTextSection( sectionName );
+        theResponse = (StructuredResponse) pageContext.getResponse();
+        theSection  = theResponse.obtainSection( sectionName );
 
         String text = determineStartText();
         if( text != null ) {
             if( theAllowDuplicates ) {
-                theSection.appendContent( text );
+                theSection.appendTextContent( text );
 
-            } else if( !theSection.containsContent( text ) ) {
-                theSection.appendContent( text );
+            } else if( !theSection.containsTextContent( text ) ) {
+                theSection.appendTextContent( text );
             }
         }
 
@@ -130,7 +129,7 @@ public abstract class AbstractInsertIntoSectionTag
     {
         String text = determineBodyText();
         if( text != null ) {
-            theSection.appendContent( text );
+            theSection.appendTextContent( text );
         }
 
         return SKIP_BODY;
@@ -153,7 +152,7 @@ public abstract class AbstractInsertIntoSectionTag
     {
         String text = determineEndText();
         if( text != null ) {
-            theSection.appendContent( text );
+            theSection.appendTextContent( text );
         }
         return EVAL_PAGE; // reasonable default
     }
@@ -220,9 +219,9 @@ public abstract class AbstractInsertIntoSectionTag
     protected StructuredResponse theResponse;
 
     /**
-     * The TextStructuredResponse to which we write.
+     * The StructuredResponse to which we write.
      */
-    protected TextStructuredResponseSection theSection;
+    protected StructuredResponseSection theSection;
 
     /**
      * If true, duplicate insertions are allowed.

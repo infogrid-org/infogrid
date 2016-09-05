@@ -22,6 +22,8 @@ import java.util.ResourceBundle;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.jsp.JspFactory;
+import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.SimpleInstanceManager;
 import org.diet4j.core.Module;
 import org.diet4j.core.ModuleActivationException;
 import org.diet4j.core.ModuleDeactivationException;
@@ -39,6 +41,7 @@ import org.infogrid.util.logging.Log;
 import org.infogrid.util.logging.log4j.Log4jLog;
 import org.infogrid.util.logging.log4j.Log4jLogFactory;
 import org.infogrid.web.app.InfoGridWebAccessory;
+import org.infogrid.web.taglib.AbstractInfoGridTag;
 
 /**
  * Main program of the InfoGrid daemon. Activate using diet4j.
@@ -135,11 +138,17 @@ public class Main
         }
 
         contextHandler.setContextPath( theConfig.getAppContextPath() + "/" ); // they want trailing slashes
+        contextHandler.setAttribute(
+                InstanceManager.class.getName(),
+                new SimpleInstanceManager() );
+        contextHandler.setAttribute(
+                AbstractInfoGridTag.INFOGRID_APP_NAME,
+                theApp );
 
         // This is a major hack: we need the CentralDaemonServlet to have access
         // to the InfoGrid app, but there seems to be no good API to do this.
         // So we hack it in.
-        ServletHolder myHolder = new ServletHolder() {
+        ServletHolder myHolder = new ServletHolder( CentralDaemonServlet.class ){
             {
                 theInfoGridApp = theApp;
             }
@@ -154,11 +163,8 @@ public class Main
             }
             protected InfoGridWebApp theInfoGridApp;
         };
-        myHolder.setHeldClass( CentralDaemonServlet.class );
 
-        contextHandler.getServletHandler().addServletWithMapping(
-                myHolder,
-                "/*" );
+        contextHandler.addServlet( myHolder, "/*");
 
         theJettyServer.setHandler( contextHandler ); // handle everything ourselves, including 404's etc
 

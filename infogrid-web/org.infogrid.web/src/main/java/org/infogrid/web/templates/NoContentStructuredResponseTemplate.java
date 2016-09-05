@@ -77,22 +77,18 @@ public class NoContentStructuredResponseTemplate
      * {@inheritDoc}
      */
     @Override
-    public void doOutput(
-            HttpServletResponse delegate,
+    public void applyTemplate(
             ServletContext      servletContext,
             SaneServletRequest  request,
             StructuredResponse  response )
         throws
             IOException
     {
-        outputStatusCode(  delegate, response );
-        outputLocale(      delegate, response );
-        outputCookies(     delegate, response );
-        outputMimeType(    delegate, response );
-        outputLocation(    delegate, response );
-        outputAdditionalHeaders( delegate, response );
+        StructuredResponseSection oldDefaultSection = response.getDefaultSection();
 
-        // stream nothing
+        response.setDefaultSection( response.obtainSection( StructuredResponse.FINAL_ASSEMBLY_SECTION ));
+
+        oldDefaultSection.copyHeaderItemsTo( response.getDefaultSection() );
     }
 
     /**

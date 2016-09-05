@@ -17,7 +17,6 @@ package org.infogrid.web.templates;
 import java.io.IOException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 import org.infogrid.web.sane.SaneServletRequest;
 
 /**
@@ -26,17 +25,15 @@ import org.infogrid.web.sane.SaneServletRequest;
 public interface StructuredResponseTemplate
 {
     /**
-     * Stream a StructuredResponse to an HttpResponse employing this template.
+     * Apply this template to the StructuredResponse.
      * 
-     * @param delegate the delegate to stream to
      * @param servletContext the ServletContext to be passed to Servlets
      * @param request the incoming request
      * @param response the structured response
      * @throws ServletException exception passed on from underlying servlet output
      * @throws IOException exception passed on from underlying servlet output
      */
-    public void doOutput(
-            HttpServletResponse delegate,
+    public void applyTemplate(
             ServletContext      servletContext,
             SaneServletRequest  request,
             StructuredResponse  response )

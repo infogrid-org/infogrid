@@ -15,6 +15,7 @@
 package org.infogrid.web.templates;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.servlet.http.Cookie;
@@ -33,7 +34,7 @@ public interface HasHeaderPreferences
      *
      * @return the desired MIME type
      */
-    public String getMimeType();
+    public String getContentType();
 
     /**
      * Obtain the Cookies.
@@ -54,7 +55,7 @@ public interface HasHeaderPreferences
      *
      * @return the HTTP response code
      */
-    public int getHttpResponseCode();
+    public int getStatus();
 
     /**
      * Obtain the locale.
@@ -71,11 +72,36 @@ public interface HasHeaderPreferences
     public String getCharacterEncoding();
 
     /**
+     * Get the single value of an additional header.
+     * 
+     * @param name name of the header
+     * @return value of the header
+     */
+    public String getHeader(
+            String name );
+
+    /**
+     * Get the set of values of an additional header.
+     * 
+     * @param name name of the header
+     * @return values of the header, or null
+     */
+    public Collection<String> getHeaders(
+            String name );
+
+    /**
+     * Get the names of the additional headers.
+     * 
+     * @return the names of the additional headers
+     */
+    public Collection<String> getHeaderNames();
+
+    /**
      * Obtain the additional headers.
      *
      * @return the headers, as Map
      */
-    public Map<String,String[]> getHeaders();
+    public Map<String,Collection<String>> getFullHeaders();
 
     /**
      * The name of the location header.

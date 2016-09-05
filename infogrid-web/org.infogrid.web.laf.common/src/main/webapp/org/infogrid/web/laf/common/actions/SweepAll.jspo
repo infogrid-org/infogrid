@@ -1,0 +1,8 @@
+<%@    page contentType="text/html"
+ %><%@ taglib prefix="u"     uri="/org/infogrid/web/taglib/util/util.tld"
+ %>
+
+<u:jspo>
+ <h2>Do you really want to sweep all MeshObjects in this MeshBase?</h2>
+ <input type="hidden" name="shell.command" value="sweepAll" />
+</u:jspo>

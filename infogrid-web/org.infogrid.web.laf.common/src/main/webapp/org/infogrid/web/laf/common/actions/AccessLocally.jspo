@@ -1,0 +1,16 @@
+<%@    page contentType="text/html"
+ %><%@ taglib prefix="u"     uri="/org/infogrid/web/taglib/util/util.tld"
+ %>
+
+<u:jspo>
+ <h2>Open a remote NetMeshObject</h2>
+ <table>
+  <tr>
+   <td class="label">Identifier:</td>
+   <td>
+    <input type="text" autocorrect="off" autocapitalization="off" class="subject" name="shell.subject" size="32"/>
+    <input type="hidden" name="shell.subject.access" value="find" />
+   </td>
+  </tr>
+ </table>
+</u:jspo>

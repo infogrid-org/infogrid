@@ -63,7 +63,7 @@ public class DaemonConfiguration
 
         theAppModuleRequirement = ModuleRequirement.create( theProperties.getProperty( "AppModule" ));
 
-        String [] accReqs = theProperties.getProperty( "AccessoryModules", "" ).trim().split( "\\s+,\\s+" );
+        String [] accReqs = theProperties.getProperty( "AccessoryModules", "" ).trim().split( "\\s*,\\s*" );
         theAccessoryModuleRequirements = new ModuleRequirement[ accReqs.length ];
         for( int i=0 ; i<accReqs.length ; ++i ) {
             theAccessoryModuleRequirements[i] = ModuleRequirement.create( accReqs[i] );

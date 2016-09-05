@@ -36,7 +36,7 @@ import org.infogrid.web.sane.SaneServletRequest;
 import org.infogrid.web.taglib.AbstractInfoGridTag;
 import org.infogrid.web.taglib.IgnoreException;
 import org.infogrid.web.templates.StructuredResponse;
-import org.infogrid.web.templates.TextStructuredResponseSection;
+import org.infogrid.web.templates.StructuredResponseSection;
 import org.infogrid.web.viewlet.WebMeshObjectsToViewFactory;
 import org.infogrid.web.viewlet.WebViewlet;
 import org.infogrid.web.viewlet.WebViewletFactoryChoice;
@@ -155,7 +155,7 @@ public class ViewletAlternativesTag
             JspException,
             IgnoreException
     {
-        StructuredResponse theResponse    = (StructuredResponse) lookupOrThrow( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
+        StructuredResponse theResponse    = (StructuredResponse) pageContext.getResponse();
         WebViewlet         currentViewlet = (WebViewlet) lookupOrThrow( WebViewlet.VIEWLET_ATTRIBUTE_NAME );
         
         MeshObject    subject       = currentViewlet.getSubject();
@@ -234,22 +234,22 @@ public class ViewletAlternativesTag
             StringBuilder js = new StringBuilder();
             js.append( "<script src=\"" );
             js.append( contextPath );
-            js.append( "/v/org/infogrid/jee/taglib/candy/ToggleCssClass.js\" type=\"text/javascript\"></script>\n" );
+            js.append( "/s/org/infogrid/web/taglib/candy/ToggleCssClass.js\" type=\"text/javascript\"></script>\n" );
 
             StringBuilder css = new StringBuilder();
             css.append( "<link rel=\"stylesheet\" href=\"" );
             css.append( contextPath );
-            css.append( "/v/" );
+            css.append( "/s/" );
             css.append( getClass().getName().replace( '.' , '/' ));
             css.append( ".css" );
             css.append( "\" />\n" );
 
-            TextStructuredResponseSection headSection = theResponse.obtainTextSection( StructuredResponse.HTML_HEAD_SECTION );
-            if( !headSection.containsContent( css.toString() )) {
-                headSection.appendContent( css.toString() );
+            StructuredResponseSection headSection = theResponse.obtainSection( StructuredResponse.HTML_HEAD_SECTION );
+            if( !headSection.containsTextContent( css.toString() )) {
+                headSection.appendTextContent( css.toString() );
             }
-            if( !headSection.containsContent( js.toString() )) {
-                headSection.appendContent( js.toString() );
+            if( !headSection.containsTextContent( js.toString() )) {
+                headSection.appendTextContent( js.toString() );
             }
         }
 

@@ -33,7 +33,7 @@ public abstract class InfoGridWebAccessory
             AppConfiguration config,
             InfoGridApp      app )
     {
-        registerResources( config, app );
+        registerResources( config, (InfoGridWebApp) app );
     }
 
     /**
@@ -44,7 +44,7 @@ public abstract class InfoGridWebAccessory
      */
     protected void registerResources(
             AppConfiguration config,
-            InfoGridApp      app )
+            InfoGridWebApp   app )
     {
         
     }

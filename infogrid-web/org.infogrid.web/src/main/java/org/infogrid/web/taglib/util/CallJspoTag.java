@@ -16,10 +16,8 @@ package org.infogrid.web.taglib.util;
 
 import java.io.IOException;
 import java.util.Map.Entry;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.BodyContent;
@@ -29,6 +27,7 @@ import org.infogrid.web.taglib.IgnoreException;
 import org.infogrid.web.taglib.candy.OverlayTag;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.ResourceHelper;
+import org.infogrid.web.app.InfoGridWebApp;
 
 /**
  * <p>Allows the inclusion of JSP overlays as subroutines with parameters.</p>
@@ -55,7 +54,7 @@ public class CallJspoTag
     @Override
     protected void initializeToDefaults()
     {
-        thePage          = null;
+        theName          = null;
         theLinkTitle     = null;
         theAction        = null;
         theSubmitLabel   = null;
@@ -68,26 +67,26 @@ public class CallJspoTag
     }
 
     /**
-     * Obtain value of the page property.
+     * Obtain value of the name property.
      *
-     * @return value of the page property
-     * @see #setPage
+     * @return value of the name property
+     * @see #setName
      */
-    public String getPage()
+    public String getName()
     {
-        return thePage;
+        return theName;
     }
 
     /**
-     * Set value of the page property.
+     * Set value of the name property.
      *
-     * @param newValue new value of the page property
-     * @see #getPage
+     * @param newValue new value of the name property
+     * @see #getName
      */
-    public void setPage(
+    public void setName(
             String newValue )
     {
-        thePage = newValue;
+        theName = newValue;
     }
 
     /**
@@ -245,7 +244,7 @@ public class CallJspoTag
     {
         ServletRequest request    = pageContext.getRequest();
         theOldCallRecord          = (CallJspXRecord) request.getAttribute( CallJspXRecord.CALL_JSPX_RECORD_ATTRIBUTE_NAME );
-        theCurrentCallRecord      = new CallJspoRecord( thePage, theDisabled );
+        theCurrentCallRecord      = new CallJspoRecord( theName, theDisabled );
         request.setAttribute( CallJspXRecord.CALL_JSPX_RECORD_ATTRIBUTE_NAME, theCurrentCallRecord );
 
         return EVAL_BODY_BUFFERED; // contains parameter declarations
@@ -266,13 +265,15 @@ public class CallJspoTag
             IgnoreException,
             IOException
     {
+        InfoGridWebApp app     = getInfoGridWebApp();
+
         ServletRequest request = pageContext.getRequest();
         BodyContent    body    = getBodyContent();
         JspWriter      out     = body.getEnclosingWriter();
 
         try {
             StringBuilder domId = new StringBuilder();
-            domId.append( thePage );
+            domId.append(theName );
 
             // This is not ordered, but that should not be a problem?
             for( Entry<String,Object> current : theCurrentCallRecord.getParameters() ) {
@@ -337,10 +338,11 @@ public class CallJspoTag
                 }
                 out.println( "<div class=\"dialog-content\">" );
 
+                out.flush();
+
                 try {
-                    // This is created after org/apache/jasper/runtime/JspRuntimeLibrary.include
-                    RequestDispatcher rd = pageContext.getServletContext().getRequestDispatcher( thePage );
-                    rd.include( request, new ServletResponseWrapperInclude( (HttpServletResponse) pageContext.getResponse(), out ));
+
+                    app.processJspo( theName, pageContext );
 
                     return EVAL_PAGE;
 
@@ -385,9 +387,9 @@ public class CallJspoTag
     }
 
     /**
-     * Name of the page.
+     * Name.
      */
-    protected String thePage;
+    protected String theName;
 
     /**
      * Title attribute on the generated link, if any.

@@ -433,7 +433,7 @@ public abstract class AbstractInfoGridTag
      */
     protected InfoGridWebApp getInfoGridWebApp()
     {
-        InfoGridWebApp app = (InfoGridWebApp) pageContext.getServletContext().getAttribute(INFOGRID_APP_NAME );
+        InfoGridWebApp app = (InfoGridWebApp) pageContext.getServletContext().getAttribute( INFOGRID_APP_NAME );
         return app;
     }
 

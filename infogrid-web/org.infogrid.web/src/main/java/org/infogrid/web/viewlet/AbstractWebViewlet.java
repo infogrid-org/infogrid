@@ -14,21 +14,17 @@
 
 package org.infogrid.web.viewlet;
 
-import java.io.IOException;
 import java.util.Deque;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.http.HTTP;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.viewlet.AbstractViewlet;
-import org.infogrid.viewlet.CannotViewException;
 import org.infogrid.web.app.InfoGridWebApp;
 import org.infogrid.web.security.UnsafePostException;
-import org.infogrid.web.taglib.viewlet.IncludeViewletTag;
 import org.infogrid.web.templates.StructuredResponse;
-import org.infogrid.web.templates.TextStructuredResponseSection;
+import org.infogrid.web.templates.StructuredResponseSection;
 
 /**
  * Factors out commonly used functionality for WebViewlets.
@@ -267,12 +263,12 @@ public abstract class AbstractWebViewlet
     {
         // if no HTML title was set but it's a non-binary html response, set one
 
-        if( response.isStructuredEmpty() ) {
+        if( response.isEmpty() ) {
             return;
         }
-        TextStructuredResponseSection titleSection = response.obtainTextSection( StructuredResponse.HTML_TITLE_SECTION );
+        StructuredResponseSection titleSection = response.obtainSection( StructuredResponse.HTML_TITLE_SECTION );
         if( titleSection.isEmpty() ) {
-            InfoGridWebApp app = getContext().findContextObjectOrThrow(InfoGridWebApp.class );
+            InfoGridWebApp app = getContext().findContextObjectOrThrow( InfoGridWebApp.class );
 
             String name                     = getName();
             String userVisibleName          = getUserVisibleName();
@@ -304,7 +300,7 @@ public abstract class AbstractWebViewlet
                     appUserVisibleName = appName;
                 }
 
-                content = theResourceHelper.getResourceStringWithArguments(
+                content = theResourceHelper.getResourceStringWithArgumentsOrNull(
                         prefix + "TitleWithApp",
                 /* 0 */ name,
                 /* 1 */ userVisibleName,
@@ -313,7 +309,7 @@ public abstract class AbstractWebViewlet
                 /* 4 */ appName,
                 /* 5 */ appUserVisibleName );
             } else {
-                content = theResourceHelper.getResourceStringWithArguments(
+                content = theResourceHelper.getResourceStringWithArgumentsOrNull(
                         prefix + "TitleWithoutApp",
                 /* 0 */ name,
                 /* 1 */ userVisibleName,
@@ -321,7 +317,9 @@ public abstract class AbstractWebViewlet
                 /* 3 */ subjectUserVisibleString );
             }
 
-            titleSection.setContent( content );
+            if( content != null ) {
+                titleSection.setTextContent( content );
+            }
         }
     }
 

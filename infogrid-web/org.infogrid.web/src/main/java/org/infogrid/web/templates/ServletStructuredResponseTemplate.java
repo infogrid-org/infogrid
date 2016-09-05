@@ -15,13 +15,9 @@
 package org.infogrid.web.templates;
 
 import java.io.IOException;
-import java.util.Enumeration;
 import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-import org.infogrid.util.ZeroElementCursorIterator;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
@@ -70,7 +66,7 @@ public class ServletStructuredResponseTemplate
     /**
      * Constructor for subclasses only, use factory method.
      *
-     * @param dispatcher identifies the JSP file
+     * @param templateClass the servlet class that acts as the template
      * @param request the incoming HTTP request
      * @param requestedTemplate the requested ResponseTemplate that will be used, if any
      * @param userRequestedTemplate the ResponseTemplate requested by the user, if any
@@ -91,16 +87,10 @@ public class ServletStructuredResponseTemplate
     }
 
     /**
-     * Stream a StructuredResponse to an HttpResponse employing this template.
-     *
-     * @param delegate the delegate to stream to
-     * @param response the StructuredResponse
-     * @throws ServletException exception passed on from underlying servlet output
-     * @throws IOException exception passed on from underlying servlet output
+     * {@inheritDoc}
      */
     @Override
-    public void doOutput(
-            HttpServletResponse delegate,
+    public void applyTemplate(
             ServletContext      servletContext,
             SaneServletRequest  request,
             StructuredResponse  response )
@@ -108,21 +98,22 @@ public class ServletStructuredResponseTemplate
             ServletException,
             IOException
     {
-        outputStatusCode(  delegate, response );
-        outputLocale(      delegate, response );
-        outputCookies(     delegate, response );
-        outputMimeType(    delegate, response );
-        outputLocation(    delegate, response );
-        outputAdditionalHeaders( delegate, response );
+        StructuredResponseSection oldDefaultSection = response.getDefaultSection();
+
+        response.setDefaultSection( response.obtainSection( StructuredResponse.FINAL_ASSEMBLY_SECTION ));
+
+        oldDefaultSection.copyHeaderItemsTo( response.getDefaultSection() );
+
+        ClassLoader old = Thread.currentThread().getContextClassLoader();
 
         Servlet servlet = null;
         try {
-            theRequest.setAttribute( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME, response );
+            Thread.currentThread().setContextClassLoader( theTemplateClass.getClassLoader() );
 
             servlet = theTemplateClass.newInstance();
-            servlet.init( new MyServletConfig( theTemplateClass.getName(), servletContext ));
+            servlet.init(new SimpleServletConfig( theTemplateClass.getName(), servletContext ));
             
-            servlet.service( request, delegate );
+            servlet.service( request, response );
 
         } catch( InstantiationException ex ) {
             log.error( ex );
@@ -131,7 +122,7 @@ public class ServletStructuredResponseTemplate
             log.error( ex );
 
         } finally {
-            theRequest.removeAttribute( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
+            Thread.currentThread().setContextClassLoader( old );
 
             if( servlet != null ) {
                 servlet.destroy();
@@ -170,39 +161,4 @@ public class ServletStructuredResponseTemplate
      */
     protected Class<? extends Servlet> theTemplateClass;
 
-    static class MyServletConfig
-            implements
-                ServletConfig
-    {
-        public MyServletConfig(
-                String name,
-                ServletContext servletContext )
-        {
-            theName = name;
-            theServletContext = servletContext;
-        }
-
-        public String getServletName()
-        {
-            return theName;
-        }
-
-        public ServletContext getServletContext()
-        {
-            return theServletContext;
-        }
-
-        public String getInitParameter( String name )
-        {
-            return null;
-        }
-
-        public Enumeration<String> getInitParameterNames()
-        {
-            return ZeroElementCursorIterator.create();
-        }
-        
-        protected String theName;
-        protected ServletContext theServletContext;
-    }
 }

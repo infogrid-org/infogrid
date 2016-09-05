@@ -297,6 +297,25 @@ public final class ResourceHelper
     }
 
     /**
+     * Obtain a resource value or null, but replace placeholders with arguments.
+     *
+     * @param resourceName the name of the resource we are looking for
+     * @param args replacement arguments for the placeholders in the found resource value
+     * @return the value of the resource, or a default, with the placeholders removed
+     */
+    public String getResourceStringWithArgumentsOrNull(
+            String    resourceName,
+            Object... args )
+    {
+        String raw = getResourceStringOrNull( resourceName );
+        if( raw != null ) {
+            return MessageFormat.format( raw, args );
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Obtain the values from a String that were inserted by
      * {@link #getResourceStringWithArguments}.
      *

@@ -19,6 +19,7 @@
         <module>org.infogrid.model.Viewlet</module>
         <module>org.infogrid.viewlet</module>
         <module>org.infogrid.web</module>
+        <module>org.infogrid.web.laf.common</module>
         <module>org.infogrid.web.viewlet.propertysheet</module>
     </modules>
 

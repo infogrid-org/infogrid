@@ -349,7 +349,7 @@ public class RelationshipBlessableByTag
             print( shortStartObjectEditVar );
             print (".to." );
             print( shortNeighborObjectEditVar );
-            println( ".blessRole\" class=\"org-infogrid-jee-taglib-mesh-MeshObjectBlessableByTag\">" );
+            println( ".blessRole\" class=\"org-infogrid-web-taglib-mesh-MeshObjectBlessableByTag\">" );
 
             for( Pair<SubjectArea,ArrayList<RoleType>> pair : candidates ) {
                 SubjectArea sa = pair.getName();

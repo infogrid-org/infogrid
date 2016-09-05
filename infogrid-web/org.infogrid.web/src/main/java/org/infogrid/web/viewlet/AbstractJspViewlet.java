@@ -42,17 +42,20 @@ public abstract class AbstractJspViewlet
     /**
      * Constructor, for subclasses only.
      *
+     * @param viewletName the computable name of the Viewlet
      * @param servletClass the Servlet implementing this Viewlet
      * @param viewed the JeeViewedMeshObjects to use
      * @param c the application context
      */
     protected AbstractJspViewlet(
+            String                   viewletName,
             Class<? extends Servlet> servletClass,
             WebViewedMeshObjects     viewed,
             Context                  c )
     {
         super( viewed, c );
 
+        theName         = viewletName;
         theServletClass = servletClass;
     }
 
@@ -80,7 +83,7 @@ public abstract class AbstractJspViewlet
     @Override
     public String getName()
     {
-        return theServletClass.getName();
+        return theName;
     }
 
     /**
@@ -145,13 +148,10 @@ public abstract class AbstractJspViewlet
         ClassLoader old    = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader( theServletClass.getClassLoader() );
-            request.setAttribute( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME, response );
-
+ 
             servlet = theServletClass.newInstance();
             servlet.init( new MyServletConfig( theServletClass.getName(), servletContext ));
             
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-
             servlet.service( request, response );
 
         } catch( InstantiationException ex ) {
@@ -161,7 +161,6 @@ public abstract class AbstractJspViewlet
             log.error( ex );
 
         } finally {
-            request.removeAttribute( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
             Thread.currentThread().setContextClassLoader( old );
 
             if( servlet != null ) {
@@ -172,6 +171,11 @@ public abstract class AbstractJspViewlet
             }
         }        
     }
+
+    /**
+     * The computable name of the Viewlet.
+     */
+    protected String theName;
 
     /**
      * The Servlet class that implements this Viewlet.

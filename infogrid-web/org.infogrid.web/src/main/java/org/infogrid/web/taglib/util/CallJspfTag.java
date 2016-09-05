@@ -21,6 +21,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
+import org.infogrid.web.app.InfoGridWebApp;
 import org.infogrid.web.taglib.AbstractInfoGridTag;
 import org.infogrid.web.taglib.IgnoreException;
 
@@ -49,33 +50,33 @@ public class CallJspfTag
     @Override
     protected void initializeToDefaults()
     {
-        thePage          = null;
+        theName          = null;
         theOldCallRecord = null;
 
         super.initializeToDefaults();
     }
 
     /**
-     * Obtain value of the page property.
+     * Obtain value of the name property.
      *
-     * @return value of the page property
-     * @see #setPage
+     * @return value of the name property
+     * @see #setName
      */
-    public String getPage()
+    public String getName()
     {
-        return thePage;
+        return theName;
     }
 
     /**
-     * Set value of the page property.
+     * Set value of the name property.
      *
-     * @param newValue new value of the page property
-     * @see #getPage
+     * @param newValue new value of the name property
+     * @see #getName
      */
-    public void setPage(
+    public void setName(
             String newValue )
     {
-        thePage = newValue;
+        theName = newValue;
     }
 
     /**
@@ -95,7 +96,7 @@ public class CallJspfTag
     {
         ServletRequest request    = pageContext.getRequest();
         theOldCallRecord          = (CallJspXRecord) request.getAttribute( CallJspXRecord.CALL_JSPX_RECORD_ATTRIBUTE_NAME );
-        CallJspXRecord callRecord = new CallJspXRecord( thePage );
+        CallJspXRecord callRecord = new CallJspXRecord( theName );
         request.setAttribute( CallJspXRecord.CALL_JSPX_RECORD_ATTRIBUTE_NAME, callRecord );
 
         return EVAL_BODY_INCLUDE; // contains parameter declarations
@@ -116,14 +117,12 @@ public class CallJspfTag
             IgnoreException,
             IOException
     {
-        // This is created after org/apache/jasper/runtime/JspRuntimeLibrary.include
-
+        InfoGridWebApp app = getInfoGridWebApp();
+        
         ServletRequest request = pageContext.getRequest();
-        JspWriter      out     = pageContext.getOut();
 
         try {
-            RequestDispatcher rd = pageContext.getServletContext().getRequestDispatcher( thePage );
-            rd.include( request, new ServletResponseWrapperInclude( (HttpServletResponse) pageContext.getResponse(), out ));
+            app.processJspf( theName, pageContext );
 
             return EVAL_PAGE;
 
@@ -136,9 +135,9 @@ public class CallJspfTag
     }
 
     /**
-     * Name of the page.
+     * Name
      */
-    protected String thePage;
+    protected String theName;
 
     /**
      * The CallJspXRecord to restore.

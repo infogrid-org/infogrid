@@ -84,7 +84,7 @@ public class RequestedTemplateTag
             JspException,
             IgnoreException
     {
-        StructuredResponse structured = (StructuredResponse) lookup( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
+        StructuredResponse structured = (StructuredResponse) pageContext.getResponse();
         if( structured == null ) {
             throw new JspException( "Cannot find StructuredResponse in the request context" );
         }

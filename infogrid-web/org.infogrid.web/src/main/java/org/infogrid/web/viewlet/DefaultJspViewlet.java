@@ -31,18 +31,20 @@ public class DefaultJspViewlet
     /**
      * Factory method.
      *
+     * @param viewletName the computable name of the Viewlet
      * @param servletClass the Servlet implementing this Viewlet
      * @param mb the MeshBase from which the viewed MeshObjects are taken
      * @param c the application context
      * @return the created Viewlet
      */
     public static DefaultJspViewlet create(
+            String                   viewletName,
             Class<? extends Servlet> servletClass,
-            MeshBase mb,
-            Context  c )
+            MeshBase                 mb,
+            Context                  c )
     {
         DefaultWebViewedMeshObjects viewed = new DefaultWebViewedMeshObjects( mb );
-        DefaultJspViewlet           ret    = new DefaultJspViewlet( servletClass, viewed, c );
+        DefaultJspViewlet           ret    = new DefaultJspViewlet( viewletName, servletClass, viewed, c );
 
         viewed.setViewlet( ret );
 
@@ -68,7 +70,7 @@ public class DefaultJspViewlet
                     throws
                         CannotViewException
                 {
-                    return create( servletClass, getMeshObjectsToView().getMeshBase(), getMeshObjectsToView().getContext() );
+                    return create( theName, servletClass, getMeshObjectsToView().getMeshBase(), getMeshObjectsToView().getContext() );
                 }
         };
     }
@@ -76,15 +78,17 @@ public class DefaultJspViewlet
     /**
      * Constructor. This is protected: use factory method or subclass.
      *
+     * @param viewletName the computable name of the Viewlet
      * @param servletClass the Servlet implementing this Viewlet
      * @param viewed the JeeViewedMeshObjects to use
      * @param c the application context
      */
     protected DefaultJspViewlet(
+            String                   viewletName,
             Class<? extends Servlet> servletClass,
             WebViewedMeshObjects     viewed,
             Context                  c )
     {
-        super( servletClass, viewed, c );
+        super( viewletName, servletClass, viewed, c );
     }
 }

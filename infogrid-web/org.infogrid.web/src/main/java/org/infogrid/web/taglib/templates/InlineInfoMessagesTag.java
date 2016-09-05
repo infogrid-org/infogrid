@@ -93,21 +93,24 @@ public class InlineInfoMessagesTag
         if( section != null ) {
             reportedInfoMessagesIter = section.infoMessages();
         } else {
-            StructuredResponse structured = (StructuredResponse) lookup( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
+            StructuredResponse structured = (StructuredResponse) pageContext.getResponse();
             if( structured == null ) {
                 throw new JspException( "Cannot find StructuredResponse in the request context" );
             }
 
             reportedInfoMessagesIter = structured.infoMessagesAggregate();
         }
-        SaneRequest sane = SaneServletRequest.create( (HttpServletRequest) pageContext.getRequest() );
+        
+        if( reportedInfoMessagesIter != null ) {
+            SaneRequest sane = SaneServletRequest.create( (HttpServletRequest) pageContext.getRequest() );
 
-        try {
-            String content = getFormatter().formatInfoMessages( sane, reportedInfoMessagesIter, theStringRepresentation, false );
-            print( content );
+            try {
+                String content = getFormatter().formatInfoMessages( sane, reportedInfoMessagesIter, theStringRepresentation, false );
+                print( content );
 
-        } catch( StringifierException ex ) {
-            throw new JspException( ex );
+            } catch( StringifierException ex ) {
+                throw new JspException( ex );
+            }
         }
 
         return SKIP_BODY;

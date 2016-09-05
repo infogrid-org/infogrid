@@ -1,0 +1,25 @@
+<%@    page contentType="text/html"
+ %><%@ taglib prefix="mesh"  uri="/org/infogrid/web/taglib/mesh/mesh.tld"
+ %><%@ taglib prefix="u"     uri="/org/infogrid/web/taglib/util/util.tld"
+ %>
+
+<u:jspo>
+ <u:jspoParam name="toUnbless" type="org.infogrid.mesh.MeshObject"/>
+ <u:jspoParam name="type"      type="org.infogrid.model.primitives.EntityType"/>
+
+ <h2>Do you really want to unbless this MeshObject?</h2>
+ <table>
+  <tr>
+   <td class="label">MeshObject:</td>
+   <td>
+    <input type="text" autocorrect="off" autocapitalization="off" class="subject" name="shell.subject" size="32" readonly="readonly" value="<mesh:meshObjectId meshObjectName="toUnbless" stringRepresentation="HttpPost" />" />
+   </td>
+  </tr>
+  <tr>
+   <td class="label">Type:</td>
+   <td>
+    <input type="text" autocorrect="off" autocapitalization="off" class="subjecttype" name="shell.subject.unbless" size="32" value="<mesh:meshTypeId meshTypeName="type" stringRepresentation="HttpPost" />" />
+   </td>
+  </tr>
+ </table>
+</u:jspo>

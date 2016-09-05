@@ -14,11 +14,16 @@
 
 package org.infogrid.app;
 
+import java.text.ParseException;
+import org.infogrid.meshbase.DefaultMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.meshbase.MeshBaseIdentifierFactory;
 import org.infogrid.meshbase.MeshBaseNameServer;
 import org.infogrid.meshbase.m.MMeshBase;
 import org.infogrid.meshbase.m.MMeshBaseNameServer;
+import org.infogrid.meshbase.security.AccessManager;
+import org.infogrid.modelbase.m.MModelBase;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.context.ObjectInContext;
 import org.infogrid.util.context.SimpleContext;
@@ -63,10 +68,34 @@ public abstract class InfoGridApp
     protected void initializeMeshBase(
             AppConfiguration config )
     {
-        theMeshBase = MMeshBase.create();
+        theMeshBaseIdentifierFactory = DefaultMeshBaseIdentifierFactory.create();
+
+        try {
+            theMeshBase = MMeshBase.create(
+                    theMeshBaseIdentifierFactory.fromExternalForm( "default" ),
+                    MModelBase.create(),
+                    createAccessManager( config ),
+                    theRootContext );
+            theRootContext.addContextObject( theMeshBase );
+        } catch( ParseException ex ) {
+            log.error( ex );
+        }
 
         theMeshBaseNameServer = MMeshBaseNameServer.create();
         ((MMeshBaseNameServer)theMeshBaseNameServer).put( theMeshBase.getIdentifier(), theMeshBase );
+        theRootContext.addContextObject( theMeshBaseNameServer );
+    }
+
+    /**
+     * Overridable method to create an AccessManager for the MeshBase, or return null if none.
+     * 
+     * @param config the configuration options
+     * @return the AccessManager, or null
+     */
+    public AccessManager createAccessManager(
+            AppConfiguration config )
+    {
+        return null;
     }
 
     /**
@@ -105,5 +134,10 @@ public abstract class InfoGridApp
      * by their identifier.
      */
     protected MeshBaseNameServer<MeshBaseIdentifier,MeshBase> theMeshBaseNameServer;
+    
+    /**
+     * The factory to use to convert Strings to MeshBaseIdentifiers.
+     */
+    protected MeshBaseIdentifierFactory theMeshBaseIdentifierFactory;
 }
     

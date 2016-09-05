@@ -14,14 +14,11 @@
 
 package org.infogrid.web.taglib.templates;
 
-import java.io.IOException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.jsp.JspException;
 import org.infogrid.web.taglib.AbstractInfoGridTag;
 import org.infogrid.web.taglib.IgnoreException;
-import org.infogrid.web.templates.BinaryStructuredResponseSection;
 import org.infogrid.web.templates.StructuredResponse;
-import org.infogrid.web.templates.TextStructuredResponseSection;
+import org.infogrid.web.templates.StructuredResponseSection;
 
 /**
  * Inlines a named section of a StructuredResponse into the output.
@@ -86,39 +83,18 @@ public class InlineTag
             JspException,
             IgnoreException
     {
-        StructuredResponse structured = (StructuredResponse) lookup( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
-        if( structured == null ) {
-            throw new JspException( "Cannot find StructuredResponse in the request context" );
-        }
+        StructuredResponse structured = (StructuredResponse) pageContext.getResponse();
 
-        TextStructuredResponseSection   textSection   = structured.obtainTextSection(   theSectionName );
-        BinaryStructuredResponseSection binarySection = structured.obtainBinarySection( theSectionName );
+        StructuredResponseSection section = structured.getSection( theSectionName );
 
-        if( textSection != null ) {
-            String content = textSection.getContent();
+        if( section != null ) {
+            String content = section.getTextContent();
             if( content != null && content.length() > 0 ) {
                 print( content );
             }
 
-        } else if( binarySection != null ) {
-            byte [] content = binarySection.getContent();
-
-            if( content != null && content.length > 0 ) {
-                try {
-                    pageContext.getOut().flush();
-
-                    ServletOutputStream o = pageContext.getResponse().getOutputStream();
-                    o.write( content );
-
-                } catch( IOException ex ) {
-                    throw new JspException( ex );
-                }
-            }
-
-        } else {
-            if( getFormatter().isFalse( getIgnore() )) {
-                throw new JspException( "Cannot find ResponseSection named " + theSectionName );
-            }
+        } else if( getFormatter().isFalse( getIgnore() )) {
+            throw new JspException( "Cannot find StructuredResponseSection named " + theSectionName );
         }
 
         return SKIP_BODY;

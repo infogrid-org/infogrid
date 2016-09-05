@@ -35,7 +35,7 @@ public class DefaultJspViewletFactoryChoice
             DefaultWebViewletFactoryChoice
 {
     /**
-     * Constructor for subclasses only, use factory method.
+     * Constructor.
      * 
      * @param toView the JeeMeshObjectsToView for which this is a choice
      * @param servletClass the name of the (non-exististing) Viewlet class
@@ -46,8 +46,26 @@ public class DefaultJspViewletFactoryChoice
             Class<? extends Servlet> servletClass,
             double                   matchQuality )
     {
+        this( toView, servletClass.getName(), servletClass, matchQuality );
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param toView the JeeMeshObjectsToView for which this is a choice
+     * @param viewletName computable name of the Viewlet
+     * @param servletClass the name of the (non-exististing) Viewlet class
+     * @param matchQuality the match quality
+     */
+    public DefaultJspViewletFactoryChoice(
+            WebMeshObjectsToView     toView,
+            String                   viewletName,
+            Class<? extends Servlet> servletClass,
+            double                   matchQuality )
+    {
         super( toView, AbstractWebViewlet.class, servletClass.getName(), matchQuality );
 
+        theName         = viewletName;
         theServletClass = servletClass;
     }
 
@@ -59,7 +77,7 @@ public class DefaultJspViewletFactoryChoice
     @Override
     public String getName()
     {
-        return theServletClass.getName();
+        return theName;
     }
 
     /**
@@ -95,7 +113,7 @@ public class DefaultJspViewletFactoryChoice
         throws
             StringifierException
     {
-        String userVisibleName = ResourceHelper.getInstance( theServletClass ).getResourceStringOrDefault("UserVisibleName", theServletClass.getName() );
+        String userVisibleName = ResourceHelper.getInstance( theName, theServletClass.getClassLoader() ).getResourceStringOrDefault( "UserVisibleName", theServletClass.getName() );
 
         String ret = rep.formatEntry(
                 getClass(), // dispatch to the right subtype
@@ -114,11 +132,16 @@ public class DefaultJspViewletFactoryChoice
             throws
             CannotViewException
     {
-        return DefaultJspViewlet.create( theServletClass, theToView.getMeshBase(), theToView.getContext() );
+        return DefaultJspViewlet.create( theName, theServletClass, theToView.getMeshBase(), theToView.getContext() );
     }
 
     /**
-     * The servlet class
+     * The name of the viewlet.
+     */
+    protected String theName;
+
+    /**
+     * The servlet class.
      */
     protected Class<? extends Servlet> theServletClass;
 }

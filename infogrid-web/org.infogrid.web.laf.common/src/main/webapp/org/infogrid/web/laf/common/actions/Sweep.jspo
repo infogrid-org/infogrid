@@ -1,0 +1,19 @@
+<%@    page contentType="text/html"
+ %><%@ taglib prefix="mesh"  uri="/org/infogrid/web/taglib/mesh/mesh.tld"
+ %><%@ taglib prefix="u"     uri="/org/infogrid/web/taglib/util/util.tld"
+ %>
+
+<u:jspo>
+ <u:jspoParam name="toSweep" type="org.infogrid.mesh.MeshObject"/>
+
+ <h2>Do you really want to sweep this MeshObject?</h2>
+ <table>
+  <tr>
+   <td class="label">MeshObject:</td>
+   <td>
+    <input type="text" autocorrect="off" autocapitalization="off" class="subject" name="shell.subject" size="40" readonly="readonly" value="<mesh:meshObjectId meshObjectName="toSweep" stringRepresentation="HttpPost" /> " />
+    <input type="hidden" name="shell.subject.access" value="sweep" />
+   </td>
+  </tr>
+ </table>
+</u:jspo>

@@ -23,23 +23,29 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.PageContext;
 import org.infogrid.app.AppConfiguration;
 import org.infogrid.app.InfoGridAccessory;
 import org.infogrid.app.InfoGridApp;
 import org.infogrid.app.InfoGridInstallable;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.meshbase.DefaultMeshBaseIdentifierFactory;
+import org.infogrid.meshbase.MeshBase;
+import org.infogrid.meshbase.MeshBaseIdentifier;
+import org.infogrid.meshbase.MeshBaseIdentifierFactory;
+import org.infogrid.meshbase.MeshBaseNameServer;
 import org.infogrid.meshbase.MeshObjectAccessException;
 import org.infogrid.model.primitives.text.ModelPrimitivesStringRepresentationDirectorySingleton;
 import org.infogrid.model.traversal.TraversalTranslator;
 import org.infogrid.model.traversal.xpath.XpathTraversalTranslator;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.Pair;
+import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.text.StringRepresentationDirectory;
 import org.infogrid.util.text.StringRepresentationDirectorySingleton;
@@ -49,16 +55,18 @@ import org.infogrid.viewlet.MeshObjectsToView;
 import org.infogrid.viewlet.ViewletFactory;
 import org.infogrid.viewlet.ViewletMatcher;
 import org.infogrid.web.ServletExceptionWithHttpStatusCode;
+import org.infogrid.web.httpshell.HttpShell;
+import org.infogrid.web.httpshell.HttpShellHandler;
 import org.infogrid.web.rest.RestfulJeeFormatter;
 import org.infogrid.web.sane.SaneServletRequest;
 import org.infogrid.web.security.SafeUnsafePostFilter;
 import org.infogrid.web.security.UnsafePostException;
 import org.infogrid.web.taglib.viewlet.IncludeViewletTag;
-import org.infogrid.web.templates.BinaryStructuredResponseSection;
 import org.infogrid.web.templates.DefaultStructuredResponseTemplateFactory;
+import org.infogrid.web.templates.SimpleServletConfig;
 import org.infogrid.web.templates.StructuredResponse;
+import org.infogrid.web.templates.StructuredResponseSection;
 import org.infogrid.web.templates.StructuredResponseTemplate;
-import org.infogrid.web.templates.StructuredResponseTemplateFactory;
 import org.infogrid.web.viewlet.DefaultWebMeshObjectsToViewFactory;
 import org.infogrid.web.viewlet.WebMeshObjectsToView;
 import org.infogrid.web.viewlet.WebMeshObjectsToViewFactory;
@@ -76,8 +84,10 @@ public class InfoGridWebApp
     /**
      * This constructor can be used directly, or the class may be subclassed.
      */
+    @SuppressWarnings( "LeakingThisInConstructor" )
     public InfoGridWebApp()
     {
+        theRootContext.addContextObject( this );
     }
     
     /**
@@ -92,7 +102,27 @@ public class InfoGridWebApp
     {
         registerResources( config );
         initializeMeshBase( config );
-        initializeUi( (WebAppConfiguration) config );
+        initializeUi( (WebAppConfiguration) config );        
+    }
+    
+    public MeshBaseNameServer<MeshBaseIdentifier,MeshBase> getMeshBaseNameServer()
+    {
+        return theMeshBaseNameServer;
+    }
+    
+    public MeshBaseIdentifierFactory getMeshBaseIdentifierFactory()
+    {
+        return theMeshBaseIdentifierFactory;
+    }
+    
+    public MeshBase getMainMeshBase()
+    {
+        return theMeshBase;
+    }
+
+    public StringRepresentationDirectory getStringRepresentationDirectory()
+    {
+        return theStringRepresentationDirectory;
     }
 
     /**
@@ -103,7 +133,7 @@ public class InfoGridWebApp
     protected void registerResources(
             AppConfiguration config )
     {
-        
+        // no op at this level
     }
 
     /**
@@ -115,8 +145,10 @@ public class InfoGridWebApp
             WebAppConfiguration config )
     {
         theViewletFactory = DefaultViewletFactory.create( WebViewlet.class.getName() );
+        theRootContext.addContextObject( theViewletFactory );
         
         theTraversalTranslator = XpathTraversalTranslator.create( theMeshBase );
+        theRootContext.addContextObject( theTraversalTranslator );
 
         theToViewFactory = DefaultWebMeshObjectsToViewFactory.create(
                 theMeshBase.getIdentifier(),
@@ -125,17 +157,21 @@ public class InfoGridWebApp
                 theTraversalTranslator,
                 config.getAppContextPath(),
                 theRootContext );
+        theRootContext.addContextObject( theToViewFactory );
 
         ModelPrimitivesStringRepresentationDirectorySingleton.initialize();
 
-        StringRepresentationDirectory srepdir = StringRepresentationDirectorySingleton.getSingleton();
-        theRootContext.addContextObject( srepdir );
+        theStringRepresentationDirectory = StringRepresentationDirectorySingleton.getSingleton();
+        theRootContext.addContextObject( theStringRepresentationDirectory );
 
-        RestfulJeeFormatter formatter = RestfulJeeFormatter.create( theMeshBase, srepdir );
+        RestfulJeeFormatter formatter = RestfulJeeFormatter.create( theMeshBase, theStringRepresentationDirectory );
         theRootContext.addContextObject( formatter );
 
         // StructuredResponseTemplateFactory
         theResponseTemplateFactory = DefaultStructuredResponseTemplateFactory.create( formatter );
+        theRootContext.addContextObject( theResponseTemplateFactory );
+        
+        theShell = HttpShell.create( this );
     }
 
     /**
@@ -147,7 +183,7 @@ public class InfoGridWebApp
      * @throws ServletException a Servlet problem
      * @throws IOException an I/O problem
      */
-    public void service(
+    public void serviceIncomingRequest(
             HttpServletRequest  servletRequest,
             HttpServletResponse servletResponse,
             ServletContext      servletContext )
@@ -155,8 +191,8 @@ public class InfoGridWebApp
             ServletException,
             IOException
     {
-        SaneServletRequest request  = SaneServletRequest.create( servletRequest );
-        StructuredResponse response = StructuredResponse.create( servletContext);
+        SaneServletRequest request  = createSaneServletRequest( servletRequest );
+        StructuredResponse response = createStructuredResponse( request, servletContext );
 
         // org.infogrid.jee.defaultapp.DefaultInitializationFilter
         // Template
@@ -170,27 +206,12 @@ public class InfoGridWebApp
         if( theAssetRegex.matcher( relativeBaseUri ).matches() ) {
             processAsset( request, response, servletContext );
         } else {
+            processHttpShell( request, response );
             processMeshObject( request, response, servletContext );
         }
 
-        if( response.isStructuredEmpty() ) {
-            // traditional processing, it ignored the StructuredResponse. We simply copy.
-            response.copyTo( (HttpServletResponse) servletResponse );
-
-        } else {
-            // process structured response
-
-            for( Map.Entry<String,String[]> entry : response.getHeaders().entrySet() ) {
-                for( String current : entry.getValue() ) {
-                    servletResponse.addHeader( entry.getKey(), current );
-                }
-            }
-            for( Cookie current : response.getCookies() ) {
-                servletResponse.addCookie( current );
-            }
-
-            processTemplate( request, response, servletResponse, servletContext );
-        }
+        processTemplate( request, response, servletContext );
+        response.copyTo( (HttpServletResponse) servletResponse );
     }
     
     protected void processAsset(
@@ -203,7 +224,7 @@ public class InfoGridWebApp
     {
         String relativeBaseUri = request.getRelativeBaseUri();
         
-        BinaryStructuredResponseSection section = response.getDefaultBinarySection();
+        StructuredResponseSection section = response.getDefaultSection();
 
         // app assets override accessory assets
         URL assetUrl = theAppAssets.get( relativeBaseUri );
@@ -221,9 +242,18 @@ public class InfoGridWebApp
                 if( read <= 0 ) {
                     break;
                 }
-                section.appendContent( buf, read );
+                section.appendBinaryContent( buf, read );
             }
         }
+    }
+
+    protected void processHttpShell(
+            SaneServletRequest request,
+            StructuredResponse response )
+        throws
+            IOException
+    {
+        theShell.performOperationsIfNeeded( request, response );
     }
 
     protected void processMeshObject(
@@ -257,10 +287,12 @@ public class InfoGridWebApp
                 throw new ServletException( ex ); // pass on
             }
             request.setAttribute( WebViewlet.SUBJECT_ATTRIBUTE_NAME, toView.getSubject() );
-            request.setAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
         }
 
         if( viewlet != null ) {
+            request.setAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
+            request.setAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
+
             processViewlet( toView, viewlet, request, response, servletContext );
         }
     }
@@ -326,7 +358,6 @@ public class InfoGridWebApp
      * 
      * @param request the incoming SaneRequest
      * @param response the structured response
-     * @param servletResponse the ultimate response
      * @param servletContext the ServletContext
      * @throws ServletException Servlet processing problem
      * @throws IOException I/O problem
@@ -334,7 +365,6 @@ public class InfoGridWebApp
     protected void processTemplate(
             SaneServletRequest  request,
             StructuredResponse  response,
-            HttpServletResponse servletResponse,
             ServletContext      servletContext )
         throws
             ServletException,
@@ -343,9 +373,87 @@ public class InfoGridWebApp
         try {
             StructuredResponseTemplate template = theResponseTemplateFactory.obtainFor( request, response );
 
-            template.doOutput( servletResponse, servletContext, request, response );
+            template.applyTemplate( servletContext, request, response );
 
         } catch( FactoryException ex ) {
+            throw new ServletException( ex );
+        }
+    }
+
+    public void processJspf(
+            String      name,
+            PageContext pageContext )
+        throws
+            ServletException,
+            IOException
+    {
+        String mime = pageContext.getResponse().getContentType();
+        if( mime == null ) {
+            mime = HTML_MIME;
+        }
+
+        Class<? extends Servlet> servletClass = null;
+
+        Map<String,Class<? extends Servlet>> appLevel1 = theAppJspfs.get( name );
+        if( appLevel1 != null ) {
+            servletClass = appLevel1.get( mime );
+        }
+        if( servletClass == null ) {
+            Map<String,Pair<Class<? extends Servlet>,InfoGridAccessory>> accLevel1 = theAccessoryJspfs.get( name );
+            if( accLevel1 != null ) {
+                servletClass = accLevel1.get( mime ).getName();
+            }
+        }
+        if( servletClass == null ) {
+            throw new ServletException( "Cannot find JSPF with name " + name );
+        }
+        
+        try {
+            Servlet servlet = servletClass.newInstance();
+            servlet.init( new SimpleServletConfig( name, pageContext.getServletContext() ));
+
+            servlet.service( pageContext.getRequest(), pageContext.getResponse() );
+
+        } catch( InstantiationException | IllegalAccessException ex ) {
+            throw new ServletException( ex );
+        }
+    }
+
+    public void processJspo(
+            String      name,
+            PageContext pageContext )
+        throws
+            ServletException,
+            IOException
+    {
+        String mime = pageContext.getResponse().getContentType();
+        if( mime == null ) {
+            mime = HTML_MIME;
+        }
+
+        Class<? extends Servlet> servletClass = null;
+
+        Map<String,Class<? extends Servlet>> appLevel1 = theAppJspos.get( name );
+        if( appLevel1 != null ) {
+            servletClass = appLevel1.get( mime );
+        }
+        if( servletClass == null ) {
+            Map<String,Pair<Class<? extends Servlet>,InfoGridAccessory>> accLevel1 = theAccessoryJspos.get( name );
+            if( accLevel1 != null ) {
+                servletClass = accLevel1.get( mime ).getName();
+            }
+        }
+        if( servletClass == null ) {
+            throw new ServletException( "Cannot find JSPF with name " + name );
+        }
+        
+        try {
+            Servlet servlet = servletClass.newInstance();
+            servlet.init( new SimpleServletConfig( name, pageContext.getServletContext() ));
+
+            servlet.service( pageContext.getRequest(), pageContext.getResponse() );
+
+        } catch( InstantiationException | IllegalAccessException ex ) {
             throw new ServletException( ex );
         }
     }
@@ -405,7 +513,7 @@ public class InfoGridWebApp
      * it is supposed to be served.
      * 
      * @param path the relative path of the asset
-     * @param loader the ClassLoader to resove the path against
+     * @param loader the ClassLoader to resolve the path against
      * @param installable the registering InfoGridAccessory or InfoGridApp
      */
     public void registerAsset(
@@ -416,6 +524,151 @@ public class InfoGridWebApp
         String pathWithoutSlash = path.substring( 1 );
 
         registerAsset( path, loader.getResource( pathWithoutSlash ), installable );
+    }
+
+    /**
+     * Allows an InfoGridAccessory or InfoGridApp to register assets with the
+     * app. The app decides whether or not, or how to make those assets
+     * available. 
+     * 
+     * This method assumes that the path in which the asset is available
+     * relative to the ClassLoader is the same as the relative URL at which
+     * it is supposed to be served. The ClassLoader is the InfoGridInstallable's.
+     * 
+     * @param path the relative path of the asset
+     * @param installable the registering InfoGridAccessory or InfoGridApp
+     */
+    public void registerAsset(
+            String              path,
+            InfoGridInstallable installable )
+    {
+        registerAsset( path, installable.getClass().getClassLoader(), installable );
+    }
+
+    /**
+     * Allows an InfoGridAccessory or InfoGridApp to register viewlet templates with the
+     * app. The app decides whether or not, or how to make those viewlet templates
+     * available. 
+     * 
+     * @param name the name of the template
+     * @param mime the MIME type which this template will emit
+     * @param servletClass the Servlet class implementing the viewlet template
+     * @param installable the registering InfoGridAccessory or InfoGridApp
+     */
+    public void registerViewletTemplate(
+            String                   name,
+            String                   mime,
+            Class<? extends Servlet> servletClass,
+            InfoGridInstallable      installable )
+    {
+        theResponseTemplateFactory.addTemplateServlet(
+                name,
+                mime,
+                servletClass );
+    } 
+    
+    /**
+     * Allows an InfoGridAccessory or InfoGridApp to register a JSP function servlet.
+     * The app decides whether or not, or how to make those JSP function servlets
+     * available. 
+     * 
+     * @param name the name of the JSP function
+     * @param mime the MIME type where this JSP function applies
+     * @param servletClass the Servlet class implementing the JSP function
+     * @param installable the registering InfoGridAccessory or InfoGridApp
+     */
+    public void registerJspf(
+            String                   name,
+            String                   mime,
+            Class<? extends Servlet> servletClass,
+            InfoGridInstallable      installable )
+    {
+        if( installable instanceof InfoGridApp ) {
+            Map<String,Class<? extends Servlet>> appLevel1 = theAppJspfs.get( name );
+            if( appLevel1 == null ) {
+                appLevel1 = new HashMap<>();
+                theAppJspfs.put( name, appLevel1 );
+            }
+            appLevel1.put( mime, servletClass );
+        } else {
+            Map<String,Pair<Class<? extends Servlet>,InfoGridAccessory>> accLevel1 = theAccessoryJspfs.get( name );
+            if( accLevel1 == null ) {
+                accLevel1 = new HashMap<>();
+                theAccessoryJspfs.put( name, accLevel1 );
+            }
+            accLevel1.put( mime, new Pair<>( servletClass, (InfoGridAccessory) installable ));
+        }
+    } 
+    
+    /**
+     * Allows an InfoGridAccessory or InfoGridApp to register a JSP overlay servlet.
+     * The app decides whether or not, or how to make those JSP overlay servlets
+     * available. 
+     * 
+     * @param name the name of the JSP overlay
+     * @param mime the MIME type where this JSP overlay applies
+     * @param servletClass the Servlet class implementing the JSP overlay
+     * @param installable the registering InfoGridAccessory or InfoGridApp
+     */
+    public void registerJspo(
+            String                   name,
+            String                   mime,
+            Class<? extends Servlet> servletClass,
+            InfoGridInstallable      installable )
+    {
+        if( installable instanceof InfoGridApp ) {
+            Map<String,Class<? extends Servlet>> appLevel1 = theAppJspos.get( name );
+            if( appLevel1 == null ) {
+                appLevel1 = new HashMap<>();
+                theAppJspos.put( name, appLevel1 );
+            }
+            appLevel1.put( mime, servletClass );
+        } else {
+            Map<String,Pair<Class<? extends Servlet>,InfoGridAccessory>> accLevel1 = theAccessoryJspos.get( name );
+            if( accLevel1 == null ) {
+                accLevel1 = new HashMap<>();
+                theAccessoryJspos.put( name, accLevel1 );
+            }
+            accLevel1.put( mime, new Pair<>( servletClass, (InfoGridAccessory) installable ));
+        }
+    } 
+    
+    /**
+     * Register a HttpShellHandler.
+     * 
+     * @param name name of the HttpShellHandler
+     * @param handler the handler
+     * @param installable the registering InfoGridAccessory or InfoGridApp
+     */
+    public void registerHttpShellHandler(
+            String              name,
+            HttpShellHandler    handler,
+            InfoGridInstallable installable )
+    {
+        if( installable instanceof InfoGridApp ) {
+            theAppHandlers.put( name, handler );
+        } else {
+            theAccessoryHandlers.put( name, new Pair<>( handler, (InfoGridAccessory) installable ));
+        }
+    }
+
+    /**
+     * Find a HttpShellHandler by name.
+     * 
+     * @param name name of the HttpShellHandler
+     * @return the HttpShellHandler or null
+     */
+    public HttpShellHandler findHttpShellHandler(
+            String name )
+    {
+        HttpShellHandler ret = theAppHandlers.get( name );
+        if( ret == null ) {
+            Pair<HttpShellHandler,InfoGridAccessory> found = theAccessoryHandlers.get( name );
+            if( found != null ) {
+                ret = found.getName();
+            }
+        }
+        return ret;
     }
 
     /**
@@ -451,6 +704,43 @@ public class InfoGridWebApp
     }
 
     /**
+     * Factory method for creating a SaneServletRequest.
+     * 
+     * @param servletRequest the incoming request
+     * @return the created SaneServletRequest
+     */
+    public SaneServletRequest createSaneServletRequest(
+            HttpServletRequest servletRequest )
+    {
+        SaneServletRequest ret = SaneServletRequest.create( servletRequest );
+        ret.setAttribute( CONTEXT_PARAMETER, ret.getContextPath() );
+
+        SaneRequest originalRequest = ret.getOriginalSaneRequest();
+
+        ret.setAttribute( FULLCONTEXT_PARAMETER, ret.getAbsoluteContextUri() );
+
+        ret.setAttribute( ORIGINAL_CONTEXT_PARAMETER,     originalRequest.getContextPath() );
+        ret.setAttribute( ORIGINAL_FULLCONTEXT_PARAMETER, originalRequest.getAbsoluteContextUri() );
+        
+        return ret;
+    }
+
+    /**
+     * Factory method for creating the StructuredResponse.
+     * 
+     * @param request the incoming request
+     * @param servletContext the ServletContext
+     * @return the created StructuredResponse
+     */
+    protected StructuredResponse createStructuredResponse(
+            SaneServletRequest request, 
+            ServletContext     servletContext )
+    {        
+        StructuredResponse ret = StructuredResponse.create( servletContext );
+        return ret;
+    }
+
+    /**
      * Knows how to parse an incoming HTTP request into MeshObjectsToView.
      */    
     protected WebMeshObjectsToViewFactory theToViewFactory;
@@ -468,8 +758,18 @@ public class InfoGridWebApp
     /**
      * Knows how to find the right response template for the incoming request.
      */
-    protected StructuredResponseTemplateFactory theResponseTemplateFactory;
+    protected DefaultStructuredResponseTemplateFactory theResponseTemplateFactory;
     
+    /**
+     * Knows how to convert to and from String.
+     */
+    protected StringRepresentationDirectory theStringRepresentationDirectory;
+
+    /**
+     * The HttpShell
+     */
+    protected HttpShell theShell;
+
     /**
      * The known assets of the app, keyed by their relative request URLs and
      * mapped to the URLs from which they can be obtained.
@@ -483,9 +783,82 @@ public class InfoGridWebApp
     protected Map<String,Pair<URL,InfoGridAccessory>> theAccessoryAssets = new HashMap<>();
 
     /**
+     * The known JSPFs of the app, keyed by their name, then MIME types, to the
+     * Servlet Class implementing it.
+     */
+    protected Map<String,Map<String,Class<? extends Servlet>>> theAppJspfs = new HashMap<>();
+
+    /**
+     * The known JSPFs of the accessories, keyed by their name, then MIME types, to the
+     * Servlet Class implementing it and the Accessory that provided it
+     */
+    protected Map<String,Map<String,Pair<Class<? extends Servlet>,InfoGridAccessory>>> theAccessoryJspfs = new HashMap<>();
+
+    /**
+     * The known JSPOs of the app, keyed by their name, then MIME types, to the
+     * Servlet Class implementing it.
+     */
+    protected Map<String,Map<String,Class<? extends Servlet>>> theAppJspos = new HashMap<>();
+
+    /**
+     * The known JSPOs of the accessories, keyed by their name, then MIME types, to the
+     * Servlet Class implementing it and the Accessory that provided it.
+     */
+    protected Map<String,Map<String,Pair<Class<? extends Servlet>,InfoGridAccessory>>> theAccessoryJspos = new HashMap<>();
+
+    /**
+     * The known HttpShellHandlers of the app, keyed by their name.
+     */
+    protected Map<String,HttpShellHandler> theAppHandlers = new HashMap<>();
+
+    /**
+     * The known HttpShellHandlers of the accessories, keyed by their name.
+     */
+    protected Map<String,Pair<HttpShellHandler,InfoGridAccessory>> theAccessoryHandlers = new HashMap<>();
+
+    /**
      * The regular expression that distinguishes between assets and MeshObject URLs.
      * This is used as an exact match.
      */
     protected static final Pattern theAssetRegex = Pattern.compile( "/[a-z]/.*" );
+    
+    /**
+     * The HTML mime type.
+     */
+    public static final String HTML_MIME = "text/html";
+    
+    /**
+     * Name of the String in the RequestContext that is the context path of the application.
+     * Having this makes the development of path-independent JSPs much simpler. This
+     * is a fully-qualified path from the root of the current host, not including the host.
+     * @see #FULLCONTEXT_PARAMETER
+     */
+    public static final String CONTEXT_PARAMETER = "CONTEXT";
+    
+    /**
+     * Name of the String in the RequestContext that is the context path of the application.
+     * Having this makes the development of path-independent JSPs much simpler. This
+     * is a fully-qualified path including protocol, host and port.
+     * @see #CONTEXT_PARAMETER
+     */
+    public static final String FULLCONTEXT_PARAMETER = "FULLCONTEXT";
+    
+    /**
+     * Name of the String in the RequestContext that is the context path of the application
+     * at the Proxy.
+     * Having this makes the development of path-independent JSPs much simpler. This
+     * is a fully-qualified path from the root of the current host, not including the host.
+     * @see #ORIGINAL_FULLCONTEXT_PARAMETER
+     */
+    public static final String ORIGINAL_CONTEXT_PARAMETER = "ORIGINAL_CONTEXT";
+
+    /** 
+     * Name of the String in the RequestContext that is the context path of the application
+     * at the Proxy.
+     * Having this makes the development of path-independent JSPs much simpler. This
+     * is a fully-qualified path including protocol, host and port.
+     * @see #ORIGINAL_CONTEXT_PARAMETER
+     */
+    public static final String ORIGINAL_FULLCONTEXT_PARAMETER = "ORIGINAL_FULLCONTEXT";
 }
     

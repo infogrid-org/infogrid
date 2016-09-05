@@ -1,19 +1,15 @@
 <%@    page contentType="text/html"
- %>
-<%--
-<%@ taglib prefix="mesh"  uri="/v/org/infogrid/jee/taglib/mesh/mesh.tld"
- %><%@ taglib prefix="candy" uri="/v/org/infogrid/jee/taglib/candy/candy.tld"
- %><%@ taglib prefix="u"     uri="/v/org/infogrid/jee/taglib/util/util.tld"
- %><%@ taglib prefix="v"     uri="/v/org/infogrid/jee/taglib/viewlet/viewlet.tld"
- %><%@ taglib prefix="tmpl"  uri="/v/org/infogrid/jee/taglib/templates/templates.tld"
- %>
---%>
-<%@ taglib prefix="c"     uri="http://java.sun.com/jsp/jstl/core"
+ %><%@ taglib prefix="mesh"  uri="/org/infogrid/web/taglib/mesh/mesh.tld"
+ %><%@ taglib prefix="candy" uri="/org/infogrid/web/taglib/candy/candy.tld"
+ %><%@ taglib prefix="u"     uri="/org/infogrid/web/taglib/util/util.tld"
+ %><%@ taglib prefix="v"     uri="/org/infogrid/web/taglib/viewlet/viewlet.tld"
+ %><%@ taglib prefix="tmpl"  uri="/org/infogrid/web/taglib/templates/templates.tld"
+ %><%@ taglib prefix="c"     uri="http://java.sun.com/jsp/jstl/core"
  %>
 <tmpl:stylesheet href="${CONTEXT}/v/org/infogrid/web/viewlet/propertysheet/PropertySheetViewlet.css"/>
-<tmpl:stylesheet href="${CONTEXT}/v/org/infogrid/web/taglib/viewlet/ChangeViewletStateTag.css"/>
-<tmpl:stylesheet href="${CONTEXT}/v/org/infogrid/web/taglib/mesh/PropertyTag.css"/>
-<tmpl:script src="${CONTEXT}/v/org/infogrid/web/taglib/mesh/PropertyTag.js"/>
+<tmpl:stylesheet href="${CONTEXT}/s/org/infogrid/web/taglib/viewlet/ChangeViewletStateTag.css"/>
+<tmpl:stylesheet href="${CONTEXT}/s/org/infogrid/web/taglib/mesh/PropertyTag.css"/>
+<tmpl:script src="${CONTEXT}/s/org/infogrid/web/taglib/mesh/PropertyTag.js"/>
 
 <v:viewletAlternatives />
 <v:changeViewletState viewletStates="edit" display="compact"/>
@@ -23,9 +19,9 @@
    <td class="title">
     <v:notIfState viewletState="edit">
      <div class="slide-in-button">
-      <u:callJspo page="/o/delete.jspo" action="${Viewlet.postUrl}" linkTitle="Delete this MeshObject" submitLabel="Delete">
+      <u:callJspo name="delete" action="${Viewlet.postUrl}" linkTitle="Delete this MeshObject" submitLabel="Delete">
        <u:callJspoParam name="toDelete" value="${Subject}"/>
-       <img src="${CONTEXT}/s/images/bin_closed.png" alt="Delete" />
+       <div class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-delete-button"><span>Delete</span></div>
       </u:callJspo>
      </div>
     </v:notIfState>

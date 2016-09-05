@@ -81,17 +81,12 @@ public abstract class AbstractSectionTag
             JspException,
             IgnoreException
     {
-        StructuredResponse response = (StructuredResponse) lookup( StructuredResponse.STRUCTURED_RESPONSE_ATTRIBUTE_NAME );
-        if( response == null ) {
-            return null;
-        }
         if( theSectionName == null ) {
             return null;
         }
-        StructuredResponseSection ret = response.obtainTextSection( theSectionName );
-        if( ret == null ) {
-            ret = response.obtainBinarySection( theSectionName );
-        }
+
+        StructuredResponse        response = (StructuredResponse) pageContext.getResponse();
+        StructuredResponseSection ret      = response.obtainSection( theSectionName );
 
         return ret;
     }

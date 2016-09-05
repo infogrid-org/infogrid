@@ -21,6 +21,7 @@ import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.FactoryException;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.http.SaneRequest;
+import org.infogrid.util.logging.Log;
 import org.infogrid.web.JeeFormatter;
 
 /**
@@ -32,9 +33,12 @@ public class DefaultStructuredResponseTemplateFactory
         implements
             StructuredResponseTemplateFactory
 {
+    private static final Log log = Log.getLogInstance( DefaultStructuredResponseTemplateFactory.class ); // our own, private logger
+
     /**
      * Factory method.
      *
+     * @param formatter the JeeFormatter to use
      * @return the created DefaultStructuredResponseTemplateFactory
      */
     public static DefaultStructuredResponseTemplateFactory create(
@@ -49,6 +53,7 @@ public class DefaultStructuredResponseTemplateFactory
      * Factory method.
      *
      * @param defaultTemplateName name of the default template
+     * @param formatter the JeeFormatter to use
      * @return the created DefaultStructuredResponseTemplateFactory
      */
     public static DefaultStructuredResponseTemplateFactory create(
@@ -65,6 +70,7 @@ public class DefaultStructuredResponseTemplateFactory
      *
      * @param defaultTemplateName name of the default template
      * @param defaultMimeType default mime type of no other is specified.
+     * @param formatter the JeeFormatter to use
      * @return the created DefaultStructuredResponseTemplateFactory
      */
     public static DefaultStructuredResponseTemplateFactory create(
@@ -82,6 +88,7 @@ public class DefaultStructuredResponseTemplateFactory
      *
      * @param defaultTemplateName name of the default template
      * @param defaultMimeType default mime type of no other is specified.
+     * @param formatter the JeeFormatter to use
      */
     protected DefaultStructuredResponseTemplateFactory(
             String       defaultTemplateName,
@@ -93,6 +100,27 @@ public class DefaultStructuredResponseTemplateFactory
         theJeeFormatter        = formatter;
     }
 
+    /**
+     * Add a supported template servlet.
+     * 
+     * @param templateName the name of the template
+     * @param mime the MIME type of the request
+     * @param servlet the Servlet
+     */
+    public void addTemplateServlet(
+            String                   templateName,
+            String                   mime,
+            Class<? extends Servlet> servlet )
+    {
+        Map<String,Class<? extends Servlet>> mimeTable = theTemplateServlets.get( templateName );
+        if( mimeTable == null ) {
+            mimeTable = new HashMap<>();
+            theTemplateServlets.put( templateName, mimeTable );
+        }
+        if( mimeTable.put( mime, servlet ) != null ) {
+            log.error( "Overwriting entry in template servlet table", templateName, mime );
+        }
+    }
     /**
      * Factory method.
      *
@@ -108,14 +136,11 @@ public class DefaultStructuredResponseTemplateFactory
         throws
             FactoryException
     {
-        TextStructuredResponseSection   defaultTextSection   = structured.getDefaultTextSection();
-        BinaryStructuredResponseSection defaultBinarySection = structured.getDefaultBinarySection();
+        StructuredResponseSection defaultTextSection = structured.getDefaultSection();
 
         String mime;
         if( !defaultTextSection.isEmpty() ) {
-            mime = defaultTextSection.getMimeType();
-        } else if( !defaultBinarySection.isEmpty() ) {
-            mime = defaultBinarySection.getMimeType();
+            mime = defaultTextSection.getContentType();
         } else {
             mime = theDefaultMimeType;
         }
@@ -180,7 +205,7 @@ public class DefaultStructuredResponseTemplateFactory
 
             } else if( mime != null && !mime.startsWith( "text/" )) {
                 // binary content
-                ret = BinaryPassThruStructuredResponseTemplate.create(
+                ret = PassThruStructuredResponseTemplate.create(
                         request,
                         structured,
                         mime );
@@ -218,11 +243,15 @@ public class DefaultStructuredResponseTemplateFactory
     }
 
     /**
-     * Find a suitable servlet based on the provided name.
+     * Find a suitable Servlet based on the provided name and MIME type
+     * 
+     * @param requestedTemplateName name of the requested servlet
+     * @param mime requested mime type
+     * @return the found Servlet class, or null
      */
     protected Class<? extends Servlet> findTemplateServlet(
-            String             requestedTemplateName,
-            String             mime )
+            String requestedTemplateName,
+            String mime )
     {
         Map<String,Class<? extends Servlet>> mimeAlternatives = theTemplateServlets.get( requestedTemplateName );
         if( mimeAlternatives == null ) {
@@ -244,6 +273,7 @@ public class DefaultStructuredResponseTemplateFactory
 
     /**
      * The known template servlets.
+     * Keyed first by template name, then by MIME type
      */
     protected Map<String,Map<String,Class<? extends Servlet>>> theTemplateServlets = new HashMap<>();
 
@@ -266,14 +296,4 @@ public class DefaultStructuredResponseTemplateFactory
      * Default mime type, if no other has been specified in the constructor or the request.
      */
     public static final String DEFAULT_MIME_TYPE = theResourceHelper.getResourceStringOrDefault( "DefaultMimeType", "text/html" );
-
-    /**
-     * Name of the JSP that contains the template.
-     */
-    public static final String TEMPLATE_JSP_NAME = theResourceHelper.getResourceStringOrDefault( "TemplateJspName", "template.jsp" );
-
-    /**
-     * Path to the directory containing the default template jsp.
-     */
-    public static final String PATH_TO_TEMPLATES = theResourceHelper.getResourceStringOrDefault( "PathToTemplates", "/s/templates/" );
 }

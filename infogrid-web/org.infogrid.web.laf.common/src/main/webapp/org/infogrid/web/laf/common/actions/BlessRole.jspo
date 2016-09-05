@@ -1,0 +1,31 @@
+<%@    page contentType="text/html"
+ %><%@ taglib prefix="mesh"  uri="/org/infogrid/web/taglib/mesh/mesh.tld"
+ %><%@ taglib prefix="u"     uri="/org/infogrid/web/taglib/util/util.tld"
+ %>
+
+<u:jspo>
+ <u:jspoParam name="from" type="org.infogrid.mesh.MeshObject"/>
+ <u:jspoParam name="to"   type="org.infogrid.mesh.MeshObject"/>
+
+ <h2>Bless role between two MeshObjects</h2>
+ <table>
+  <tr>
+   <td class="label">MeshObject:</td>
+   <td>
+    <input type="text" autocorrect="off" autocapitalization="off" class="subject" name="shell.from" size="32" readonly="readonly" value="<mesh:meshObjectId meshObjectName="from" stringRepresentation="HttpPost"/>" />
+   </td>
+  </tr>
+  <tr>
+   <td class="label">RoleType:</td>
+   <td>
+    <mesh:relationshipBlessableBy startObjectName="from" neighborName="to"/>
+   </td>
+  </tr>
+  <tr>
+   <td class="label">Neighbor:</td>
+   <td>
+    <input type="text" autocorrect="off" autocapitalization="off" class="object" name="shell.to" size="32" readonly="readonly" value="<mesh:meshObjectId meshObjectName="to" stringRepresentation="HttpPost"/>" />
+   </td>
+  </tr>
+ </table>
+</u:jspo>

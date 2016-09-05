@@ -14,10 +14,13 @@
 
 package org.infogrid.meshworld;
 
+import javax.servlet.ServletContext;
 import org.infogrid.app.AppConfiguration;
 import org.infogrid.web.app.InfoGridWebApp;
+import org.infogrid.web.sane.SaneServletRequest;
+import org.infogrid.web.templates.StructuredResponse;
 
-/**
+        /**
  * The MeshWorld app.
  */
 public class MeshWorldApp
@@ -36,26 +39,40 @@ public class MeshWorldApp
      * {@inheritDoc}
      */
     @Override
+    protected StructuredResponse createStructuredResponse(
+            SaneServletRequest request, 
+            ServletContext     servletContext )
+    {
+        String contextPath = request.getOriginalSaneRequest().getContextPath();
+        String appHeader = APP_HEADER.replace( "${CONTEXT}", contextPath );
+        String appFooter = APP_FOOTER.replace( "${CONTEXT}", APP_FOOTER );
+        
+        StructuredResponse ret = StructuredResponse.create( servletContext );
+        ret.obtainSection( StructuredResponse.HTML_APP_HEADER_SECTION ).getWriter().print( appHeader );
+        ret.obtainSection( StructuredResponse.HTML_FOOTER_SECTION ).getWriter().print( appFooter );
+        return ret;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void registerResources(
             AppConfiguration config )
     {
-        reg( "/s/images/bin_closed.png" );
-        reg( "/s/images/link_add.png" );
-        reg( "/s/images/link_delete.png" );
-        reg( "/s/images/medal_bronze_add.png" );
-        reg( "/s/images/medal_bronze_delete.png" );
-        reg( "/s/images/medal_silver_add.png" );
-        reg( "/s/images/medal_silver_delete.png" );
+        registerAsset( "/s/images/built-on-infogrid.png", this );
+        registerAsset( "/s/images/infogrid-medium.png",   this );
+        registerAsset( "/s/images/meshworld.png",         this );
     }
     
-    /**
-     * Helper method to make invocations shorter.
-     * 
-     * @param name name/path of the asset
-     */
-    protected void reg(
-            String name )
-    {
-        registerAsset( name, getClass().getClassLoader(), this );
-    }
+    public static final String APP_HEADER
+        = "<a class=\"infogrid\" href=\"http://infogrid.org/\"><img src=\"${CONTEXT}/s/images/infogrid-medium.png\" alt=\"[InfoGrid logo]\" /></a>\n"
+        + "<a href=\"${CONTEXT}/\"><img id=\"app-logo\" src=\"${CONTEXT}/s/images/meshworld.png\" alt=\"[Logo]\" /></a>\n"
+        + "<h1><a href=\"${CONTEXT}/\">The Mesh World</a></h1>\n";
+
+    public static final String APP_FOOTER
+        = "<p><a class=\"built-on-infogrid\" href=\"http://infogrid.org/\"><img src=\"${CONTEXT}/s/images/built-on-infogrid.png\" title=\"Built on InfoGrid&trade;\" alt=\"[Built on InfoGrid&trade;]\"/></a>\n"
+        + "&copy; 2001-2016 Johannes Ernst. All rights reserved. InfoGrid is a trademark or registered trademark of Johannes Ernst.</p>\n"
+        + "<p>Silk Icons from <a href=\"http://www.famfamfam.com/lab/icons/silk/\">famfamfam.com</a> using Creative Commons license.\n"
+        + "<a href=\"http://infogrid.org/\">Learn more</a> about InfoGrid&trade;.</p>\n";
 }

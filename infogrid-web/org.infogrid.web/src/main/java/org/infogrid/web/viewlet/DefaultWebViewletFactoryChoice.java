@@ -94,7 +94,7 @@ public abstract class DefaultWebViewletFactoryChoice
         String target      = (String) pars.get( StringRepresentationParameters.LINK_TARGET_KEY );
         String title       = (String) pars.get( StringRepresentationParameters.LINK_TITLE_KEY );
         String pane        = (String) pars.get( WebViewlet.PANE_STRING_REPRESENTATION_PARAMETER_KEY );
-        Deque<WebViewedMeshObjects> viewedMeshObjectsStack = (Deque<WebViewedMeshObjects>) pars.get(WebViewletFactoryChoice.VIEWEDMESHOBJECTS_STACK_KEY );
+        Deque<WebViewedMeshObjects> viewedMeshObjectsStack = (Deque<WebViewedMeshObjects>) pars.get( WebViewletFactoryChoice.VIEWEDMESHOBJECTS_STACK_KEY );
 
         if( target == null ) {
             target = "_self";

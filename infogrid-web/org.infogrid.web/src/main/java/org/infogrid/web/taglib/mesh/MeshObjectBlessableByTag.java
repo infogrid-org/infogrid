@@ -332,7 +332,7 @@ public class MeshObjectBlessableByTag
 
         print( "<select name=\"" );
         print( editVar );
-        println( ".bless\" class=\"org-infogrid-jee-taglib-mesh-MeshObjectBlessableByTag\">" );
+        println( ".bless\" class=\"org-infogrid-web-taglib-mesh-MeshObjectBlessableByTag\">" );
 
         if( theOfferEmptySelection ) {
             println( " <option value=\"\">None</option>" );

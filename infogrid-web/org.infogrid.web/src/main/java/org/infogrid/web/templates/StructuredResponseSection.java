@@ -14,32 +14,59 @@
 
 package org.infogrid.web.templates;
 
+import java.io.ByteArrayOutputStream;
+import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
-import org.infogrid.util.ArrayHelper;
+import javax.servlet.http.HttpServletResponse;
 import org.infogrid.util.logging.Log;
 
 /**
- * An actual section in a StructuredResponse.
+ * A section in a StructuredResponse.
  */
-public abstract class StructuredResponseSection
+public class StructuredResponseSection
         implements
             HasHeaderPreferences
 {
     private static final Log log = Log.getLogInstance( StructuredResponseSection.class ); // our own, private logger
 
     /**
-     * Constructor for subclasses only.
+     * Factory method.
+     * 
+     * @param maxProblems the maximum number of problems to report in this StructuredResponse
+     * @param maxInfoMessages the maximum number of informational messages to report in this StructuredResponse
+     * @return the created StructuredResponseSection
      */
-    protected StructuredResponseSection()
+    public static StructuredResponseSection create(
+            int maxProblems,
+            int maxInfoMessages )
     {
+        return new StructuredResponseSection( maxProblems, maxInfoMessages );
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param maxProblems the maximum number of problems to report in this StructuredResponse
+     * @param maxInfoMessages the maximum number of informational messages to report in this StructuredResponse
+     */
+    protected StructuredResponseSection(
+            int maxProblems,
+            int maxInfoMessages )
+    {
+        theMaxProblems     = maxProblems;
+        theMaxInfoMessages = maxInfoMessages;
     }
 
     /**
@@ -47,19 +74,50 @@ public abstract class StructuredResponseSection
      *
      * @return true if this section is empty
      */
-    public abstract boolean isEmpty();
+    public boolean isEmpty()
+    {
+        if( theStatus > 0 && theStatus != 200 ) {
+            return false;
+        }
+        if( theTextWriter != null && theTextWriter.size() > 0 ) {
+            return false;
+        }
+        if( theBinaryStream != null && theBinaryStream.size() > 0 ) {
+            return false;
+        }
+        if( theOutgoingCookies != null && !theOutgoingCookies.isEmpty() ) {
+            return false;
+        }
+        if( theCurrentProblems != null && !theCurrentProblems.isEmpty() ) {
+            return false;
+        }
+        return true;
+    }
 
     /**
-     * Stream this StructuredResponseSection to an OutputStream.
+     * Stream the content of this StructuredResponseSection to an HttpServletResponse.
      *
-     * @param s the OutputStream to write to
+     * @param delegate the HttpServletResponse to write to
      * @return true if something was output, false otherwise
      * @throws IOException thrown if an I/O error occurred
      */
-    public abstract boolean doOutput(
-            OutputStream s )
+    public boolean doContentOutput(
+            HttpServletResponse delegate )
         throws
-            IOException;
+            IOException
+    {
+        if( theTextWriter != null ) {
+            delegate.getWriter().print( theTextWriter.toString() );
+            return true;
+
+        } else if( theBinaryStream != null ) {
+            delegate.getOutputStream().write( theBinaryStream.toByteArray() );
+            return true;
+
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Determine whether problems have been reported.
@@ -69,7 +127,7 @@ public abstract class StructuredResponseSection
     @Override
     public boolean haveProblemsBeenReported()
     {
-        return !theCurrentProblems.isEmpty();
+        return theCurrentProblems != null && !theCurrentProblems.isEmpty();
     }
 
     /**
@@ -81,7 +139,12 @@ public abstract class StructuredResponseSection
     public void reportProblem(
             Throwable t )
     {
-        theCurrentProblems.add( t );
+        if( theCurrentProblems == null ) {
+            theCurrentProblems = new ArrayList<>();
+        }
+        if( theCurrentProblems.size() < theMaxProblems ) {
+            theCurrentProblems.add( t );
+        }
     }
 
     /**
@@ -93,7 +156,11 @@ public abstract class StructuredResponseSection
     public void reportProblems(
             Throwable [] ts )
     {
-        for( int i=0 ; i<ts.length ; ++i ) {
+        if( theCurrentProblems == null ) {
+            theCurrentProblems = new ArrayList<>();
+        }
+        int max = Math.min( theMaxProblems - theCurrentProblems.size(), ts.length );
+        for( int i=0 ; i<max ; ++i ) {
             theCurrentProblems.add( ts[i] );
         }
     }
@@ -101,12 +168,16 @@ public abstract class StructuredResponseSection
     /**
      * Obtain the problems reported so far.
      *
-     * @return problems reported so far, in sequence
+     * @return problems reported so far, in sequence. For efficiency, may return null
      */
     @Override
     public Iterator<Throwable> problems()
     {
-        return theCurrentProblems.iterator();
+        if( theCurrentProblems != null ) {
+            return theCurrentProblems.iterator();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -118,10 +189,12 @@ public abstract class StructuredResponseSection
     public void reportInfoMessage(
             Throwable t )
     {
-        if( log.isDebugEnabled() ) {
-            log.debug( "Reporting info message: ", t );
+        if( theCurrentInfoMessages == null ) {
+            theCurrentInfoMessages = new ArrayList<>();
         }
-        theCurrentInfoMessages.add( t );
+        if( theCurrentInfoMessages.size() < theMaxInfoMessages ) {
+            theCurrentInfoMessages.add( t );
+        }
     }
 
     /**
@@ -133,7 +206,11 @@ public abstract class StructuredResponseSection
     public void reportInfoMessages(
             Throwable [] ts )
     {
-        for( int i=0 ; i<ts.length ; ++i ) {
+        if( theCurrentInfoMessages == null ) {
+            theCurrentInfoMessages = new ArrayList<>();
+        }
+        int max = Math.min( theMaxInfoMessages - theCurrentInfoMessages.size(), ts.length );
+        for( int i=0 ; i<max ; ++i ) {
             theCurrentInfoMessages.add( ts[i] );
         }
     }
@@ -146,7 +223,7 @@ public abstract class StructuredResponseSection
     @Override
     public boolean haveInfoMessagesBeenReported()
     {
-        return !theCurrentInfoMessages.isEmpty();
+        return theCurrentInfoMessages != null && !theCurrentInfoMessages.isEmpty();
     }
 
     /**
@@ -157,7 +234,11 @@ public abstract class StructuredResponseSection
     @Override
     public Iterator<Throwable> infoMessages()
     {
-        return theCurrentInfoMessages.iterator();
+        if( theCurrentInfoMessages != null ) {
+            return theCurrentInfoMessages.iterator();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -165,10 +246,10 @@ public abstract class StructuredResponseSection
      *
      * @param newValue the new value
      */
-    public void setMimeType(
+    public void setContentType(
             String newValue )
     {
-        theMimeType = newValue;
+        theContentType = newValue;
     }
 
     /**
@@ -177,9 +258,9 @@ public abstract class StructuredResponseSection
      * @return the MIME type
      */
     @Override
-    public String getMimeType()
+    public String getContentType()
     {
-        return theMimeType;
+        return theContentType;
     }
 
     /**
@@ -190,6 +271,9 @@ public abstract class StructuredResponseSection
     public void addCookie(
             Cookie newCookie )
     {
+        if( theOutgoingCookies == null ) {
+            theOutgoingCookies = new HashMap<>();
+        }
         Cookie found = theOutgoingCookies.put( newCookie.getName(), newCookie );
 
         if( found != null ) {
@@ -207,6 +291,11 @@ public abstract class StructuredResponseSection
     {
         Cookie newCookie = new Cookie( name, "**deleted**" );
         newCookie.setMaxAge( 0 );
+
+        if( theOutgoingCookies == null ) {
+            theOutgoingCookies = new HashMap<>();
+        }
+
         Cookie found = theOutgoingCookies.put( name, newCookie );
 
         if( found != null ) {
@@ -217,12 +306,16 @@ public abstract class StructuredResponseSection
     /**
      * Obtain the getCookies.
      *
-     * @return the getCookies
+     * @return the getCookies. For efficiency, may return null
      */
     @Override
     public Collection<Cookie> getCookies()
     {
-        return theOutgoingCookies.values();
+        if( theOutgoingCookies != null ) {
+            return theOutgoingCookies.values();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -252,10 +345,10 @@ public abstract class StructuredResponseSection
      *
      * @param code the HTTP response code
      */
-    public void setHttpResponseCode(
+    public void setStatus(
             int code )
     {
-        theHttpResponseCode = code;
+        theStatus = code;
     }
 
     /**
@@ -264,9 +357,9 @@ public abstract class StructuredResponseSection
      * @return the HTTP response code
      */
     @Override
-    public int getHttpResponseCode()
+    public int getStatus()
     {
-        return theHttpResponseCode;
+        return theStatus;
     }
 
     /**
@@ -314,6 +407,23 @@ public abstract class StructuredResponseSection
     }
 
     /**
+     * Set an additional header.
+     *
+     * @param name name of the header to add
+     * @param value value of the header to add
+     */
+    public void setHeader(
+            String name,
+            String value )
+    {
+        if( theOutgoingHeaders == null ) {
+            theOutgoingHeaders = new HashMap<>();
+        }
+        ArrayList<String> list = new ArrayList<>();
+        list.add( value );
+        theOutgoingHeaders.put( name, list );
+    }
+    /**
      * Add an additional header.
      *
      * @param name name of the header to add
@@ -323,40 +433,401 @@ public abstract class StructuredResponseSection
             String name,
             String value )
     {
-        addHeader( name, new String[] { value } );
-    }
-
-    /**
-     * Add an additional header.
-     *
-     * @param name name of the header to add
-     * @param value value of the header to add
-     */
-    public void addHeader(
-            String    name,
-            String [] value )
-    {
-        String [] already = theOutgoingHeaders.put( name, value );
-        if( already != null && already.length > 0 ) {
-            theOutgoingHeaders.put( name, ArrayHelper.append( already, value, String.class ));
+        if( theOutgoingHeaders == null ) {
+            theOutgoingHeaders = new HashMap<>();
         }
+        Collection<String> list = theOutgoingHeaders.get( name );
+        if( list == null ) {
+            list = new ArrayList<>();
+            theOutgoingHeaders.put( name, list );
+        }
+        list.add( value );
     }
 
     /**
-     * Obtain the additionla headers.
+     * Obtain the single value of an additional header
+     * 
+     * @param name name of the header
+     * @return the value or null
+     */
+    public String getHeader(
+            String name )
+    {
+        if( theOutgoingHeaders == null ) {
+            return null;
+        }
+        Collection<String> list = theOutgoingHeaders.get( name );
+        if( list == null || list.isEmpty() ) {
+            return null;
+        }
+        return list.iterator().next();
+    }
+
+    /**
+     * Obtain the value(s) of an additional header.
+     * 
+     * @param name name of the header
+     * @return the values, or null
+     */
+    public Collection<String> getHeaders(
+            String name )
+    {
+        if( theOutgoingHeaders == null ) {
+            return null;
+        }
+        Collection<String> list = theOutgoingHeaders.get( name );
+        return list;
+    }
+
+    /**
+     * Obtain the names of the additional headers.
+     * 
+     * @return the names
+     */
+    public Collection<String> getHeaderNames()
+    {
+        if( theOutgoingHeaders == null ) {
+            return null;
+        }
+        return theOutgoingHeaders.keySet();
+    }
+
+    /**
+     * Obtain the additional headers.
      *
-     * @return the headers, as Map
+     * @return the headers, as Map. May return null for efficiency.
      */
     @Override
-    public Map<String,String[]> getHeaders()
+    public Map<String,Collection<String>> getFullHeaders()
     {
         return theOutgoingHeaders;
     }
 
     /**
+     * Determine whether an additional header with this name exists
+     * 
+     * @param name the name
+     * @return true or false
+     */
+    public boolean containsHeader(
+            String name )
+    {
+        return theOutgoingHeaders != null && theOutgoingHeaders.containsKey( name );
+    }
+
+    /**
+     * Obtain the current text content of this section.
+     *
+     * @return the current text content of this section, or null
+     */
+    public String getTextContent()
+    {
+        if( theTextWriter != null ) {
+            thePrintWriter.flush();
+            return theTextWriter.toString();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Set the text content of this section.
+     *
+     * @param newValue the new content of this section
+     */
+    public void setTextContent(
+            String newValue )
+    {
+        if( theBinaryStream != null ) {
+            throw new IllegalStateException( "StructuredResponseSection has binary content already, cannot set text content" );
+        }
+        theTextWriter = new CharArrayWriter(); // throw the old one away
+        thePrintWriter = new PrintWriter( theTextWriter );
+        theTextWriter.append( newValue );
+    }
+
+    /**
+     * Append to the content of this section.
+     *
+     * @param toAppend the content to append to this section
+     */
+    public void appendTextContent(
+            String toAppend )
+    {
+        if( theBinaryStream != null ) {
+            throw new IllegalStateException( "StructuredResponseSection has binary content already, cannot append text content" );
+        }
+        if( theTextWriter == null ) {
+            theTextWriter = new CharArrayWriter();
+            thePrintWriter = new PrintWriter( theTextWriter );
+        }
+        theTextWriter.append( toAppend );
+    }
+
+    /**
+     * Determine whether this section contains this content fragment already.
+     *
+     * @param testContent the content fragment to test
+     * @return true if this section containsContent the testContent already
+     */
+    public boolean containsTextContent(
+            String testContent )
+    {
+        if( theTextWriter == null ) {
+            return false;
+        } else {
+            thePrintWriter.flush();
+            int found = theTextWriter.toString().indexOf( testContent );
+            return found >= 0;
+        }
+    }
+
+    /**
+     * Obtain the current binary content of this section.
+     * 
+     * @return the current content of this section, or null
+     */
+    public byte [] getBinaryContent()
+    {
+        if( theBinaryStream != null ) {
+            return theBinaryStream.toByteArray();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Set the binary content of this section.
+     * 
+     * @param newValue the new content of this section
+     */
+    public void setBinaryContent(
+            byte [] newValue )
+    {
+        if( theTextWriter != null ) {
+            throw new IllegalStateException( "StructuredResponseSection has text content already, cannot set binary content" );
+        }
+        if( theBinaryStream != null ) {
+            throw new IllegalStateException( "StructuredResponseSection has binary content already, cannot set text content" );
+        }
+        theBinaryStream = new ByteArrayOutputStream(); // throw the old one away
+        try {
+            theBinaryStream.write( newValue );
+        } catch( IOException ex ) {
+            // cannot happen
+            log.error( ex );
+        }
+    }
+    
+    /**
+     * Append to the content of this section.
+     * 
+     * @param toAppend the content to append to this section
+     */
+    public void appendBinaryContent(
+            byte [] toAppend )
+    {
+        appendBinaryContent( toAppend, toAppend.length );
+    }
+
+    /**
+     * Append to the content of this section.
+     * 
+     * @param toAppend the content to append to this section
+     * @param len   the number of bytes
+     */
+    public void appendBinaryContent(
+            byte [] toAppend,
+            int     len )
+    {
+        if( theTextWriter != null ) {
+            throw new IllegalStateException( "StructuredResponseSection has text content already, cannot append binary content" );
+        }
+        if( theBinaryStream == null ) {
+            theBinaryStream = new ByteArrayOutputStream();
+        }
+        theBinaryStream.write( toAppend, 0, len );
+    }
+
+    /**
+     * Obtain a ServletOutputStream to write to this section.
+     * 
+     * @return the ServletOutputStream
+     */
+    public ServletOutputStream getOutputStream()
+    {
+        if( theTextWriter != null ) {
+            throw new IllegalStateException( "StructuredResponseSection has text content already, cannot append binary content" );
+        }
+        if( theBinaryStream == null ) {
+            theBinaryStream = new ByteArrayOutputStream();
+        }
+        return new MyServletOutputStream( theBinaryStream );
+    }
+
+    /**
+     * Obtain a PrintWriter to write to this section.
+     * 
+     * @return the PrintWriter
+     */
+    public PrintWriter getWriter()
+    {
+        if( theBinaryStream != null ) {
+            throw new IllegalStateException( "StructuredResponseSection has binary content already, cannot append text content" );
+        }
+        if( theTextWriter == null ) {
+            theTextWriter  = new CharArrayWriter();
+            thePrintWriter = new PrintWriter( theTextWriter );
+        }
+        return thePrintWriter;
+    }
+
+    /**
+     * Convenience method to append text directly without going through Writer.
+     */
+    public void appendText(
+            String toAppend )
+    {
+        getWriter().append( toAppend );
+    }
+
+    /**
+     * Clears any data that exists in any buffers.
+     */
+    public void resetBuffer()
+    {
+        theTextWriter   = null;
+        theBinaryStream = null;
+    }
+
+    /**
+     * Copy the buffer into this StructuredResponse.
+     * 
+     * @param destination the HttpServletResponse to copy to
+     * @throws IOException thown if an input/output error occurred
+     */
+    public void copyAllTo(
+            StructuredResponseSection destination )
+        throws
+            IOException
+    {
+        copyHeaderItemsTo( destination );
+        copyContentTo(     destination );
+    }
+
+    public void copyHeaderItemsTo(
+            StructuredResponseSection destination )
+        throws
+            IOException
+    {
+        if( theStatus > 0 ) {
+            destination.setStatus( theStatus );
+        }
+        if( theContentType != null ) {
+            destination.setContentType( theContentType );
+        }
+        if( theLocale != null ) {
+            destination.setLocale( theLocale );
+        }
+        if( theOutgoingHeaders != null ) {
+            for( String key : theOutgoingHeaders.keySet() ) {
+                for( String value : theOutgoingHeaders.get( key )) {
+                    destination.addHeader( key, value );
+                }
+            }
+        }
+        if( theOutgoingCookies != null ) {
+            for( Cookie c : theOutgoingCookies.values() ) {
+                destination.addCookie( c );
+            }
+        }
+    }
+
+    public void copyContentTo(
+            StructuredResponseSection destination )
+        throws
+            IOException
+    {
+        if( theTextWriter != null ) {
+            thePrintWriter.flush();
+            OutputStreamWriter delegate = new OutputStreamWriter( destination.getOutputStream() );
+            theTextWriter.writeTo( delegate );
+            delegate.flush();
+
+        } else if( theBinaryStream != null ) {
+            theBinaryStream.writeTo( destination.getOutputStream() );
+        } else {
+            // do nothing
+        }
+        destination.getOutputStream().flush();
+    }
+
+    /**
+     * Copy the buffer into this HttpServletResponse.
+     * 
+     * @param destination the HttpServletResponse to copy to
+     * @throws IOException thown if an input/output error occurred
+     */
+    public void copyAllTo(
+            HttpServletResponse destination )
+        throws
+            IOException
+    {
+        copyHeaderItemsTo( destination );
+        copyContentTo(     destination );
+    }
+    
+    public void copyHeaderItemsTo(
+            HttpServletResponse destination )
+        throws
+            IOException
+    {
+        if( theStatus > 0 ) {
+            destination.setStatus( theStatus );
+        }
+        if( theContentType != null ) {
+            destination.setContentType( theContentType );
+        }
+        if( theLocale != null ) {
+            destination.setLocale( theLocale );
+        }
+        if( theOutgoingHeaders != null ) {
+            for( String key : theOutgoingHeaders.keySet() ) {
+                for( String value : theOutgoingHeaders.get( key )) {
+                    destination.addHeader( key, value );
+                }
+            }
+        }
+        if( theOutgoingCookies != null ) {
+            for( Cookie c : theOutgoingCookies.values() ) {
+                destination.addCookie( c );
+            }
+        }
+    }
+
+    public void copyContentTo(
+            HttpServletResponse destination )
+        throws
+            IOException
+    {
+        if( theTextWriter != null ) {
+            thePrintWriter.flush();
+            OutputStreamWriter delegate = new OutputStreamWriter( destination.getOutputStream() );
+            theTextWriter.writeTo( delegate );
+            delegate.flush();
+
+        } else if( theBinaryStream != null ) {
+            theBinaryStream.writeTo( destination.getOutputStream() );
+        } else {
+            // do nothing
+        }
+        destination.getOutputStream().flush();
+    }
+
+    /**
      * The mime type of this section. null is default.
      */
-    protected String theMimeType = null;
+    protected String theContentType = null;
 
     /**
      * The location header, if any.
@@ -372,7 +843,7 @@ public abstract class StructuredResponseSection
     /**
      * The outgoing HTTP response code. -1 stands for "not set".
      */
-    protected int theHttpResponseCode = -1;
+    protected int theStatus = -1;
 
     /**
      * The outgoing Locale.
@@ -387,15 +858,104 @@ public abstract class StructuredResponseSection
     /**
      * The outgoing headers.
      */
-    protected HashMap<String,String[]> theOutgoingHeaders = new HashMap<>();
+    protected HashMap<String,Collection<String>> theOutgoingHeaders;
 
     /**
      * The current problems, in sequence of occurrence.
      */
-    protected ArrayList<Throwable> theCurrentProblems = new ArrayList<>();
+    protected ArrayList<Throwable> theCurrentProblems;
 
     /**
      * The current informational messages, in sequence of occurrence.
      */
-    protected ArrayList<Throwable> theCurrentInfoMessages = new ArrayList<>();
-}
+    protected ArrayList<Throwable> theCurrentInfoMessages;
+
+    /**
+     * The maximum number of problems to store in this section.
+     */
+    protected int theMaxProblems;
+
+    /**
+     * The maximum number of informational messages to store in this section.
+     */
+    protected int theMaxInfoMessages;
+
+    /**
+     * Text content of this section, if any.
+     * This is mutually exclusive with theBinaryContent.
+     */
+    protected CharArrayWriter theTextWriter;
+
+    /**
+     * Delegates to theTextWriter.
+     */
+    protected PrintWriter thePrintWriter;
+
+    /**
+     * Binary content of this section, if any.
+     * This is mutually exclusive with theTextWriter.
+     */
+    protected ByteArrayOutputStream theBinaryStream;
+
+
+    /**
+     * Simple implementation of ServletOutputStream.
+     */
+    static class MyServletOutputStream
+            extends
+                ServletOutputStream
+    {
+        /**
+         * Constructor.
+         *
+         * @param delegate the OutputStream to write to.
+         */
+        public MyServletOutputStream(
+                OutputStream delegate )
+        {
+            theDelegate = delegate;
+        }
+        
+        /**
+         * Write method.
+         *
+         * @param i the integer to write
+         * @throws IOException
+         */
+        @Override
+        public void write(
+                int i )
+            throws
+                IOException
+        {
+            theDelegate.write( i );
+        }
+
+        /**
+         * Can data be written without blocking.
+         * 
+         * @return true or false
+         */
+        @Override
+        public boolean isReady()
+        {
+            return true;
+        }
+
+        /**
+         * Set a listener
+         * 
+         * @param writeListener 
+         */
+        @Override
+        public void setWriteListener(
+                WriteListener writeListener )
+        {
+            throw new UnsupportedOperationException(); // FIXME?
+        }
+
+        /**
+         * The underlying stream.
+         */
+        protected OutputStream theDelegate;
+    }}
