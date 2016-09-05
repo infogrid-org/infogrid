@@ -43,11 +43,12 @@ public class MeshWorldApp
             SaneServletRequest request, 
             ServletContext     servletContext )
     {
+        StructuredResponse ret = super.createStructuredResponse( request, servletContext );
+
         String contextPath = request.getOriginalSaneRequest().getContextPath();
         String appHeader = APP_HEADER.replace( "${CONTEXT}", contextPath );
         String appFooter = APP_FOOTER.replace( "${CONTEXT}", APP_FOOTER );
         
-        StructuredResponse ret = StructuredResponse.create( servletContext );
         ret.obtainSection( StructuredResponse.HTML_APP_HEADER_SECTION ).getWriter().print( appHeader );
         ret.obtainSection( StructuredResponse.HTML_FOOTER_SECTION ).getWriter().print( appFooter );
         return ret;

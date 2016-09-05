@@ -23,18 +23,18 @@ import org.infogrid.web.taglib.IgnoreException;
 /**
  * <p>Tag to support tabbed navigation.</p>
  * <p>The structure of the generated HTML is as follows:</p>
- * <pre>&lt;div class="org_infogrid_jee_taglib_candy_TabbedTag">
- * &lt;div class="org_infogrid_jee_taglib_candy_TabbedTag-header">
- *  &lt;ul class="org_infogrid_jee_taglib_candy_TabbedTag-header-list">
- *   &lt;li class="org_infogrid_jee_taglib_candy_TabbedTag-header-list-item"></pre>
+ * <pre>&lt;div class="org_infogrid_web_taglib_candy_TabbedTag">
+ * &lt;div class="org_infogrid_web_taglib_candy_TabbedTag-header">
+ *  &lt;ul class="org_infogrid_web_taglib_candy_TabbedTag-header-list">
+ *   &lt;li class="org_infogrid_web_taglib_candy_TabbedTag-header-list-item"></pre>
  * <p>(header of tab 1)</p>
  * <pre>   &lt;/li>
- *    &lt;li class="selected org_infogrid_jee_taglib_candy_TabbedTag-header-list-item"></pre>
+ *    &lt;li class="selected org_infogrid_web_taglib_candy_TabbedTag-header-list-item"></pre>
  * <p>(header of tab 2, which is selected)</p>
  * <pre>   &lt;/li>
  *   &lt;/ul>
  *  &lt;/div>
- *  &lt;div class="org_infogrid_jee_taglib_candy_TabbedTag-content"></pre>
+ *  &lt;div class="org_infogrid_web_taglib_candy_TabbedTag-content"></pre>
  * <p>(content of tab 2, which is selected)</p>
  * <pre> &lt;/div>
  *&lt;/div></pre>

@@ -24,7 +24,7 @@ function overlay_show( overlayId, parameters ) {
         } else {
             overlayCanvas = document.createElement("div");
         }
-        overlayCanvas.id = "org-infogrid-jee-taglib-candy-OverlayTagCanvas";
+        overlayCanvas.id = "org-infogrid-web-taglib-candy-OverlayTagCanvas";
 
         body = document.getElementsByTagName( 'body' )[0];
         body.appendChild( overlayCanvas );

@@ -179,16 +179,16 @@ span.org-infogrid-model-primitives-BlobValue > span.mime {
     visibility: hidden;
 }
 
-div.org-infogrid-jee-taglib-mesh-RefreshTag {
+div.org-infogrid-web-taglib-mesh-RefreshTag {
     font-size: 0.7em;
 }
-div.org-infogrid-jee-taglib-viewlet-ChangeViewletStateTag {
+div.org-infogrid-web-taglib-viewlet-ChangeViewletStateTag {
     font-size: 0.7em;
 }
-div.org-infogrid-jee-taglib-viewlet-ViewletAlternativesTag {
+div.org-infogrid-web-taglib-viewlet-ViewletAlternativesTag {
     font-size: 0.7em;
 }
-div.org-infogrid-jee-taglib-viewlet-ViewletAlternativesTag > h3 {
+div.org-infogrid-web-taglib-viewlet-ViewletAlternativesTag > h3 {
     font-size: 1em;
 }
 
@@ -196,7 +196,7 @@ span.org-infogrid-util-MeshTypeIdentifier {
     font-family: Courier;
     font-size: 70%;
 }
-div.org-infogrid-jee-viewlet-meshbase-AllMeshObjectsViewlet > table.set > tbody > tr > td {
+div.org-infogrid-web-viewlet-meshbase-AllMeshObjectsViewlet > table.set > tbody > tr > td {
     font-size: 0.7em;
 }
 a.built-on-infogrid {

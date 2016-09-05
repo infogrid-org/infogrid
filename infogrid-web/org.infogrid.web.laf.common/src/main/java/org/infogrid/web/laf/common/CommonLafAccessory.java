@@ -78,7 +78,10 @@ public class CommonLafAccessory
         app.registerAsset( "/s/org/infogrid/web/laf/common/assets/layout.css", this );
         app.registerAsset( "/s/org/infogrid/web/laf/common/assets/color.css",  this );
 
-    // implementation of org.infogrid.web functionality
+        app.registerAsset( "/s/org/infogrid/web/laf/common/images/cancel.png", this );
+        app.registerAsset( "/s/org/infogrid/web/laf/common/images/tick.png",   this );
+
+        // implementation of org.infogrid.web functionality
         
         app.registerAsset( "/s/org/infogrid/web/taglib/candy/OverlayTag.css", this );
         app.registerAsset( "/s/org/infogrid/web/taglib/candy/OverlayTag.js", this );

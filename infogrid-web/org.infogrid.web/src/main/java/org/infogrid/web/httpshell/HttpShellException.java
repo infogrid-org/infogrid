@@ -20,7 +20,7 @@ import org.infogrid.util.logging.Dumper;
 
 /**
  * Thrown when something went wrong in the
- * {@link org.infogrid.jee.shell.http.HttpShellFilter HttpShellFilter}. For
+ * {@link org.infogrid.web.httpshell.HttpShell HttpShell}. For
  * details, consider the cause of the exception using <code>getCause()</code>.
  */
 public final class HttpShellException

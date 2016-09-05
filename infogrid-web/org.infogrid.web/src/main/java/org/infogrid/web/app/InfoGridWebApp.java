@@ -54,6 +54,7 @@ import org.infogrid.viewlet.DefaultViewletFactory;
 import org.infogrid.viewlet.MeshObjectsToView;
 import org.infogrid.viewlet.ViewletFactory;
 import org.infogrid.viewlet.ViewletMatcher;
+import org.infogrid.web.ProblemReporter;
 import org.infogrid.web.ServletExceptionWithHttpStatusCode;
 import org.infogrid.web.httpshell.HttpShell;
 import org.infogrid.web.httpshell.HttpShellHandler;
@@ -199,8 +200,6 @@ public class InfoGridWebApp
         // SafeUnsafe
         // com.cldstr.cldstr.www.WwwCldstrInitializationFilter
         // AUthenticationFilter
-        // HttpShellFilter
-        // RegexDispatcherFilter
 
         String relativeBaseUri = request.getRelativeBaseUri();
         if( theAssetRegex.matcher( relativeBaseUri ).matches() ) {
@@ -737,6 +736,9 @@ public class InfoGridWebApp
             ServletContext     servletContext )
     {        
         StructuredResponse ret = StructuredResponse.create( servletContext );
+
+        request.setAttribute( ProblemReporter.PROBLEM_REPORTER_ATTRIBUTE_NAME, ret );
+
         return ret;
     }
 

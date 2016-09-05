@@ -28,6 +28,7 @@ import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.text.StringifierException;
 import org.infogrid.web.taglib.IgnoreException;
 import org.infogrid.web.taglib.rest.AbstractRestInfoGridTag;
 
@@ -326,7 +327,11 @@ public class MeshObjectBlessableByTag
             print( "<input type=\"hidden\" name=\"" );
             print( editVar );
             print( "\" value=\"" );
-            print( obj.getIdentifier().toExternalForm() );
+            try {
+                print( getFormatter().formatMeshObjectIdentifier( pageContext, obj, IDENTIFIER_STRING_REPRESENTATION, -1 ));
+            } catch( StringifierException ex ) {
+                throw new JspException( ex );
+            }
             println( "\"/>" );
         }
 
@@ -455,6 +460,13 @@ public class MeshObjectBlessableByTag
      * Name of the request variable that we use internally to count up variables.
      */
     public static final String VARIABLE_COUNTER_NAME = MeshObjectBlessableByTag.class.getName().replace( '.', '_' ) + "-varCounter";
+
+    /**
+     * Name of the StringRepresentation for Identifiers.
+     */
+    public static final String IDENTIFIER_STRING_REPRESENTATION = theResourceHelper.getResourceStringOrDefault(
+            "IdentifierStringRepresentation",
+            "HttpShell" );
 
     /**
      * Format String to generate variable names.
