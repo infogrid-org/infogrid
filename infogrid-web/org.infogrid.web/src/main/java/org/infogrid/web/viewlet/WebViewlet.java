@@ -192,6 +192,7 @@ public interface WebViewlet
      * 
      * @param request the incoming request
      * @param response the StructuredResponse into which to write the result
+     * @param servletContext the ServletContext
      * @throws ServletException thrown if an error occurred
      * @throws IOException thrown if writing the output failed
      */
@@ -222,7 +223,7 @@ public interface WebViewlet
             WebMeshObjectsToView        toView );
 
     /**
-     * Name of the Request attribute that contains the current JeeViewlet instance.
+     * Name of the Request attribute that contains the current WebViewlet instance.
      */
     public static final String VIEWLET_ATTRIBUTE_NAME = "Viewlet";
     
@@ -230,6 +231,11 @@ public interface WebViewlet
      * Name of the Request attribute that contains the REST-ful subject MeshObject.
      */
     public static final String SUBJECT_ATTRIBUTE_NAME = "Subject";
+
+    /**
+     * Name of the Request attribute that contains the MeshObjectsToView.
+     */
+    public static final String TO_VIEW_ATTRIBUTE_NAME = "MeshObjectsToView";
 
     /**
      * Key in the StringRepresentationParameters collection that identifies which pane should be

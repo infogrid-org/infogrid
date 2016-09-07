@@ -14,12 +14,12 @@
 
 package org.infogrid.web.viewlet;
 
+import javax.servlet.Servlet;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.PagingCursorIterator;
 import org.infogrid.util.context.Context;
 import org.infogrid.viewlet.CannotViewException;
-import org.infogrid.viewlet.Viewlet;
 
 /**
  * Factors out common functionality for Viewlets that display sets in
@@ -30,19 +30,23 @@ public abstract class AbstractPagingCursorIterableViewlet
             AbstractCursorIterableViewlet
 {
     /**
-     * Constructor. This is protected: use factory method or subclass.
-     *
-     * @param viewed the AbstractViewedMeshObjects implementation to use
+     * Constructor, for subclasses only.
+     * 
+     * @param viewletName the computable name of the Viewlet
+     * @param servletClass the Servlet implementing this Viewlet
+     * @param viewed the JeeViewedMeshObjects to use
      * @param defaultPageLength the default page length
      * @param c the application context
      */
     protected AbstractPagingCursorIterableViewlet(
-            WebViewedMeshObjects viewed,
-            int                  defaultPageLength,
-            Context              c )
+            String                   viewletName,
+            Class<? extends Servlet> servletClass,
+            WebViewedMeshObjects     viewed,
+            int                      defaultPageLength,
+            Context                  c )
     {
-        super( viewed, c );
-
+        super( viewletName, servletClass, viewed, c );
+        
         theDefaultPageLength = defaultPageLength;
     }
 

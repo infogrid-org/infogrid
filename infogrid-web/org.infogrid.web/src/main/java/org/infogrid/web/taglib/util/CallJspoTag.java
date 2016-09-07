@@ -28,6 +28,8 @@ import org.infogrid.web.taglib.candy.OverlayTag;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.web.app.InfoGridWebApp;
+import org.infogrid.web.templates.StructuredResponse;
+import org.infogrid.web.templates.StructuredResponseSection;
 
 /**
  * <p>Allows the inclusion of JSP overlays as subroutines with parameters.</p>
@@ -338,11 +340,13 @@ public class CallJspoTag
                 }
                 out.println( "<div class=\"dialog-content\">" );
 
-                out.flush();
-
+                StructuredResponse        response   = (StructuredResponse) pageContext.getResponse();
+                StructuredResponseSection oldDefault = response.swapInNewDefaultSection();
                 try {
 
                     app.processJspo( theName, pageContext );
+
+                    response.getDefaultSection().copyContentTo( body.getEnclosingWriter() );
 
                     return EVAL_PAGE;
 
@@ -350,6 +354,8 @@ public class CallJspoTag
                     throw new JspException( ex ); // why in the world are these two differnt types of exceptions?
 
                 } finally {
+                    response.setDefaultSection( oldDefault );
+
                     out.println( "</div>" );
                     if( theAction != null ) {
                         out.println( "<div class=\"dialog-buttons\">" );

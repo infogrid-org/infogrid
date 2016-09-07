@@ -6,7 +6,7 @@
       <div class="slide-in-button">
        <u:callJspo name="bless" action="${Viewlet.postUrl}" linkTitle="Bless this MeshObject" submitLabel="Bless">
         <u:callJspoParam name="toBless" value="${Subject}"/>
-         <div class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-bless-button"><span>Bless</span></div>
+         <span class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-bless-button"><span>Bless</span></span>
        </u:callJspo>
       </div>
      </v:notIfState>
@@ -25,7 +25,7 @@
         <u:callJspo name="unbless" action="${Viewlet.postUrl}" linkTitle="Unbless this MeshObject" submitLabel="Unbless">
          <u:callJspoParam name="toUnbless" value="${Subject}"/>
          <u:callJspoParam name="type"      value="${blessedBy}"/>
-         <div class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unbless-button"><span>Unbless</span></div>
+         <span class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unbless-button"><span>Unbless</span></span>
         </u:callJspo>
        </div>
       </v:notIfState>

@@ -114,7 +114,7 @@ public class ServletStructuredResponseTemplate
             servlet.init(new SimpleServletConfig( theTemplateClass.getName(), servletContext ));
             
             servlet.service( request, response );
-
+            
         } catch( InstantiationException ex ) {
             log.error( ex );
 

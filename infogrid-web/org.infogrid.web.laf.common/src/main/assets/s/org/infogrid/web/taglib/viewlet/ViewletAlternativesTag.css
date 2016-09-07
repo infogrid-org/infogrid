@@ -33,3 +33,7 @@ div.org-infogrid-web-taglib-viewlet-ViewletAlternativesTag > ul > li {
     padding: 0;
 }
 
+div.org-infogrid-web-taglib-viewlet-ViewletAlternativesTag > ul > li.selected,
+div.org-infogrid-web-taglib-viewlet-ViewletAlternativesTag-expanded > ul > li.selected {
+    font-weight: bold;
+}

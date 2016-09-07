@@ -15,15 +15,14 @@
 package org.infogrid.web.taglib.util;
 
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
 import org.infogrid.web.app.InfoGridWebApp;
 import org.infogrid.web.taglib.AbstractInfoGridTag;
 import org.infogrid.web.taglib.IgnoreException;
+import org.infogrid.web.templates.StructuredResponse;
+import org.infogrid.web.templates.StructuredResponseSection;
 
 /**
  * <p>Allows the inclusion of JSP fragments as subroutines with parameters.</p>

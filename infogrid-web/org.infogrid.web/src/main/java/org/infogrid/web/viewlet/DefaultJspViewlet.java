@@ -26,7 +26,7 @@ import org.infogrid.viewlet.ViewletFactoryChoice;
  */
 public class DefaultJspViewlet
         extends
-            AbstractJspViewlet
+            AbstractWebViewlet
 {
     /**
      * Factory method.

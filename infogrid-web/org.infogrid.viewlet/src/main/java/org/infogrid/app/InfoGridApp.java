@@ -23,6 +23,7 @@ import org.infogrid.meshbase.MeshBaseNameServer;
 import org.infogrid.meshbase.m.MMeshBase;
 import org.infogrid.meshbase.m.MMeshBaseNameServer;
 import org.infogrid.meshbase.security.AccessManager;
+import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.modelbase.m.MModelBase;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.context.ObjectInContext;
@@ -73,7 +74,7 @@ public abstract class InfoGridApp
         try {
             theMeshBase = MMeshBase.create(
                     theMeshBaseIdentifierFactory.fromExternalForm( "default" ),
-                    MModelBase.create(),
+                    ModelBaseSingleton.getSingleton(),
                     createAccessManager( config ),
                     theRootContext );
             theRootContext.addContextObject( theMeshBase );

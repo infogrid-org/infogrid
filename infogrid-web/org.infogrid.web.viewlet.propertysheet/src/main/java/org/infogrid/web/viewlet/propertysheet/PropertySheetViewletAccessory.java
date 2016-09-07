@@ -28,7 +28,7 @@ import org.infogrid.web.app.InfoGridWebApp;
 /**
  * A PropertySheet packaged as an InfoGridAccessory.
  */
-public class PropertySheetAccessory
+public class PropertySheetViewletAccessory
     extends
         InfoGridWebAccessory
 {
@@ -39,14 +39,14 @@ public class PropertySheetAccessory
      * @return the accessory that was activated
      * @throws ModuleActivationException thrown if module activation failed
      */
-    public static PropertySheetAccessory moduleActivate(
+    public static PropertySheetViewletAccessory moduleActivate(
             Module thisModule )
         throws
             ModuleActivationException
     {
         System.err.println( "Activating " + thisModule );
 
-        return new PropertySheetAccessory();
+        return new PropertySheetViewletAccessory();
     }
 
     /**

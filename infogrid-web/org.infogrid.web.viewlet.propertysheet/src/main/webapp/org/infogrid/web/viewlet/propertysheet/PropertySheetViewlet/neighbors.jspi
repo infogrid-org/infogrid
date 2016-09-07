@@ -7,7 +7,7 @@
       <div class="slide-in-button">
        <u:callJspo name="relate" action="${Viewlet.postUrl}" linkTitle="Add a neighbor" submitLabel="Relate">
         <u:callJspoParam name="from" value="${Subject}"/>
-        <div class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addneighbor-button"><span>Add a neighbor</span></div>
+        <span class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addneighbor-button"><span>Add a neighbor</span></span>
        </u:callJspo>
       </div>
      </v:notIfState>
@@ -24,7 +24,7 @@
         <u:callJspo name="blessRole" action="${Viewlet.postUrl}" linkTitle="Add a role" submitLabel="Add role">
          <u:callJspoParam name="from" value="${Subject}"/>
          <u:callJspoParam name="to"   value="${neighbor}"/>
-          <div class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addrole-button"><span>Add a role</span></div>
+          <span class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addrole-button"><span>Add a role</span></span>
         </u:callJspo>
        </div>
       </v:notIfState>
@@ -37,7 +37,7 @@
             <u:callJspoParam name="from" value="${Subject}"/>
             <u:callJspoParam name="to"   value="${neighbor}"/>
             <u:callJspoParam name="role" value="${roleType}"/>
-            <div class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-deleterole-button"><span>Delete a role</span></div>
+            <spna class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-deleterole-button"><span>Delete a role</span></span>
            </u:callJspo>
           </div>
          </v:notIfState>
@@ -52,7 +52,7 @@
         <u:callJspo name="unrelate" action="${Viewlet.postUrl}" linkTitle="Unrelate from neighbor" submitLabel="Unrelate">
          <u:callJspoParam name="from" value="${Subject}"/>
          <u:callJspoParam name="to"   value="${neighbor}"/>
-         <div class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unrelate-button"><span>Unrelate from neighbor</span></div>
+         <span class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unrelate-button"><span>Unrelate from neighbor</span></span>
         </u:callJspo>
        </div>
       </v:notIfState>

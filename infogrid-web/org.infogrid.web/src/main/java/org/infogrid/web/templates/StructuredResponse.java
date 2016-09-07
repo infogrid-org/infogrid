@@ -97,6 +97,21 @@ public class StructuredResponse
     }
 
     /**
+     * Create a new section, make it the default, and return
+     * the previously set default section.
+     * 
+     * @return the old default section
+     */
+    public StructuredResponseSection swapInNewDefaultSection()
+    {
+        StructuredResponseSection ret = theDefaultSection;
+        
+        theDefaultSection = obtainSection( String.format( "temp-default-%d", theDefaultSectionIndex++ ));
+        
+        return ret;
+    }
+
+    /**
      * Obtain a section; if the section does not exist, create it.
      *
      * @param name the section name
@@ -872,6 +887,11 @@ public class StructuredResponse
      * Name of the template that is being requested, if any.
      */
     protected String theRequestedTemplateName = null;
+
+    /**
+     * Counts up for naming default sections.
+     */
+    protected int theDefaultSectionIndex;
 
     /**
      * Our ResourceHelper.

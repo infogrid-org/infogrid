@@ -30,6 +30,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.JspWriter;
 import org.infogrid.util.logging.Log;
 
 /**
@@ -726,6 +727,9 @@ public class StructuredResponseSection
         if( theContentType != null ) {
             destination.setContentType( theContentType );
         }
+        if( theLocation != null ) {
+            destination.setLocation( theLocation );
+        }
         if( theLocale != null ) {
             destination.setLocale( theLocale );
         }
@@ -761,6 +765,23 @@ public class StructuredResponseSection
         }
         destination.getOutputStream().flush();
     }
+    
+    public void copyContentTo(
+            JspWriter destination )
+        throws
+            IOException
+    {
+        if( theTextWriter != null ) {
+            thePrintWriter.flush();
+            destination.append( theTextWriter.toString() );
+
+        } else if( theBinaryStream != null ) {
+            log.error( "Cannot write binary to JspWriter" );
+
+        } else {
+            // do nothing
+        }
+    }
 
     /**
      * Copy the buffer into this HttpServletResponse.
@@ -782,7 +803,9 @@ public class StructuredResponseSection
         throws
             IOException
     {
-        if( theStatus > 0 ) {
+        if( theLocation != null ) {
+            destination.sendRedirect( theLocation );
+        } else if( theStatus > 0 ) {
             destination.setStatus( theStatus );
         }
         if( theContentType != null ) {
@@ -825,6 +848,11 @@ public class StructuredResponseSection
     }
 
     /**
+     * The outgoing HTTP response code. -1 stands for "not set".
+     */
+    protected int theStatus = -1;
+
+    /**
      * The mime type of this section. null is default.
      */
     protected String theContentType = null;
@@ -839,11 +867,6 @@ public class StructuredResponseSection
      * able to detect that the same cookie has been set again.
      */
     protected HashMap<String,Cookie> theOutgoingCookies = new HashMap<>();
-
-    /**
-     * The outgoing HTTP response code. -1 stands for "not set".
-     */
-    protected int theStatus = -1;
 
     /**
      * The outgoing Locale.

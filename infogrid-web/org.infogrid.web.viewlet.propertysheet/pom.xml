@@ -92,6 +92,6 @@
     </build>
 
     <properties>
-        <diet4j.activationclass>org.infogrid.web.viewlet.propertysheet.PropertySheetAccessory</diet4j.activationclass>
+        <diet4j.activationclass>org.infogrid.web.viewlet.propertysheet.PropertySheetViewletAccessory</diet4j.activationclass>
     </properties>
 </project>

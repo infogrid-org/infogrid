@@ -59,51 +59,51 @@ div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet > table > * > tr
     padding-left: 10%;
 }
 
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-delete-button:before {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-delete-button:before {
     content: url(bin_closed.png);
 }
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-delete-button > span {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-delete-button > span {
     display: none;
 }
 
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-bless-button:before {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-bless-button:before {
     content: url(medal_bronze_add.png);
 }
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-bless-button > span {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-bless-button > span {
     display: none;
 }
 
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unbless-button:before {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unbless-button:before {
     content: url(medal_bronze_delete.png);
 }
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unbless-button > span {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unbless-button > span {
     display: none;
 }
 
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addneighbor-button:before {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addneighbor-button:before {
     content: url(link_add.png);
 }
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addneighbor-button > span {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addneighbor-button > span {
     display: none;
 }
 
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addrole-button:before {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addrole-button:before {
     content: url(medal_silver_add.png);
 }
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addrole-button > span {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-addrole-button > span {
     display: none;
 }
 
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-deleterole-button:before {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-deleterole-button:before {
     content: url(medal_silver_delete.png);
 }
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-deleterole-button > span {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-deleterole-button > span {
     display: none;
 }
 
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unrelate-button:before {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unrelate-button:before {
     content: url(link_delete.png);
 }
-div.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unrelate-button > span {
+span.org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-unrelate-button > span {
     display: none;
 }

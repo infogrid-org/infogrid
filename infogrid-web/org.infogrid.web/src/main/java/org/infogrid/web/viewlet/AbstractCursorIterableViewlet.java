@@ -14,6 +14,7 @@
 
 package org.infogrid.web.viewlet;
 
+import javax.servlet.Servlet;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.util.CursorIterator;
@@ -31,16 +32,20 @@ public abstract class AbstractCursorIterableViewlet
             AbstractWebViewlet
 {
     /**
-     * Constructor. This is protected: use factory method or subclass.
-     *
+     * Constructor, for subclasses only.
+     * 
+     * @param viewletName the computable name of the Viewlet
+     * @param servletClass the Servlet implementing this Viewlet
      * @param viewed the JeeViewedMeshObjects to use
      * @param c the application context
      */
     protected AbstractCursorIterableViewlet(
-            WebViewedMeshObjects viewed,
-            Context              c )
+            String                   viewletName,
+            Class<? extends Servlet> servletClass,
+            WebViewedMeshObjects     viewed,
+            Context                  c )
     {
-        super( viewed, c );
+        super( viewletName, servletClass, viewed, c );
     }
 
     /**

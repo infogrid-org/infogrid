@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
 import javax.servlet.Servlet;
@@ -102,7 +103,9 @@ public class InfoGridWebApp
             AppConfiguration config )
     {
         registerResources( config );
+        initializeModels( config );
         initializeMeshBase( config );
+        initializeGraph( config );
         initializeUi( (WebAppConfiguration) config );        
     }
     
@@ -127,6 +130,28 @@ public class InfoGridWebApp
     }
 
     /**
+     * Overridable method to initialize available models with this app.
+     * 
+     * @param config the configuration options
+     */
+    protected void initializeModels(
+            AppConfiguration config )
+    {
+        
+    }
+
+    /**
+     * Overridable method to initialize the object graph with this app.
+     * 
+     * @param config the configuration options
+     */
+    protected void initializeGraph(
+            AppConfiguration config )
+    {
+        // no op at this level
+    }
+
+    /**
      * Overridable method to register available resources with this app.
      * 
      * @param config the configuration options
@@ -136,7 +161,7 @@ public class InfoGridWebApp
     {
         // no op at this level
     }
-
+    
     /**
      * Overridable method to initialize the user interface.
      * 
@@ -213,6 +238,26 @@ public class InfoGridWebApp
         response.copyTo( (HttpServletResponse) servletResponse );
     }
     
+    protected <T> Pair<String,T> findByMimeType(
+            Map<String,T> map,
+            String        mime )
+    {
+        T found = map.get( mime ); // FIXME: this may have to become more complex
+        if( found == null && mime == null ) {
+            Iterator<Map.Entry<String,T>> iter = map.entrySet().iterator();
+            if( iter.hasNext() ) { // take anything
+                Map.Entry<String,T> found2 = iter.next();
+                mime  = found2.getKey();
+                found = found2.getValue();
+            }
+        }
+        if( found != null ) {
+            return new Pair<>( mime, found );
+        } else {
+            return null;
+        }
+    }
+
     protected void processAsset(
             SaneServletRequest request,
             StructuredResponse response,
@@ -226,15 +271,24 @@ public class InfoGridWebApp
         StructuredResponseSection section = response.getDefaultSection();
 
         // app assets override accessory assets
-        URL assetUrl = theAppAssets.get( relativeBaseUri );
-        if( assetUrl == null ) {
-            Pair<URL,InfoGridAccessory> found = theAccessoryAssets.get( relativeBaseUri );
-            if( found != null ) {
-                assetUrl = found.getName();
+        Map<String,URL>  appLevel1 = theAppAssets.get( relativeBaseUri );
+        Pair<String,URL> asset     = null;
+
+        if( appLevel1 != null ) {
+            asset = findByMimeType( appLevel1, request.getContentType());
+        }
+        if( asset == null ) {
+            Map<String,Pair<URL,InfoGridAccessory>> accLevel1 = theAccessoryAssets.get( relativeBaseUri );
+            if( accLevel1 != null ) {
+                Pair<String,Pair<URL,InfoGridAccessory>> found = findByMimeType( accLevel1, request.getContentType());
+                if( found != null ) {
+                    asset = new Pair<>( found.getName(), found.getValue().getName() );
+                }
             }
         }
-        if( assetUrl != null ) {
-            InputStream inStream = new BufferedInputStream( assetUrl.openStream() );
+        if( asset != null ) {
+            section.setContentType( asset.getName() );
+            InputStream inStream = new BufferedInputStream( asset.getValue().openStream() );
             byte []     buf      = new byte[8192];
             while( true ) {
                 int read = inStream.read( buf );
@@ -285,11 +339,11 @@ public class InfoGridWebApp
             } catch( FactoryException ex ) {
                 throw new ServletException( ex ); // pass on
             }
+            request.setAttribute( WebViewlet.TO_VIEW_ATTRIBUTE_NAME, toView );
             request.setAttribute( WebViewlet.SUBJECT_ATTRIBUTE_NAME, toView.getSubject() );
         }
 
         if( viewlet != null ) {
-            request.setAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
             request.setAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
 
             processViewlet( toView, viewlet, request, response, servletContext );
@@ -475,11 +529,13 @@ public class InfoGridWebApp
      * 
      * @param path the relative path of the asset
      * @param url the URL of the asset
+     * @param mime the content type of the asset
      * @param installable the registering InfoGridAccessory or InfoGridApp
      */
     public void registerAsset(
             String              path,
             URL                 url,
+            String              mime,
             InfoGridInstallable installable )
     {
         if( path == null || path.length() < 3 || path.charAt( 0 ) != '/' ) {
@@ -492,10 +548,20 @@ public class InfoGridWebApp
             throw new IllegalArgumentException( "Cannot register asset with unidentified installable: " + path + ", " + url.toExternalForm() );
         }
         if( installable == this ) {
-            theAppAssets.put( path, url );
+            Map<String,URL> appLevel1 = theAppAssets.get( path );
+            if( appLevel1 == null ) {
+                appLevel1 = new HashMap<>();
+                theAppAssets.put( path, appLevel1 );
+            }
+            appLevel1.put( mime, url );
             
         } else if( installable instanceof InfoGridAccessory ) {
-            theAccessoryAssets.put( path, new Pair<>( url, (InfoGridAccessory) installable ) );
+            Map<String,Pair<URL,InfoGridAccessory>> accLevel1 = theAccessoryAssets.get( path );
+            if( accLevel1 == null ) {
+                accLevel1 = new HashMap<>();
+                theAccessoryAssets.put( path, accLevel1 );
+            }
+            accLevel1.put( mime, new Pair<>( url, (InfoGridAccessory) installable ) );
 
         } else {
             throw new IllegalArgumentException( "Cannot register asset from a different app: " + installable.getName() + " vs " + getName() );
@@ -513,16 +579,18 @@ public class InfoGridWebApp
      * 
      * @param path the relative path of the asset
      * @param loader the ClassLoader to resolve the path against
+     * @param mime the content type of the asset
      * @param installable the registering InfoGridAccessory or InfoGridApp
      */
     public void registerAsset(
             String              path,
             ClassLoader         loader,
+            String              mime,
             InfoGridInstallable installable )
     {
         String pathWithoutSlash = path.substring( 1 );
 
-        registerAsset( path, loader.getResource( pathWithoutSlash ), installable );
+        registerAsset( path, loader.getResource( pathWithoutSlash ), mime, installable );
     }
 
     /**
@@ -541,7 +609,38 @@ public class InfoGridWebApp
             String              path,
             InfoGridInstallable installable )
     {
-        registerAsset( path, installable.getClass().getClassLoader(), installable );
+        String mime = determineMimeFromFile( path );
+        if( mime == null ) {
+            throw new IllegalArgumentException( "Cannot determine content type from file extension, register explicitly: " + path );
+        }
+        registerAsset( path, installable.getClass().getClassLoader(), mime, installable );
+    }
+
+    protected String determineMimeFromFile(
+            String path )
+    {
+        int lastPeriod = path.lastIndexOf( '.' );
+        if( lastPeriod > 0 ) {
+            switch( path.substring( lastPeriod+1 )) {
+                case "txt":
+                    return "text/plain";
+                case "html":
+                case "xhtml":
+                    return "text/html";
+                case "css":
+                    return "text/css";
+                case "png":
+                    return "image/png";
+                case "jpg":
+                case "jpeg":
+                    return "image/jpg";
+                case "gif":
+                    return "image/gif";
+                case "js":
+                    return "application/javascript";
+            }
+        }
+        return null;
     }
 
     /**
@@ -773,16 +872,16 @@ public class InfoGridWebApp
     protected HttpShell theShell;
 
     /**
-     * The known assets of the app, keyed by their relative request URLs and
-     * mapped to the URLs from which they can be obtained.
+     * The known assets of the app, keyed by their relative request URLs, then MIME types,
+     * to the URLs from which they can be obtained.
      */
-    protected Map<String,URL> theAppAssets = new HashMap<>();
+    protected Map<String,Map<String,URL>> theAppAssets = new HashMap<>();
 
     /**
-     * The known assets of the accessories, keyed by their relative request URLs
-     * and mapped to the URLs from which they can be obtained.
+     * The known assets of the accessories, keyed by their relative request URLs,
+     * then MIME types, to the URLs from which they can be obtained.
      */
-    protected Map<String,Pair<URL,InfoGridAccessory>> theAccessoryAssets = new HashMap<>();
+    protected Map<String,Map<String,Pair<URL,InfoGridAccessory>>> theAccessoryAssets = new HashMap<>();
 
     /**
      * The known JSPFs of the app, keyed by their name, then MIME types, to the

@@ -130,7 +130,10 @@ public class Main
         // https://github.com/eclipse/jetty.project/issues/894
         // contextHandler.setClassLoader( Main.class.getClassLoader() );
 
-        contextHandler.setSessionHandler( new SessionHandler() );
+        SessionHandler sessionHandler = new SessionHandler();
+        sessionHandler.getSessionManager().setSessionIdPathParameterName( null );
+        // per http://stackoverflow.com/questions/7727534/how-do-you-disable-jsessionid-for-jetty-running-with-the-eclipse-jetty-maven-plu
+        contextHandler.setSessionHandler( sessionHandler );
 
         String virtualHost = theConfig.getAppVirtualHost();
         if( virtualHost != null ) {

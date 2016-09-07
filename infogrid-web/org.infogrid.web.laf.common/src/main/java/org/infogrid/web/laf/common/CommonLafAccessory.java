@@ -25,6 +25,7 @@ import jsps.org.infogrid.web.laf.common.actions.Sweep_jspo;
 import jsps.org.infogrid.web.laf.common.actions.UnblessRole_jspo;
 import jsps.org.infogrid.web.laf.common.actions.Unbless_jspo;
 import jsps.org.infogrid.web.laf.common.actions.Unrelate_jspo;
+import jsps.org.infogrid.web.laf.common.templates.BareHtmlTemplate_jsp;
 import jsps.org.infogrid.web.laf.common.templates.DefaultHtmlTemplate_jsp;
 import org.diet4j.core.Module;
 import org.diet4j.core.ModuleActivationException;
@@ -72,6 +73,11 @@ public class CommonLafAccessory
                 "default",
                 HTML,
                 DefaultHtmlTemplate_jsp.class,
+                this );
+        app.registerViewletTemplate(
+                "bare",
+                HTML,
+                BareHtmlTemplate_jsp.class,
                 this );
         
         app.registerAsset( "/s/org/infogrid/web/laf/common/assets/master.css", this );

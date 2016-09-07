@@ -63,7 +63,7 @@ public class DefaultJspViewletFactoryChoice
             Class<? extends Servlet> servletClass,
             double                   matchQuality )
     {
-        super( toView, AbstractWebViewlet.class, servletClass.getName(), matchQuality );
+        super( toView, DefaultJspViewlet.class, viewletName, matchQuality );
 
         theName         = viewletName;
         theServletClass = servletClass;
@@ -90,7 +90,7 @@ public class DefaultJspViewletFactoryChoice
     {
         ArrayList<String> almost = new ArrayList<>();
 
-        almost.add( theServletClass.getName() );
+        almost.add( theName);
 
         determineClassNames( theViewletClass, almost );
 

@@ -21,7 +21,7 @@
      <div class="slide-in-button">
       <u:callJspo name="delete" action="${Viewlet.postUrl}" linkTitle="Delete this MeshObject" submitLabel="Delete">
        <u:callJspoParam name="toDelete" value="${Subject}"/>
-       <div class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-delete-button"><span>Delete</span></div>
+       <span class="org-infogrid-web-viewlet-propertysheet-PropertySheetViewlet-delete-button"><span>Delete</span></span>
       </u:callJspo>
      </div>
     </v:notIfState>

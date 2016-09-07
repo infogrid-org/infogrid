@@ -21,6 +21,7 @@
         <module>org.infogrid.web</module>
         <module>org.infogrid.web.laf.common</module>
         <module>org.infogrid.web.viewlet.propertysheet</module>
+        <module>org.infogrid.web.viewlet.meshbase</module>
     </modules>
 
     <build>

@@ -93,6 +93,7 @@ package() {
     installJar 'infogrid-web' 'org.infogrid.viewlet'
     installJar 'infogrid-web' 'org.infogrid.web'
     installJar 'infogrid-web' 'org.infogrid.web.laf.common'
+    installJar 'infogrid-web' 'org.infogrid.web.viewlet.meshbase'
     installJar 'infogrid-web' 'org.infogrid.web.viewlet.propertysheet'
 }
 

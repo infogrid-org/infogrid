@@ -138,10 +138,11 @@ public class DefaultStructuredResponseTemplateFactory
     {
         StructuredResponseSection defaultTextSection = structured.getDefaultSection();
 
-        String mime;
+        String mime = null;
         if( !defaultTextSection.isEmpty() ) {
             mime = defaultTextSection.getContentType();
-        } else {
+        }
+        if( mime == null ) {
             mime = theDefaultMimeType;
         }
 
@@ -182,16 +183,6 @@ public class DefaultStructuredResponseTemplateFactory
             if( templateServlet == null ) {
                 // try default template if named template did not work
                 templateServlet = findTemplateServlet( theDefaultTemplateName, mime );
-            }
-            if( templateServlet == null && mime == null ) {
-                // if no mime type is specified, default to html
-                if( requestedTemplateName != null ) {
-                    templateServlet = findTemplateServlet( requestedTemplateName, "text/html" );
-                }
-                if( templateServlet == null && ( requestedTemplateName != null && requestedTemplateName.length() > 0 )) {
-                    // try default template if named template did not work
-                    templateServlet = findTemplateServlet( theDefaultTemplateName, "text/html" );
-                }
             }
 
             if( templateServlet != null ) {
