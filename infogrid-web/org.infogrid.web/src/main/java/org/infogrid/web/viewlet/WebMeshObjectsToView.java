@@ -20,7 +20,7 @@ import org.infogrid.util.http.SaneUrl;
 import org.infogrid.viewlet.MeshObjectsToView;
 
 /**
- * Augments MeshObjectsToView for JEE Viewlets.
+ * Augments MeshObjectsToView for Web Viewlets.
  */
 public interface WebMeshObjectsToView
         extends
@@ -31,7 +31,7 @@ public interface WebMeshObjectsToView
      *
      * @return the desired state
      */
-    public JeeViewletState getViewletState();
+    public WebViewletState getViewletState();
 
     /**
      * Set the desired JeeViewletState.
@@ -39,14 +39,14 @@ public interface WebMeshObjectsToView
      * @param newValue the new value
      */
     public void setViewletState(
-            JeeViewletState newValue );
+            WebViewletState newValue );
 
     /**
      * Obtain the desired JeeViewletStateTransition.
      *
      * @return the desired transition
      */
-    public JeeViewletStateTransition getViewletStateTransition();
+    public WebViewletStateTransition getViewletStateTransition();
 
     /**
      * The desired JeeViewletStateTransition.
@@ -54,7 +54,7 @@ public interface WebMeshObjectsToView
      * @param newValue the new value
      */
     public void setViewletStateTransition(
-            JeeViewletStateTransition newValue );
+            WebViewletStateTransition newValue );
 
     /**
      * Obtain the requested MIME type.

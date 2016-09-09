@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,12 +21,12 @@ import org.infogrid.util.FactoryException;
 /**
  * <p>A factory for Viewlets. Objects supporting this interface not only support the
  *    regular {@link org.infogrid.util.Factory Factory} pattern, but also method
- *    {@link #determineFactoryChoices determineFactoryChoices}.</p>
+ *    {@link #determineViewletChoices determineFactoryChoices}.</p>
  * <p>One can best visualize the purpose of this method in terms of a user interface:
  *    the obtained {@link ViewletFactoryChoice ViewletFactoryChoices} could
  *    be displayed as the choices the user has in executing the creation method of
  *    a factory. For example, a given MeshObject could be displayed using a PropertySheet
- *    or a custom viewlet; either of those could be displayed in the current window
+ *    or a custom Viewlet; either of those could be displayed in the current window
  *    or in a new window. In this example, 4 ViewletFactoryChoices would be returned,
  *    representing the 2x2 choices the user has to display the given MeshObject.
  *    The ViewletFactoryChoices are clearly distinct from the results of executing
@@ -40,7 +40,8 @@ public interface ViewletFactory
 {
     /**
      * Factory method. This is inherited from the <code>Factory</code> interface, but
-     * repeated here for clarity.
+     * repeated here for clarity. This will instantiate the best ViewletFactoryChoice
+     * found by the ViewletFactory.
      *
      * @param key the MeshObjectsToView with this Viewlet
      * @param argument any argument-style information required for object creation, if any
@@ -60,7 +61,7 @@ public interface ViewletFactory
      * @param theObjectsToView the MeshObjectsToView
      * @return the found ViewletFactoryChoices, if any
      */
-    public ViewletFactoryChoice [] determineFactoryChoices(
+    public ViewletFactoryChoice [] determineViewletChoices(
             MeshObjectsToView theObjectsToView );
 
     /**
@@ -70,11 +71,11 @@ public interface ViewletFactory
      * @param theObjectsToView the MeshObjectsToView
      * @return the found ViewletFactoryChoices, if any
      */
-    public ViewletFactoryChoice [] determineFactoryChoicesOrderedByMatchQuality(
+    public ViewletFactoryChoice [] determineOrderedViewletChoices(
             MeshObjectsToView theObjectsToView );
 
     /**
-     * Register a new Viewlet by way of its ViewletMatcher.
+     * Register a new Viewlet by way of a ViewletMatcher.
      * 
      * @param matcher the ViewletMatcher
      * @param installable the InfoGridApp or InfoGridAccessory performing the registration

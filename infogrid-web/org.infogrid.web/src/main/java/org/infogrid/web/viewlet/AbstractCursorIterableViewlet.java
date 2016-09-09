@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -78,7 +78,7 @@ public abstract class AbstractCursorIterableViewlet
     }
 
     /**
-     * Detemine the correct CursorIterator. Default implementation can be
+     * Determine the correct CursorIterator. Default implementation can be
      * overridden by subclasses.
      *
      * @return the CursorIterator
@@ -113,7 +113,6 @@ public abstract class AbstractCursorIterableViewlet
         if( minName != null || maxName != null ) {
             MeshObject min;
             MeshObject max;
-            int        page;
 
             if( minName != null ) {
                 try {

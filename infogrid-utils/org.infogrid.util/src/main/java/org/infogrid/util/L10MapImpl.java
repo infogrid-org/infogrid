@@ -24,12 +24,38 @@ import java.util.NoSuchElementException;
  *
  * <p>This will not scale for large numbers of supported locales, but it is good for just one or
  * a handful of locales (the typical case here).</p>
+ * 
+ * @param <T> the type of the Map's values
  */
-public abstract class L10MapImpl<T>
+public class L10MapImpl<T>
         implements
             L10Map<T>
 {
     private final static long serialVersionUID = 1L; // helps with serialization
+
+    /**
+     * Create an empty L10Map.
+     * 
+     * @return the empty L10Map
+     * @param <T> the type of the Map's values
+     */
+    public static <T> L10MapImpl<T> create()
+    {
+        return new L10MapImpl<>( null, null, null );
+    }
+
+    /**
+     * Create an L10Map that only has a default value.
+     * 
+     * @param defaultValue the default value
+     * @return the L10Map
+     * @param <T> the type of the Map's values
+     */
+    public static <T> L10MapImpl<T> create(
+            T defaultValue )
+    {
+        return new L10MapImpl<>( defaultValue, null, null );
+    }
 
     /**
      * Construct an L10Map from a HashMap whose keys are String representations of the Locale,
@@ -241,6 +267,7 @@ public abstract class L10MapImpl<T>
      *
      * @return the default value
      */
+    @Override
     public T getDefault()
     {
         return defaultValue;

@@ -25,7 +25,7 @@ import org.infogrid.util.context.Context;
 import org.infogrid.util.http.SaneUrl;
 
 /**
- * Augments MeshObjectsToView for JEE Viewlets.
+ * Augments MeshObjectsToView for Web Viewlets.
  */
 public class DefaultWebMeshObjectsToView
         extends
@@ -56,8 +56,8 @@ public class DefaultWebMeshObjectsToView
             TraversalSpecification    traversalSpecification,
             TraversalPathSet          traversalPaths,
             MeshBase                  mb,
-            JeeViewletState           state,
-            JeeViewletStateTransition transition,
+            WebViewletState           state,
+            WebViewletStateTransition transition,
             String                    mimeType,
             String                    contextPath,
             Context                   c,
@@ -83,11 +83,12 @@ public class DefaultWebMeshObjectsToView
      *
      * @return copy of this object
      */
+    @Override
     public DefaultWebMeshObjectsToView createCopy()
     {
         HashMap<String,Object[]> paramsCopy = null;
         if( theViewletParameters != null ) {
-            paramsCopy = new HashMap<String,Object[]>();
+            paramsCopy = new HashMap<>();
             paramsCopy.putAll( theViewletParameters );
         }
 

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -56,18 +56,29 @@ public class DaemonConfiguration
             theProperties.load( new FileInputStream( configFile ));
         }
 
-        theHttpServerPort    = Integer.parseInt( theProperties.getProperty( "HttpServerPort",    "8081" ));
-        theHttpServerThreads = Integer.parseInt( theProperties.getProperty( "HttpServerThreads", "200" )); // same as in Jetty default
-        theAppVirtualHost    = theProperties.getProperty( "AppVirtualHost" );                              // any
-        theAppContextPath    = theProperties.getProperty( "AppContextPath", "" );                          // root of site
+        theHttpServerPort    = Integer.parseInt( theProperties.getProperty( HTTP_SERVER_PORT_KEYWORD,    DEFAULT_HTTP_SERVER_PORT ));
+        theHttpServerThreads = Integer.parseInt( theProperties.getProperty( HTTP_SERVER_THREADS_KEYWORD, DEFAULT_HTTP_SERVER_THREADS ));
 
-        theAppModuleRequirement = ModuleRequirement.create( theProperties.getProperty( "AppModule" ));
+        theAppVirtualHost    = theProperties.getProperty( APP_VIRTUAL_HOST_KEYWORD );
+        theAppContextPath    = theProperties.getProperty( APP_CONTEXT_PATH_KEYWORD, DEFAULT_CONTEXT_PATH );
 
-        String [] accReqs = theProperties.getProperty( "AccessoryModules", "" ).trim().split( "\\s*,\\s*" );
+        theAppModuleRequirement = ModuleRequirement.create( theProperties.getProperty( APP_MODULE_KEYWORD ));
+
+        String accString  = theProperties.getProperty( ACCESSORY_MODULES_KEYWORD, "" ).trim();
+        String [] accReqs;
+        if( accString.isEmpty() ) {
+            // split of empty string does not return empty array
+            accReqs = new String[0];
+        } else {
+            accReqs = accString.split( "\\s*,\\s*" );
+        }
         theAccessoryModuleRequirements = new ModuleRequirement[ accReqs.length ];
         for( int i=0 ; i<accReqs.length ; ++i ) {
             theAccessoryModuleRequirements[i] = ModuleRequirement.create( accReqs[i] );
         }
+        
+        theDatabaseConnectionString = theProperties.getProperty( MAIN_DB_CONNECTION_KEYWORD );
+        theMeshBaseTable            = theProperties.getProperty( MAIN_MESHBASE_DB_TABLE_KEYWORD, DEFAULT_MESHBASE_DB_TABLE );
     }
 
     /**
@@ -99,4 +110,69 @@ public class DaemonConfiguration
      * Requested number of threads for the HTTP server.
      */
     private final int theHttpServerThreads;
+
+    /**
+     * Keyword in the config file indicating the port at which to run the HTTP server.
+     */    
+    public static final String HTTP_SERVER_PORT_KEYWORD = "HttpServerPort";
+    
+    /**
+     * Default HTTP server port.
+     */
+    public static final String DEFAULT_HTTP_SERVER_PORT = "8081";
+    
+    /**
+     * Keyword in the config file indicating the number of threads to use for the
+     * HTTP server.
+     */
+    public static final String HTTP_SERVER_THREADS_KEYWORD = "HttpServerThreads";
+
+    /**
+     * Default number of threads to use for the HTTP server.
+     * Use the same as Jetty's default.
+     */
+    public static final String DEFAULT_HTTP_SERVER_THREADS = "200";
+
+    /**
+     * Keyword in the config file indicating the virtual host for the app.
+     */
+    public static final String APP_VIRTUAL_HOST_KEYWORD = "AppVirtualHost";
+
+    /**
+     * Keyword in the config file indicating the context path for the app.
+     */    
+    public static final String APP_CONTEXT_PATH_KEYWORD = "AppContextPath";
+    
+    /**
+     * Default context path.
+     */
+    public static final String DEFAULT_CONTEXT_PATH = "";
+
+    /**
+     * Keyword in the config file indicating the name of the app's top module.
+     */
+    public static final String APP_MODULE_KEYWORD = "AppModule";
+
+    /**
+     * Keyword in the config file indicating the names of the app's accessories,
+     * separated by commas.
+     */
+    public static final String ACCESSORY_MODULES_KEYWORD = "AccessoryModules";
+
+    /**
+     * Keyword in the config file indicating the connection string to the main
+     * database.
+     */
+    public static final String MAIN_DB_CONNECTION_KEYWORD = "MainDbConnection";
+    
+    /**
+     * Keyword in the config file indicating the name of the table in the main
+     * database that contains the main MeshBase's MeshObjects.
+     */
+    public static final String MAIN_MESHBASE_DB_TABLE_KEYWORD = "MainMeshBaseDbTable";
+    
+    /**
+     * Default name of the table that contains the main MeshBase's MeshObjects.
+     */
+    public static final String DEFAULT_MESHBASE_DB_TABLE = "MeshObjects";
 }

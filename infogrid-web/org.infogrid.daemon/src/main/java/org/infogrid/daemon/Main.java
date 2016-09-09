@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,9 +16,9 @@ package org.infogrid.daemon;
 
 import org.infogrid.web.app.InfoGridWebApp;
 import java.io.BufferedInputStream;
-import java.util.Locale;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.jsp.JspFactory;
@@ -36,7 +36,7 @@ import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.BufferingInputStream;
 import org.infogrid.util.logging.Log;
 import org.infogrid.util.logging.log4j.Log4jLog;
 import org.infogrid.util.logging.log4j.Log4jLogFactory;
@@ -62,7 +62,6 @@ public class Main
         System.err.println( "Activating " + thisModule );
 
         activateLogging( thisModule );
-        activateResourceHelper( thisModule );
 
         theDaemonModule = thisModule;
     }
@@ -213,18 +212,33 @@ public class Main
             ModuleActivationException
     {
         Properties logProperties = new Properties();
-        try {
-            logProperties.load( new BufferedInputStream( thisModule.getClassLoader().getResourceAsStream( "org/infogrid/daemon/Log.properties" )));
+        boolean    initialized   = false;
 
-        } catch( Throwable ex ) {
-            throw new ModuleActivationException(
-                    thisModule.getModuleMeta(),
-                    "Log4j configuration file could not be loaded",
-                    ex );
+        if( DAEMON_LOG4J_CONFIG_FILESYSTEM.exists() ) {
+            try {
+                if( DAEMON_LOG4J_CONFIG_FILESYSTEM.canRead() ) {
+                    logProperties.load( new BufferingInputStream( new FileInputStream( DAEMON_LOG4J_CONFIG_FILESYSTEM )));
+                    initialized = true;
+                }
+            } catch( Throwable t) {
+                System.err.println( "Failed to read log4j configuration from: " + DAEMON_LOG4J_CONFIG_FILESYSTEM );
+                // ignore
+            }
         }
+        if( !initialized ) {
+            try {
+                logProperties.load( new BufferedInputStream( thisModule.getClassLoader().getResourceAsStream( DAEMON_LOG4J_CONFIG_RESOURCE )));
+
+            } catch( Throwable ex ) {
+                throw new ModuleActivationException(
+                        thisModule.getModuleMeta(),
+                        "Default Log4j configuration file could not be loaded from " + DAEMON_LOG4J_CONFIG_RESOURCE,
+                        ex );
+            }
+        }
+            
         try {
             Log4jLog.configure( logProperties );
-            // which logger is being used is defined in the module dependency declaration through parameters
         } catch( Throwable ex ) {
             // This can happen, for example, when a file could not be written
             throw new ModuleActivationException(
@@ -232,29 +246,6 @@ public class Main
                     ex );
         }
         Log.setLogFactory( new Log4jLogFactory() );
-    }
-
-    /**
-     * Helper method to activate the application-level ResourceHelper.
-     * 
-     * @param thisModule the Module being activated
-     * @throws ModuleActivationException a problem occurred during activation
-     */
-    private static void activateResourceHelper(
-            Module thisModule )
-        throws
-            ModuleActivationException
-    {
-        try {
-            ResourceHelper.setApplicationResourceBundle(
-                    ResourceBundle.getBundle( "org.infogrid.daemon.Daemon", Locale.getDefault(), thisModule.getClassLoader() ));
-
-        } catch( Throwable ex ) {
-            throw new ModuleActivationException(
-                    thisModule.getModuleMeta(),
-                    ex );
-        }
-        ResourceHelper.initializeLogging();
     }
 
     /**
@@ -279,8 +270,9 @@ public class Main
     
     /**
      * The accessories for the main application.
+     * Same sequence as theAccessoryModules, possibly containing nulls,
      */
-    protected static InfoGridWebAccessory [] theAccessories; // same sequence as theAccessoryModules, possibly containing nulls
+    protected static InfoGridWebAccessory [] theAccessories;
 
     /**
      * The configuration provided to the daemon by means of a config file.
@@ -291,4 +283,16 @@ public class Main
      * The HTTP server.
      */
     protected static Server theJettyServer;
+    
+    /**
+     * The log4j configuration file in the file system. This is optional and will
+     * be loaded in preference to 
+     */
+    public static final File DAEMON_LOG4J_CONFIG_FILESYSTEM = new File( "/etc/infogrid/daemon-log4j.properties" );
+    
+    /**
+     * The log4j configuration resource in this module. This is the fallback if
+     * DAEMON_LOG4J_CONFIG_FILESYSTEM could not be loaded.
+     */
+    public static final String DAEMON_LOG4J_CONFIG_RESOURCE = "org/infogrid/daemon/Log.properties";
 }

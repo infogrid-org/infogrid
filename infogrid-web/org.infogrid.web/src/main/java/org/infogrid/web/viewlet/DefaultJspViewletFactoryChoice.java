@@ -8,13 +8,14 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.web.viewlet;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import javax.servlet.Servlet;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.ResourceHelper;
@@ -88,7 +89,7 @@ public class DefaultJspViewletFactoryChoice
     @Override
     public String [] getInterfaceNames()
     {
-        ArrayList<String> almost = new ArrayList<>();
+        Set<String> almost = new HashSet<>();
 
         almost.add( theName);
 

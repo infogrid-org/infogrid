@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,11 +21,11 @@ import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationParameters;
 
 /**
- * Default implementation of JeeViewletStateTransition.
+ * Default implementation of WebViewletStateTransition.
  */
 public enum DefaultWebViewletStateTransitionEnum
         implements
-            JeeViewletStateTransition
+            WebViewletStateTransition
 {
     DO_EDIT( "do-edit" ) {
         /**
@@ -33,7 +33,8 @@ public enum DefaultWebViewletStateTransitionEnum
          *
          * @return the desired state after this transition has been taken
          */
-        public JeeViewletState getNextState()
+        @Override
+        public WebViewletState getNextState()
         {
             return DefaultWebViewletStateEnum.EDIT;
         }
@@ -44,7 +45,8 @@ public enum DefaultWebViewletStateTransitionEnum
          *
          * @return the desired state after this transition has been taken
          */
-        public JeeViewletState getNextState()
+        @Override
+        public WebViewletState getNextState()
         {
             return DefaultWebViewletStateEnum.PREVIEW;
         }
@@ -55,7 +57,8 @@ public enum DefaultWebViewletStateTransitionEnum
          *
          * @return the desired state after this transition has been taken
          */
-        public JeeViewletState getNextState()
+        @Override
+        public WebViewletState getNextState()
         {
             return DefaultWebViewletStateEnum.VIEW;
         }
@@ -66,7 +69,8 @@ public enum DefaultWebViewletStateTransitionEnum
          *
          * @return the desired state after this transition has been taken
          */
-        public JeeViewletState getNextState()
+        @Override
+        public WebViewletState getNextState()
         {
             return DefaultWebViewletStateEnum.VIEW;
         }
@@ -88,11 +92,11 @@ public enum DefaultWebViewletStateTransitionEnum
      *
      * @return the name of this transition
      */
+    @Override
     public String getName()
     {
         return theTransitionName;
     }
-
 
     /**
      * Obtain the correct member of this enum, given this incoming request.
@@ -124,6 +128,7 @@ public enum DefaultWebViewletStateTransitionEnum
      * @param pars collects parameters that may influence the String representation. Always provided.
      * @return String representation
      */
+    @Override
     public String toStringRepresentation(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
@@ -139,6 +144,7 @@ public enum DefaultWebViewletStateTransitionEnum
      * @param pars collects parameters that may influence the String representation. Always provided.
      * @return String representation
      */
+    @Override
     public String toStringRepresentationLinkStart(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
@@ -154,6 +160,7 @@ public enum DefaultWebViewletStateTransitionEnum
      * @param pars collects parameters that may influence the String representation. Always provided.
      * @return String representation
      */
+    @Override
     public String toStringRepresentationLinkEnd(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
@@ -169,5 +176,5 @@ public enum DefaultWebViewletStateTransitionEnum
     /**
      * Our ResourceHelper.
      */
-    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance(DefaultWebViewletStateTransitionEnum.class );
+    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( DefaultWebViewletStateTransitionEnum.class );
 }

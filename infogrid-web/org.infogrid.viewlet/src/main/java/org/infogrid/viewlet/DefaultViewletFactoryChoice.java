@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -48,11 +48,12 @@ public abstract class DefaultViewletFactoryChoice
     }
 
     /**
-     * Helper method to create a copy of a MeshObjectsToView and set the correct Viewlet type.
+     * Helper method to create a copy of a MeshObjectsToView and set the correct Viewlet type
+     * if the Viewlet type is different.
      *
      * @param original the MeshObjectsToView to copy
      * @param viewletTypeName the Viewlet type
-     * @return the adjusted MeshObjectsToView
+     * @return the adjusted MeshObjectsToView if adjustment was needed, otherwise the original
      */
     static MeshObjectsToView possiblyCreateCopyWithViewletType(
             MeshObjectsToView original,

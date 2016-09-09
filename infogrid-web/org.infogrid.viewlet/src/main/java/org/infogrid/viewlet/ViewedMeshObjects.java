@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -24,10 +24,10 @@ import org.infogrid.model.traversal.TraversalSpecification;
 import org.infogrid.util.NotSingleMemberException;
 
 /**
- * A collection of MeshObjects, plus information about their context,
- * that are being viewed by a Viewlet. It is similar to {@link MeshObjectsToView MeshObjectsToView},
- * but MeshObjectsToView is a specification looking for a good Viewlet, while ViewedMeshObjects
- * captures what a chosen Viewlet currently actually does.
+ * A subject MeshObject, plus information about its context, that is being viewed
+ * by a Viewlet. It is similar to {@link MeshObjectsToView MeshObjectsToView},
+ * but MeshObjectsToView is a specification looking for a good Viewlet, while
+ * ViewedMeshObjects captures what a chosen Viewlet currently actually does.
  */
 public interface ViewedMeshObjects
 {

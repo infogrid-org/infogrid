@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -19,11 +19,13 @@ import org.diet4j.core.Module;
 import org.diet4j.core.ModuleActivationException;
 import org.infogrid.app.AppConfiguration;
 import org.infogrid.viewlet.MeshObjectsToView;
+import org.infogrid.viewlet.ViewletFactory;
 import org.infogrid.viewlet.ViewletFactoryChoice;
 import org.infogrid.web.viewlet.DefaultJspViewletFactoryChoice;
 import org.infogrid.web.viewlet.WebMeshObjectsToView;
 import org.infogrid.web.app.InfoGridWebAccessory;
 import org.infogrid.web.app.InfoGridWebApp;
+import org.infogrid.web.app.WebAppResourceManager;
 
 /**
  * A PropertySheet packaged as an InfoGridAccessory.
@@ -57,7 +59,10 @@ public class PropertySheetViewletAccessory
             AppConfiguration config,
             InfoGridWebApp   app )
     {
-        app.registerViewlet(
+        WebAppResourceManager rm     = app.getResourceManager();
+        ViewletFactory        vlFact = app.getViewletFactory();
+        
+        vlFact.registerViewlet(
                 (MeshObjectsToView toView) -> new DefaultJspViewletFactoryChoice(
                         (WebMeshObjectsToView) toView,
                         "org.infogrid.web.viewlet.propertysheet.PropertySheetViewlet",
@@ -65,14 +70,19 @@ public class PropertySheetViewletAccessory
                         ViewletFactoryChoice.BAD_MATCH_QUALITY ),
                 this
         );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/PropertySheetViewlet.css", this );
 
-        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/bin_closed.png",          this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/medal_bronze_add.png",    this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/medal_bronze_delete.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/medal_silver_add.png",    this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/medal_silver_delete.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/link_add.png",            this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/link_delete.png",         this );
+        final String [] ASSETS = {
+            "PropertySheetViewlet.css",
+            "bin_closed.png",
+            "medal_bronze_add.png",
+            "medal_bronze_delete.png",
+            "medal_silver_add.png",
+            "medal_silver_delete.png",
+            "link_add.png",
+            "link_delete.png",
+        };     
+        for( String name : ASSETS ) {
+            rm.registerAsset( "/v/org/infogrid/web/viewlet/propertysheet/" + name, this  );
+        }
     }
 }

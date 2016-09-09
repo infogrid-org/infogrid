@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -27,8 +27,8 @@ import org.infogrid.util.logging.Dumper;
 
 /**
  * Factors out common functionality of StructuredResponseTemplates.
- * By default, we consider the cookies, redirects etc. of the template first and the default section in it
- * next. All other section's attributes of that kind are ignored
+ * By default, we emit the cookies, redirects etc. of the default section.
+ * All other sections' header information is ignored.
  */
 public abstract class AbstractStructuredResponseTemplate
         implements

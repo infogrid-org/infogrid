@@ -8,11 +8,11 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
-package org.infogrid.web.templates;
+package org.infogrid.web.util;
 
 import java.util.Enumeration;
 import javax.servlet.ServletConfig;
@@ -20,8 +20,7 @@ import javax.servlet.ServletContext;
 import org.infogrid.util.ZeroElementCursorIterator;
 
 /**
- * Simple implementation of the ServletConfig interface. It does not provide
- * any init parameters.
+ * A simple implementation of ServletConfig.
  */
 public class SimpleServletConfig
     implements
@@ -29,12 +28,12 @@ public class SimpleServletConfig
 {
     /**
      * Constructor.
-     * 
-     * @param name name of the servlet
+     *
+     * @param name name of this servlet
      * @param servletContext the ServletContext
      */
     public SimpleServletConfig(
-            String name,
+            String         name,
             ServletContext servletContext )
     {
         theName           = name;
@@ -60,17 +59,21 @@ public class SimpleServletConfig
     }
 
     /**
-     * {@inheritDoc}
+     * Always returns null.
+     * 
+     * @param name ignored
+     * @return null
      */
     @Override
-    public String getInitParameter(
-            String name )
+    public String getInitParameter( String name )
     {
         return null;
     }
 
     /**
-     * {@inheritDoc}
+     * Always returns an empty enumeration.
+     * 
+     * @return empty enumeration
      */
     @Override
     public Enumeration<String> getInitParameterNames()
@@ -79,7 +82,7 @@ public class SimpleServletConfig
     }
 
     /**
-     * The Servlet name.
+     * Name of this servlet.
      */
     protected String theName;
     

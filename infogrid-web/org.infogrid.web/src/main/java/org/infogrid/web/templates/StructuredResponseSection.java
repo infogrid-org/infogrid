@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -45,29 +45,44 @@ public class StructuredResponseSection
     /**
      * Factory method.
      * 
+     * @param name the name of the section
      * @param maxProblems the maximum number of problems to report in this StructuredResponse
      * @param maxInfoMessages the maximum number of informational messages to report in this StructuredResponse
      * @return the created StructuredResponseSection
      */
     public static StructuredResponseSection create(
-            int maxProblems,
-            int maxInfoMessages )
+            String name,
+            int    maxProblems,
+            int    maxInfoMessages )
     {
-        return new StructuredResponseSection( maxProblems, maxInfoMessages );
+        return new StructuredResponseSection( name, maxProblems, maxInfoMessages );
     }
 
     /**
      * Constructor.
      * 
+     * @param name the name of the section
      * @param maxProblems the maximum number of problems to report in this StructuredResponse
      * @param maxInfoMessages the maximum number of informational messages to report in this StructuredResponse
      */
     protected StructuredResponseSection(
-            int maxProblems,
-            int maxInfoMessages )
+            String name,
+            int    maxProblems,
+            int    maxInfoMessages )
     {
+        theName            = name;
         theMaxProblems     = maxProblems;
         theMaxInfoMessages = maxInfoMessages;
+    }
+
+    /**
+     * Get the name of this StructuredResponseSection.
+     * 
+     * @return the name
+     */
+    public String getName()
+    {
+        return theName;
     }
 
     /**
@@ -451,6 +466,7 @@ public class StructuredResponseSection
      * @param name name of the header
      * @return the value or null
      */
+    @Override
     public String getHeader(
             String name )
     {
@@ -470,6 +486,7 @@ public class StructuredResponseSection
      * @param name name of the header
      * @return the values, or null
      */
+    @Override
     public Collection<String> getHeaders(
             String name )
     {
@@ -485,6 +502,7 @@ public class StructuredResponseSection
      * 
      * @return the names
      */
+    @Override
     public Collection<String> getHeaderNames()
     {
         if( theOutgoingHeaders == null ) {
@@ -685,6 +703,8 @@ public class StructuredResponseSection
 
     /**
      * Convenience method to append text directly without going through Writer.
+     * 
+     * @param toAppend the text to append
      */
     public void appendText(
             String toAppend )
@@ -698,14 +718,15 @@ public class StructuredResponseSection
     public void resetBuffer()
     {
         theTextWriter   = null;
+        thePrintWriter  = null;
         theBinaryStream = null;
     }
 
     /**
-     * Copy the buffer into this StructuredResponse.
+     * Copy the buffer into the destination StructuredResponse.
      * 
-     * @param destination the HttpServletResponse to copy to
-     * @throws IOException thown if an input/output error occurred
+     * @param destination the StructuredResponseSection to copy to
+     * @throws IOException thrown if an input/output error occurred
      */
     public void copyAllTo(
             StructuredResponseSection destination )
@@ -716,6 +737,12 @@ public class StructuredResponseSection
         copyContentTo(     destination );
     }
 
+    /**
+     * Copy just the header items into the destination StructuredResponse.
+     * 
+     * @param destination the StructuredResponseSection to copy to
+     * @throws IOException thrown if an input/output error occurred
+     */
     public void copyHeaderItemsTo(
             StructuredResponseSection destination )
         throws
@@ -747,6 +774,12 @@ public class StructuredResponseSection
         }
     }
 
+    /**
+     * Copy just the content into the destination StructuredResponse.
+     * 
+     * @param destination the StructuredResponseSection to copy to
+     * @throws IOException thrown if an input/output error occurred
+     */
     public void copyContentTo(
             StructuredResponseSection destination )
         throws
@@ -766,6 +799,12 @@ public class StructuredResponseSection
         destination.getOutputStream().flush();
     }
     
+    /**
+     * Write the content to the destination JspWriter.
+     * 
+     * @param destination the JspWriter to write to
+     * @throws IOException thrown if an input/output error occurred
+     */
     public void copyContentTo(
             JspWriter destination )
         throws
@@ -787,7 +826,7 @@ public class StructuredResponseSection
      * Copy the buffer into this HttpServletResponse.
      * 
      * @param destination the HttpServletResponse to copy to
-     * @throws IOException thown if an input/output error occurred
+     * @throws IOException thrown if an input/output error occurred
      */
     public void copyAllTo(
             HttpServletResponse destination )
@@ -798,6 +837,12 @@ public class StructuredResponseSection
         copyContentTo(     destination );
     }
     
+    /**
+     * Copy just the header items into this HttpServletResponse.
+     * 
+     * @param destination the HttpServletResponse to copy to
+     * @throws IOException thrown if an input/output error occurred
+     */
     public void copyHeaderItemsTo(
             HttpServletResponse destination )
         throws
@@ -828,6 +873,12 @@ public class StructuredResponseSection
         }
     }
 
+    /**
+     * Copy the content into this HttpServletResponse.
+     * 
+     * @param destination the HttpServletResponse to copy to
+     * @throws IOException thrown if an input/output error occurred
+     */
     public void copyContentTo(
             HttpServletResponse destination )
         throws
@@ -848,6 +899,11 @@ public class StructuredResponseSection
     }
 
     /**
+     * The name of the section.
+     */
+    protected String theName;
+
+    /**
      * The outgoing HTTP response code. -1 stands for "not set".
      */
     protected int theStatus = -1;
@@ -866,7 +922,7 @@ public class StructuredResponseSection
      * The getCookies to be sent. This is represented as a HashMap in order to easily be
      * able to detect that the same cookie has been set again.
      */
-    protected HashMap<String,Cookie> theOutgoingCookies = new HashMap<>();
+    protected HashMap<String,Cookie> theOutgoingCookies;
 
     /**
      * The outgoing Locale.
@@ -981,4 +1037,5 @@ public class StructuredResponseSection
          * The underlying stream.
          */
         protected OutputStream theDelegate;
-    }}
+    }
+}

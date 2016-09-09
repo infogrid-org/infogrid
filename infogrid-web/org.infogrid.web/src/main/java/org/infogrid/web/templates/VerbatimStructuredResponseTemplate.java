@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -26,8 +26,8 @@ import org.infogrid.util.text.StringifierException;
 import org.infogrid.web.sane.SaneServletRequest;
 
 /**
- * A ResponseTemplate that returns the default sections in the StructuredResponse without
- * any changes, one after each other.
+ * A ResponseTemplate that returns the default section in the StructuredResponse without
+ * any changes, except that it first emits any reported problems.
  */
 public class VerbatimStructuredResponseTemplate
         extends

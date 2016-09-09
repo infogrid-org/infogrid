@@ -8,17 +8,19 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.web.templates;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import javax.servlet.Servlet;
 import org.infogrid.util.AbstractFactory;
 import org.infogrid.util.FactoryException;
+import org.infogrid.util.L10MapImpl;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Log;
@@ -112,15 +114,45 @@ public class DefaultStructuredResponseTemplateFactory
             String                   mime,
             Class<? extends Servlet> servlet )
     {
-        Map<String,Class<? extends Servlet>> mimeTable = theTemplateServlets.get( templateName );
+        addTemplateServlet( templateName, mime, null, servlet );
+    }
+    
+    /**
+     * Add a supported template servlet.
+     * 
+     * @param templateName the name of the template
+     * @param mime the MIME type of the request
+     * @param locale the Locale to which this servlet applies, or null
+     * @param servlet the Servlet
+     */
+    public void addTemplateServlet(
+            String                   templateName,
+            String                   mime,
+            Locale                   locale,
+            Class<? extends Servlet> servlet )
+    {
+        Map<String,L10MapImpl<Class<? extends Servlet>>> mimeTable = theTemplateServlets.get( templateName );
         if( mimeTable == null ) {
             mimeTable = new HashMap<>();
             theTemplateServlets.put( templateName, mimeTable );
         }
-        if( mimeTable.put( mime, servlet ) != null ) {
-            log.error( "Overwriting entry in template servlet table", templateName, mime );
+        L10MapImpl<Class<? extends Servlet>> localeMap = mimeTable.get( mime );
+        if( localeMap == null ) {
+            localeMap = L10MapImpl.create();
+            mimeTable.put( mime, localeMap );
+        }
+        if( locale == null ) {
+            if( localeMap.getDefault() != null ) {
+                log.error( "Overwriting default entry in template servlet table", templateName, mime );
+            }
+            localeMap.setDefault( servlet );
+        } else {
+            if( localeMap.put( locale, servlet ) != null ) {
+                log.error( "Overwriting entry in template servlet table", templateName, mime, locale );
+            }
         }
     }
+
     /**
      * Factory method.
      *
@@ -145,11 +177,12 @@ public class DefaultStructuredResponseTemplateFactory
         if( mime == null ) {
             mime = theDefaultMimeType;
         }
+        Locale requestedLocale = null; // FIXME
 
         StructuredResponseTemplate ret;
 
         String requestedTemplateName     = structured.getRequestedTemplateName();
-        String userRequestedTemplateName = getUserRequestedTemplate( request );
+        String userRequestedTemplateName = getUserRequestedTemplateName( request );
 
         if( requestedTemplateName == null ) {
             // internally requested template overrides user-requested template
@@ -177,12 +210,12 @@ public class DefaultStructuredResponseTemplateFactory
             Class<? extends Servlet> templateServlet = null;
 
             if( requestedTemplateName != null ) {
-                templateServlet = findTemplateServlet( requestedTemplateName, mime );
+                templateServlet = findTemplateServlet( requestedTemplateName, mime, requestedLocale );
             }
 
             if( templateServlet == null ) {
                 // try default template if named template did not work
-                templateServlet = findTemplateServlet( theDefaultTemplateName, mime );
+                templateServlet = findTemplateServlet( theDefaultTemplateName, mime, requestedLocale );
             }
 
             if( templateServlet != null ) {
@@ -221,7 +254,7 @@ public class DefaultStructuredResponseTemplateFactory
      * @param request the incoming HTTP request for which the response is being created
      * @return class name of the requested layout template, if any
      */
-    public String getUserRequestedTemplate(
+    public String getUserRequestedTemplateName(
             SaneRequest request )
     {
         String ret = request.getUrlArgument( StructuredResponseTemplate.LID_TEMPLATE_PARAMETER_NAME );
@@ -234,21 +267,27 @@ public class DefaultStructuredResponseTemplateFactory
     }
 
     /**
-     * Find a suitable Servlet based on the provided name and MIME type
+     * Find a suitable Servlet based on the provided information.
      * 
-     * @param requestedTemplateName name of the requested servlet
+     * @param requestedTemplateName name of the requested template
      * @param mime requested mime type
+     * @param locale the requested Locale
      * @return the found Servlet class, or null
      */
     protected Class<? extends Servlet> findTemplateServlet(
             String requestedTemplateName,
-            String mime )
+            String mime,
+            Locale locale )
     {
-        Map<String,Class<? extends Servlet>> mimeAlternatives = theTemplateServlets.get( requestedTemplateName );
+        Map<String,L10MapImpl<Class<? extends Servlet>>> mimeAlternatives = theTemplateServlets.get( requestedTemplateName );
         if( mimeAlternatives == null ) {
             return null;
         }
-        Class<? extends Servlet> ret = mimeAlternatives.get( mime );
+        L10MapImpl<Class<? extends Servlet>> localeAlternatives = mimeAlternatives.get( mime );
+        if( localeAlternatives == null ) {
+            return null;
+        }
+        Class<? extends Servlet> ret = localeAlternatives.get( locale );
         return ret;
     }
 
@@ -264,9 +303,9 @@ public class DefaultStructuredResponseTemplateFactory
 
     /**
      * The known template servlets.
-     * Keyed first by template name, then by MIME type
+     * Keyed first by template name, then by MIME type, then by Locale
      */
-    protected Map<String,Map<String,Class<? extends Servlet>>> theTemplateServlets = new HashMap<>();
+    protected Map<String,Map<String,L10MapImpl<Class<? extends Servlet>>>> theTemplateServlets = new HashMap<>();
 
     /**
      * The JeeFormatter to use.

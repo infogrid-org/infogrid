@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -25,8 +25,8 @@ import org.infogrid.util.context.ObjectInContext;
 import org.infogrid.util.logging.CanBeDumped;
 
 /**
- * Objects supporting this interface are being used to tell a Viewlet which MeshObjects it is supposed
- * to view, in which context, with which parameters etc.
+ * Objects supporting this interface are being used to tell a Viewlet which
+ * MeshObjects it is supposed to view, in which context, with which parameters etc.
  */
 public interface MeshObjectsToView
         extends
@@ -48,7 +48,7 @@ public interface MeshObjectsToView
     public String getViewletTypeName();
 
     /**
-     * Set the name representing the Viewlet type that the Viewlet is supposed to support.
+     * CHange the name representing the Viewlet type that the Viewlet is supposed to support.
      *
      * @param newValue the new value
      */

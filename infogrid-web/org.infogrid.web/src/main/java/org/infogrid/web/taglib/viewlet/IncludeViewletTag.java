@@ -20,7 +20,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import org.infogrid.app.InfoGridApp;
@@ -33,7 +32,6 @@ import org.infogrid.viewlet.CannotViewException;
 import org.infogrid.viewlet.MeshObjectsToView;
 import org.infogrid.viewlet.ViewletFactory;
 import org.infogrid.web.sane.SaneServletRequest;
-import org.infogrid.web.security.SafeUnsafePostFilter;
 import org.infogrid.web.security.UnsafePostException;
 import org.infogrid.web.taglib.AbstractInfoGridTag;
 import org.infogrid.web.taglib.IgnoreException;
@@ -217,14 +215,13 @@ public class IncludeViewletTag
             IgnoreException,
             IOException
     {
-        HttpServletRequest servletRequest = (HttpServletRequest) pageContext.getRequest();
-        SaneServletRequest saneRequest    = SaneServletRequest.create( servletRequest );
+        SaneServletRequest request = (SaneServletRequest) pageContext.getRequest();
 
         InfoGridApp app = getInfoGridWebApp();
         Context     c   = app.getContext();
 
         @SuppressWarnings("unchecked")
-        Deque<MeshObjectsToView> toIncludeStack = (Deque<MeshObjectsToView>) saneRequest.getAttribute( TO_INCLUDE_STACK_ATTRIBUTE_NAME );
+        Deque<MeshObjectsToView> toIncludeStack = (Deque<MeshObjectsToView>) request.getAttribute( TO_INCLUDE_STACK_ATTRIBUTE_NAME );
         MeshObjectsToView        toView;
 
         try {
@@ -263,37 +260,37 @@ public class IncludeViewletTag
         if( viewlet != null ) {
             synchronized( viewlet ) {
                 // create a stack of Viewlets and other request attributes
-                WebViewlet    oldViewlet = (WebViewlet) servletRequest.getAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME );
-                TraversalPath oldPath    = (TraversalPath) servletRequest.getAttribute( TRAVERSAL_PATH_ATTRIBUTE_NAME );
+                WebViewlet    oldViewlet = (WebViewlet)    request.getAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME );
+                TraversalPath oldPath    = (TraversalPath) request.getAttribute( TRAVERSAL_PATH_ATTRIBUTE_NAME );
 
                 @SuppressWarnings("unchecked")
-                Deque<WebViewedMeshObjects> parentStack = (Deque<WebViewedMeshObjects>) saneRequest.getAttribute( PARENT_STACK_ATTRIBUTE_NAME );
+                Deque<WebViewedMeshObjects> parentStack = (Deque<WebViewedMeshObjects>) request.getAttribute( PARENT_STACK_ATTRIBUTE_NAME );
                 if( parentStack == null ) {
                     parentStack = new ArrayDeque<>();
-                    saneRequest.setAttribute( PARENT_STACK_ATTRIBUTE_NAME, parentStack );
+                    request.setAttribute( PARENT_STACK_ATTRIBUTE_NAME, parentStack );
                 }
 
                 Throwable thrown  = null;
                 try {
-                    servletRequest.setAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
-                    servletRequest.setAttribute( WebViewlet.SUBJECT_ATTRIBUTE_NAME, subject );
+                    request.setAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME, viewlet );
+                    request.setAttribute( WebViewlet.SUBJECT_ATTRIBUTE_NAME, subject );
                     parentStack.push( oldViewlet.getViewedMeshObjects() );
 
                     viewlet.view( toView );
-                    if( SafeUnsafePostFilter.isSafePost( servletRequest ) ) {
-                        viewlet.performBeforeSafePost( saneRequest, innerStructured );
+                    if( request.isSafePost()) {
+                        viewlet.performBeforeSafePost( request, innerStructured );
 
-                    } else if( SafeUnsafePostFilter.isUnsafePost( servletRequest ) ) {
-                        viewlet.performBeforeUnsafePost( saneRequest, innerStructured );
+                    } else if( request.isUnsafePost() ) {
+                        viewlet.performBeforeUnsafePost( request, innerStructured );
 
-                    } else if( SafeUnsafePostFilter.mayBeSafeOrUnsafePost( servletRequest ) ) {
-                        viewlet.performBeforeMaybeSafeOrUnsafePost( saneRequest, innerStructured );
+                    } else if( request.mayBeSafeOrUnsafePost() ) {
+                        viewlet.performBeforeMaybeSafeOrUnsafePost( request, innerStructured );
 
                     } else {
-                        viewlet.performBeforeGet( saneRequest, innerStructured );
+                        viewlet.performBeforeGet( request, innerStructured );
                     }
 
-                    viewlet.processRequest( saneRequest, innerStructured, pageContext.getServletContext() );
+                    viewlet.processRequest( request, innerStructured, pageContext.getServletContext() );
 
                 } catch( RuntimeException t ) {
                     thrown = t;
@@ -317,7 +314,7 @@ public class IncludeViewletTag
 
                 } finally {
                     try {
-                        viewlet.performAfter( saneRequest, innerStructured, thrown );
+                        viewlet.performAfter( request, innerStructured, thrown );
 
                     } catch( Throwable ex2 ) {
                         log.error( ex2 );
@@ -325,9 +322,9 @@ public class IncludeViewletTag
 
                     // restore context
                     parentStack.pop();
-                    servletRequest.setAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME, oldViewlet );
-                    servletRequest.setAttribute( WebViewlet.SUBJECT_ATTRIBUTE_NAME, oldViewlet.getSubject() );
-                    servletRequest.setAttribute( TRAVERSAL_PATH_ATTRIBUTE_NAME,     oldPath );
+                    request.setAttribute( WebViewlet.VIEWLET_ATTRIBUTE_NAME, oldViewlet );
+                    request.setAttribute( WebViewlet.SUBJECT_ATTRIBUTE_NAME, oldViewlet.getSubject() );
+                    request.setAttribute( TRAVERSAL_PATH_ATTRIBUTE_NAME,     oldPath );
                 }
             }
         }
@@ -339,7 +336,7 @@ public class IncludeViewletTag
                 StructuredResponseSection there = innerStructured.getSection( name );
                 StructuredResponseSection here  = outerStructured.obtainSection( name );
 
-                if( StructuredResponse.DEFAULT_SECTION.equals( name )) {
+                if( StructuredResponse.MAIN_SECTION.equals( name )) {
                     // inline main section
                     JspWriter w = pageContext.getOut();
                     w.print( there.getTextContent() );

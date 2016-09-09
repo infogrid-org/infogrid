@@ -17,8 +17,8 @@ package org.infogrid.web.taglib.viewlet;
 import javax.servlet.jsp.JspException;
 import org.infogrid.web.taglib.AbstractInfoGridTag;
 import org.infogrid.web.taglib.IgnoreException;
-import org.infogrid.web.viewlet.JeeViewletState;
 import org.infogrid.web.viewlet.WebViewlet;
+import org.infogrid.web.viewlet.WebViewletState;
 
 /**
  * Collects functionality common to tags that evaluate Viewlet state.
@@ -96,14 +96,14 @@ public abstract class AbstractViewletStateConditionTag
      * @throws JspException thrown if an evaluation error occurred
      * @throws IgnoreException thrown to abort processing without an error
      */
-    protected JeeViewletState evaluate()
+    protected WebViewletState evaluate()
         throws
             JspException,
             IgnoreException
     {
         WebViewlet currentViewlet = (WebViewlet) lookupOrThrow( WebViewlet.VIEWLET_ATTRIBUTE_NAME );
 
-        JeeViewletState ret = currentViewlet.getViewletState();
+        WebViewletState ret = currentViewlet.getViewletState();
         return ret;
     }
 

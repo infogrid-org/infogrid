@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -25,18 +25,9 @@ import org.infogrid.viewlet.Viewlet;
 import org.infogrid.web.sane.SaneServletRequest;
 
 /**
- * <p>A software component of an application's JEE user interface.
+ * <p>A software component of an application's web user interface.
  *    Conceptually, the user interface of an InfoGrid web application consists of Viewlets.
- *    These Viewlets can be supported by Servlets and/or JSPs, which can rely on the fact that a specific
- *    JeeViewlet exists for them &quot;behind the,&quot;; this makes programming much simpler.
- *    Among them, it makes it easy to deliver the same JeeViewlet functionality in multiple
- *    locales.</p>
- * <p>JEE Viewlets are somewhat comparable with Java portlets, but much simpler and built around
- *    a REST-ful, identity-aware design.</p>
- * <p>A JeeViewlet typically has a subject, which is given as a <code>MeshObject</code>. For example,
- *    a JeeViewlet showing an electronic business card might have the owner of the business card
- *    as the subject.</p>
- * <p>The <code>JeeViewlet</code> interface is supported by all InfoGrid Viewlets.</p>
+ *    These Viewlets can be supported by Servlets and/or JSPs.</p>
  */
 public interface WebViewlet
         extends
@@ -58,14 +49,14 @@ public interface WebViewlet
      *
      * @return the possible ViewletStates
      */
-    public JeeViewletState [] getPossibleViewletStates();
+    public WebViewletState [] getPossibleViewletStates();
     
     /**
      * The current JeeViewletState.
      *
      * @return the current state
      */
-    public JeeViewletState getViewletState();
+    public WebViewletState getViewletState();
 
     /**
      * Obtain the Html class name for this Viewlet that will be used for the enclosing <tt>div</tt> tag.
@@ -76,7 +67,7 @@ public interface WebViewlet
 
     /**
      * <p>Invoked prior to the execution of the Servlet if the GET method has been requested.
-     *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
+     *    It is the hook by which the WebViewlet can perform whatever operations needed prior to
      *    the GET execution of the servlet.</p>
      * 
      * @param request the incoming request
@@ -98,7 +89,7 @@ public interface WebViewlet
     /**
      * <p>Invoked prior to the execution of the Servlet if the POST method has been requested
      *    and the SafeUnsafePostFilter determined that the incoming POST was safe.
-     *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
+     *    It is the hook by which the WebViewlet can perform whatever operations needed prior to
      *    the POST execution of the servlet, e.g. the evaluation of POST commands.</p>
      * 
      * @param request the incoming request
@@ -120,7 +111,7 @@ public interface WebViewlet
     /**
      * <p>Invoked prior to the execution of the Servlet if the POST method has been requested
      *    and the SafeUnsafePostFilter determined that the incoming POST was <b>not</b> safe.
-     *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
+     *    It is the hook by which the WebViewlet can perform whatever operations needed prior to
      *    the POST execution of the servlet.</p>
      * <p>It is strongly recommended that JeeViewlets do not regularly process the incoming
      *    POST data, as the request is likely unsafe (e.g. a Cross-Site Request Forgery).</p>
@@ -146,7 +137,7 @@ public interface WebViewlet
     /**
      * <p>Invoked prior to the execution of the Servlet if the POST method has been requested
      *    and no SafeUnsafePostFilter has been used.
-     *    It is the hook by which the JeeViewlet can perform whatever operations needed prior to
+     *    It is the hook by which the WebViewlet can perform whatever operations needed prior to
      *    the POST execution of the servlet.</p>
      * <p>It is strongly recommended that JeeViewlets do not regularly process the incoming
      *    POST data, as the request is likely unsafe (e.g. a Cross-Site Request Forgery).</p>
@@ -168,8 +159,8 @@ public interface WebViewlet
     
     /**
      * <p>Invoked after to the execution of the Servlet. It is the hook by which
-     * the JeeViewlet can perform whatever operations needed after to the execution of the servlet, e.g.
-     * logging. Subclasses will often override this.</p>
+     * the WebViewlet can perform whatever operations needed after to the execution
+     * of the servlet, e.g. logging. Subclasses will often override this.</p>
      * 
      * @param request the incoming request
      * @param response the response to be assembled

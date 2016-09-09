@@ -16,8 +16,10 @@ package org.infogrid.web.taglib.util;
 
 import java.io.IOException;
 import javax.servlet.jsp.JspException;
-import static javax.servlet.jsp.tagext.Tag.EVAL_PAGE;
+import org.infogrid.util.http.SaneRequest;
+import org.infogrid.web.app.InfoGridWebApp;
 import org.infogrid.web.sane.SaneServletRequest;
+import org.infogrid.web.security.CsrfMitigator;
 import org.infogrid.web.taglib.AbstractInfoGridTag;
 import org.infogrid.web.taglib.IgnoreException;
 
@@ -543,6 +545,7 @@ public class SafeFormTag
      * @throws JspException thrown if an evaluation error occurred
      * @throws IgnoreException thrown to abort processing without an error
      */
+    @Override
     protected int realDoStartTag()
         throws
             JspException,
@@ -573,8 +576,11 @@ public class SafeFormTag
         appendIfNeeded( "accept-charset", theAcceptCharset );
         print( ">" );
 
-        if( "POST".equalsIgnoreCase( theMethod )) {
-            String toInsert = SafeFormHiddenInputTag.hiddenInputTagString( pageContext );
+        InfoGridWebApp app       = getInfoGridWebApp();
+        CsrfMitigator  mitigator = app.getCsrfMitigator();
+        
+        if( mitigator != null ) {
+            String toInsert = mitigator.getHtmlFormFragment( (SaneRequest) pageContext.getRequest() );
             if( toInsert != null ) {
                 print( toInsert );
             }

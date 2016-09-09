@@ -14,7 +14,8 @@
 
 package org.infogrid.viewlet;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationParameters;
@@ -50,7 +51,8 @@ public abstract class AbstractViewletFactoryChoice
     }
 
     /**
-     * Obtain the computable name of the Viewlet.
+     * Obtain the computable name of this choice. By default, this maps to the
+     * implementation name.
      *
      * @return the Viewlet's name
      */
@@ -69,7 +71,7 @@ public abstract class AbstractViewletFactoryChoice
     public static String [] getInterfaceNames(
             Class viewletClass )
     {
-        ArrayList<String> almost = new ArrayList<>();
+        Set<String> almost = new HashSet<>();
 
         determineClassNames( viewletClass, almost );
 
@@ -78,15 +80,15 @@ public abstract class AbstractViewletFactoryChoice
     }
 
     /**
-     * Internal helper method that recursively looks up the names of all interface
+     * Helper method that recursively looks up the names of all interface
      * and class names supported by a Class.
      *
      * @param clazz the Class
      * @param found the set of names found
      */
     public static void determineClassNames(
-            Class             clazz,
-            ArrayList<String> found )
+            Class       clazz,
+            Set<String> found )
     {
         found.add( clazz.getName() );
 

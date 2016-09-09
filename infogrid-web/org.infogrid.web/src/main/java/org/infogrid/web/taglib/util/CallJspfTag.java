@@ -21,8 +21,6 @@ import javax.servlet.jsp.JspException;
 import org.infogrid.web.app.InfoGridWebApp;
 import org.infogrid.web.taglib.AbstractInfoGridTag;
 import org.infogrid.web.taglib.IgnoreException;
-import org.infogrid.web.templates.StructuredResponse;
-import org.infogrid.web.templates.StructuredResponseSection;
 
 /**
  * <p>Allows the inclusion of JSP fragments as subroutines with parameters.</p>
@@ -121,7 +119,7 @@ public class CallJspfTag
         ServletRequest request = pageContext.getRequest();
 
         try {
-            app.processJspf( theName, pageContext );
+            app.getResourceManager().processJspf( theName, pageContext );
 
             return EVAL_PAGE;
 

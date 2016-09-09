@@ -18,7 +18,7 @@ import java.io.ObjectStreamException;
 import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.infogrid.util.L10Map;
+import org.infogrid.util.L10StringMap;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.StringHelper;
 import org.infogrid.util.text.StringRepresentation;
@@ -210,9 +210,9 @@ public final class StringDataType
      * @return the StringDataType
      */
     public static StringDataType create(
-            Pattern        regex,
-            StringValue    defaultValue,
-            L10Map<String> regexErrorMessages )
+            Pattern      regex,
+            StringValue  defaultValue,
+            L10StringMap regexErrorMessages )
     {
         if( regex == null ) {
             if( defaultValue == null || defaultValue.equals( theDefault.getDefaultValue() )) {
@@ -237,9 +237,9 @@ public final class StringDataType
      * @param regexErrorMessages localized error messages if the regular expression has been violated.
      */
     private StringDataType(
-            Pattern        regex,
-            StringValue    defaultValue,
-            L10Map<String> regexErrorMessages )
+            Pattern      regex,
+            StringValue  defaultValue,
+            L10StringMap regexErrorMessages )
     {
         super( null );
 
@@ -563,7 +563,7 @@ public final class StringDataType
     /**
      * The internationalized map of error messages if the regular expression was violated.
      */
-    private L10Map<String> theRegexErrorMessages;
+    private L10StringMap theRegexErrorMessages;
 
     /**
      * The entry in the resource files for a StringDataType with a regular expression, prefixed by the StringRepresentation's prefix.

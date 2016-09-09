@@ -44,7 +44,6 @@ public abstract class WebAppConfiguration
     {
         return theAppContextPath;
     }
-    
     /**
      * The application's virtual host.
      */

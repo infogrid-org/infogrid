@@ -227,4 +227,27 @@ public interface SaneRequest
      */
     public abstract MimePart getMimePart(
             String argName );
+
+    /**
+     * Determine whether this incoming request is a POST safe from CSRF attacks
+     * 
+     * @return true if this is an HTTP POST, and the POST is safe
+     */
+    public abstract boolean isSafePost();
+
+    /**
+     * Determine whether this incoming request is a POST that is not safe from
+     * CSRF attacks.
+     * 
+     * @return true if this is an HTTP POST, and the POST is not known to be safe
+     */
+    public abstract boolean isUnsafePost();
+
+    /**
+     * Determine whether it cannot be determined whether this incoming request is
+     * a POST that is safe from CSRF attacks.
+     * 
+     * @return true if this is an HTTP POST and it is unclear whether it is safe or not
+     */
+    public abstract boolean mayBeSafeOrUnsafePost();
 }

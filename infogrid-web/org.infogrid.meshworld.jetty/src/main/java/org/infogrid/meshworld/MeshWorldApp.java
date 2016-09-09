@@ -61,9 +61,9 @@ public class MeshWorldApp
     protected void registerResources(
             AppConfiguration config )
     {
-        registerAsset( "/s/images/built-on-infogrid.png", this );
-        registerAsset( "/s/images/infogrid-medium.png",   this );
-        registerAsset( "/s/images/meshworld.png",         this );
+        theResourceManager.registerAsset( "/s/images/built-on-infogrid.png", this );
+        theResourceManager.registerAsset( "/s/images/infogrid-medium.png",   this );
+        theResourceManager.registerAsset( "/s/images/meshworld.png",         this );
     }
     
     public static final String APP_HEADER

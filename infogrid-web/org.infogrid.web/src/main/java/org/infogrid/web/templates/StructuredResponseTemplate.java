@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -20,7 +20,8 @@ import javax.servlet.ServletException;
 import org.infogrid.web.sane.SaneServletRequest;
 
 /**
- * A template for a StructuredResponse.
+ * A template that, when applied to a StructuredResponse, produces a web document
+ * such as an HTML page.
  */
 public interface StructuredResponseTemplate
 {
@@ -49,5 +50,5 @@ public interface StructuredResponseTemplate
     /**
      * Name of the cookie representing the LID template.
      */
-    public static final String LID_TEMPLATE_COOKIE_NAME = "org-netmesh-lid-template";
+    public static final String LID_TEMPLATE_COOKIE_NAME = "lid-template";
 }

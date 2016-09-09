@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -22,11 +22,11 @@ import org.infogrid.util.http.SaneRequest;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
 import org.infogrid.web.sane.SaneServletRequest;
+import org.infogrid.web.util.SimpleServletConfig;
 
 /**
- * A ResponseTemplate that processes a Servlet (e.g. compiled from a JSP)
- * with placeholders, in which the named
- * sections of the StructuredResponse are inserted.
+ * A ResponseTemplate that processes a Servlet (e.g. compiled from a JSP) with
+ * placeholders, in which the named sections of the StructuredResponse are inserted.
  */
 public class ServletStructuredResponseTemplate
         extends
@@ -37,7 +37,7 @@ public class ServletStructuredResponseTemplate
     /**
      * Factory method.
      *
-     * @param dispatcher identifies the JSP file
+     * @param templateClass the servlet class that acts as the template
      * @param request the incoming HTTP request
      * @param requestedTemplate the requested ResponseTemplate that will be used, if any
      * @param userRequestedTemplate the ResponseTemplate requested by the user, if any
@@ -157,8 +157,7 @@ public class ServletStructuredResponseTemplate
     }
 
     /**
-     * The dispatcher.
+     * The servlet that acts as the template.
      */
     protected Class<? extends Servlet> theTemplateClass;
-
 }

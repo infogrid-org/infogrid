@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -39,6 +39,9 @@ import org.infogrid.util.logging.Dumper;
  * consists of at least one StructuredResponseSection (the default) and any number
  * of additional named StructuredResponseSections.
  * 
+ * Once assembled, a StructuredResponse is combined with a StructuredResponseTemplate
+ * to produce the HTTP response.
+ * 
  * It is also acts as a HttpServletResponse that buffers its content by writing
  * to the default StructuredResponseSection.
  */
@@ -59,7 +62,7 @@ public class StructuredResponse
             ServletContext servletContext )
     {
         StructuredResponse ret = new StructuredResponse( servletContext );
-        ret.setDefaultSection( ret.obtainSection( StructuredResponse.DEFAULT_SECTION ));
+        ret.setDefaultSection( ret.obtainSection(StructuredResponse.MAIN_SECTION ));
 
         return ret;
     }
@@ -76,7 +79,7 @@ public class StructuredResponse
     }
 
     /**
-     * Obtain the default section.
+     * Obtain the current default section.
      *
      * @return the default section
      */
@@ -106,7 +109,7 @@ public class StructuredResponse
     {
         StructuredResponseSection ret = theDefaultSection;
         
-        theDefaultSection = obtainSection( String.format( "temp-default-%d", theDefaultSectionIndex++ ));
+        theDefaultSection = obtainSection( String.format( "temp-default-%d", theUnnamedSectionIndex++ ));
         
         return ret;
     }
@@ -125,7 +128,7 @@ public class StructuredResponse
         }
         StructuredResponseSection ret = theSections.get( name );
         if( ret == null ) {
-            ret = StructuredResponseSection.create( DEFAULT_MAX_PROBLEMS, DEFAULT_MAX_INFO_MESSAGES );
+            ret = StructuredResponseSection.create( name, DEFAULT_MAX_PROBLEMS, DEFAULT_MAX_INFO_MESSAGES );
             theSections.put( name, ret );
         }
         return ret;
@@ -871,7 +874,7 @@ public class StructuredResponse
     /**
      * The sections of the response.
      */
-    protected HashMap<String,StructuredResponseSection> theSections = new HashMap<>();
+    protected Map<String,StructuredResponseSection> theSections = new HashMap<>();
 
     /**
      * The section currently identified as the default section.
@@ -889,9 +892,9 @@ public class StructuredResponse
     protected String theRequestedTemplateName = null;
 
     /**
-     * Counts up for naming default sections.
+     * Counts up for naming otherwise unnamed sections.
      */
-    protected int theDefaultSectionIndex;
+    protected int theUnnamedSectionIndex;
 
     /**
      * Our ResourceHelper.
@@ -918,46 +921,47 @@ public class StructuredResponse
     }
 
     /**
-     * The default section. Output will be written into this section
-     * unless otherwise specified.
+     * Name of the main content section. By default, output will be written into this
+     * section unless a different section has been specified.
      */
-    public static final String DEFAULT_SECTION = "default";
+    public static final String MAIN_SECTION = "main";
 
     /**
-     * The section representing the head of an HTML document.
+     * Name of the section representing the head of an HTML document.
      */
     public static final String HTML_HEAD_SECTION = "html-head";
 
     /**
-     * The section representing the title of an HTML document. While this could be considered
+     * Name of the section representing the title of an HTML document. While this could be considered
      * a part of the head of the HTML document, in practice it has turned out to be useful if
      * it is kept separate.
      */
     public static final String HTML_TITLE_SECTION = "html-title";
 
     /**
-     * The section representing the app icon and top-headline of an HTML document.
+     * Name of the section representing the app icon and top-headline of an HTML document.
      */
     public static final String HTML_APP_HEADER_SECTION = "html-app-header";
 
     /**
-     * The section representing the messages section of an HTML document.
+     * Name of the section representing the messages section of an HTML document.
      */
     public static final String HTML_MESSAGES_SECTION = "html-messages";
 
     /**
-     * The section representing the main menu in an HTML document. Many HTML documents don't have
-     * such a section, but it is common enough that we make it explicit here.
+     * Name of the section representing the main menu in an HTML document. Many HTML
+     * documents don't have such a section, but it is common enough that we make it
+     * explicit here.
      */
     public static final String HTML_MAIN_MENU_SECTION = "html-main-menu";
     
     /**
-     * The section representing the copyright or other footer in an HTML document.
+     * Name of the section representing the copyright or other footer in an HTML document.
      */
     public static final String HTML_FOOTER_SECTION = "html-footer";
 
     /**
-     * The section that represents the final assembly of the output.
+     * Name of the section that represents the final assembly of the output.
      */
     public static final String FINAL_ASSEMBLY_SECTION = "final-assembly";
 }

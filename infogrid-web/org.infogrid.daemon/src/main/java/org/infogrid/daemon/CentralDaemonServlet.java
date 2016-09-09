@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -29,7 +29,7 @@ import org.infogrid.web.app.InfoGridWebApp;
  */
 public class CentralDaemonServlet
     extends
-        GenericServlet // the HTTP-method-dispatching performed by HttpServlet does not help us
+        GenericServlet // the HTTP-method-dispatching performed by HttpServlet is counter-productive
 {
     /**
      * Enables our overridden ServletHolder to tell us about the InfoGridApp.

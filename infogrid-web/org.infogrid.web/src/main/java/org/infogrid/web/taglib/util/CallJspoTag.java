@@ -27,7 +27,9 @@ import org.infogrid.web.taglib.IgnoreException;
 import org.infogrid.web.taglib.candy.OverlayTag;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.ResourceHelper;
+import org.infogrid.util.http.SaneRequest;
 import org.infogrid.web.app.InfoGridWebApp;
+import org.infogrid.web.security.CsrfMitigator;
 import org.infogrid.web.templates.StructuredResponse;
 import org.infogrid.web.templates.StructuredResponseSection;
 
@@ -269,9 +271,9 @@ public class CallJspoTag
     {
         InfoGridWebApp app     = getInfoGridWebApp();
 
-        ServletRequest request = pageContext.getRequest();
-        BodyContent    body    = getBodyContent();
-        JspWriter      out     = body.getEnclosingWriter();
+        SaneRequest request = (SaneRequest) pageContext.getRequest();
+        BodyContent body    = getBodyContent();
+        JspWriter   out     = body.getEnclosingWriter();
 
         try {
             StringBuilder domId = new StringBuilder();
@@ -332,19 +334,22 @@ public class CallJspoTag
                     out.print( "<form action=\"" + theAction + "\" method=\"post\" enctype=\"multipart/form-data\" accept-charset=\"" );
                     out.print( SaneServletRequest.FORM_CHARSET );
                     out.print( "\">" );
-
-                    String toInsert = SafeFormHiddenInputTag.hiddenInputTagString( pageContext );
-                    if( toInsert != null ) {
-                        out.print( toInsert );
+                    
+                    CsrfMitigator mitigator = app.getCsrfMitigator();
+                    if( mitigator != null ) {
+                        String toInsert = mitigator.getHtmlFormFragment( request );
+                        if( toInsert != null ) {
+                            print( toInsert );
+                        }
                     }
-                }
+               }
                 out.println( "<div class=\"dialog-content\">" );
 
                 StructuredResponse        response   = (StructuredResponse) pageContext.getResponse();
                 StructuredResponseSection oldDefault = response.swapInNewDefaultSection();
                 try {
 
-                    app.processJspo( theName, pageContext );
+                    app.getResourceManager().processJspo( theName, pageContext );
 
                     response.getDefaultSection().copyContentTo( body.getEnclosingWriter() );
 

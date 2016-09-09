@@ -25,6 +25,8 @@ import java.util.Map;
 public class L10StringMapImpl
         extends
             L10MapImpl<String>
+        implements
+            L10StringMap
 {
     /**
       * Construct an empty L10Map with only a default value and no Locale-specific values.
@@ -53,6 +55,7 @@ public class L10StringMapImpl
             String             secondDefaultValue )
     {
         return create( theMap, secondDefaultValue, new Fact<String,L10StringMapImpl>() {
+                @Override
                 public L10StringMapImpl create(
                         String      theDefaultValue,
                         String [][] theKeys,
@@ -90,6 +93,7 @@ public class L10StringMapImpl
      * @param typeVar  name of the variable containing the DataType that goes with the to-be-created instance.
      * @return the Java-language constructor expression
      */
+    @Override
     public String getJavaConstructorString(
             String classLoaderVar,
             String typeVar )

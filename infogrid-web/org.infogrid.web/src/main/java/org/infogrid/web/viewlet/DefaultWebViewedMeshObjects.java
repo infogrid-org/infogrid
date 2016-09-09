@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -21,7 +21,7 @@ import org.infogrid.viewlet.DefaultViewedMeshObjects;
 import org.infogrid.viewlet.MeshObjectsToView;
 
 /**
- * Extends DefaultViewedMeshObjects with JEE information.
+ * Extends DefaultViewedMeshObjects with Web information.
  */
 public class DefaultWebViewedMeshObjects
         extends
@@ -72,7 +72,7 @@ public class DefaultWebViewedMeshObjects
         if( theState == null ) {
             theState = DefaultWebViewletStateEnum.VIEW;
         }
-        JeeViewletStateTransition newTransition = realNewObjectsToView.getViewletStateTransition();
+        WebViewletStateTransition newTransition = realNewObjectsToView.getViewletStateTransition();
         if( newTransition != null ) {
             performStateTransition( newTransition );
         }
@@ -84,7 +84,7 @@ public class DefaultWebViewedMeshObjects
      * @param newTransition the transition to perform
      */
     protected void performStateTransition(
-            JeeViewletStateTransition newTransition )
+            WebViewletStateTransition newTransition )
     {
         if( newTransition.getNextState() != null ) {
             theState = newTransition.getNextState();
@@ -96,6 +96,7 @@ public class DefaultWebViewedMeshObjects
      *
      * @return the MIME type
      */
+    @Override
     public String getMimeType()
     {
         return theMimeType;
@@ -106,7 +107,8 @@ public class DefaultWebViewedMeshObjects
      *
      * @return the current state
      */
-    public JeeViewletState getViewletState()
+    @Override
+    public WebViewletState getViewletState()
     {
         return theState;
     }
@@ -119,6 +121,7 @@ public class DefaultWebViewedMeshObjects
      * @param childArrivedAt the TraversalPath, if any, to reach any child of this
      * @return the URL
      */
+    @Override
     public String getAsUrl(
             TraversalPath childArrivedAt )
     {
@@ -145,5 +148,5 @@ public class DefaultWebViewedMeshObjects
     /**
      * The current viewlet state, if any.
      */
-    protected JeeViewletState theState;
+    protected WebViewletState theState;
 }

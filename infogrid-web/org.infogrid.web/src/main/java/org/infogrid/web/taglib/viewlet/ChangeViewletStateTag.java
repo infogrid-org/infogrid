@@ -26,10 +26,10 @@ import org.infogrid.web.sane.SaneServletRequest;
 import org.infogrid.web.taglib.AbstractInfoGridTag;
 import org.infogrid.web.taglib.IgnoreException;
 import org.infogrid.web.viewlet.DefaultWebViewletStateEnum;
-import org.infogrid.web.viewlet.JeeViewletState;
 import org.infogrid.web.viewlet.WebMeshObjectsToView;
 import org.infogrid.web.viewlet.WebViewedMeshObjects;
 import org.infogrid.web.viewlet.WebViewlet;
+import org.infogrid.web.viewlet.WebViewletState;
 
 /**
  * Allows the user to select an alternate JeeViewletState.
@@ -124,8 +124,8 @@ public class ChangeViewletStateTag
         SaneRequest request        = SaneServletRequest.create( (HttpServletRequest) pageContext.getRequest() );
         WebViewlet  currentViewlet = (WebViewlet) lookupOrThrow( WebViewlet.VIEWLET_ATTRIBUTE_NAME );
 
-        JeeViewletState    currentState    = currentViewlet.getViewletState();
-        JeeViewletState [] possibleStates  = currentViewlet.getPossibleViewletStates();
+        WebViewletState    currentState    = currentViewlet.getViewletState();
+        WebViewletState [] possibleStates  = currentViewlet.getPossibleViewletStates();
         String []          specifiedStates = theViewletStates.trim().split( "\\s*,\\s*" );
 
         if( specifiedStates.length >= 1 ) {
@@ -143,8 +143,8 @@ public class ChangeViewletStateTag
             buf.append( "<div class=\"" ).append( nameInCss ).append( "\" id=\"" ).append( nameInCss ).append( "\">\n" );
             buf.append( " <ul>\n" );
             for( String current : specifiedStates ) {
-                JeeViewletState found = null;
-                for( JeeViewletState possible : possibleStates ) {
+                WebViewletState found = null;
+                for( WebViewletState possible : possibleStates ) {
                     if( current.equals( possible.getName() )) {
                         found = possible;
                         break;

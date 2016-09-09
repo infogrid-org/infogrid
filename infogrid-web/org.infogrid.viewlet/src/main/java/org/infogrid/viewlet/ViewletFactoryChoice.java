@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -26,7 +26,7 @@ public interface ViewletFactoryChoice
             HasStringRepresentation
 {
     /**
-     * Determine the MeshObjectsToView for which this is a choice.
+     * Obtain the MeshObjectsToView for which this is a choice.
      *
      * @return the MeshObjectsToView
      */

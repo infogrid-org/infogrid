@@ -14,12 +14,11 @@
 
 package org.infogrid.web.taglib.util;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-import org.infogrid.util.CreateWhenNeeded;
 import org.infogrid.util.ResourceHelper;
-import org.infogrid.web.sane.SaneServletRequest;
+import org.infogrid.util.http.SaneRequest;
+import org.infogrid.web.app.InfoGridWebApp;
+import org.infogrid.web.security.CsrfMitigator;
 import org.infogrid.web.taglib.AbstractInfoGridTag;
 import org.infogrid.web.taglib.IgnoreException;
 
@@ -63,39 +62,16 @@ public class SafeFormHiddenInputTag
             JspException,
             IgnoreException
     {
-        String toInsert = hiddenInputTagString( pageContext );
-        if( toInsert != null ) {
-            print( toInsert );
+        InfoGridWebApp app       = getInfoGridWebApp();
+        CsrfMitigator  mitigator = app.getCsrfMitigator();
+        
+        if( mitigator != null ) {
+            String toInsert = mitigator.getHtmlFormFragment( (SaneRequest) pageContext.getRequest() );
+            if( toInsert != null ) {
+                print( toInsert );
+            }
         }
         return EVAL_PAGE;
-    }
-
-    /**
-     * Construct the String to insert into the HTML.
-     *
-     * @param pageContext the PageContext of the current page
-     * @return the String
-     */
-    @SuppressWarnings("unchecked")
-    public static String hiddenInputTagString(
-            PageContext pageContext )
-    {
-        SaneServletRequest       saneRequest = SaneServletRequest.create( (HttpServletRequest) pageContext.getRequest() );
-        CreateWhenNeeded<String> onDemand    = (CreateWhenNeeded<String>) saneRequest.getAttribute( TOKEN_ATTRIBUTE_NAME );
-
-        if( onDemand != null ) {
-            StringBuilder ret = new StringBuilder();
-
-            ret.append( "<input name=\"" );
-            ret.append( INPUT_FIELD_NAME );
-            ret.append( "\" type=\"hidden\" value=\"" );
-            ret.append( onDemand.obtain() );
-            ret.append( "\" />" );
-            return ret.toString();
-
-        } else {
-            return null;
-        }
     }
 
     /**

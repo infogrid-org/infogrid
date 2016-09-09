@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -16,12 +16,12 @@ package org.infogrid.web.templates;
 
 import java.io.IOException;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletResponse;
 import org.infogrid.util.http.SaneRequest;
 import org.infogrid.web.sane.SaneServletRequest;
 
 /**
- * A ResponseTemplate that emits nothing, regardless of what content has been set.
+ * A ResponseTemplate that emits only header information, no content, regardless
+ * of what content has been set.
  */
 public class NoContentStructuredResponseTemplate
         extends

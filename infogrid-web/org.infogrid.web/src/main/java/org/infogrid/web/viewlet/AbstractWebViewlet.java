@@ -8,12 +8,13 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
 package org.infogrid.web.viewlet;
 
+import org.infogrid.web.util.SimpleServletConfig;
 import java.io.IOException;
 import java.util.Deque;
 import javax.servlet.Servlet;
@@ -187,7 +188,7 @@ public abstract class AbstractWebViewlet
      * @return the possible ViewletStates
      */
     @Override
-    public JeeViewletState [] getPossibleViewletStates()
+    public WebViewletState [] getPossibleViewletStates()
     {
         // FIXME: should take MeshObject access rights into account
         return DefaultWebViewletStateEnum.values();
@@ -199,7 +200,7 @@ public abstract class AbstractWebViewlet
      * @return the current state
      */
     @Override
-    public JeeViewletState getViewletState()
+    public WebViewletState getViewletState()
     {
         return getViewedMeshObjects().getViewletState();
     }

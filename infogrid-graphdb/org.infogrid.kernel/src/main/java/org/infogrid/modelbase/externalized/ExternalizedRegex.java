@@ -17,9 +17,7 @@ package org.infogrid.modelbase.externalized;
 import java.util.regex.Pattern;
 import org.infogrid.model.primitives.StringDataType;
 import org.infogrid.model.primitives.StringValue;
-import org.infogrid.util.L10MapImpl;
 import org.infogrid.util.L10StringMapImpl;
-import org.infogrid.util.StringHelper;
 
 /**
  * This is data wanting to become a regular expression, during reading.
@@ -167,5 +165,5 @@ public class ExternalizedRegex
     /**
      * Error messages, by locale.
      */
-    protected L10MapImpl<String> theErrorMessages;
+    protected L10StringMapImpl theErrorMessages;
 }

@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,7 +18,7 @@ import org.infogrid.model.traversal.TraversalPath;
 import org.infogrid.viewlet.ViewedMeshObjects;
 
 /**
- * Extends ViewedMeshObjects with JEE information.
+ * Extends ViewedMeshObjects with web information.
  */
 public interface WebViewedMeshObjects
         extends
@@ -36,7 +36,7 @@ public interface WebViewedMeshObjects
      *
      * @return the current state
      */
-    public JeeViewletState getViewletState();
+    public WebViewletState getViewletState();
 
     /**
      * Obtain this ViewedMeshObjects as a URL, i.e. obtain the URL that, when entered into a browser,
@@ -55,5 +55,6 @@ public interface WebViewedMeshObjects
      *
      * @return the MeshObjectsToView
      */
+    @Override
     public WebMeshObjectsToView getMeshObjectsToView();
 }

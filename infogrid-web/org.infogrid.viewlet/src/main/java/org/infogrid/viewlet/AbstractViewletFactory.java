@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -68,7 +68,7 @@ public abstract class AbstractViewletFactory
         throws
             FactoryException
     {
-        ViewletFactoryChoice [] candidates = determineFactoryChoicesOrderedByMatchQuality( theObjectsToView );
+        ViewletFactoryChoice [] candidates = determineOrderedViewletChoices( theObjectsToView );
 
         if( candidates.length == 0 ) {
             throw new NoViewletFoundException( this, theObjectsToView );
@@ -90,10 +90,10 @@ public abstract class AbstractViewletFactory
      * @return the found ViewletFactoryChoices, if any
      */
     @Override
-    public ViewletFactoryChoice [] determineFactoryChoicesOrderedByMatchQuality(
+    public ViewletFactoryChoice [] determineOrderedViewletChoices(
             MeshObjectsToView theObjectsToView )
     {
-        ViewletFactoryChoice [] ret = determineFactoryChoices( theObjectsToView );
+        ViewletFactoryChoice [] ret = determineViewletChoices( theObjectsToView );
 
         Arrays.sort( ret, new ByQualityComparator( theObjectsToView ) );
 
@@ -107,7 +107,7 @@ public abstract class AbstractViewletFactory
      * @return the found ViewletFactoryChoices, if any
      */
     @Override
-    public ViewletFactoryChoice [] determineFactoryChoices(
+    public ViewletFactoryChoice [] determineViewletChoices(
             MeshObjectsToView theObjectsToView )
     {
         // find substitute viewlet type name if none given
@@ -131,7 +131,7 @@ public abstract class AbstractViewletFactory
             }
         }
 
-        ViewletFactoryChoice [] withoutType = determineFactoryChoicesIgnoringType( theObjectsToView );
+        ViewletFactoryChoice [] withoutType = determineChoicesIgnoringType( theObjectsToView );
         // now:
         // - weed out those that do not match the implementation technology
         // - bolster the ones that have the right type
@@ -170,13 +170,13 @@ public abstract class AbstractViewletFactory
     }
 
     /**
-     * Find the ViewletFactoryChoices that apply to these MeshObjectsToView, but ignore the specified
-     * viewlet type. If none are found, return an empty array.
+     * Find the ViewletFactoryChoices that apply to these MeshObjectsToView, but ignore
+     * the specified Viewlet type. If none are found, return an empty array.
      *
      * @param theObjectsToView the MeshObjectsToView
      * @return the found ViewletFactoryChoices, if any
      */
-    public abstract ViewletFactoryChoice [] determineFactoryChoicesIgnoringType(
+    public abstract ViewletFactoryChoice [] determineChoicesIgnoringType(
             MeshObjectsToView theObjectsToView );
 
     /**

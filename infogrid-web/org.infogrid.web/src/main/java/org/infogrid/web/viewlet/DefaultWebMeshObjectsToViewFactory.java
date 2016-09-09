@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -51,7 +51,7 @@ import org.infogrid.viewlet.MeshObjectsToView;
 import static org.infogrid.web.taglib.viewlet.IncludeViewletTag.INCLUDE_URL_ARGUMENT_NAME;
 
 /**
- * The default factory for MeshObjectsToView objects to be used in a JEE context.
+ * The default factory for MeshObjectsToView objects to be used in a server-side context.
  */
 public class DefaultWebMeshObjectsToViewFactory
         extends
@@ -199,15 +199,19 @@ public class DefaultWebMeshObjectsToViewFactory
         String                    viewletTypeName;
         String                    mimeType;
         TraversalPathSet          paths;
-        JeeViewletState           viewletState;
-        JeeViewletStateTransition viewletTransition;
+        WebViewletState           viewletState;
+        WebViewletStateTransition viewletTransition;
         HashMap<String,Object[]>  viewletPars;
 
         try {
             // Subject and MeshBase
             String relativeBaseUrl = request.getRelativeBaseUri();
             if( !relativeBaseUrl.startsWith( request.getContextPath() )) {
-                throw new IllegalArgumentException( "Cannot process incoming relative URI " + relativeBaseUrl + " that is outside of context path " + request.getContextPath() );
+                throw new IllegalArgumentException(
+                        "Cannot process incoming relative URI "
+                        + relativeBaseUrl
+                        + " that is outside of context path "
+                        + request.getContextPath() );
             }
 
             String trailer = relativeBaseUrl.substring( request.getContextPath().length() );
@@ -225,7 +229,7 @@ public class DefaultWebMeshObjectsToViewFactory
                 subjectIdentifierString = m.group( 3 );
 
             } else {
-                mbIdentifierString   = null;
+                mbIdentifierString      = null;
                 subjectIdentifierString = trailer;
             }
             if( subjectIdentifierString == null ) {
@@ -302,10 +306,10 @@ public class DefaultWebMeshObjectsToViewFactory
                 if( WebMeshObjectsToView.LID_TRAVERSAL_ARGUMENT_NAME.equals( key )) {
                     continue;
                 }
-                if( JeeViewletState.VIEWLET_STATE_PAR_NAME.equals( key )) {
+                if( WebViewletState.VIEWLET_STATE_PAR_NAME.equals( key )) {
                     continue;
                 }
-                if( JeeViewletStateTransition.VIEWLET_STATE_TRANSITION_PAR_NAME.equals( key )) {
+                if( WebViewletStateTransition.VIEWLET_STATE_TRANSITION_PAR_NAME.equals( key )) {
                     continue;
                 }
                 if( IncludeViewletTag.INCLUDE_URL_ARGUMENT_NAME.equals( key )) {

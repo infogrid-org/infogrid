@@ -76,7 +76,6 @@ import org.infogrid.util.text.StringifierException;
 import org.infogrid.web.ProblemReporter;
 import org.infogrid.web.app.InfoGridWebApp;
 import org.infogrid.web.sane.SaneServletRequest;
-import org.infogrid.web.security.SafeUnsafePostFilter;
 import org.infogrid.web.templates.StructuredResponse;
 
 /**
@@ -160,23 +159,26 @@ public class HttpShell
         throws
             IOException
     {
+        if( !"POST".equals( request.getMethod() )) {
+            return;
+        }
+
         String redirectUrl  = null;
 
         try {
-            if( "POST".equals( request.getMethod() )) {
-                if(    SafeUnsafePostFilter.isSafePost( request )
-                    || SafeUnsafePostFilter.mayBeSafeOrUnsafePost( request ))
-                {
-                    String command = request.getPostedArgument( FULL_SUBMIT_TAG );
-                    if( command == null || command.equals( SUBMIT_COMMIT_VALUE )) {
-                        redirectUrl = performFactoryOperations( request );
-                    }
+            if( !request.isUnsafePost()) {
+                // do things unless we are certain it's unsafe. This supports situations
+                // where there is no CsrfMitigator.
+                
+                String command = request.getPostedArgument( FULL_SUBMIT_TAG );
+                if( command == null || command.equals( SUBMIT_COMMIT_VALUE )) {
+                    redirectUrl = performFactoryOperations( request );
+                }
 
-                } else {
-                    if( log.isDebugEnabled() ) {
-                        // otherwise it's producing way too much output
-                        log.debug( "Ignoring unsafe POST", request );
-                    }
+            } else {
+                if( log.isDebugEnabled() ) {
+                    // otherwise it's producing way too much output
+                    log.debug( "Ignoring unsafe POST", request );
                 }
             }
 
@@ -197,18 +199,18 @@ public class HttpShell
     /**
      * Perform all factory methods contained in the request.
      *
-     * @param lidRequest the incoming request
+     * @param request the incoming request
      * @return URL to redirect to, if any
      * @throws NotPermittedException thrown if the caller had insufficient privileges to perform this operation
      * @throws HttpShellException a factory Exception occurred
      */
     protected String performFactoryOperations(
-            final SaneRequest lidRequest )
+            final SaneRequest request )
         throws
             NotPermittedException,
             HttpShellException
     {
-        Map<String,String[]>              postArguments = lidRequest.getPostedArguments();
+        Map<String,String[]>              postArguments = request.getPostedArguments();
         final ArrayList<HttpShellHandler> handlers      = new ArrayList<>();
         String                            ret           = null;
 
@@ -217,7 +219,7 @@ public class HttpShell
         if( handlerNames != null ) {
             for( String handlerName : handlerNames ) {
                 try {
-                    HttpShellHandler handler = theApp.findHttpShellHandler( handlerName );
+                    HttpShellHandler handler = theApp.getResourceManager().findHttpShellHandler( handlerName );
                     if( handler == null ) {
                         throw new SpecifiedHandlerNotFoundException( handlerName );
                     }
@@ -232,7 +234,7 @@ public class HttpShell
         Throwable                  thrown    = null;
         TimeStampValue             now       = TimeStampValue.now();
 
-        HttpShellOnDemandTransactionFactory txFact = new HttpShellOnDemandTransactionFactory( lidRequest, handlers, theMainMeshBase, now );
+        HttpShellOnDemandTransactionFactory txFact = new HttpShellOnDemandTransactionFactory( request, handlers, theMainMeshBase, now );
 
         MSmartFactory<MeshBase,OnDemandTransaction,Void> txs = MSmartFactory.create(
                 txFact,
@@ -241,12 +243,12 @@ public class HttpShell
 
         // invoke pre-transaction
         for( HttpShellHandler handler : handlers ) {
-            handler.beforeTransactionStart( lidRequest, theMainMeshBase, now );
+            handler.beforeTransactionStart( request, theMainMeshBase, now );
         }
 
         if( thePreferVarsFromRequest != null ) {
             for( String varName : thePreferVarsFromRequest ) {
-                Object varValue = lidRequest.getAttribute( varName );
+                Object varValue = request.getAttribute( varName );
                 if( varValue == null || varValue instanceof MeshObject ) {
                     variables.put( varName, (MeshObject) varValue );
                 } else {
@@ -276,19 +278,19 @@ public class HttpShell
                 if( variables.containsKey( varName )) {
                     continue; // no repetition please
                 }
-                String varValue = lidRequest.getPostedArgument( arg ); // use SaneRequest's error handling for multiple values
+                String varValue = request.getPostedArgument( arg ); // use SaneRequest's error handling for multiple values
 
                 if( UNASSIGNED_VALUE.equals( varValue )) {
                     throw new HttpShellException( new UnassignedArgumentException( arg ));
                 }
-                MeshBase            base       = findMeshBaseFor( varName, lidRequest );
-                HttpShellAccessVerb accessVerb = HttpShellAccessVerb.findAccessFor( varName, lidRequest );
+                MeshBase            base       = findMeshBaseFor( varName, request );
+                HttpShellAccessVerb accessVerb = HttpShellAccessVerb.findAccessFor( varName, request );
 
                 MeshObjectIdentifier id = parseMeshObjectIdentifier( base.getMeshObjectIdentifierFactory(), varValue );
 
                 OnDemandTransaction tx = txs.obtainFor( base );
 
-                MeshObject accessed = accessVerb.access( id, base, tx, lidRequest );
+                MeshObject accessed = accessVerb.access( id, base, tx, request );
                 variables.put( varName, accessed );
             }
 
@@ -308,18 +310,18 @@ public class HttpShell
                     // dealt with this one already
                     continue;
                 }
-                MeshBase            base       = findMeshBaseFor( varName, lidRequest );
-                HttpShellAccessVerb accessVerb = HttpShellAccessVerb.findAccessFor( varName, lidRequest );
+                MeshBase            base       = findMeshBaseFor( varName, request );
+                HttpShellAccessVerb accessVerb = HttpShellAccessVerb.findAccessFor( varName, request );
 
                 OnDemandTransaction  tx = txs.obtainFor( base );
 
-                MeshObject accessed = accessVerb.access( null, base, tx, lidRequest );
+                MeshObject accessed = accessVerb.access( null, base, tx, request );
                 variables.put( varName, accessed );
             }
 
             // invoke after access
             for( HttpShellHandler handler : handlers ) {
-                handler.afterAccess( lidRequest, variables, txs, theMainMeshBase, now );
+                handler.afterAccess( request, variables, txs, theMainMeshBase, now );
             }
 
             for( Map.Entry<String,MeshObject> entry : variables.entrySet() ) {
@@ -331,9 +333,9 @@ public class HttpShell
 
                     OnDemandTransaction  tx = txs.obtainFor( accessed.getMeshBase() );
 
-                    potentiallyBless(         varName, accessed, tx, lidRequest );
-                    potentiallyUnbless(       varName, accessed, tx, lidRequest );
-                    potentiallySetProperties( varName, accessed, tx, lidRequest );
+                    potentiallyBless(         varName, accessed, tx, request );
+                    potentiallyUnbless(       varName, accessed, tx, request );
+                    potentiallySetProperties( varName, accessed, tx, request );
                 }
             }
 
@@ -356,7 +358,7 @@ public class HttpShell
                         MeshObject found2   = variables.get( var2Name );
                         MeshObject found1   = variables.get( var1Name );
 
-                        String [] values = lidRequest.getMultivaluedPostedArgument( arg );
+                        String [] values = request.getMultivaluedPostedArgument( arg );
                         if( values != null ) {
                             OnDemandTransaction tx = txs.obtainFor( found1.getMeshBase() );
 
@@ -374,7 +376,7 @@ public class HttpShell
                         MeshObject found2   = variables.get( var2Name );
                         MeshObject found1   = variables.get( var1Name );
 
-                        String [] values = lidRequest.getMultivaluedPostedArgument( arg );
+                        String [] values = request.getMultivaluedPostedArgument( arg );
                         if( values != null ) {
                             OnDemandTransaction tx = txs.obtainFor( found1.getMeshBase() );
 
@@ -411,12 +413,12 @@ public class HttpShell
                         MeshObject found2   = variables.get( var2Name );
                         MeshObject found1   = variables.get( var1Name );
 
-                        HttpShellRelationshipVerb relVerb = HttpShellRelationshipVerb.findPerformFor( var1Name, var2Name, lidRequest );
+                        HttpShellRelationshipVerb relVerb = HttpShellRelationshipVerb.findPerformFor( var1Name, var2Name, request );
 
                         OnDemandTransaction tx = txs.obtainFor( found1.getMeshBase() );
 
                         if( relVerb != null ) {
-                            relVerb.perform( found1, found2, var1Name, var2Name, tx, lidRequest );
+                            relVerb.perform( found1, found2, var1Name, var2Name, tx, request );
                         }
                     }
                 }
@@ -442,7 +444,7 @@ public class HttpShell
 
                         if( found1 != null && found2 != null ) {
                             // be lenient
-                            String [] values = lidRequest.getMultivaluedPostedArgument( arg );
+                            String [] values = request.getMultivaluedPostedArgument( arg );
                             if( values != null ) {
                                 OnDemandTransaction tx = txs.obtainFor( found1.getMeshBase() );
 
@@ -463,7 +465,7 @@ public class HttpShell
 
                         if( found1 != null && found2 != null ) {
                             // be lenient
-                            String [] values = lidRequest.getMultivaluedPostedArgument( arg );
+                            String [] values = request.getMultivaluedPostedArgument( arg );
                             if( values != null ) {
                                 OnDemandTransaction tx = txs.obtainFor( found1.getMeshBase() );
 
@@ -506,12 +508,12 @@ public class HttpShell
                         if( found1 == null ) {
                             throw new HttpShellException( new SpecifiedMeshObjectNotFoundException( var1Name ));
                         }
-                        String   value = lidRequest.getPostedArgument( arg );
+                        String   value = request.getPostedArgument( arg );
                         RoleType rt    = (RoleType) findMeshType( value );
 
                         // now look for whether the checkbox argument has been POST'd or not
                         String arg2 = arg.substring( 0, arg.length()-CHECKBOX_ROLE_TAG.length() ) + CHECKBOX_TAG;
-                        String [] values = lidRequest.getMultivaluedPostedArgument( arg2 );
+                        String [] values = request.getMultivaluedPostedArgument( arg2 );
 
                         OnDemandTransaction tx = txs.obtainFor( found1.getMeshBase() );
                         tx.obtain();
@@ -557,17 +559,17 @@ public class HttpShell
                         if( found1 == null ) {
                             throw new HttpShellException( new SpecifiedMeshObjectNotFoundException( var1Name ));
                         }
-                        String   value = lidRequest.getPostedArgument( arg );
+                        String   value = request.getPostedArgument( arg );
                         RoleType rt    = (RoleType) findMeshType( value );
 
-                        String radiogroupName = lidRequest.getPostedArgument( key + var2Name + RADIOBOX_NAME_TAG );
+                        String radiogroupName = request.getPostedArgument( key + var2Name + RADIOBOX_NAME_TAG );
                         if( radiogroupName == null ) {
                             continue;
                         }
                         OnDemandTransaction tx = txs.obtainFor( found1.getMeshBase() );
                         tx.obtain();
 
-                        String doBless = lidRequest.getPostedArgument( radiogroupName );
+                        String doBless = request.getPostedArgument( radiogroupName );
                         if( doBless != null && doBless.equals( key + var2Name + RADIOBOX_TAG )) {
                             // relate and bless
                             try {
@@ -606,7 +608,7 @@ public class HttpShell
                     String current = commands[i];
 
                     if( SWEEP_ALL_COMMAND.equals( current )) {
-                        MeshBase mb = findMeshBaseFor( COMMAND_TAG, lidRequest ); // ugly?
+                        MeshBase mb = findMeshBaseFor( COMMAND_TAG, request ); // ugly?
 
                         Sweeper s = mb.getSweeper();
                         if( s == null ) {
@@ -619,7 +621,7 @@ public class HttpShell
 
             // invoke pre-transaction
             for( HttpShellHandler handler : handlers ) {
-                handler.beforeTransactionEnd( lidRequest, variables, txs, theMainMeshBase, now );
+                handler.beforeTransactionEnd( request, variables, txs, theMainMeshBase, now );
             }
 
         } catch( HttpShellException ex ) {
@@ -726,7 +728,7 @@ public class HttpShell
             // invoke post-transaction
             for( HttpShellHandler handler : handlers ) {
                 try {
-                    String ret2 = handler.afterTransactionEnd( lidRequest, variables, txs, theMainMeshBase, now, thrown );
+                    String ret2 = handler.afterTransactionEnd( request, variables, txs, theMainMeshBase, now, thrown );
                     if( ret2 != null ) {
                         if( ret == null || ret.equals( ret2 )) {
                             ret = ret2;
@@ -763,7 +765,7 @@ public class HttpShell
 
                 if( value != null && value.length == 1 && value[0] != null && value[0].trim().length() > 0 ) {
                     if( redirectVar != null ) {
-                        throw new HttpShellException( new ConflictingArgumentsException( key, redirectVar, lidRequest ));
+                        throw new HttpShellException( new ConflictingArgumentsException( key, redirectVar, request ));
                     }
                     redirectVar   = var1Name;
                     redirectValue = value[0].trim();
@@ -773,7 +775,7 @@ public class HttpShell
             if( redirectVar != null ) {
                 MeshObject redirectObj = variables.get( redirectVar );
 
-                String ret2 = calculateRedirectUrlFromMeshObject( lidRequest, redirectObj );
+                String ret2 = calculateRedirectUrlFromMeshObject( request, redirectObj );
 
                 if( !REDIRECT_TAG_TRUE.equalsIgnoreCase( redirectValue )) {
                     ret2 = HTTP.appendArgumentPairToUrl( ret2, redirectValue );

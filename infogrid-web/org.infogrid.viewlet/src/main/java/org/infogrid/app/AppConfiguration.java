@@ -43,6 +43,28 @@ public abstract class AppConfiguration
     }
 
     /**
+     * Determine the database connection string to use to connect to the
+     * primary database.
+     * 
+     * @return the connection string to connect to the main database.
+     */
+    public String getDatabaseConnectionString()
+    {
+        return theDatabaseConnectionString;
+    }
+    
+    /**
+     * Determine the name of the table in the main database containing the
+     * main MeshBase's MeshObjects.
+     * 
+     * @return the main MeshBase's database table
+     */
+    public String getMeshBaseTable()
+    {
+        return theMeshBaseTable;
+    }
+
+    /**
      * Obtain the value of a named property in this configuration.
      * 
      * @param name name of the property
@@ -83,4 +105,15 @@ public abstract class AppConfiguration
      * Accessory modules, if any.
      */
     protected ModuleRequirement [] theAccessoryModuleRequirements;
+
+    /**
+     * The connection string to connect to the main database.
+     */
+    protected String theDatabaseConnectionString;
+    
+    /**
+     * The name of the table in the main database containing the main MeshBase's
+     * MeshObjects.
+     */
+    protected String theMeshBaseTable;
 }

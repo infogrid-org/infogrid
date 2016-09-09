@@ -8,8 +8,9 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
+//
 
 package org.infogrid.web.viewlet;
 
@@ -19,7 +20,7 @@ import org.infogrid.util.text.HasStringRepresentation;
  * Many Viewlets can be in several states, such as "display" vs. "edit" vs. "preview".
  * This type captures that state.
  */
-public interface JeeViewletState
+public interface WebViewletState
         extends
             HasStringRepresentation
 {

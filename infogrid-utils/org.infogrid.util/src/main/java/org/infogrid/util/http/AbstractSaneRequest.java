@@ -59,23 +59,18 @@ public abstract class AbstractSaneRequest
     }
 
     /**
-     * If this request was obtained by way of a reverse proxy, return the SaneRequest
-     * that the reverse proxy received. Returns null if no reverse proxy was involved.
-     *
-     * @return the SaneRequest at the reverse proxy, or null if none
+     * {@inheritDoc}
      */
+    @Override
     public SaneRequest getSaneRequestAtProxy()
     {
         return theRequestAtProxy;
     }
 
     /**
-     * Obtain the original request as originally issued by the HTTP client. If a reverse
-     * proxy was involved, return the SaneRequest that the reverse proxy received. If
-     * no reverse proxy was involved, return this SaneRequest.
-     *
-     * @return the ultimate SaneRequest
+     * {@inheritDoc}
      */
+    @Override
     public SaneRequest getOriginalSaneRequest()
     {
         if( theRequestAtProxy == null ) {
@@ -86,12 +81,9 @@ public abstract class AbstractSaneRequest
     }
 
     /**
-     * Obtain a POST'd argument. If more than one argument is given by this name,
-     * this will throw an IllegalStateException.
-     *
-     * @param argName name of the argument
-     * @return value.
+     * {@inheritDoc}
      */
+    @Override
     public final String getPostedArgument(
             String argName )
     {
@@ -106,13 +98,9 @@ public abstract class AbstractSaneRequest
     }
 
     /**
-     * Determine whether a named POST'd argument has the given value.
-     * This method is useful in case several arguments have been given with the same name.
-     *
-     * @param name the name of the argument
-     * @param value the desired value of the argument
-     * @return true if the request contains an argument with this name and value
+     * {@inheritDoc}
      */
+    @Override
     public boolean matchPostedArgument(
             String name,
             String value )
@@ -130,11 +118,9 @@ public abstract class AbstractSaneRequest
     }
 
     /**
-     * Obtain a named cookie, or null if not present.
-     *
-     * @param name the name of the cookie
-     * @return the named cookie, or null
+     * {@inheritDoc}
      */
+    @Override
     public IncomingSaneCookie getCookie(
             String name )
     {
@@ -150,11 +136,9 @@ public abstract class AbstractSaneRequest
     }
 
     /**
-     * Obtain the value of a named cookie, or null if not present.
-     *
-     * @param name the name of the cookie
-     * @return the value of the named cookie, or null
+     * {@inheritDoc}
      */
+    @Override
     public String getCookieValue(
             String name )
     {
@@ -167,12 +151,9 @@ public abstract class AbstractSaneRequest
     }
 
     /**
-     * Obtain a MimePart that was HTTP POST'd. If more than one MimePart was posted with this name,
-     * this will throw an IllegalStateException.
-     *
-     * @param argName name of the argument
-     * @return the MimePart or null
+     * {@inheritDoc}
      */
+    @Override
     public MimePart getMimePart(
             String argName )
     {
@@ -184,6 +165,33 @@ public abstract class AbstractSaneRequest
         } else {
             throw new IllegalStateException();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSafePost()
+    {
+        return theIsSafe != null && theIsSafe;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isUnsafePost()
+    {
+        return theIsSafe != null && !theIsSafe;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean mayBeSafeOrUnsafePost()
+    {
+        return theIsSafe == null;
     }
 
     /**
@@ -221,6 +229,14 @@ public abstract class AbstractSaneRequest
      * The request as it was received by the reverse proxy, if any.
      */
     protected SaneRequest theRequestAtProxy;
+
+    /**
+     * Flag that indicates whether the request is a safe HTTP POST request
+     * (true), an unsafe one (false) or undetermined (null). This is not
+     * set in this class and thus always remains at null unless a subclass
+     * sets it.
+     */
+    protected Boolean theIsSafe;
 
     /**
      * Name of the cookie that might contain Accept-Language information.

@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -18,11 +18,12 @@ import org.diet4j.core.Module;
 import org.diet4j.core.ModuleActivationException;
 import org.infogrid.app.AppConfiguration;
 import org.infogrid.viewlet.MeshObjectsToView;
+import org.infogrid.viewlet.ViewletFactory;
 import org.infogrid.viewlet.ViewletFactoryChoice;
-import org.infogrid.web.viewlet.DefaultJspViewletFactoryChoice;
 import org.infogrid.web.viewlet.WebMeshObjectsToView;
 import org.infogrid.web.app.InfoGridWebAccessory;
 import org.infogrid.web.app.InfoGridWebApp;
+import org.infogrid.web.app.WebAppResourceManager;
 
 /**
  * Viewlets related to MeshBase packaged as an InfoGridAccessory.
@@ -56,7 +57,10 @@ public class MeshbaseViewletAccessory
             AppConfiguration config,
             InfoGridWebApp   app )
     {
-        app.registerViewlet(
+        WebAppResourceManager rm     = app.getResourceManager();
+        ViewletFactory        vlFact = app.getViewletFactory();
+        
+        vlFact.registerViewlet(
                 (MeshObjectsToView toView) -> {
                     if( toView.getSubject().isHomeObject() ) {
                         return AllMeshObjectsViewlet.choice( (WebMeshObjectsToView) toView, ViewletFactoryChoice.AVERAGE_MATCH_QUALITY );
@@ -66,18 +70,24 @@ public class MeshbaseViewletAccessory
                 },
                 this
         );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/AllMeshObjectsViewlet.css", this );
-
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/add.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/bin_closed.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/control_end.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/control_end_blue.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/control_fastforward.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/control_fastforward_blue.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/control_rewind.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/control_rewind_blue.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/control_start.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/control_start_blue.png", this );
-        app.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/pencil.png", this );
+        
+        final String [] ASSETS = {
+            "AllMeshObjectsViewlet.css",
+            "add.png",
+            "bin_closed.png",
+            "control_end.png",
+            "control_end_blue.png",
+            "control_fastforward.png",
+            "control_fastforward_blue.png",
+            "control_rewind.png",
+            "control_rewind_blue.png",
+            "control_start.png",
+            "control_start_blue.png",
+            "pencil.png"
+        };
+        
+        for( String name : ASSETS ) {
+            rm.registerAsset( "/v/org/infogrid/web/viewlet/meshbase/" + name, this );
+        }
     }
 }

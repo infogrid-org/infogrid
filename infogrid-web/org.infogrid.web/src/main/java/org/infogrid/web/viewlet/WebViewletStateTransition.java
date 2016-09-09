@@ -8,18 +8,19 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
+//
 
 package org.infogrid.web.viewlet;
 
 import org.infogrid.util.text.HasStringRepresentation;
 
 /**
- * Many Viewlets can attempt to transition from one state to another, such as "begin edit" vs. "cancel edit".
- * This type captures that transition.
+ * Many Viewlets can attempt to transition from one state to another, such as
+ * "begin edit" vs. "cancel edit". This type captures that transition.
  */
-public interface JeeViewletStateTransition
+public interface WebViewletStateTransition
         extends
             HasStringRepresentation
 {
@@ -35,7 +36,7 @@ public interface JeeViewletStateTransition
      *
      * @return the desired state after this transition has been taken
      */
-    public JeeViewletState getNextState();
+    public WebViewletState getNextState();
 
     /**
      * Default HTTP POST parameter name containing the viewlet state transition.

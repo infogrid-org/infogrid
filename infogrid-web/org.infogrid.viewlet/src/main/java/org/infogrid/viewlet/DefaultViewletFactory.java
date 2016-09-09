@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -62,7 +62,7 @@ public class DefaultViewletFactory
      * @return the found ViewletFactoryChoices, if any
      */
     @Override
-    public ViewletFactoryChoice [] determineFactoryChoicesIgnoringType(
+    public ViewletFactoryChoice [] determineChoicesIgnoringType(
             MeshObjectsToView theObjectsToView )
     {
         ViewletFactoryChoice [] ret   = new ViewletFactoryChoice[ theViewletMatchers.size() ];

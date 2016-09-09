@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -22,7 +22,7 @@ import org.infogrid.util.http.SaneUrl;
 import org.infogrid.viewlet.MeshObjectsToViewFactory;
 
 /**
- * A factory for JeeMeshObjectsToView objects.
+ * A factory for WebMeshObjectsToView objects.
  */
 public interface WebMeshObjectsToViewFactory
     extends

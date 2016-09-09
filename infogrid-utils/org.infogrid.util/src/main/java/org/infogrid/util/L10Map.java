@@ -17,7 +17,6 @@ package org.infogrid.util;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Locale;
-import org.infogrid.util.NameValuePair;
 
 /**
  * This is a in implementation of a map between Locale and PropertyValue. It is used
@@ -112,16 +111,4 @@ public interface L10Map<T>
      * @return an Iterator over all keys (Locales) known by this L10Map
      */
     public Iterator<NameValuePair<T>> getPairIterator();
-
-    /**
-     * Obtain a string which is the Java-language constructor expression reflecting this value.
-     * This is for code-generation purposes.
-     *
-     * @param classLoaderVar name of a variable containing the class loader to be used to initialize this value
-     * @param typeVar  name of the variable containing the DataType that goes with the to-be-created instance.
-     * @return the Java-language constructor expression
-     */
-    public String getJavaConstructorString(
-            String classLoaderVar,
-            String typeVar );
 }

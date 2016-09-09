@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -23,9 +23,8 @@ public abstract class InfoGridAccessory
         InfoGridInstallable
 {
     /**
-     * Invoked by the framework, run the various initialization methods with
-     * the configuration options provided. Also provides the InfoGridApp that
-     * this is an accessory for.
+     * Invoked by the framework, initialize the accessory. This allows the
+     * accessory to register itself with the app.
      * 
      * @param config the configuration options
      * @param app the InfoGridApp that this is an accessory for

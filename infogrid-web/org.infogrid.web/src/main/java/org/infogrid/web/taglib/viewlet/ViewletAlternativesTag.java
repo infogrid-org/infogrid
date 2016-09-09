@@ -172,7 +172,7 @@ public class ViewletAlternativesTag
         } else {
             toView = toViewFact.obtainFor( subject, request ); // don't have a parent
         }
-        ViewletFactoryChoice [] candidates = vlFact.determineFactoryChoicesOrderedByMatchQuality( toView );
+        ViewletFactoryChoice [] candidates = vlFact.determineOrderedViewletChoices( toView );
 
         if( candidates.length > 0 ) {
 

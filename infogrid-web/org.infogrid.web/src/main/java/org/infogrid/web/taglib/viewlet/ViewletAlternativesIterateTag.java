@@ -128,7 +128,7 @@ public class ViewletAlternativesIterateTag
         ViewletFactory           vlFact     = c.findContextObjectOrThrow( ViewletFactory.class );
         MeshObjectsToView toView  = toViewFact.obtainFor( subject );
 
-        ViewletFactoryChoice [] candidates = vlFact.determineFactoryChoicesOrderedByMatchQuality( toView );
+        ViewletFactoryChoice [] candidates = vlFact.determineOrderedViewletChoices( toView );
         int max = candidates.length;
 
         if( theWorstAcceptable != null ) {

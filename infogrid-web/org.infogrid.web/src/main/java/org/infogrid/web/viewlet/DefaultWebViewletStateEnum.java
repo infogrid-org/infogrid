@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -20,11 +20,11 @@ import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationParameters;
 
 /**
- * Default implementation of JeeViewletState.
+ * Default implementation of WebViewletState.
  */
 public enum DefaultWebViewletStateEnum
         implements
-            JeeViewletState
+            WebViewletState
 {
     VIEW(    "view",    true ),
     EDIT(    "edit",    false ),
@@ -48,6 +48,7 @@ public enum DefaultWebViewletStateEnum
      *
      * @return the name of this state
      */
+    @Override
     public String getName()
     {
         return theStateName;
@@ -58,6 +59,7 @@ public enum DefaultWebViewletStateEnum
      *
      * @return true if default
      */
+    @Override
     public boolean isDefaultState()
     {
         return theIsDefault;
@@ -90,6 +92,7 @@ public enum DefaultWebViewletStateEnum
      * @param pars collects parameters that may influence the String representation. Always provided.
      * @return String representation
      */
+    @Override
     public String toStringRepresentation(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
@@ -105,6 +108,7 @@ public enum DefaultWebViewletStateEnum
      * @param pars collects parameters that may influence the String representation. Always provided.
      * @return String representation
      */
+    @Override
     public String toStringRepresentationLinkStart(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
@@ -120,6 +124,7 @@ public enum DefaultWebViewletStateEnum
      * @param pars collects parameters that may influence the String representation. Always provided.
      * @return String representation
      */
+    @Override
     public String toStringRepresentationLinkEnd(
             StringRepresentation           rep,
             StringRepresentationParameters pars )
@@ -140,5 +145,5 @@ public enum DefaultWebViewletStateEnum
     /**
      * Our ResourceHelper.
      */
-    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance(DefaultWebViewletStateEnum.class );
+    private static final ResourceHelper theResourceHelper = ResourceHelper.getInstance( DefaultWebViewletStateEnum.class );
 }

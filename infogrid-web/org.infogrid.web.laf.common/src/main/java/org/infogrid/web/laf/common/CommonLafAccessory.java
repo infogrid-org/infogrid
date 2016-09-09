@@ -32,6 +32,7 @@ import org.diet4j.core.ModuleActivationException;
 import org.infogrid.app.AppConfiguration;
 import org.infogrid.web.app.InfoGridWebAccessory;
 import org.infogrid.web.app.InfoGridWebApp;
+import org.infogrid.web.app.WebAppResourceManager;
 
 /**
  * Common look-and-feel packaged as an InfoGridAccessory.
@@ -67,90 +68,92 @@ public class CommonLafAccessory
     {
         final String HTML = "text/html";
 
-    // template
+        WebAppResourceManager rm = app.getResourceManager();
+
+        // template
         
-        app.registerViewletTemplate(
+        rm.registerViewletTemplate(
                 "default",
                 HTML,
                 DefaultHtmlTemplate_jsp.class,
                 this );
-        app.registerViewletTemplate(
+        rm.registerViewletTemplate(
                 "bare",
                 HTML,
                 BareHtmlTemplate_jsp.class,
                 this );
         
-        app.registerAsset( "/s/org/infogrid/web/laf/common/assets/master.css", this );
-        app.registerAsset( "/s/org/infogrid/web/laf/common/assets/layout.css", this );
-        app.registerAsset( "/s/org/infogrid/web/laf/common/assets/color.css",  this );
+        rm.registerAsset( "/s/org/infogrid/web/laf/common/assets/master.css", this );
+        rm.registerAsset( "/s/org/infogrid/web/laf/common/assets/layout.css", this );
+        rm.registerAsset( "/s/org/infogrid/web/laf/common/assets/color.css",  this );
 
-        app.registerAsset( "/s/org/infogrid/web/laf/common/images/cancel.png", this );
-        app.registerAsset( "/s/org/infogrid/web/laf/common/images/tick.png",   this );
+        rm.registerAsset( "/s/org/infogrid/web/laf/common/images/cancel.png", this );
+        rm.registerAsset( "/s/org/infogrid/web/laf/common/images/tick.png",   this );
 
         // implementation of org.infogrid.web functionality
         
-        app.registerAsset( "/s/org/infogrid/web/taglib/candy/OverlayTag.css", this );
-        app.registerAsset( "/s/org/infogrid/web/taglib/candy/OverlayTag.js", this );
-        app.registerAsset( "/s/org/infogrid/web/taglib/candy/ToggleCssClass.js", this );
-        app.registerAsset( "/s/org/infogrid/web/taglib/mesh/PropertyTag.css", this );
-        app.registerAsset( "/s/org/infogrid/web/taglib/mesh/PropertyTag.js", this );
-        app.registerAsset( "/s/org/infogrid/web/taglib/mesh/RefreshTag.css", this );
-        app.registerAsset( "/s/org/infogrid/web/taglib/viewlet/ChangeViewletStateTag.css", this );
-        app.registerAsset( "/s/org/infogrid/web/taglib/viewlet/ViewletAlternativesTag.css", this );
+        rm.registerAsset( "/s/org/infogrid/web/taglib/candy/OverlayTag.css", this );
+        rm.registerAsset( "/s/org/infogrid/web/taglib/candy/OverlayTag.js", this );
+        rm.registerAsset( "/s/org/infogrid/web/taglib/candy/ToggleCssClass.js", this );
+        rm.registerAsset( "/s/org/infogrid/web/taglib/mesh/PropertyTag.css", this );
+        rm.registerAsset( "/s/org/infogrid/web/taglib/mesh/PropertyTag.js", this );
+        rm.registerAsset( "/s/org/infogrid/web/taglib/mesh/RefreshTag.css", this );
+        rm.registerAsset( "/s/org/infogrid/web/taglib/viewlet/ChangeViewletStateTag.css", this );
+        rm.registerAsset( "/s/org/infogrid/web/taglib/viewlet/ViewletAlternativesTag.css", this );
 
     // JSPOs
         
-        app.registerJspo(
+        rm.registerJspo(
                 "accessLocally",
                 HTML,
                 AccessLocally_jspo.class,
                 this );
-        app.registerJspo(
+        rm.registerJspo(
                 "blessRole",
                 HTML,
                 BlessRole_jspo.class,
                 this );
-        app.registerJspo(
+        rm.registerJspo(
                 "bless",
                 HTML,
                 Bless_jspo.class,
                 this );
-        app.registerJspo(
+        rm.registerJspo(
                 "create",
                 HTML,
                 Create_jspo.class,
                 this );
-        app.registerJspo(
+        rm.registerJspo(
                 "delete",
                 HTML,
                 Delete_jspo.class,
                 this );
-        app.registerJspo(
+        rm.registerJspo(
                 "relate",
                 HTML,
                 Relate_jspo.class,
                 this );
-        app.registerJspo(
+        rm.registerJspo(
                 "sweepAll",
                 HTML,
                 SweepAll_jspo.class,
                 this );
-        app.registerJspo(
+        rm.registerJspo(
                 "sweep",
                 HTML,
                 Sweep_jspo.class,
                 this );
-        app.registerJspo(
+        rm.registerJspo(
                 "unblessRole",
                 HTML,
                 UnblessRole_jspo.class,
                 this );
-        app.registerJspo(
+        rm.registerJspo(
                 "unbless",
                 HTML,
                 Unbless_jspo.class,
                 this );
-        app.registerJspo(
+        rm.registerJspo(
                 "unrelate",
                 HTML,
                 Unrelate_jspo.class,
@@ -158,7 +161,6 @@ public class CommonLafAccessory
 
     // styles for other viewlets
     
-        app.registerAsset( "/s/org/infogrid/web/viewlet/propertysheet/PropertySheetViewlet.css", this );
-    
+        rm.registerAsset( "/s/org/infogrid/web/viewlet/propertysheet/PropertySheetViewlet.css", this );
     }
 }

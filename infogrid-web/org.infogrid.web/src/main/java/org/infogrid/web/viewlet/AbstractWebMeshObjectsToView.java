@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -72,8 +72,8 @@ public abstract class AbstractWebMeshObjectsToView
             TraversalSpecification    traversalSpecification,
             TraversalPathSet          traversalPaths,
             MeshBase                  mb,
-            JeeViewletState           state,
-            JeeViewletStateTransition transition,
+            WebViewletState           state,
+            WebViewletStateTransition transition,
             String                    mimeType,
             String                    contextPath,
             Context                   c,
@@ -100,7 +100,8 @@ public abstract class AbstractWebMeshObjectsToView
      *
      * @return the desired state
      */
-    public JeeViewletState getViewletState()
+    @Override
+    public WebViewletState getViewletState()
     {
         return theState;
     }
@@ -110,8 +111,9 @@ public abstract class AbstractWebMeshObjectsToView
      *
      * @param newValue the new value
      */
+    @Override
     public void setViewletState(
-            JeeViewletState newValue )
+            WebViewletState newValue )
     {
         theState = newValue;
     }
@@ -121,7 +123,8 @@ public abstract class AbstractWebMeshObjectsToView
      *
      * @return the desired transition
      */
-    public JeeViewletStateTransition getViewletStateTransition()
+    @Override
+    public WebViewletStateTransition getViewletStateTransition()
     {
         return theTransition;
     }
@@ -131,8 +134,9 @@ public abstract class AbstractWebMeshObjectsToView
      *
      * @param newValue the new value
      */
+    @Override
     public void setViewletStateTransition(
-            JeeViewletStateTransition newValue )
+            WebViewletStateTransition newValue )
     {
         theTransition = newValue;
     }
@@ -142,6 +146,7 @@ public abstract class AbstractWebMeshObjectsToView
      *
      * @return the MIME type
      */
+    @Override
     public String getMimeType()
     {
         return theMimeType;
@@ -152,6 +157,7 @@ public abstract class AbstractWebMeshObjectsToView
      *
      * @param newValue the new value
      */
+    @Override
     public void setMimeType(
             String newValue )
     {
@@ -163,6 +169,7 @@ public abstract class AbstractWebMeshObjectsToView
      *
      * @return the incoming request
      */
+    @Override
     public String getContextPath()
     {
         return theContextPath;
@@ -176,6 +183,7 @@ public abstract class AbstractWebMeshObjectsToView
      * @param childArrivedAt the TraversalPath, if any, to reach any child of this
      * @return the URL
      */
+    @Override
     public String getAsUrl(
             TraversalPath childArrivedAt )
     {
@@ -225,12 +233,12 @@ public abstract class AbstractWebMeshObjectsToView
 
         // the ViewletState
         if( theState != null && !theState.isDefaultState()) {
-            HTTP.appendArgumentToUrl( buf, JeeViewletState.VIEWLET_STATE_PAR_NAME, theState.getName() );
+            HTTP.appendArgumentToUrl( buf, WebViewletState.VIEWLET_STATE_PAR_NAME, theState.getName() );
         }
 
         // the ViewletStateTransition
         if( theTransition != null ) {
-            HTTP.appendArgumentToUrl( buf, JeeViewletStateTransition.VIEWLET_STATE_TRANSITION_PAR_NAME, theTransition.getName() );
+            HTTP.appendArgumentToUrl( buf, WebViewletStateTransition.VIEWLET_STATE_TRANSITION_PAR_NAME, theTransition.getName() );
         }
 
         // the Viewlet parameters
@@ -254,6 +262,7 @@ public abstract class AbstractWebMeshObjectsToView
      * @param viewedMeshObjectsStack the Stack of ViewedMeshObjects of the parent Viewlets.
      * @return the URL
      */
+    @Override
     public String getAsUrl(
             Deque<WebViewedMeshObjects> viewedMeshObjectsStack )
     {
@@ -286,6 +295,7 @@ public abstract class AbstractWebMeshObjectsToView
      *
      * @return the incoming request
      */
+    @Override
     public SaneUrl getRequest()
     {
         return theRequest;
@@ -299,12 +309,12 @@ public abstract class AbstractWebMeshObjectsToView
     /**
      * The desired viewlet state, if any.
      */
-    protected JeeViewletState theState;
+    protected WebViewletState theState;
 
     /**
      * The desired viewlet state transition, if any.
      */
-    protected JeeViewletStateTransition theTransition;
+    protected WebViewletStateTransition theTransition;
 
     /**
      * The context path of the web application.

@@ -5,24 +5,22 @@
 // have received with InfoGrid. If you have not received LICENSE.InfoGrid.txt
 // or you do not consent to all aspects of the license and the disclaimers,
 // no license is granted; do not use this file.
-//
+// 
 // For more information about InfoGrid go to http://infogrid.org/
 //
 // Copyright 1998-2015 by Johannes Ernst
 // All rights reserved.
 //
 
-package org.infogrid.model.primitives;
-
-import org.infogrid.util.CanGenerateJavaConstructorString;
-import org.infogrid.util.L10Map;
+package org.infogrid.util;
 
 /**
- * An L10Map for PropertyValues.
+ * A L10Map for Strings.
  */
-public interface L10PropertyValueMap
-        extends
-            L10Map<PropertyValue>,
-            CanGenerateJavaConstructorString
+public interface L10StringMap
+    extends
+        L10Map<String>,
+        CanGenerateJavaConstructorString
 {
+    
 }

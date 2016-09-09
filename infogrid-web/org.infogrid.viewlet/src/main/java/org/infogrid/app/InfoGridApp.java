@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -24,12 +24,10 @@ import org.infogrid.meshbase.m.MMeshBase;
 import org.infogrid.meshbase.m.MMeshBaseNameServer;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.modelbase.ModelBaseSingleton;
-import org.infogrid.modelbase.m.MModelBase;
 import org.infogrid.util.context.Context;
 import org.infogrid.util.context.ObjectInContext;
 import org.infogrid.util.context.SimpleContext;
 import org.infogrid.util.logging.Log;
-import org.infogrid.viewlet.ViewletMatcher;
 
 /**
  * The superclass of all InfoGridApps.
@@ -45,13 +43,14 @@ public abstract class InfoGridApp
     /**
      * This constructor can be used directly, or the class may be subclassed.
      */
+    @SuppressWarnings( "LeakingThisInConstructor" )
     public InfoGridApp()
     {
+        theRootContext.addContextObject( this );
     }
     
     /**
-     * Invoked by the framework, run the various initialization methods with
-     * the configuration options provided.
+     * Invoked by the framework, initialize the app.
      * 
      * @param config the configuration options
      */
@@ -61,6 +60,46 @@ public abstract class InfoGridApp
         initializeMeshBase( config );
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Context getContext()
+    {
+        return theRootContext;
+    }
+
+    /**
+     * Obtain the name server which enables lookup of named MeshBases if the app
+     * has several.
+     * 
+     * @return the name server
+     */
+    public MeshBaseNameServer<MeshBaseIdentifier,MeshBase> getMeshBaseNameServer()
+    {
+        return theMeshBaseNameServer;
+    }
+    
+    /**
+     * Obtain the factory for MeshBaseIdentifiers.
+     * 
+     * @return the factory
+     */
+    public MeshBaseIdentifierFactory getMeshBaseIdentifierFactory()
+    {
+        return theMeshBaseIdentifierFactory;
+    }
+    
+    /**
+     * Obtain this app's main MeshBase.
+     * 
+     * @return the main MeshBase
+     */
+    public MeshBase getMainMeshBase()
+    {
+        return theMeshBase;
+    }
+
     /**
      * Overridable method to initialize the MeshBase and related.
      * 
@@ -93,32 +132,11 @@ public abstract class InfoGridApp
      * @param config the configuration options
      * @return the AccessManager, or null
      */
-    public AccessManager createAccessManager(
+    protected AccessManager createAccessManager(
             AppConfiguration config )
     {
         return null;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Context getContext()
-    {
-        return theRootContext;
-    }
-
-    /**
-     * Allows an InfoGridAccessory or InfoGridApp to register Viewlets with the
-     * app. The app decides whether or not, or how to make those Viewlets
-     * available. 
-     * 
-     * @param matcher the ViewletMatcher leading to the Viewlet being registered
-     * @param installable the registering InfoGridAccessory or InfoGridApp
-     */
-    public abstract void registerViewlet(
-            ViewletMatcher      matcher,
-            InfoGridInstallable installable );
 
     /**
      * The root context.
@@ -141,4 +159,3 @@ public abstract class InfoGridApp
      */
     protected MeshBaseIdentifierFactory theMeshBaseIdentifierFactory;
 }
-    

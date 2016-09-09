@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -23,7 +23,7 @@ import org.infogrid.util.text.StringRepresentationParameters;
 import org.infogrid.util.text.StringifierException;
 
 /**
- * No Viewlet could be found with the required Viewlet type.
+ * No Viewlet could be found that could view the provided MeshObjectsToView.
  */
 public class NoViewletFoundException
         extends
@@ -136,18 +136,18 @@ public class NoViewletFoundException
     protected MeshObjectsToView theObjectsToView;
 
     /**
-     * The default entry in the resouce files, prefixed by the StringRepresentation's prefix.
+     * The default entry in the resource files, prefixed by the StringRepresentation's prefix.
      */
     public static final String DEFAULT_ENTRY = "String";
 
     /**
-     * The default entry in the resouce files for the case where no ViewletType has
+     * The default entry in the resource files for the case where no ViewletType has
      * been specified, prefixed by the StringRepresentation's prefix.
      */
     public static final String DEFAULT_NO_VIEWLET_TYPE_ENTRY = DEFAULT_ENTRY + "NoViewletType";
 
     /**
-     * The default entry in the resouce files for the case where a ViewletType has
+     * The default entry in the resource files for the case where a ViewletType has
      * been specified, prefixed by the StringRepresentation's prefix.
      */
     public static final String DEFAULT_VIEWLET_TYPE_ENTRY = DEFAULT_ENTRY + "ViewletType";

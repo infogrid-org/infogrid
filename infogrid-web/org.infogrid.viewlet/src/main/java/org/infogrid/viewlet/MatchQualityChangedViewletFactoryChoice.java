@@ -8,7 +8,7 @@
 //
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -19,8 +19,8 @@ import org.infogrid.util.text.StringRepresentationParameters;
 import org.infogrid.util.text.StringifierException;
 
 /**
- * A ViewletFactoryChoice whose quality has been overridden, but otherwise delegates
- * to another ViewletFactoryChoice.
+ * A ViewletFactoryChoice whose match quality has been overridden, but otherwise
+ * delegates to another ViewletFactoryChoice.
  */
 public class MatchQualityChangedViewletFactoryChoice
         extends

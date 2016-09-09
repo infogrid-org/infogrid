@@ -16,7 +16,7 @@ package org.infogrid.web.taglib.viewlet;
 
 import javax.servlet.jsp.JspException;
 import org.infogrid.web.taglib.IgnoreException;
-import org.infogrid.web.viewlet.JeeViewletState;
+import org.infogrid.web.viewlet.WebViewletState;
 
 /**
  * <p>This tag tests for the Viewlet not being in a particular ViewletState.</p>
@@ -39,7 +39,7 @@ public class NotIfViewletStateTag
             JspException,
             IgnoreException
     {
-        JeeViewletState value = evaluate();
+        WebViewletState value = evaluate();
 
         boolean ret = !theViewletState.equals( value.getName() );
 

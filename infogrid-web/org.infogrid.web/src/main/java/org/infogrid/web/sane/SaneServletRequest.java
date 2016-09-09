@@ -1346,6 +1346,18 @@ public class SaneServletRequest
     }
 
     /**
+     * Set the flag that indicates whether this is is an HTTP POST that's safe
+     * (true), unsafe (false) or unknown (null) from CSRF attacks.
+     * 
+     * @param newValue the new value
+     */
+    public void setIsSafe(
+            Boolean newValue )
+    {
+        theIsSafe = newValue;
+    }
+    
+    /**
      * Convert to String representation, for debugging reasons only.
      *
      * @return String representation
