@@ -32,6 +32,7 @@ import org.infogrid.meshbase.MeshBaseError;
 import org.infogrid.meshbase.MeshBaseErrorListener;
 import org.infogrid.model.primitives.EntityType;
 import org.infogrid.model.primitives.RoleType;
+import org.infogrid.model.primitives.TimeStampValue;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.sql.mysql.MysqlStore;
 import org.infogrid.util.ArrayHelper;
@@ -198,6 +199,28 @@ public class Igck
     }
     
     /**
+     * Set the assignDefaultsToMandatoryNulls flag.
+     * 
+     * @param newValue the new value
+     */
+    public void setAssignDefaultsToMandatoryNulls(
+            boolean newValue )
+    {
+        theAssignDefaultsToMandatoryNulls = newValue;
+    }
+
+    /**
+     * Set the assignDefaultsIfIncompatibleDataType flag.
+     * 
+     * @param newValue the new value
+     */
+    public void setAssignDefaultsIfIncompatibleDataType(
+            boolean newValue )
+    {
+        theAssignDefaultsIfIncompatibleDataType = newValue;
+    }
+
+    /**
      * Set the verbosity level. Higher means more verbose.
      * 
      * @param newValue the new level
@@ -265,6 +288,7 @@ public class Igck
                     addToHaveErrors( current.getIdentifier() );
                     error(  current,
                             "null neighbor identifier (" + i + "/" + neighborIds.length + ")",
+                            "updated: " + TimeStampValue.create( current.getTimeUpdated() ),
                             "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
                     
                     if( toRemove != null ) {
@@ -276,6 +300,7 @@ public class Igck
                         addToHaveErrors( current.getIdentifier() );
                         error(  current,
                                 "neighbor (" + i + "/" + neighborIds.length + ") cannot be found:",
+                                "updated: " + TimeStampValue.create( current.getTimeUpdated() ),
                                 neighborIds[i].toExternalForm(),
                                 "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
 
@@ -315,6 +340,7 @@ public class Igck
                         addToHaveErrors( current.getIdentifier() );
                         error(  current,
                                 "RoleType " + roleType.getIdentifier().toExternalForm() + " (" + roleType.getMultiplicity().toString() + ") has " + others.length,
+                                "updated: " + TimeStampValue.create( current.getTimeUpdated() ),
                                 "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
                     }
                 }
@@ -341,8 +367,9 @@ public class Igck
         if( theCheckMissingTypes ) {
             addToHaveErrors( event.getMeshObject().getIdentifier() );
             error(  event.getMeshObject(),
-                    "unknown EntityType " + event.getMeshTypeIdentifier().toExternalForm() );
-            
+                    "unknown EntityType " + event.getMeshTypeIdentifier().toExternalForm(),
+                    "updated: " + TimeStampValue.create( event.getMeshObject().getTimeUpdated() ));
+
             if( theRemoveMissingTypes ) {
                 // just writing it back will do this
                 theHaveBeenFixed.add( event.getMeshObject().getIdentifier() );
@@ -360,7 +387,8 @@ public class Igck
         if( theCheckMissingTypes ) {
             addToHaveErrors( event.getMeshObject().getIdentifier() );
             error(  event.getMeshObject(),
-                    "unknown RoleType " + event.getMeshTypeIdentifier().toExternalForm() );
+                    "unknown RoleType " + event.getMeshTypeIdentifier().toExternalForm(),
+                    "updated: " + TimeStampValue.create( event.getMeshObject().getTimeUpdated() ));
 
             if( theRemoveMissingTypes ) {
                 // just writing it back will do this
@@ -379,7 +407,8 @@ public class Igck
         if( theCheckMissingTypes ) {
             addToHaveErrors( event.getMeshObject().getIdentifier() );
             error(  event.getMeshObject(),
-                    "unknown PropertyType " + event.getMeshTypeIdentifier().toExternalForm() );
+                    "unknown PropertyType " + event.getMeshTypeIdentifier().toExternalForm(),
+                    "updated: " + TimeStampValue.create( event.getMeshObject().getTimeUpdated() ));
 
             if( theRemoveMissingTypes ) {
                 // just writing it back will do this
@@ -398,7 +427,13 @@ public class Igck
         if( theCheckValues ) {
             addToHaveErrors( event.getMeshObject().getIdentifier() );
             error(  event.getMeshObject(),
-                    "value " + event.getPropertyValue() + " incompatible with type " + event.getPropertyType().getDataType() + " of PropertyType " + event.getPropertyType() );
+                    "value " + event.getPropertyValue() + " incompatible with type " + event.getPropertyType().getDataType() + " of PropertyType " + event.getPropertyType(),
+                    "updated: " + TimeStampValue.create( event.getMeshObject().getTimeUpdated() ));
+
+            if( theAssignDefaultsIfIncompatibleDataType ) {
+                // just writing it back will do this
+                theHaveBeenFixed.add( event.getMeshObject().getIdentifier() );
+            }
         }
     }
 
@@ -412,7 +447,13 @@ public class Igck
         if( theCheckValues ) {
             addToHaveErrors( event.getMeshObject().getIdentifier() );
             error(  event.getMeshObject(),
-                    "PropertyType " + event.getPropertyType() + " does not allow null values" );
+                    "PropertyType " + event.getPropertyType().getIdentifier().toExternalForm() + " does not allow null values",
+                    "updated: " + TimeStampValue.create( event.getMeshObject().getTimeUpdated() ));
+           
+            if( theAssignDefaultsToMandatoryNulls ) {
+                // just writing it back will do this
+                theHaveBeenFixed.add( event.getMeshObject().getIdentifier() );
+            }
         }
     }
 
@@ -525,6 +566,18 @@ public class Igck
      */
     protected boolean theRemoveMissingTypes;
     
+    /**
+     * If true, assign default values to non-optional properties whose value
+     * is currently null.
+     */
+    protected boolean theAssignDefaultsToMandatoryNulls;
+
+    /**
+     * If true, assign default values to properties whose current value does not
+     * conform to the property's data type.
+     */
+    protected boolean theAssignDefaultsIfIncompatibleDataType;
+
     /**
      * The verbosity level.
      */

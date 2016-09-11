@@ -1,0 +1,7 @@
+Limitations:
+ * If a MeshObject has more than one problem and at least one of them is being
+   fixed, all others are being fixed, too, as InfoGrid cannot write partially
+   invalid MeshObjects to disk
+ * Mandatory properties that nevertheless currently have null values can only
+   be set to static default values, not the dynamic ones (using
+   <defaultvalue code="java"> in the model)

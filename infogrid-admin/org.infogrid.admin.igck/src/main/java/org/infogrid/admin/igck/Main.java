@@ -31,22 +31,24 @@ public class Main {
     public static void main(
             String [] args )
     {
-        boolean checkMissingNeighbors  = false;
-        boolean checkMissingTypes      = false;
-        boolean checkMultiplicities    = false;
-        boolean checkValues            = false;
-        boolean removeMissingNeighbors = false;
-        boolean removeMissingTypes     = false;
-        String  dbTable                = null;
-        String  dbUser                 = null;
-        String  dbPassword             = null;
-        String  logfile                = null;
-        String  dbConnectString        = null;
-        int     verbose                = 1;
+        boolean checkMissingNeighbors                = false;
+        boolean checkMissingTypes                    = false;
+        boolean checkMultiplicities                  = false;
+        boolean checkValues                          = false;
+        boolean removeMissingNeighbors               = false;
+        boolean removeMissingTypes                   = false;
+        boolean assignDefaultsToMandatoryNulls       = false;
+        boolean assignDefaultsIfIncompatibleDataType = false;
+        String  dbTable                              = null;
+        String  dbUser                               = null;
+        String  dbPassword                           = null;
+        String  logfile                              = null;
+        String  dbConnectString                      = null;
+        int     verbose                              = 1;
         
         try {
             for( int i = 0; i < args.length ; ++i ) {
-                switch( args[i] ) {
+                switch( args[i].toLowerCase() ) {
                     case "--checkmissingneighbors":
                         checkMissingNeighbors = true;
                         break;
@@ -64,6 +66,12 @@ public class Main {
                         break;
                     case "--removemissingtypes":
                         removeMissingTypes = true;
+                        break;
+                    case "--assigndefaultstomandatorynulls":
+                        assignDefaultsToMandatoryNulls = true;
+                        break;
+                    case "--assigndefaultsifincompatibledatatype":
+                        assignDefaultsIfIncompatibleDataType = true;
                         break;
                     case "--logfile":
                         if( logfile == null ) {
@@ -129,6 +137,10 @@ public class Main {
         if( removeMissingTypes ) {
             checkMissingTypes = true;
         }
+        if( assignDefaultsToMandatoryNulls || assignDefaultsIfIncompatibleDataType ) {
+            checkValues = true;
+        }
+
         if( !checkMissingNeighbors && !checkMissingTypes && !checkMultiplicities && !checkValues ) {
             // default is to check all
             checkMissingNeighbors = true;
@@ -146,13 +158,16 @@ public class Main {
             ModelPrimitivesStringRepresentationDirectorySingleton.initialize();
 
             Igck theObj = Igck.create( dbConnectString, dbTable, dbUser, dbPassword );
-            theObj.setCheckMissingNeighbors(  checkMissingNeighbors );
-            theObj.setCheckMissingTypes(      checkMissingTypes );
-            theObj.setCheckMultiplicities(    checkMultiplicities );
-            theObj.setCheckValues(            checkValues );
-            theObj.setRemoveMissingNeighbors( removeMissingNeighbors );
-            theObj.setRemoveMissingTypes(     removeMissingTypes );
-            theObj.setVerbose(                verbose );
+            theObj.setCheckMissingNeighbors(                checkMissingNeighbors );
+            theObj.setCheckMissingTypes(                    checkMissingTypes );
+            theObj.setCheckMultiplicities(                  checkMultiplicities );
+            theObj.setCheckValues(                          checkValues );
+            theObj.setRemoveMissingNeighbors(               removeMissingNeighbors );
+            theObj.setRemoveMissingTypes(                   removeMissingTypes );
+            theObj.setAssignDefaultsToMandatoryNulls(       assignDefaultsToMandatoryNulls );
+            theObj.setAssignDefaultsIfIncompatibleDataType( assignDefaultsIfIncompatibleDataType );
+            theObj.setVerbose(                              verbose );
+
             theObj.run();
 
         } catch( IOException ex ) {
@@ -163,18 +178,21 @@ public class Main {
     static void synopsisQuit()
     {
         System.err.println( "Arguments:" );
-        System.err.println( "    [--checkmissingneighbors]        : check for missing neighbor MeshObjects" );
-        System.err.println( "    [--checkmissingtypes]            : check for MeshTypes used that cannot be resolved" );
-        System.err.println( "    [--checkmultiplicities]          : check that all RoleType multiplicities are obeyed" );
-        System.err.println( "    [--checkvalues]                  : check that all PropertyValues are allowed" );
-        System.err.println( "    [--removemissingneighbors]       : remove references to missing neighbor MeshObjects" );
-        System.err.println( "    [--removemissingtypes]           : remove references to MeshTypes used that cannot be resolved" );
-        System.err.println( "    [--table <table>]                : the database table containing the MeshObjects (default: MeshObjects)" );
-        System.err.println( "    [--user <user>]                  : the database username to use" );
-        System.err.println( "    [--password <pass>]              : the database password to use" );
-        System.err.println( "    [--logfile <log4jconfig>]        : alternate log4j config file" );
-        System.err.println( "    [--verbose] | [--quiet]          : increase or decrease verbosity level" );
-        System.err.println( "    jdbc:<engine>://<host>/<database : the JDBC database connection string" );
+        System.err.println( "    [--checkmissingneighbors]                : check for missing neighbor MeshObjects" );
+        System.err.println( "    [--checkmissingtypes]                    : check for MeshTypes used that cannot be resolved" );
+        System.err.println( "    [--checkmultiplicities]                  : check that all RoleType multiplicities are obeyed" );
+        System.err.println( "    [--checkvalues]                          : check that all PropertyValues are allowed" );
+        System.err.println( "    [--removemissingneighbors]               : remove references to missing neighbor MeshObjects" );
+        System.err.println( "    [--removemissingtypes]                   : remove references to MeshTypes used that cannot be resolved" );
+        System.err.println( "    [--assigndefaultstomandatorynulls]       : assign default values to non-optional properties that are null" );
+        System.err.println( "    [--assigndefaultsifincompatibledatatype] : assign default values to properties with values not conforming with the property's data type" );
+        
+        System.err.println( "    [--table <table>]                        : the database table containing the MeshObjects (default: MeshObjects)" );
+        System.err.println( "    [--user <user>]                          : the database username to use" );
+        System.err.println( "    [--password <pass>]                      : the database password to use" );
+        System.err.println( "    [--logfile <log4jconfig>]                : alternate log4j config file" );
+        System.err.println( "    [--verbose] | [--quiet]                  : increase or decrease verbosity level" );
+        System.err.println( "    jdbc:<engine>://<host>/<database         : the JDBC database connection string" );
         
         System.exit( 1 );
     }
