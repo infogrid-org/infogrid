@@ -16,17 +16,21 @@ package org.infogrid.admin.igck;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MultiplicityException;
-import org.infogrid.meshbase.IterableMeshBase;
+import org.infogrid.mesh.NotRelatedException;
+import org.infogrid.mesh.a.AMeshObject;
+import org.infogrid.mesh.a.AMeshObjectNeighborManager;
 import org.infogrid.meshbase.MeshBaseError;
 import org.infogrid.meshbase.MeshBaseErrorListener;
-import org.infogrid.meshbase.store.IterableStoreMeshBase;
 import org.infogrid.model.primitives.EntityType;
-import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.sql.mysql.MysqlStore;
@@ -111,7 +115,7 @@ public class Igck
             throw new IOException( "Cannot identify database engine for connection string " + dbConnectString );
         }
         
-        IterableStoreMeshBase mb = IterableStoreMeshBase.create( store );
+        InstrumentedStoreMeshBase mb = InstrumentedStoreMeshBase.create( store );
 
         return new Igck( mb );
     }
@@ -122,7 +126,7 @@ public class Igck
      * @param mb the MeshBase to be tested
      */
     protected Igck(
-            IterableMeshBase mb )
+            InstrumentedStoreMeshBase mb )
     {
         theMeshBase = mb;
     }
@@ -213,15 +217,27 @@ public class Igck
 
         theMeshObjectCount = 0;
         theErrorCount      = 0;
+        theFixedCount      = 0;
 
         theMeshBase.iterator().batchForEach(
                 512,
                 (MeshObject current) -> runOne( current ));
 
         if( theErroneousCount == 0 ) {
-            System.out.println( "Congratulations, no errors found." );
+            System.out.printf(
+                    "Congratulations, no errors found in %d MeshObjects.\n",
+                    theMeshObjectCount );
+
+        } else if( theFixedCount > 0 ) {
+            System.out.printf("Found %d erroneous out of %d MeshObjects (%02.1f%%), %d errors total, fixed %d.\n",
+                    theErroneousCount,
+                    theMeshObjectCount,
+                    100.f * theErroneousCount / theMeshObjectCount,
+                    theErrorCount,
+                    theFixedCount );
+
         } else {
-            System.out.printf("Found %d erroneous out of %d MeshObjects (%02.1f%%), %d errors total\n",
+            System.out.printf("Found %d erroneous out of %d MeshObjects (%02.1f%%), %d errors total.\n",
                     theErroneousCount,
                     theMeshObjectCount,
                     100.f * theErroneousCount / theMeshObjectCount,
@@ -239,25 +255,51 @@ public class Igck
             MeshObject current )
     {
         ++theMeshObjectCount;
-        theErrorFlag = 0;
 
         if( theCheckMissingNeighbors ) {
-            MeshObjectIdentifier [] neighborIds = current.getNeighborMeshObjectIdentifiers();
+            MeshObjectIdentifier []   neighborIds = current.getNeighborMeshObjectIdentifiers();
+            Set<MeshObjectIdentifier> toRemove    = theRemoveMissingNeighbors ? new HashSet<>( neighborIds.length ) : null;
+
             for( int i=0 ; i<neighborIds.length ; ++i ) {
                 if( neighborIds[i] == null ) {
-                    ++theErrorFlag;
+                    addToHaveErrors( current.getIdentifier() );
                     error(  current,
                             "null neighbor identifier (" + i + "/" + neighborIds.length + ")",
                             "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
+                    
+                    if( toRemove != null ) {
+                        toRemove.add( neighborIds[i] );
+                    }
                 } else {
                     MeshObject neighbor = theMeshBase.findMeshObjectByIdentifier( neighborIds[i] );
                     if( neighbor == null ) {
-                        ++theErrorFlag;
+                        addToHaveErrors( current.getIdentifier() );
                         error(  current,
                                 "neighbor (" + i + "/" + neighborIds.length + ") cannot be found:",
                                 neighborIds[i].toExternalForm(),
                                 "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
+
+                        if( toRemove != null ) {
+                            toRemove.add( neighborIds[i] );
+                        }
                     }
+                }
+            }
+            if( theRemoveMissingNeighbors && !toRemove.isEmpty() ) {
+                if( current instanceof AMeshObject ) {
+                    for( MeshObjectIdentifier id : toRemove ) {
+                        try {
+                            NM.removeNeighbor( (AMeshObject) current, id );
+                        } catch( NotRelatedException ex ) {
+                            log.error( ex );
+                        }
+                    }
+                    theHaveBeenFixed.add( current.getIdentifier() );
+
+                    info( current, "removed " + toRemove.size() + " unresolvable neighbor(s)" );
+
+                } else {
+                    log.warn( "Cannot remove", toRemove.size() + "neighbor(s), not an AMeshObject:", current.getIdentifier().toExternalForm() );
                 }
             }
         }
@@ -270,7 +312,7 @@ public class Igck
                         roleType.checkMultiplicity( current, others );
 
                     } catch( MultiplicityException ex ) {
-                        ++theErrorFlag;
+                        addToHaveErrors( current.getIdentifier() );
                         error(  current,
                                 "RoleType " + roleType.getIdentifier().toExternalForm() + " (" + roleType.getMultiplicity().toString() + ") has " + others.length,
                                 "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
@@ -278,10 +320,14 @@ public class Igck
                 }
             }            
         }
-        if( theErrorFlag > 0 ) {
-            theErrorCount += theErrorFlag;
+        if( theHaveBeenFixed.remove( current.getIdentifier() )) {
+            theMeshBase.flush( current );
+            ++theFixedCount;
+        }
+        Integer haveErrors = theHaveErrors.get( current.getIdentifier() );
+        if( haveErrors != null && haveErrors > 0 ) {
+            theErrorCount += haveErrors;
             ++theErroneousCount;
-            theErrorFlag = 0;
         }
     }
     
@@ -292,10 +338,15 @@ public class Igck
     public void unresolveableEntityType(
             MeshBaseError.UnresolvableEntityType event )
     {
-        ++theErrorFlag;
         if( theCheckMissingTypes ) {
+            addToHaveErrors( event.getMeshObject().getIdentifier() );
             error(  event.getMeshObject(),
                     "unknown EntityType " + event.getMeshTypeIdentifier().toExternalForm() );
+            
+            if( theRemoveMissingTypes ) {
+                // just writing it back will do this
+                theHaveBeenFixed.add( event.getMeshObject().getIdentifier() );
+            }
         }
     }
 
@@ -306,10 +357,15 @@ public class Igck
     public void unresolveableRoleType(
             MeshBaseError.UnresolvableRoleType event )
     {
-        ++theErrorFlag;
         if( theCheckMissingTypes ) {
+            addToHaveErrors( event.getMeshObject().getIdentifier() );
             error(  event.getMeshObject(),
                     "unknown RoleType " + event.getMeshTypeIdentifier().toExternalForm() );
+
+            if( theRemoveMissingTypes ) {
+                // just writing it back will do this
+                theHaveBeenFixed.add( event.getMeshObject().getIdentifier() );
+            }
         }
     }
 
@@ -320,10 +376,15 @@ public class Igck
     public void unresolveablePropertyType(
             MeshBaseError.UnresolvablePropertyType event )
     {
-        ++theErrorFlag;
         if( theCheckMissingTypes ) {
+            addToHaveErrors( event.getMeshObject().getIdentifier() );
             error(  event.getMeshObject(),
                     "unknown PropertyType " + event.getMeshTypeIdentifier().toExternalForm() );
+
+            if( theRemoveMissingTypes ) {
+                // just writing it back will do this
+                theHaveBeenFixed.add( event.getMeshObject().getIdentifier() );
+            }
         }
     }
 
@@ -334,8 +395,8 @@ public class Igck
     public void incompatibleDataType(
             MeshBaseError.IncompatibleDataType event )
     {
-        ++theErrorFlag;
         if( theCheckValues ) {
+            addToHaveErrors( event.getMeshObject().getIdentifier() );
             error(  event.getMeshObject(),
                     "value " + event.getPropertyValue() + " incompatible with type " + event.getPropertyType().getDataType() + " of PropertyType " + event.getPropertyType() );
         }
@@ -348,8 +409,8 @@ public class Igck
     public void propertyNotOptional(
             MeshBaseError.PropertyNotOptional event )
     {
-        ++theErrorFlag;
         if( theCheckValues ) {
+            addToHaveErrors( event.getMeshObject().getIdentifier() );
             error(  event.getMeshObject(),
                     "PropertyType " + event.getPropertyType() + " does not allow null values" );
         }
@@ -390,9 +451,49 @@ public class Igck
     }
 
     /**
+     * Report an informational message.
+     * 
+     * @param obj the affected MeshObject
+     * @param msgs the messages in increasing verbosity
+     */
+    protected void info(
+            HasIdentifier obj,
+            Object ... msgs )
+    {
+        if( theVerbose == 0 ) {
+            System.err.println( obj.getIdentifier().toExternalForm() );
+        } else {
+            StringBuilder msg = new StringBuilder();
+            msg.append( "Info: " );
+            msg.append( obj.getIdentifier().toExternalForm() );
+            for( int i=0 ; i<theVerbose && i<msgs.length; ++i ) {
+                msg.append( ' ' );
+                msg.append( msgs[i] );
+            }
+            System.out.println( msg );
+        }
+    }
+
+    /**
+     * Utility method to increment the value in the theHaveErrors hash.
+     * 
+     * @param id the MeshObjectIdentifier
+     */    
+    protected void addToHaveErrors(
+            MeshObjectIdentifier id )
+    {
+        Integer found = theHaveErrors.get( id );
+        if( found != null ) {
+            theHaveErrors.put( id, found + 1 );
+        } else {
+            theHaveErrors.put( id, 1 );
+        }    
+    }
+
+    /**
      * The MeshBase to be tested.
      */
-    protected IterableMeshBase theMeshBase;
+    protected InstrumentedStoreMeshBase theMeshBase;
     
     /**
      * If true, check for missing neighbors.
@@ -445,7 +546,24 @@ public class Igck
     protected int theErroneousCount;
     
     /**
-     * Temporary flag for error counting that gets reset on each MeshObject.
+     * Running counter for the number of MeshObjects that were fixed.
      */
-    protected int theErrorFlag;
+    protected int theFixedCount;
+
+    /**
+     * Flag errors from callbacks. Keep those around until the main processing
+     * loop comes around to catch up with processing MeshObjects that had errors
+     * upon deserialization from disk.
+     */
+    protected Map<MeshObjectIdentifier,Integer> theHaveErrors = new HashMap<>();
+    
+    /**
+     * Mark a MeshObject has having to be written back to disk
+     */
+    protected Set<MeshObjectIdentifier> theHaveBeenFixed = new HashSet<>();
+
+    /**
+     * The NeighborManager to use.
+     */
+    protected static AMeshObjectNeighborManager NM = AMeshObjectNeighborManager.SINGLETON;
 }
