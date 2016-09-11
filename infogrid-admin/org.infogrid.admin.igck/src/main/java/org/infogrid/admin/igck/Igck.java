@@ -22,13 +22,17 @@ import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MultiplicityException;
 import org.infogrid.meshbase.IterableMeshBase;
+import org.infogrid.meshbase.MeshBaseError;
+import org.infogrid.meshbase.MeshBaseErrorListener;
 import org.infogrid.meshbase.store.IterableStoreMeshBase;
 import org.infogrid.model.primitives.EntityType;
+import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.store.IterableStore;
 import org.infogrid.store.sql.mysql.MysqlStore;
+import org.infogrid.util.ArrayHelper;
 //import org.infogrid.store.sql.postgresql.PostgresqlStore;
-import org.infogrid.util.CursorIterator;
+import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.logging.Log;
 //import org.postgresql.ds.PGSimpleDataSource;
 
@@ -36,6 +40,8 @@ import org.infogrid.util.logging.Log;
  * The InfoGrid checker.
  */
 public class Igck
+    implements
+        MeshBaseErrorListener
 {
     private static final Log log = Log.getLogInstance( Igck.class ); // our own, private logger
 
@@ -44,6 +50,8 @@ public class Igck
      * 
      * @param dbConnectString the JDBC database connection string
      * @param dbTable the table in the database containing the MeshObjects
+     * @param dbUser the database user to use
+     * @param dbPassword the database password to use
      * @return the created Igck
      * @throws IOException thrown if an input/output problem occurred
      */
@@ -120,24 +128,80 @@ public class Igck
     }
     
     /**
-     * Set the preen flag.
+     * Set the checkMissingNeighbors flag.
      * 
      * @param newValue the new value
      */
-    public void setPreen(
+    public void setCheckMissingNeighbors(
             boolean newValue )
     {
-        thePreen = newValue;
+        theCheckMissingNeighbors = newValue;
     }
     
     /**
-     * Get the preen flag.
+     * Set the checkMissingTypes flag.
      * 
-     * @return the flag
+     * @param newValue the new value
      */
-    public boolean getPreen()
+    public void setCheckMissingTypes(
+            boolean newValue )
     {
-        return thePreen;
+        theCheckMissingTypes = newValue;
+    }
+    
+    /**
+     * Set the checkMultiplicities flag.
+     * 
+     * @param newValue the new value
+     */
+    public void setCheckMultiplicities(
+            boolean newValue )
+    {
+        theCheckMultiplicities = newValue;
+    }
+    
+    /**
+     * Set the checkValues flag.
+     * 
+     * @param newValue the new value
+     */
+    public void setCheckValues(
+            boolean newValue )
+    {
+        theCheckValues = newValue;
+    }
+
+    /**
+     * Set the removeMissingNeighbors flag.
+     * 
+     * @param newValue the new value
+     */
+    public void setRemoveMissingNeighbors(
+            boolean newValue )
+    {
+        theRemoveMissingNeighbors = newValue;
+    }
+    
+    /**
+     * Set the removeMissingTypes flag.
+     * 
+     * @param newValue the new value
+     */
+    public void setRemoveMissingTypes(
+            boolean newValue )
+    {
+        theRemoveMissingTypes = newValue;
+    }
+    
+    /**
+     * Set the verbosity level. Higher means more verbose.
+     * 
+     * @param newValue the new level
+     */
+    public void setVerbose(
+            int newValue )
+    {
+        theVerbose = newValue;
     }
 
     /**
@@ -145,85 +209,184 @@ public class Igck
      */
     public void run()
     {
-        runNeighbors();
-        runMultiplicities();
-    }
-    
-    /**
-     * Access all the neighbors in each MeshObject, and make sure they exist.
-     */
-    protected void runNeighbors()
-    {
-        log.info( "Checking MeshObjects for neighbors" );
+        theMeshBase.addDirectErrorListener( this );
 
-        int meshObjectCount = 0;
-        int neighborCount   = 0;
-        CursorIterator<MeshObject> iter = theMeshBase.iterator();
-        
-        while( iter.hasNext() ) {
-            MeshObject current = iter.next();
-            log.debug( current.getIdentifier().toExternalForm() );
-            
+        theMeshObjectCount = 0;
+        theErrorCount      = 0;
+
+        theMeshBase.iterator().batchForEach(
+                512,
+                (MeshObject current) -> runOne( current ));
+
+        if( theErroneousCount == 0 ) {
+            System.out.println( "Congratulations, no errors found." );
+        } else {
+            System.out.printf("Found %d erroneous out of %d MeshObjects (%02.1f%%), %d errors total\n",
+                    theErroneousCount,
+                    theMeshObjectCount,
+                    100.f * theErroneousCount / theMeshObjectCount,
+                    theErrorCount );
+        }
+        theMeshBase.removeErrorListener( this );
+    }
+
+    /**
+     * Check a single MeshObject.
+     * 
+     * @param current the MeshObject to check
+     */    
+    protected void runOne(
+            MeshObject current )
+    {
+        ++theMeshObjectCount;
+        theErrorFlag = 0;
+
+        if( theCheckMissingNeighbors ) {
             MeshObjectIdentifier [] neighborIds = current.getNeighborMeshObjectIdentifiers();
             for( int i=0 ; i<neighborIds.length ; ++i ) {
                 if( neighborIds[i] == null ) {
-                    log.error(
-                            "MeshObject",
-                            current.getIdentifier().toExternalForm(),
-                            "has null neighbor identifier (" + i + "/" + neighborIds.length + ")" );
+                    ++theErrorFlag;
+                    error(  current,
+                            "null neighbor identifier (" + i + "/" + neighborIds.length + ")",
+                            "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
                 } else {
                     MeshObject neighbor = theMeshBase.findMeshObjectByIdentifier( neighborIds[i] );
                     if( neighbor == null ) {
-                        log.error(
-                                "MeshObject",
-                                current.getIdentifier().toExternalForm(),
-                                ", neighbor (" + i + "/" + neighborIds.length + ") cannot be found:",
-                                neighborIds[i] );
+                        ++theErrorFlag;
+                        error(  current,
+                                "neighbor (" + i + "/" + neighborIds.length + ") cannot be found:",
+                                neighborIds[i].toExternalForm(),
+                                "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
                     }
                 }
             }
-            ++meshObjectCount;
-            neighborCount += neighborIds.length;
         }
-        log.info( "Done checking", meshObjectCount, "MeshObjects for neighbors (" + neighborCount + ")" );
-    }
-    
-    /**
-     * Check the Multiplicities of all relationships.
-     */
-    protected void runMultiplicities()
-    {
-        log.info( "Checking multiplicities" );
-        
-        int meshObjectCount = 0;
-        CursorIterator<MeshObject> iter = theMeshBase.iterator();
-        
-        while( iter.hasNext() ) {
-            MeshObject current = iter.next();
-            log.debug( current.getIdentifier().toExternalForm() );
-
+        if( theCheckMultiplicities ) {
             for( EntityType entityType : current.getTypes()) {
                 for( RoleType roleType : entityType.getAllRoleTypes()) {
                     MeshObjectIdentifier [] others = current.traverseToIdentifiers( roleType );
-                    
+
                     try {
                         roleType.checkMultiplicity( current, others );
 
                     } catch( MultiplicityException ex ) {
-                        log.error(
-                                "MeshObject",
-                                current.getIdentifier().toExternalForm(),
-                                "violates multiplicity of RoleType",
-                                roleType.getIdentifier().toExternalForm(),
-                                ": has ",
-                                others.length,
-                                "related MeshObjects, multiplicity is",
-                                roleType.getMultiplicity());
+                        ++theErrorFlag;
+                        error(  current,
+                                "RoleType " + roleType.getIdentifier().toExternalForm() + " (" + roleType.getMultiplicity().toString() + ") has " + others.length,
+                                "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
                     }
                 }
-            }
+            }            
         }
-        log.info( "Done chechking", meshObjectCount, "MeshObjects for multiplicities" );
+        if( theErrorFlag > 0 ) {
+            theErrorCount += theErrorFlag;
+            ++theErroneousCount;
+            theErrorFlag = 0;
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unresolveableEntityType(
+            MeshBaseError.UnresolvableEntityType event )
+    {
+        ++theErrorFlag;
+        if( theCheckMissingTypes ) {
+            error(  event.getMeshObject(),
+                    "unknown EntityType " + event.getMeshTypeIdentifier().toExternalForm() );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unresolveableRoleType(
+            MeshBaseError.UnresolvableRoleType event )
+    {
+        ++theErrorFlag;
+        if( theCheckMissingTypes ) {
+            error(  event.getMeshObject(),
+                    "unknown RoleType " + event.getMeshTypeIdentifier().toExternalForm() );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unresolveablePropertyType(
+            MeshBaseError.UnresolvablePropertyType event )
+    {
+        ++theErrorFlag;
+        if( theCheckMissingTypes ) {
+            error(  event.getMeshObject(),
+                    "unknown PropertyType " + event.getMeshTypeIdentifier().toExternalForm() );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void incompatibleDataType(
+            MeshBaseError.IncompatibleDataType event )
+    {
+        ++theErrorFlag;
+        if( theCheckValues ) {
+            error(  event.getMeshObject(),
+                    "value " + event.getPropertyValue() + " incompatible with type " + event.getPropertyType().getDataType() + " of PropertyType " + event.getPropertyType() );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void propertyNotOptional(
+            MeshBaseError.PropertyNotOptional event )
+    {
+        ++theErrorFlag;
+        if( theCheckValues ) {
+            error(  event.getMeshObject(),
+                    "PropertyType " + event.getPropertyType() + " does not allow null values" );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void otherError(
+            MeshBaseError.OtherError event )
+    {
+        log.error( event );
+    }
+
+    /**
+     * Report an error.
+     * 
+     * @param obj the affected MeshObject
+     * @param msgs the messages in increasing verbosity
+     */
+    protected void error(
+            HasIdentifier obj,
+            Object ... msgs )
+    {
+        if( theVerbose == 0 ) {
+            System.err.println( obj.getIdentifier().toExternalForm() );
+        } else {
+            StringBuilder msg = new StringBuilder();
+            msg.append( "Error: " );
+            msg.append( obj.getIdentifier().toExternalForm() );
+            for( int i=0 ; i<theVerbose && i<msgs.length; ++i ) {
+                msg.append( ' ' );
+                msg.append( msgs[i] );
+            }
+            System.err.println( msg );
+        }
     }
 
     /**
@@ -232,7 +395,57 @@ public class Igck
     protected IterableMeshBase theMeshBase;
     
     /**
-     * The preen flag. If true, automatically repair everything.
+     * If true, check for missing neighbors.
      */
-    protected boolean thePreen;
+    protected boolean theCheckMissingNeighbors;
+    
+    /**
+     * If true, check for missing types.
+     */
+    protected boolean theCheckMissingTypes;
+    
+    /**
+     * If true, check for invalid multiplicities.
+     */
+    protected boolean theCheckMultiplicities;
+
+    /**
+     * If true, check PropertyValues.
+     */
+    protected boolean theCheckValues;
+
+    /**
+     * If true, remove missing neighbors.
+     */
+    protected boolean theRemoveMissingNeighbors;
+    
+    /**
+     * If true, remove missing types.
+     */
+    protected boolean theRemoveMissingTypes;
+    
+    /**
+     * The verbosity level.
+     */
+    protected int theVerbose;
+    
+    /**
+     * Running counter for examined MeshObjects.
+     */
+    protected int theMeshObjectCount;
+    
+    /**
+     * Running counter for errors.
+     */
+    protected int theErrorCount;
+
+    /**
+     * Running counter for MeshObjects with at least one error.
+     */
+    protected int theErroneousCount;
+    
+    /**
+     * Temporary flag for error counting that gets reset on each MeshObject.
+     */
+    protected int theErrorFlag;
 }

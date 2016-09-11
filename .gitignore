@@ -1,2 +1,4 @@
 infogrid-*-any.pkg*
 nb-configuration.xml
+/infogrid-admin/org.infogrid.admin.igck/nbproject/private/
+/infogrid-admin/org.infogrid.admin.igck/target/

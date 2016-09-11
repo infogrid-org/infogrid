@@ -14,6 +14,7 @@
 
 package org.infogrid.model.primitives;
 
+import java.text.ParseException;
 import org.infogrid.util.ResourceHelper;
 import org.infogrid.util.text.StringRepresentation;
 import org.infogrid.util.text.StringRepresentationParameters;
@@ -185,9 +186,36 @@ public final class MultiplicityValue
     {
         StringBuilder buf = new StringBuilder();
         buf.append( ( minimum == N ) ? N_SYMBOL : String.valueOf( minimum ) );
-        buf.append( ".." );
+        buf.append( SEPARATOR );
         buf.append( ( maximum == N ) ? N_SYMBOL : String.valueOf( maximum ) );
         return buf.toString();
+    }
+
+    /**
+     * Parse a text string into a MultiplicityValue.
+     * 
+     * @param raw the text String
+     * @return the MultiplicityValue
+     * @throws ParseException thrown if the string could not be parsed
+     */
+    public static MultiplicityValue parseMultiplicityValue(
+            String raw )
+        throws
+            ParseException
+    {
+        int sep = raw.indexOf( SEPARATOR );
+        if( sep < 0 ) {
+            throw new ParseException( "No separator in string: " + raw, 0 );
+        }
+        if( sep == 0 && sep == raw.length() - SEPARATOR.length() ) {
+            throw new ParseException( "MultiplicityValue must have two components, is: " + raw, 0 );
+        }
+        String first  = raw.substring( 0, sep );
+        String second = raw.substring( sep + SEPARATOR.length() );
+
+        return MultiplicityValue.create(
+                N_SYMBOL.equals( first )  ? N : Integer.parseInt( first ),
+                N_SYMBOL.equals( second ) ? N : Integer.parseInt( second ));
     }
 
     /**
@@ -297,4 +325,9 @@ public final class MultiplicityValue
     public static final String N_SYMBOL = ResourceHelper.getInstance( MultiplicityValue.class ).getResourceStringOrDefault(
             "NSymbol",
             "*" );
+    
+    /**
+     * The separator between the minimum and the maximum.
+     */
+    public static final String SEPARATOR = "..";
 }

@@ -28,6 +28,7 @@ import org.infogrid.meshbase.MeshObjectIdentifierFactory;
 import org.infogrid.meshbase.a.AMeshBaseLifecycleManager;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.modelbase.ModelBase;
+import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.modelbase.m.MModelBase;
 import org.infogrid.store.IterableStore;
 import org.infogrid.util.CursorIterator;
@@ -60,7 +61,7 @@ public class IterableStoreMeshBase
         try {
             return create(
                     DefaultMeshBaseIdentifierFactory.create().fromExternalForm( "DefaultMeshBase" ),
-                    MModelBase.create(),
+                    ModelBaseSingleton.getSingleton(),
                     null,
                     meshObjectStore,
                     SimpleContext.createRoot( "root context" ));

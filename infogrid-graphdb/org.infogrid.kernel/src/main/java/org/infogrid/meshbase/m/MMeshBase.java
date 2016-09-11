@@ -27,7 +27,7 @@ import org.infogrid.meshbase.a.AIterableMeshBase;
 import org.infogrid.meshbase.a.AMeshBaseLifecycleManager;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.modelbase.ModelBase;
-import org.infogrid.modelbase.m.MModelBase;
+import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.util.CachingMap;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.MCachingHashMap;
@@ -56,7 +56,7 @@ public class MMeshBase
         try {
             return create(
                     DefaultMeshBaseIdentifierFactory.create().fromExternalForm( "DefaultMeshBase" ),
-                    MModelBase.create(),
+                    ModelBaseSingleton.getSingleton(),
                     null,
                     SimpleContext.createRoot( "root context" ));
         } catch( StringRepresentationParseException ex ) {

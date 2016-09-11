@@ -8,7 +8,7 @@
 // 
 // For more information about InfoGrid go to http://infogrid.org/
 //
-// Copyright 1998-2015 by Johannes Ernst
+// Copyright 1998-2016 by Johannes Ernst
 // All rights reserved.
 //
 
@@ -90,6 +90,7 @@ public interface MeshBase
      * 
      * @return the MeshBaseIdentifier
      */
+    @Override
     public abstract MeshBaseIdentifier getIdentifier();
 
     /**
@@ -508,7 +509,8 @@ public interface MeshBase
      * Subscribe to events indicating the addition/removal/etc
      * of MeshObjects to/from this MeshBase, without using a Reference.
      * 
-     * @param newListener the to-be-added MMeshObjectLifecycleListener@see #removeMeshObjectLifecycleEventListener
+     * @param newListener the to-be-added MMeshObjectLifecycleListener
+     * @see #removeMeshObjectLifecycleEventListener
      * @see #addWeakMeshObjectLifecycleEventListener
      * @see #addSoftMeshObjectLifecycleEventListener
      * @see #removeMeshObjectLifecycleEventListener
@@ -520,7 +522,8 @@ public interface MeshBase
      * Subscribe to events indicating the addition/removal/etc
      * of MeshObjects to/from this MeshBase, using a WeakReference.
      * 
-     * @param newListener the to-be-added MMeshObjectLifecycleListener@see #removeMeshObjectLifecycleEventListener
+     * @param newListener the to-be-added MMeshObjectLifecycleListener
+     * @see #removeMeshObjectLifecycleEventListener
      * @see #addDirectMeshObjectLifecycleEventListener
      * @see #addSoftMeshObjectLifecycleEventListener
      * @see #removeMeshObjectLifecycleEventListener
@@ -532,7 +535,8 @@ public interface MeshBase
      * Subscribe to events indicating the addition/removal/etc
      * of MeshObjects to/from this MeshBase, using a SoftReference.
      * 
-     * @param newListener the to-be-added MMeshObjectLifecycleListener@see #removeMeshObjectLifecycleEventListener
+     * @param newListener the to-be-added MMeshObjectLifecycleListener
+     * @see #removeMeshObjectLifecycleEventListener
      * @see #addWeakMeshObjectLifecycleEventListener
      * @see #addDirectMeshObjectLifecycleEventListener
      * @see #removeMeshObjectLifecycleEventListener
@@ -544,13 +548,62 @@ public interface MeshBase
      * Unsubscribe from events indicating the addition/removal/etc
      * of MeshObjects to/from this MeshBase.
      * 
-     * @param oldListener the to-be-removed MMeshObjectLifecycleListener@see #addMeshObjectLifecycleEventListener
+     * @param oldListener the to-be-removed MMeshObjectLifecycleListener
+     * @see #addMeshObjectLifecycleEventListener
      * @see #addWeakMeshObjectLifecycleEventListener
      * @see #addSoftMeshObjectLifecycleEventListener
      * @see #addDirectMeshObjectLifecycleEventListener
      */
     public abstract void removeMeshObjectLifecycleEventListener(
             MeshObjectLifecycleListener oldListener );
+
+    /**
+     * Subscribe to events indicating errors.
+     *
+     * @param newListener the to-be-added MeshBaseErrorListener
+     * @see #removeErrorListener
+     * @see #addWeakErrorListener
+     * @see #addSoftErrorListener
+     * @see #removeErrorListener
+     */
+    public abstract void addDirectErrorListener(
+            MeshBaseErrorListener newListener );
+
+    /**
+     * Subscribe to events indicating errors.
+     *
+     * @param newListener the to-be-added MeshBaseErrorListener
+     * @see #removeErrorListener
+     * @see #addSoftErrorListener
+     * @see #addDirectErrorListener
+     * @see #removeErrorListener
+     */
+    public abstract void addWeakErrorListener(
+            MeshBaseErrorListener newListener );
+
+    /**
+     * Subscribe to events indicating errors.
+     *
+     * @param newListener the to-be-added MeshBaseErrorListener
+     * @see #removeErrorListener
+     * @see #addWeakErrorListener
+     * @see #addDirectErrorListener
+     * @see #removeErrorListener
+     */
+    public abstract void addSoftErrorListener(
+            MeshBaseErrorListener newListener );
+
+    /**
+     * Unsubscribe from events indicating errors.
+     * 
+     * @param oldListener the to-be-removed MeshBaseErrorListener
+     * @see #addMeshBaseErrorListener
+     * @see #addWeakMeshBaseErrorListener
+     * @see #addSoftMesBaseErrorListener
+     * @see #addDirectMeshBaseErrorListener
+     */
+    public abstract void removeErrorListener(
+            MeshBaseErrorListener oldListener );
 
     /**
      * Tell this MeshBase that we don't need it any more.

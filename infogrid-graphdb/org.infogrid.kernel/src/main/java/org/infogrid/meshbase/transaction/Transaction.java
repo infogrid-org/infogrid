@@ -288,15 +288,8 @@ public abstract class Transaction
 
             for( EntityType entityType : affected.getTypes()) {
                 for( RoleType roleType : entityType.getAllRoleTypes()) {
-                    MultiplicityValue mult = roleType.getMultiplicity();
-
                     MeshObjectIdentifier [] others = affected.traverseToIdentifiers( roleType );
-                    if( mult.getMinimum() > others.length ) {
-                        throw new MultiplicityException( affected, roleType );
-                    }
-                    if( mult.getMaximum() != MultiplicityValue.N && others.length > mult.getMaximum() ) {
-                        throw new MultiplicityException( affected, roleType );
-                    }
+                    roleType.checkMultiplicity( affected, others );
                 }
             }
         }

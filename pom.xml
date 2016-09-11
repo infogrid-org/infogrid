@@ -16,6 +16,7 @@
         <module>infogrid-stores</module>
         <module>infogrid-ui</module>
         <module>infogrid-utils</module>
+        <module>infogrid-admin</module>
     </modules>
 
     <build>

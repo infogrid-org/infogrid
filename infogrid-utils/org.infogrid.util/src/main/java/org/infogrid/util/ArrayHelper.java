@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.function.Function;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 
@@ -1262,8 +1263,8 @@ public abstract class ArrayHelper
      * @param array the array to convert to a String
      * @return String form of the array
      */
-    public static String arrayToString(
-            Object [] array )
+    public static <T> String arrayToString(
+            T [] array )
     {
         return arrayToString( array, "/" );
     }
@@ -1273,13 +1274,45 @@ public abstract class ArrayHelper
      * separator String.
      *
      * @param array the array to convert to a String
-     * @param separator the sepator String
+     * @param separator the separator String
      * @return String form of the array
      */
-    public static String arrayToString(
-            Object [] array,
+    public static <T> String arrayToString(
+            T      [] array,
             String    separator )
     {
+        return arrayToString( array, separator, ( T t ) -> t.toString() );
+    }
+    
+    /**
+     * This is the same as arrayToString( Object [] ) but it lets you specify a
+     * method by which the Object gets converted to String.
+     *
+     * @param array the array to convert to a String
+     * @param converter the Converter from T to the String for the component type
+     * @return String form of the array
+     */
+    public static <T> String arrayToString(
+            T []               array,
+            Function<T,String> converter )
+    {
+        return arrayToString( array, "/", converter );
+    }
+
+    /**
+     * This is the same as arrayToString( Object [] ) but it lets you specify a
+     * separator String and a method by which the Object gets converted to String.
+     *
+     * @param array the array to convert to a String
+     * @param separator the separator String
+     * @param converter the Converter from T to the String for the component type
+     * @return String form of the array
+     */
+    public static <T> String arrayToString(
+            T []               array,
+            String             separator,
+            Function<T,String> converter )
+    {    
         if( array == null ) {
             return "null";
         }
@@ -1290,14 +1323,14 @@ public abstract class ArrayHelper
         if( array[0] instanceof Object[] ) {
             ret.append( ArrayHelper.arrayToString( (Object []) array[0] ));
         } else {
-            ret.append( array[0] );
+            ret.append( converter.apply( array[0] ));
         }
         for( int i=1 ; i<array.length ; ++i ) {
             ret.append( separator );
             if( array[i] instanceof Object[] ) {
                 ret.append( ArrayHelper.arrayToString( (Object []) array[i] ));
             } else {
-                ret.append( array[i] );
+                ret.append( converter.apply( array[i] ));
             }
         }
         ret.append( " }" );

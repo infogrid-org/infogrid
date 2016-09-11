@@ -16,6 +16,7 @@ package org.infogrid.admin.igck;
 
 import java.io.File;
 import java.io.IOException;
+import org.infogrid.model.primitives.text.ModelPrimitivesStringRepresentationDirectorySingleton;
 import org.infogrid.util.logging.log4j.Log4jLog;
 
 /**
@@ -30,24 +31,45 @@ public class Main {
     public static void main(
             String [] args )
     {
-        boolean preen           = false; // automatic repair
-        String  logfile         = null;
-        String  dbConnectString = null;
-        String  dbTable         = null;
-        String  dbUser          = null;
-        String  dbPassword      = null;
+        boolean checkMissingNeighbors  = false;
+        boolean checkMissingTypes      = false;
+        boolean checkMultiplicities    = false;
+        boolean checkValues            = false;
+        boolean removeMissingNeighbors = false;
+        boolean removeMissingTypes     = false;
+        String  dbTable                = null;
+        String  dbUser                 = null;
+        String  dbPassword             = null;
+        String  logfile                = null;
+        String  dbConnectString        = null;
+        int     verbose                = 1;
         
         try {
             for( int i = 0; i < args.length ; ++i ) {
                 switch( args[i] ) {
-                    case "-p":
-                        preen = true;
+                    case "--checkmissingneighbors":
+                        checkMissingNeighbors = true;
+                        break;
+                    case "--checkmissingtypes":
+                        checkMissingTypes = true;
+                        break;
+                    case "--checkmultiplicities":
+                        checkMultiplicities = true;
+                        break;
+                    case "--checkvalues":
+                        checkValues = true;
+                        break;
+                    case "--removemissingneighbors":
+                        removeMissingNeighbors = true;
+                        break;
+                    case "--removemissingtypes":
+                        removeMissingTypes = true;
                         break;
                     case "--logfile":
                         if( logfile == null ) {
                             logfile = args[++i];
                         } else {
-                            synopsisQuit( 1 );
+                            synopsisQuit();
                         }
                         break;
                     case "-t":
@@ -55,7 +77,7 @@ public class Main {
                         if( dbTable == null ) {
                             dbTable = args[++i];
                         } else {
-                            synopsisQuit( 2 );
+                            synopsisQuit();
                         }
                         break;
                     case "-u":
@@ -63,41 +85,74 @@ public class Main {
                         if( dbUser == null ) {
                             dbUser = args[++i];
                         } else {
-                            synopsisQuit( 3 );
+                            synopsisQuit();
                         }
                         break;
                     case "--password":
                         if( dbPassword == null ) {
                             dbPassword = args[++i];
                         } else {
-                            synopsisQuit( 4 );
+                            synopsisQuit();
                         }
                         break;
+                    case "-v":
+                    case "--verbose":
+                        ++verbose;
+                        break;
+                    case "-q":
+                    case "--quiet":
+                        --verbose;
+                        break;
                     default:
+                        if( args[i].startsWith( "--" ) ) {
+                            // unknown option
+                            synopsisQuit();
+                        }
                         if( dbConnectString == null ) {
                             dbConnectString = args[i];
                         } else {
-                            synopsisQuit( 5 );
+                            synopsisQuit();
                         }
                         break;
                 }
             }
         } catch( ArrayIndexOutOfBoundsException ex ) {
-            synopsisQuit( 6 );
+            synopsisQuit();
         }
         if( dbConnectString == null ) {
-            synopsisQuit( 7 );
+            synopsisQuit();
         }
         
+        if( removeMissingNeighbors ) {
+            checkMissingNeighbors = true;
+        }
+        if( removeMissingTypes ) {
+            checkMissingTypes = true;
+        }
+        if( !checkMissingNeighbors && !checkMissingTypes && !checkMultiplicities && !checkValues ) {
+            // default is to check all
+            checkMissingNeighbors = true;
+            checkMissingTypes     = true;
+            checkMultiplicities   = true;
+            checkValues           = true;
+        }
         try {
             if( logfile != null ) {
                 Log4jLog.configure( new File( logfile ));
             } else {
                 Log4jLog.configure( "Log.properties", Main.class.getClassLoader() );
             }
+            
+            ModelPrimitivesStringRepresentationDirectorySingleton.initialize();
 
             Igck theObj = Igck.create( dbConnectString, dbTable, dbUser, dbPassword );
-            theObj.setPreen( preen );
+            theObj.setCheckMissingNeighbors(  checkMissingNeighbors );
+            theObj.setCheckMissingTypes(      checkMissingTypes );
+            theObj.setCheckMultiplicities(    checkMultiplicities );
+            theObj.setCheckValues(            checkValues );
+            theObj.setRemoveMissingNeighbors( removeMissingNeighbors );
+            theObj.setRemoveMissingTypes(     removeMissingTypes );
+            theObj.setVerbose(                verbose );
             theObj.run();
 
         } catch( IOException ex ) {
@@ -105,13 +160,21 @@ public class Main {
         }
     }
     
-    static void synopsisQuit( int i )
+    static void synopsisQuit()
     {
-        System.err.println( "Synopsis:" );
-        System.err.println( i );
-        System.err.println( "    [ -p ] [--table <table>] [--user <user>] [--password <pass>] [--logfile <log4jconfig>] <jdbcString>" );
-        System.err.println();
-        System.err.println( "Example: -p --table MeshObjects jdbc:mysql://localhost/test" );
+        System.err.println( "Arguments:" );
+        System.err.println( "    [--checkmissingneighbors]        : check for missing neighbor MeshObjects" );
+        System.err.println( "    [--checkmissingtypes]            : check for MeshTypes used that cannot be resolved" );
+        System.err.println( "    [--checkmultiplicities]          : check that all RoleType multiplicities are obeyed" );
+        System.err.println( "    [--checkvalues]                  : check that all PropertyValues are allowed" );
+        System.err.println( "    [--removemissingneighbors]       : remove references to missing neighbor MeshObjects" );
+        System.err.println( "    [--removemissingtypes]           : remove references to MeshTypes used that cannot be resolved" );
+        System.err.println( "    [--table <table>]                : the database table containing the MeshObjects (default: MeshObjects)" );
+        System.err.println( "    [--user <user>]                  : the database username to use" );
+        System.err.println( "    [--password <pass>]              : the database password to use" );
+        System.err.println( "    [--logfile <log4jconfig>]        : alternate log4j config file" );
+        System.err.println( "    [--verbose] | [--quiet]          : increase or decrease verbosity level" );
+        System.err.println( "    jdbc:<engine>://<host>/<database : the JDBC database connection string" );
         
         System.exit( 1 );
     }

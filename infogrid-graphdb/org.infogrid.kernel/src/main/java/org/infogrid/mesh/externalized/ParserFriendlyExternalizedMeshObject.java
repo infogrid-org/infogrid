@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.PropertyValue;
+import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 
 /**
@@ -27,7 +28,8 @@ public class ParserFriendlyExternalizedMeshObject
         extends
             AbstractExternalizedMeshObject
         implements
-            ExternalizedMeshObject
+            ExternalizedMeshObject,
+            CanBeDumped
 {
     /**
      * Set the MeshObjectIdentifier of the MeshObject.
@@ -237,6 +239,7 @@ public class ParserFriendlyExternalizedMeshObject
      *
      * @param d the Dumper to dump to
      */
+    @Override
     public void dump(
             Dumper d )
     {

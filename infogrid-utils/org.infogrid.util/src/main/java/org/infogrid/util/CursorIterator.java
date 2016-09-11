@@ -17,6 +17,7 @@ package org.infogrid.util;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 /**
  * A more fully-featured version of <code>java.util.Iterator</code> that can move
@@ -246,4 +247,35 @@ public interface CursorIterator<E>
      * @return the type of array
      */
     public Class<E> getArrayComponentType();
+    
+    /**
+     * Efficiently iterate by fetching larger sets of objects in batch.
+     * 
+     * @param batchSize the size of the initial batch to fetch
+     * @param consumer the consumer of the value
+     */
+    default
+    public void batchForEach(
+            int                 batchSize,
+            Consumer<? super E> consumer )
+    {
+        while( true ) {
+            while( batchSize > 0 ) {
+                if( hasNext( batchSize ) ) {
+                    break;
+                }
+                batchSize /= 2;
+            }
+            if( batchSize == 0 ) {
+                break;
+            }
+            E [] batch = next( batchSize );
+            
+            for( int i=0 ; i<batchSize ; ++ i ) {
+                E current = batch[i];
+                
+                consumer.accept( current );
+            }
+        }
+    }
 }

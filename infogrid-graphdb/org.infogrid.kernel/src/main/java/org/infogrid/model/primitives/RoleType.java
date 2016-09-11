@@ -16,6 +16,7 @@ package org.infogrid.model.primitives;
 
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.MultiplicityException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.model.traversal.TraversalSpecification;
 
@@ -312,6 +313,20 @@ public interface RoleType
             MeshObject           caller )
         throws
             NotPermittedException;
+
+    /**
+     * Given this MeshObject and this set of other sides for the RoleType,
+     * check that it conforms to the range specified in the RoleType's Multiplicity.
+     * 
+     * @param affected the MeshObject
+     * @param others the other MeshObjects by their identifiers
+     * @throws MultiplicityException thrown if the other sites were out of range
+     */
+    public void checkMultiplicity(
+            MeshObject              affected,
+            MeshObjectIdentifier [] others )
+        throws
+            MultiplicityException;
 
     /**
       * Appended to the Identifier of a RelationshipType to create a "source" RoleType's Identifier.

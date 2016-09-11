@@ -192,6 +192,7 @@ public abstract class FlexibleListenerSet<T,E,P>
                 }
             } else {
                 if( found == oldListener ) {
+                    theContent.remove( i );
                     break;
                 }
             }
