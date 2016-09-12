@@ -35,6 +35,7 @@ public class Main {
         boolean checkMissingTypes                    = false;
         boolean checkMultiplicities                  = false;
         boolean checkValues                          = false;
+        boolean checkReferentialIntegrity            = false;
         boolean removeMissingNeighbors               = false;
         boolean removeMissingTypes                   = false;
         boolean assignDefaultsToMandatoryNulls       = false;
@@ -60,6 +61,9 @@ public class Main {
                         break;
                     case "--checkvalues":
                         checkValues = true;
+                        break;
+                    case "--checkreferentialintegrity":
+                        checkReferentialIntegrity = true;
                         break;
                     case "--removemissingneighbors":
                         removeMissingNeighbors = true;
@@ -141,12 +145,13 @@ public class Main {
             checkValues = true;
         }
 
-        if( !checkMissingNeighbors && !checkMissingTypes && !checkMultiplicities && !checkValues ) {
+        if( !checkMissingNeighbors && !checkMissingTypes && !checkMultiplicities && !checkValues && !checkReferentialIntegrity ) {
             // default is to check all
-            checkMissingNeighbors = true;
-            checkMissingTypes     = true;
-            checkMultiplicities   = true;
-            checkValues           = true;
+            checkMissingNeighbors     = true;
+            checkMissingTypes         = true;
+            checkMultiplicities       = true;
+            checkValues               = true;
+            checkReferentialIntegrity = true;
         }
         
         if( dbTable == null ) {
@@ -167,6 +172,7 @@ public class Main {
             theObj.setCheckMissingTypes(                    checkMissingTypes );
             theObj.setCheckMultiplicities(                  checkMultiplicities );
             theObj.setCheckValues(                          checkValues );
+            theObj.setCheckReferentialIntegrity(            checkReferentialIntegrity );
             theObj.setRemoveMissingNeighbors(               removeMissingNeighbors );
             theObj.setRemoveMissingTypes(                   removeMissingTypes );
             theObj.setAssignDefaultsToMandatoryNulls(       assignDefaultsToMandatoryNulls );
@@ -187,6 +193,7 @@ public class Main {
         System.err.println( "    [--checkmissingtypes]                    : check for MeshTypes used that cannot be resolved" );
         System.err.println( "    [--checkmultiplicities]                  : check that all RoleType multiplicities are obeyed" );
         System.err.println( "    [--checkvalues]                          : check that all PropertyValues are allowed" );
+        System.err.println( "    [--checkreferentialintegrity]            : check referential integrity" );
         System.err.println( "    [--removemissingneighbors]               : remove references to missing neighbor MeshObjects" );
         System.err.println( "    [--removemissingtypes]                   : remove references to MeshTypes used that cannot be resolved" );
         System.err.println( "    [--assigndefaultstomandatorynulls]       : assign default values to non-optional properties that are null" );

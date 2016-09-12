@@ -38,6 +38,7 @@ import org.infogrid.store.sql.mysql.MysqlStore;
 import org.infogrid.util.ArrayHelper;
 //import org.infogrid.store.sql.postgresql.PostgresqlStore;
 import org.infogrid.util.HasIdentifier;
+import org.infogrid.util.Identifier;
 import org.infogrid.util.logging.Log;
 //import org.postgresql.ds.PGSimpleDataSource;
 
@@ -177,6 +178,17 @@ public class Igck
     }
 
     /**
+     * Set the checkReferentialIntegrity flag.
+     * 
+     * @param newValue the new value
+     */
+    public void setCheckReferentialIntegrity(
+            boolean newValue )
+    {
+        theCheckReferentialIntegrity = newValue;
+    }
+
+    /**
      * Set the removeMissingNeighbors flag.
      * 
      * @param newValue the new value
@@ -302,7 +314,7 @@ public class Igck
                                 "neighbor (" + i + "/" + neighborIds.length + ") cannot be found:",
                                 "updated: " + TimeStampValue.create( current.getTimeUpdated() ),
                                 neighborIds[i].toExternalForm(),
-                                "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
+                                "(type " + arrayToString( current.getTypes() ) + ")" );
 
                         if( toRemove != null ) {
                             toRemove.add( neighborIds[i] );
@@ -328,6 +340,42 @@ public class Igck
                 }
             }
         }
+        if( theCheckReferentialIntegrity ) {
+            MeshObjectIdentifier [] neighborIds = current.getNeighborMeshObjectIdentifiers();
+
+            for( int i=0 ; i<neighborIds.length ; ++i ) {
+                MeshObject neighbor = theMeshBase.findMeshObjectByIdentifier( neighborIds[i] );
+                if( !neighbor.isRelated( current.getIdentifier() )) {
+                    addToHaveErrors( current.getIdentifier() );
+                    try {
+                        error(  current,
+                                "lists " + neighborIds[i].getExternalForm() + " as neighbor, but neighbor is not pointing back",
+                                "updated: " + TimeStampValue.create( current.getTimeUpdated() ) + " and " + TimeStampValue.create( neighbor.getTimeUpdated() ),
+                                "(type " + arrayToString( current.getTypes())
+                                        + " and " + arrayToString( neighbor.getTypes())
+                                        + ", roles " + arrayToString( current.getRoleTypeIdentifiers( neighborIds[i] ))+ ")" );
+                    } catch( NotRelatedException ex ) {
+                        log.error( ex );
+                    }
+                } else {
+                    try {
+                        RoleType [] hereRoles  = current.getRoleTypes( neighbor );
+                        RoleType [] thereRoles = neighbor.getRoleTypes( current );
+                        if( !ArrayHelper.hasSameContentOutOfOrder( hereRoles, thereRoles, (RoleType one, RoleType two ) -> one.getInverseRoleType().equals( two ) )) {
+                            addToHaveErrors( current.getIdentifier() );
+                            error(   current,
+                                    "has different roles than corresponding roles of neighbor " + neighborIds[i].toExternalForm(),
+                                    "updated: " + TimeStampValue.create( current.getTimeUpdated() ) + " and " + TimeStampValue.create( neighbor.getTimeUpdated() ),
+                                    "( " + arrayToString( hereRoles )
+                                         + " vs " + arrayToString( thereRoles ) + " )" );
+                        }
+                    } catch( NotRelatedException ex ) {
+                        log.error( ex );
+                    }
+                }
+            }
+            
+        }
         if( theCheckMultiplicities ) {
             for( EntityType entityType : current.getTypes()) {
                 for( RoleType roleType : entityType.getAllRoleTypes()) {
@@ -341,7 +389,7 @@ public class Igck
                         error(  current,
                                 "RoleType " + roleType.getIdentifier().toExternalForm() + " (" + roleType.getMultiplicity().toString() + ") has " + others.length,
                                 "updated: " + TimeStampValue.create( current.getTimeUpdated() ),
-                                "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
+                                "(type " + arrayToString( current.getTypes()) + ")" );
                     }
                 }
             }            
@@ -516,6 +564,30 @@ public class Igck
     }
 
     /**
+     * Helper method to turn an array into a String.
+     * 
+     * @param array the array
+     * @return the String
+     */
+    protected String arrayToString(
+            HasIdentifier [] array )
+    {
+        return ArrayHelper.arrayToString( array, "", " / ", "", (HasIdentifier hid) -> hid.getIdentifier().getExternalForm() );
+    }
+
+    /**
+     * Helper method to turn an array into a String.
+     * 
+     * @param array the array
+     * @return the String
+     */
+    protected String arrayToString(
+            Identifier [] array )
+    {
+        return ArrayHelper.arrayToString( array, "", " / ", "", (Identifier id) -> id.getExternalForm() );
+    }
+
+    /**
      * Utility method to increment the value in the theHaveErrors hash.
      * 
      * @param id the MeshObjectIdentifier
@@ -555,6 +627,11 @@ public class Igck
      * If true, check PropertyValues.
      */
     protected boolean theCheckValues;
+
+    /**
+     * If true, check that all relationships are bidirectional.
+     */
+    protected boolean theCheckReferentialIntegrity;
 
     /**
      * If true, remove missing neighbors.
