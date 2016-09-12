@@ -148,6 +148,11 @@ public class Main {
             checkMultiplicities   = true;
             checkValues           = true;
         }
+        
+        if( dbTable == null ) {
+            dbTable = "MeshObjects";
+        }
+
         try {
             if( logfile != null ) {
                 Log4jLog.configure( new File( logfile ));
