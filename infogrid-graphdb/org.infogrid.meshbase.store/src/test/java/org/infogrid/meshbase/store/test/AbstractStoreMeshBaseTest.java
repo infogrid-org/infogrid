@@ -22,6 +22,7 @@ import org.diet4j.core.ModuleRequirement;
 import org.diet4j.inclasspath.InClasspathModuleRegistry;
 import org.infogrid.meshbase.DefaultMeshBaseIdentifierFactory;
 import org.infogrid.meshbase.MeshBaseIdentifierFactory;
+import org.infogrid.model.primitives.text.ModelPrimitivesStringRepresentationDirectorySingleton;
 import org.infogrid.modelbase.ModelBase;
 import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.store.sql.AbstractSqlStore;
@@ -62,6 +63,8 @@ public abstract class AbstractStoreMeshBaseTest
         Log4jLog.configure( "org/infogrid/meshbase/store/test/Log.properties", cl );
         Log.setLogFactory( new Log4jLogFactory());
         
+        ModelPrimitivesStringRepresentationDirectorySingleton.initialize();
+
         ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
                 "org/infogrid/meshbase/store/test/ResourceHelper",
                 Locale.getDefault(),

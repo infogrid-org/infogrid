@@ -25,6 +25,7 @@ import org.infogrid.modelbase.MeshTypeWithIdentifierNotFoundException;
 import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.event.AbstractExternalizablePropertyChangeEvent;
 import org.infogrid.util.event.PropertyUnresolvedException;
+import org.infogrid.util.logging.Log;
 
 /**
   * <p>This event indicates that one of a MeshObject's properties has changed its value.</p>
@@ -35,6 +36,7 @@ public class MeshObjectPropertyChangeEvent
         implements
             Change<MeshObject,MeshObjectIdentifier,PropertyValue,PropertyValue>
 {
+    private static final Log log = Log.getLogInstance( MeshObjectPropertyChangeEvent.class ); // our own, private logger
     private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
@@ -270,7 +272,11 @@ public class MeshObjectPropertyChangeEvent
 
         } finally {
             if( tx != null ) {
-                tx.commitTransaction();
+                try {
+                    tx.commitTransaction();
+                } catch( Throwable t ) {
+                    log.error( t );
+                }
             }
         }
     }

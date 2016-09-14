@@ -39,29 +39,29 @@ public abstract class AbstractMeshBaseTest
         extends
             AbstractTest
 {
-    /**
-     * Initialize Module Framework, and initialize statics.
-     * 
-     * @throws Exception all sorts of things may go wrong in tests
-     */
-    @BeforeClass
-    public static void initialize()
-        throws
-            Exception
-    {
-        ClassLoader    cl       = AbstractMeshBaseTest.class.getClassLoader();
-        ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
-
-        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.model.Test" ))).activateRecursively();
-
-        Log4jLog.configure( "org/infogrid/kernel/test/meshbase/m/Log.properties", cl );
-        Log.setLogFactory( new Log4jLogFactory());
-        
-        ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
-                "org/infogrid/kernel/test/meshbase/m/ResourceHelper",
-                Locale.getDefault(),
-                cl ));
-    }
+//    /**
+//     * Initialize Module Framework, and initialize statics.
+//     * 
+//     * @throws Exception all sorts of things may go wrong in tests
+//     */
+//    @BeforeClass
+//    public static void initialize()
+//        throws
+//            Exception
+//    {
+//        ClassLoader    cl       = AbstractMeshBaseTest.class.getClassLoader();
+//        ModuleRegistry registry = InClasspathModuleRegistry.instantiateOrGet( cl );
+//
+//        registry.resolve( registry.determineSingleResolutionCandidate( ModuleRequirement.create( "org.infogrid", "org.infogrid.model.Test" ))).activateRecursively();
+//
+//        Log4jLog.configure( "org/infogrid/kernel/test/meshbase/m/Log.properties", cl );
+//        Log.setLogFactory( new Log4jLogFactory());
+//        
+//        ResourceHelper.setApplicationResourceBundle( ResourceBundle.getBundle(
+//                "org/infogrid/kernel/test/meshbase/m/ResourceHelper",
+//                Locale.getDefault(),
+//                cl ));
+//    }
 
     /**
      * The root context for these tests.

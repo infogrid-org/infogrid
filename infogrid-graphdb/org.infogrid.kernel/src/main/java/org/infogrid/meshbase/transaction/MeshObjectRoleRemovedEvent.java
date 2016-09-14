@@ -22,6 +22,7 @@ import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MeshTypeUtils;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.logging.Log;
 
 /**
  * <p>This event indicates that a relationship between the MeshObject and
@@ -31,6 +32,7 @@ public class MeshObjectRoleRemovedEvent
         extends
             AbstractMeshObjectRoleChangeEvent
 {
+    private static final Log log = Log.getLogInstance( MeshObjectRoleRemovedEvent.class ); // our own, private logger
     private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
@@ -233,7 +235,11 @@ public class MeshObjectRoleRemovedEvent
 
         } finally {
             if( tx != null ) {
-                tx.commitTransaction();
+                try {
+                    tx.commitTransaction();
+                } catch( Throwable t ) {
+                    log.error( t );
+                }
             }
         }
     }

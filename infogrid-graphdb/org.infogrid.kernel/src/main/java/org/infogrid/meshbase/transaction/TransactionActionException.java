@@ -124,5 +124,4 @@ public abstract class TransactionActionException
             super( null, cause );
         }
     }
-
 }

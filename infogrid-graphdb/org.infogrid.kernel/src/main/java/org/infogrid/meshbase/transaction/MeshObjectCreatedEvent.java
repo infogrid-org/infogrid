@@ -175,8 +175,8 @@ public class MeshObjectCreatedEvent
     {
         setResolver( base );
 
-        Transaction tx = null;
-        Throwable   t = null;
+        Transaction tx     = null;
+        Throwable   thrown = null;
 
         ModelBase modelBase = base.getModelBase();
 
@@ -195,8 +195,8 @@ public class MeshObjectCreatedEvent
                     newObject.setPropertyValue( propertyType, propertyValue );
 
                 } catch( Throwable ex ) {
-                    if( t == null ) {
-                        t = ex;
+                    if( thrown == null ) {
+                        thrown = ex;
                     } else {
                         log.warn( "Second or later Exception", ex );
                     }
@@ -208,19 +208,23 @@ public class MeshObjectCreatedEvent
             throw ex;
 
         } catch( Throwable ex ) {
-            if( t == null ) {
-                t = ex;
+            if( thrown == null ) {
+                thrown = ex;
             } else {
                 log.warn( "Second or later Exception", ex );
             }
 
         } finally {
             if( tx != null ) {
-                tx.commitTransaction();
+                try {
+                    tx.commitTransaction();
+                } catch( Throwable t ) {
+                    log.error( t );
+                }
             }
         }
-        if( t != null ) {
-            throw new CannotApplyChangeException.ExceptionOccurred( base, t );
+        if( thrown != null ) {
+            throw new CannotApplyChangeException.ExceptionOccurred( base, thrown );
         }
         return null; // I don't think this can happen, but let's make the compiler happy.
     }

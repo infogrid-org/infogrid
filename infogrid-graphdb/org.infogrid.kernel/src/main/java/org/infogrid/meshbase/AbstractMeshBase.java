@@ -16,7 +16,6 @@ package org.infogrid.meshbase;
 
 import java.beans.PropertyChangeListener;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
@@ -26,6 +25,7 @@ import org.infogrid.mesh.set.MeshObjectSetFactory;
 import org.infogrid.mesh.text.MeshStringRepresentationParameters;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.sweeper.Sweeper;
+import org.infogrid.meshbase.transaction.CommitFailedException;
 import org.infogrid.meshbase.transaction.DefaultTransaction;
 import org.infogrid.meshbase.transaction.IllegalTransactionThreadException;
 import org.infogrid.meshbase.transaction.MeshObjectCreatedEvent;
@@ -34,6 +34,7 @@ import org.infogrid.meshbase.transaction.MeshObjectLifecycleEvent;
 import org.infogrid.meshbase.transaction.MeshObjectLifecycleListener;
 import org.infogrid.meshbase.transaction.NotWithinTransactionBoundariesException;
 import org.infogrid.meshbase.transaction.Transaction;
+import org.infogrid.meshbase.transaction.Transaction.Status;
 import org.infogrid.meshbase.transaction.TransactionAction;
 import org.infogrid.meshbase.transaction.TransactionActionException;
 import org.infogrid.meshbase.transaction.TransactionActiveAlreadyException;
@@ -202,7 +203,7 @@ public abstract class AbstractMeshBase
                 if( tx != null ) {
                     try {
                         tx.commitTransaction();
-                    } catch( MeshObjectGraphModificationException ex ) {
+                    } catch( CommitFailedException ex ) {
                         log.error( ex );
                     }
                 }
@@ -973,6 +974,7 @@ public abstract class AbstractMeshBase
                 return null;
 
             } catch( TransactionActionException.Rollback ex ) {
+                thrown = ex;
                 return null;
 
             } catch( TransactionActionException.Retry ex ) {
@@ -984,13 +986,14 @@ public abstract class AbstractMeshBase
                 // do nothing, stay in the loop
 
             } catch( TransactionActionException.Error ex ) {
+                thrown = ex;
                 throw ex;
 
             } catch( TransactionActionException ex ) {
                 log.error( "This should not be possible", ex );
                 throw new RuntimeException( ex );
 
-            } catch( MeshObjectGraphModificationException ex ) {
+            } catch( CommitFailedException ex ) {
                 thrown = ex;
 
             } catch( Throwable ex ) {
@@ -999,7 +1002,7 @@ public abstract class AbstractMeshBase
 
             } finally {
                 act.setTransaction( null );
-                if( thrown != null && tx != null ) {
+                if( thrown != null && tx != null && tx.getStatus() != Transaction.Status.TRANSACTION_ROLLEDBACK ) {
                     try {
                         act.preRollbackTransaction( tx, thrown );
                     } catch( Throwable t ) {

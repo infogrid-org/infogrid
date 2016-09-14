@@ -23,6 +23,7 @@ import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.MeshTypeUtils;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.logging.Log;
 
 /**
  * This event indicates that a MeshObject was added to the set of neighbors of a MeshObject.
@@ -32,6 +33,7 @@ public class MeshObjectNeighborAddedEvent
         extends
             AbstractMeshObjectNeighborChangeEvent
 {
+    private static final Log log = Log.getLogInstance( MeshObjectNeighborAddedEvent.class ); // our own, private logger
     private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
@@ -233,7 +235,11 @@ public class MeshObjectNeighborAddedEvent
 
         } finally {
             if( tx != null ) {
-                tx.commitTransaction();
+                try {
+                    tx.commitTransaction();
+                } catch( Throwable t ) {
+                    log.error( t );
+                }
             }
         }
     }

@@ -18,6 +18,7 @@ import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.meshbase.MeshBase;
+import org.infogrid.util.logging.Log;
 
 /**
  * This indicates that a MeshObject became dead, such as by being deleted.
@@ -26,6 +27,7 @@ public class MeshObjectBecameDeadStateEvent
         extends
             MeshObjectStateEvent
 {
+    private static final Log log = Log.getLogInstance( MeshObjectBecameDeadStateEvent.class ); // our own, private logger
     private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
@@ -124,7 +126,11 @@ public class MeshObjectBecameDeadStateEvent
 
         } finally {
             if( tx != null ) {
-                tx.commitTransaction();
+                try {
+                    tx.commitTransaction();
+                } catch( Throwable t ) {
+                    log.error( t );
+                }
             }
         }
     }

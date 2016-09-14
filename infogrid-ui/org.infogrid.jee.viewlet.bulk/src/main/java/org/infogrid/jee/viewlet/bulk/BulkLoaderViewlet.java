@@ -25,7 +25,6 @@ import org.infogrid.jee.viewlet.DefaultJeeViewletFactoryChoice;
 import org.infogrid.jee.viewlet.JeeMeshObjectsToView;
 import org.infogrid.jee.viewlet.JeeViewedMeshObjects;
 import org.infogrid.jee.viewlet.SimpleJeeViewlet;
-import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.externalized.xml.BulkExternalizedMeshObjectXmlEncoder;
 import org.infogrid.meshbase.BulkLoadException;
@@ -193,7 +192,7 @@ public class BulkLoaderViewlet
             if( tx != null ) {
                 try {
                     tx.commitTransaction();
-                } catch( MeshObjectGraphModificationException ex2 ) {
+                } catch( Throwable ex2 ) {
                     throw new ServletException( ex2 );
                 }
             }

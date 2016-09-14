@@ -165,7 +165,10 @@ public abstract class TransactionAction<T>
      * Make it easy for TransactionActions to perform other TransactionActions on the same Transaction.
      * Note: this will not execute the pre and post commit/rollback callbacks on the subtransaction.
      * 
+     * @param <T2> the return type of the subaction
      * @param subAct the TransactionAction to perform
+     * @return return value of the subaction
+     * @throws Throwable all sorts of problems might occur
      */
     protected <T2> T2 executeSubTransactionAction(
             TransactionAction<T2> subAct )

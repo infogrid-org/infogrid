@@ -15,7 +15,6 @@
 package org.infogrid.meshbase.sweeper;
 
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.security.ThreadIdentityManager;
 import org.infogrid.meshbase.MeshBase;
@@ -122,7 +121,7 @@ public abstract class AbstractSweepPolicy
             if( tx != null ) {
                 try {
                     tx.commitTransaction();
-                } catch( MeshObjectGraphModificationException ex ) {
+                } catch( Throwable ex ) {
                     log.error( ex );
                 }
             }
