@@ -15,6 +15,7 @@
 package org.infogrid.meshbase;
 
 import java.beans.PropertyChangeListener;
+import java.text.ParseException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
@@ -374,6 +375,98 @@ public abstract class AbstractMeshBase
             notFound = ArrayHelper.copyIntoNewArray( notFound, 0, count, MeshObjectIdentifier.class );
         }
         throw new MeshObjectsNotFoundException( this, notFound );
+    }
+
+    /**
+     * <p>Find a MeshObject in this MeshBase by its identifier. Unlike
+     * the {@link #accessLocally accessLocally} methods, this method purely considers MeshObjects in the
+     * MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
+     * <p>If not found, returns <code>null</code>.</p>
+     * 
+     * @param identifier the identifier of the MeshObject that shall be found
+     * @return the found MeshObject, or null if not found
+     * @throws ParseException thrown if an error occurred when parsing the identifier
+     * @see #findMeshObjectByIdentifierOrThrow
+     */
+    @Override
+    public MeshObject findMeshObjectByIdentifier(
+            String identifier )
+        throws
+            ParseException
+    {
+        return findMeshObjectByIdentifier( theMeshObjectIdentifierFactory.fromExternalForm( identifier ));
+    }
+
+    /**
+     * <p>Find a set of MeshObjects in this MeshBase by their identifiers. Unlike
+     *    the {@link #accessLocally accessLocally} methods, this method purely considers MeshObjects in the
+     *    MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
+     * <p>If one or more of the MeshObjects could not be found, returns <code>null</code> at
+     *    the respective index in the returned array.</p>
+     * 
+     * @param identifiers the identifiers of the MeshObjects that shall be found
+     * @return the found MeshObjects, which may contain null values for MeshObjects that were not found
+     * @throws ParseException thrown if an error occurred when parsing the identifier
+     */
+    @Override
+    public MeshObject [] findMeshObjectsByIdentifier(
+            String [] identifiers )
+        throws
+            ParseException
+    {
+        MeshObjectIdentifier [] realIdentifiers = new MeshObjectIdentifier[ identifiers.length ];
+        for( int i=0 ; i<identifiers.length ; ++i ) {
+            realIdentifiers[i] = theMeshObjectIdentifierFactory.fromExternalForm( identifiers[i] );
+        }
+
+        return findMeshObjectsByIdentifier( realIdentifiers );
+    }
+
+    /**
+     * <p>Find a MeshObject in this MeshBase by its identifier. Unlike
+     * the {@link #accessLocally accessLocally} methods, this method purely considers MeshObjects in the
+     * MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
+     * <p>If not found, throws {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
+     * 
+     * @param identifier the identifier of the MeshObject that shall be found
+     * @return the found MeshObject, or null if not found
+     * @throws ParseException thrown if an error occurred when parsing the identifier
+     * @throws MeshObjectsNotFoundException if the MeshObject was not found
+     */
+    @Override
+    public MeshObject findMeshObjectByIdentifierOrThrow(
+            String identifier )
+        throws
+            ParseException,
+            MeshObjectsNotFoundException
+    {
+        return findMeshObjectByIdentifierOrThrow( theMeshObjectIdentifierFactory.fromExternalForm( identifier ));
+    }
+
+    /**
+     * <p>Find a set of MeshObjects in this MeshBase by their identifiers. Unlike
+     *    the {@link #accessLocally accessLocally} method, this method purely considers MeshObjects in the
+     *    MeshBase, and does not attempt to obtain them if they are not in the MeshBase yet.</p>
+     * <p>If one or more of the MeshObjects could not be found, throws
+     *    {@link MeshObjectsNotFoundException MeshObjectsNotFoundException}.</p>
+     * 
+     * @param identifiers the identifiers of the MeshObjects that shall be found
+     * @return the found MeshObjects, which may contain null values for MeshObjects that were not found
+     * @throws ParseException thrown if an error occurred when parsing the identifier
+     * @throws MeshObjectsNotFoundException if one or more of the MeshObjects were not found
+     */
+    @Override
+    public MeshObject [] findMeshObjectsByIdentifierOrThrow(
+            String [] identifiers )
+        throws
+            ParseException,
+            MeshObjectsNotFoundException
+    {
+        MeshObjectIdentifier [] realIdentifiers = new MeshObjectIdentifier[ identifiers.length ];
+        for( int i=0 ; i<identifiers.length ; ++i ) {
+            realIdentifiers[i] = theMeshObjectIdentifierFactory.fromExternalForm( identifiers[i] );
+        }
+        return findMeshObjectsByIdentifierOrThrow( realIdentifiers );
     }
 
     /**
@@ -1028,6 +1121,9 @@ public abstract class AbstractMeshBase
 
         } else if( firstThrown instanceof TransactionActionException ) {
             throw (TransactionActionException) firstThrown;
+
+        } else if( firstThrown instanceof CommitFailedException ) {
+            throw new TransactionActionException.CannotCommit( firstThrown.getCause() );
 
         } else {
             throw new TransactionActionException.Error( firstThrown );

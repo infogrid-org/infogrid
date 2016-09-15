@@ -81,6 +81,28 @@ public abstract class TransactionActionException
         {
         }
     }
+    
+    /**
+     * Indicates that the Transaction could not be committed, such as because
+     * a model constraint was violated.
+     */
+    public static class CannotCommit
+            extends
+                TransactionActionException
+    {
+        private static final long serialVersionUID = 1L; // helps with serialization
+
+        /**
+         * Constructor.
+         *
+         * @param cause the cause
+         */
+        public CannotCommit(
+                Throwable cause )
+        {
+            super( null, cause );
+        }
+    }            
 
     /**
      * Indicates that a different problem occurred that could not be remedied from

@@ -14,6 +14,7 @@
 
 package org.infogrid.meshbase;
 
+import java.text.ParseException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
@@ -286,8 +287,199 @@ public interface MeshBaseLifecycleManager
             IsAbstractException,
             MeshObjectIdentifierNotUniqueException,
             TransactionException,
+            NotPermittedException;    
+
+    /**
+     * <p>Create a new MeshObject without a type
+     * and with a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is to be created.</p>
+     * 
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     * 
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
+     * @return the created MeshObject
+     * @throws ParseException thrown if an error occurred when parsing the identifier
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public abstract MeshObject createMeshObject(
+            String               identifier )
+        throws
+            ParseException,
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
             NotPermittedException;
-    
+
+    /**
+     * <p>This is a convenience method to create a MeshObject with exactly one EntityType
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     * 
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     * 
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
+     * @param type the EntityType with which the MeshObject will be blessed
+     * @return the created MeshObject
+     * @throws ParseException thrown if an error occurred when parsing the identifier
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public abstract MeshObject createMeshObject(
+            String               identifier,
+            EntityType           type )
+        throws
+            ParseException,
+            IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException;
+
+    /**
+     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     * 
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     * 
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
+     * @param types the EntityTypes with which the MeshObject will be blessed
+     * @return the created MeshObject
+     * @throws ParseException thrown if an error occurred when parsing the identifier
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public abstract MeshObject createMeshObject(
+            String               identifier,
+            EntityType []        types )
+        throws
+            ParseException,
+            IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException;
+
+    /**
+     * <p>Create a new MeshObject without a type, but with provided time stamps
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is to be created.</p>
+     * 
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     * 
+     * @param identifier the identifier of the to-be-created MeshObject. This must not be null.
+     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
+     * @return the created MeshObject
+     * @throws ParseException thrown if an error occurred when parsing the identifier
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public abstract MeshObject createMeshObject(
+            String               identifier,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
+        throws
+            ParseException,
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException;
+
+    /**
+     * <p>This is a convenience method to create a MeshObject with exactly one EntityType,
+     * with provided time stamps
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     * 
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     * 
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
+     * @param type the EntityType with which the MeshObject will be blessed
+     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
+     * @return the created MeshObject
+     * @throws ParseException thrown if an error occurred when parsing the identifier
+     * @throws IsAbstractException thrown if the EntityType is abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public abstract MeshObject createMeshObject(
+            String               identifier,
+            EntityType           type,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
+        throws
+            ParseException,
+            IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException;
+
+    /**
+     * <p>This is a convenience method to create a MeshObject with zero or more EntityTypes,
+     * with provided time stamps
+     * and a provided MeshObjectIdentifier.
+     * This call is a "semantic create" which means that a new, semantically distinct object
+     * is created.</p>
+     * 
+     * <p>Before this operation can be successfully invoked, a Transaction must be active
+     * on this Thread.>/p>
+     * 
+     * @param identifier the identifier of the to-be-created MeshObject. If this is null,
+     *                        automatically create a suitable MeshObjectIdentifier.
+     * @param types the EntityTypes with which the MeshObject will be blessed
+     * @param timeCreated the time when this MeshObject was semantically created, in System.currentTimeMillis() format
+     * @param timeUpdated the time when this MeshObject was last updated, in System.currentTimeMillis() format
+     * @param timeRead the time when this MeshObject was last read, in System.currentTimeMillis() format
+     * @param timeExpires the time this MeshObject will expire, in System.currentTimeMillis() format
+     * @return the created MeshObject
+     * @throws ParseException thrown if an error occurred when parsing the identifier
+     * @throws IsAbstractException thrown if one or more of the EntityTypes are abstract and cannot be instantiated
+     * @throws MeshObjectIdentifierNotUniqueException a MeshObject exists already in this MeshBase with the specified identifier
+     * @throws TransactionException thrown if this method was invoked outside of proper Transaction boundaries
+     * @throws NotPermittedException thrown if the caller is not authorized to perform this operation
+     */
+    public abstract MeshObject createMeshObject(
+            String               identifier,
+            EntityType []        types,
+            long                 timeCreated,
+            long                 timeUpdated,
+            long                 timeRead,
+            long                 timeExpires )
+        throws
+            ParseException,
+            IsAbstractException,
+            MeshObjectIdentifierNotUniqueException,
+            TransactionException,
+            NotPermittedException;
+
     /**
      * <p>Semantically delete a MeshObject.</p>
      * 
