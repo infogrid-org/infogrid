@@ -39,6 +39,7 @@ import org.infogrid.meshbase.transaction.MeshObjectDeletedEvent;
 import org.infogrid.meshbase.transaction.MeshObjectPropertyChangeEvent;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.modelbase.ModelBase;
+import org.infogrid.modelbase.ModelBaseSingleton;
 import org.infogrid.modelbase.m.MModelBase;
 import org.infogrid.store.Store;
 import org.infogrid.store.util.StoreBackedSwappingHashMap;
@@ -70,7 +71,7 @@ public class StoreMeshBase
         try {
             return create(
                     DefaultMeshBaseIdentifierFactory.create().fromExternalForm( "DefaultMeshBase" ),
-                    MModelBase.create(),
+                    ModelBaseSingleton.getSingleton(),
                     null,
                     meshObjectStore,
                     SimpleContext.createRoot( "root context" ));

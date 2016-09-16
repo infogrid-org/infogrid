@@ -9,6 +9,7 @@
     <url>http://infogrid.org/</url>
 
     <modules>
+        <module>infogrid-admin</module>
         <module>infogrid-graphdb</module>
         <module>infogrid-graphdb-grid</module>
         <module>infogrid-lid</module>

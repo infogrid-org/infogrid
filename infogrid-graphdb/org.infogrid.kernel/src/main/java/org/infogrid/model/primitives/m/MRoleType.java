@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import org.infogrid.mesh.MeshObject;
 import org.infogrid.mesh.MeshObjectIdentifier;
+import org.infogrid.mesh.MultiplicityException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.MeshBase;
@@ -637,6 +638,28 @@ public abstract class MRoleType
                     neighborIdentifier,
                     neighbor,
                     caller );
+        }
+    }
+
+    /**
+     * Given this MeshObject and this set of other sides for the RoleType,
+     * check that it conforms to the range specified in the RoleType's Multiplicity.
+     * 
+     * @param affected the MeshObject
+     * @param others the other MeshObjects by their identifiers
+     * @throws MultiplicityException thrown if the other sites were out of range
+     */
+    public void checkMultiplicity(
+            MeshObject              affected,
+            MeshObjectIdentifier [] others )
+        throws
+            MultiplicityException
+    {
+        if( theMultiplicity.getMinimum() > others.length ) {
+            throw new MultiplicityException( affected, this, others );
+        }
+        if( theMultiplicity.getMaximum() != MultiplicityValue.N && others.length > theMultiplicity.getMaximum() ) {
+            throw new MultiplicityException( affected, this, others );
         }
     }
 

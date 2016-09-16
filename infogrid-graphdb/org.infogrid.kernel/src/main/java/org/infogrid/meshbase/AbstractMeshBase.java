@@ -2099,7 +2099,7 @@ public abstract class AbstractMeshBase
                 log.error( ex );
 
             } finally {
-                if( tx != null ) {
+                if( thrown != null && tx != null ) {
                     try {
                         act.preRollbackTransaction( tx, thrown );
                     } catch( Throwable t ) {
@@ -2408,6 +2408,79 @@ public abstract class AbstractMeshBase
     }
 
     /**
+     * Subscribe to events indicating errors.
+     *
+     * @param newListener the to-be-added MeshBaseErrorListener
+     * @see #removeErrorListener
+     * @see #addWeakErrorListener
+     * @see #addSoftErrorListener
+     * @see #removeErrorListener
+     */
+    @Override
+    public void addDirectErrorListener(
+            MeshBaseErrorListener newListener )
+    {
+        instantiateErrorListenersIfNeeded();
+        
+        theErrorListeners.addDirect( newListener );
+    }
+
+    /**
+     * Subscribe to events indicating errors.
+     *
+     * @param newListener the to-be-added MeshBaseErrorListener
+     * @see #removeErrorListener
+     * @see #addSoftErrorListener
+     * @see #addDirectErrorListener
+     * @see #removeErrorListener
+     */
+    @Override
+    public void addWeakErrorListener(
+            MeshBaseErrorListener newListener )
+    {
+        instantiateErrorListenersIfNeeded();
+        
+        theErrorListeners.addWeak( newListener );
+    }
+
+    /**
+     * Subscribe to events indicating errors.
+     *
+     * @param newListener the to-be-added MeshBaseErrorListener
+     * @see #removeErrorListener
+     * @see #addWeakErrorListener
+     * @see #addDirectErrorListener
+     * @see #removeErrorListener
+     */
+    @Override
+    public void addSoftErrorListener(
+            MeshBaseErrorListener newListener )
+    {
+        instantiateErrorListenersIfNeeded();
+        
+        theErrorListeners.addSoft( newListener );
+    }
+
+    /**
+     * Unsubscribe from events indicating errors.
+     * 
+     * @param oldListener the to-be-removed MeshBaseErrorListener
+     * @see #addMeshBaseErrorListener
+     * @see #addWeakMeshBaseErrorListener
+     * @see #addSoftMesBaseErrorListener
+     * @see #addDirectMeshBaseErrorListener
+     */
+    @Override
+    public void removeErrorListener(
+            MeshBaseErrorListener oldListener )
+    {
+        theErrorListeners.remove( oldListener );
+        if( theErrorListeners.isEmpty() ) {
+            theErrorListeners = null;
+        }
+    }
+
+    /**
      * Internal helper to instantiate thePropertyChangeListeners if needed.
      */
     protected void instantiatePropertyChangeListenersIfNeeded()
@@ -2459,6 +2532,39 @@ public abstract class AbstractMeshBase
                         listener.meshObjectCreated( (MeshObjectCreatedEvent) event );
                     } else if( event instanceof MeshObjectDeletedEvent ) {
                         listener.meshObjectDeleted( (MeshObjectDeletedEvent) event );
+                    } else {
+                        log.error( "Unexpected event: " + event );
+                    }
+                }
+            };
+        }
+    }
+
+    /**
+     * Internal helper to instantiate theErrorListeners if needed.
+     */
+    protected void instantiateErrorListenersIfNeeded()
+    {
+        if( theErrorListeners == null ) {
+            theErrorListeners = new FlexibleListenerSet<MeshBaseErrorListener,MeshBaseError,Void>() {
+                @Override
+                public void fireEventToListener(
+                        MeshBaseErrorListener listener,
+                        MeshBaseError         event,
+                        Void                  flag )
+                {
+                    if( event instanceof MeshBaseError.UnresolvableEntityType ) {
+                        listener.unresolveableEntityType( (MeshBaseError.UnresolvableEntityType) event );
+                    } else if( event instanceof MeshBaseError.UnresolvableRoleType ) {
+                        listener.unresolveableRoleType( (MeshBaseError.UnresolvableRoleType) event );
+                    } else if( event instanceof MeshBaseError.UnresolvablePropertyType ) {
+                        listener.unresolveablePropertyType( (MeshBaseError.UnresolvablePropertyType) event );
+                    } else if( event instanceof MeshBaseError.IncompatibleDataType ) {
+                        listener.incompatibleDataType( (MeshBaseError.IncompatibleDataType) event );
+                    } else if( event instanceof MeshBaseError.PropertyNotOptional ) {
+                        listener.propertyNotOptional( (MeshBaseError.PropertyNotOptional) event );
+                    } else if( event instanceof MeshBaseError.OtherError ) {
+                        listener.otherError( (MeshBaseError.OtherError) event );
                     } else {
                         log.error( "Unexpected event: " + event );
                     }
@@ -2727,7 +2833,7 @@ public abstract class AbstractMeshBase
      * Notify MeshObjectLifecycleListeners that a MeshObjectLifecycleEvent occurred.
      * This shall not be invoked by the application programmer.
      *
-     * @param theEvent the MAbstractMeshObjectLifecycleEvent
+     * @param theEvent the MeshObjectLifecycleEvent
      */
     public final void notifyLifecycleEvent(
             MeshObjectLifecycleEvent theEvent )
@@ -2736,6 +2842,22 @@ public abstract class AbstractMeshBase
 
         if( listeners != null ) {
             listeners.fireEvent( theEvent );
+        }
+    }
+
+    /**
+     * Notify MeshBaseErrorListeners that a MeshBaseError occurred.
+     * This shall not be invoked by the application programmer.
+     * 
+     * @param event the MeshBaseError
+     */
+    public final void notifyMeshBaseError(
+            MeshBaseError event )
+    {
+        FlexibleListenerSet<MeshBaseErrorListener,MeshBaseError,Void> listeners = theErrorListeners;
+        
+        if( listeners != null ) {
+            listeners.fireEvent( event );
         }
     }
 
@@ -2812,6 +2934,11 @@ public abstract class AbstractMeshBase
       * The MeshObjectLifecycleEventListeners (if any).
       */
     private FlexibleListenerSet<MeshObjectLifecycleListener, MeshObjectLifecycleEvent, Integer> theLifecycleEventListeners = null;
+
+    /**
+     * The ErrorListeners (if any).
+     */
+    private FlexibleListenerSet<MeshBaseErrorListener,MeshBaseError,Void> theErrorListeners = null;
 
     /**
       * The current Transaction, if any.

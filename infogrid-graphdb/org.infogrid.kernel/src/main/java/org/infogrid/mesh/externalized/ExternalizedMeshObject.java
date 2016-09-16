@@ -18,11 +18,14 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 
 import org.infogrid.model.primitives.MeshTypeIdentifier;
 import org.infogrid.model.primitives.PropertyValue;
+import org.infogrid.util.HasIdentifier;
 
 /**
  * Representation of a MeshObject that can be easily serialized and deserialized.
  */
 public interface ExternalizedMeshObject
+    extends
+        HasIdentifier
 {
     /**
      * Obtain the MeshObjectIdentifier of the MeshObject.

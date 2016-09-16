@@ -107,7 +107,7 @@ public abstract class AbstractLocalizedException
                     StringRepresentationParameters.EMPTY );
         } catch( StringifierException ex ) {
             log.error( ex );
-            return super.getLocalizedMessage();
+            return super.getMessage(); // getLocalizedMessage can apparently somehow call back into here.
         }
     }
 

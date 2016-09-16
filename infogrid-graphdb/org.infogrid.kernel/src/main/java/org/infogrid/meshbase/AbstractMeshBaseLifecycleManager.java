@@ -530,8 +530,8 @@ public abstract class AbstractMeshBaseLifecycleManager
     /**
      * The MeshBase that we work on.
      */
-    protected MeshBase theMeshBase;
-
+    protected AbstractMeshBase theMeshBase;
+    
     /**
      * Our ResourceHelper.
      */

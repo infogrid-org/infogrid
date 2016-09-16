@@ -140,6 +140,18 @@ public class ModelPrimitivesStringRepresentationDirectorySingleton
         // javadoc:    same as java
         // json:       same as javascript
 
+    // multiplicity -- render a MultiplicityValue
+    
+        plainMap.put(     "multiplicity",     MultiplicityStringifier.create() );
+        // editPlain:  same as plain
+        // html:       same as plain
+        // editHtml:   same as editPlain
+        // url:        same as plain
+        // java:       same as plain
+        // javascript: same as java
+        // javadoc:    same as java
+        // json:       same as javascript
+        
     // identifiers in a URL
 
         plainMap.put(     "idInWebContext",   WebContextAwareMeshObjectIdentifierStringifier.create( true ) );

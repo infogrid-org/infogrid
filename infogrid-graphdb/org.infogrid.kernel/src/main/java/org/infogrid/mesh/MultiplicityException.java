@@ -47,6 +47,7 @@ public class MultiplicityException
      * @param meshObjectIdentifier the MeshObjectIdentifier for the MeshObject where the multiplicity violation was discovered
      * @param roleType the RoleType whose multiplicity was violated, if available
      * @param roleTypeIdentifier the MeshTypeIdentifier for the RoleType whose multiplicity was violated
+     * @param others the MeshObjectIdentifiers of the other MeshObjects participating in this Role
      */
     public MultiplicityException(
             MeshBase             mb,
@@ -54,7 +55,8 @@ public class MultiplicityException
             MeshObject           meshObject,
             MeshObjectIdentifier meshObjectIdentifier,
             RoleType             roleType,
-            MeshTypeIdentifier   roleTypeIdentifier )
+            MeshTypeIdentifier   roleTypeIdentifier,
+            MeshObjectIdentifier [] others )
     {
         super( mb, originatingMeshBaseIdentifier );
 
@@ -62,6 +64,8 @@ public class MultiplicityException
         theMeshObjectIdentifier = meshObjectIdentifier;
         theRoleType             = roleType;
         theRoleTypeIdentifier   = roleTypeIdentifier;
+        
+        theOthers = others;
     }
 
     /**
@@ -69,17 +73,20 @@ public class MultiplicityException
      *
      * @param meshObject the MeshObject where the multiplicity violation was discovered, if available
      * @param roleType the RoleType whose multiplicity was violated, if available
+     * @param others the MeshObjectIdentifiers of the other MeshObjects participating in this Role
      */
     public MultiplicityException(
-            MeshObject           meshObject,
-            RoleType             roleType )
+            MeshObject              meshObject,
+            RoleType                roleType,
+            MeshObjectIdentifier [] others )
     {
         this(   meshObject.getMeshBase(),
                 meshObject.getMeshBase().getIdentifier(),
                 meshObject,
                 meshObject.getIdentifier(),
                 roleType,
-                roleType.getIdentifier());
+                roleType.getIdentifier(),
+                others );
     }
 
     /**
@@ -142,6 +149,17 @@ public class MultiplicityException
     }
 
     /**
+     * Obtain the MeshObjectIdentifiers of the other MeshObjects participating in
+     * this role.
+     * 
+     * @return the MeshObjectIdentifiers
+     */
+    public MeshObjectIdentifier [] getOthers()
+    {
+        return theOthers;
+    }
+
+    /**
      * Dump this object.
      *
      * @param d the Dumper to dump to
@@ -155,13 +173,15 @@ public class MultiplicityException
                     "theMeshObject",
                     "theMeshObjectIdentifier",
                     "theRoleType",
-                    "theRoleTypeIdentifier"
+                    "theRoleTypeIdentifier",
+                    "theOthers"
                 },
                 new Object[] {
                     theMeshObject,
                     theMeshObjectIdentifier,
                     theRoleType,
-                    theRoleTypeIdentifier
+                    theRoleTypeIdentifier,
+                    theOthers
                 });
     }
 
@@ -173,7 +193,12 @@ public class MultiplicityException
     @Override
     public Object [] getLocalizationParameters()
     {
-        return new Object[] { theMeshObjectIdentifier, theRoleTypeIdentifier };
+        return new Object[] {
+            theMeshObjectIdentifier,
+            theRoleTypeIdentifier,
+            theRoleType != null ? theRoleType.getMultiplicity() : null,
+            theOthers.length
+        };
     }
 
     /**
@@ -195,4 +220,9 @@ public class MultiplicityException
      * The MeshTypeIdentifier for the RoleType for which we discovered a violation.
      */
     protected MeshTypeIdentifier theRoleTypeIdentifier;
+    
+    /**
+     * The MeshObjectIdentifiers of the other MeshObjects participating in this role.
+     */
+    protected MeshObjectIdentifier [] theOthers;
 }

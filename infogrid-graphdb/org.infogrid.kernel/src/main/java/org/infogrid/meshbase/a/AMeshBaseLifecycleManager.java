@@ -28,6 +28,7 @@ import org.infogrid.mesh.externalized.ExternalizedMeshObject;
 import org.infogrid.mesh.security.MustNotDeleteHomeObjectException;
 import org.infogrid.mesh.set.MeshObjectSet;
 import org.infogrid.meshbase.AbstractMeshBaseLifecycleManager;
+import org.infogrid.meshbase.MeshBaseError;
 import org.infogrid.meshbase.security.AccessManager;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.meshbase.transaction.TransactionException;
@@ -426,8 +427,10 @@ public class AMeshBaseLifecycleManager
                 types[typeCounter] = (EntityType) mb.findMeshTypeByIdentifier( meshTypeNames[i] );
                 typeCounter++; // make sure we do the increment after an exception might have been thrown
 
+            } catch( MeshTypeWithIdentifierNotFoundException ex ) {
+                theMeshBase.notifyMeshBaseError( new MeshBaseError.UnresolvableEntityType( theMeshBase, theObjectBeingParsed, meshTypeNames[i] ));
             } catch( Exception ex ) {
-                log.warn( ex );
+                theMeshBase.notifyMeshBaseError( new MeshBaseError.OtherError( theMeshBase, theObjectBeingParsed, ex ));
             }
         }
         if( typeCounter < types.length ) {
@@ -458,11 +461,11 @@ public class AMeshBaseLifecycleManager
 
                 if( propertyValues[i] != null ) {
                     if( propertyType.getDataType().conforms( propertyValues[i] ) != 0 ) {
-                        log.warn( "Wrong DataType when attempting to recreateMeshObject", theObjectBeingParsed.getIdentifier().toExternalForm(), propertyType.getIdentifier().toExternalForm() );
+                        theMeshBase.notifyMeshBaseError( new MeshBaseError.IncompatibleDataType( theMeshBase, theObjectBeingParsed, propertyType, propertyValues[i] ));
                         continue;
                     }
                 } else if( !propertyType.getIsOptional().value() ) {
-                    log.warn( "No null value allowed when attempting to recreateMeshObject", theObjectBeingParsed.getIdentifier().toExternalForm(), propertyType.getIdentifier().toExternalForm() );
+                    theMeshBase.notifyMeshBaseError( new MeshBaseError.PropertyNotOptional( theMeshBase, theObjectBeingParsed, propertyType ));
                     propertyValues[i] = propertyType.getDefaultValue();
                 }
                 // now we patch EnumeratedValues
@@ -476,11 +479,9 @@ public class AMeshBaseLifecycleManager
                 }
 
             } catch( MeshTypeWithIdentifierNotFoundException ex ) {
-                // don't need the full log here
-                log.warn( "Exception when attempting to recreateMeshObject", theObjectBeingParsed.getIdentifier().toExternalForm(), ex.getIdentifier().toExternalForm() );
-
+                theMeshBase.notifyMeshBaseError( new MeshBaseError.UnresolvablePropertyType( theMeshBase, theObjectBeingParsed, propertyTypeNames[i] ));
             } catch( Exception ex ) {
-                log.warn( "Exception when attempting to recreateMeshObject", theObjectBeingParsed.getIdentifier().toExternalForm(), ex );
+                theMeshBase.notifyMeshBaseError( new MeshBaseError.OtherError( theMeshBase, theObjectBeingParsed, ex ));
             }
         }
 
@@ -517,11 +518,9 @@ public class AMeshBaseLifecycleManager
                     typeCounter++; // make sure we do the increment after an exception might have been thrown
 
                 } catch( MeshTypeWithIdentifierNotFoundException ex ) {
-                    // don't need the full log here
-                    log.warn( "Exception when attempting to recreateMeshObject", theObjectBeingParsed.getIdentifier().toExternalForm(), currentRoleTypes[j].toExternalForm(), ex.getIdentifier().toExternalForm() );
-
+                    theMeshBase.notifyMeshBaseError( new MeshBaseError.UnresolvableRoleType( theMeshBase, theObjectBeingParsed, currentRoleTypes[j] ));
                 } catch( Exception ex ) {
-                    log.warn( "Exception when attempting to recreateMeshObject", theObjectBeingParsed.getIdentifier().toExternalForm(), currentRoleTypes[j].toExternalForm(), ex );
+                    theMeshBase.notifyMeshBaseError( new MeshBaseError.OtherError( theMeshBase, theObjectBeingParsed, ex ));
                 }
             }
             if( typeCounter < roleTypes[i].length ) {
