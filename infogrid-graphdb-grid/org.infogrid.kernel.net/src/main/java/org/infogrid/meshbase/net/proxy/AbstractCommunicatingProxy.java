@@ -22,7 +22,6 @@ import org.infogrid.comm.ReceivingMessageEndpoint;
 import org.infogrid.comm.ReturnSynchronizerEndpoint;
 import org.infogrid.comm.SendingMessageEndpoint;
 import org.infogrid.comm.pingpong.PingPongMessageEndpoint;
-import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
 import org.infogrid.mesh.net.NetMeshObject;
@@ -708,7 +707,7 @@ public abstract class AbstractCommunicatingProxy
             if( perhapsTx.hasBeenCreated() ) {
                 try {
                     perhapsTx.obtain().commitTransaction();
-                } catch( MeshObjectGraphModificationException ex2 ) {
+                } catch( Throwable ex2 ) {
                     log.error( ex2 );
                 }
             }

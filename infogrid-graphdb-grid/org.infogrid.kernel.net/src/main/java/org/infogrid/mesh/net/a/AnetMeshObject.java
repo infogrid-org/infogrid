@@ -24,7 +24,6 @@ import org.infogrid.mesh.IllegalPropertyTypeException;
 import org.infogrid.mesh.IllegalPropertyValueException;
 import org.infogrid.mesh.IsAbstractException;
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectIdentifierNotUniqueException;
 import org.infogrid.mesh.NotPermittedException;
@@ -1348,7 +1347,7 @@ public class AnetMeshObject
                         if( tx != null ) {
                             try {
                                 tx.commitTransaction();
-                            } catch( MeshObjectGraphModificationException ex2 ) {
+                            } catch( Throwable ex2 ) {
                                 log.error( ex2 );
                             }
                         }

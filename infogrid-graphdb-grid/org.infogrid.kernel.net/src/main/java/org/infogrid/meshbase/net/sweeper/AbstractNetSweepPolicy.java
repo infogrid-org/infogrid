@@ -14,7 +14,6 @@
 
 package org.infogrid.meshbase.net.sweeper;
 
-import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.mesh.net.NetMeshObject;
 import org.infogrid.mesh.security.MustNotDeleteHomeObjectException;
 import org.infogrid.meshbase.net.NetMeshBase;
@@ -93,7 +92,7 @@ public abstract class AbstractNetSweepPolicy
             if( tx != null ) {
                 try {
                     tx.commitTransaction();
-                } catch( MeshObjectGraphModificationException ex2 ) {
+                } catch( Throwable ex2 ) {
                     log.error( ex2 );
                 }
             }

@@ -86,14 +86,6 @@ public class RollbackTest3
 
                     throw new TransactionActionException.Rollback();
                 }
-
-                @Override
-                public void preRollbackTransaction(
-                        Transaction tx,
-                        Throwable   causeForRollback )
-                {
-                    checkEquals( tx.getChangeSet().size(), 2, "Wrong number of changes" );
-                }
         });
 
         //

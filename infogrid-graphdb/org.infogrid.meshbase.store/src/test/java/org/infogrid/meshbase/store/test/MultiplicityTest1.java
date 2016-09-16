@@ -15,9 +15,9 @@
 package org.infogrid.meshbase.store.test;
 
 import org.infogrid.mesh.MeshObject;
-import org.infogrid.mesh.MeshObjectGraphModificationException;
 import org.infogrid.meshbase.MeshBaseLifecycleManager;
 import org.infogrid.meshbase.store.StoreMeshBase;
+import org.infogrid.meshbase.transaction.CommitFailedException;
 import org.infogrid.meshbase.transaction.Transaction;
 import org.infogrid.model.Test.TestSubjectArea;
 import org.infogrid.util.logging.Log;
@@ -74,7 +74,7 @@ public class MultiplicityTest1
             tx.commitTransaction();
             reportError( "Should have thrown exception (one)" );
 
-        } catch( MeshObjectGraphModificationException ex ) {
+        } catch( CommitFailedException ex ) {
             log.info( "Correctly thrown", ex );
         } catch( Throwable t ) {
             log.error( "FINALLY CAUGHT", t );
@@ -102,7 +102,7 @@ public class MultiplicityTest1
             tx.commitTransaction();
             reportError( "Should have thrown exception (two)" );
 
-        } catch( MeshObjectGraphModificationException ex ) {
+        } catch( CommitFailedException ex ) {
             log.info( "Correctly thrown", ex );
         }
         tx = null;
@@ -133,7 +133,7 @@ public class MultiplicityTest1
 
             log.info( "No exception here is correct (three)" );
 
-        } catch( MeshObjectGraphModificationException ex ) {
+        } catch( CommitFailedException ex ) {
             reportError( "Should have been no exception", ex );
         }
         tx = null;

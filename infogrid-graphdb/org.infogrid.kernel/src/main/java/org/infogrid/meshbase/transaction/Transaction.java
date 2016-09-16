@@ -27,11 +27,9 @@ import org.infogrid.mesh.security.PropertyReadOnlyException;
 import org.infogrid.mesh.security.ThreadIdentityManager;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.model.primitives.EntityType;
-import org.infogrid.model.primitives.MultiplicityValue;
 import org.infogrid.model.primitives.RoleType;
 import org.infogrid.util.CursorIterator;
 import org.infogrid.util.FlexibleListenerSet;
-import org.infogrid.util.Pair;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
 import org.infogrid.util.logging.Log;
@@ -84,11 +82,11 @@ public abstract class Transaction
     /**
       * Commit a started Transaction.
       *
-      * @throws MeshObjectGraphModificationException thrown if the changes made during this Transaction do not conform to the rules of the model
+      * @throws CommitFailedException thrown if the changes made during this Transaction do not conform to the rules of the model
       */
     public final synchronized void commitTransaction()
         throws
-            MeshObjectGraphModificationException
+            CommitFailedException
     {
         if( log.isTraceEnabled() ) {
             log.traceMethodCallEntry( this, "commitTransaction" );
@@ -100,9 +98,12 @@ public abstract class Transaction
             throw new IllegalStateException( "trying to commit transaction from wrong thread" );
         }
 
-        if( !( status == Status.TRANSACTION_STARTED || status == Status.TRANSACTION_VOTED )) {
+        if( !( status == Status.TRANSACTION_STARTED )) {
             log.error( "illegal state for transaction: " + status );
         }
+        
+        notifyStateChanged();
+
 
         ThreadIdentityManager.sudo();
 
@@ -115,19 +116,22 @@ public abstract class Transaction
 
             status = Status.TRANSACTION_COMMITTED;
 
+            notifyStateChanged();
+            
             postCommitSucceededHook();
 
-        } catch( MultiplicityException t ) {
+        } catch( Throwable t ) {
             try {
                 doRollback();
+
             } catch( Throwable t2 ) {
-                log.error( "MultiplicityException leading to failed rollback", t );
+                log.error( "Exception leading to failed rollback", t );
                 log.error( "Failed rollback", t2 );
             } finally {
                 postCommitFailedHook( t ); // don't leave any transactions open
             }
 
-            throw t;
+            throw new CommitFailedException( this, t );
 
         } finally {
             ThreadIdentityManager.sudone();
@@ -152,7 +156,7 @@ public abstract class Transaction
             throw new IllegalStateException( "trying to rollback transaction from wrong thread" );
         }
 
-        if( !( status == Status.TRANSACTION_STARTED || status == Status.TRANSACTION_VOTED )) {
+        if( status != Status.TRANSACTION_STARTED ) {
             log.error( "illegal state for transaction: " + status );
         }
 
@@ -216,6 +220,9 @@ public abstract class Transaction
                 // that's the best we can do
             }
         }
+        status = Status.TRANSACTION_ROLLEDBACK;
+        
+        notifyStateChanged();
     }
 
     /**
@@ -394,7 +401,7 @@ public abstract class Transaction
     }
 
     /**
-     * Internal helper to createCopy a listener set.
+     * Internal helper to create a listener set.
      *
      * @return the created listener set
      */
@@ -415,16 +422,19 @@ public abstract class Transaction
                                 Transaction         event,
                                 Status              parameter )
                         {
-                            if( status == Status.TRANSACTION_STARTED ) {
-                                listener.transactionStarted( Transaction.this );
-                            // } else if( status == TRANSACTION_VOTED ) {
-                            //     theListener.transactionVoted( this );
-                            } else if( status == Status.TRANSACTION_COMMITTED ) {
-                                listener.transactionCommitted( Transaction.this );
-                            // } else if( status == TRANSACTION_ROLLEDBACK ) {
-                            //     theListener.transactionRolledBack( this );
-                            } else {
-                                log.error( "unknown value for status in Transaction" );
+                            switch (status) {
+                                case TRANSACTION_STARTED:
+                                    listener.transactionStarted( Transaction.this );
+                                    break;
+                                case TRANSACTION_COMMITTED:
+                                    listener.transactionCommitted( Transaction.this );
+                                    break;
+                                case TRANSACTION_ROLLEDBACK:
+                                    listener.transactionRolledback( Transaction.this );
+                                    break;
+                                default:
+                                    log.error( "unknown value for status in Transaction" );
+                                    break;
                             }
                         }
                 };
@@ -537,19 +547,9 @@ public abstract class Transaction
     public static enum Status
     {
         /**
-          * Indicates that this Transaction is currently being started.
-          */
-        TRANSACTION_BEING_STARTED,
-
-        /**
           * Indicates that this Transaction has been started but not voted on.
           */
         TRANSACTION_STARTED,
-
-        /**
-          * Indicates that this Transaction has voted but not committed or rollback'ed yet.
-          */
-        TRANSACTION_VOTED,
 
         /**
           * Indicates that this Transaction has been committed.

@@ -97,12 +97,20 @@ public interface TransactionAction<T>
     /**
      * Make it easy for TransactionActions to perform other TransactionActions on the same Transaction.
      * Note: this will not execute the pre and post commit/rollback callbacks on the subtransaction.
+<<<<<<< HEAD
      *
      * @param <T2>
      * @param tx
      * @param subAct the TransactionAction to perform
      * @return
      * @throws java.lang.Throwable
+=======
+     * 
+     * @param <T2> the return type of the subaction
+     * @param subAct the TransactionAction to perform
+     * @return return value of the subaction
+     * @throws Throwable all sorts of problems might occur
+>>>>>>> master
      */
     default <T2> T2 executeSubTransactionAction(
             Transaction           tx,

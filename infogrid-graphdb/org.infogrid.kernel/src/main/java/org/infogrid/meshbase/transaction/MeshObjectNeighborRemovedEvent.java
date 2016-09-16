@@ -20,6 +20,7 @@ import org.infogrid.mesh.MeshObjectIdentifier;
 import org.infogrid.mesh.MeshObjectUtils;
 import org.infogrid.meshbase.MeshBase;
 import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.logging.Log;
 
 /**
  * This event indicates that a MeshObject was removed from the set of neighbors of a MeshObject.
@@ -29,6 +30,7 @@ public class MeshObjectNeighborRemovedEvent
         extends
             AbstractMeshObjectNeighborChangeEvent
 {
+    private static final Log log = Log.getLogInstance( MeshObjectNeighborRemovedEvent.class ); // our own, private logger
     private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
@@ -207,7 +209,11 @@ public class MeshObjectNeighborRemovedEvent
 
         } finally {
             if( tx != null ) {
-                tx.commitTransaction();
+                try {
+                    tx.commitTransaction();
+                } catch( Throwable t ) {
+                    log.error( t );
+                }
             }
         }
     }

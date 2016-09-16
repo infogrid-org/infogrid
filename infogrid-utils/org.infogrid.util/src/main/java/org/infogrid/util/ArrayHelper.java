@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import org.infogrid.util.logging.CanBeDumped;
 import org.infogrid.util.logging.Dumper;
@@ -691,6 +692,28 @@ public abstract class ArrayHelper
             T []    secondArray,
             boolean useEquals )
     {
+        if( useEquals ) {
+            return hasSameContentOutOfOrder( firstArray, secondArray, ( T one, T two ) -> one.equals( two ));
+        } else {
+            return hasSameContentOutOfOrder( firstArray, secondArray, ( T one, T two ) -> one == two );
+        }
+    }
+    
+    /**
+     * Determine whether two arrays contain the same content,
+     * but potentially in a different sequence.
+     * 
+     * @param firstArray the first array
+     * @param secondArray the second array
+     * @param comparator the comparator function
+     * @return true if the two arrays have the same content according to the comparator function
+     * @param <T> parameterizes the array
+     */
+    public static <T> boolean hasSameContentOutOfOrder(
+            T []             firstArray,
+            T []             secondArray,
+            BiPredicate<T,T> comparator )
+    {
         if( firstArray == null ) {
             return secondArray == null;
         } else if( secondArray == null ) {
@@ -721,16 +744,9 @@ public abstract class ArrayHelper
                     if( takenAlready[j] ) {
                         continue;
                     }
-                    if( useEquals ) {
-                        if( firstArray[i].equals( secondArray[j] )) {
-                            takenAlready[j] = true;
-                            continue outer;
-                        }
-                    } else {
-                        if( firstArray[i] == secondArray[j] ) {
-                            takenAlready[j] = true;
-                            continue outer;
-                        }
+                    if( comparator.test( firstArray[i], secondArray[j] )) {
+                        takenAlready[j] = true;
+                        continue outer;
                     }
                 }
                 return false;
@@ -1266,7 +1282,7 @@ public abstract class ArrayHelper
     public static <T> String arrayToString(
             T [] array )
     {
-        return arrayToString( array, "/" );
+        return arrayToString( array, "{ ", "/", " }", ( T t ) -> t != null ? t.toString() : "null" );
     }
 
     /**
@@ -1281,7 +1297,26 @@ public abstract class ArrayHelper
             T      [] array,
             String    separator )
     {
-        return arrayToString( array, separator, ( T t ) -> t.toString() );
+        return arrayToString( array, "{ ", separator, " }", ( T t ) -> t.toString() );
+    }
+    
+    /**
+     * This is the same as arrayToString( Object [] ) but it lets you specify a
+     * start, separator and end String.
+     *
+     * @param array the array to convert to a String
+     * @param start the start String
+     * @param separator the separator String
+     * @param end the end String
+     * @return String form of the array
+     */
+    public static <T> String arrayToString(
+            T      [] array,
+            String    start,
+            String    separator,
+            String    end )
+    {
+        return arrayToString( array, start, separator, end, ( T t ) -> t.toString() );
     }
     
     /**
@@ -1296,7 +1331,7 @@ public abstract class ArrayHelper
             T []               array,
             Function<T,String> converter )
     {
-        return arrayToString( array, "/", converter );
+        return arrayToString( array, "{ ", "/", " }", converter );
     }
 
     /**
@@ -1312,14 +1347,34 @@ public abstract class ArrayHelper
             T []               array,
             String             separator,
             Function<T,String> converter )
-    {    
+    {
+        return arrayToString( array, "{ ", separator, " }", converter );
+    }
+    
+    /**
+     * This is the same as arrayToString( Object [] ) but with all options.
+     *
+     * @param array the array to convert to a String
+     * @param start the start String
+     * @param separator the separator String
+     * @param end the end String
+     * @param converter the Converter from T to the String for the component type
+     * @return String form of the array
+     */
+    public static <T> String arrayToString(
+            T []               array,
+            String             start,
+            String             separator,
+            String             end,
+            Function<T,String> converter )
+    {
         if( array == null ) {
             return "null";
         }
         if( array.length == 0 ) {
             return array.toString();
         }
-        StringBuilder ret = new StringBuilder( "{ " );
+        StringBuilder ret = new StringBuilder( start );
         if( array[0] instanceof Object[] ) {
             ret.append( ArrayHelper.arrayToString( (Object []) array[0] ));
         } else {
@@ -1333,7 +1388,7 @@ public abstract class ArrayHelper
                 ret.append( converter.apply( array[i] ));
             }
         }
-        ret.append( " }" );
+        ret.append( end );
         return new String( ret );
     }
 

@@ -25,6 +25,7 @@ import org.infogrid.model.primitives.MeshTypeUtils;
 import org.infogrid.model.primitives.PropertyType;
 import org.infogrid.model.primitives.PropertyValue;
 import org.infogrid.util.ArrayHelper;
+import org.infogrid.util.logging.Log;
 
 /**
  * Event that indicates a MeshObject was unblessed from one or more EntityTypes.
@@ -33,6 +34,7 @@ public class MeshObjectTypeRemovedEvent
         extends
             AbstractMeshObjectTypeChangeEvent
 {
+    private static final Log log = Log.getLogInstance( MeshObjectTypeRemovedEvent.class ); // our own, private logger
     private static final long serialVersionUID = 1L; // helps with serialization
 
     /**
@@ -171,7 +173,11 @@ public class MeshObjectTypeRemovedEvent
 
         } finally {
             if( tx != null ) {
-                tx.commitTransaction();
+                try {
+                    tx.commitTransaction();
+                } catch( Throwable t ) {
+                    log.error( t );
+                }
             }
         }
     }
