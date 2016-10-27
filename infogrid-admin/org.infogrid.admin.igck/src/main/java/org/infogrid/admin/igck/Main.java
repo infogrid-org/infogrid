@@ -16,6 +16,7 @@ package org.infogrid.admin.igck;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import org.infogrid.model.primitives.text.ModelPrimitivesStringRepresentationDirectorySingleton;
 import org.infogrid.util.logging.log4j.Log4jLog;
 
@@ -40,11 +41,16 @@ public class Main {
         boolean removeMissingTypes                   = false;
         boolean assignDefaultsToMandatoryNulls       = false;
         boolean assignDefaultsIfIncompatibleDataType = false;
+        String  meshBaseId                           = null;
         String  dbTable                              = null;
+        String  proxyTable                           = null;
+        String  shadowTable                          = null;
+        String  shadowProxyTable                     = null;
         String  dbUser                               = null;
         String  dbPassword                           = null;
         String  logfile                              = null;
         String  dbConnectString                      = null;
+        boolean isNetMeshBase                        = false;
         int     verbose                              = 1;
         
         try {
@@ -92,6 +98,37 @@ public class Main {
                             synopsisQuit();
                         }
                         break;
+                    case "--id":
+                        if( meshBaseId == null ) {
+                            meshBaseId = args[++i];
+                        } else {
+                            synopsisQuit();
+                        }
+                        break;
+                    case "-pt":
+                    case "--proxytable":
+                        if( proxyTable == null ) {
+                            proxyTable = args[++i];
+                        } else {
+                            synopsisQuit();
+                        }
+                        break;
+                    case "-st":
+                    case "--shadowtable":
+                        if( shadowTable == null ) {
+                            shadowTable = args[++i];
+                        } else {
+                            synopsisQuit();
+                        }
+                        break;
+                    case "-spt":
+                    case "--shadowproxytable":
+                        if( shadowProxyTable == null ) {
+                            shadowProxyTable = args[++i];
+                        } else {
+                            synopsisQuit();
+                        }
+                        break;
                     case "-u":
                     case "--user":
                         if( dbUser == null ) {
@@ -100,12 +137,17 @@ public class Main {
                             synopsisQuit();
                         }
                         break;
+                    case "-p":
                     case "--password":
                         if( dbPassword == null ) {
                             dbPassword = args[++i];
                         } else {
                             synopsisQuit();
                         }
+                        break;
+                    case "-n":
+                    case "--netmeshbase":
+                        isNetMeshBase = true;
                         break;
                     case "-v":
                     case "--verbose":
@@ -157,6 +199,15 @@ public class Main {
         if( dbTable == null ) {
             dbTable = "MeshObjects";
         }
+        if( proxyTable == null ) {
+            proxyTable = "Proxies";
+        }
+        if( shadowTable == null ) {
+            shadowTable = "Shadows";
+        }
+        if( shadowProxyTable == null ) {
+            shadowProxyTable = "ShadowProxies";
+        }
 
         try {
             if( logfile != null ) {
@@ -167,7 +218,15 @@ public class Main {
             
             ModelPrimitivesStringRepresentationDirectorySingleton.initialize();
 
-            Igck theObj = Igck.create( dbConnectString, dbTable, dbUser, dbPassword );
+            Igck theObj;
+            if( isNetMeshBase ) {
+                if( meshBaseId == null ) {
+                    synopsisQuit();
+                }
+                theObj = NetIgck.create( meshBaseId, dbConnectString, dbTable, proxyTable, shadowTable, shadowProxyTable, dbUser, dbPassword );
+            } else {
+                theObj = Igck.create( meshBaseId, dbConnectString, dbTable, dbUser, dbPassword );
+            }
             theObj.setCheckMissingNeighbors(                checkMissingNeighbors );
             theObj.setCheckMissingTypes(                    checkMissingTypes );
             theObj.setCheckMultiplicities(                  checkMultiplicities );
@@ -180,6 +239,9 @@ public class Main {
             theObj.setVerbose(                              verbose );
 
             theObj.run();
+
+        } catch( ParseException ex ) {
+            System.err.println( "ERROR: the provided MeshBaseIdentifier could not be parsed: " + meshBaseId );
 
         } catch( IOException ex ) {
             ex.printStackTrace( System.err );
@@ -199,9 +261,14 @@ public class Main {
         System.err.println( "    [--assigndefaultstomandatorynulls]       : assign default values to non-optional properties that are null" );
         System.err.println( "    [--assigndefaultsifincompatibledatatype] : assign default values to properties with values not conforming with the property's data type" );
         
+        System.err.println( "    [--id <identifier>]                      : identifier of the MeshBase; required for NetMeshBases" );
         System.err.println( "    [--table <table>]                        : the database table containing the MeshObjects (default: MeshObjects)" );
+        System.err.println( "    [--proxytable <table>]                   : the database table containing the Proxies (default: Proxies)" );
+        System.err.println( "    [--shadowtable <table>]                  : the database table containing the Shadow MeshBases (default: Shadows)" );
+        System.err.println( "    [--shadowproxytable <table>]             : the database table containing the Shadow MeshBases' Proxies (default: ShadowProxies)" );
         System.err.println( "    [--user <user>]                          : the database username to use" );
         System.err.println( "    [--password <pass>]                      : the database password to use" );
+        System.err.println( "    [--netmeshbase]                          : instantiate a NetMeshBase instead of a MeshBase" );
         System.err.println( "    [--logfile <log4jconfig>]                : alternate log4j config file" );
         System.err.println( "    [--verbose] | [--quiet]                  : increase or decrease verbosity level" );
         System.err.println( "    jdbc:<engine>://<host>/<database         : the JDBC database connection string" );

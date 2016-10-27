@@ -9,6 +9,7 @@ makedepends=('maven' 'jdk8-openjdk' )
 depends=(
     'java-runtime'
     'diet4j'
+    'infogrid-graphdb-grid'
     'infogrid-graphdb')
 
 prepare() {

@@ -16,6 +16,7 @@ package org.infogrid.admin.igck;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,6 +41,7 @@ import org.infogrid.util.ArrayHelper;
 import org.infogrid.util.HasIdentifier;
 import org.infogrid.util.Identifier;
 import org.infogrid.util.logging.Log;
+import org.infogrid.util.text.StringRepresentationParseException;
 //import org.postgresql.ds.PGSimpleDataSource;
 
 /**
@@ -54,20 +56,24 @@ public class Igck
     /**
      * Factory method.
      * 
+     * @param meshBaseId the MeshBaseIdentifier for the MeshBase
      * @param dbConnectString the JDBC database connection string
      * @param dbTable the table in the database containing the MeshObjects
      * @param dbUser the database user to use
      * @param dbPassword the database password to use
      * @return the created Igck
      * @throws IOException thrown if an input/output problem occurred
+     * @throws ParseException thrown if the MeshBaseIdentifier could not be parsed
      */
     public static Igck create(
+            String meshBaseId,
             String dbConnectString,
             String dbTable,
             String dbUser,
             String dbPassword )
         throws
-            IOException
+            IOException,
+            ParseException
     {
         // example: jdbc:mysql://localhost/test
         
@@ -117,7 +123,10 @@ public class Igck
             throw new IOException( "Cannot identify database engine for connection string " + dbConnectString );
         }
         
-        InstrumentedStoreMeshBase mb = InstrumentedStoreMeshBase.create( store );
+        if( meshBaseId == null ) {
+            meshBaseId = "default";
+        }
+        InstrumentedStoreMeshBase mb = InstrumentedStoreMeshBase.create( meshBaseId, store );
 
         return new Igck( mb );
     }
@@ -128,7 +137,7 @@ public class Igck
      * @param mb the MeshBase to be tested
      */
     protected Igck(
-            InstrumentedStoreMeshBase mb )
+            InstrumentedMeshBase mb )
     {
         theMeshBase = mb;
     }
@@ -301,20 +310,24 @@ public class Igck
                     error(  current,
                             "null neighbor identifier (" + i + "/" + neighborIds.length + ")",
                             "updated: " + TimeStampValue.create( current.getTimeUpdated() ),
-                            "(type " + ArrayHelper.arrayToString( current.getTypes(), (EntityType t) -> t.getIdentifier().toExternalForm() ) + ")" );
+                            "(type " + arrayToString( current.getTypes() ) + ")" );
                     
                     if( toRemove != null ) {
                         toRemove.add( neighborIds[i] );
                     }
                 } else {
-                    MeshObject neighbor = theMeshBase.findMeshObjectByIdentifier( neighborIds[i] );
-                    if( neighbor == null ) {
+                    boolean error = meshObjectShouldExist( neighborIds[i] );
+                    if( error ) {
                         addToHaveErrors( current.getIdentifier() );
-                        error(  current,
-                                "neighbor (" + i + "/" + neighborIds.length + ") cannot be found:",
-                                "updated: " + TimeStampValue.create( current.getTimeUpdated() ),
-                                neighborIds[i].toExternalForm(),
-                                "(type " + arrayToString( current.getTypes() ) + ")" );
+                        try {
+                            error(  current,
+                                    "neighbor (" + i + "/" + neighborIds.length + ") cannot be found:",
+                                    "updated: " + TimeStampValue.create( current.getTimeUpdated() ),
+                                    neighborIds[i].toExternalForm(),
+                                    "(reltype " + arrayToString( current.getRoleTypeIdentifiers( neighborIds[i] )) + ")" );
+                        } catch( NotRelatedException ex ) {
+                            log.error( ex );
+                        }
 
                         if( toRemove != null ) {
                             toRemove.add( neighborIds[i] );
@@ -322,7 +335,7 @@ public class Igck
                     }
                 }
             }
-            if( theRemoveMissingNeighbors && !toRemove.isEmpty() ) {
+            if( theRemoveMissingNeighbors && toRemove != null && !toRemove.isEmpty() ) {
                 if( current instanceof AMeshObject ) {
                     for( MeshObjectIdentifier id : toRemove ) {
                         try {
@@ -344,37 +357,38 @@ public class Igck
             MeshObjectIdentifier [] neighborIds = current.getNeighborMeshObjectIdentifiers();
 
             for( int i=0 ; i<neighborIds.length ; ++i ) {
-                MeshObject neighbor = theMeshBase.findMeshObjectByIdentifier( neighborIds[i] );
-                if( !neighbor.isRelated( current.getIdentifier() )) {
-                    addToHaveErrors( current.getIdentifier() );
-                    try {
-                        error(  current,
-                                "lists " + neighborIds[i].getExternalForm() + " as neighbor, but neighbor is not pointing back",
-                                "updated: " + TimeStampValue.create( current.getTimeUpdated() ) + " and " + TimeStampValue.create( neighbor.getTimeUpdated() ),
-                                "(type " + arrayToString( current.getTypes())
-                                        + " and " + arrayToString( neighbor.getTypes())
-                                        + ", roles " + arrayToString( current.getRoleTypeIdentifiers( neighborIds[i] ))+ ")" );
-                    } catch( NotRelatedException ex ) {
-                        log.error( ex );
-                    }
-                } else {
-                    try {
-                        RoleType [] hereRoles  = current.getRoleTypes( neighbor );
-                        RoleType [] thereRoles = neighbor.getRoleTypes( current );
-                        if( !ArrayHelper.hasSameContentOutOfOrder( hereRoles, thereRoles, (RoleType one, RoleType two ) -> one.getInverseRoleType().equals( two ) )) {
-                            addToHaveErrors( current.getIdentifier() );
-                            error(   current,
-                                    "has different roles than corresponding roles of neighbor " + neighborIds[i].toExternalForm(),
+                MeshObject neighbor = findMeshObject( neighborIds[i] );
+                if( neighbor != null ) { // in case there is another error
+                    if( !neighbor.isRelated( current.getIdentifier() )) {
+                        addToHaveErrors( current.getIdentifier() );
+                        try {
+                            error(  current,
+                                    "lists " + neighborIds[i].getExternalForm() + " as neighbor, but neighbor is not pointing back",
                                     "updated: " + TimeStampValue.create( current.getTimeUpdated() ) + " and " + TimeStampValue.create( neighbor.getTimeUpdated() ),
-                                    "( " + arrayToString( hereRoles )
-                                         + " vs " + arrayToString( thereRoles ) + " )" );
+                                    "(type " + arrayToString( current.getTypes())
+                                            + " and " + arrayToString( neighbor.getTypes())
+                                            + ", roles " + arrayToString( current.getRoleTypeIdentifiers( neighborIds[i] ))+ ")" );
+                        } catch( NotRelatedException ex ) {
+                            log.error( ex );
                         }
-                    } catch( NotRelatedException ex ) {
-                        log.error( ex );
+                    } else {
+                        try {
+                            RoleType [] hereRoles  = current.getRoleTypes( neighbor );
+                            RoleType [] thereRoles = neighbor.getRoleTypes( current );
+                            if( !ArrayHelper.hasSameContentOutOfOrder( hereRoles, thereRoles, (RoleType one, RoleType two ) -> one.getInverseRoleType().equals( two ) )) {
+                                addToHaveErrors( current.getIdentifier() );
+                                error(   current,
+                                        "has different roles than corresponding roles of neighbor " + neighborIds[i].toExternalForm(),
+                                        "updated: " + TimeStampValue.create( current.getTimeUpdated() ) + " and " + TimeStampValue.create( neighbor.getTimeUpdated() ),
+                                        "( " + arrayToString( hereRoles )
+                                             + " vs " + arrayToString( thereRoles ) + " )" );
+                            }
+                        } catch( NotRelatedException ex ) {
+                            log.error( ex );
+                        }
                     }
                 }
-            }
-            
+            }            
         }
         if( theCheckMultiplicities ) {
             for( EntityType entityType : current.getTypes()) {
@@ -405,6 +419,33 @@ public class Igck
         }
     }
     
+    /**
+     * Overridable method to find a MeshObject by identifier.
+     * 
+     * @param id the identifier
+     * @return the found MeshObject, or null
+     */
+    protected MeshObject findMeshObject(
+            MeshObjectIdentifier id )
+    {
+        MeshObject ret = theMeshBase.findMeshObjectByIdentifier( id );
+        return ret;
+    }
+
+    /**
+     * Overridable method to test whether the MeshObject with this identifier exists,
+     * and if it does not, but should exist, return true.
+     * 
+     * @param id the identifier
+     * @return true indicates error
+     */
+    protected boolean meshObjectShouldExist(
+            MeshObjectIdentifier id )
+    {
+        MeshObject ret = theMeshBase.findMeshObjectByIdentifier( id );
+        return ret == null;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -606,7 +647,7 @@ public class Igck
     /**
      * The MeshBase to be tested.
      */
-    protected InstrumentedStoreMeshBase theMeshBase;
+    protected InstrumentedMeshBase theMeshBase;
     
     /**
      * If true, check for missing neighbors.

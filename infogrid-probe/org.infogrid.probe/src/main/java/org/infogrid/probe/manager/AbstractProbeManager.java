@@ -135,7 +135,7 @@ public abstract class AbstractProbeManager
             ShadowMeshBase        value,
             ProxyParameters       argument )
     {
-        if( theXprisoMessageLogger != null ) {
+        if( theXprisoMessageLogger != null && value != null ) {
             value.setXprisoMessageLogger( theXprisoMessageLogger );
         }
     }

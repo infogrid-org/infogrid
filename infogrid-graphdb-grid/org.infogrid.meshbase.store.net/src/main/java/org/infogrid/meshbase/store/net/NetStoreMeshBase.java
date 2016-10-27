@@ -318,9 +318,9 @@ public class NetStoreMeshBase
      * 
      * @return the right subtype of CachingMap
      */
-    protected IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject> getCachingMap()
+    protected StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject> getCachingMap()
     {
-        return (IterableStoreBackedSwappingHashMap<MeshObjectIdentifier,MeshObject>) theCache;
+        return (StoreMeshBaseSwappingHashMap<MeshObjectIdentifier,MeshObject>) theCache;
     }
 
     /**

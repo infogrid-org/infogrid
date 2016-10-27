@@ -1088,14 +1088,15 @@ public class AMeshObject
             MeshObject [] almostRet2 = new MeshObject[ almostRet.length ];
 
             int index = 0;
-            for( MeshObject current : almostRet ) {
+            for( int i=0 ; i<almostRet.length ; ++i ) {
+                MeshObject current = almostRet[i];
                 try {
                     checkPermittedTraversal( type, current.getIdentifier(), current );
                     almostRet2[ index++ ] = current;
                 } catch( NotPermittedException ex ) {
                     log.info( this, current, index, ex );
                 } catch( Throwable t ) {
-                    log.error( this, current, index, t );
+                    log.error( this, almost[i], current, index, t );
                 }
             }
             if( index < almostRet2.length ) {

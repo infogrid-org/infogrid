@@ -223,13 +223,15 @@ public abstract class ScheduledExecutorProbeManager
             ShadowMeshBase        value,
             ProxyParameters       argument )
     {
-        long nextTime = value.getDelayUntilNextUpdate();
-        if( nextTime >= 0 && theExecutorService != null ) { // allow 0 for immediate execution
-            ScheduledFuture<Long> newFuture = theExecutorService.schedule(
-                    new ExecutorAdapter( new WeakReference<ScheduledExecutorProbeManager>( this ), key, nextTime ),
-                    nextTime,
-                    TimeUnit.MILLISECONDS );
-            theFutures.put( key, newFuture );
+        if( value != null ) {
+            long nextTime = value.getDelayUntilNextUpdate();
+            if( nextTime >= 0 && theExecutorService != null ) { // allow 0 for immediate execution
+                ScheduledFuture<Long> newFuture = theExecutorService.schedule(
+                        new ExecutorAdapter( new WeakReference<ScheduledExecutorProbeManager>( this ), key, nextTime ),
+                        nextTime,
+                        TimeUnit.MILLISECONDS );
+                theFutures.put( key, newFuture );
+            }
         }
         super.createdHook( key, value, argument );
     }

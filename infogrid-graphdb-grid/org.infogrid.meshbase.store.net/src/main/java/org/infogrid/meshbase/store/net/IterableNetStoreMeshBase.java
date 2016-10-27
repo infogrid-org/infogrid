@@ -298,7 +298,7 @@ public class IterableNetStoreMeshBase
      */
     public CursorIterator<MeshObject> iterator()
     {
-        return getCachingMap().valuesIterator( null, MeshObject.class );
+        return getCachingMap().valuesIterator( MeshObjectIdentifier.class, MeshObject.class );
     }
     
     /**
@@ -319,7 +319,7 @@ public class IterableNetStoreMeshBase
     public int size()
     {
         try {
-            return getCachingMap().getStore().size();
+            return ((IterableStore)getCachingMap().getStore()).size();
 
         } catch( IOException ex ) {
             log.error( ex );

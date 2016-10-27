@@ -43,18 +43,25 @@ import org.infogrid.util.text.StringRepresentationParseException;
 public class InstrumentedStoreMeshBase
     extends
         IterableStoreMeshBase
+    implements
+        InstrumentedMeshBase
 {
     private static final Log log = Log.getLogInstance( InstrumentedStoreMeshBase.class ); // our own, private logger
 
     /**
      * Factory method.
      * 
+     * @param meshBaseId the MeshBaseIdentifier for the MeshBase
+     * @param meshObjectStore the underlying IterableStore
      * @return the created InstrumentedStoreMeshBase
+     * @throws StringRepresentationParseException thrown if the MeshBaseIdentifier could not be parsed
      */
     public static InstrumentedStoreMeshBase create(
+            String        meshBaseId,
             IterableStore meshObjectStore )
+        throws
+            StringRepresentationParseException
     {
-        try {
             ImmutableMMeshObjectSetFactory setFactory
                     = ImmutableMMeshObjectSetFactory.create( MeshObject.class, MeshObjectIdentifier.class );
             
@@ -63,7 +70,7 @@ public class InstrumentedStoreMeshBase
             MyMap objectStorage = new MyMap( objectMapper, meshObjectStore );
 
             InstrumentedStoreMeshBase ret = new InstrumentedStoreMeshBase(
-                    DefaultMeshBaseIdentifierFactory.create().fromExternalForm( "DefaultMeshBase" ),
+                    DefaultMeshBaseIdentifierFactory.create().fromExternalForm( meshBaseId ),
                     DefaultAMeshObjectIdentifierFactory.create(),
                     setFactory,
                     ModelBaseSingleton.getSingleton(),
@@ -77,11 +84,6 @@ public class InstrumentedStoreMeshBase
             ret.initializeHomeObject();
             
             return ret;
-
-        } catch( StringRepresentationParseException ex ) {
-            log.error( ex );
-            return null;
-        }
     }
     
     /**
@@ -110,17 +112,15 @@ public class InstrumentedStoreMeshBase
     }
     
     /**
-     * Write a particular MeshObject back to disk.
-     * 
-     * @param obj the MeshObject to write to disk
+     * {@inheritDoc}
      */
+    @Override
     public void flush(
             MeshObject obj )
     {
         MyMap map = (MyMap) theCache;
         
         map.flush( obj );
-        
     }
     
     /**
