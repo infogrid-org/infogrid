@@ -3,15 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infogrid</groupId>
     <artifactId>infogrid-graphdb</artifactId>
-    <packaging>pom</packaging>
     <name>infogrid-graphdb</name>
+    <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
+    <packaging>pom</packaging>
     <url>http://infogrid.org/</url>
-
-    <parent>
-        <groupId>org.infogrid</groupId>
-        <artifactId>infogrid-all</artifactId>
-        <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
-    </parent>
 
     <modules>
         <module>org.infogrid.codegen</module>
@@ -67,5 +62,36 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test*.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <diet4j.version>[0.15]</diet4j.version>
+    </properties>
+
 </project>
