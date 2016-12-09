@@ -5,7 +5,7 @@
     <artifactId>infogrid-model-library</artifactId>
     <name>infogrid-model-library</name>
     <packaging>pom</packaging>
-    <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
+    <version><!-- PKGVER -->2.9.12<!-- /PKGVER --></version>
     <url>http://infogrid.org/</url>
 
     <modules>

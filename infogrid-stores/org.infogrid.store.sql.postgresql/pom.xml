@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.infogrid</groupId>
         <artifactId>infogrid-stores</artifactId>
-        <version><!-- PKGVER -->2.9.11<!-- /PKGVER --></version>
+        <version><!-- PKGVER -->2.9.12<!-- /PKGVER --></version>
     </parent>
 
     <dependencies>

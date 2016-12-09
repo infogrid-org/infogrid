@@ -1,5 +1,5 @@
 pkgname=$(basename $(pwd))
-pkgver=2.9.11
+pkgver=2.9.12
 pkgrel=1
 pkgdesc='InfoGrid LID'
 arch=('any')
