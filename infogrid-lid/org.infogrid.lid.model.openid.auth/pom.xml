@@ -59,6 +59,7 @@
                             <executable>diet4j</executable>
                             <arguments>
                                 <argument>org.infogrid:org.infogrid.codegen</argument>
+                                <argument>--</argument>
                                 <argument>${basedir}/infogrid-models/model.xml</argument>
                                 <argument>-o</argument>
                                 <argument>${basedir}/target/generated-sources/infogrid</argument>
